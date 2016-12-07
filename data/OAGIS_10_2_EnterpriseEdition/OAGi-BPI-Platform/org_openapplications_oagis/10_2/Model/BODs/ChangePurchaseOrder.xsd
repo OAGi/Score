@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangePurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+        <xsd:element name="ChangePurchaseOrder" type="ChangePurchaseOrderType" id="oagis-id-28e8102576e247dbaf1bf4d52e00a141">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Change Purchaseorder is to request another business application to make changes to an existing Purchase Order.  This change must refer to the original document and/or item ordered.  The change processing assumes replacement of fields sent, with the exception the identifying fields of the Purchase Order.
+
+If any of these key fields require changing, (i.e. the PurchaseOrder Document Id or a LineNumber) that constitutes a cancellation of the request and/or the addition of another Purchase Order.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangePurchaseOrderType" id="oagis-id-90899583cd4b443589ad6ae660978c50">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangePurchaseOrderDataAreaType" id="oagis-id-26b2db142b9248db873b468439f2d0d4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangePurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangePurchaseOrderDataAreaType" id="oagis-id-c4537acd2df94522bbf0e8cd73f69d66">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-7f13284edbc94ccfab9b3c1c0ae667b9"/>
+                        <xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-b2f038df73f348199c82a853e15f03e1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

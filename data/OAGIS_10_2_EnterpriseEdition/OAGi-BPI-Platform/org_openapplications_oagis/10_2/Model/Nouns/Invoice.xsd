@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/Invoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="Invoice" type="InvoiceType" id="oagis-id-eecc2a8ba86e4a1eac8bf19977a3d9d0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Invoice is used to invoice a customer for goods/services the have been provided.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="InvoiceHeader" type="InvoiceHeaderType" id="oagis-id-d2bb316b70034c5ba7e5f98e3ee13d92">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the entire invoice document. The Header supports summary amounts for line items, charges, taxes and allowances.
+
+It also supports itemizing Header level charges, taxes and allowances for use in credit or debit invoices. In this case Line items are not needed. 
+
+The summary amounts in the Header include the Line level amounts and Header level amounts.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="InvoiceLine" type="InvoiceLineType" id="oagis-id-57a00bde1ac9493d9e432ed9caf011e1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In general an Invoice Line can be aligned with Order Lines. The ItemQuantity and Price are used to compute the Total. The Total is a sum of the Total and any Charges, Taxes or Allowances.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="InvoiceSubLine" type="InvoiceSubLineType" id="oagis-id-4a5fb74b94724f90bb84ea6e92c08082">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a SubLine of the InvoiceLine in order to provide a finer grained breakdown of the items being invoiced.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="InvoiceType" id="oagis-id-9a47afef92474a61b6ab64247f41a97c">
+		<xsd:sequence>
+			<xsd:element ref="InvoiceHeader" id="oagis-id-9e45be0932a94341a24ba313b4304228" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the entire invoice document. The Header supports summary amounts for line items, charges, taxes and allowances.
+
+It also supports itemizing Header level charges, taxes and allowances for use in credit or debit invoices. In this case Line items are not needed. 
+
+The summary amounts in the Header include the Line level amounts and Header level amounts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="InvoiceLine" id="oagis-id-d565da73a0dc4d93967df30bade554d9" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">In general an Invoice Line can be aligned with Order Lines. The ItemQuantity and Price are used to compute the Total. The Total is a sum of the Total and any Charges, Taxes or Allowances.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-6b858a9e66934f7b9ff4d14b78966dce"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f0a93c9be9ef4cfd8df993dd490ef758"/>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceHeaderBaseType" id="oagis-id-677ca5ea68504394b38b7a641b65d517">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The InvoiceHeader type supports summary amounts for line items, charges and allowances.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ExtendedAmount" id="oagis-id-fab22a04af12412184f4727848d8ddce" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is an amount not including taxes or charges. In the case of orders, this is typically the Unit Price times the Order Quantity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalAmount" id="oagis-id-f05fa42050004a83befdc980c2cad06d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the total amount of the object associated. This includes the Price and the total of all the charges, allowances and taxes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AmountDiscount" id="oagis-id-42305d889a04447caab5a0f07a4d4fad" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-c60eb1f6ba754e7faacb9e4121fde98c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerParty" id="oagis-id-6da3db5ebf3544deb43ae32329d03daf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the organization that is the end customer of the goods or services being provided in the associated transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemitToParty" id="oagis-id-db4e9607c2414820b7b52db7ee9cbd60" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party or location that the payment is to be remitted to or sent to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-9935c5952e4048b1a7bc810f2f66abed" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the ShipToParty for the document or the line. In a lot of cases, this is the same as the CustomerParty. In multi-organization purchasing, the CustomerParty may be different from the BuyerParty</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CarrierParty" id="oagis-id-a180deac49ad4f7687609d135134c66b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Idenitfies the party that serves as the carrier of the goods or services for the transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BillToParty" id="oagis-id-4dbbf3f1d8aa4631a0d071cb653bd2c6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the bill or invoice is to be sent. In most cases this is the same as the CustomerParty however there are many cases where the CustomerParty and the BillToParty will be different.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipFromParty" id="oagis-id-a8b40a4b2be94e158cfc05ca05c404d1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the goods or services are being shipped or sent from.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-5dad81f9c9e04b33b20043ad9041f4aa" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReasonCode" id="oagis-id-a838797e7e884a72a28a12e62e083f28" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PurchaseOrderReference" id="oagis-id-93c56f6803784ef29f86cfa498a7577b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a PurchaseOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" id="oagis-id-771e1b448f3f4def9eb0de747f5bd51c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PaymentTerm" id="oagis-id-96a089d7c66246299ca472fd6124dee2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the payment term for an Order or Invoice. Supports the abiility to specify an absolute due date, a number of days from a start daye, a percent discount or an absolute discount. A common term like "Net30Days" is explicitly code as either a calculated DueDateTime or a PaymentTermsDateTime and NumberOfDays.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Payment" id="oagis-id-518b8982f56c4957aaf139f9f565a985" minOccurs="0"/>
+					<xsd:element ref="Tax" id="oagis-id-1b01741e78b141279d01b1d661cf62a1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the tax for the object associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DistributeCharge" id="oagis-id-eda6ea25f988461cb31f7b65051d6ab3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DistributeTax" id="oagis-id-bc6251d8a33f4fb68f68c26dc29895ac" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Distribution" id="oagis-id-e981cc25b6724592aae24edaf5576acf" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Charge" id="oagis-id-448b5d593db144d595ec18277d4f0a60" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the different Charges that may be applied to the associated document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Allowance" id="oagis-id-590a5ed8f72b48feb91d7709531dcba3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the discount or allowance that the Customer is to receive off of the TotalAmount owed as a result of the associated document or sub-portion of a document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransportationMethodCode" id="oagis-id-8a7dac50719c44be84f3ae6e7750f97c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the general type of carrier transportation used to deliver goods.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransportationTerm" id="oagis-id-bd444af3596945a680c61da954553f3f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When a seller ships something via common to a buyer in accordance with the Uniform Commerical Code and international legal agreements, you must specify a particular "phrase" that states who assumes the risk of shipment, who is responsible for loading and unloading the goods, where ownership or title to the goods passes, who paid or pays the carrirer, etc. Examples of these "phrases" include: - "FOB Origin Prepaid and Add" (Free On Board - no cost for loading, title passes at seller's dock, seller prepaid freight cost and delivery insurance, seller will freight costs to cost of goods) - "FOB Destination" or "FOB Destination Prepaid" (Free On Board - no cost for loading, title passes at buyer's dock, seller prepaid freight cost and delivery insurance)  In software applications, this phrase is commonly split into two coded pieces, a "legal terms" risk and responsibility component for use with common carriers (FOB Destination) and some kind of qualifying component (Prepaid and Add).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="ShippingWeightAndVolumeGroup" id="oagis-id-3f37323cb60e4528ab9b2e5c9a101607"/>
+					<xsd:element ref="Event" id="oagis-id-7d9aefc751f04d4aa924f13a6a4191a9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceHeaderType" id="oagis-id-3c54a9111312419c9ec7bcbe50de1548">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The InvoiceHeader type supports summary amounts for line items, charges and allowances.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="InvoiceHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InvoiceHeaderExtensionType" id="oagis-id-1c94cefcca6d4452a697195c0406ccfb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceLineSubLineBaseType" id="oagis-id-8cd8ca38e18a4189ba3cb1d7dcd4dd30">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Item" id="oagis-id-12e6e8f816a242ecb98ae2bcb549103e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-a77a4856644f4cfc9d5e3a6c4f9681f1" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Quantity" id="oagis-id-79d7e8fff0734a3aaeb6c80ae41d640e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UnitPrice" id="oagis-id-d23f8af00c004596a13eb983b6193e34" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Unit price of the item for the number of items in the unitCode specified in the PerQuantity elements.
+
+In most cases the unitCode of the PerQuantity is the same as the unitCode of the Quantity element above.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PurchaseOrderReference" id="oagis-id-f4f2f479ba8e4eb8976e201cf931ed61" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a PurchaseOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BuyerParty" id="oagis-id-4e8e475d308048e2b006bd83d56a43d2" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-5f54f47d0ef34a309344dfa1212d87f5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" id="oagis-id-00a1fb483f934d02a97cde9db65a8472" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExtendedAmount" id="oagis-id-442952d41aa5416d965818438496e4df" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is an amount not including taxes or charges. In the case of orders, this is typically the Unit Price times the Order Quantity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalAmount" id="oagis-id-2a3bd908d5b847229b45ab6e52009ccb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the total amount of the object associated. This includes the Price and the total of all the charges, allowances and taxes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AmountDiscount" id="oagis-id-6106c43ad5ce47578cb6fbd5b05c793d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OpenItemIndicator" id="oagis-id-3e1fd8884d70452dafab9ca932495cc0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that the line is an open item and is not to be included in the document total. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Tax" id="oagis-id-cc2fd3e0ac62420882f5fc5b4f54dc58" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the tax for the object associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DistributeCharge" id="oagis-id-345befef228741eca3edb03041402f7a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DistributeTax" id="oagis-id-0b9cd46a0dfa477c9d633d6ffe67ba6d" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Distribution" id="oagis-id-c617b4328cca4b309eb645df0e92f9fb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InvoiceCharge" id="oagis-id-855ebc7d414e4b2eaa71907124872c54" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="InvoiceAllowance" id="oagis-id-99132705849746b78513c926c10191df" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="GoodsReceiptDateTime" id="oagis-id-c32515e9ce994d6497c15696a86cb577" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A datetime specifying a goods receipt.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ServicesReceiptDateTime" id="oagis-id-6c00b6c664804bd0891a2878a87369e9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A datetime specifying a services receipt.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceLineBaseType" id="oagis-id-281421a12922475da4236c09107c2235">
+		<xsd:complexContent>
+			<xsd:extension base="InvoiceLineSubLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="InvoiceSubLine" id="oagis-id-8211395113a34abaa1ca20393ff52345" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceLineType" id="oagis-id-e8954e7c0d7f4180a00eab149e112c1e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The InvoiceLine type supports order line invoicing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="InvoiceLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InvoiceLineExtensionType" id="oagis-id-0ca98d99278e4670bfc9fbf9ea803198" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceSubLineBaseType" id="oagis-id-80c918cf6c704cf899221792eca69df9">
+		<xsd:complexContent>
+			<xsd:extension base="InvoiceLineSubLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="HeatReference" id="oagis-id-af96b8fa1f704254866a199e3b59db01" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InvoiceSubLineType" id="oagis-id-c0ee1d061c22461d84de58a113360e0f">
+		<xsd:complexContent>
+			<xsd:extension base="InvoiceSubLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InvoiceSubLineExtensionType" id="oagis-id-1cff867314e742228c92292022a2541d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

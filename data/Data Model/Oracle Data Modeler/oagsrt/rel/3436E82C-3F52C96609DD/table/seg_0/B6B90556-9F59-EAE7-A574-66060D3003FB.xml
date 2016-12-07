@@ -1,0 +1,169 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="B6B90556-9F59-EAE7-A574-66060D3003FB" name="CODE_LIST_VALUE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:00:37 UTC</createdTime>
+<comment>Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed.</comment>
+<commentInRDBMS>Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_40</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CODE_LIST_VALUE_ID" id="528D7AEB-E35C-4782-60D6-A70D776CF7D0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>Internal, primary database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CODE_LIST_ID" id="8F4770F6-992A-EBFE-D70A-9DF4CB0C9C9E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>Foreign key to the CODE_LIST table. It indicates the code list this code value belonging to.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DFB27287-521A-AA6F-113C-B2E508108C64" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="VALUE" id="AB5AC409-90FD-AA8E-4DB5-124A2A4E6315">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>The code list value used in the instance data, e.g., EA, US-EN.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="5B6C6129-5E18-FF96-54FB-D0A2F156CD2F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>Pretty print name of the code list value, e.g., &apos;Each&apos; for EA, &apos;English&apos; for EN.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="32417993-D789-4004-C594-C072D4337151">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>Long description or explannation of the code list value, e.g., &apos;EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals&apos;.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="CB969263-6925-0BD2-A8D0-2229801765D4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="USED_INDICATOR" id="37E94477-D8A5-E7B2-8D2C-B5CC2458BC5B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>This indicates whether the code value is allowed to be used or not in that code list context. In other words, this flag allows a user to enable or disable a code list value.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOCKED_INDICATOR" id="00D73EEA-1422-84C0-A93D-69DB49B9024E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>This indicates whether the USED_INDICATOR can be changed from False to True. In other words, if the code value is derived from its base code list and the USED_INDICATOR of the code value in the base is False, then the USED_iNDICATOR cannot be changed from False to True for this code value; and this is indicated using this LOCKED_INDICATOR flag in the derived code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="EXTENSION_INDICATOR" id="42F3A0DF-5338-154B-99D5-9CAE67912F83">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:05 UTC</createdTime>
+<commentInRDBMS>This indicates whether this code value has just been added in this code list. It is used particularly in the derived code list. If the code value has only been added to the derived code list, then it can be deleted; otherwise, it cannot be deleted.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="6F3A7EF7-56EB-B8B5-1C46-2C126D2DF836" name="CLV_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:01:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="528D7AEB-E35C-4782-60D6-A70D776CF7D0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F06E0C8E-D242-68E6-B94A-5381E0C47A66" name="CODE_LIST_VALUE_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:23:18 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="528D7AEB-E35C-4782-60D6-A70D776CF7D0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="78F32551-BAEE-5EAF-90EA-F4ABBA70E1C7" name="CODE_LIST_VALUE_CL_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:23:33 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8F4770F6-992A-EBFE-D70A-9DF4CB0C9C9E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AC241922-5DC4-9918-3807-E77E9F28DC30" name="CLV_CODE_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:02:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8F4770F6-992A-EBFE-D70A-9DF4CB0C9C9E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

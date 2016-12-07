@@ -1,0 +1,345 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="42EB519B-5D57-5DD1-5B0D-FEE7BA53DAAA" name="CODE_LIST">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:25:50 UTC</createdTime>
+<comment>This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied.</comment>
+<commentInRDBMS>This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_30</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CODE_LIST_ID" id="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Internal, primary database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="96C0041C-1A96-588C-B393-A742D51433E0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>GUID of the code list. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ENUM_TYPE_GUID" id="D8ABDCD2-F404-A932-A155-5C3E6E22A93F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>In the OAGIS Model XML schema, a type, which keeps all the enumerated values, is  defined separately from the type that represents a code list. This only applies to some code lists. When that is the case, this column stores the GUID of that enumeration type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="1A23B030-15EB-27C3-2DDA-939833EDC2D9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Name of the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LIST_ID" id="2361FEB6-D128-00BD-F97D-CFA206CAC971">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>External identifier.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="AGENCY_ID" id="1F1CC35D-86BA-AB66-500C-63865CBE890B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Foreign key to the AGENCY_ID_LIST_VALUE table. It indicates the organization which maintains the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="19D7F3A5-BA92-929E-5AE4-294FF9426406" referredColumn="166E2644-631C-ABAE-F0C1-4E3A8A71AD0B"/>
+</associations>
+</Column>
+<Column name="VERSION_ID" id="3AE9D4AD-8D32-C3D4-775F-6DC8155F6EE5">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Code list version number.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>10 CHAR</dataTypeSize>
+<ownDataTypeParameters>10 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Description of the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REMARK" id="5BEA2A63-F353-E3B1-A50F-EDEC87D83998">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Usage information about the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="183008D0-13AD-38C1-32BB-83C2D7E7B217">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>This is typically a URL which indicates the source of the code list&apos;s DEFINITION.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BASED_CODE_LIST_ID" id="31B0C6D3-86A5-B21E-4E3F-C707B278259C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>This is a foreign key to the CODE_LIST table itself. This identifies the code list on which this code list is based, if any. The derivation may be restriction and/or extension.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D5F48BAE-5833-1090-627B-E1F45F4680A6" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="EXTENSIBLE_INDICATOR" id="7DCEB7CE-7B80-515D-E9C4-C95BC740479A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>This is a flag to indicate whether the code list is final and shall not be further derived.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MODULE_ID" id="DE9B189F-C3D2-40F6-42CB-9EB344704ED9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Foreign key to the module table indicating the physical file the code list belongs to when generating a physical model schema. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="25AB0458-4D06-4939-E2AA-EE0043526B11" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</associations>
+</Column>
+<Column name="CREATED_BY" id="ACCB5BA7-DB69-9F6C-1E02-C700F5D76255">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Foreign key to the APP_USER table. It indicates the user who created the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9ADE0109-BE95-0878-2993-825E3B9625CB" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="FDCB2B2E-22E7-5447-24EA-39A38E160B06">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Foreign key to the APP_USER table. It identifies the user who last updated the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9C2E2DEB-3DD4-1591-244D-0457DDA53839" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="80C56B68-77A7-EC5A-E5B7-04F48C94EE31">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Timestamp when the code list was created.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="148BBDBE-19DB-62CF-DF2F-868E2CC658FF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Timestamp when the code list was last updated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STATE" id="E5D5AC4F-789C-25F9-185D-0FE4617E7EFE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<commentInRDBMS>Life cycle state of the code list. Possible values are Editing, Published, or Deleted. Only a code list in published state is available for derivation and for used by the CC and BIE. Once the code list is published, it cannot go back to Editing. A new version would have to be created.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>10 CHAR</dataTypeSize>
+<ownDataTypeParameters>10 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="B067AEAF-560D-5DE5-9B10-42B8CCA0896F" name="CODE_LIST_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D6AC236C-7416-A366-9FA4-BE95F1CA5B79" name="CODE_LIST_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="96C0041C-1A96-588C-B393-A742D51433E0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A4AF9572-2CAA-6C41-EC9A-562A46EA453B" name="CODE_LIST_UK2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D8ABDCD2-F404-A932-A155-5C3E6E22A93F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="53CFAA5C-06B5-6F9F-9FA7-2CB6CDBC85B4" name="CODE_LIST_BASED_CL_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:23:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="31B0C6D3-86A5-B21E-4E3F-C707B278259C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="33138858-91C6-A29C-E34A-476B0309B6A6" name="CODE_LIST_AILV_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:29:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1F1CC35D-86BA-AB66-500C-63865CBE890B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F675BF9A-CF45-CAC0-9AAB-4B410687D879" name="CODE_LIST_BASED_CL_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:29:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="31B0C6D3-86A5-B21E-4E3F-C707B278259C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A784C1B4-193A-8981-CE4B-FF1EE8BC0CC0" name="CODE_LIST_MODULE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DE9B189F-C3D2-40F6-42CB-9EB344704ED9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9174DC96-3CA9-D0E2-9379-4115A62020D1" name="CODE_LIST_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="ACCB5BA7-DB69-9F6C-1E02-C700F5D76255"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="92BA7230-B5E1-5295-93A7-C1728F63CC26" name="CODE_LIST_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FDCB2B2E-22E7-5447-24EA-39A38E160B06"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

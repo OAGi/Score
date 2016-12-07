@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessEmployeeWorkSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/EmployeeWorkSchedule.xsd"/>
+	<xsd:element name="ProcessEmployeeWorkSchedule" type="ProcessEmployeeWorkScheduleType" id="oagis-id-a6658b0c19274b63a1748c48a2d621b7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessEmployeeWorkSchedule is to enable an application to request specific EmployeeWorkSchedule information from another business application module.  The response to the ProcessEmployeeWorkSchedule is the AcknowledgeEmployeeWorkSchedule.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessEmployeeWorkScheduleType" id="oagis-id-f3ba37dde6a7412db2e091f2263b82c1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessEmployeeWorkScheduleDataAreaType" id="oagis-id-589efe0810e847a2b402deead997c3a3">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessEmployeeWorkSchedule. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (EmployeeWorkSchedule).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessEmployeeWorkScheduleDataAreaType" id="oagis-id-db4436e9ab7b48f9b05132a5d0753ff6">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-475493c92e5342438ee1c1dbc564a42f"/>
+			<xsd:element ref="EmployeeWorkSchedule" maxOccurs="unbounded" id="oagis-id-313a42e54ceb44d3a8c39740c938481f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

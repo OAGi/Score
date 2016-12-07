@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeRiskControlLibrary.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RiskControlLibrary.xsd"/>
+	<xsd:element name="ChangeAcknowledgeRiskControlLibrary" type="ChangeAcknowledgeRiskControlLibraryType" id="oagis-id-ad932a80793542acb364f6cd1212f821">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeRiskControlLibrary is to notify a Manufacturing Application of the creation of usable production materials from material previously considered to be unsuitable for production use. This is most often likely to represent a return to production of scrap material. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what is being recovered, the quantity being recovered, and the processing step at which the recovered material is to re-enter the production process, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeRiskControlLibraryType" id="oagis-id-973417c5ee8e4e8e9b46dc28930fa45f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeRiskControlLibraryDataAreaType" id="oagis-id-d83b8db534bf4c0a97903ae5cefbd5dd">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessRiskControlLibrary. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (RiskControlLibrary).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeRiskControlLibraryDataAreaType" id="oagis-id-d4b78c6a6d774159bf7737c9dca004c0">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-9aebfad8dfff4d2792a6276b3a3e74d5"/>
+			<xsd:element ref="RiskControlLibrary" maxOccurs="unbounded" id="oagis-id-eda1af4a4aca490ca0155bf647541069"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

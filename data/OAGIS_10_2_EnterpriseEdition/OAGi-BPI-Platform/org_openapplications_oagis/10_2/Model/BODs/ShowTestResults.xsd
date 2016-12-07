@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowTestResults.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/TestResults.xsd"/>
+	<xsd:element name="ShowTestResults" type="ShowTestResultsType" id="oagis-id-a16139af09ff44b1a47ef711332d4df5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowTestResults is to supply Item Bill of Material information to another business application module.  This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate Item Bill of Material information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowTestResultsType" id="oagis-id-3b238bba1ebe47c3b189b613ac9a017e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowTestResultsDataAreaType" id="oagis-id-075e389f56f94a47b6a201949be6a33a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowTestResults. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (TestResults).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowTestResultsDataAreaType" id="oagis-id-72dfca89efd24b2a92a83bc664320137">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-2481ce36d4c14e5f819664bf5bab5284"/>
+			<xsd:element ref="TestResults" id="oagis-id-0c7507de67a646dcad42ce7f3d00c6e9" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

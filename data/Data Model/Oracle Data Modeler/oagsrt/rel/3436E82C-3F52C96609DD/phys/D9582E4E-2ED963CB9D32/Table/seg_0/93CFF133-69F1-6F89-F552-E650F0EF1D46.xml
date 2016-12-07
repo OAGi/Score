@@ -1,0 +1,145 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableProxyOraclev10g" name="BBIE_SC" directorySegmentName="seg_0" id="93CFF133-69F1-6F89-F552-E650F0EF1D46">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="CODE_LIST_ID" id="1BC826AA-628C-B007-B8DB-F76682937F43">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DT_SC_PRI_RESTRI_ID" id="32757495-7DFD-1911-BE39-AA2608E62D18">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CARDINALITY_MAX" id="32E34D11-4118-88A8-5A8A-AA9806D623A0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="33AB3A3A-A48E-FEE8-CCB3-76D99B4158AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="FIXED_VALUE" id="5760CAB0-CF86-4A9F-423C-8313713351AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="AGENCY_ID_LIST_ID" id="5E93EF19-50DD-0AF0-1D16-7A2F36B8842B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BBIE_ID" id="5FAEF807-6E36-E241-66CE-284DA878B195">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REMARK" id="6E001D2D-1884-8316-6E16-B6E563C62E16">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BBIE_SC_ID" id="6F09C621-162D-D77A-96C3-4FAE20F78B26">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OWNER_TOP_LEVEL_ABIE_ID" id="81AD63DE-18AA-CA8E-81BD-803E54143AD4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:12:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="IS_USED" id="9F7F3D21-8F78-99E1-84B4-3B9EB43A6A8D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BIZ_TERM" id="AB05F261-1884-A6FC-1412-D80AF2F19501">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CARDINALITY_MIN" id="ACDFCBEF-DB20-432F-4822-786CA99CC4C9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="GUID" id="D27D3BA3-0CCE-FC0B-7E79-66BDCA184ACC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:33:34 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DT_SC_ID" id="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFAULT_VALUE" id="F1810A1A-5719-4E44-08AA-8C003368EB3F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BBIE_SC_OWNER_TLVL_ABIE_ID_IDX" id="C0020B50-D0A6-C792-ADC6-B5E2949C412B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:11:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BBIE_SC_DT_SC_PRI_RESTR_ID_IDX" id="C92F3E78-53B2-2CD9-6FE8-77AF54A6651E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:11:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_CODE_LIST_ID_FK" id="0D4D8F6A-187A-AD09-7943-2D10B19382A7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_TOP_LEVEL_ABIE_ID_FK" id="2F5F31C8-A10C-F29B-744A-7DE1AAEF136D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:12:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_AGENCY_ID_LIST_ID_FK" id="44C9EBE0-D828-A9CA-DD50-660BF633CAC4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_DT_SC_PRI_RESTRI_ID_FK" id="7A5A9E4A-5FC4-2AF9-EF96-D7563CFE414C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_DT_SC_ID_FK" id="A05D366F-B12D-2A71-FE14-AA9C257817D2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_SC_BBIE_ID_FK" id="A9B253E1-9023-5A30-988E-7F3B01FF138C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="BBIE_SC_PK" id="F5BE8DA9-6FF7-86C4-3A13-765430994EE0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev10g>

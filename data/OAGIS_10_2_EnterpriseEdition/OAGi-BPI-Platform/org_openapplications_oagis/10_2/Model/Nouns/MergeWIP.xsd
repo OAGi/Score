@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/MergeWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="MergeWIP" type="MergeWIPType" id="oagis-id-6b6c6d0aee1a47379588bbeea584617a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">MergeWIP is used to notify a Manufacturing Application of the creation of a single production lot from multiple production lots of a product being made on a production order.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MergeWIPHeader" type="WIPEventHeaderType" id="oagis-id-22a69a83bd924b279ba9e4d88f10b6fa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about the merge event.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MergeWIPSource" type="MergeWIPSourceType" id="oagis-id-63e96a5b33ad426b8704601d2feede3e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MergeWIPDestination" type="MergeWIPDestinationType" id="oagis-id-894cbd699ba7489fba07207d4ddee7fa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MergeWIPType" id="oagis-id-9f8be535b36944f09a06000ee689b7a4">
+		<xsd:sequence>
+			<xsd:element ref="MergeWIPHeader" id="oagis-id-8402e980740f4e97aa4b36bc6c4b9e3e" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about the merge event.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MergeWIPSource" id="oagis-id-3d1adf4660264c1699376e53eb59a4ec" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.</xsd:documentation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MergeWIPDestination" id="oagis-id-ac094b445c4340ed8ac4c1e02bb87493" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.</xsd:documentation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-abceb2de1fde4cb1b624ac4c08593e88"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-caf6f37a325a4009b9521bbc241f8d82"/>
+	</xsd:complexType>
+	<xsd:complexType name="MergeWIPDestinationBaseType" id="oagis-id-9af9599c38d641f89e1a78c6aa48032f">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-5113515518224271bc85124c65f38adc" minOccurs="0"/>
+					<xsd:element ref="ItemQuantity" id="oagis-id-ec2375977fcd45d390f422b28b407fc6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-716c5050c4ad45b29d5882d913580799" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-cd6373b289874927b0b0161fe74d1063" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationReference" id="oagis-id-6972193880cf4f56af6678a5eccbb9f6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MergeWIPDestinationType" id="oagis-id-90567a6428524766bc37c014655d58c5">
+		<xsd:complexContent>
+			<xsd:extension base="MergeWIPDestinationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MergeWIPDestinationExtensionType" id="oagis-id-d6da3d41bb4b4f0bb449906f502d922f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MergeWIPSourceBaseType" id="oagis-id-47cdc534b9c743f8981d712a0406e4fc">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-a1c9d9deaccf45ba99e0d2b7e7592352" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-0dd76d74d7b5416cbeba01a79101a627" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ItemInstance" id="oagis-id-bc8cf744d3f54c638a8581635220a40a" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MergeWIPSourceType" id="oagis-id-b793ee528a0d4430a37c7883fe033b24">
+		<xsd:complexContent>
+			<xsd:extension base="MergeWIPSourceBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MergeWIPSourceExtensionType" id="oagis-id-62c99aa84a01499e9f5fbb7497e9b4c0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

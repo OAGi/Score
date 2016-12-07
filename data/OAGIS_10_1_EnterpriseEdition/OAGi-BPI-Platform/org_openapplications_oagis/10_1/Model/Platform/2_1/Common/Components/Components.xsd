@@ -6253,7 +6253,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:complexType name="NamedIDsType" abstract="false" id="oagis-id-a8e649deeb074d118d71949f831cc76f" mixed="false">
+	<xsd:sequence>
 		<xsd:group ref="NamedIDsGroup" id="oagis-id-54db3d59f147427aa552e9b6064d5939" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:group name="SequencedIDsGroup" id="oagis-id-1865b226967e48f1824883eb0e881f92">
 		<xsd:sequence>
@@ -6264,7 +6266,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the sequenced identifier for the associated component or noun.</xsd:documentation>
 		</xsd:annotation>
+		<xsd:sequence>
 		<xsd:group ref="SequencedIDsGroup" id="oagis-id-005c96018e9f4a018b2ca39c2b8af29e" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="LotIDs" type="SequencedIDsType" abstract="false" nillable="false" id="oagis-id-8a24154b8d28492eb7424e4ee118aa4d">
 		<xsd:annotation>
@@ -13453,7 +13457,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A request to perform a specific test</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="DesiredPointValue" type="NameValuePairType" id="oagis-id-edb1a60aaff746239c19324e4b8ca29c"/>
+	<xsd:element name="DesiredPointValue" type="NameValuePairValueType" id="oagis-id-edb1a60aaff746239c19324e4b8ca29c"/>
 	<!---->
 	<xsd:complexType name="TestDetailBaseType" id="oagis-id-0082677cb2ff488ea2a80873456e310b">
 		<xsd:annotation>
@@ -13636,8 +13640,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A representation of some limits usually expressed as a high and low limit</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="UpperLimit" type="NameValuePairType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
-	<xsd:element name="LowerLimit" type="NameValuePairType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
+	<xsd:element name="UpperLimit" type="NameValuePairValueType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
+	<xsd:element name="LowerLimit" type="NameValuePairValueType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
 	<!---->
 	<xsd:complexType name="LogisticEquipmentBaseType" id="oagis-id-becfd5c4010b44f9a5733c5584140fb9">
 		<xsd:complexContent>

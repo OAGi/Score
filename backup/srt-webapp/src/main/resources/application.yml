@@ -1,0 +1,70 @@
+spring:
+  aop:
+    proxy-target-class: true
+
+  datasource:
+    continue-on-error: true
+    initialize: false
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
+        id:
+          new_generator_mappings: true
+
+  batch:
+    initializer:
+      enabled: false
+
+  freemarker:
+    suffix: .ftl
+
+  resources:
+    static-locations: classpath:/static
+
+logging:
+  level:
+    org.oagi.srt: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json, application/xml, text/html, text/xml, text/plain
+
+# Development environment
+---
+spring:
+  profiles: development
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  freemarker:
+    cache: false
+
+# Staging environment
+---
+spring:
+  profiles: staging
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521/OAGISRTDB
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  freemarker:
+    cache: true

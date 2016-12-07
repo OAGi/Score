@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- ====================================================================== --><!-- =====  OAGi Condition Type Code - Code List XML Schema File  ===== --><!-- ====================================================================== --><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the 
+	Condition Type Code List from UN/CEFACT Condition Code.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_ConditionTypeCode_1.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<!-- ====================================================================== -->
+	<!-- =====  Element Declarations				      		===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Root Element Declaration				      	===== -->
+	<!-- ====================================================================== -->
+	<!--
+	<xsd:element name="ConditionTypeCode" type="clm6ConditionTypeCode1_ConditionTypeCodeContentType" id="oagis-id-e281f5de31ff4252adf9950e9d7ee946"/>
+	-->
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definitions					      				===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definition: Condition Type Code Content Type		      ===== -->
+	<!-- ====================================================================== -->
+	<xsd:simpleType name="clm6ConditionTypeCode1_ConditionTypeCodeContentType" id="oagis-id-b7e16bb124eb4ddbb86d4861383fe372">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="PRE">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Precondition</ccts_Name>
+						<ccts_Definition>A precondition to an operation is a restriction that must be true at the moment that the operation is going to be executed</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="POST">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Postcondition</ccts_Name>
+						<ccts_Definition>A postcondition to an operation is a restriction that must be true at the moment that the operation has just ended its execution</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INV">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Invariant</ccts_Name>
+						<ccts_Definition>An invariant is a constraint that states a condition that must always be met by all instances of the class, type, or interface. An invariant is described using an expression that evaluates to true if the invariant is met. Invariants must be true all the time. 
+</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

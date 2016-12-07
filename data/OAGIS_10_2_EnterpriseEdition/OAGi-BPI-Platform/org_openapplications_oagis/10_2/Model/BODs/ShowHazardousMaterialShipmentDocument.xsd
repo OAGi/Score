@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowHazardousMaterialShipmentDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/HazardousMaterialShipmentDocument.xsd"/>
+	<xsd:element name="ShowHazardousMaterialShipmentDocument" type="ShowHazardousMaterialShipmentDocumentType" id="oagis-id-255b6520bf8440599c9ab94dcdefb6f4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowHazardousMaterialShipmentDocument is to supply HazardousMaterialShipmentDocument information to another business application module. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowHazardousMaterialShipmentDocumentType" id="oagis-id-adb18ce922a6407ab63a77623cac4528">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-1ab1a0a1fd8d423e9cb224ce105ca7da">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowHazardousMaterialShipmentDocument. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the response from the request for information through a Get on the Noun (HazardousMaterialShipmentDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-3196e8ecacc34036906cd1bc3d9eab16">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-a21997cfaf144952bddda0531a02bc91"/>
+			<xsd:element ref="HazardousMaterialShipmentDocument" maxOccurs="unbounded" id="oagis-id-31d065f3a8fc4b0d8c12a81a4ae3fcaf"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

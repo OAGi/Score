@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Code List</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:panel>
+                <f:facet name="header">
+                    <p:autoComplete id="ccName" value="#{codeListBean.basedCodeListName}"
+                                    style="min-width: 440px; margin-right: 20px;"
+                                    maxResults="10"
+                                    completeMethod="#{codeListBean.completeInput}">
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                    </p:autoComplete>
+                    <p:commandButton value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
+                                     icon="ui-icon-search"/>
+                    <p:button value="Create Code List without Base" style="float: right; padding: 3px 0 3px 0;"
+                              outcome="/views/code_list/create_wo_base.xhtml"/>
+                </f:facet>
+                <p:dataTable id="tbl" var="cVO"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom: 20px;"
+                             value="#{codeListBean.codeLists}" rowKey="#{cVO.codeListId}">
+                    <p:ajax event="rowSelect" listener="#{codeListBean.onRowSelect}"/>
+                    <p:ajax event="rowUnselect" listener="#{codeListBean.onRowUnselect}"/>
+                    <p:column headerText="Name" sortBy="#{cVO.name}">
+                        <h:link value="#{cVO.name}" outcome="/views/code_list/details.xhtml">
+                            <f:param name="codeListId" value="#{cVO.codeListId}"/>
+                        </h:link>
+                    </p:column>
+                    <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
+                        <h:outputText value="#{cVO.agencyId}" style="float: right;"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
+                        <h:outputText value="#{cVO.versionId}" style="float: right;"/>
+                    </p:column>
+                    <p:column style="width: 100px; text-align: center;" headerText="Extensible">
+                        <h:panelGroup rendered="#{cVO.extensibleIndicator}">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!cVO.extensibleIndicator}">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </h:panelGroup>
+                    </p:column>
+                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cVO.state}">
+                        <h:panelGroup rendered="#{cVO.state == 'Published'}">
+                            <span class="label label-default">#{cVO.state}</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{cVO.state == 'Editing'}">
+                            <span class="label label-primary">#{cVO.state}</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{cVO.state == 'Discarded'}">
+                            <span class="label label-warning">#{cVO.state}</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{cVO.state == 'Deleted'}">
+                            <span class="label label-danger">#{cVO.state}</span>
+                        </h:panelGroup>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

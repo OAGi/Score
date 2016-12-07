@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelInspectionOrder.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InspectionOrder.xsd"/>
+	<xsd:element name="CancelInspectionOrder" type="CancelInspectionOrderType" id="oagis-id-2b9f8f0512ee455ba5a1d430c3af3a13">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynInspectionOrder is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Cancelhronize a Bill of Material.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelInspectionOrderType" id="oagis-id-1f38154d32fb471982aa36f732ea302b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelInspectionOrderDataAreaType" id="oagis-id-2e1f43bb90e343c9a69db46b6c8e8ede">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelInspectionOrder. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (InspectionOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelInspectionOrderDataAreaType" id="oagis-id-0077db9ea039412a92a0211d7833692f">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-072b2a2ba1d94da2933c70c7a87635bf"/>
+			<xsd:element ref="InspectionOrder" id="oagis-id-4880a2e7e82646ee9da01c4e36693dcc" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

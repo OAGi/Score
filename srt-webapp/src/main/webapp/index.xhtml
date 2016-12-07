@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" template="template.xhtml">
+
+    <ui:define name="side_menu">
+        <h:form>
+            <p:growl id="messages" showDetail="false"/>
+
+            <p:menu>
+                <p:submenu style="width: 180px !important;" label="Ajax">
+                    <p:menuitem value="Save" actionListener="#{sideMenu1.save}"
+                                update="messages" icon="ui-icon-disk"/>
+                    <p:menuitem value="Update" actionListener="#{sideMenu1.update}"
+                                update="messages" icon="ui-icon-arrowrefresh-1-w"/>
+                </p:submenu>
+                <p:submenu style="width: 180px !important;" label="Non-Ajax">
+                    <p:menuitem value="Delete" actionListener="#{sideMenu1.delete}"
+                                update="messages" ajax="false" icon="ui-icon-close"/>
+                </p:submenu>
+                <p:submenu style="width: 180px !important;" label="Navigations">
+                    <p:menuitem value="External" url="http://www.primefaces.org"
+                                icon="ui-icon-home"/>
+                </p:submenu>
+            </p:menu>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="markdown-body">
+            <h2>Objective</h2>
+            <p>To advance semantic precision of interface definitions exposing OAGIS</p>
+
+            <h2>Scope</h2>
+            <p>Develop a meta-model for holding OAGIS data model</p>
+            <ul>
+                <li>Allow for import of OAGIS developer schemas</li>
+                <li>Allow for precise content contextualization</li>
+            </ul>
+            <p>Implement a prototype, open source tool, which in addition to above requirements</p>
+            <ul>
+                <li>Allow for export of OAGIS contextualized profile schema</li>
+                <li>Allow for import of OAGIS contextualized profile schema</li>
+            </ul>
+            <h2>Future scope</h2>
+            <ul>
+                <li>Round trip export of OAGIS developer schemas</li>
+                <li>OWL/RDF model</li>
+                <li>OAGIS semantic content life-cycle management</li>
+            </ul>
+            <p:graphicImage name="images/oag_main.png" width="800" height="450"
+                            style="border:0; margin-top: 20px; padding:0;"/>
+        </div>
+    </ui:define>
+</ui:composition>

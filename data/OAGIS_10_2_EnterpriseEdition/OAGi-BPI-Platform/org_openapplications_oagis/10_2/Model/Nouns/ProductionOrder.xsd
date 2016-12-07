@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/ProductionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="ProductionOrder" type="ProductionOrderType" id="oagis-id-84e1065222964560921630efe3264d52">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Production Order is a document requesting the manufacture of a specified product and quantity.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProductionOrderHeader" type="ProductionOrderHeaderType" id="oagis-id-46fe99bb547145db925f580acc05f9f3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the details of the production order requested to be initiated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProductionOrderLine" type="ProductionOrderLineType" id="oagis-id-83b333328c094524953786dadc7bfbe0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Deorecate?
+
+Information used to communicate the individual items on the pre-determined Bill of Material structure.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProductionOrderRouteOperation" type="ProductionOrderRouteOperationType" id="oagis-id-493d12aa7b29467285ca0c55c538e547">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProductionOrderHeaderBaseType" id="oagis-id-71fef601f1b54a368510b7599e995339">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="BOMReference" id="oagis-id-eef3b8570a6b47b7b64f56823c8813a5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Bill-Of-Material Document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Item" id="oagis-id-23f79dc7d44548cbab0e87ef780226fa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-59c698c39aaa41559c6f32b052dc003a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Item definition and the identification of given Item Instances as identified by the RFID, SerialNumber or Lot and SerialNumber.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-5a7955c9db7e45f9ae3ebdbe94ecf798" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RouteReference" id="oagis-id-9706c925eeee40a29b504feaec7590c0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to a Routing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationReference" id="oagis-id-2fcdc4e70ec94e36b497df4be1b58709" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SiteLocation" id="oagis-id-75f030235e3540cd9e6388503fd858d9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-355d647ac7b249c5958debd6774f1d39" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OriginationCountryCode" id="oagis-id-128ad836e54f4c9b852b9d114fcfdb55" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the country of origin of the item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DestinationCountryCode" id="oagis-id-12f7305b39c14ca9b6c4a2542e891a57" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the country that the item being manufactured is destinated to go to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PriorityCode" id="oagis-id-1fd95e539f7f4e05a69b2304c8692593" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderQuantity" id="oagis-id-ddaa562ab8d04568a1414fbbaf463320" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of a material or product ordered by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequiredQuantity" id="oagis-id-61ac917c1584478abf9ab5ba5e07a177" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The quantity required of the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DueQuantity" id="oagis-id-bbae86fb7a4a48d2a6108d55bbcff0c7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The number currently due or scheduled to be completed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-7b4ab27d901f498a90fe5886d5108751" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExecutionTimePeriod" id="oagis-id-b2d59f91fde54d8facfd696459db2c48" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time in which the associated entity is actually in process.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ForecastedTimePeriod" id="oagis-id-da7b76d4e3db47ec8f6b0d3b9943bf22" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating the forecasted start and finish datetimes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="NeedDeliveryDate" id="oagis-id-7190a12503304aaeb7111beac8533d8e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the timestamp indicating the date and time that the items need be delivered to the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DueDateTime" id="oagis-id-cdd85702e88d40ada9adb3ed802465a6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date and time that the production order is to be completed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequiredDateTime" id="oagis-id-e1181cbfeda14eebb0200b7a128834bc" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date the goods or services must be delivered to the customer. Specified by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AvailableDateTime" id="oagis-id-060dda00ecba43838fc25dff7616cc87" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the datetime that the associated entities will be available.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReasonCode" id="oagis-id-734a75b2d7a9439bb26b440a695298c2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="KanbanNumberID" id="oagis-id-0eb17238bc0c4a9599fd1dbf07ea58d5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference number associated with in-plant routing information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SerialLot" id="oagis-id-97c3d9a23a914e15bb7ff454c9aa66ef" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Lot and Setial numbers for the items contained in the associated component by identifing the number of items and the uniques serial number of those items that belong to a given Lot.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-6f84664c7e674debb38abe43960323a5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InQueueLocation" id="oagis-id-07bb4137df0f422f96cef478519bfd5b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the location that the associated entity receives raw material from. 
+
+In the case of an Operation is the location that the Operation receives it's raw materials. In order to produce the specified widget the corresponding raw materials must be available at the given location.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OutQueueLocation" id="oagis-id-453b090e23fb46af9c534c720a9fa786" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the location that the associated entity places the material from. 
+
+In the case of an Operation is the location that the Operation its resulting materials. In order to produce the specified widget the widgets will be placed in the is location.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" id="oagis-id-6c548ac7ab2c4948a1d13c78b97044e1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProjectReference" id="oagis-id-c5e275d14a6e4615b0612c04fafdfa56" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a project that is associated with the given component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductionOrderRouteOperation" id="oagis-id-2c5b487368204dbbb3e96269fe96af60" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufacturingItem" id="oagis-id-6c621b77d22d4fa89eb7c2af2e6eb6d6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the manufacturing view of an Item where the complete detail of an Item is represented by the MasterItem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProducedQuantity" id="oagis-id-cf6fc7da1ba14a44a4a3f1d8ed3935e9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of items produced in a manufacturing run.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TrackingIndicator" id="oagis-id-440fdf3d715944dc9661e549ca6c86fe" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the related object is to be tracked</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderHeaderType" id="oagis-id-4fccc675f9c04d549089f330845d108d">
+		<xsd:complexContent>
+			<xsd:extension base="ProductionOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductionOrderHeaderExtensionType" id="oagis-id-131ba284758f45f9817bb35fdfa7ac92" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderType" id="oagis-id-0125556f128e4ab7b036f75e498da1b1">
+		<xsd:sequence>
+			<xsd:element ref="ProductionOrderHeader" id="oagis-id-f99efee983e040868498a3cc074cb85a" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the details of the production order requested to be initiated.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ProductionOrderLine" id="oagis-id-74c86de25fbf4116baa3e856d1da48b0" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Depricated in favor of ComponentItemInstance and Operation.
+
+Information used to communicate the individual items on the pre-determined Bill of Material structure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ComponentItemInstance" id="oagis-id-7fc2d569b4c7462a8f8e62be4b79f1af" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Material List / Component List for the Item to be created.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="Operation" id="oagis-id-078e5fd8c25d4e1d8ab0fb5d6faf6eb6" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Extension" type="ProductionOrderExtensionType" id="oagis-id-2c2acdb4bdac41d89d51d4a9c3a1869d" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-003d30b80dcf46a38930f8a682dedd3b"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-dd75418a769441c5a3f2946d255c3c70"/>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderLineBaseType" id="oagis-id-5c2094938fa54c07a0a67211610495d2">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="BOMReference" id="oagis-id-e05fb5b9563d48a99397a977b36787f9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Bill-Of-Material Document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufacturingItem" id="oagis-id-0361fc491b5341dfaaaa0ac12da2c380" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the manufacturing view of an Item where the complete detail of an Item is represented by the MasterItem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufacturingItemInstance" id="oagis-id-07fbc298d62147a48d8e4eb4ba22bdb5" minOccurs="0"/>
+					<xsd:element ref="SiteLocation" id="oagis-id-93082bbe9a95456aa86c250f70b56eb5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderQuantity" id="oagis-id-528e4efe1ec04c0cae01594b9e200d7d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of a material or product ordered by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProducedQuantity" id="oagis-id-6d5bc24d7b9b472ba4bada4e03a3f0ce" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of items produced in a manufacturing run.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TrackingIndicator" id="oagis-id-afd65e724f974d859f35227ff23d4a95" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the related object is to be tracked</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SerialLot" id="oagis-id-87e31389516145b2922f701dc248b482" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Lot and Setial numbers for the items contained in the associated component by identifing the number of items and the uniques serial number of those items that belong to a given Lot.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-a8eb1ad6f0c64081aac8aed2f296f3c9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExecutionTimePeriod" id="oagis-id-beee65222ec442b5aeec14238ac5d994" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time in which the associated entity is actually in process.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ForecastedTimePeriod" id="oagis-id-add23abea0034e8ca5596ec7e5bd1c96" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating the forecasted start and finish datetimes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="NeedDeliveryDate" id="oagis-id-8edf13f7ce7d41239dc0343df52e88bd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the timestamp indicating the date and time that the items need be delivered to the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DueDateTime" id="oagis-id-e8cb60a2fe3f40feb5c30a44a848a34a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date and time that the production order is to be completed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequiredDateTime" id="oagis-id-ff6fe5439530436aad9b456006a92d65" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date the goods or services must be delivered to the customer. Specified by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AvailableDateTime" id="oagis-id-fbb7bb1c711d4ffdbac228b29b417692" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the datetime that the associated entities will be available.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderLineType" id="oagis-id-e14119e5382b45138ebd821af1b21221">
+		<xsd:complexContent>
+			<xsd:extension base="ProductionOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductionOrderLineExtensionType" id="oagis-id-ee413f5260eb46599fcd1e28921efd53" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderRouteOperationBaseType" id="oagis-id-5d6825afccc14df08f4584b1294b7fd7">
+		<xsd:complexContent>
+			<xsd:extension base="ManufacturingRouteOperationBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ForecastedTimePeriod" id="oagis-id-4fa2da6c134b47d5899da8178622d3e3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating the forecasted start and finish datetimes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExecutionTimePeriod" id="oagis-id-b915952f3fa1409f9a15f73ccc1b3d19" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time in which the associated entity is actually in process.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualTimePeriod" id="oagis-id-b8925d23ad11478490e18459ae53443e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time period in which the actual event(s) occurred.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SiteLocation" id="oagis-id-fc31f9ccbf91442984f5baeb5f0e182d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionOrderRouteOperationType" id="oagis-id-db8e1821085f479ab693c4ba221f4f4b">
+		<xsd:complexContent>
+			<xsd:extension base="ProductionOrderRouteOperationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductionOrderRouteOperationExtensionType" id="oagis-id-bd2cce8932244c34a98093d0e2378e6f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

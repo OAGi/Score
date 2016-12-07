@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyInventoryBalance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryBalance.xsd"/>
+        <xsd:element name="NotifyInventoryBalance" type="NotifyInventoryBalanceType" id="oagis-id-9363ab778e6e468298f3df7871a82505">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyInventoryBalance is to enable the synchronization of InventoryBalance data that exists on separate Item Master databases.  This data is not the master data that describes the attributes of the item such as dimensions, weight, or unit of measure.
+
+This is data that describes the ITEM as it exists at a specific location.
+
+The primary focus of this BOD is to synchronize the quantity of an item by stocking location.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyInventoryBalanceType" id="oagis-id-725abf2b081f4ca9ae9470ef7ac1fa83">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyInventoryBalanceDataAreaType" id="oagis-id-e3bce05d498f431ebca9ee4b78b9c20d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyInventoryBalance. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (InventoryBalance).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyInventoryBalanceDataAreaType" id="oagis-id-ea0401579847402c98b3d79b82860645">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-021ad009c6354037b2880dab9d1ac48b"/>
+                        <xsd:element ref="InventoryBalance" maxOccurs="unbounded" id="oagis-id-f79b077d94ab49c3adf2cdf613a29353"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

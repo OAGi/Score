@@ -1,7 +1,8 @@
 .idea/*
 *.iml
 *.class
-target/*
+target
+target/**
 build/*
 bin/*
 tmp/*
@@ -12,3 +13,13 @@ tmp/*
 docker-compose.yml
 /target/
 logs/*
+
+backup/*
+data/Model
+Dockerfile
+docker-compose.yaml
+*.zip
+~$*
+*.bak
+*-mysql.sql
+srt-webapp/src/main/resources/static/bower_components/**

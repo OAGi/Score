@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessProductionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductionOrder.xsd"/>
+        <xsd:element name="ProcessProductionOrder" type="ProcessProductionOrderType" id="oagis-id-0be2f09eaaca4f1ca1a8326af3e51596">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessProductionOrder provides the ability to request an application/ system to create a ProductionOrder</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessProductionOrderType" id="oagis-id-c1be63dff97d4f468092be0831cd7484">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessProductionOrderDataAreaType" id="oagis-id-345f67e6779e4fa0813e18609f8f7503">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessProductionOrder. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ProductionOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessProductionOrderDataAreaType" id="oagis-id-cd1fa9bb7cfc4f10bacd22b572ef0998">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-18d2fb4e52f0410896435898ad1331e8"/>
+                        <xsd:element ref="ProductionOrder" maxOccurs="unbounded" id="oagis-id-a8e1aed0c6b14d1ba9f9b3ac6af175e1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

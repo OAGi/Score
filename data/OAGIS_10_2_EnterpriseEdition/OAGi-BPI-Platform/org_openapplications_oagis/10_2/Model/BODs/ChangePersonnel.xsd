@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangePersonnel.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Personnel.xsd"/>
+	<xsd:element name="ChangePersonnel" type="ChangePersonnelType" id="oagis-id-2d3f6c740d0c43ec944caf3f715f35dc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangePersonnel is to communicate personnel data that exists on separate data bases between manufacturing and human resource applications.  The ChangePersonnel allows the adding of new employees and their relevant data as well as the modification of previously established employees.
+
+The ChangePersonnel is used to facilitate the maintenance of human resource data in a manufacturing work force planning module.  This enables the workforce planning module to use current personnel information when creating finite production schedules.  The ChangePersonnel can also be used by a project accounting application or a work order management application to assign qualified personnel or to perform resource planning.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangePersonnelType" id="oagis-id-548d4ac09e2c40a3b82417af6f3c45ce">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangePersonnelDataAreaType" id="oagis-id-33ef3dd241524756881c7a195ab20b5a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangePersonnel. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (Personnel).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangePersonnelDataAreaType" id="oagis-id-26633713f2a7430ebe043e75c72765f4">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-328303f1856d4f97a5fef2843577a9a3"/>
+			<xsd:element ref="Personnel" maxOccurs="unbounded" id="oagis-id-e0a8288f1211427e92a3c1bc580cb169"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

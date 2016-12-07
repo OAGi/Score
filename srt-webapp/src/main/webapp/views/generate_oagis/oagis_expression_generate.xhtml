@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="side_menu">
+        <h:form>
+            <p:growl id="messages" showDetail="false"/>
+            <p:menu>
+                <p:submenu style="width: 180px !important;" label="Context Category">
+                    <p:menuitem value="Create" url="business_context_create.jsf" icon="ui-icon-create"/>
+                    <p:menuitem value="List" url="business_context_list.jsf" icon="ui-icon-search"/>
+                </p:submenu>
+            </p:menu>
+        </h:form>
+    </ui:define>
+
+    <style type="text/css">
+        .companyHeaderGrid tr, .companyHeaderGrid td {
+            border: none;
+        }
+    </style>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:panel header="Profile BOD Generation">
+                <p:messages autoUpdate="true"/>
+
+                <h:panelGrid id="grid" cellpadding="5">
+                    <p:row>
+                        <p:column>
+                            <h:outputLabel for="desc" value="Select top-level ABIEs: "
+                                           style="font-weight:bold; color: #bd2c00"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandButton value="Add" icon="ui-icon-extlink"
+                                             actionListener="#{profileBODHandler.chooseABIE}">
+                                <p:ajax event="dialogReturn" listener="#{profileBODHandler.onABIEChosen}"
+                                        update=":form:tbl"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:dataTable id="tbl" var="abieView" value="#{profileBODHandler.abieViewList}"
+                                         style="width:800px; margin-bottom:20px">
+
+                                <p:column style="width:200px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Name"/>
+                                    </f:facet>
+                                    <h:outputText value="#{abieView.name}"/>
+                                </p:column>
+
+                                <p:column style="width:200px">
+                                    <f:facet name="header">
+                                        <h:outputText value="State"/>
+                                    </f:facet>
+                                    <h:outputText value="#{(abieView.abie.state eq '2') ? 'Editing' : 'Published'}"/>
+                                </p:column>
+
+                                <p:column style="width:200px">
+                                    <f:facet name="header">
+                                        <h:outputText value="Creation Timestamp"/>
+                                    </f:facet>
+                                    <h:outputText value="#{abieView.abie.creationTimestamp}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:column>
+                    </p:row>
+                </h:panelGrid>
+            </p:panel>
+            <p:panel header="Select annotation to generate">
+                <h:panelGrid id="grid2" columns="8" cellpadding="5">
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="CC GUID"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="CC Definition"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="Business Term"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="Business Context"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="Remark"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="BIE GUID"/>
+
+                    <h:selectBooleanCheckbox value="1"/>
+                    <h:outputText value="BIE Definition"/>
+                </h:panelGrid>
+            </p:panel>
+            <p:panel header="Select expressions and Schema package option">
+                <p:selectOneRadio id="customRadio" value="1" layout="custom">
+                    <f:selectItem itemLabel="XML" itemValue="XML"/>
+                    <f:selectItem itemLabel="JSON" itemValue="JSON"/>
+                </p:selectOneRadio>
+                <p:selectOneRadio id="customRadio2" value="1" layout="custom">
+                    <f:selectItem itemLabel="All" itemValue="All"/>
+                    <f:selectItem itemLabel="Each" itemValue="Each"/>
+                </p:selectOneRadio>
+                <h:panelGrid id="grid3" cellpadding="5" columns="5" styleClass="companyHeaderGrid">
+                    <h:outputLabel for="desc" value="#1 " style="font-weight:bold; color: green"/> <h:outputLabel
+                        for="desc" value="Select expression" style="font-weight:bold; color: #4078c0"/>
+                    <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray"/>
+                    <h:outputLabel for="desc" value="#2 " style="font-weight:bold; color: green"/> <h:outputLabel
+                        for="desc" value="Schema package option" style="font-weight:bold; color: #4078c0"/>
+
+                    <p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true"/>
+                    <h:outputLabel rows="10" value="XML Schema" style="font-weight:bold"/>
+                    <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray"/>
+                    <p:radioButton id="opt3" for="customRadio2" itemIndex="0" selected="true"/>
+                    <h:outputLabel rows="10" value="Put all schemas in the same package" style="font-weight:bold"/>
+
+                    <p:radioButton id="opt2" for="customRadio" itemIndex="0" selected="false"/>
+                    <h:outputLabel rows="10" value="JSON Schema" style="font-weight:bold"/>
+                    <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray"/>
+                    <p:radioButton id="opt4" for="customRadio2" itemIndex="0" selected="true"/>
+                    <h:outputLabel rows="10" value="Put each schemas in the different package"
+                                   style="font-weight:bold"/>
+
+                </h:panelGrid>
+                <p:separator/>
+                <h:panelGrid id="grid44" cellpadding="5" columns="2" styleClass="companyHeaderGrid">
+                    <p:commandButton value="Generate" update="downloadButton" icon="ui-icon-extlink"
+                                     actionListener="#{profileBODHandler.generate}"/>
+                    <p:commandButton id="downloadButton" value="Download"
+                                     disabled="#{profileBODHandler.filePath eq null ? true : false}" ajax="false"
+                                     icon="ui-icon-arrowthick-1-s">
+                        <p:fileDownload value="#{profileBODHandler.file}"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

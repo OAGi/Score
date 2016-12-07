@@ -1,0 +1,696 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Copy Profile BOD</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:wizard flowListener="#{copyProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
+                      showNavBar="false" onback="onBack();" onnext="onNext();">
+                <!--
+                    Step 1: Select Top-Level Concept
+                -->
+                <p:tab id="step_1">
+                    <f:facet name="title">
+                        <strong class="step">Step 1:</strong>
+                        <h:outputText value="Select Profile BOD"/>
+                    </f:facet>
+                    <p:panel>
+                        <f:facet name="header">
+                            <p:autoComplete id="propertyTerm" value="#{copyProfileBODBean.selectedPropertyTerm}"
+                                            completeMethod="#{copyProfileBODBean.completeInput}"
+                                            style="width: 440px; margin-right: 20px;">
+                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                            </p:autoComplete>
+                            <p:commandButton value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
+                                             update="tbl1" icon="ui-icon-search"/>
+                        </f:facet>
+                        <p:dataTable id="tbl1" var="profileBOD" value="#{copyProfileBODBean.profileBODs}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
+                                     style="width: 100%; margin-bottom: 20px"
+                                     selection="#{copyProfileBODBean.selectedProfileBOD}"
+                                     rowKey="#{profileBOD.asccpId}"
+                                     selectionMode="single">
+                            <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                                <h:outputText value="#{profileBOD.propertyTerm}"/>
+                            </p:column>
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                      headerText="Business Context"
+                                      sortBy="#{profileBOD.bizCtxName}">
+                                <h:outputText value="#{profileBOD.bizCtxName}"/>
+                            </p:column>
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                                      sortBy="#{profileBOD.ownerName}">
+                                <h:outputText value="#{profileBOD.ownerName}"/>
+                            </p:column>
+                            <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                                      sortBy="#{profileBOD.creationTimestamp}">
+                                <h:outputText value="#{profileBOD.creationTimestamp}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column style="width: 100px; text-align: center;" headerText="State"
+                                      sortBy="#{profileBOD.state}">
+                                <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                                    <span class="label label-primary">Editing</span>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                    <span class="label label-warning">Candidate</span>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                                    <span class="label label-default">Published</span>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:tab>
+
+                <!--
+                    Step 2: Select Business Context
+                -->
+                <p:tab id="step_2">
+                    <f:facet name="title">
+                        <strong class="step">Step 2:</strong>
+                        <h:outputText value="Select Business Context"/>
+                    </f:facet>
+                    <p:panel header="Selected Profile BOD">
+                        <p:dataTable var="profileBOD" value="#{copyProfileBODBean.selectedProfileBOD}"
+                                     style="width: 100%; margin-bottom: 20px;">
+                            <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                                <h:outputText value="#{profileBOD.propertyTerm}"/>
+                            </p:column>
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                      headerText="Business Context"
+                                      sortBy="#{profileBOD.bizCtxName}">
+                                <h:outputText value="#{profileBOD.bizCtxName}"/>
+                            </p:column>
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                                      sortBy="#{profileBOD.ownerName}">
+                                <h:outputText value="#{profileBOD.ownerName}"/>
+                            </p:column>
+                            <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                                      sortBy="#{profileBOD.creationTimestamp}">
+                                <h:outputText value="#{profileBOD.creationTimestamp}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column style="width: 100px; text-align: center;" headerText="State"
+                                      sortBy="#{profileBOD.state}">
+                                <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                                    <span class="label label-primary">Editing</span>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                    <span class="label label-warning">Candidate</span>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                                    <span class="label label-default">Published</span>
+                                </h:panelGroup>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel>
+                        <p:dataTable id="tbl2" var="businessContext"
+                                     value="#{copyProfileBODBean.businessContexts}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
+                                     style="width: 100%; margin-bottom:20px"
+                                     selection="#{copyProfileBODBean.selectedBusinessContext}"
+                                     selectionMode="single"
+                                     rowKey="#{businessContext.bizCtxId}">
+                            <p:column headerText="Business Context Name" sortBy="#{businessContext.name}">
+                                <h:outputText value="#{businessContext.name}"/>
+                                <div>
+                                    <h:outputText value="GUID: #{businessContext.guid}"
+                                                  style="font-size: 12px !important; color: #767676 !important;"/>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:tab>
+
+                <!--
+                    Step 3: Create BIE
+                -->
+                <p:tab id="step_3">
+                    <f:facet name="title">
+                        <strong class="step">Step 3:</strong>
+                        <h:outputText value="Copy BIE"/>
+                    </f:facet>
+                    <p:panel>
+                        <h:panelGroup style="width: 100%;">
+                            <div class="row">
+                                <div id="left_panel" class="col-md-5" style="max-height: 470px; overflow-y: scroll;">
+                                    <p:treeTable value="#{copyProfileBODBean.treeNode}" var="node"
+                                                 selection="#{copyProfileBODBean.selectedTreeNode}"
+                                                 selectionMode="single">
+                                        <p:ajax event="select" update=":form:details"/>
+                                        <p:column headerText="BIEs">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:column>
+                                    </p:treeTable>
+                                </div>
+                                <div id="main_panel" class="col-md-7" style="max-height: 470px; overflow-y: scroll">
+                                    <div id="myAffix" style="overflow-y: auto;">
+                                        <p:panel id="details">
+                                            <f:facet name="header">
+                                                <h:outputText value="View and Edit BIE"/>
+                                            </f:facet>
+
+                                            <!--
+                                                ABIE
+                                            -->
+                                            <h:panelGroup
+                                                    rendered="#{copyProfileBODBean.selectedTreeNode.type eq 'ABIE'}">
+                                                <p:panel>
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.name}"
+                                                                styleClass="section-content"/>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="topLevelBiePanel" header="Top-Level BIE Info">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Business Term" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="topLevelBiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="topLevelBiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="topLevelBiePanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                            </h:panelGroup>
+
+                                            <!--
+                                                ASBIE
+                                            -->
+                                            <h:panelGroup
+                                                    rendered="#{fn:startsWith(copyProfileBODBean.selectedTreeNode.type, 'ASBIE')}">
+                                                <p:panel id="asbieHeaderPanel">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.name}"
+                                                                styleClass="section-content"/>
+
+                                                        <h:outputText value="Used" styleClass="section-label"/>
+                                                        <h:selectBooleanCheckbox
+                                                                value="${copyProfileBODBean.selectedTreeNode.data.asbie.used}"
+                                                                styleClass="section-content">
+                                                            <f:ajax render="asbieHeaderPanel"/>
+                                                        </h:selectBooleanCheckbox>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="asbiePanel" header="ASBIE">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Min" styleClass="section-label"/>
+                                                        <p:selectOneMenu
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                                styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="0" itemValue="0"/>
+                                                            <f:selectItem itemLabel="1" itemValue="1"/>
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Max" styleClass="section-label"/>
+                                                        <p:selectOneMenu editable="true"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                                         styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                            <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                            <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Nillable" styleClass="section-label"/>
+                                                        <h:selectBooleanCheckbox
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.nillable}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </h:selectBooleanCheckbox>
+                                                        
+                                                        <p:selectOneMenu
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.nillable}"
+                                                                styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="true" itemValue="true"/>
+                                                            <f:selectItem itemLabel="false" itemValue="false"/>
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiePanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="asbiepPanel" header="ASBIEP">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Business Term" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiepPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiepPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="asbiepPanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="abiePanel" header="Target ABIE">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Business Term" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="abiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="abiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="abiePanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                            </h:panelGroup>
+
+                                            <!--
+                                                BBIE
+                                            -->
+                                            <h:panelGroup
+                                                    rendered="#{copyProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                <p:panel id="bbieHeaderPanel">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.name}"
+                                                                styleClass="section-content"/>
+
+                                                        <h:outputText value="Used" styleClass="section-label"/>
+                                                        <h:selectBooleanCheckbox
+                                                                value="${copyProfileBODBean.selectedTreeNode.data.bbie.used}"
+                                                                styleClass="section-content">
+                                                            <f:ajax render="bbieHeaderPanel"/>
+                                                        </h:selectBooleanCheckbox>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="bbiePanel" header="BBIE">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Min" styleClass="section-label"/>
+                                                        <p:selectOneMenu
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                                styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="0" itemValue="0"/>
+                                                            <f:selectItem itemLabel="1" itemValue="1"/>
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Max" styleClass="section-label"/>
+                                                        <p:selectOneMenu editable="true"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                                         styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Nillable" styleClass="section-label"/>
+                                                        <p:selectOneMenu
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.nillable}"
+                                                                styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="true" itemValue="true"/>
+                                                            <f:selectItem itemLabel="false" itemValue="false"/>
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiePanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="bbiepPanel" header="BBIEP">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Business Term" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiepPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiepPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbiepPanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="bdtPriRestriPanel">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="BDT Primitive Restriction"/>
+
+                                                        <h:selectOneMenu id="selectBdtPriRestri"
+                                                                         style="width: 100px; margin-left: 20px; font-weight: normal !important;"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.restrictionType}">
+                                                            <p:ajax update="bdtPriRestriPanel"/>
+                                                            <f:selectItems
+                                                                    value="#{copyProfileBODBean.getAvailablePrimitiveRestrictions(copyProfileBODBean.selectedTreeNode.data)}"/>
+                                                        </h:selectOneMenu>
+                                                    </f:facet>
+                                                    <h:panelGrid columns="2" cellpadding="2">
+                                                        <h:outputText value="BDT Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bdt.den}"
+                                                                styleClass="section-content"/>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
+                                                        <h:outputText value="Primitive" styleClass="section-label"/>
+
+                                                        <p:autoComplete value="#{copyProfileBODBean.bbieXbtName}"
+                                                                        completeMethod="#{copyProfileBODBean.completeInputForBbieXbt}"
+                                                                        dropdown="true"
+                                                                        style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieXbtName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
+                                                        <h:outputText value="Code List" styleClass="section-label"/>
+
+                                                        <p:autoComplete value="#{copyProfileBODBean.bbieCodeListName}"
+                                                                        completeMethod="#{copyProfileBODBean.completeInputForBbieCodeList}"
+                                                                        dropdown="true"
+                                                                        style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieCodeListName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
+                                                        <h:outputText value="Agency ID List"
+                                                                      styleClass="section-label"/>
+
+                                                        <p:autoComplete
+                                                                value="#{copyProfileBODBean.bbieAgencyIdListName}"
+                                                                completeMethod="#{copyProfileBODBean.completeInputForBbieAgencyIdList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieAgencyIdListName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                            </h:panelGroup>
+
+                                            <!--
+                                                BBIE_SC
+                                            -->
+                                            <h:panelGroup
+                                                    rendered="#{copyProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
+                                                <p:panel id="bbieScHeaderPanel">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.name}"
+                                                                styleClass="section-content"/>
+
+                                                        <h:outputText value="Used" styleClass="section-label"/>
+                                                        <h:selectBooleanCheckbox
+                                                                value="${copyProfileBODBean.selectedTreeNode.data.bbieSc.used}"
+                                                                styleClass="section-content">
+                                                            <f:ajax render="bbieScHeaderPanel"/>
+                                                        </h:selectBooleanCheckbox>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="bbieScPanel" header="BBIE SC">
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Min" styleClass="section-label"/>
+                                                        <p:selectOneMenu
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                                styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="0" itemValue="0"/>
+                                                            <f:selectItem itemLabel="1" itemValue="1"/>
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Max" styleClass="section-label"/>
+                                                        <p:selectOneMenu editable="true"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                                         styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                            <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                            <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </p:selectOneMenu>
+
+                                                        <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Default" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Business Term" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.bizTerm}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Remark" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.remark}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Definition" styleClass="section-label"/>
+                                                        <h:inputTextarea
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
+                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="bbieScPanel"/>
+                                                        </h:inputTextarea>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                                <p:panel id="bdtScPriRestriPanel">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="BDT SC Primitive Restriction"/>
+
+                                                        <h:selectOneMenu id="selectBdtScPriRestri"
+                                                                         style="width: 100px; margin-left: 20px; font-weight: normal !important;"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.restrictionType}">
+                                                            <p:ajax update="bdtScPriRestriPanel"/>
+                                                            <f:selectItems
+                                                                    value="#{copyProfileBODBean.getAvailableScPrimitiveRestrictions(copyProfileBODBean.selectedTreeNode.data)}"/>
+                                                        </h:selectOneMenu>
+                                                    </f:facet>
+                                                    <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="BDT SC Name" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bdtSc.propertyTerm} #{copyProfileBODBean.selectedTreeNode.data.bdtSc.representationTerm}"
+                                                                styleClass="section-content"/>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
+                                                        <h:outputText value="Primitive" styleClass="section-label"/>
+
+                                                        <p:autoComplete value="#{copyProfileBODBean.bbieScXbtName}"
+                                                                        completeMethod="#{copyProfileBODBean.completeInputForBbieScXbt}"
+                                                                        dropdown="true"
+                                                                        style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieScXbtName}"/>
+                                                            <f:ajax render="bdtScPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
+                                                        <h:outputText value="Code List" styleClass="section-label"/>
+
+                                                        <p:autoComplete
+                                                                value="#{copyProfileBODBean.bbieScCodeListName}"
+                                                                completeMethod="#{copyProfileBODBean.completeInputForBbieScCodeList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieScCodeListName}"/>
+                                                            <f:ajax render="bdtScPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
+                                                        <h:outputText value="Agency ID List"
+                                                                      styleClass="section-label"/>
+
+                                                        <p:autoComplete
+                                                                value="#{copyProfileBODBean.bbieScAgencyIdListName}"
+                                                                completeMethod="#{copyProfileBODBean.completeInputForBbieScAgencyIdList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{copyProfileBODBean.onSelectBbieScAgencyIdListName}"/>
+                                                            <f:ajax render="bdtScPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+                                                </p:panel>
+                                            </h:panelGroup>
+                                        </p:panel>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </p:panel>
+                </p:tab>
+            </p:wizard>
+
+            <p:panel id="btnGroup" style="margin-top: 40px;">
+                <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
+                                 value="Back" icon="ui-icon-arrowthick-1-w" oncomplete="PF('wizard').back();"/>
+                <p:commandButton id="btnNext" widgetVar="btnNext" style=""
+                                 value="Next" icon="ui-icon-arrowthick-1-e" oncomplete="PF('wizard').next();"/>
+                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
+                                 value="Copy" icon="ui-icon-check" action="#{copyProfileBODBean.copy()}"/>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+            <script>
+                var disableButtons = function () {
+                    var btnBack = $(document.getElementById(PF('btnBack').id));
+                    var btnNext = $(document.getElementById(PF('btnNext').id));
+                    var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
+
+                    btnBack.prop("disabled", true).addClass('ui-state-disabled');
+                    btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                    btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
+                };
+
+                var onBack = function () {
+                    disableButtons();
+                };
+
+                var onNext = function () {
+                    disableButtons();
+
+                    var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
+                    var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
+
+                    if (idx == 1 &amp;&amp; selected) {
+                        PF('loadingBlock').show();
+
+                        var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
+                        $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
+                    }
+                };
+
+                var onSubmit = function () {
+                    disableButtons();
+
+                    PF('progressBlock').show();
+                    PF('progressBar').start();
+                };
+            </script>
+        </h:form>
+    </ui:define>
+</ui:composition>

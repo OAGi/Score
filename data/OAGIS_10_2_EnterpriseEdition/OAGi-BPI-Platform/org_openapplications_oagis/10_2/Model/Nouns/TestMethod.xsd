@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               		 10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/ActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="TestMethod" type="TestMethodType" id="oagis-id-474b59cbf55347b8a6b5a11d8769c986"/>
+	<xsd:complexType name="TestMethodType" id="oagis-id-8bf46f3f21c448d0a582dfb37a02dd6f">
+		<xsd:complexContent>
+			<xsd:extension base="TestMethodBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestMethodExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-2f6070d01b6d4d39bfa6357a795661b4"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestMethodBaseType" id="oagis-id-72790a01125b44d7aa0da81bc641abc6">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="RevisionID" minOccurs="0" id="oagis-id-8750294e1b0b40aa8509e52052819ace"/>
+					<xsd:element ref="Name" minOccurs="0" id="oagis-id-0f7b494f68144b14b145021bcfbe101d"/>
+					<xsd:element ref="EnterpriseUnit" minOccurs="0" maxOccurs="unbounded" id="oagis-id-857d68f3afb94f96afecc732be301515"/>
+					<xsd:element ref="StandardDocumentReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-4ba226ce79444fb982a0ba65058166d4"/>
+					<xsd:element ref="MethodDocumentReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-890d960d312f4225b73f50fe934fefbf"/>
+					<xsd:element ref="Status" minOccurs="0" maxOccurs="unbounded" id="oagis-id-68910fd965fb486fb911502e4de59a66"/>
+					<xsd:element ref="TestEnvironmentCondition" minOccurs="0" maxOccurs="unbounded" id="oagis-id-22717996d07a41eb80778086c9aa5508"/>
+					<xsd:element ref="PersonnelClass" minOccurs="0" maxOccurs="unbounded" id="oagis-id-70aa81eb412447968733fe0d2ec184ab"/>
+					<xsd:element ref="TestEquipmentClass" minOccurs="0" maxOccurs="unbounded" id="oagis-id-3fb2d70c9ae44067a4c2de18056487c8"/>
+					<xsd:element ref="ProcedureStep" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c28e2626ae464f54928dd788751936e6"/>
+					<xsd:element ref="TestCondition" minOccurs="0" maxOccurs="unbounded" id="oagis-id-9dc607af63f84099a41dd5fd56460190"/>
+					<xsd:element ref="TestMaterial" minOccurs="0" maxOccurs="unbounded" id="oagis-id-f9323bbe28984452b84a04b79c0a60b1"/>
+					<xsd:element ref="TotalSampleQuantity" minOccurs="0" id="oagis-id-27eaba57b80e4f5ab62e5454132e2d99"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+</xsd:schema>

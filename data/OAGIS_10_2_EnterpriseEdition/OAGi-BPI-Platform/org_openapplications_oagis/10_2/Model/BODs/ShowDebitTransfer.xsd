@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowDebitTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/DebitTransfer.xsd"/>
+        <xsd:element name="ShowDebitTransfer" type="ShowDebitTransferType" id="oagis-id-a454930a2584482aa626d79f87690b95">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowDebitTransfer is to enable an application to request specific DebitTransfer information from another business application module.  The response to the ShowDebitTransfer is the ShowDebitTransfer.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowDebitTransferType" id="oagis-id-2c3aa5ba67f7463280f3192e62baf6d1">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowDebitTransferDataAreaType" id="oagis-id-dbbb12b465a0479792aaf29d7b6563c2">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowDebitTransfer. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (DebitTransfer).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowDebitTransferDataAreaType" id="oagis-id-426cad9f687d4afd885acd152831d9cf">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-6a47e30d764d4a88a5f78cc125d83b63"/>
+                        <xsd:element ref="DebitTransfer" maxOccurs="unbounded" id="oagis-id-095d3208a73b4635be816c8b2c08d80c"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

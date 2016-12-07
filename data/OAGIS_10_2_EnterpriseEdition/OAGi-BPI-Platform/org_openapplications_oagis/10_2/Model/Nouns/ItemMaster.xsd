@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/ItemMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="ItemMaster" type="ItemMasterType" id="oagis-id-08d26da02865431980dd73372b2261c7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Represents any unique purchased part or manufactured product.  Item, as used here, refers to the basic information about an item, including its attributes, cost, and locations.  It does not include item quantities.  Compare to the noun BalanceInventory, which includes all quantities and other location-specific information.
+
+ItemMaster is used as the Item Master. 
+
+The ItemMaster provides details about an Item in many domains of an enterprise. Each domain or functional area are interested in different views of the Item. The ItemMaster provides information to the following partial list of functional areas: Manufacturing, Order Management along with the Catalog view, Logistics, Engineering along with the EngineeringDocument, CRM, and Financials.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="LocationItemMaster" type="LocationItemMasterType" id="oagis-id-5687d7bcd26c4f18bb1162917f8af1fb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Item information that is specific to a location. For example a plant or site may keep different information about an item than the corporate office.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ItemValue" type="ItemValueType" id="oagis-id-9aa89d380f094c698f14a88af10f1dce">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the cost or value of the item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ItemMasterLocationBaseType" id="oagis-id-2e5ae9d540f94a7192adba9fa2865b2b">
+		<xsd:complexContent>
+			<xsd:extension base="ItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Effectivity" id="oagis-id-2182b4b0ab954e0fa5fd5806614964d0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-92ca95eaf5de4a5999ae4cec147a782c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExecutionTimePeriod" id="oagis-id-cd9850dcbcfe4e6b928a62fc694a99c5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time in which the associated entity is actually in process.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FixedQuantityIndicator" id="oagis-id-9fe837bd7f314ed4bccea199b93d2424" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the ItemQuantity is a fixed size and does not scale along with the quantity of the BOM or Routing being produced</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MaximumLotSizeQuantity" id="oagis-id-28969b71d85242a593bc1a4f6cf45062" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the maximum number of items that can be put into a lot for this Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MinimumLotSizeQuantity" id="oagis-id-5dda57af27734eeabe626014ad20a56a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the minimum number of items that can be put into a lot for this Item,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LotSizeMultiplerNumber" id="oagis-id-881d2f3d3b4541f18164448ee9f59df7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used with the MinimumLotSize and MaximumLotSize.  It contains the multiplier between the minimum and maximum manufactured lot quantities.  For example, if the maximum lot quantity is 10,000 and the minimum lot quantity is 1000, the lot size multiplier could be 1000.  This means the Item may be manufactured in lot sizes starting at 1000 and going up to 10,000 by 1000 increments.For example, 1000, 2000, 3000, etc.  A lot of 4500, would not be allowed under these constraints.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LeadTimeDuration" id="oagis-id-7311d5b9a4d843278db315050bf8e218" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the duration of time that is required to add to a manufacturing process to forecast availability of this Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequiredPercent" id="oagis-id-3a0e4d5dbc74475b8e29f1ad671c680f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the percentage of the total quantity on the Bill of Material that is required to be available before the manufacturing process can begin</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BackFlushedIndicator" id="oagis-id-64e65e96ced54376a1788c83b63d32b5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the associated quatities are backflushed or not.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualIndicator" id="oagis-id-7a5e4dc09f4845c1b77c7b94afbd6bc9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates if the associated quatities are reported as they happen.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TrackingIndicator" id="oagis-id-72d91a9655594b5696fc80f4806c8573" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the related object is to be tracked</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScrapIndicator" id="oagis-id-5539ee820eb044bb9b6e9b71aea5fee1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the status of an item as a scrapped item</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemStatus" id="oagis-id-cb97a7de77904b0f823a77d5e16a3e8e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether an item is active, inactive, or in other various states.  Examples of values for this field include:	Active, Inactive, Hold, Deleted, Obsolete</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BaseUOMCode" id="oagis-id-ac04cf799556477e9f0899ebc09b7475" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the base unit of measure of the associated item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="StorageUOMCode" id="oagis-id-004ce75aef9c4e3b8bb325ef816f1104" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the storage unit of measure of the item. This is sometimes different from the unit of measure that is used to count a product as it is consumed, sold or accounted for</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShippingUOMCode" id="oagis-id-52963efd26e6456a9fe660b52cd1c5df" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This describes the unit of measure that a product is shipped.  This is sometimes different from the unit of measure that is used to count a product as it is consumed, sold or accounted for.
+
+Examples are:
+
+- Generic Quantity  (Each, Pair, Dozen, Gross, etc)
+- Weight (Ounce, Pound, Ton, Kilogram, etc)
+- Volume (Cup, Pint, Gallon, Liter, etc)
+- Length (Inch, Foot, Yard, Meter, etc)
+- Time (Second, Minute, Hour, Day, Year, etc)</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RoutingDisposition" id="oagis-id-699bce47df7f4a9c961c5a68c9c87949" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This determines the receipt routing of an item or part.
+
+Examples of values include:
+Customer consignment, Inspection, Vendor consignment, Blocked
+Bonded, User defined
+
+Possible synonyms are 
+Receipt Routing, Material Status, Material Condition Code</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SerialNumberSpecificationDescription" id="oagis-id-4e73e8b681ff4190b01e2a72b3e476f3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the business rules used to specify what constitutes a serial number</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LotNumberSpecification" id="oagis-id-e1a16112941843898fc9c7a2a57bcad6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the business rules used to specify what constitutes a lot</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LastModificationDateTime" id="oagis-id-0cf2664d66024f4ba484a6d1571679ce" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The datetime on which the object was last modified</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UnitPackaging" id="oagis-id-d30ae827a971407cacfde97e560c62be" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the packaging that the company generally references the Item in.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OwnerParty" id="oagis-id-be4098072d1c4a7b842e30d4a670e381" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to identify who or which organization owns the item or part. The content of this field is user defined based on a specific Customer or Supplier.
+
+Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UOMGroupID" id="oagis-id-88532191f0ca44448cd07a3b5e64bfa8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies a set of related UOM's and their conversions from the Item's UOM</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AlternateUOMCode" id="oagis-id-6766020e924a44d29dc6f3d68cf3542f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies alternate unit of measures for an item that may be used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UOMCodeConversionRate" id="oagis-id-4f95369f8e2e4f6bab9c189554674115" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ItemValue" id="oagis-id-c3dec8717ed34b558302f1e59bafb28f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the cost or value of the item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BOMReference" id="oagis-id-695f52c617944bb795bbcb7cf09b2bde" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Bill-Of-Material Document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DrawingAttachment" id="oagis-id-ff845cb977e745ec8f70a3c423336f54" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Drawing Attachment allows drawings to be attached to a Noun or Component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-80453c0fc82f4f0f875dcad684cb97e4" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemMasterBaseType" id="oagis-id-25ceabfffd2e40d1809365d3b5e3d9f0">
+		<xsd:complexContent>
+			<xsd:extension base="ItemMasterLocationBaseType">
+				<xsd:sequence>
+					<xsd:element ref="SupplierContractReference" id="oagis-id-5cca6069bb6741bea9734b73a681bf34" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference to the supplier contract.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BuyerContractReference" id="oagis-id-259d2305def64cd6b7b89f9558fb2bb9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference to the buyer contract.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FreightItemID" id="oagis-id-548e571d49084d2aa4c63a8a8179e400" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the item number assigned to the type of goods for the purposes of freight classification and cost calculation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FreightClassification" id="oagis-id-e6ac995824ed4768a0e7a0870543f292" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies goods for purposes of freight cost calculation. An example would the qualifications used by National Motor Freight Carriers. The classification is used in order calculate the freight cost. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SerialControlIndicator" id="oagis-id-53c93524518f4a15a3abb320c553efd5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates if the item is a serialized item i.e. unique instances of the item are identified by unique serial numbers. Valid values are 0 for no, and 1 for yes</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LotControlIndicator" id="oagis-id-9d5d901675994439bc6c8445f3692639" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates if the item is a lotted item. Valid values are 0 for no, and 1 for yes</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExpirationControlCode" id="oagis-id-063ef27ec8d94162a7a6d7edfdbead1d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the type of control used to determine whether or not an item has expired or is no longer considered good to sell or consume.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GeneralLedgerAccount" id="oagis-id-64fc4146611041daa5bab035f4d33ad1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An account on the general ledger for the associated document and component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DocumentDateTime" id="oagis-id-a0f42900a18147d991c88a774f9594f8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date that document was created within the system of record.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CatchWeightIndicator" id="oagis-id-a44c6bb64570475f800951a7a17bf81d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that an ITEM requires special processing to determine the actual net or gross weight during certain inventory operations.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShelfLifeDuration" id="oagis-id-fd73d25ba93d465b981bd33f79d0ece5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the period of time in duration that the item is valid for use</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AverageRunSizeQuantity" id="oagis-id-82edd4bb57b24457961b595c4e6d281b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the average quantity made during a manufacturing run using a specific Item or Bill of Material.  This is often used during MRP or other forecasting operations</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-bf2dcf59c61e44afbd6304443744da9a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LocationItemMaster" id="oagis-id-92840f1e9af64bf8946ae7c1b9b35a71" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Item information that is specific to a location. For example a plant or site may keep different information about an item than the corporate office.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemMasterType" id="oagis-id-f409e66d2e3841ff8fd959962e418557">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Represents any unique purchased part or manufactured product.  Item, as used here, refers to the basic information about an item, including its attributes, cost, and locations.  It does not include item quantities.  Compare to the noun InventoryBalance, which includes all quantities and other location-specific information.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ItemMasterBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ItemMasterExtensionType" id="oagis-id-64c27efad218453692e8ef1883ed289f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemValueBaseType" id="oagis-id-dc2a6cb390f140a6ab75a9349e47a50d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the cost or value of an item.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="UnitValue" id="oagis-id-f336c3ecb10c4718a68677597d480b97" minOccurs="0"/>
+					<xsd:element ref="CostingMethodCode" id="oagis-id-1e41cbd9a9b74af39e72c2bbcd1a26a5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the methodology by which the value of an item is determined.
+
+Values are:
+ Standard
+ Moving Average
+ LIFO - For last in first out.
+ FIFO - For first in first out.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ValueClassification" id="oagis-id-3a687ed2c1c5405f993d52b6d489e546" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2"> Is a grouping used to determine the General Ledger accounting effect. These are user defined values, with the exception of the values TOTAL, MATERIAL, LABOR, BURDEN, OVERHEAD, SUBCONTRACT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GLEntityID" id="oagis-id-d1c7013e2931474785d053486a9efc5a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
+
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-a3a5cdb94b22405b8831b7721e2c452d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-90d1b0d7e56d4c36b578c4e08a85b4bc" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemValueType" id="oagis-id-6f3010bb7560478997c98c990a54d11b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the cost or value of an item.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ItemValueBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ItemValueExtensionType" id="oagis-id-a6ea6aefe52446bdb86d1ee4f7dde1e1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LocationItemMasterBaseType" id="oagis-id-e62c3c0246864f459326975ab10c8ec9">
+		<xsd:complexContent>
+			<xsd:extension base="ItemMasterLocationBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Facility" id="oagis-id-b007faa986c246e990630255a9eefb56" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A Facility identifies a location within an entity. The facility may have sub-locators identified using a sequenced identification notation e.g. Warehouse A100 Sub-Location 11, Row R10 would be represented as an array of three Facility elements with values as A100, 11, R10, name attribute as Warehouse, Sub-Location and Row and sequence attribute as 1,2 and 3 respectively.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LocationItemMasterType" id="oagis-id-9f8f948a435f4ffaa7e4864f0ccb4e48">
+		<xsd:complexContent>
+			<xsd:extension base="LocationItemMasterBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="LocationItemMasterExtensionType" id="oagis-id-3fa23bcf72084daf84e5d5f35a92a74d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AlternateUOMBaseType" id="oagis-id-2e9f87764c514d52a540f1dee63f5cfc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The UOM here represents the alternate UOM. The the Mulitplier determines the conversion between the parent UOM and the UOM specified here in the allternate UOM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="UOMMultiplierNumber" id="oagis-id-97a487a100ef498e94a4e1662af746dd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the multiple to make the conversion from the Inventory UOM to the the alternate UOM. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UOMCode" id="oagis-id-f9685501f15649339f36083c7c960e2a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the UOM of any object</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UnitPackaging" id="oagis-id-9c4f2d7c099140fa9167c4565b41e241" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the packaging that the company generally references the Item in.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AlternateUOMType" id="oagis-id-9185d6a0f5a04ab38c362e033353b43f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The UOM here represents the alternate UOM. The the Mulitplier determines the conversion between the parent UOM and the UOM specified here in the allternate UOM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AlternateUOMBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="AlternateUOMExtensionType" id="oagis-id-105847a69dc1449bb8799abbfb46cb49" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

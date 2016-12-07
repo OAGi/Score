@@ -1,0 +1,111 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="629839AE-F8C3-6544-3090-0E21DF98F56A" name="APP_USER">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:55:57 UTC</createdTime>
+<comment>This table captures the user information for authentication and authorization purposes.</comment>
+<commentInRDBMS>This table captures the user information for authentication and authorization purposes.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_1</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="APP_USER_ID" id="0F407506-2FE3-AC47-2F58-3B1949647DAD">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>Primary key column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOGIN_ID" id="651FA698-F3F8-3D21-D3C0-518C3F8BF129">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>User Id of the user.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="PASSWORD" id="407F1B8D-0D40-8E04-8F63-056D3FA86A17">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>Password to authenticate the user.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="1232C853-4D5B-F9FA-027A-A058A7677D88">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>Full name of the user.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ORGANIZATION" id="791DFCC6-8783-2B0E-032F-FBEAA375B256">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>The company the user represents.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OAGIS_DEVELOPER_INDICATOR" id="2A655C40-C4A8-A17C-9ABD-FC4561E9E235">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<commentInRDBMS>This indicates whether the user can edit OAGIS Model content. Content created by the OAGIS developer is also considered OAGIS Model content.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="5B77DA46-5F43-A0AA-6527-00937076EE5C" name="APP_USER_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="199215DA-E444-CE97-64BD-AB768C24EAEB" name="APP_USER_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:58:48 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="651FA698-F3F8-3D21-D3C0-518C3F8BF129"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

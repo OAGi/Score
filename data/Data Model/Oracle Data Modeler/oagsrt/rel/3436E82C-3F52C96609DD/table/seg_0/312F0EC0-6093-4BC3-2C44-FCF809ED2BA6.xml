@@ -1,0 +1,108 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="312F0EC0-6093-4BC3-2C44-FCF809ED2BA6" name="BIZ_CTX_VALUE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:17:47 UTC</createdTime>
+<comment>This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value.</comment>
+<commentInRDBMS>This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_44</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BIZ_CTX_VALUE_ID" id="DA4DAA6A-C1C7-2F16-BFE1-D02693CF65CB">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:19 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BIZ_CTX_ID" id="8AA5ADF3-131C-0BC4-EAA2-602869119F85">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:19 UTC</createdTime>
+<commentInRDBMS>Foreign key to the biz_ctx table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="847D1DE5-FBF0-6E1D-DDBF-233BFD3389A5" referredColumn="5925057B-29E1-5A22-3A22-6E5C72802C85"/>
+</associations>
+</Column>
+<Column name="CTX_SCHEME_VALUE_ID" id="0A307A89-5040-1CF7-C278-CDB3F044C194">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:19 UTC</createdTime>
+<commentInRDBMS>Foreign key to the CTX_SCHEME_VALUE table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="3468816A-3A55-75A7-A0E1-96C3E7CCF2EE" referredColumn="C0CA9967-95A0-9E20-CEE6-ED12E3FA67CB"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="0A5B45F4-0A9D-DADA-2E43-CAF5DE05D1CA" name="BIZ_CTX_VALUE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:19 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DA4DAA6A-C1C7-2F16-BFE1-D02693CF65CB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="1A19E3AF-9A88-A17E-2FBC-9A001CC1D19D" name="BIZ_CTX_VAL_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:44 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DA4DAA6A-C1C7-2F16-BFE1-D02693CF65CB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="90EE6FE9-E007-2A8D-42D0-68D63ECFB0C6" name="BIZ_CTX_VAL_CTX_SCH_VAL_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:18:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0A307A89-5040-1CF7-C278-CDB3F044C194"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2B66956E-EE43-09F9-2952-BE571FBCCD9B" name="BIZ_CTX_VALUE_BIZ_CTX_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:47 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8AA5ADF3-131C-0BC4-EAA2-602869119F85"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F5887CDC-6FAF-4B31-1A2D-2053813F33C1" name="BIZ_CTX_VALUE_CSV_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:18:47 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0A307A89-5040-1CF7-C278-CDB3F044C194"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeShippersExportDeclaration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersExportDeclaration.xsd"/>
+	<xsd:element name="ChangeShippersExportDeclaration" type="ChangeShippersExportDeclarationType" id="oagis-id-43bedba896f443318eab4af18fe27221">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeShippersExportDeclaration is to transmit an ShippersExportDeclaration from a supplier to a customer. Indicating that the receiver of the ShippersExportDeclaration is to Change the ShippersExportDeclaration for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeShippersExportDeclarationType" id="oagis-id-c56b6b84a6ba47a6b52db58bf613f291">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeShippersExportDeclarationDataAreaType" id="oagis-id-2a43e059538248f9a7d96a00602d517f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeShippersExportDeclaration. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (ShippersExportDeclaration).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeShippersExportDeclarationDataAreaType" id="oagis-id-8590883e69a94cbe8fa0df06562c6146">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-faa9863cdb204ead90453e70af388e09"/>
+			<xsd:element ref="ShippersExportDeclaration" maxOccurs="unbounded" id="oagis-id-a41434d42eb64f97bac9997abed9220f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

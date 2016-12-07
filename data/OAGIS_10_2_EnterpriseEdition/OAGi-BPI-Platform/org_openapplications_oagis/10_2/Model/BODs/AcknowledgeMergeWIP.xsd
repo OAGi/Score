@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/AcknowledgeMergeWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MergeWIP.xsd"/>
+        <xsd:element name="AcknowledgeMergeWIP" type="AcknowledgeMergeWIPType" id="oagis-id-27479b8a915d4eb38f2897aa4675c551">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeMergeWIP BOD is to notify a Manufacturing Application of the creation of a single production lot from multiple production lots of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lots, the resulting lot, lot quantities, and the processing step at which this event occurred, along with the time at which this event occurred.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeMergeWIPType" id="oagis-id-b0b5d08fef094d95861b86eb3a0e375e">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeMergeWIPDataAreaType" id="oagis-id-b4d161ab38f44433a4d861cf7380e79a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeMergeWIP. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (MergeWIP).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeMergeWIPDataAreaType" id="oagis-id-c8b5dc0ed3334cc799bcd159e5ce22cc">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-98719e57914e4e7e92446bac00738ba4"/>
+                        <xsd:element ref="MergeWIP" maxOccurs="unbounded" id="oagis-id-5f8f64668f7a4aed9f1777e6b4e7589d"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

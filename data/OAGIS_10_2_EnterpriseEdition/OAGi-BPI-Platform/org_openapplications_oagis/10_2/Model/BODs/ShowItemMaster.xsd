@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowItemMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ItemMaster.xsd"/>
+        <xsd:element name="ShowItemMaster" type="ShowItemMasterType" id="oagis-id-ae15a1dd2ff94fb797bf38ec4d7558b6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowItemMaster is to supply ITEM Information to another business application module.  This request may be used as a response to a GetItemMaster request or as the result of some other business event.  This BOD does not usually cause updates to occur.
+
+There are many possible business applications in several environments that may use this capability.  For example, an MRP, Inventory, or Manufacturing business application could use this to request item information.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowItemMasterType" id="oagis-id-673a72f474194ee5a755552579bc4f70">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowItemMasterDataAreaType" id="oagis-id-f8a9be55f02b484b82c877b77ac87b6a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowItemMaster. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ItemMaster).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowItemMasterDataAreaType" id="oagis-id-4f16099481c44e75bd085ae4468d6d2c">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-4000695b02a44607974c2f1ce4f59886"/>
+                        <xsd:element ref="ItemMaster" maxOccurs="unbounded" id="oagis-id-51c45ea0c6fe4a85b701cc19eaa2c615"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

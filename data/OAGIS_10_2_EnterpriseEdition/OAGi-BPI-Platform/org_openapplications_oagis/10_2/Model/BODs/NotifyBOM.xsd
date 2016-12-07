@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyBOM.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BOM.xsd"/>
+        <xsd:element name="NotifyBOM" type="NotifyBOMType" id="oagis-id-6539a93cd21f41a48ac086cfda7d579f">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyBOM is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may usethis capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement of a Bill of Material.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyBOMType" id="oagis-id-9d4c399506974ad3b5ec81f246920873">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyBOMDataAreaType" id="oagis-id-4cc15580f6484ec6952f3f859cfa3920">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyBOM. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (BOM).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyBOMDataAreaType" id="oagis-id-9f096c33c6b445719ec52d9f7112ed0b">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-fa98970ab14441c3a72bd44a195192d0"/>
+                        <xsd:element ref="BOM" maxOccurs="unbounded" id="oagis-id-350c777ec384468a819d6a0d1c66dbc8"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

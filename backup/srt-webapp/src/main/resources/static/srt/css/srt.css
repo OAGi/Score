@@ -1,0 +1,63 @@
+body {
+    font-family: "Source Sans Pro", sans-serif;
+}
+
+#header {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
+}
+
+.navbar-brand {
+    padding: 0px; /* firefox bug fix */
+}
+
+.navbar-brand > img {
+    padding: 1px;
+    margin: 0 15px 0 0;
+    width: 180px;
+    height: 50px;
+}
+
+#content {
+
+}
+
+.content-header {
+    opacity: .4;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    color: #f8f8f8;
+    background: url(../images/oag_main.png) no-repeat center center;
+    background-size: cover;
+}
+
+.content-section-a {
+    padding: 50px 0;
+    background-color: #f8f8f8;
+}
+
+.content-section-b {
+    padding: 50px 0;
+    border-top: 1px solid #e7e7e7;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+ul.lead {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#footer {
+    padding-top: 10px;
+}
+
+#footer a {
+    color: #777;
+    text-decoration: none;
+}
+
+#footer a:hover {
+    color: #777;
+    text-decoration: none;
+    cursor: pointer;
+}

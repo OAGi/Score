@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseProductionPerformance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductionPerformance.xsd"/>
+	<xsd:element name="SyncResponseProductionPerformance" type="SyncResponseProductionPerformanceType" id="oagis-id-cdc0f0b2cc6f4f5faa7ae0b32401636d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseProductionPerformance is to SyncResponsehronize the information known about ProductionPerformances between systems. The SyncResponseProductionPerformance MUST be generated from the system that own the ProductionPerformance and sent to systems that count on the sending system to maintain the ProductionPerformance information.
+
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseProductionPerformanceType" id="oagis-id-0f7ff9b27bca4f3ba10c4d25d046b4bc">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseProductionPerformanceDataAreaType" id="oagis-id-4008ea2bd5f54ce090495a3a3cbe0927">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseProductionPerformance. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ProductionPerformance).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseProductionPerformanceDataAreaType" id="oagis-id-a590342ec28943eb977ec48f850e754a">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-555dc892a5214208b546ce70183cc2c7"/>
+			<xsd:element ref="ProductionPerformance" maxOccurs="unbounded" id="oagis-id-ebee7fe4154e4848be276803e59904d2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeConfirmWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ConfirmWIP.xsd"/>
+	<xsd:element name="CancelAcknowledgeConfirmWIP" type="CancelAcknowledgeConfirmWIPType" id="oagis-id-5d9caba2e0d84cb5bda2b295b416c19f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeConfirmWIP is to respond to a request for the data necessary to perform a confirmation of the movement of WIP (Work in Progress).
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeConfirmWIPType" id="oagis-id-6ff8ee8836444f148c042b9ed3599e24">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeConfirmWIPDataAreaType" id="oagis-id-6193dad01def4534bbeccb0cfdb89f9d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeConfirmWIP. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ConfirmWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeConfirmWIPDataAreaType" id="oagis-id-67d64ba965e24949aced0f6cbac66619">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-73448f53af2844f0b93222757f12a97b"/>
+			<xsd:element ref="ConfirmWIP" maxOccurs="unbounded" id="oagis-id-5b4df9afc99246d9a250df6452a52c68"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

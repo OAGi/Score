@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/AcknowledgeProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+        <xsd:element name="AcknowledgeProductAvailability" type="AcknowledgeProductAvailabilityType" id="oagis-id-dda67b40ae0148a1b66522c8f44f1ce8">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The AcknowledgeProductAvailability may be used to obtain limited information Acknowledgeing about documents that match certain selection criteria in a GetAcknowledgeProductAvailability.
+
+Additional information about a specific ProductAvailability may be obtained through ShowProductAvailability by using the Acknowledgeing information to populate a GetProductAvailability request.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeProductAvailabilityType" id="oagis-id-56eb8ac6a2be4883961e1ae0913056d3">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeProductAvailabilityDataAreaType" id="oagis-id-0d97219efca3468880011d845f401369">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeProductAvailability. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (ProductAvailability).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeProductAvailabilityDataAreaType" id="oagis-id-f686af3ae1c54f9c864caba736a81ee0">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-e5acf1cceebb4818a2a84cb511c802d2"/>
+                        <xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-f4d0ecff19f54925b48934100912363a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

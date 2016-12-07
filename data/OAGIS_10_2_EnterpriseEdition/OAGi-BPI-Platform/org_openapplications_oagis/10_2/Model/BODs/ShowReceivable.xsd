@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowReceivable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Receivable.xsd"/>
+        <xsd:element name="ShowReceivable" type="ShowReceivableType" id="oagis-id-48013ab9b6c44c9f9e321e6cbcb91a96">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowReceivable is to supply Receivable information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowReceivableType" id="oagis-id-5da0e35cfd3b457f9a1b0ea4b426af04">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowReceivableDataAreaType" id="oagis-id-9e43421d56f14f4a8469155f27fd1f41">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowReceivable. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Receivable).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowReceivableDataAreaType" id="oagis-id-cb5d2643d0e848fb9f8d62a147fb3098">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-7026bc48344a43c7b51ac34930da5a11"/>
+                        <xsd:element ref="Receivable" maxOccurs="unbounded" id="oagis-id-cf3389fa541e4beeb14b75e3296c1e7a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

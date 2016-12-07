@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessChartOfAccounts.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ChartOfAccounts.xsd"/>
+	<xsd:element name="ProcessChartOfAccounts" type="ProcessChartOfAccountsType" id="oagis-id-9d6e8583ecd3486f98eabef1ffcc42e8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessChartOfAccounts is to enable an application to request specific ChartOfAccounts information from another business application module.  The response to the ProcessChartOfAccounts is the ShowChartOfAccounts.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessChartOfAccountsType" id="oagis-id-a87837c9389842b3bc128b07f80c7570">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessChartOfAccountsDataAreaType" id="oagis-id-2dec44cce5e046e485dbfa44a46f9544">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessChartOfAccounts. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ChartOfAccounts).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessChartOfAccountsDataAreaType" id="oagis-id-3b25df2c988a4344aac85899f10eade8">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-1fca31dc73b64a49b6b46a5973ed5faf"/>
+			<xsd:element ref="ChartOfAccounts" maxOccurs="unbounded" id="oagis-id-4bb105b8fd6f43d99fd7d5044643beda"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

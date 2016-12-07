@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/PartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="PartyScreen" type="PartyScreenType" id="oagis-id-b9f5225e38fc4e7fa3bc6dcc4985aba8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Process</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PartyScreenBaseType" id="oagis-id-b51032a65e854a4386d8463759a34a48">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ScreeningSearchTypeCode" id="oagis-id-4525f231391a4c2c949ef11232b498a1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">HR/XML 3.0: Classifies the type of screening service to be performed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScreeningSearchTypeQualifierCode" id="oagis-id-b6f7525a170a493890c805bf2ac338ec" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">HR/XML 3.0: Classifies the type of screening service to be performed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SearchSanction" id="oagis-id-3307a3495cd84614a39419e99c0d84fd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">HR-XML 3.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScreeningListRecordValue" id="oagis-id-03483b59627b426ba9d0aba3fd579b31" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ScreeningListQualifierValue" id="oagis-id-fe933a0eba9d46169c08fe87935d3592" minOccurs="0"/>
+					<xsd:element ref="ScreenParty" id="oagis-id-b713959c514f4917b599ab9eafa0fe7d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is the Party or Partner Master records of the Parties that an organization partners.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-2aa2beba2e55474ba4dd720c69b7dfc5" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PartyScreenType" id="oagis-id-e129e1aabef6426e8e0b18ac2b605e9b">
+		<xsd:complexContent>
+			<xsd:extension base="PartyScreenBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PartyScreenExtensionType" id="oagis-id-fdf161f5dfb64114acb9cce7fb76dd2d" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

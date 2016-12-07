@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessMergeWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MergeWIP.xsd"/>
+        <xsd:element name="ProcessMergeWIP" type="ProcessMergeWIPType" id="oagis-id-07d720726c184cccae0c94f550c2390e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessMergeWIP BOD is to notify a Manufacturing Application of the creation of a single production lot from multiple production lots of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lots, the resulting lot, lot quantities, and the processing step at which this event occurred, along with the time at which this event occurred.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessMergeWIPType" id="oagis-id-2a752e6227964530b4a800283e89c95a">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessMergeWIPDataAreaType" id="oagis-id-b8feec33523a4dfba87d374fdfd3435c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessMergeWIP. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (MergeWIP).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessMergeWIPDataAreaType" id="oagis-id-b75da4a58f324d4d819aefcb81e32359">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-000180fcdaca4b01af45d04befa5a0a3"/>
+                        <xsd:element ref="MergeWIP" maxOccurs="unbounded" id="oagis-id-368777659f824c2a9d5e7f53d64c1330"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

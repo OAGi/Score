@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelProjectMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProjectMaster.xsd"/>
+	<xsd:element name="CancelProjectMaster" type="CancelProjectMasterType" id="oagis-id-d233262995fc47dd9e15290bca870f05">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelProjectMaster is to enable all relevant sub-systems that submit transactions to the project accounting application to maintain valid values for the key project fields.  The target applications for this update would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelProjectMasterType" id="oagis-id-5a1026708bc047468f5b29c5799fb809">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelProjectMasterDataAreaType" id="oagis-id-08743dbb4a3c4f91b0d198d7fc1bf524">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelProjectMaster. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (ProjectMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelProjectMasterDataAreaType" id="oagis-id-18dcf8a54e524e28b7f2057c7ed876b2">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-0184c0328be84f3e9c0219a28602a83a"/>
+			<xsd:element ref="ProjectMaster" maxOccurs="unbounded" id="oagis-id-1fbb668543f145b18fed863232e700e6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

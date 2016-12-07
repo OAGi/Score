@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncEngineeringWorkDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EngineeringWorkDocument.xsd"/>
+        <xsd:element name="SyncEngineeringWorkDocument" type="SyncEngineeringWorkDocumentType" id="oagis-id-b5b84dfc70bd4962a29b0d432a23ee69">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncEngineeringWorkDocument is to enable an application to provide EngineeringWorkDocument from another business application module. The SyncEngineeringWorkDocument is typically provided in a a publishe/subscribe or broadcast buiness exchange wher the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest..</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncEngineeringWorkDocumentType" id="oagis-id-be9d69081b094dd8af9310d3d7fbeea0">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncEngineeringWorkDocumentDataAreaType" id="oagis-id-163eca811e6140fabcd45fbba52e64ea">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncEngineeringWorkDocument. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (EngineeringWorkDocument).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncEngineeringWorkDocumentDataAreaType" id="oagis-id-d7e3e4cc132a47f39d32342ad4059035">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-3e7f8f49b7534183bf054a4c6d399254"/>
+                        <xsd:element ref="EngineeringWorkDocument" maxOccurs="unbounded" id="oagis-id-7b0b3048994641be9f8ab04a21e041d5"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyTable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Table.xsd"/>
+	<xsd:element name="NotifyTable" type="NotifyTableType" id="oagis-id-d4581045af8a4a6e8c01d5c207fdfc9b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Notify Table is to enable a mechanism to ensure that the physical Table identifiers are synchronized between the business applications that require this to communicate clearly.  This is particularly critical when only the codes that identify Tables are used.  Without the meaning of the codes clearly communicated, the integration is not effective.  This BOD enables the Table codes to be synchronized among business applications.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyTableType" id="oagis-id-beda39d2fbd44e03a401cf807283df85">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyTableDataAreaType" id="oagis-id-a53ee8859bb8481a8edd373d511578eb">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyTable. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (Table).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyTableDataAreaType" id="oagis-id-66f104e49b9c4bbb9b96b34b1a26e685">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-bbc25e6e20fd4f878153e0af686aabc0"/>
+			<xsd:element ref="Table" maxOccurs="unbounded" id="oagis-id-bdf3842fc49842c19f8bddaf29636470"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

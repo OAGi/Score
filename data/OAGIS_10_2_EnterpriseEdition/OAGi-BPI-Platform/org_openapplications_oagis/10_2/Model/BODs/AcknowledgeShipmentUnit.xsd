@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/AcknowledgeShipmentUnit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShipmentUnit.xsd"/>
+	<xsd:element name="AcknowledgeShipmentUnit" type="AcknowledgeShipmentUnitType" id="oagis-id-7e4b345ec7de48e494b1131c8271d20e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeShipmentUnit is to enable an application to respond to a ShipmentUnit information from another business application module in order to accept or reject the request to Process.
+
+The AcknowledgeShipmentUnit is typically published from the business application that is is receiving the request to Process the ShipmentUnit information  This may also occur across enterprises.
+
+The AcknowledgeShipmentUnit is the response for the ProcessShipmentUnit to indicate success or failure. If the receiving system needs to make changes to the ShipmentUnit then the ChangeShipmentUnit can be used a coresponding RespondShipmentUnit accepts the changes or indicates additional changes.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeShipmentUnitType" id="oagis-id-d74bbd75b7834aebbc976a12e5e55c94">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeShipmentUnitDataAreaType" id="oagis-id-bd533c49d18e40d28f345e211587541e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeShipmentUnit. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (ShipmentUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeShipmentUnitDataAreaType" id="oagis-id-9b52009a170141eebcbe170a404e8b88">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-ddd60717332e40a09506d9df97d922a6"/>
+			<xsd:element ref="ShipmentUnit" maxOccurs="unbounded" id="oagis-id-32a00a36cfbb4634a6edf95f1f9ba42d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

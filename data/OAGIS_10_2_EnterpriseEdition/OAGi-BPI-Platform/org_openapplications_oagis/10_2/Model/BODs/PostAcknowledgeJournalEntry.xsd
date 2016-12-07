@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/PostAcknowledgeJournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/JournalEntry.xsd"/>
+	<xsd:element name="PostAcknowledgeJournalEntry" type="PostAcknowledgeJournalEntryType" id="oagis-id-dfcdb6cdf69d43428db98db6eb69ad26">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PostAcknowledgeJournalEntry is to enable an application or component to respond to a ProcessJournalEntry.
+
+The response to the PostAcknowledgeJournalEntry is the response to the ProcessJournalEntry. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PostAcknowledgeJournalEntryType" id="oagis-id-5ff1629d68a8454aba06a7fea66578a2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="PostAcknowledgeJournalEntryDataAreaType" id="oagis-id-c558acb14904481ca5d79b7f1971e89f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case PostAcknowledgeJournalEntry. The information consists of a Verb and one or more Nouns. The verb (PostAcknowledge) indicates the action to be performed on the Noun (JournalEntry). In response to the PostJournalEntry.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PostAcknowledgeJournalEntryDataAreaType" id="oagis-id-a1673a980d07409a9c4aeb8a42985c35">
+		<xsd:sequence>
+			<xsd:element ref="PostAcknowledge" id="oagis-id-0bfb0df814bf4fe6930bb7216f96c0ef"/>
+			<xsd:element ref="JournalEntry" maxOccurs="unbounded" id="oagis-id-3af942a69c5046cea81497f7f9c063b9"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

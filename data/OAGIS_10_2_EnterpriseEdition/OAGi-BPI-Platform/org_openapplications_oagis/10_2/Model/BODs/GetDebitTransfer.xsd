@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/GetDebitTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/DebitTransfer.xsd"/>
+        <xsd:element name="GetDebitTransfer" type="GetDebitTransferType" id="oagis-id-f3e9636ca02d4ac2adb4836af3617426">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetDebitTransfer is to enable an application to request specific DebitTransfer information from another business application module.  The response to the GetDebitTransfer is the ShowDebitTransfer.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetDebitTransferType" id="oagis-id-fbe435ad405649eb8421d4a1bf629839">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetDebitTransferDataAreaType" id="oagis-id-b1afe67127a147e6a88477e9e3327e78">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetDebitTransfer. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (DebitTransfer).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetDebitTransferDataAreaType" id="oagis-id-a5cd14338566430bada5c086a2b6a1c5">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-21c6fa10003b4a14a27a84b29f064b0f"/>
+                        <xsd:element ref="DebitTransfer" maxOccurs="unbounded" id="oagis-id-85725a46a6ae4214bd1b9e6254ba9f20"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>
