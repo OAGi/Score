@@ -21,11 +21,11 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring.framework.version>4.3.3.RELEASE</spring.framework.version>
-		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
-		<spring.data.jpa.version>1.10.4.RELEASE</spring.data.jpa.version>
-		<spring.data.commons.version>1.12.4.RELEASE</spring.data.commons.version>
-		<spring.data.rest.version>2.5.3.RELEASE</spring.data.rest.version>
+		<spring.framework.version>4.3.4.RELEASE</spring.framework.version>
+		<spring.boot.version>1.4.2.RELEASE</spring.boot.version>
+		<spring.data.jpa.version>1.10.5.RELEASE</spring.data.jpa.version>
+		<spring.data.commons.version>1.12.5.RELEASE</spring.data.commons.version>
+		<spring.data.rest.version>2.5.5.RELEASE</spring.data.rest.version>
 		<spring.hateoas.version>0.20.0.RELEASE</spring.hateoas.version>
 		<spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
 		<spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
