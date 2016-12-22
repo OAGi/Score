@@ -19,6 +19,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2")
     public List<AssociationCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
+    @Query("select count(a) from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2")
+    public int countByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
+
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2 and a.state = ?3")
     public List<AssociationCoreComponent> findByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
 

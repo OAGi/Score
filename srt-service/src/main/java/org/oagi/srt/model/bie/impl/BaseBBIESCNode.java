@@ -2,6 +2,7 @@ package org.oagi.srt.model.bie.impl;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.AbstractBaseNode;
+import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.BBIERestrictionType;
@@ -37,6 +38,27 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
         this.bdtSc = bdtSc;
 
         setRestrictionType((bbieSc.getDtScPriRestriId() > 0L) ? Primitive : (bbieSc.getCodeListId() > 0L) ? Code : Agency);
+    }
+
+    @Override
+    public boolean isUsed() {
+        return getBbieSc().isUsed();
+    }
+
+    @Override
+    public void setUsed(boolean used) {
+        getBbieSc().setUsed(used);
+
+        if (used) {
+            BIENode parent = (BIENode) getParent();
+            if (parent != null && !parent.isUsed()) {
+                parent.setUsed(used);
+            }
+        } else {
+            for (Node node : getChildren()) {
+                ((BIENode) node).setUsed(used);
+            }
+        }
     }
 
     public BasicBusinessInformationEntitySupplementaryComponent getBbieSc() {

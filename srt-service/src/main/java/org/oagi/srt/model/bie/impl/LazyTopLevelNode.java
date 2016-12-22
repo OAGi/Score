@@ -18,6 +18,15 @@ public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, 
     }
 
     @Override
+    public boolean isUsed() {
+        return true;
+    }
+
+    @Override
+    public void setUsed(boolean used) {
+    }
+
+    @Override
     public void accept(BIENodeVisitor visitor) {
         visitor.startNode(this);
         if (isFetched()) {

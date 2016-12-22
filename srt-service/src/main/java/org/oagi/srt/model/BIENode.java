@@ -1,6 +1,8 @@
 package org.oagi.srt.model;
 
-public interface BIENode extends Node {
+import org.oagi.srt.repository.entity.Usable;
+
+public interface BIENode extends Node, Usable {
 
     public void accept(BIENodeVisitor visitor);
 }

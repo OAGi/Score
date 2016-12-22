@@ -119,11 +119,15 @@
                         <h:panelGroup style="width: 100%;">
                             <div class="row">
                                 <div id="left_panel" class="col-md-5" style="max-height: 470px; overflow-y: scroll;">
-                                    <p:treeTable value="#{createProfileBODBean.treeNode}" var="node"
+                                    <p:treeTable value="#{createProfileBODBean.treeNode}" var="node" id="treeTable"
                                                  selection="#{createProfileBODBean.selectedTreeNode}"
                                                  selectionMode="single">
+                                        <p:ajax event="expand" listener="#{createProfileBODBean.expand}"
+                                                update=":form:treeTable"/>
+                                        <p:ajax event="collapse"
+                                                update=":form:treeTable"/>
                                         <p:ajax event="select" update=":form:details"/>
-                                        <p:column headerText="BIEs">
+                                        <p:column headerText="#{createProfileBODBean.topLevelNode.asccp.module.module}">
                                             <h:outputText value="#{node.name}"/>
                                         </p:column>
                                     </p:treeTable>
@@ -190,7 +194,7 @@
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
                                                         <h:selectBooleanCheckbox
-                                                                value="${createProfileBODBean.selectedTreeNode.data.asbie.used}"
+                                                                value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <f:ajax render="asbieHeaderPanel"/>
                                                         </h:selectBooleanCheckbox>
@@ -310,7 +314,7 @@
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
                                                         <h:selectBooleanCheckbox
-                                                                value="${createProfileBODBean.selectedTreeNode.data.bbie.used}"
+                                                                value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <f:ajax render="bbieHeaderPanel"/>
                                                         </h:selectBooleanCheckbox>
@@ -473,7 +477,7 @@
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
                                                         <h:selectBooleanCheckbox
-                                                                value="${createProfileBODBean.selectedTreeNode.data.bbieSc.used}"
+                                                                value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <f:ajax render="bbieScHeaderPanel"/>
                                                         </h:selectBooleanCheckbox>
@@ -664,8 +668,6 @@
                     var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
 
                     if (idx == 1 &amp;&amp; selected) {
-                        PF('loadingBlock').show();
-
                         var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
                         $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
                     }

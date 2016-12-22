@@ -34,6 +34,27 @@ public class BaseASBIENode extends AbstractBaseNode implements ASBIENode {
         this.abie = abie;
     }
 
+    @Override
+    public boolean isUsed() {
+        return getAsbie().isUsed();
+    }
+
+    @Override
+    public void setUsed(boolean used) {
+        getAsbie().setUsed(used);
+
+        if (used) {
+            BIENode parent = (BIENode) getParent();
+            if (parent != null && !parent.isUsed()) {
+                parent.setUsed(used);
+            }
+        } else {
+            for (Node node : getChildren()) {
+                ((BIENode) node).setUsed(used);
+            }
+        }
+    }
+
     public AssociationBusinessInformationEntity getAsbie() {
         return asbie;
     }

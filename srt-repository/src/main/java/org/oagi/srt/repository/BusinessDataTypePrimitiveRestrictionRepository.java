@@ -12,6 +12,9 @@ public interface BusinessDataTypePrimitiveRestrictionRepository extends JpaRepos
     @Query("select b from BusinessDataTypePrimitiveRestriction b where b.bdtId = ?1 and b.isDefault = ?2")
     public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndDefault(long bdtId, boolean isDefault);
 
+    @Query("select b from BusinessDataTypePrimitiveRestriction b where b.bdtId = ?1 and b.codeListId > 0")
+    public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndCodeListIdIsNotZero(long bdtId);
+
     @Query("select b from BusinessDataTypePrimitiveRestriction b where b.bdtId = ?1 and b.cdtAwdPriXpsTypeMapId = ?2")
     public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndCdtAwdPriXpsTypeMapId(long bdtId, long cdtAwdPriXpsTypeMapId);
 

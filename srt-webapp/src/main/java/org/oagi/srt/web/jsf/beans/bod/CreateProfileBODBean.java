@@ -3,6 +3,7 @@ package org.oagi.srt.web.jsf.beans.bod;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
@@ -12,7 +13,9 @@ import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,9 +214,9 @@ public class CreateProfileBODBean {
         this.treeNode = treeNode;
     }
 
-    public BaseTopLevelNode getTopLevelNode() {
+    public TopLevelNode getTopLevelNode() {
         TreeNode treeNode = getTreeNode();
-        return (BaseTopLevelNode) treeNode.getChildren().get(0).getData();
+        return (TopLevelNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -457,33 +460,27 @@ public class CreateProfileBODBean {
                     break;
 
                 case "step_3":
-                    try {
-                        if (selectedBusinessContext == null) {
-                            FacesContext.getCurrentInstance().addMessage(null,
-                                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                            "'Business Context' must be selected."));
-                            nextStep = event.getOldStep();
+                    if (selectedBusinessContext == null) {
+                        FacesContext.getCurrentInstance().addMessage(null,
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                        "'Business Context' must be selected."));
+                        nextStep = event.getOldStep();
 
-                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
-                        } else {
-                            AssociationCoreComponentProperty selectedASCCP =
-                                    asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                            setTreeNode(bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext));
+                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
+                    } else {
+                        AssociationCoreComponentProperty selectedASCCP =
+                                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                        TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(selectedASCCP, selectedBusinessContext);
+                        setTreeNode(treeNode);
 
-                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
-                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
-                        }
-
-                        break;
-                    } finally {
-                        /*
-                         * Hide loading dialog
-                         */
-                        requestContext.execute("PF('loadingBlock').hide()");
+                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
+                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
                     }
+
+                    break;
             }
 
             setCurrentStep(nextStep);
@@ -491,6 +488,11 @@ public class CreateProfileBODBean {
         } finally {
             enableButtons();
         }
+    }
+
+    public void expand(NodeExpandEvent expandEvent) {
+        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
+        bieTreeNodeHandler.expandLazyTreeNode(treeNode);
     }
 
     private void enableButtons() {

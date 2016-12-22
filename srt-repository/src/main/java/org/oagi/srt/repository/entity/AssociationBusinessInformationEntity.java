@@ -13,7 +13,7 @@ import java.util.*;
 @Table(name = "asbie")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationBusinessInformationEntity
-        implements Serializable, TimestampAware, IdEntity, BusinessInformationEntity {
+        implements Serializable, TimestampAware, IdEntity, BusinessInformationEntity, Usable {
 
     public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
 

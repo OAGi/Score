@@ -28,6 +28,27 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
         }
     }
 
+    @Override
+    public boolean isUsed() {
+        return getBbie().isUsed();
+    }
+
+    @Override
+    public void setUsed(boolean used) {
+        getBbie().setUsed(used);
+
+        if (used) {
+            BIENode parent = (BIENode) getParent();
+            if (parent != null && !parent.isUsed()) {
+                parent.setUsed(used);
+            }
+        } else {
+            for (Node node : getChildren()) {
+                ((BIENode) node).setUsed(used);
+            }
+        }
+    }
+
     public BasicBusinessInformationEntity getBbie() {
         return bbieNode.getBbie();
     }

@@ -19,6 +19,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
+    @Query("select count(b) from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
+    public int countByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
+
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2 and b.state = ?3")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
 

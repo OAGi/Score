@@ -56,6 +56,27 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
         setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? Primitive : (bbie.getCodeListId() > 0L) ? Code : Agency);
     }
 
+    @Override
+    public boolean isUsed() {
+        return getBbie().isUsed();
+    }
+
+    @Override
+    public void setUsed(boolean used) {
+        getBbie().setUsed(used);
+
+        if (used) {
+            BIENode parent = (BIENode) getParent();
+            if (parent != null && !parent.isUsed()) {
+                parent.setUsed(used);
+            }
+        } else {
+            for (Node node : getChildren()) {
+                ((BIENode) node).setUsed(used);
+            }
+        }
+    }
+
     public BasicBusinessInformationEntity getBbie() {
         return bbie;
     }

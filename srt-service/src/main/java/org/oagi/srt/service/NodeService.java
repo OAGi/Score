@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Service
 @Transactional(readOnly = true)
@@ -445,6 +449,333 @@ public class NodeService {
     /*
      * Lazy Node
      */
+    public LazyBIENode createLazyBIENode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
+        long roleOfAccId = asccp.getRoleOfAccId();
+        AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNumAndState(
+                roleOfAccId, 0, Published);
+        AggregateBusinessInformationEntity abie = createABIE(acc, bizCtx);
+        AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp, abie);
+        TopLevelNode topLevelNode = new BaseTopLevelNode(asbiep, asccp, abie, bizCtx);
+        LazyBIEFetcher fetcher = new LazyBIEFetcher(acc, abie, bizCtx);
+        return new LazyTopLevelNode(topLevelNode, fetcher, fetcher.getChildrenCount());
+    }
+
+    private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, BusinessContext bizCtx) {
+        if (acc == null) {
+            throw new IllegalArgumentException("'acc' argument must not be null.");
+        }
+        if (bizCtx == null) {
+            throw new IllegalArgumentException("'bizCtx' argument must not be null.");
+        }
+
+        AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
+        String abieGuid = Utility.generateGUID();
+        abie.setGuid(abieGuid);
+        abie.setBasedAcc(acc);
+        abie.setBizCtx(bizCtx);
+        abie.setDefinition(acc.getDefinition());
+        abie.afterLoaded();
+
+        return abie;
+    }
+
+    private AssociationBusinessInformationEntityProperty createASBIEP(AssociationCoreComponentProperty asccp,
+                                                                      AggregateBusinessInformationEntity abie) {
+        if (asccp == null) {
+            throw new IllegalArgumentException("'asccp' argument must not be null.");
+        }
+        if (abie == null) {
+            throw new IllegalArgumentException("'abie' argument must not be null.");
+        }
+
+        AssociationBusinessInformationEntityProperty asbiep =
+                new AssociationBusinessInformationEntityProperty();
+        asbiep.setGuid(Utility.generateGUID());
+        asbiep.setBasedAsccp(asccp);
+        asbiep.setRoleOfAbie(abie);
+        asbiep.setDefinition(asccp.getDefinition());
+        asbiep.afterLoaded();
+
+        return asbiep;
+    }
+
+    private class LazyBIEFetcher implements Fetcher {
+
+        private AggregateCoreComponent acc;
+        private AggregateBusinessInformationEntity abie;
+        private BusinessContext bizCtx;
+
+        public LazyBIEFetcher(AggregateCoreComponent acc, AggregateBusinessInformationEntity abie, BusinessContext bizCtx) {
+            this.acc = acc;
+            this.abie = abie;
+            this.bizCtx = bizCtx;
+        }
+
+        public int getChildrenCount() {
+            LinkedList<AggregateCoreComponent> accList = new LinkedList();
+            AggregateCoreComponent acc = this.acc;
+            while (acc != null) {
+                accList.add(acc);
+                acc = accRepository.findOneByAccIdAndRevisionNumAndState(acc.getBasedAccId(), 0, Published);
+            }
+
+            int childrenCount = 0;
+            while (!accList.isEmpty()) {
+                acc = accList.pollLast();
+                long accId = acc.getAccId();
+                int asccCount = asccRepository.countByFromAccIdAndRevisionNum(accId, 0);
+                int bccCount = bccRepository.countByFromAccIdAndRevisionNum(accId, 0);
+                childrenCount += asccCount + bccCount;
+            }
+
+            return childrenCount;
+        }
+
+        @Override
+        public void fetch(Node parent) {
+            LinkedList<AggregateCoreComponent> accList = new LinkedList();
+            AggregateCoreComponent acc = this.acc;
+            while (acc != null) {
+                accList.add(acc);
+                acc = accRepository.findOneByAccIdAndRevisionNumAndState(acc.getBasedAccId(), 0, Published);
+            }
+
+            int seqKey = 1;
+            while (!accList.isEmpty()) {
+                acc = accList.pollLast();
+
+                List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
+                for (int i = 0; i < childAssoc.size(); i++) {
+                    CoreComponent assoc = childAssoc.get(i);
+                    if (assoc instanceof BasicCoreComponent) {
+                        BasicCoreComponent bcc = (BasicCoreComponent) assoc;
+                        if (Attribute == bcc.getEntityType()) {
+                            appendBBIELazyNode(parent, bcc, abie);
+                        }
+                    }
+                }
+
+                for (CoreComponent assoc : childAssoc) {
+                    if (assoc instanceof BasicCoreComponent) {
+                        BasicCoreComponent bcc = (BasicCoreComponent) assoc;
+                        if (Element == bcc.getEntityType()) {
+                            appendBBIELazyNode(parent, bcc, abie, seqKey++);
+                        }
+                    } else if (assoc instanceof AssociationCoreComponent) {
+                        AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
+                        appendASBIELazyNode(parent, ascc, abie, bizCtx, seqKey++);
+                    }
+                }
+            }
+        }
+
+        private void appendBBIELazyNode(Node parent, BasicCoreComponent bcc,
+                                        AggregateBusinessInformationEntity abie) {
+            appendBBIELazyNode(parent, bcc, abie, 0);
+        }
+
+        private void appendBBIELazyNode(Node parent, BasicCoreComponent bcc,
+                                        AggregateBusinessInformationEntity abie, int seqKey) {
+            long toBccpId = bcc.getToBccpId();
+            BasicCoreComponentProperty bccp = bccpRepository.findOneByBccpIdAndRevisionNumAndState(toBccpId, 0, Published);
+            BasicBusinessInformationEntityProperty bbiep = createBBIEP(bccp);
+
+            long bdtId = bccp.getBdtId();
+            DataType bdt = dataTypeRepository.findOne(bdtId);
+            BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                    bdtPriRestriRepository.findOneByBdtIdAndCodeListIdIsNotZero(bdtId);
+            long codeListId = (bdtPriRestri != null) ? bdtPriRestri.getCodeListId() : 0L;
+            bdtPriRestri = bdtPriRestriRepository.findOneByBdtIdAndDefault(bdtId, true);
+
+            BasicBusinessInformationEntity bbie = createBBIE(bcc, abie, bbiep, bdtPriRestri, codeListId, seqKey);
+
+            BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bdtPriRestri, bbiep, bccp, bdt);
+            LazyBBIESCFetcher fetcher = new LazyBBIESCFetcher(bdt, bbie);
+            new LazyBBIENode(bbieNode, fetcher, fetcher.getChildrenCount(), parent);
+        }
+
+        private BasicBusinessInformationEntityProperty createBBIEP(BasicCoreComponentProperty bccp) {
+            BasicBusinessInformationEntityProperty bbiep = new BasicBusinessInformationEntityProperty();
+            bbiep.setGuid(Utility.generateGUID());
+            bbiep.setBasedBccp(bccp);
+            bbiep.setDefinition(bccp.getDefinition());
+            bbiep.afterLoaded();
+            return bbiep;
+        }
+
+        private BasicBusinessInformationEntity createBBIE(BasicCoreComponent bcc,
+                                                          AggregateBusinessInformationEntity abie,
+                                                          BasicBusinessInformationEntityProperty bbiep,
+                                                          BusinessDataTypePrimitiveRestriction bdtPriRestri,
+                                                          long codeListId,
+                                                          int seqKey) {
+            BasicBusinessInformationEntity bbie = new BasicBusinessInformationEntity();
+            bbie.setGuid(Utility.generateGUID());
+            bbie.setBasedBccId(bcc.getBccId());
+            bbie.setFromAbie(abie);
+            bbie.setToBbiep(bbiep);
+            bbie.setNillable(false);
+            bbie.setCardinalityMax(bcc.getCardinalityMax());
+            bbie.setCardinalityMin(bcc.getCardinalityMin());
+            bbie.setBdtPriRestri(bdtPriRestri);
+//            if (codeListId > 0) {
+//                bbie.setCodeListId(codeListId);
+//            }
+            bbie.setSeqKey(seqKey);
+            bbie.afterLoaded();
+            return bbie;
+        }
+
+        private void appendASBIELazyNode(Node parent, AssociationCoreComponent ascc,
+                                         AggregateBusinessInformationEntity abie, BusinessContext bizCtx, int seqKey) {
+            long toAsccpId = ascc.getToAsccpId();
+            AssociationCoreComponentProperty asccp =
+                    asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
+            long roleOfAccId = asccp.getRoleOfAccId();
+            AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+            AggregateBusinessInformationEntity roleOfAbie = createABIE(acc, bizCtx);
+
+            AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp, roleOfAbie);
+            AssociationBusinessInformationEntity asbie = createASBIE(abie, asbiep, ascc, seqKey);
+
+            ASBIENode asbieNode = new BaseASBIENode(seqKey, null, asbie, asbiep, asccp, roleOfAbie);
+            LazyBIEFetcher fetcher = new LazyBIEFetcher(acc, roleOfAbie, bizCtx);
+            new LazyASBIENode(asbieNode, fetcher, fetcher.getChildrenCount(), parent);
+        }
+
+        public AssociationBusinessInformationEntityProperty createASBIEP(AssociationCoreComponentProperty asccp,
+                                                                         AggregateBusinessInformationEntity roleOfAbie) {
+            AssociationBusinessInformationEntityProperty asbiep = new AssociationBusinessInformationEntityProperty();
+            asbiep.setGuid(Utility.generateGUID());
+            asbiep.setBasedAsccp(asccp);
+            asbiep.setRoleOfAbie(roleOfAbie);
+            asbiep.setDefinition(asccp.getDefinition());
+            asbiep.afterLoaded();
+            return asbiep;
+        }
+
+        public AssociationBusinessInformationEntity createASBIE(AggregateBusinessInformationEntity fromAbie,
+                                                                AssociationBusinessInformationEntityProperty asbiep,
+                                                                AssociationCoreComponent ascc, int seqKey) {
+            AssociationBusinessInformationEntity asbie = new AssociationBusinessInformationEntity();
+            asbie.setGuid(Utility.generateGUID());
+            asbie.setFromAbie(fromAbie);
+            asbie.setToAsbiep(asbiep);
+            asbie.setBasedAscc(ascc);
+            asbie.setCardinalityMax(ascc.getCardinalityMax());
+            asbie.setCardinalityMin(ascc.getCardinalityMin());
+            asbie.setDefinition(ascc.getDefinition());
+            asbie.setSeqKey(seqKey);
+            asbie.afterLoaded();
+            return asbie;
+        }
+    }
+
+    private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent acc) {
+        long accId = acc.getAccId();
+        List<BasicCoreComponent> bcc_tmp_assoc = bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
+        List<AssociationCoreComponent> ascc_tmp_assoc = asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
+
+        List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
+        return coreComponents;
+    }
+
+    private List<CoreComponent> gatheringBySeqKey(
+            List<BasicCoreComponent> bccList, List<AssociationCoreComponent> asccList
+    ) {
+        int size = bccList.size() + asccList.size();
+        List<CoreComponent> tmp_assoc = new ArrayList(size);
+        tmp_assoc.addAll(bccList);
+        tmp_assoc.addAll(asccList);
+        Collections.sort(tmp_assoc, (a, b) -> a.getSeqKey() - b.getSeqKey());
+
+        List<CoreComponent> coreComponents = new ArrayList(size);
+        for (BasicCoreComponent basicCoreComponent : bccList) {
+            if (BasicCoreComponentEntityType.Attribute == basicCoreComponent.getEntityType()) {
+                coreComponents.add(basicCoreComponent);
+            }
+        }
+
+        for (CoreComponent coreComponent : tmp_assoc) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
+                if (BasicCoreComponentEntityType.Element == basicCoreComponent.getEntityType()) {
+                    coreComponents.add(basicCoreComponent);
+                }
+            } else {
+                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
+                coreComponents.add(associationCoreComponent);
+            }
+        }
+
+        return coreComponents;
+    }
+
+
+    private class LazyBBIESCFetcher implements Fetcher {
+
+        private DataType bdt;
+        private BasicBusinessInformationEntity bbie;
+
+        public LazyBBIESCFetcher(DataType bdt, BasicBusinessInformationEntity bbie) {
+            this.bdt = bdt;
+            this.bbie = bbie;
+        }
+
+        public int getChildrenCount() {
+            long bdtId = bdt.getDtId();
+            return (int) dtScRepository.findByOwnerDtId(bdtId)
+                    .stream()
+                    .filter(dtSc -> dtSc.getCardinalityMax() != 0)
+                    .count();
+        }
+
+        @Override
+        public void fetch(Node parent) {
+            long bdtId = bdt.getDtId();
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList =
+                    dtScRepository.findByOwnerDtId(bdtId)
+                    .stream()
+                    .filter(dtSc -> dtSc.getCardinalityMax() != 0)
+                    .map(dtSc -> {
+                        BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                                new BasicBusinessInformationEntitySupplementaryComponent();
+                        long bdtScId = dtSc.getDtScId();
+                        bbieSc.setBbie(bbie);
+                        bbieSc.setDtSc(dtSc);
+                        bbieSc.setGuid(Utility.generateGUID());
+
+                        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                                bdtScPriRestriRepository.findOneByBdtScIdAndDefault(bdtScId, true);
+                        if (bdtScPriRestri != null) {
+                            bbieSc.setDtScPriRestri(bdtScPriRestri);
+                        }
+
+//                        long codeListId = dataContainer.getCodeListIdOfBdtScPriRestriId(bdtScId);
+//                        if (codeListId > 0) {
+//                            bbieSc.setCodeListId(codeListId);
+//                        }
+
+                        bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
+                        bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
+                        bbieSc.setDefinition(dtSc.getDefinition());
+                        bbieSc.afterLoaded();
+                        return bbieSc;
+                    })
+                    .collect(Collectors.toList());
+
+            for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
+                long dtScId = bbiesc.getDtScId();
+                DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(dtScId);
+                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtPriRestri =
+                        bdtScPriRestriRepository.findOne(bbiesc.getDtScPriRestriId());
+
+                new BaseBBIESCNode(parent, bbiesc, bdtPriRestri, dtsc);
+            }
+        }
+    }
+
+
     public LazyBIENode createLazyBIENode(TopLevelAbie topLevelAbie) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         BusinessContext bizCtx = businessContextRepository.findOne(abie.getBizCtxId());
@@ -464,7 +795,8 @@ public class NodeService {
 
         public int getChildrenCount() {
             long abieId = abie.getAbieId();
-            return bbieRepository.countByFromAbieId(abieId) + asbieRepository.countByFromAbieId(abieId);
+            int childrenCount = bbieRepository.countByFromAbieId(abieId) + asbieRepository.countByFromAbieId(abieId);
+            return childrenCount;
         }
 
         @Override

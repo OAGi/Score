@@ -299,6 +299,14 @@ public class BIETreeNodeHandler extends UIHandler {
         return treeNodeVisitor.getRoot();
     }
 
+    public TreeNode createLazyTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
+        BIENode node = nodeService.createLazyBIENode(asccp, bizCtx);
+
+        LazyTreeBIENodeVisitor lazyTreeNodeVisitor = new LazyTreeBIENodeVisitor();
+        node.accept(lazyTreeNodeVisitor);
+        return lazyTreeNodeVisitor.getParent();
+    }
+
     public TreeNode createLazyTreeNode(TopLevelAbie topLevelAbie) {
         BIENode node = nodeService.createLazyBIENode(topLevelAbie);
 
