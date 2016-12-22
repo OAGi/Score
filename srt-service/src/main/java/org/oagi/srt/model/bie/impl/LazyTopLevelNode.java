@@ -3,10 +3,7 @@ package org.oagi.srt.model.bie.impl;
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
-import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessContext;
+import org.oagi.srt.repository.entity.*;
 
 public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, LazyBIENode {
 
@@ -38,6 +35,17 @@ public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, 
             visitor.endNode();
         }
     }
+
+    @Override
+    public TopLevelAbie getTopLevelAbie() {
+        return topLevelNode.getTopLevelAbie();
+    }
+
+    @Override
+    public void setTopLevelAbie(TopLevelAbie topLevelAbie) {
+        topLevelNode.setTopLevelAbie(topLevelAbie);
+    }
+
     public AssociationBusinessInformationEntityProperty getAsbiep() {
         return topLevelNode.getAsbiep();
     }

@@ -23,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
@@ -68,162 +65,6 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
-
-    private class SubmitBIENodeVisitor implements BIENodeVisitor {
-
-        private User user;
-        private ProgressListener progressListener;
-
-        private TopLevelAbie topLevelAbie;
-        private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
-        private List<AssociationBusinessInformationEntity> asbieList = new ArrayList();
-        private List<AssociationBusinessInformationEntityProperty> asbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntity> bbieList = new ArrayList();
-        private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
-
-        public SubmitBIENodeVisitor(User user) {
-            this.user = user;
-        }
-
-        public void setProgressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public void startNode(TopLevelNode topLevelNode) {
-            topLevelAbie = new TopLevelAbie();
-            topLevelAbie.setAbie(topLevelNode.getAbie());
-            asbiepList.add(topLevelNode.getAsbiep());
-        }
-
-        @Override
-        public void visitASBIENode(ASBIENode asbieNode) {
-            abieList.add(asbieNode.getAbie());
-            asbieList.add(asbieNode.getAsbie());
-            asbiepList.add(asbieNode.getAsbiep());
-        }
-
-        @Override
-        public void visitBBIENode(BBIENode bbieNode) {
-            BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
-            bbieList.add(bbie);
-            bbiepList.add(bbieNode.getBbiep());
-        }
-
-        @Override
-        public void visitBBIESCNode(BBIESCNode bbiescNode) {
-            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
-            bbiescList.add(bbieSc);
-        }
-
-        @Override
-        public void endNode() {
-            adjust();
-            save();
-        }
-
-        private void adjust() {
-            long owner = user.getAppUserId();
-            topLevelAbie.setOwnerUserId(owner);
-            topLevelAbie.setState(Editing);
-
-            AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
-            tAbie.setCreatedBy(owner);
-            tAbie.setLastUpdatedBy(owner);
-            tAbie.setState(Editing);
-            tAbie.setOwnerTopLevelAbie(topLevelAbie);
-            tAbie.addPersistEventListener(progressListener);
-
-            abieList.stream().forEach(abie -> {
-                abie.setCreatedBy(owner);
-                abie.setLastUpdatedBy(owner);
-                abie.setState(Editing);
-                abie.setOwnerTopLevelAbie(topLevelAbie);
-                abie.addPersistEventListener(progressListener);
-            });
-            asbieList.stream().forEach(asbie -> {
-                asbie.setCreatedBy(owner);
-                asbie.setLastUpdatedBy(owner);
-                asbie.setOwnerTopLevelAbie(topLevelAbie);
-                asbie.addPersistEventListener(progressListener);
-            });
-            asbiepList.stream().forEach(asbiep -> {
-                asbiep.setCreatedBy(owner);
-                asbiep.setLastUpdatedBy(owner);
-                asbiep.setOwnerTopLevelAbie(topLevelAbie);
-                asbiep.addPersistEventListener(progressListener);
-            });
-            bbieList.stream().forEach(bbie -> {
-                bbie.setCreatedBy(owner);
-                bbie.setLastUpdatedBy(owner);
-                bbie.setOwnerTopLevelAbie(topLevelAbie);
-                bbie.addPersistEventListener(progressListener);
-            });
-            bbiepList.stream().forEach(bbiep -> {
-                bbiep.setCreatedBy(owner);
-                bbiep.setLastUpdatedBy(owner);
-                bbiep.setOwnerTopLevelAbie(topLevelAbie);
-                bbiep.addPersistEventListener(progressListener);
-            });
-            bbiescList.stream().forEach(bbiesc -> {
-                bbiesc.setOwnerTopLevelAbie(topLevelAbie);
-                bbiesc.addPersistEventListener(progressListener);
-            });
-
-            if (progressListener != null) {
-                int maxCount = abieList.size() + asbieList.size() + asbiepList.size() + bbieList.size() + bbiepList.size() + bbiescList.size();
-                progressListener.setMaxCount(maxCount);
-            }
-        }
-
-        private void save() {
-            saveTopLevelAbie();
-            saveAbieList();
-            saveBbiepList();
-            saveBbieList();
-            saveBbieScList();
-            saveAsbiepList();
-            saveAsbieList();
-        }
-
-        private void saveTopLevelAbie() {
-            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-            topLevelAbie.setAbie(null);
-
-            topLevelAbieRepository.saveAndFlush(topLevelAbie);
-            abie.setOwnerTopLevelAbie(topLevelAbie);
-
-            abieRepository.saveAndFlush(abie);
-
-            topLevelAbie.setAbie(abie);
-            topLevelAbieRepository.save(topLevelAbie);
-        }
-
-        private void saveAbieList() {
-            abieRepository.save(abieList);
-        }
-
-        private void saveBbiepList() {
-            bbiepRepository.save(bbiepList);
-        }
-
-        private void saveBbieList() {
-            bbieRepository.save(bbieList);
-        }
-
-        private void saveBbieScList() {
-            bbiescRepository.save(bbiescList);
-        }
-
-        private void saveAsbiepList() {
-            asbiepRepository.save(asbiepList);
-        }
-
-        private void saveAsbieList() {
-            asbieRepository.save(asbieList);
-        }
-    }
 
     private BasicBusinessInformationEntity handleBBIEBdtPriRestri(BBIENode bbieNode) {
         BasicBusinessInformationEntity bbie = bbieNode.getBbie();
@@ -332,71 +173,115 @@ public class BIETreeNodeHandler extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public void submit(BIENode node, ProgressListener progressListener) {
         User currentUser = getCurrentUser();
-        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(currentUser);
-        submitNodeVisitor.setProgressListener(progressListener);
-        node.accept(submitNodeVisitor);
+        UpdateBIENodeVisitor updateBIENodeVisitor = new UpdateBIENodeVisitor(currentUser);
+        updateBIENodeVisitor.setProgressListener(progressListener);
+        node.accept(updateBIENodeVisitor);
     }
 
 
     private class UpdateBIENodeVisitor implements BIENodeVisitor {
 
         private User user;
-        private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
-        private List<AssociationBusinessInformationEntity> asbieList = new ArrayList();
-        private List<AssociationBusinessInformationEntityProperty> asbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntity> bbieList = new ArrayList();
-        private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
+        private ProgressListener progressListener;
+
+        private TopLevelAbie topLevelAbie;
+        private Set<AggregateBusinessInformationEntity> abieList = new LinkedHashSet();
+        private Set<AssociationBusinessInformationEntity> asbieList = new LinkedHashSet();
+        private Set<AssociationBusinessInformationEntityProperty> asbiepList = new LinkedHashSet();
+        private Set<BasicBusinessInformationEntity> bbieList = new LinkedHashSet();
+        private Set<BasicBusinessInformationEntityProperty> bbiepList = new LinkedHashSet();
+        private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
         public UpdateBIENodeVisitor(User user) {
             this.user = user;
         }
 
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+        }
+
+        private boolean isCreationProcess() {
+            return (topLevelAbie == null || topLevelAbie.getTopLevelAbieId() == 0L);
+        }
+
         @Override
         public void startNode(TopLevelNode topLevelNode) {
+            topLevelAbie = topLevelNode.getTopLevelAbie();
             AggregateBusinessInformationEntity abie = topLevelNode.getAbie();
-            if (abie.isDirty()) {
-                abieList.add(abie);
-            }
             AssociationBusinessInformationEntityProperty asbiep = topLevelNode.getAsbiep();
-            if (asbiep.isDirty()) {
+
+            if (isCreationProcess()) {
+                topLevelAbie = new TopLevelAbie();
+                topLevelAbie.setAbie(abie);
                 asbiepList.add(asbiep);
+            } else {
+                if (abie.isDirty()) {
+                    abieList.add(abie);
+                }
+                if (asbiep.isDirty()) {
+                    asbiepList.add(asbiep);
+                }
             }
         }
 
         @Override
         public void visitASBIENode(ASBIENode asbieNode) {
             AggregateBusinessInformationEntity abie = asbieNode.getAbie();
-            if (abie.isDirty()) {
-                abieList.add(abie);
-            }
             AssociationBusinessInformationEntity asbie = asbieNode.getAsbie();
-            if (asbie.isDirty()) {
-                asbieList.add(asbie);
-            }
             AssociationBusinessInformationEntityProperty asbiep = asbieNode.getAsbiep();
-            if (asbiep.isDirty()) {
-                asbiepList.add(asbiep);
+
+            if (abie.getAbieId() > 0L) {
+                if (asbie.isDirty()) {
+                    asbieList.add(asbie);
+                }
+                if (abie.isDirty()) {
+                    abieList.add(abie);
+                }
+                if (asbiep.isDirty()) {
+                    asbiepList.add(asbiep);
+                }
+            } else {
+                if (asbie.isDirty() || abie.isDirty() || asbiep.isDirty()) {
+                    asbieList.add(asbie);
+                    abieList.add(abie);
+                    asbiepList.add(asbiep);
+                }
             }
         }
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
             BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
-            if (bbie.isDirty()) {
-                bbieList.add(bbie);
-            }
             BasicBusinessInformationEntityProperty bbiep = bbieNode.getBbiep();
-            if (bbiep.isDirty()) {
-                bbiepList.add(bbiep);
+
+            if (bbie.getBbieId() > 0L) {
+                if (bbie.isDirty()) {
+                    bbieList.add(bbie);
+                }
+                if (bbiep.isDirty()) {
+                    bbiepList.add(bbiep);
+                }
+            } else {
+                if (bbie.isDirty() || bbiep.isDirty()) {
+                    bbieList.add(bbie);
+                    bbiepList.add(bbiep);
+                }
             }
         }
 
         @Override
-        public void visitBBIESCNode(BBIESCNode bbiescNode) {
-            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
+        public void visitBBIESCNode(BBIESCNode bbieScNode) {
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
             if (bbieSc.isDirty()) {
-                bbiescList.add(bbieSc);
+                bbieScList.add(bbieSc);
+
+                BBIENode bbieNode = (BBIENode) bbieScNode.getParent();
+
+                BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
+                BasicBusinessInformationEntityProperty bbiep = bbieNode.getBbiep();
+
+                bbieList.add(bbie);
+                bbiepList.add(bbiep);
             }
         }
 
@@ -409,30 +294,129 @@ public class BIETreeNodeHandler extends UIHandler {
         private void adjust() {
             long owner = user.getAppUserId();
 
+            if (isCreationProcess()) {
+                topLevelAbie.setOwnerUserId(owner);
+                topLevelAbie.setState(Editing);
+
+                AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
+                tAbie.setCreatedBy(owner);
+                tAbie.setLastUpdatedBy(owner);
+                tAbie.setState(Editing);
+                tAbie.setOwnerTopLevelAbie(topLevelAbie);
+                tAbie.addPersistEventListener(progressListener);
+            }
+
             abieList.stream().forEach(abie -> {
-                abie.setLastUpdatedBy(owner);
+                if (abie.getAbieId() == 0L) {
+                    abie.setCreatedBy(owner);
+                    abie.setLastUpdatedBy(owner);
+                    abie.setState(Editing);
+                    abie.setOwnerTopLevelAbie(topLevelAbie);
+                } else {
+                    abie.setLastUpdatedBy(owner);
+                }
+                abie.addPersistEventListener(progressListener);
             });
             asbieList.stream().forEach(asbie -> {
-                asbie.setLastUpdatedBy(owner);
+                if (asbie.getAsbieId() == 0L) {
+                    asbie.setCreatedBy(owner);
+                    asbie.setLastUpdatedBy(owner);
+                    asbie.setOwnerTopLevelAbie(topLevelAbie);
+                } else {
+                    asbie.setLastUpdatedBy(owner);
+                }
+                asbie.addPersistEventListener(progressListener);
             });
             asbiepList.stream().forEach(asbiep -> {
-                asbiep.setLastUpdatedBy(owner);
+                if (asbiep.getAsbiepId() == 0L) {
+                    asbiep.setCreatedBy(owner);
+                    asbiep.setLastUpdatedBy(owner);
+                    asbiep.setOwnerTopLevelAbie(topLevelAbie);
+                } else {
+                    asbiep.setLastUpdatedBy(owner);
+                }
+                asbiep.addPersistEventListener(progressListener);
             });
             bbieList.stream().forEach(bbie -> {
-                bbie.setLastUpdatedBy(owner);
+                if (bbie.getBbieId() == 0L) {
+                    bbie.setCreatedBy(owner);
+                    bbie.setLastUpdatedBy(owner);
+                    bbie.setOwnerTopLevelAbie(topLevelAbie);
+                } else {
+                    bbie.setLastUpdatedBy(owner);
+                }
+                bbie.addPersistEventListener(progressListener);
             });
             bbiepList.stream().forEach(bbiep -> {
-                bbiep.setLastUpdatedBy(owner);
+                if (bbiep.getBbiepId() == 0L) {
+                    bbiep.setCreatedBy(owner);
+                    bbiep.setLastUpdatedBy(owner);
+                    bbiep.setOwnerTopLevelAbie(topLevelAbie);
+                } else {
+                    bbiep.setLastUpdatedBy(owner);
+                }
+                bbiep.addPersistEventListener(progressListener);
             });
+            bbieScList.stream().forEach(bbiesc -> {
+                if (bbiesc.getBbieScId() == 0L) {
+                    bbiesc.setOwnerTopLevelAbie(topLevelAbie);
+                }
+                bbiesc.addPersistEventListener(progressListener);
+            });
+
+            if (progressListener != null) {
+                int maxCount = abieList.size() + asbieList.size() + asbiepList.size() + bbieList.size() + bbiepList.size() + bbieScList.size();
+                progressListener.setMaxCount(maxCount);
+            }
         }
 
         private void save() {
+            if (isCreationProcess()) {
+                saveTopLevelAbie();
+            }
+            saveAbieList();
+            saveBbiepList();
+            saveBbieList();
+            saveBbieScList();
+            saveAsbiepList();
+            saveAsbieList();
+        }
+
+        private void saveTopLevelAbie() {
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+            topLevelAbie.setAbie(null);
+
+            topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            abie.setOwnerTopLevelAbie(topLevelAbie);
+
+            abieRepository.saveAndFlush(abie);
+
+            topLevelAbie.setAbie(abie);
+            topLevelAbieRepository.save(topLevelAbie);
+        }
+
+        private void saveAbieList() {
             abieRepository.save(abieList);
-            asbieRepository.save(asbieList);
-            asbiepRepository.save(asbiepList);
-            bbieRepository.save(bbieList);
+        }
+
+        private void saveBbiepList() {
             bbiepRepository.save(bbiepList);
-            bbiescRepository.save(bbiescList);
+        }
+
+        private void saveBbieList() {
+            bbieRepository.save(bbieList);
+        }
+
+        private void saveBbieScList() {
+            bbiescRepository.save(bbieScList);
+        }
+
+        private void saveAsbiepList() {
+            asbiepRepository.save(asbiepList);
+        }
+
+        private void saveAsbieList() {
+            asbieRepository.save(asbieList);
         }
     }
 

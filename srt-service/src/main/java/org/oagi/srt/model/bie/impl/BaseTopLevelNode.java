@@ -14,6 +14,7 @@ import java.util.List;
 
 public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
 
+    private TopLevelAbie topLevelAbie;
     private AssociationBusinessInformationEntityProperty asbiep;
     private AssociationCoreComponentProperty asccp;
     private AggregateBusinessInformationEntity abie;
@@ -39,6 +40,16 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
         this.abie = abie;
         this.asbieList = asbieList;
         this.bizCtx = bizCtx;
+    }
+
+    @Override
+    public TopLevelAbie getTopLevelAbie() {
+        return topLevelAbie;
+    }
+
+    @Override
+    public void setTopLevelAbie(TopLevelAbie topLevelAbie) {
+        this.topLevelAbie = topLevelAbie;
     }
 
     public AssociationBusinessInformationEntityProperty getAsbiep() {

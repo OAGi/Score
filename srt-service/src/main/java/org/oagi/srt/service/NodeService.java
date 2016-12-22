@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,7 +96,7 @@ public class NodeService {
     private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
 
     @Autowired
-    private BasicBusinessInformationEntitySupplementaryComponentRepository bbiescRepository;
+    private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
     private ExecutorService executorService;
 
@@ -251,7 +250,7 @@ public class NodeService {
             }, null);
 
             executorCompletionService.submit(() -> {
-                bbiescList = bbiescRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                bbiescList = bbieScRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
                 bbieScListByBbieIdMap = bbiescList.stream()
                         .collect(Collectors.groupingBy(e -> e.getBbieId()));
             }, null);
@@ -576,9 +575,29 @@ public class NodeService {
 
         private void appendBBIELazyNode(Node parent, BasicCoreComponent bcc,
                                         AggregateBusinessInformationEntity abie, int seqKey) {
-            long toBccpId = bcc.getToBccpId();
-            BasicCoreComponentProperty bccp = bccpRepository.findOneByBccpIdAndRevisionNumAndState(toBccpId, 0, Published);
-            BasicBusinessInformationEntityProperty bbiep = createBBIEP(bccp);
+
+            BasicBusinessInformationEntity bbie = null;
+            BasicBusinessInformationEntityProperty bbiep = null;
+            BasicCoreComponentProperty bccp = null;
+            long abieId = abie.getAbieId();
+
+            if (abieId > 0L) {
+                long bccId = bcc.getBccId();
+                long ownerTopLevelAbieId = abie.getOwnerTopLevelAbieId();
+
+                bbie = bbieRepository.findOneByBasedBccIdAndFromAbieIdAndOwnerTopLevelAbieId(bccId, abieId, ownerTopLevelAbieId);
+                if (bbie != null) {
+                    long toBbiepId = bbie.getToBbiepId();
+                    bbiep = bbiepRepository.findOne(toBbiepId);
+                    bccp = bccpRepository.findOne(bbiep.getBasedBccpId());
+                }
+            }
+
+            if (bbie == null) {
+                long toBccpId = bcc.getToBccpId();
+                bccp = bccpRepository.findOneByBccpIdAndRevisionNumAndState(toBccpId, 0, Published);
+                bbiep = createBBIEP(bccp);
+            }
 
             long bdtId = bccp.getBdtId();
             DataType bdt = dataTypeRepository.findOne(bdtId);
@@ -587,7 +606,9 @@ public class NodeService {
             long codeListId = (bdtPriRestri != null) ? bdtPriRestri.getCodeListId() : 0L;
             bdtPriRestri = bdtPriRestriRepository.findOneByBdtIdAndDefault(bdtId, true);
 
-            BasicBusinessInformationEntity bbie = createBBIE(bcc, abie, bbiep, bdtPriRestri, codeListId, seqKey);
+            if (bbie == null) {
+                bbie = createBBIE(bcc, abie, bbiep, bdtPriRestri, codeListId, seqKey);
+            }
 
             BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bdtPriRestri, bbiep, bccp, bdt);
             LazyBBIESCFetcher fetcher = new LazyBBIESCFetcher(bdt, bbie);
@@ -628,18 +649,40 @@ public class NodeService {
 
         private void appendASBIELazyNode(Node parent, AssociationCoreComponent ascc,
                                          AggregateBusinessInformationEntity abie, BusinessContext bizCtx, int seqKey) {
-            long toAsccpId = ascc.getToAsccpId();
-            AssociationCoreComponentProperty asccp =
-                    asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
-            long roleOfAccId = asccp.getRoleOfAccId();
-            AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
-            AggregateBusinessInformationEntity roleOfAbie = createABIE(acc, bizCtx);
 
-            AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp, roleOfAbie);
-            AssociationBusinessInformationEntity asbie = createASBIE(abie, asbiep, ascc, seqKey);
+            long abieId = abie.getAbieId();
+            AssociationBusinessInformationEntity asbie = null;
+            AssociationBusinessInformationEntityProperty asbiep = null;
+            AssociationCoreComponentProperty asccp = null;
+            AggregateBusinessInformationEntity roleOfAbie = null;
+            AggregateCoreComponent basedAcc = null;
+
+            if (abieId > 0L) {
+                long asccId = ascc.getAsccId();
+                long ownerTopLevelAbieId = abie.getOwnerTopLevelAbieId();
+
+                asbie = asbieRepository.findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(asccId, abieId, ownerTopLevelAbieId);
+                if (asbie != null) {
+                    asbiep = asbiepRepository.findOne(asbie.getToAsbiepId());
+                    asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
+                    roleOfAbie = abieRepository.findOne(asbiep.getRoleOfAbieId());
+                    basedAcc = accRepository.findOne(roleOfAbie.getBasedAccId());
+                }
+            }
+
+            if (asbie == null) {
+                long toAsccpId = ascc.getToAsccpId();
+                asccp = asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
+                long roleOfAccId = asccp.getRoleOfAccId();
+                basedAcc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+
+                roleOfAbie = createABIE(basedAcc, bizCtx);
+                asbiep = createASBIEP(asccp, roleOfAbie);
+                asbie = createASBIE(abie, asbiep, ascc, seqKey);
+            }
 
             ASBIENode asbieNode = new BaseASBIENode(seqKey, null, asbie, asbiep, asccp, roleOfAbie);
-            LazyBIEFetcher fetcher = new LazyBIEFetcher(acc, roleOfAbie, bizCtx);
+            LazyBIEFetcher fetcher = new LazyBIEFetcher(basedAcc, roleOfAbie, bizCtx);
             new LazyASBIENode(asbieNode, fetcher, fetcher.getChildrenCount(), parent);
         }
 
@@ -733,44 +776,58 @@ public class NodeService {
         @Override
         public void fetch(Node parent) {
             long bdtId = bdt.getDtId();
-            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList =
+
+            List<DataTypeSupplementaryComponent> dtScList =
                     dtScRepository.findByOwnerDtId(bdtId)
-                    .stream()
-                    .filter(dtSc -> dtSc.getCardinalityMax() != 0)
-                    .map(dtSc -> {
-                        BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                                new BasicBusinessInformationEntitySupplementaryComponent();
-                        long bdtScId = dtSc.getDtScId();
-                        bbieSc.setBbie(bbie);
-                        bbieSc.setDtSc(dtSc);
-                        bbieSc.setGuid(Utility.generateGUID());
+                            .stream()
+                            .filter(dtSc -> dtSc.getCardinalityMax() != 0)
+                            .collect(Collectors.toList());
 
-                        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
-                                bdtScPriRestriRepository.findOneByBdtScIdAndDefault(bdtScId, true);
-                        if (bdtScPriRestri != null) {
-                            bbieSc.setDtScPriRestri(bdtScPriRestri);
-                        }
+            long bbieId = bbie.getBbieId();
+            long ownerTopLevelAbieId = bbie.getOwnerTopLevelAbieId();
 
-//                        long codeListId = dataContainer.getCodeListIdOfBdtScPriRestriId(bdtScId);
-//                        if (codeListId > 0) {
-//                            bbieSc.setCodeListId(codeListId);
-//                        }
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new ArrayList();
+            for (DataTypeSupplementaryComponent dtSc : dtScList) {
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = null;
+                if (bbieId > 0L) {
+                    long dtScId = dtSc.getDtScId();
+                    bbieSc = bbieScRepository.findOneByBbieIdAndDtScIdAndOwnerTopLevelAbieId(bbieId, dtScId, ownerTopLevelAbieId);
+                }
 
-                        bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
-                        bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
-                        bbieSc.setDefinition(dtSc.getDefinition());
-                        bbieSc.afterLoaded();
-                        return bbieSc;
-                    })
-                    .collect(Collectors.toList());
+                if (bbieSc == null) {
+                    bbieSc = new BasicBusinessInformationEntitySupplementaryComponent();
+                    long bdtScId = dtSc.getDtScId();
+                    bbieSc.setBbie(bbie);
+                    bbieSc.setDtSc(dtSc);
+                    bbieSc.setGuid(Utility.generateGUID());
 
-            for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
-                long dtScId = bbiesc.getDtScId();
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                            bdtScPriRestriRepository.findOneByBdtScIdAndDefault(bdtScId, true);
+                    if (bdtScPriRestri != null) {
+                        bbieSc.setDtScPriRestri(bdtScPriRestri);
+                    }
+
+//                    long codeListId = dataContainer.getCodeListIdOfBdtScPriRestriId(bdtScId);
+//                    if (codeListId > 0) {
+//                        bbieSc.setCodeListId(codeListId);
+//                    }
+
+                    bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
+                    bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
+                    bbieSc.setDefinition(dtSc.getDefinition());
+                    bbieSc.afterLoaded();
+                }
+
+                bbieScList.add(bbieSc);
+            }
+
+            for (BasicBusinessInformationEntitySupplementaryComponent bbieSc : bbieScList) {
+                long dtScId = bbieSc.getDtScId();
                 DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(dtScId);
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtPriRestri =
-                        bdtScPriRestriRepository.findOne(bbiesc.getDtScPriRestriId());
+                        bdtScPriRestriRepository.findOne(bbieSc.getDtScPriRestriId());
 
-                new BaseBBIESCNode(parent, bbiesc, bdtPriRestri, dtsc);
+                new BaseBBIESCNode(parent, bbieSc, bdtPriRestri, dtsc);
             }
         }
     }
@@ -781,8 +838,13 @@ public class NodeService {
         BusinessContext bizCtx = businessContextRepository.findOne(abie.getBizCtxId());
         AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
+
         TopLevelNode topLevelNode = new BaseTopLevelNode(asbiep, asccp, abie, bizCtx);
-        BIEFetcher fetcher = new BIEFetcher(abie);
+        topLevelNode.setTopLevelAbie(topLevelAbie);
+
+        long basedAccId = abie.getBasedAccId();
+        AggregateCoreComponent acc = accRepository.findOne(basedAccId);
+        LazyBIEFetcher fetcher = new LazyBIEFetcher(acc, abie, bizCtx);
         return new LazyTopLevelNode(topLevelNode, fetcher, fetcher.getChildrenCount());
     }
 
@@ -874,13 +936,13 @@ public class NodeService {
         }
 
         public int getChildrenCount() {
-            return bbiescRepository.countByBbieId(bbie.getBbieId());
+            return bbieScRepository.countByBbieId(bbie.getBbieId());
         }
 
         @Override
         public void fetch(Node parent) {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList =
-                    bbiescRepository.findByBbieId(bbie.getBbieId());
+                    bbieScRepository.findByBbieId(bbie.getBbieId());
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbiescList) {
                 long dtScId = bbiesc.getDtScId();
                 DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(dtScId);
