@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Service
 @Transactional(readOnly = true)
@@ -715,6 +717,61 @@ public class NodeService {
     }
 
     private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent acc) {
+        List<CoreComponent> coreComponents = queryChildAssoc(acc);
+        return getAssocList(coreComponents);
+    }
+
+    private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+        for (int i = 0; i < list.size(); i++) {
+            CoreComponent srt = list.get(i);
+            if (srt instanceof AssociationCoreComponent) {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) srt;
+                long toAsccpId = ascc.getToAsccpId();
+                AssociationCoreComponentProperty asccp =
+                        asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
+                long roleOfAccId = asccp.getRoleOfAccId();
+                AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+                if (groupcheck(acc)) {
+                    list = handleNestedGroup(acc, list, i);
+                }
+            }
+        }
+        return list;
+    }
+
+    private boolean groupcheck(AggregateCoreComponent acc) {
+        OagisComponentType oagisComponentType = acc.getOagisComponentType();
+        return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
+    }
+
+    private List<CoreComponent> handleNestedGroup(AggregateCoreComponent acc,
+                                                  List<CoreComponent> coreComponents, int gPosition) {
+
+        List<CoreComponent> bList = queryChildAssoc(acc);
+        if (!bList.isEmpty()) {
+            coreComponents.addAll(gPosition, bList);
+            coreComponents.remove(gPosition + bList.size());
+        }
+
+        for (int i = 0; i < coreComponents.size(); i++) {
+            CoreComponent coreComponent = coreComponents.get(i);
+            if (coreComponent instanceof AssociationCoreComponent) {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+                long toAsccpId = ascc.getToAsccpId();
+                AssociationCoreComponentProperty asccp =
+                        asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
+                long roleOfAccId = asccp.getRoleOfAccId();
+                acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+                if (groupcheck(acc)) {
+                    coreComponents = handleNestedGroup(acc, coreComponents, i);
+                }
+            }
+        }
+
+        return coreComponents;
+    }
+
+    private List<CoreComponent> queryChildAssoc(AggregateCoreComponent acc) {
         long accId = acc.getAccId();
         List<BasicCoreComponent> bcc_tmp_assoc = bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
         List<AssociationCoreComponent> ascc_tmp_assoc = asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
