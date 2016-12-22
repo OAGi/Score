@@ -523,10 +523,9 @@ public class NodeService {
             int childrenCount = 0;
             while (!accList.isEmpty()) {
                 acc = accList.pollLast();
-                long accId = acc.getAccId();
-                int asccCount = asccRepository.countByFromAccIdAndRevisionNum(accId, 0);
-                int bccCount = bccRepository.countByFromAccIdAndRevisionNum(accId, 0);
-                childrenCount += asccCount + bccCount;
+
+                List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
+                childrenCount += childAssoc.size();
             }
 
             return childrenCount;
