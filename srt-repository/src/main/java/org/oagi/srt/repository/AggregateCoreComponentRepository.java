@@ -21,6 +21,9 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select new AggregateCoreComponent(a.accId, a.den) from AggregateCoreComponent a where a.guid = ?1")
     public AggregateCoreComponent findAccIdAndDenByGuid(String guid);
 
+    @Query("select a from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2")
+    public AggregateCoreComponent findOneByAccIdAndRevisionNum(long accId, int revisionNum);
+
     @Query("select a from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2 and a.state = ?3")
     public AggregateCoreComponent findOneByAccIdAndRevisionNumAndState(long accId, int revisionNum, CoreComponentState state);
 

@@ -721,6 +721,8 @@ public class NodeService {
     }
 
     private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+        Map<Integer, Boolean> hashCodes = new HashMap();
+
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
             if (srt instanceof AssociationCoreComponent) {
@@ -729,9 +731,9 @@ public class NodeService {
                 AssociationCoreComponentProperty asccp =
                         asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
                 long roleOfAccId = asccp.getRoleOfAccId();
-                AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+                AggregateCoreComponent acc = accRepository.findOneByAccIdAndRevisionNum(roleOfAccId, 0);
                 if (groupcheck(acc)) {
-                    list = handleNestedGroup(acc, list, i);
+                    list = handleNestedGroup(acc, list, i, hashCodes);
                 }
             }
         }
@@ -743,8 +745,30 @@ public class NodeService {
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
+    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponent> coreComponents,
+                                            int gPosition, Map<Integer, Boolean> hashCodes) {
+        int hashCode = acc.hashCode() + coreComponents.hashCode() + gPosition;
+        Boolean check = hashCodes.get(hashCode);
+        if (check == null) {
+            check = false;
+            hashCodes.put(hashCode, true);
+
+        }
+        return check;
+    }
+
     private List<CoreComponent> handleNestedGroup(AggregateCoreComponent acc,
-                                                  List<CoreComponent> coreComponents, int gPosition) {
+                                                  List<CoreComponent> coreComponents, int gPosition,
+                                                  Map<Integer, Boolean> hashCodes) {
+        /*
+         * TODO: FIX ME
+         * As of Nov 15th, 2016, When the User Extension is in Editing state
+         * Circular Reference Problem occurred in this code.
+         */
+        if (ensureCircularReference(acc, coreComponents, gPosition, hashCodes)) {
+            coreComponents.remove(gPosition);
+            return coreComponents;
+        }
 
         List<CoreComponent> bList = queryChildAssoc(acc);
         if (!bList.isEmpty()) {
@@ -752,6 +776,7 @@ public class NodeService {
             coreComponents.remove(gPosition + bList.size());
         }
 
+        long accId = acc.getAccId();
         for (int i = 0; i < coreComponents.size(); i++) {
             CoreComponent coreComponent = coreComponents.get(i);
             if (coreComponent instanceof AssociationCoreComponent) {
@@ -760,9 +785,9 @@ public class NodeService {
                 AssociationCoreComponentProperty asccp =
                         asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
                 long roleOfAccId = asccp.getRoleOfAccId();
-                acc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
-                if (groupcheck(acc)) {
-                    coreComponents = handleNestedGroup(acc, coreComponents, i);
+                AggregateCoreComponent roleOfAcc = accRepository.findOneByAccIdAndRevisionNum(roleOfAccId, 0);
+                if (groupcheck(roleOfAcc)) {
+                    coreComponents = handleNestedGroup(roleOfAcc, coreComponents, i, hashCodes);
                 }
             }
         }
