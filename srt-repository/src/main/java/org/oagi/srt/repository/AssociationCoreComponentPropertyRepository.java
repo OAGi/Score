@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
@@ -52,4 +53,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select a from AssociationCoreComponentProperty a where a.den = '" + ANY_ASCCP_DEN + "'")
     public AssociationCoreComponentProperty findAny();
+
+    @Query("select a from AssociationCoreComponentProperty a where a.asccpId in ?1")
+    public List<AssociationCoreComponentProperty> findByAsccpId(Collection<Long> asccpId);
 }

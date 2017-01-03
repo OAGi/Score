@@ -8,10 +8,7 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -364,10 +361,8 @@ public class CoreComponentService {
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList = new ArrayList();
         for (TopLevelAbie topLevelAbie : topLevelAbies) {
-            long ownerTopLevelAbieId = topLevelAbie.getTopLevelAbieId();
-            long basedAccId = eAcc.getAccId();
-
-            if (eAcc.isGlobalExtension()) {
+            boolean hasExtensionAsccpAsChild = hasExtensionAsccpAsChild(topLevelAbie, eAcc);
+            if (hasExtensionAsccpAsChild) {
                 BusinessInformationEntityUserExtensionRevision bieUserExtRevision =
                         new BusinessInformationEntityUserExtensionRevision();
                 bieUserExtRevision.setTopLevelAbie(topLevelAbie);
@@ -375,23 +370,41 @@ public class CoreComponentService {
                 bieUserExtRevision.setUserExtAcc(ueAcc);
                 bieUserExtRevision.setRevisedIndicator(false);
                 bieUserExtRevisionList.add(bieUserExtRevision);
-            } else {
-                List<AggregateBusinessInformationEntity> abieList =
-                        abieRepository.findByOwnerTopLevelAbieIdAndBasedAccId(ownerTopLevelAbieId, basedAccId);
-
-                for (AggregateBusinessInformationEntity abie : abieList) {
-                    BusinessInformationEntityUserExtensionRevision bieUserExtRevision =
-                            new BusinessInformationEntityUserExtensionRevision();
-                    bieUserExtRevision.setTopLevelAbie(topLevelAbie);
-                    bieUserExtRevision.setExtAbie(abie);
-                    bieUserExtRevision.setExtAcc(eAcc);
-                    bieUserExtRevision.setUserExtAcc(ueAcc);
-                    bieUserExtRevision.setRevisedIndicator(false);
-                    bieUserExtRevisionList.add(bieUserExtRevision);
-                }
             }
         }
 
         bieUserExtRevisionRepository.save(bieUserExtRevisionList);
+    }
+
+    private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
+        AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+        long basedAccId = abie.getBasedAccId();
+        long eAccId = eAcc.getAccId();
+
+        AssociationCoreComponentProperty asccp = findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(basedAccId, eAccId);
+        return (asccp != null) ? true : false;
+    }
+
+    private AssociationCoreComponentProperty findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
+        Collection<Long> fromAccIds = Arrays.asList(basedAccId);
+
+        while (true) {
+            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccIds);
+            List<AssociationCoreComponentProperty> asccpList =
+                    !asccList.isEmpty()
+                            ? asccpRepository.findByAsccpId(asccList.stream().map(AssociationCoreComponent::getToAsccpId).collect(Collectors.toList()))
+                            : Collections.emptyList();
+            if (asccpList.isEmpty()) {
+                return null;
+            }
+
+            for (AssociationCoreComponentProperty asccp : asccpList) {
+                if (asccp.getRoleOfAccId() == eAccId) {
+                    return asccp;
+                }
+            }
+
+            fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
+        }
     }
 }

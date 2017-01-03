@@ -19,6 +19,7 @@ public class BusinessInformationEntityUserExtensionRevision {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ext_abie_id")
+    @Deprecated
     private AggregateBusinessInformationEntity extAbie;
 
     @OneToOne(fetch = FetchType.EAGER)

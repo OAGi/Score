@@ -16,8 +16,8 @@
             <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
                         closable="true"/>
 
-            <p:confirmDialog widgetVar="confirmExtensionUptake" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Uptake extension">
+            <p:confirmDialog widgetVar="notifyExtensionChange" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Notification">
                 <f:facet name="message">
                     There is an update to the extension content of the following extension#{editProfileBODBean.bieUserExtRevisionList.size() > 1 ? "s" : ""}.
                     <div style="padding: 10px 0 10px 0;">
@@ -26,14 +26,13 @@
                             </li>
                         </ui:repeat>
                     </div>
-                    Would you like to uptake the extension?
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
-                                     action="#{editProfileBODBean.uptakeExtensions(editProfileBODBean.bieUserExtRevisionList)}"
-                                     onclick="PF('confirmExtensionUptake').hide(); PF('loadingBlock').show();"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
-                                     onclick="PF('confirmExtensionUptake').hide(); PF('confirmKeepNotification').show();"/>
+                    <p:commandButton value="Okay" icon="ui-icon-check"
+                                     action="#{editProfileBODBean.discard(editProfileBODBean.bieUserExtRevisionList)}"
+                                     onclick="PF('notifyExtensionChange').hide();"/>
+                    <p:commandButton value="Remind me later" icon="ui-icon-close"
+                                     onclick="PF('notifyExtensionChange').hide();"/>
                 </div>
             </p:confirmDialog>
 
@@ -51,22 +50,6 @@
                                      onclick="PF('confirmChangeStateToEditing').hide(); PF('loadingBlock').show();"/>
                     <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmChangeStateToEditing').hide(); PF('confirmKeepNotification').show();"/>
-                </div>
-            </p:confirmDialog>
-
-            <p:confirmDialog widgetVar="confirmKeepNotification" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Keep or discard notification">
-                <f:facet name="message">
-                    Would you like to keep or disregard this notification?
-                    <br/>
-                    Keeping the notification allows you to review the content of the extension first.
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton value="Keep" icon="ui-icon-check"
-                                     onclick="PF('confirmKeepNotification').hide()"/>
-                    <p:commandButton value="Discard" icon="ui-icon-close"
-                                     action="#{editProfileBODBean.discard(editProfileBODBean.bieUserExtRevisionList)}"
-                                     onclick="PF('confirmKeepNotification').hide()"/>
                 </div>
             </p:confirmDialog>
 

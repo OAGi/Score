@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AssociationCoreComponentRepository extends JpaRepository<AssociationCoreComponent, Long> {
@@ -55,6 +56,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionTrackingNum = (" +
             "select MAX(a.revisionTrackingNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId)")
     public AssociationCoreComponent findLatestOneByCurrentAsccId(long currentAsccId);
+
+    @Query("select a from AssociationCoreComponent a where a.fromAccId in ?1")
+    public List<AssociationCoreComponent> findByFromAccId(Collection<Long> fromAccId);
 
     @Modifying
     @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +

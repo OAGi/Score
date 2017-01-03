@@ -58,6 +58,10 @@ public class EditProfileBODBean extends UIHandler {
     @Autowired
     private AggregateBusinessInformationEntityRepository abieRepository;
     @Autowired
+    private AggregateCoreComponentRepository accRepository;
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
+    @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
     @Autowired
     private AssociationBusinessInformationEntityRepository asbieRepository;
@@ -94,7 +98,7 @@ public class EditProfileBODBean extends UIHandler {
         setBieUserExtRevisionList(bieUserExtRevisionList);
 
         if (!bieUserExtRevisionList.isEmpty()) {
-            RequestContext.getCurrentInstance().execute("PF('confirmExtensionUptake').show()");
+            RequestContext.getCurrentInstance().execute("PF('notifyExtensionChange').show()");
         }
     }
 
@@ -122,8 +126,9 @@ public class EditProfileBODBean extends UIHandler {
         asccpStack.push(asccp);
 
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-        AggregateBusinessInformationEntity eAbie = bieUserExtRevision.getExtAbie();
-        traverseToFindTargetAbie(asccpStack, abie, eAbie);
+        AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
+        AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
+        traverseToFindTargetAcc(asccpStack, acc, eAcc);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0, len = asccpStack.size(); i < len; ++i) {
@@ -181,30 +186,28 @@ public class EditProfileBODBean extends UIHandler {
         return asccp;
     }
 
-    private boolean traverseToFindTargetAbie(Stack<AssociationCoreComponentProperty> asccpStack,
-                                             AggregateBusinessInformationEntity sourceAbie,
-                                             AggregateBusinessInformationEntity targetAbie) {
+    private boolean traverseToFindTargetAcc(Stack<AssociationCoreComponentProperty> asccpStack,
+                                            AggregateCoreComponent sourceAcc,
+                                            AggregateCoreComponent targetAcc) {
 
-        long targetAbieId = targetAbie.getAbieId();
-        long fromAbieId = sourceAbie.getAbieId();
+        long targetAccId = targetAcc.getAccId();
+        long fromAccId = sourceAcc.getAccId();
 
-        List<AssociationBusinessInformationEntity> asbieList = asbieRepository.findByFromAbieId(fromAbieId);
-        for (AssociationBusinessInformationEntity asbie : asbieList) {
-            long asbiepId = asbie.getToAsbiepId();
-            AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOne(asbiepId);
-            long roleOfAbieId = asbiep.getRoleOfAbieId();
-
-            long asccpId = asbiep.getBasedAsccpId();
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccId);
+        for (AssociationCoreComponent ascc : asccList) {
+            long toAsccpId = ascc.getToAsccpId();
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(toAsccpId);
             asccpStack.push(asccp);
 
-            if (targetAbieId == roleOfAbieId) {
+            long roleOfAccId = asccp.getRoleOfAccId();
+            if (targetAccId == roleOfAccId) {
                 // we've found it
                 return true;
 
             } else {
-                sourceAbie = abieRepository.findOne(roleOfAbieId);
-                boolean result = traverseToFindTargetAbie(asccpStack, sourceAbie, targetAbie);
+                fromAccId = asccp.getRoleOfAccId();
+                sourceAcc = accRepository.findOne(fromAccId);
+                boolean result = traverseToFindTargetAcc(asccpStack, sourceAcc, targetAcc);
                 if (result) {
                     return true;
                 } else {
