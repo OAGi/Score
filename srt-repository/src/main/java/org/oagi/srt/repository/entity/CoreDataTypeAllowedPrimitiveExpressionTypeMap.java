@@ -1,13 +1,10 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "cdt_awd_pri_xps_type_map")
-@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializable {
 
     public static final String SEQUENCE_NAME = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ";

@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 
 import javax.persistence.*;
@@ -8,7 +7,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "top_level_abie")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TopLevelAbie implements Serializable {
 
     public static final String SEQUENCE_NAME = "TOP_LEVEL_ABIE_ID_SEQ";

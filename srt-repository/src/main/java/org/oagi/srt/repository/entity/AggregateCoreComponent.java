@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
@@ -11,7 +10,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "acc")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AggregateCoreComponent implements Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";

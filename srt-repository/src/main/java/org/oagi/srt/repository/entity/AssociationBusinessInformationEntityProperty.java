@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -12,7 +11,6 @@ import java.util.*;
 
 @Entity
 @Table(name = "asbiep")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationBusinessInformationEntityProperty
         implements Serializable, TimestampAware, IdEntity, IGuidEntity {
 

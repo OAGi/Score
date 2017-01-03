@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.BasicCoreComponentEntityTypeConverter;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
@@ -12,7 +12,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bcc")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BasicCoreComponent
         implements CoreComponent, Serializable, Cloneable {
 

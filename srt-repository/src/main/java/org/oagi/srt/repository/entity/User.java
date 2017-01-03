@@ -1,13 +1,10 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "app_user")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User implements Serializable {
 
     public static final String SEQUENCE_NAME = "APP_USER_ID_SEQ";

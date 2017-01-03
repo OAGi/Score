@@ -1,12 +1,9 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name = "bie_user_ext_revision")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BusinessInformationEntityUserExtensionRevision {
 
     public static final String SEQUENCE_NAME = "BIE_USER_EXT_REVISION_ID_SEQ";

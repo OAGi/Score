@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import org.oagi.srt.repository.entity.converter.DependencyTypeConverter;
 
 import javax.persistence.*;
@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "module_dep")
-@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class ModuleDep implements Serializable {
 
     public enum DependencyType {

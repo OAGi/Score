@@ -1,13 +1,11 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "bccp")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BasicCoreComponentPropertyForLookup {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";

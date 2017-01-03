@@ -1,13 +1,10 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "ctx_scheme_value")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ContextSchemeValue implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_VALUE_ID_SEQ";

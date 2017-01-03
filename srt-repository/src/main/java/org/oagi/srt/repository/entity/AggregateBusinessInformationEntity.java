@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
@@ -12,7 +11,6 @@ import java.util.*;
 
 @Entity
 @Table(name = "abie")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AggregateBusinessInformationEntity implements Serializable, TimestampAware, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";

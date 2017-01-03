@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.apache.commons.io.FileUtils;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.File;
@@ -11,7 +10,6 @@ import java.util.Arrays;
 
 @Entity
 @Table(name = "blob_content")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BlobContent implements Serializable {
 
     public static final String SEQUENCE_NAME = "BLOB_CONTENT_ID_SEQ";

@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.springframework.util.StringUtils;
 
@@ -8,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "asccp")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationCoreComponentPropertyForLookup {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";

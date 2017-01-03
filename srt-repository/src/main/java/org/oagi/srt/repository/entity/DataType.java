@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
@@ -10,7 +10,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "dt")
-@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class DataType implements Serializable {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";

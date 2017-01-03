@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
@@ -11,7 +11,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "asccp")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationCoreComponentProperty
         implements CoreComponentProperty, Serializable, Cloneable {
 
