@@ -17,7 +17,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long abieId;
 
     @Column(nullable = false, length = 41, updatable = false)

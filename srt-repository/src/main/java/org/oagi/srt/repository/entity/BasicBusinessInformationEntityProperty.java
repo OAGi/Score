@@ -16,7 +16,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 5000)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bbiepId;
 
     @Column(nullable = false, length = 41, updatable = false)

@@ -3,9 +3,8 @@
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:49:41 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
-<incrementBy>5000</incrementBy>
+<incrementBy>1</incrementBy>
 <maxValue>999999999999999999999999</maxValue>
 <minValue>1</minValue>
-<noCache>YES</noCache>
 <startWith>1</startWith>
 </SequenceOraclev10g>
