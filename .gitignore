@@ -21,5 +21,4 @@ docker-compose.yaml
 *.zip
 ~$*
 *.bak
-*-mysql.sql
 srt-webapp/src/main/resources/static/bower_components/**

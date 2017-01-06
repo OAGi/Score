@@ -1,5 +1,7 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,8 +11,16 @@ public class BusinessInformationEntityUserExtensionRevision {
     public static final String SEQUENCE_NAME = "BIE_USER_EXT_REVISION_ID_SEQ";
 
     @Id
-    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
+    @GenericGenerator(
+            name = SEQUENCE_NAME,
+            strategy = "org.oagi.srt.repository.support.jpa.ByDialectIdentifierGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = SEQUENCE_NAME),
+                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1")
+            }
+    )
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
     private long bieUserExtRevisionId;
 
     @OneToOne(fetch = FetchType.EAGER)
