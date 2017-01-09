@@ -230,7 +230,7 @@ public class P_1_4_PopulateCodeList {
 
                         if (baseCodelistVO != null && codelistVO != null) {
                             codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
-                            codeListRepository.save(codelistVO);
+                            codeListRepository.saveAndFlush(codelistVO);
                             logger.debug(" Update Based Code List ID: " + elementName.substring(0, elementName.lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
                         } else {
                             logger.warn(" Update Based Code List ID Is Failed! Check CodeListID: " + elementName);
@@ -286,7 +286,7 @@ public class P_1_4_PopulateCodeList {
                                 codeListValue.setUsedIndicator(true);
                                 codeListValue.setLockedIndicator(false);
                                 codeListValue.setExtensionIndicator(false);
-                                codeListValueRepository.save(codeListValue);
+                                codeListValueRepository.saveAndFlush(codeListValue);
                             }
                         }
                     } else {//if based code list is null
@@ -322,7 +322,7 @@ public class P_1_4_PopulateCodeList {
                             codeListValue.setDefinitionSource(definition.getAttribute("source"));
                         }
 
-                        codeListValueRepository.save(codeListValue);
+                        codeListValueRepository.saveAndFlush(codeListValue);
                         count++;
                     }
                     if (count > 0) {

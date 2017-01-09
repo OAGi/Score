@@ -85,7 +85,7 @@ public class PopulateBlobContents {
             Module module = moduleRepository.findByModule(moduleName);
             blobContent.setModule(module);
             blobContent.setReleaseId(release.getReleaseId());
-            blobContentRepository.save(blobContent);
+            blobContentRepository.saveAndFlush(blobContent);
         }
     }
 

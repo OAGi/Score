@@ -10,7 +10,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ public class JpaConfig {
 
         HibernateJpaVendorAdapter hibernateJpa = new HibernateJpaVendorAdapter();
         hibernateJpa.setShowSql(env.getProperty("hibernate.show_sql", Boolean.class));
+        hibernateJpa.setGenerateDdl(false);
 
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource);

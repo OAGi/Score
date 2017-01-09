@@ -74,9 +74,7 @@ public class P_1_1_PopulateCommonData {
         user.setOrganization("Open Applications Group");
         user.setOagisDeveloperIndicator(true);
 
-        userRepository.saveAndFlush(user);
-
-        return user;
+        return userRepository.saveAndFlush(user);
     }
 
     private Namespace populateNamespace(User user) throws ParseException {
@@ -94,8 +92,7 @@ public class P_1_1_PopulateCommonData {
         namespace.setCreationTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
         namespace.setLastUpdateTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
 
-        namespaceRepository.saveAndFlush(namespace);
-        return namespace;
+        return namespaceRepository.saveAndFlush(namespace);
     }
 
     private Release populateRelease(Namespace namespace) {
@@ -106,8 +103,7 @@ public class P_1_1_PopulateCommonData {
         release.setNamespaceId(namespace.getNamespaceId());
         release.setReleaseNote(OAGIS_RELEASE_NOTE);
 
-        releaseRepository.saveAndFlush(release);
-        return release;
+        return releaseRepository.saveAndFlush(release);
     }
 
     private class XBTBuilder {
@@ -137,8 +133,7 @@ public class P_1_1_PopulateCommonData {
             if (subTypeXbt != null) {
                 xbt.setSubtypeOfXbtId(subTypeXbt.getXbtId());
             }
-            xbtRepository.saveAndFlush(xbt);
-            return xbt;
+            return xbtRepository.saveAndFlush(xbt);
         }
     }
 
@@ -189,17 +184,17 @@ public class P_1_1_PopulateCommonData {
     public void populateCdtPri() {
         printTitle("Populate CDT Primitive");
 
-        cdtPriRepository.save(cdtPri("Binary"));
-        cdtPriRepository.save(cdtPri("Boolean"));
-        cdtPriRepository.save(cdtPri("Decimal"));
-        cdtPriRepository.save(cdtPri("Double"));
-        cdtPriRepository.save(cdtPri("Float"));
-        cdtPriRepository.save(cdtPri("Integer"));
-        cdtPriRepository.save(cdtPri("NormalizedString"));
-        cdtPriRepository.save(cdtPri("String"));
-        cdtPriRepository.save(cdtPri("TimeDuration"));
-        cdtPriRepository.save(cdtPri("TimePoint"));
-        cdtPriRepository.save(cdtPri("Token"));
+        cdtPriRepository.saveAndFlush(cdtPri("Binary"));
+        cdtPriRepository.saveAndFlush(cdtPri("Boolean"));
+        cdtPriRepository.saveAndFlush(cdtPri("Decimal"));
+        cdtPriRepository.saveAndFlush(cdtPri("Double"));
+        cdtPriRepository.saveAndFlush(cdtPri("Float"));
+        cdtPriRepository.saveAndFlush(cdtPri("Integer"));
+        cdtPriRepository.saveAndFlush(cdtPri("NormalizedString"));
+        cdtPriRepository.saveAndFlush(cdtPri("String"));
+        cdtPriRepository.saveAndFlush(cdtPri("TimeDuration"));
+        cdtPriRepository.saveAndFlush(cdtPri("TimePoint"));
+        cdtPriRepository.saveAndFlush(cdtPri("Token"));
     }
 
     private CoreDataTypePrimitive cdtPri(String name) {
@@ -372,8 +367,7 @@ public class P_1_1_PopulateCommonData {
         }
 
         public DataType build() {
-            dataTypeRepository.save(cdt);
-            return cdt;
+            return dataTypeRepository.saveAndFlush(cdt);
         }
     }
 }

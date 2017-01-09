@@ -134,7 +134,7 @@ public class P_1_3_PopulateAgencyIDList {
         AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOneByValue("6");
         agencyIdListRepository.findAll().forEach(e -> {
             e.setAgencyIdListValueId(agencyIdListValue.getAgencyIdListValueId());
-            agencyIdListRepository.save(e);
+            agencyIdListRepository.saveAndFlush(e);
         });
     }
 

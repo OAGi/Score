@@ -533,7 +533,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());
-        bccpRepository.save(bccp);
+        bccpRepository.saveAndFlush(bccp);
     }
 
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
@@ -665,7 +665,7 @@ public class P_1_7_PopulateQBDTInDT {
                         cdtScAwdPri.setCdtScId(dtSc.getDtScId());
                         cdtScAwdPri.setCdtPriId(svo.getCdtPriId());
                         cdtScAwdPri.setDefault(svo.isDefault());
-                        cdtScAwdPriRepository.save(cdtScAwdPri);
+                        cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
                         long cdtScAwdPriId =
@@ -680,7 +680,7 @@ public class P_1_7_PopulateQBDTInDT {
                             cdtScAwdPriXpsTypeMap.setCdtScAwdPriId(cdtScAwdPriId);
                             long xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             cdtScAwdPriXpsTypeMap.setXbtId(xdtBuiltTypeId);
-                            cdtScAwdPriXpsTypeMapRepository.save(cdtScAwdPriXpsTypeMap);
+                            cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtScAwdPriXpsTypeMap);
                         }
                     }
 

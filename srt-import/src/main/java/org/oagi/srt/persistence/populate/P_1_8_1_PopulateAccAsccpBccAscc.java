@@ -388,9 +388,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setReleaseId(importUtil.getReleaseId());
         asccp.setReusableIndicator(reusableIndicator);
         asccp.setNillable(declaration.isNillable());
-        asccpRepository.saveAndFlush(asccp);
-
-        return asccp;
+        return asccpRepository.saveAndFlush(asccp);
     }
 
     private AggregateCoreComponent createACC(Declaration declaration) {
@@ -492,9 +490,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
         acc.setNamespaceId(importUtil.getNamespaceId());
         acc.setReleaseId(importUtil.getReleaseId());
-        accRepository.saveAndFlush(acc);
-
-        return acc;
+        return accRepository.saveAndFlush(acc);
     }
 
     private AggregateCoreComponent doCreateACC(Declaration declaration) {
@@ -557,9 +553,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         ascc.setCreatedBy(importUtil.getUserId());
         ascc.setLastUpdatedBy(importUtil.getUserId());
         ascc.setOwnerUserId(importUtil.getUserId());
-        asccRepository.saveAndFlush(ascc);
-
-        return ascc;
+        return asccRepository.saveAndFlush(ascc);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
@@ -679,7 +673,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setReleaseId(importUtil.getReleaseId());
             bccp.setNamespaceId(importUtil.getNamespaceId());
             bccp.setNillable(declaration.isNillable());
-            bccpRepository.saveAndFlush(bccp);
+            bccp = bccpRepository.saveAndFlush(bccp);
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }

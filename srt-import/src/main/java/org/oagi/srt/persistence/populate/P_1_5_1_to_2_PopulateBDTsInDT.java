@@ -250,7 +250,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                     aBDT_Primitive_RestrictionVO.setDefault(isDefault);
                     logger.debug("Inserting allowed primitive expression type map with XSD built-in type in DefaultBDT" +
                             getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = " + isDefault);
-                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+                    bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
                 }
             }
         }
@@ -262,7 +262,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
         		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
         		logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
-                bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+                bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
         	}
         }
         
@@ -535,7 +535,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 	                    aBDT_Primitive_RestrictionVO.setDefault(true);
 	                    logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
 	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
-	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+	                    bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
 	                } 
 	                
 	                if(isTimePoint && idOfXsdToken==aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()){
@@ -545,7 +545,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 	                    aBDT_Primitive_RestrictionVO.setDefault(false);
 	                    logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
 	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = false");
-	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+	                    bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
 	                }
 	                
 	                //TODO: logic for default BDTs which don't have base type and only have union 
@@ -560,7 +560,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
         		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
         		logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
-                bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+                bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
         	}
         }
     }

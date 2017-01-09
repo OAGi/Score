@@ -8,6 +8,7 @@ import org.hibernate.boot.model.relational.ExportableProducer;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.Configurable;
@@ -26,6 +27,8 @@ public class ByDialectIdentifierGenerator implements IdentifierGenerator, Config
     private Properties config;
     private Database database;
 
+    private IdentifierGenerator identifierGenerator;
+
     @Override
     public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
         this.identifierGeneratorFactory =
@@ -40,23 +43,27 @@ public class ByDialectIdentifierGenerator implements IdentifierGenerator, Config
 
     @Override
     public Serializable generate(SessionImplementor session, Object object) throws HibernateException {
-        Dialect dialect = identifierGeneratorFactory.getDialect();
-        IdentifierGenerator identifierGenerator = getIdentifierGenerator(dialect);
+        IdentifierGenerator identifierGenerator = getIdentifierGenerator();
         return identifierGenerator.generate(session, object);
     }
 
-    private IdentifierGenerator getIdentifierGenerator(Dialect dialect) {
+    private IdentifierGenerator getIdentifierGenerator() {
+        if (identifierGenerator != null) {
+            return identifierGenerator;
+        }
+
+        Dialect dialect = identifierGeneratorFactory.getDialect();
         String strategy;
-        if (dialect instanceof MySQLDialect) {
+        if (dialect instanceof MySQLDialect || dialect instanceof HSQLDialect) {
             strategy = "increment";
         } else {
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator";
         }
-        final IdentifierGenerator ig = identifierGeneratorFactory.createIdentifierGenerator(strategy, type, config);
-        if (ig instanceof ExportableProducer) {
-            ((ExportableProducer) ig).registerExportables(database);
+        identifierGenerator = identifierGeneratorFactory.createIdentifierGenerator(strategy, type, config);
+        if (identifierGenerator instanceof ExportableProducer) {
+            ((ExportableProducer) identifierGenerator).registerExportables(database);
         }
 
-        return ig;
+        return identifierGenerator;
     }
 }

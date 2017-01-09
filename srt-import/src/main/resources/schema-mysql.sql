@@ -29,7 +29,20 @@ CREATE TABLE `abie` (
   `remark` varchar(225) DEFAULT NULL COMMENT 'This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be "Type of BOM should be recognized in the BOM/typeCode."',
   `biz_term` varchar(225) DEFAULT NULL COMMENT 'To indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column. ',
-  PRIMARY KEY (`abie_id`)
+  PRIMARY KEY (`abie_id`),
+  UNIQUE KEY `abie_uk1` (`guid`),
+  KEY `abie_based_acc_id_fk` (`based_acc_id`),
+  KEY `abie_biz_ctx_id_fk` (`biz_ctx_id`),
+  KEY `abie_client_id_fk` (`client_id`),
+  KEY `abie_created_by_fk` (`created_by`),
+  KEY `abie_last_updated_by_fk` (`last_updated_by`),
+  KEY `abie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  CONSTRAINT `abie_based_acc_id_fk` FOREIGN KEY (`based_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `abie_biz_ctx_id_fk` FOREIGN KEY (`biz_ctx_id`) REFERENCES `biz_ctx` (`biz_ctx_id`),
+  CONSTRAINT `abie_client_id_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`client_id`),
+  CONSTRAINT `abie_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `abie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `abie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE "SEMANTIC_GROUP", "USER_EXTENSION_GROUP", etc.';
 
 
@@ -63,7 +76,24 @@ CREATE TABLE `acc` (
   `current_acc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\\n\\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\\n\\nThe value of this column for the current record should be left NULL.',
   `is_deprecated` tinyint(1) DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be allowed).',
   `is_abstract` tinyint(1) DEFAULT '0' COMMENT 'This is the XML Schema abstract flag. Default is false. If it is true, the abstract flag will be set to true when generating a corresponding xsd:complexType. So although this flag may not apply to some ACCs such as those that are xsd:group. It is still have a false value.',
-  PRIMARY KEY (`acc_id`)
+  PRIMARY KEY (`acc_id`),
+  UNIQUE KEY `acc_uk1` (`guid`),
+  KEY `acc_based_acc_id_fk` (`based_acc_id`),
+  KEY `acc_created_by_fk` (`created_by`),
+  KEY `acc_current_acc_id_fk` (`current_acc_id`),
+  KEY `acc_last_updated_by_fk` (`last_updated_by`),
+  KEY `acc_module_id_fk` (`module_id`),
+  KEY `acc_namespace_id_fk` (`namespace_id`),
+  KEY `acc_owner_user_id_fk` (`owner_user_id`),
+  KEY `acc_release_id_fk` (`release_id`),
+  CONSTRAINT `acc_based_acc_id_fk` FOREIGN KEY (`based_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `acc_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `acc_current_acc_id_fk` FOREIGN KEY (`current_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `acc_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `acc_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `acc_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
+  CONSTRAINT `acc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `acc_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The ACC table holds information about complex data structured concepts. For example, OAGIS''s Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as a qualification of an ACC.';
 
 
@@ -79,11 +109,17 @@ CREATE TABLE `agency_id_list` (
   `enum_type_guid` varchar(41) NOT NULL COMMENT 'This column stores the GUID of the type containing the enumerated values. In OAGIS, most code lists and agnecy ID lists are defined by an XyzCodeContentType (or XyzAgencyIdentificationContentType) and XyzCodeEnumerationType (or XyzAgencyIdentificationEnumerationContentType). However, some don''t have the enumeration type. When that is the case, this column is null.',
   `name` varchar(100) DEFAULT '' COMMENT 'Name of the agency identification list.',
   `list_id` varchar(10) DEFAULT '' COMMENT 'This is a business or standard identification assigned to the agency identification list.',
-  `agency_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is the identification of the agency or organization which developed and/or maintains the list. Theoretically, this can be modeled as a self-reference foreign key, but it is not implemented at this point.',
+  `agency_id_list_value_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is the identification of the agency or organization which developed and/or maintains the list. Theoretically, this can be modeled as a self-reference foreign key, but it is not implemented at this point.',
   `version_id` varchar(10) DEFAULT '' COMMENT 'Version number of the agency identification list (assigned by the agency).',
   `module_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the module table indicating the physical schema the MODULE belongs to.',
   `definition` text COMMENT 'Description of the agency identification list.',
-  PRIMARY KEY (`agency_id_list_id`)
+  PRIMARY KEY (`agency_id_list_id`),
+  UNIQUE KEY `agency_id_list_uk2` (`enum_type_guid`),
+  UNIQUE KEY `agency_id_list_uk1` (`guid`),
+  KEY `agency_id_list_agency_id_list_value_id_fk` (`agency_id_list_value_id`),
+  KEY `agency_id_list_module_id_fk` (`module_id`),
+  CONSTRAINT `agency_id_list_agency_id_list_value_id_fk` FOREIGN KEY (`agency_id_list_value_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`),
+  CONSTRAINT `agency_id_list_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The AGENCY_ID_LIST table stores information about agency identification lists. The list''s values are however kept in the AGENCY_ID_LIST_VALUE.';
 
 
@@ -99,7 +135,9 @@ CREATE TABLE `agency_id_list_value` (
   `name` varchar(150) DEFAULT '' COMMENT 'Descriptive or short name of the value.',
   `definition` text COMMENT 'The meaning of the value.',
   `owner_list_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the agency identification list in the AGENCY_ID_LIST table this value belongs to.',
-  PRIMARY KEY (`agency_id_list_value_id`)
+  PRIMARY KEY (`agency_id_list_value_id`),
+  KEY `agency_id_list_value_owner_list_id_fk` (`owner_list_id`),
+  CONSTRAINT `agency_id_list_value_owner_list_id_fk` FOREIGN KEY (`owner_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the values within an agency identification list.';
 
 
@@ -116,7 +154,8 @@ CREATE TABLE `app_user` (
   `name` varchar(100) DEFAULT '' COMMENT 'Full name of the user.',
   `organization` varchar(100) DEFAULT '' COMMENT 'The company the user represents.',
   `oagis_developer_indicator` tinyint(1) NOT NULL COMMENT 'This indicates whether the user can edit OAGIS Model content. Content created by the OAGIS developer is also considered OAGIS Model content.',
-  PRIMARY KEY (`app_user_id`)
+  PRIMARY KEY (`app_user_id`),
+  UNIQUE KEY `app_user_uk1` (`login_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the user information for authentication and authorization purposes.';
 
 
@@ -144,7 +183,20 @@ CREATE TABLE `asbie` (
   `seq_key` decimal(10,2) NOT NULL COMMENT 'This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.',
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It signifies whether the field/component should be generated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE which owns this ASBIE record.',
-  PRIMARY KEY (`asbie_id`)
+  PRIMARY KEY (`asbie_id`),
+  UNIQUE KEY `asbie_uk1` (`guid`,`from_abie_id`,`to_asbiep_id`),
+  KEY `asbie_based_ascc_id_fk` (`based_ascc_id`),
+  KEY `asbie_created_by_fk` (`created_by`),
+  KEY `asbie_from_abie_id_fk` (`from_abie_id`),
+  KEY `asbie_last_updated_by_fk` (`last_updated_by`),
+  KEY `asbie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  KEY `asbie_to_asbiep_id_fk` (`to_asbiep_id`),
+  CONSTRAINT `asbie_based_ascc_id_fk` FOREIGN KEY (`based_ascc_id`) REFERENCES `ascc` (`ascc_id`),
+  CONSTRAINT `asbie_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asbie_from_abie_id_fk` FOREIGN KEY (`from_abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `asbie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asbie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`),
+  CONSTRAINT `asbie_to_asbiep_id_fk` FOREIGN KEY (`to_asbiep_id`) REFERENCES `asbiep` (`asbiep_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is a contextualization of an ASCC.';
 
 
@@ -167,7 +219,18 @@ CREATE TABLE `asbiep` (
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the ASBIEP record was first created. ASBIEPs created as children of another ABIE have the same CREATION_TIMESTAMP.',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the ASBIEP was last updated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this ASBIEP record.',
-  PRIMARY KEY (`asbiep_id`)
+  PRIMARY KEY (`asbiep_id`),
+  UNIQUE KEY `asbiep_uk1` (`guid`),
+  KEY `asbiep_based_asccp_id_fk` (`based_asccp_id`),
+  KEY `asbiep_role_of_abie_id_fk` (`role_of_abie_id`),
+  KEY `asbiep_created_by_fk` (`created_by`),
+  KEY `asbiep_last_updated_by_fk` (`last_updated_by`),
+  KEY `asbiep_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  CONSTRAINT `asbiep_based_asccp_id_fk` FOREIGN KEY (`based_asccp_id`) REFERENCES `asccp` (`asccp_id`),
+  CONSTRAINT `asbiep_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asbiep_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asbiep_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`),
+  CONSTRAINT `asbiep_role_of_abie_id_fk` FOREIGN KEY (`role_of_abie_id`) REFERENCES `abie` (`abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP.';
 
 
@@ -199,7 +262,22 @@ CREATE TABLE `ascc` (
   `revision_action` tinyint(4) DEFAULT '1' COMMENT 'This indicates the action associated with the record. The action can be 1 = INSERT, 2 = UPDATE, and 3 = DELETE. This column is null for the current record.',
   `release_id` bigint(20) unsigned DEFAULT NULL COMMENT 'RELEASE_ID is an incremental integer. It is an unformatted counterpart of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. RELEASE_ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).\n\nNot all component revisions have an associated RELEASE_ID because some revisions may never be released.\n\nUnpublished components cannot be released.\n\nThis column is NULL for the current record.',
   `current_ascc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
-  PRIMARY KEY (`ascc_id`)
+  PRIMARY KEY (`ascc_id`),
+  UNIQUE KEY `ascc_uk1` (`guid`,`from_acc_id`,`to_asccp_id`),
+  KEY `ascc_from_acc_id_fk` (`from_acc_id`),
+  KEY `ascc_to_asccp_id_fk` (`to_asccp_id`),
+  KEY `ascc_created_by_fk` (`created_by`),
+  KEY `ascc_owner_user_id_fk` (`owner_user_id`),
+  KEY `ascc_last_updated_by_fk` (`last_updated_by`),
+  KEY `ascc_release_id_fk` (`release_id`),
+  KEY `ascc_current_ascc_id_fk` (`current_ascc_id`),
+  CONSTRAINT `ascc_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `ascc_current_ascc_id_fk` FOREIGN KEY (`current_ascc_id`) REFERENCES `ascc` (`ascc_id`),
+  CONSTRAINT `ascc_from_acc_id_fk` FOREIGN KEY (`from_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `ascc_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `ascc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `ascc_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
+  CONSTRAINT `ascc_to_asccp_id_fk` FOREIGN KEY (`to_asccp_id`) REFERENCES `asccp` (`asccp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASCC represents a relationship/association between two ACCs through an ASCCP. ';
 
 
@@ -232,7 +310,24 @@ CREATE TABLE `asccp` (
   `release_id` bigint(20) unsigned DEFAULT NULL COMMENT 'RELEASE_ID is an incremental integer. It is an unformatted counter part of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. A release ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).\n\nNot all component revisions have an associated RELEASE_ID because some revisions may never be released. USER_EXTENSION_GROUP component type is never part of a release.\n\nUnpublished components cannot be released.\n\nThis column is NULLl for the current record.',
   `current_asccp_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
   `is_nillable` tinyint(1) DEFAULT NULL COMMENT 'This is corresponding to the XML schema nillable flag. Although the nillable may not apply in certain cases of the ASCCP (e.g., when it corresponds to an XSD group), the value is default to false for simplification.',
-  PRIMARY KEY (`asccp_id`)
+  PRIMARY KEY (`asccp_id`),
+  UNIQUE KEY `asccp_uk1` (`guid`),
+  KEY `asccp_role_of_acc_id_fk` (`role_of_acc_id`),
+  KEY `asccp_created_by_fk` (`created_by`),
+  KEY `asccp_owner_user_id_fk` (`owner_user_id`),
+  KEY `asccp_last_updated_by_fk` (`last_updated_by`),
+  KEY `asccp_module_id_fk` (`module_id`),
+  KEY `asccp_namespace_id_fk` (`namespace_id`),
+  KEY `asccp_release_id_fk` (`release_id`),
+  KEY `asccp_current_asccp_id_fk` (`current_asccp_id`),
+  CONSTRAINT `asccp_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asccp_current_asccp_id_fk` FOREIGN KEY (`current_asccp_id`) REFERENCES `asccp` (`asccp_id`),
+  CONSTRAINT `asccp_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asccp_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `asccp_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
+  CONSTRAINT `asccp_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asccp_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
+  CONSTRAINT `asccp_role_of_acc_id_fk` FOREIGN KEY (`role_of_acc_id`) REFERENCES `acc` (`acc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASCCP specifies a role (or property) an ACC may play under another ACC.';
 
 
@@ -266,7 +361,26 @@ CREATE TABLE `bbie` (
   `seq_key` decimal(10,2) DEFAULT NULL COMMENT 'This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.',
   `is_used` tinyint(1) DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated in the expression generation.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this BBIE record.',
-  PRIMARY KEY (`bbie_id`)
+  PRIMARY KEY (`bbie_id`),
+  UNIQUE KEY `bbie_uk1` (`guid`,`from_abie_id`,`to_bbiep_id`),
+  KEY `bbie_based_bcc_id_fk` (`based_bcc_id`),
+  KEY `bbie_from_abie_id_fk` (`from_abie_id`),
+  KEY `bbie_to_bbiep_id_fk` (`to_bbiep_id`),
+  KEY `bbie_bdt_pri_restri_id_fk` (`bdt_pri_restri_id`),
+  KEY `bbie_code_list_id_fk` (`code_list_id`),
+  KEY `bbie_agency_id_list_id_fk` (`agency_id_list_id`),
+  KEY `bbie_created_by_fk` (`created_by`),
+  KEY `bbie_last_updated_by_fk` (`last_updated_by`),
+  KEY `bbie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  CONSTRAINT `bbie_agency_id_list_id_fk` FOREIGN KEY (`agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
+  CONSTRAINT `bbie_based_bcc_id_fk` FOREIGN KEY (`based_bcc_id`) REFERENCES `bcc` (`bcc_id`),
+  CONSTRAINT `bbie_bdt_pri_restri_id_fk` FOREIGN KEY (`bdt_pri_restri_id`) REFERENCES `bdt_pri_restri` (`bdt_pri_restri_id`),
+  CONSTRAINT `bbie_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`),
+  CONSTRAINT `bbie_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bbie_from_abie_id_fk` FOREIGN KEY (`from_abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `bbie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bbie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`),
+  CONSTRAINT `bbie_to_bbiep_id_fk` FOREIGN KEY (`to_bbiep_id`) REFERENCES `bbiep` (`bbiep_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A BBIE represents a relationship/association between an ABIE and a BBIEP. It is a contextualization of a BCC. The BBIE table also stores some information about the specific constraints related to the BDT associated with the BBIEP. In particular, the three columns including the BDT_PRI_RESTRI_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID allows for capturing of the specific primitive to be used in the context. Only one column among the three can have a value in a particular record.';
 
 
@@ -293,7 +407,19 @@ CREATE TABLE `bbie_sc` (
   `biz_term` varchar(225) DEFAULT NULL COMMENT 'Business term to indicate what the BBIE SC is called in a particular business context. With this current design, only one business term is allowed per business context.',
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE. It specifies the top-level ABIE, which owns this BBIE_SC record.',
-  PRIMARY KEY (`bbie_sc_id`)
+  PRIMARY KEY (`bbie_sc_id`),
+  KEY `bbie_sc_bbie_id_fk` (`bbie_id`),
+  KEY `bbie_sc_dt_sc_id_fk` (`dt_sc_id`),
+  KEY `bbie_sc_dt_sc_pri_restri_id_fk` (`dt_sc_pri_restri_id`),
+  KEY `bbie_sc_code_list_id_fk` (`code_list_id`),
+  KEY `bbie_sc_agency_id_list_id_fk` (`agency_id_list_id`),
+  KEY `bbie_sc_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  CONSTRAINT `bbie_sc_agency_id_list_id_fk` FOREIGN KEY (`agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
+  CONSTRAINT `bbie_sc_bbie_id_fk` FOREIGN KEY (`bbie_id`) REFERENCES `bbie` (`bbie_id`),
+  CONSTRAINT `bbie_sc_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`),
+  CONSTRAINT `bbie_sc_dt_sc_id_fk` FOREIGN KEY (`dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
+  CONSTRAINT `bbie_sc_dt_sc_pri_restri_id_fk` FOREIGN KEY (`dt_sc_pri_restri_id`) REFERENCES `bdt_sc_pri_restri` (`bdt_sc_pri_restri_id`),
+  CONSTRAINT `bbie_sc_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT''s SCs. ';
 
 
@@ -315,7 +441,16 @@ CREATE TABLE `bbiep` (
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the BBIEP record was first created. BBIEPs created as children of another ABIE have the same CREATION_TIMESTAMP,',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the BBIEP was last updated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE which owns this BBIEP record.',
-  PRIMARY KEY (`bbiep_id`)
+  PRIMARY KEY (`bbiep_id`),
+  UNIQUE KEY `bbiep_uk1` (`guid`),
+  KEY `bbiep_based_bccp_id_fk` (`based_bccp_id`),
+  KEY `bbiep_created_by_fk` (`created_by`),
+  KEY `bbiep_last_updated_by_fk` (`last_updated_by`),
+  KEY `bbiep_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
+  CONSTRAINT `bbiep_based_bccp_id_fk` FOREIGN KEY (`based_bccp_id`) REFERENCES `bccp` (`bccp_id`),
+  CONSTRAINT `bbiep_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bbiep_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bbiep_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='BBIEP represents the usage of basic property in a specific business context. It is a contextualization of a BCCP.';
 
 
@@ -350,7 +485,22 @@ CREATE TABLE `bcc` (
   `is_deprecated` tinyint(1) NOT NULL COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
   `is_nillable` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicate whether the field can have a NULL This is corresponding to the nillable flag in the XML schema.',
   `default_value` text COMMENT 'This set the default value at the association level. ',
-  PRIMARY KEY (`bcc_id`)
+  PRIMARY KEY (`bcc_id`),
+  UNIQUE KEY `bcc_uk1` (`guid`,`from_acc_id`,`to_bccp_id`),
+  KEY `bcc_to_bccp_id_fk` (`to_bccp_id`),
+  KEY `bcc_from_acc_id_fk` (`from_acc_id`),
+  KEY `bcc_created_by_fk` (`created_by`),
+  KEY `bcc_owner_user_id_fk` (`owner_user_id`),
+  KEY `bcc_last_updated_by_fk` (`last_updated_by`),
+  KEY `bcc_release_id_fk` (`release_id`),
+  KEY `bcc_current_bcc_id_fk` (`current_bcc_id`),
+  CONSTRAINT `bcc_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bcc_current_bcc_id_fk` FOREIGN KEY (`current_bcc_id`) REFERENCES `bcc` (`bcc_id`),
+  CONSTRAINT `bcc_from_acc_id_fk` FOREIGN KEY (`from_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `bcc_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bcc_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bcc_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
+  CONSTRAINT `bcc_to_bccp_id_fk` FOREIGN KEY (`to_bccp_id`) REFERENCES `bccp` (`bccp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. ';
 
 
@@ -384,7 +534,25 @@ CREATE TABLE `bccp` (
   `current_bccp_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
   `is_nillable` tinyint(1) NOT NULL COMMENT 'This is corresponding to the XML Schema nillable flag. Although the nillable may not apply to certain cases of the BCCP (e.g., when it is only used as XSD attribute), the value is default to false for simplification. ',
   `default_value` text COMMENT 'This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.',
-  PRIMARY KEY (`bccp_id`)
+  PRIMARY KEY (`bccp_id`),
+  UNIQUE KEY `bccp_uk1` (`guid`),
+  UNIQUE KEY `bccp_uk2` (`property_term`,`guid`),
+  KEY `bccp_bdt_id_fk` (`bdt_id`),
+  KEY `bccp_module_id_fk` (`module_id`),
+  KEY `bccp_namespace_id_fk` (`namespace_id`),
+  KEY `bccp_created_by_fk` (`created_by`),
+  KEY `bccp_owner_user_id_fk` (`owner_user_id`),
+  KEY `bccp_last_updated_by_fk` (`last_updated_by`),
+  KEY `bccp_release_id_fk` (`release_id`),
+  KEY `bccp_current_bccp_id_fk` (`current_bccp_id`),
+  CONSTRAINT `bccp_bdt_id_fk` FOREIGN KEY (`bdt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `bccp_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bccp_current_bccp_id_fk` FOREIGN KEY (`current_bccp_id`) REFERENCES `bccp` (`bccp_id`),
+  CONSTRAINT `bccp_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bccp_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `bccp_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
+  CONSTRAINT `bccp_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bccp_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An BCCP specifies a property concept and data type associated with it. A BCCP can be then added as a property of an ACC.';
 
 
@@ -401,7 +569,15 @@ CREATE TABLE `bdt_pri_restri` (
   `code_list_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the CODE_LIST table.',
   `agency_id_list_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.',
   `is_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.',
-  PRIMARY KEY (`bdt_pri_restri_id`)
+  PRIMARY KEY (`bdt_pri_restri_id`),
+  KEY `bdt_pri_restri_bdt_id_fk` (`bdt_id`),
+  KEY `bdt_pri_restri_cdt_awd_pri_xps_type_map_id_fk` (`cdt_awd_pri_xps_type_map_id`),
+  KEY `bdt_pri_restri_code_list_id_fk` (`code_list_id`),
+  KEY `bdt_pri_restri_agency_id_list_id_fk` (`agency_id_list_id`),
+  CONSTRAINT `bdt_pri_restri_agency_id_list_id_fk` FOREIGN KEY (`agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
+  CONSTRAINT `bdt_pri_restri_bdt_id_fk` FOREIGN KEY (`bdt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `bdt_pri_restri_cdt_awd_pri_xps_type_map_id_fk` FOREIGN KEY (`cdt_awd_pri_xps_type_map_id`) REFERENCES `cdt_awd_pri_xps_type_map` (`cdt_awd_pri_xps_type_map_id`),
+  CONSTRAINT `bdt_pri_restri_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.';
 
 
@@ -418,7 +594,15 @@ CREATE TABLE `bdt_sc_pri_restri` (
   `code_list_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to identify a code list. It allows for a primitive restriction based on a code list.',
   `agency_id_list_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.',
   `is_default` tinyint(1) NOT NULL COMMENT 'This column specifies the default primitive for a BDT. It is typically the most generic primitive allowed for the BDT.',
-  PRIMARY KEY (`bdt_sc_pri_restri_id`)
+  PRIMARY KEY (`bdt_sc_pri_restri_id`),
+  KEY `bdt_sc_pri_restri_bdt_sc_id_fk` (`bdt_sc_id`),
+  KEY `bdt_sc_pri_restri_cdt_sc_awd_pri_xps_type_map_id_fk` (`cdt_sc_awd_pri_xps_type_map_id`),
+  KEY `bdt_sc_pri_restri_code_list_id_fk` (`code_list_id`),
+  KEY `bdt_sc_pri_restri_agency_id_list_id_fk` (`agency_id_list_id`),
+  CONSTRAINT `bdt_sc_pri_restri_agency_id_list_id_fk` FOREIGN KEY (`agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
+  CONSTRAINT `bdt_sc_pri_restri_bdt_sc_id_fk` FOREIGN KEY (`bdt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
+  CONSTRAINT `bdt_sc_pri_restri_cdt_sc_awd_pri_xps_type_map_id_fk` FOREIGN KEY (`cdt_sc_awd_pri_xps_type_map_id`) REFERENCES `cdt_sc_awd_pri_xps_type_map` (`cdt_sc_awd_pri_xps_type_map_id`),
+  CONSTRAINT `bdt_sc_pri_restri_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.\n\nIt should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the BDT_SC_PRI_RESTRI key.';
 
 
@@ -435,7 +619,15 @@ CREATE TABLE `bie_user_ext_revision` (
   `ext_acc_id` bigint(20) unsigned NOT NULL COMMENT 'This points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).',
   `user_ext_acc_id` bigint(20) unsigned NOT NULL COMMENT 'This column points to the specific revision of a User Extension ACC (this is an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of the AllExtension). ',
   `revised_indicator` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This column is a flag indicating to whether the User Extension ACC (as identified in the USER_EXT_ACC_ID column) has been revised, i.e., there is a newer version of the user extension ACC than the one currently used by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is not current.',
-  PRIMARY KEY (`bie_user_ext_revision_id`)
+  PRIMARY KEY (`bie_user_ext_revision_id`),
+  KEY `bie_user_ext_revision_top_level_abie_id_fk` (`top_level_abie_id`),
+  KEY `bie_user_ext_revision_ext_abie_id_fk` (`ext_abie_id`),
+  KEY `bie_user_ext_revision_ext_acc_id_fk` (`ext_acc_id`),
+  KEY `bie_user_ext_revision_user_ext_acc_id_fk` (`user_ext_acc_id`),
+  CONSTRAINT `bie_user_ext_revision_ext_abie_id_fk` FOREIGN KEY (`ext_abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `bie_user_ext_revision_ext_acc_id_fk` FOREIGN KEY (`ext_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `bie_user_ext_revision_top_level_abie_id_fk` FOREIGN KEY (`top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`),
+  CONSTRAINT `bie_user_ext_revision_user_ext_acc_id_fk` FOREIGN KEY (`user_ext_acc_id`) REFERENCES `acc` (`acc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC.';
 
 
@@ -453,7 +645,12 @@ CREATE TABLE `biz_ctx` (
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table  referring to the last user who has updated the business context.',
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the business context record was first created. ',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the business context was last updated.',
-  PRIMARY KEY (`biz_ctx_id`)
+  PRIMARY KEY (`biz_ctx_id`),
+  UNIQUE KEY `biz_ctx_uk1` (`guid`),
+  KEY `biz_ctx_created_by_fk` (`created_by`),
+  KEY `biz_ctx_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `biz_ctx_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `biz_ctx_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents a business context. A business context is a combination of one or more business context values.';
 
 
@@ -467,7 +664,11 @@ CREATE TABLE `biz_ctx_value` (
   `biz_ctx_value_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
   `biz_ctx_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the biz_ctx table.',
   `ctx_scheme_value_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CTX_SCHEME_VALUE table.',
-  PRIMARY KEY (`biz_ctx_value_id`)
+  PRIMARY KEY (`biz_ctx_value_id`),
+  KEY `biz_ctx_value_biz_ctx_id_fk` (`biz_ctx_id`),
+  KEY `biz_ctx_value_ctx_scheme_value_id_fk` (`ctx_scheme_value_id`),
+  CONSTRAINT `biz_ctx_value_biz_ctx_id_fk` FOREIGN KEY (`biz_ctx_id`) REFERENCES `biz_ctx` (`biz_ctx_id`),
+  CONSTRAINT `biz_ctx_value_ctx_scheme_value_id_fk` FOREIGN KEY (`ctx_scheme_value_id`) REFERENCES `ctx_scheme_value` (`ctx_scheme_value_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents business context values for business contexts. It provides the associations between a business context and a context scheme value.';
 
 
@@ -482,7 +683,11 @@ CREATE TABLE `blob_content` (
   `content` mediumblob NOT NULL COMMENT 'The Blob content of the schema file.',
   `release_id` bigint(20) unsigned NOT NULL COMMENT 'The release to which this file/content belongs/published.',
   `module_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the module table indicating the physical file the blob content should be output to when generating/serializing the content.',
-  PRIMARY KEY (`blob_content_id`)
+  PRIMARY KEY (`blob_content_id`),
+  KEY `blob_content_release_id_fk` (`release_id`),
+  KEY `blob_content_module_id_fk` (`module_id`),
+  CONSTRAINT `blob_content_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `blob_content_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores schemas whose content is only imported as a whole and is represented in Blob.';
 
 
@@ -497,7 +702,11 @@ CREATE TABLE `cdt_awd_pri` (
   `cdt_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key pointing to a CDT in the DT table.',
   `cdt_pri_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. ',
   `is_default` tinyint(1) NOT NULL COMMENT 'Indicating a default primitive for the CDT?s Content Component. True for a default primitive; False otherwise.',
-  PRIMARY KEY (`cdt_awd_pri_id`)
+  PRIMARY KEY (`cdt_awd_pri_id`),
+  KEY `cdt_awd_pri_cdt_id_fk` (`cdt_id`),
+  KEY `cdt_awd_pri_cdt_pri_id_fk` (`cdt_pri_id`),
+  CONSTRAINT `cdt_awd_pri_cdt_id_fk` FOREIGN KEY (`cdt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `cdt_awd_pri_cdt_pri_id_fk` FOREIGN KEY (`cdt_pri_id`) REFERENCES `cdt_pri` (`cdt_pri_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table capture allowed primitives of the CDT?s Content Component.  The information in this table is captured from the Allowed Primitive column in each of the CDT Content Component section/table in CCTS DTC3.';
 
 
@@ -511,7 +720,11 @@ CREATE TABLE `cdt_awd_pri_xps_type_map` (
   `cdt_awd_pri_xps_type_map_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Internal, primary database key.',
   `cdt_awd_pri_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CDT_AWD_PRI table.',
   `xbt_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key and to the XBT table. It identifies the XML schema built-in types that can be mapped to the CDT primivite identified in the CDT_AWD_PRI_ID column. The CDT primitives are typically broad and hence it usually maps to more than one XML schema built-in types.',
-  PRIMARY KEY (`cdt_awd_pri_xps_type_map_id`)
+  PRIMARY KEY (`cdt_awd_pri_xps_type_map_id`),
+  KEY `cdt_awd_pri_xps_type_map_cdt_awd_pri_id_fk` (`cdt_awd_pri_id`),
+  KEY `cdt_awd_pri_xps_type_map_xbt_id_fk` (`xbt_id`),
+  CONSTRAINT `cdt_awd_pri_xps_type_map_cdt_awd_pri_id_fk` FOREIGN KEY (`cdt_awd_pri_id`) REFERENCES `cdt_awd_pri` (`cdt_awd_pri_id`),
+  CONSTRAINT `cdt_awd_pri_xps_type_map_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. ';
 
 
@@ -524,7 +737,8 @@ DROP TABLE IF EXISTS `cdt_pri`;
 CREATE TABLE `cdt_pri` (
   `cdt_pri_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Internal, primary database key.',
   `name` varchar(45) NOT NULL COMMENT 'Name of the CDT primitive per the CCTS datatype catalog, e.g., Decimal.',
-  PRIMARY KEY (`cdt_pri_id`)
+  PRIMARY KEY (`cdt_pri_id`),
+  UNIQUE KEY `cdt_pri_uk1` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores the CDT primitives.';
 
 
@@ -539,7 +753,11 @@ CREATE TABLE `cdt_sc_awd_pri` (
   `cdt_sc_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key pointing to the supplementary component (SC).',
   `cdt_pri_id` bigint(20) unsigned NOT NULL COMMENT 'A foreign key pointing to the CDT_Pri table. It represents a CDT primitive allowed for the suppliement component identified in the CDT_SC_ID column.',
   `is_default` tinyint(1) NOT NULL COMMENT 'Indicating whether the primitive is the default primitive of the supplementary component.',
-  PRIMARY KEY (`cdt_sc_awd_pri_id`)
+  PRIMARY KEY (`cdt_sc_awd_pri_id`),
+  KEY `cdt_sc_awd_pri_cdt_sc_id_fk` (`cdt_sc_id`),
+  KEY `cdt_sc_awd_pri_cdt_pri_id_fk` (`cdt_pri_id`),
+  CONSTRAINT `cdt_sc_awd_pri_cdt_pri_id_fk` FOREIGN KEY (`cdt_pri_id`) REFERENCES `cdt_pri` (`cdt_pri_id`),
+  CONSTRAINT `cdt_sc_awd_pri_cdt_sc_id_fk` FOREIGN KEY (`cdt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table capture the CDT primitives allowed for a particular SC of a CDT. It also stores the CDT primitives allowed for a SC of a BDT that extends its base (such SC is not defined in the CCTS data type catalog specification).';
 
 
@@ -553,7 +771,11 @@ CREATE TABLE `cdt_sc_awd_pri_xps_type_map` (
   `cdt_sc_awd_pri_xps_type_map_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Internal, primary database key.',
   `cdt_sc_awd_pri_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CDT_SC_AWD_PRI table.',
   `xbt_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the Xbt table. It identifies an XML schema built-in type that maps to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.',
-  PRIMARY KEY (`cdt_sc_awd_pri_xps_type_map_id`)
+  PRIMARY KEY (`cdt_sc_awd_pri_xps_type_map_id`),
+  KEY `cdt_sc_awd_pri_xps_type_map_cdt_sc_awd_pri_id_fk` (`cdt_sc_awd_pri_id`),
+  KEY `cdt_sc_awd_pri_xps_type_map_xbt_id_fk` (`xbt_id`),
+  CONSTRAINT `cdt_sc_awd_pri_xps_type_map_cdt_sc_awd_pri_id_fk` FOREIGN KEY (`cdt_sc_awd_pri_id`) REFERENCES `cdt_sc_awd_pri` (`cdt_sc_awd_pri_id`),
+  CONSTRAINT `cdt_sc_awd_pri_xps_type_map_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It allows for the concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. ';
 
 
@@ -595,7 +817,19 @@ CREATE TABLE `code_list` (
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the code list was created.',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the code list was last updated.',
   `state` varchar(10) DEFAULT '' COMMENT 'Life cycle state of the code list. Possible values are Editing, Published, or Deleted. Only a code list in published state is available for derivation and for used by the CC and BIE. Once the code list is published, it cannot go back to Editing. A new version would have to be created.',
-  PRIMARY KEY (`code_list_id`)
+  PRIMARY KEY (`code_list_id`),
+  UNIQUE KEY `code_list_uk1` (`guid`),
+  UNIQUE KEY `code_list_uk2` (`enum_type_guid`),
+  KEY `code_list_agency_id_fk` (`agency_id`),
+  KEY `code_list_based_code_list_id_fk` (`based_code_list_id`),
+  KEY `code_list_module_id_fk` (`module_id`),
+  KEY `code_list_created_by_fk` (`created_by`),
+  KEY `code_list_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `code_list_agency_id_fk` FOREIGN KEY (`agency_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`),
+  CONSTRAINT `code_list_based_code_list_id_fk` FOREIGN KEY (`based_code_list_id`) REFERENCES `code_list` (`code_list_id`),
+  CONSTRAINT `code_list_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `code_list_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `code_list_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores information about a code list. When a code list is derived from another code list, the whole set of code values belonging to the based code list will be copied.';
 
 
@@ -615,7 +849,9 @@ CREATE TABLE `code_list_value` (
   `used_indicator` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'This indicates whether the code value is allowed to be used or not in that code list context. In other words, this flag allows a user to enable or disable a code list value.',
   `locked_indicator` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This indicates whether the USED_INDICATOR can be changed from False to True. In other words, if the code value is derived from its base code list and the USED_INDICATOR of the code value in the base is False, then the USED_iNDICATOR cannot be changed from False to True for this code value; and this is indicated using this LOCKED_INDICATOR flag in the derived code list.',
   `extension_Indicator` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This indicates whether this code value has just been added in this code list. It is used particularly in the derived code list. If the code value has only been added to the derived code list, then it can be deleted; otherwise, it cannot be deleted.',
-  PRIMARY KEY (`code_list_value_id`)
+  PRIMARY KEY (`code_list_value_id`),
+  KEY `code_list_value_code_list_id_fk` (`code_list_id`),
+  CONSTRAINT `code_list_value_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Each record in this table stores a code list value of a code list. A code list value may be inherited from another code list on which it is based. However, inherited value may be restricted (i.e., disabled and cannot be used) in this code list, i.e., the USED_INDICATOR = false. If the value cannot be used since the based code list, then the LOCKED_INDICATOR = TRUE, because the USED_INDICATOR of such code list value is FALSE by default and can no longer be changed.';
 
 
@@ -630,7 +866,8 @@ CREATE TABLE `ctx_category` (
   `guid` varchar(41) NOT NULL COMMENT 'GUID of the context category.  Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
   `name` varchar(45) DEFAULT NULL COMMENT 'Short name of the context category.',
   `description` text COMMENT 'Explanation of what the context category is.',
-  PRIMARY KEY (`ctx_category_id`)
+  PRIMARY KEY (`ctx_category_id`),
+  UNIQUE KEY `ctx_category_uk1` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures the context category. Examples of context categories as described in the CCTS are business process, industry, etc.';
 
 
@@ -653,7 +890,14 @@ CREATE TABLE `ctx_scheme` (
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It identifies the user who last updated the context scheme.',
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the scheme was created.',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the scheme was last updated.',
-  PRIMARY KEY (`ctx_scheme_id`)
+  PRIMARY KEY (`ctx_scheme_id`),
+  UNIQUE KEY `ctx_scheme_uk1` (`guid`),
+  KEY `ctx_scheme_ctx_category_id_fk` (`ctx_category_id`),
+  KEY `ctx_scheme_created_by_fk` (`created_by`),
+  KEY `ctx_scheme_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `ctx_scheme_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `ctx_scheme_ctx_category_id_fk` FOREIGN KEY (`ctx_category_id`) REFERENCES `ctx_category` (`ctx_category_id`),
+  CONSTRAINT `ctx_scheme_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents a context scheme (a classification scheme) for a context category.';
 
 
@@ -669,7 +913,10 @@ CREATE TABLE `ctx_scheme_value` (
   `value` varchar(45) NOT NULL COMMENT 'A short value for the scheme value similar to the code list value.',
   `meaning` text COMMENT 'The description, explanatiion of the scheme value.',
   `owner_ctx_scheme_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CTX_SCHEME table. It identifies the context scheme, to which this scheme value belongs.',
-  PRIMARY KEY (`ctx_scheme_value_id`)
+  PRIMARY KEY (`ctx_scheme_value_id`),
+  UNIQUE KEY `ctx_scheme_value_uk1` (`guid`),
+  KEY `ctx_scheme_value_owner_ctx_scheme_id_fk` (`owner_ctx_scheme_id`),
+  CONSTRAINT `ctx_scheme_value_owner_ctx_scheme_id_fk` FOREIGN KEY (`owner_ctx_scheme_id`) REFERENCES `ctx_scheme` (`ctx_scheme_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores the context scheme values for a particular context scheme in the CTX_SCHEME table.';
 
 
@@ -706,7 +953,24 @@ CREATE TABLE `dt` (
   `release_id` bigint(20) unsigned DEFAULT NULL COMMENT 'RELEASE_ID is an incremental integer. It is an unformatted counter part of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. A release ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).\n\nNot all component revisions have an associated RELEASE_ID because some revisions may never be released. USER_EXTENSION_GROUP component type is never part of a release.\n\nUnpublished components cannot be released.\n\nThis column is NULL for the current record.',
   `current_bdt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.\n\nThe column name is specific to BDT because, the column does not apply to CDT.',
   `is_deprecated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
-  PRIMARY KEY (`dt_id`)
+  PRIMARY KEY (`dt_id`),
+  UNIQUE KEY `dt_uk1` (`guid`),
+  KEY `dt_previous_version_dt_id_fk` (`previous_version_dt_id`),
+  KEY `dt_based_dt_id_fk` (`based_dt_id`),
+  KEY `dt_module_id_fk` (`module_id`),
+  KEY `dt_created_by_fk` (`created_by`),
+  KEY `dt_last_updated_by_fk` (`last_updated_by`),
+  KEY `dt_owner_user_id_fk` (`owner_user_id`),
+  KEY `dt_release_id_fk` (`release_id`),
+  KEY `dt_current_bdt_id_fk` (`current_bdt_id`),
+  CONSTRAINT `dt_based_dt_id_fk` FOREIGN KEY (`based_dt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `dt_current_bdt_id_fk` FOREIGN KEY (`current_bdt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `dt_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `dt_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `dt_previous_version_dt_id_fk` FOREIGN KEY (`previous_version_dt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The DT table stores both CDT and BDT. The two types of DTs are differentiated by the TYPE column.';
 
 
@@ -726,7 +990,12 @@ CREATE TABLE `dt_sc` (
   `cardinality_min` int(11) NOT NULL DEFAULT '0' COMMENT 'The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.',
   `cardinality_max` int(11) DEFAULT NULL COMMENT 'The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.',
   `based_dt_sc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the DT_SC table itself. This column is used when the SC is derived from the based DT.',
-  PRIMARY KEY (`dt_sc_id`)
+  PRIMARY KEY (`dt_sc_id`),
+  UNIQUE KEY `dt_sc_uk1` (`guid`),
+  KEY `dt_sc_owner_dt_id_fk` (`owner_dt_id`),
+  KEY `dt_sc_based_dt_sc_id_fk` (`based_dt_sc_id`),
+  CONSTRAINT `dt_sc_based_dt_sc_id_fk` FOREIGN KEY (`based_dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
+  CONSTRAINT `dt_sc_owner_dt_id_fk` FOREIGN KEY (`owner_dt_id`) REFERENCES `dt` (`dt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. ';
 
 
@@ -742,7 +1011,11 @@ CREATE TABLE `module` (
   `release_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table. It identifies the release, for which this module is associated.',
   `namespace_id` bigint(20) unsigned NOT NULL COMMENT 'Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release''s namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.',
   `version_num` varchar(45) DEFAULT NULL COMMENT 'This is the version number to be assigned to the schema module.',
-  PRIMARY KEY (`module_id`)
+  PRIMARY KEY (`module_id`),
+  KEY `module_release_id_fk` (`release_id`),
+  KEY `module_namespace_id_fk` (`namespace_id`),
+  CONSTRAINT `module_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
+  CONSTRAINT `module_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The module table stores information about a physical file, into which CC components will be generated during the expression generation.';
 
 
@@ -757,7 +1030,11 @@ CREATE TABLE `module_dep` (
   `dependency_type` int(11) NOT NULL COMMENT 'This is a code list. The value tells the expression generator what to do based on this dependency type. 0 = xsd:include, 1 = xsd:import. There could be other values supporting other expressions/syntaxes.',
   `depending_module_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the MODULE table. It identifies a depending module. For example, in XML schema if module A imports or includes module B, then module A is a depending module.',
   `depended_module_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the MODULE table. It identifies a depended module counterpart of the depending module. For example, in XML schema if module A imports or includes module B, then module B is a depended module.',
-  PRIMARY KEY (`module_dep_id`)
+  PRIMARY KEY (`module_dep_id`),
+  KEY `module_dep_depending_module_id_fk` (`depending_module_id`),
+  KEY `module_dep_depended_module_id_fk` (`depended_module_id`),
+  CONSTRAINT `module_dep_depended_module_id_fk` FOREIGN KEY (`depended_module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `module_dep_depending_module_id_fk` FOREIGN KEY (`depending_module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table carries the dependency between modules in the MODULE table.';
 
 
@@ -777,8 +1054,14 @@ CREATE TABLE `namespace` (
   `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying user who created the namespace.',
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying the user who last updated the record.',
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was first created.',
-  `last_updated_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was last updated.',
-  PRIMARY KEY (`namespace_id`)
+  `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was last updated.',
+  PRIMARY KEY (`namespace_id`),
+  KEY `namespace_owner_user_id_fk` (`owner_user_id`),
+  KEY `namespace_created_by_fk` (`created_by`),
+  KEY `namespace_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `namespace_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `namespace_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `namespace_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores information about a namespace. Namespace is the namespace as in the XML schema specification.';
 
 
@@ -793,7 +1076,9 @@ CREATE TABLE `release` (
   `release_num` varchar(45) DEFAULT '' COMMENT 'Release number such has 10.0, 10.1, etc. ',
   `release_note` longtext COMMENT 'Description or note associated with the release.',
   `namespace_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.',
-  PRIMARY KEY (`release_id`)
+  PRIMARY KEY (`release_id`),
+  KEY `release_namespace_id_fk` (`namespace_id`),
+  CONSTRAINT `release_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The is table store the release information.';
 
 
@@ -808,7 +1093,11 @@ CREATE TABLE `top_level_abie` (
   `abie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ABIE table pointing to a record which is a top-level ABIE.',
   `owner_user_id` bigint(20) unsigned NOT NULL,
   `state` int(11) DEFAULT NULL,
-  PRIMARY KEY (`top_level_abie_id`)
+  PRIMARY KEY (`top_level_abie_id`),
+  KEY `top_level_abie_abie_id_fk` (`abie_id`),
+  KEY `top_level_abie_owner_user_id_fk` (`owner_user_id`),
+  CONSTRAINT `top_level_abie_abie_id_fk` FOREIGN KEY (`abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `top_level_abie_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table indexes the ABIE which is a top-level ABIE. This table and the owner_top_level_abie_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions.';
 
 
@@ -823,7 +1112,9 @@ CREATE TABLE `xbt` (
   `name` varchar(45) DEFAULT NULL COMMENT 'Human understandable name of the built-in type.',
   `builtIn_type` varchar(45) DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
   `subtype_of_xbt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.',
-  PRIMARY KEY (`xbt_id`)
+  PRIMARY KEY (`xbt_id`),
+  KEY `xbt_subtype_of_xbt_id_fk` (`subtype_of_xbt_id`),
+  CONSTRAINT `xbt_subtype_of_xbt_id_fk` FOREIGN KEY (`subtype_of_xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.';
 
 

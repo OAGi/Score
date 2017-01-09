@@ -100,7 +100,7 @@ public class PopulateModules {
                 String versionNum = getVersion(file);
                 module.setVersionNum(versionNum);
 
-                moduleRepository.save(module);
+                moduleRepository.saveAndFlush(module);
             }
         }
     }
@@ -142,7 +142,7 @@ public class PopulateModules {
                 moduleDep.setDependingModule(includeModule);
                 moduleDep.setDependedModule(module);
 
-                moduleDepRepository.save(moduleDep);
+                moduleDepRepository.saveAndFlush(moduleDep);
             }
 
             NodeList importNodeList = (NodeList) Context.xPath.evaluate("//xsd:import", document, XPathConstants.NODESET);
@@ -154,7 +154,7 @@ public class PopulateModules {
                 moduleDep.setDependencyType(ModuleDep.DependencyType.IMPORT);
                 moduleDep.setDependingModule(importModule);
                 moduleDep.setDependedModule(module);
-                moduleDepRepository.save(moduleDep);
+                moduleDepRepository.saveAndFlush(moduleDep);
             }
         }
     }

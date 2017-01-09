@@ -135,8 +135,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtAwdPri.setDefault(isDefault);
 
-        cdtAwdPriRepository.save(cdtAwdPri);
-        return cdtAwdPri;
+        return cdtAwdPriRepository.saveAndFlush(cdtAwdPri);
     }
 
     public void populateCdtAwdPriXpsTypeMap() {
@@ -265,8 +264,7 @@ public class P_1_2_PopulateCDTandCDTSC {
                 xbtRepository.findOneByBuiltInType(xbtBuiltInType).getXbtId()
         );
 
-        cdtAwdPriXpsTypeMapRepository.save(cdtAwdPriXpsTypeMap);
-        return cdtAwdPriXpsTypeMap;
+        return cdtAwdPriXpsTypeMapRepository.saveAndFlush(cdtAwdPriXpsTypeMap);
     }
 
     public void populateDtSc() {
@@ -324,8 +322,7 @@ public class P_1_2_PopulateCDTandCDTSC {
                 dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId()
         );
 
-        dtScRepository.save(dtSc);
-        return dtSc;
+        return dtScRepository.saveAndFlush(dtSc);
     }
 
     public void populateCdtScAwdPri() {
@@ -447,8 +444,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtScAwdPri.setDefault(isDefault);
 
-        cdtScAwdPriRepository.save(cdtScAwdPri);
-        return cdtScAwdPri;
+        return cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
     }
 
     public void populateCdtScAwdPriXpsTypeMap() {
@@ -579,7 +575,6 @@ public class P_1_2_PopulateCDTandCDTSC {
                 xbtRepository.findOneByName(xbtName).getXbtId()
         );
 
-        cdtScAwdPriXpsTypeMapRepository.save(cdtScAwdPriXpsTypeMap);
-        return cdtScAwdPriXpsTypeMap;
+        return cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtScAwdPriXpsTypeMap);
     }
 }

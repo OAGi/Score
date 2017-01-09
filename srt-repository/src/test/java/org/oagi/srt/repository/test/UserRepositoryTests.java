@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.config.Config;
-import org.oagi.srt.repository.config.TestConfig;
 import org.oagi.srt.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContextConfiguration(classes={Config.class, TestConfig.class})
+@ContextConfiguration(classes = {Config.class})
 @ActiveProfiles("test")
 @Transactional
 @Rollback
@@ -42,8 +41,6 @@ public class UserRepositoryTests {
         userRepository.saveAndFlush(user);
         Long appUserId = user.getAppUserId();
 
-        assertThat(appUserId).isGreaterThan(0L);
-
         user = userRepository.findOne(appUserId);
         assertThat(user).isNotNull();
 
@@ -53,4 +50,5 @@ public class UserRepositoryTests {
         assertThat(user.getOrganization()).isEqualTo(expectedOrganization);
         assertThat(user.getPassword()).isEqualTo(expectedPassword);
     }
+
 }
