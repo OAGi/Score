@@ -8,7 +8,10 @@ import org.oagi.srt.model.cc.BDTSCNode;
 import org.oagi.srt.model.cc.impl.BaseACCNode;
 import org.oagi.srt.model.cc.impl.LazyASCCPNode;
 import org.oagi.srt.model.cc.impl.LazyBCCPNode;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.AggregateCoreComponentRepository;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
+import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
@@ -65,19 +68,7 @@ public class ExtensionBean extends UIHandler {
     private AggregateCoreComponentRepository accRepository;
 
     @Autowired
-    private AssociationCoreComponentRepository asccRepository;
-
-    @Autowired
-    private AssociationCoreComponentPropertyRepository asccpRepository;
-
-    @Autowired
-    private BasicCoreComponentPropertyRepository bccpRepository;
-
-    @Autowired
     private DataTypeRepository dataTypeRepository;
-
-    @Autowired
-    private DataTypeSupplementaryComponentRepository dtScRepository;
 
     private AggregateCoreComponent targetAcc;
     private AssociationCoreComponentProperty rootAsccp;
@@ -290,12 +281,12 @@ public class ExtensionBean extends UIHandler {
      */
 
     @Autowired
-    private AssociationCoreComponentPropertyForLookupRepository asccpLookupRepository;
+    private AssociationCoreComponentPropertyRepository asccpRepository;
     private boolean preparedAppendAscc;
-    private List<AssociationCoreComponentPropertyForLookup> allAsccpList;
-    private List<AssociationCoreComponentPropertyForLookup> asccpList;
+    private List<AssociationCoreComponentProperty> allAsccpList;
+    private List<AssociationCoreComponentProperty> asccpList;
     private String selectedAsccpPropertyTerm;
-    private AssociationCoreComponentPropertyForLookup selectedAsccp;
+    private AssociationCoreComponentProperty selectedAsccp;
 
     public boolean isPreparedAppendAscc() {
         return preparedAppendAscc;
@@ -306,11 +297,11 @@ public class ExtensionBean extends UIHandler {
         setPreparedAppend(preparedAppendAscc);
     }
 
-    public List<AssociationCoreComponentPropertyForLookup> getAsccpList() {
+    public List<AssociationCoreComponentProperty> getAsccpList() {
         return asccpList;
     }
 
-    public void setAsccpList(List<AssociationCoreComponentPropertyForLookup> asccpList) {
+    public void setAsccpList(List<AssociationCoreComponentProperty> asccpList) {
         this.asccpList = asccpList;
     }
 
@@ -322,16 +313,16 @@ public class ExtensionBean extends UIHandler {
         this.selectedAsccpPropertyTerm = selectedAsccpPropertyTerm;
     }
 
-    public AssociationCoreComponentPropertyForLookup getSelectedAsccp() {
+    public AssociationCoreComponentProperty getSelectedAsccp() {
         return selectedAsccp;
     }
 
-    public void setSelectedAsccp(AssociationCoreComponentPropertyForLookup selectedAsccp) {
+    public void setSelectedAsccp(AssociationCoreComponentProperty selectedAsccp) {
         this.selectedAsccp = selectedAsccp;
     }
 
     public void onAsccpRowSelect(SelectEvent event) {
-        setSelectedAsccp((AssociationCoreComponentPropertyForLookup) event.getObject());
+        setSelectedAsccp((AssociationCoreComponentProperty) event.getObject());
     }
 
     public void onAsccpRowUnselect(UnselectEvent event) {
@@ -339,7 +330,7 @@ public class ExtensionBean extends UIHandler {
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpLookupRepository.findAll().stream()
+        allAsccpList = asccpRepository.findAll().stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
@@ -381,7 +372,7 @@ public class ExtensionBean extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void appendAscc() {
-        AssociationCoreComponentPropertyForLookup selectedAsccpLookup = getSelectedAsccp();
+        AssociationCoreComponentProperty selectedAsccpLookup = getSelectedAsccp();
         if (selectedAsccpLookup == null) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
@@ -425,12 +416,12 @@ public class ExtensionBean extends UIHandler {
      */
 
     @Autowired
-    private BasicCoreComponentPropertyForLookupRepository bccpLookupRepository;
+    private BasicCoreComponentPropertyRepository bccpRepository;
     private boolean preparedAppendBcc;
-    private List<BasicCoreComponentPropertyForLookup> allBccpList;
-    private List<BasicCoreComponentPropertyForLookup> bccpList;
+    private List<BasicCoreComponentProperty> allBccpList;
+    private List<BasicCoreComponentProperty> bccpList;
     private String selectedBccpPropertyTerm;
-    private BasicCoreComponentPropertyForLookup selectedBccp;
+    private BasicCoreComponentProperty selectedBccp;
 
     public boolean isPreparedAppendBcc() {
         return preparedAppendBcc;
@@ -441,11 +432,11 @@ public class ExtensionBean extends UIHandler {
         setPreparedAppend(preparedAppendBcc);
     }
 
-    public List<BasicCoreComponentPropertyForLookup> getBccpList() {
+    public List<BasicCoreComponentProperty> getBccpList() {
         return bccpList;
     }
 
-    public void setBccpList(List<BasicCoreComponentPropertyForLookup> bccpList) {
+    public void setBccpList(List<BasicCoreComponentProperty> bccpList) {
         this.bccpList = bccpList;
     }
 
@@ -457,16 +448,16 @@ public class ExtensionBean extends UIHandler {
         this.selectedBccpPropertyTerm = selectedBccpPropertyTerm;
     }
 
-    public BasicCoreComponentPropertyForLookup getSelectedBccp() {
+    public BasicCoreComponentProperty getSelectedBccp() {
         return selectedBccp;
     }
 
-    public void setSelectedBccp(BasicCoreComponentPropertyForLookup selectedBccp) {
+    public void setSelectedBccp(BasicCoreComponentProperty selectedBccp) {
         this.selectedBccp = selectedBccp;
     }
 
     public void onBccpRowSelect(SelectEvent event) {
-        setSelectedBccp((BasicCoreComponentPropertyForLookup) event.getObject());
+        setSelectedBccp((BasicCoreComponentProperty) event.getObject());
     }
 
     public void onBccpRowUnselect(UnselectEvent event) {
@@ -474,7 +465,7 @@ public class ExtensionBean extends UIHandler {
     }
 
     public void prepareAppendBcc() {
-        allBccpList = bccpLookupRepository.findAll().stream()
+        allBccpList = bccpRepository.findAll().stream()
                 .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
         setBccpList(
@@ -515,7 +506,7 @@ public class ExtensionBean extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void appendBcc() {
-        BasicCoreComponentPropertyForLookup selectedBccpLookup = getSelectedBccp();
+        BasicCoreComponentProperty selectedBccpLookup = getSelectedBccp();
         if (selectedBccpLookup == null) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",

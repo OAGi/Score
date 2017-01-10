@@ -17,7 +17,7 @@ public class DataSourceConfig {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.HSQL)
                 .setScriptEncoding("UTF-8")
-                .addScripts("/scripts/schema-hsqldb.sql")
+                .addScripts("/scripts/schema-hsqldb.sql", "/scripts/data-hsqldb.sql")
                 .build();
     }
 
