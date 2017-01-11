@@ -60,7 +60,7 @@ public class SignUpBean {
             return null;
         } else {
             userService.register(username, password);
-            return "login.xhtml";
+            return "/views/user/login.xhtml?faces-redirect=true";
         }
     }
 }
