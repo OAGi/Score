@@ -4,10 +4,7 @@ import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BusinessContextRepository;
-import org.oagi.srt.repository.ProfileBODRepository;
-import org.oagi.srt.repository.TopLevelAbieRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
@@ -78,6 +75,8 @@ public class CopyProfileBODBean {
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
@@ -225,6 +224,10 @@ public class CopyProfileBODBean {
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
         this.selectedTreeNode = selectedTreeNode;
+    }
+
+    public String getModule(long moduleId) {
+        return moduleRepository.findModuleByModuleId(moduleId);
     }
 
     /*

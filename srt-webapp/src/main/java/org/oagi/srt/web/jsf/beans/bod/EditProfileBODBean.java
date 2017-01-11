@@ -71,6 +71,8 @@ public class EditProfileBODBean extends UIHandler {
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     private TopLevelAbie topLevelAbie;
     private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
@@ -238,6 +240,10 @@ public class EditProfileBODBean extends UIHandler {
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
         this.selectedTreeNode = selectedTreeNode;
+    }
+
+    public String getModule(long moduleId) {
+        return moduleRepository.findModuleByModuleId(moduleId);
     }
 
     /*

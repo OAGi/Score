@@ -7,6 +7,7 @@ import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -78,6 +79,8 @@ public class CreateProfileBODBean {
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
@@ -225,6 +228,10 @@ public class CreateProfileBODBean {
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
         this.selectedTreeNode = selectedTreeNode;
+    }
+
+    public String getModule(long moduleId) {
+        return moduleRepository.findModuleByModuleId(moduleId);
     }
 
     /*

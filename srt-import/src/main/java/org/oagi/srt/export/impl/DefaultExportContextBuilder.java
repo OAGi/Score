@@ -162,14 +162,14 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpId(bccp.getBccpId());
             if (isAvailable(bccList)) {
                 DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
-                Module module = bccp.getModule();
+                long moduleId = bccp.getModuleId();
                 /*
                  * Issue #98
                  *
                  * BCCP attribute has no module_id.
                  */
-                if (module != null) {
-                    SchemaModule schemaModule = moduleMap.get(module.getModuleId());
+                if (moduleId > 0L) {
+                    SchemaModule schemaModule = moduleMap.get(moduleId);
                     schemaModule.addBCCP(
                             new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen(),
                                     bccp.isNillable(), bccp.getDefaultValue()));
@@ -191,11 +191,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
     private void createACC(Map<Long, SchemaModule> moduleMap) {
         for (AggregateCoreComponent acc : importedDataProvider.findACC()) {
-            Module module = acc.getModule();
-            if (module == null) {
+            long moduleId = acc.getModuleId();
+            if (moduleId == 0L) {
                 continue;
             }
-            SchemaModule schemaModule = moduleMap.get(module.getModuleId());
+            SchemaModule schemaModule = moduleMap.get(moduleId);
             schemaModule.addACC(ACC.newInstance(acc, importedDataProvider));
         }
     }
@@ -205,11 +205,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                 importedDataProvider.findASCCP().stream()
                         .filter(e -> e.isReusableIndicator()).collect(Collectors.toList())) {
 
-            Module module = asccp.getModule();
-            if (module == null) {
+            long moduleId = asccp.getModuleId();
+            if (moduleId == 0L) {
                 continue;
             }
-            SchemaModule schemaModule = moduleMap.get(module.getModuleId());
+            SchemaModule schemaModule = moduleMap.get(moduleId);
             schemaModule.addASCCP(ASCCP.newInstance(asccp, importedDataProvider));
         }
     }

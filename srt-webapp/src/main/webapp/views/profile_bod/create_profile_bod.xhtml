@@ -127,7 +127,7 @@
                                         <p:ajax event="collapse"
                                                 update=":form:treeTable"/>
                                         <p:ajax event="select" update=":form:details"/>
-                                        <p:column headerText="#{createProfileBODBean.topLevelNode.asccp.module.module}">
+                                        <p:column headerText="#{createProfileBODBean.getModule(createProfileBODBean.topLevelNode.asccp.moduleId)}">
                                             <h:outputText value="#{node.name}"/>
                                         </p:column>
                                     </p:treeTable>

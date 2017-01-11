@@ -67,9 +67,8 @@ public class AssociationCoreComponentProperty
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id")
-    private Module module;
+    @Column
+    private Long moduleId;
 
     @Column(nullable = false)
     private long namespaceId;
@@ -222,12 +221,14 @@ public class AssociationCoreComponentProperty
         this.state = state;
     }
 
-    public Module getModule() {
-        return module;
+    public long getModuleId() {
+        return (moduleId == null) ? 0L : moduleId;
     }
 
-    public void setModule(Module module) {
-        this.module = module;
+    public void setModuleId(long moduleId) {
+        if (moduleId > 0L) {
+            this.moduleId = moduleId;
+        }
     }
 
     public long getNamespaceId() {
@@ -317,7 +318,7 @@ public class AssociationCoreComponentProperty
         clone.setCreationTimestamp(timestamp);
         clone.setLastUpdateTimestamp(timestamp);
         clone.setState(this.state);
-        clone.setModule(this.module);
+        clone.setModuleId(this.moduleId);
         clone.setNamespaceId(this.namespaceId);
         clone.setReusableIndicator(this.reusableIndicator);
         clone.setDeprecated(this.deprecated);
@@ -364,7 +365,7 @@ public class AssociationCoreComponentProperty
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
         result = 31 * result + (reusableIndicator ? 1 : 0);
         result = 31 * result + (deprecated ? 1 : 0);
@@ -392,7 +393,7 @@ public class AssociationCoreComponentProperty
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", state=" + state +
-                ", module=" + module +
+                ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", reusableIndicator=" + reusableIndicator +
                 ", deprecated=" + deprecated +

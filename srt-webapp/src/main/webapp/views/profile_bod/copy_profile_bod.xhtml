@@ -155,7 +155,7 @@
                                                  selection="#{copyProfileBODBean.selectedTreeNode}"
                                                  selectionMode="single">
                                         <p:ajax event="select" update=":form:details"/>
-                                        <p:column headerText="BIEs">
+                                        <p:column headerText="#{copyProfileBODBean.getModule(copyProfileBODBean.topLevelNode.asccp.moduleId)}">
                                             <h:outputText value="#{node.name}"/>
                                         </p:column>
                                     </p:treeTable>

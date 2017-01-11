@@ -67,7 +67,7 @@ public class DataType implements Serializable {
     @Column(length = 10 * 1024)
     private String revisionDoc;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 

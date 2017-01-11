@@ -51,9 +51,8 @@ public class AggregateCoreComponent implements Serializable {
     @Convert(attributeName = "oagisComponentType", converter = OagisComponentTypeConverter.class)
     private OagisComponentType oagisComponentType;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id")
-    private Module module;
+    @Column
+    private Long moduleId;
 
     @Column
     private Long namespaceId;
@@ -195,12 +194,14 @@ public class AggregateCoreComponent implements Serializable {
         this.oagisComponentType = oagisComponentType;
     }
 
-    public Module getModule() {
-        return module;
+    public long getModuleId() {
+        return (moduleId == null) ? 0L : moduleId;
     }
 
-    public void setModule(Module module) {
-        this.module = module;
+    public void setModuleId(long moduleId) {
+        if (moduleId > 0L) {
+            this.moduleId = moduleId;
+        }
     }
 
     public long getNamespaceId() {
@@ -349,7 +350,7 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
-        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
@@ -378,7 +379,7 @@ public class AggregateCoreComponent implements Serializable {
                 ", basedAccId=" + basedAccId +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
                 ", oagisComponentType=" + oagisComponentType +
-                ", module=" + module +
+                ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +

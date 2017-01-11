@@ -529,7 +529,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setDeprecated(false);
         bccp.setReleaseId(importUtil.getReleaseId());
         Module module = elementDecl.getModule();
-        bccp.setModule(module);
+        bccp.setModuleId((module != null) ? module.getModuleId() : 0L);
         bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());

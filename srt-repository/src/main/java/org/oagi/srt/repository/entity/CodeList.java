@@ -59,7 +59,7 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private boolean extensibleIndicator;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 

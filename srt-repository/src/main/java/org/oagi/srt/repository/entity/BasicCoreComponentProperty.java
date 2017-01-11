@@ -48,9 +48,8 @@ public class BasicCoreComponentProperty
     @Column(length = 10 * 1024)
     private String definition;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id")
-    private Module module;
+    @Column
+    private Long moduleId;
 
     @Column
     private Long namespaceId;
@@ -126,7 +125,7 @@ public class BasicCoreComponentProperty
         this.bdtId = bccp.getBdtId();
         this.den = bccp.getDen();
         this.definition = bccp.getDefinition();
-        this.module = bccp.getModule();
+        this.moduleId = bccp.getModuleId();
         this.namespaceId = bccp.getNamespaceId();
         this.deprecated = bccp.isDeprecated();
         this.createdBy = bccp.getCreatedBy();
@@ -211,12 +210,14 @@ public class BasicCoreComponentProperty
         this.definition = definition;
     }
 
-    public Module getModule() {
-        return module;
+    public long getModuleId() {
+        return (moduleId == null) ? 0L : moduleId;
     }
 
-    public void setModule(Module module) {
-        this.module = module;
+    public void setModuleId(long moduleId) {
+        if (moduleId > 0L) {
+            this.moduleId = moduleId;
+        }
     }
 
     public long getNamespaceId() {
@@ -355,7 +356,7 @@ public class BasicCoreComponentProperty
         clone.setCreationTimestamp(timestamp);
         clone.setLastUpdateTimestamp(timestamp);
         clone.setState(this.state);
-        clone.setModule(this.module);
+        clone.setModuleId(this.moduleId);
         clone.setNamespaceId(this.namespaceId);
         clone.setDeprecated(this.deprecated);
         clone.setRevisionNum(this.revisionNum);
@@ -397,7 +398,7 @@ public class BasicCoreComponentProperty
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -426,7 +427,7 @@ public class BasicCoreComponentProperty
                 ", bdtId=" + bdtId +
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
-                ", module=" + module +
+                ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", deprecated=" + deprecated +
                 ", createdBy=" + createdBy +

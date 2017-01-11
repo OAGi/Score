@@ -379,7 +379,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setRoleOfAccId(roleOfAccId);
         asccp.setDen(den);
         asccp.setState(CoreComponentState.Published);
-        asccp.setModule(module);
+        asccp.setModuleId((module != null) ? module.getModuleId() : 0L);
         asccp.setCreatedBy(importUtil.getUserId());
         asccp.setLastUpdatedBy(importUtil.getUserId());
         asccp.setOwnerUserId(importUtil.getUserId());
@@ -483,7 +483,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         acc.setLastUpdatedBy(importUtil.getUserId());
         acc.setOwnerUserId(importUtil.getUserId());
         acc.setState(CoreComponentState.Published);
-        acc.setModule(module);
+        acc.setModuleId((module != null) ? module.getModuleId() : 0L);
         acc.setDeprecated(false);
         if (declaration instanceof TypeDecl) {
             acc.setAbstract(((TypeDecl) declaration).isAbstract());
