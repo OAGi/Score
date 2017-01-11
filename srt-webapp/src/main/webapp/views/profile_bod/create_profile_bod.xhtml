@@ -154,6 +154,20 @@
                                                 </p:panel>
                                                 <p:panel id="topLevelBiePanel" header="Top-Level BIE Info">
                                                     <h:panelGrid columns="2" cellpadding="3">
+                                                        <h:outputText value="Version" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.version}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="topLevelBiePanel"/>
+                                                        </h:inputText>
+
+                                                        <h:outputText value="Status" styleClass="section-label"/>
+                                                        <h:inputText
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.status}"
+                                                                styleClass="section-content input-section">
+                                                            <f:ajax render="topLevelBiePanel"/>
+                                                        </h:inputText>
+
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
                                                         <h:inputText
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.abie.bizTerm}"

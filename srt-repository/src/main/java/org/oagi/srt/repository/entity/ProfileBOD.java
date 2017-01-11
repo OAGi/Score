@@ -21,6 +21,8 @@ import java.util.Date;
                         fields = {
                                 @FieldResult(name = "abieId", column = "abie_id"),
                                 @FieldResult(name = "creationTimestamp", column = "creation_timestamp"),
+                                @FieldResult(name = "version", column = "version"),
+                                @FieldResult(name = "status", column = "status"),
                         }
                 ),
                 @EntityResult(
@@ -59,6 +61,12 @@ public class ProfileBOD {
 
     @Column(nullable = false)
     private long abieId;
+
+    @Column(length = 45)
+    private String version;
+
+    @Column(length = 45)
+    private String status;
 
     @Column(nullable = false)
     private long asbiepId;
@@ -103,6 +111,22 @@ public class ProfileBOD {
 
     public void setAbieId(long abieId) {
         this.abieId = abieId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public long getAsbiepId() {
@@ -192,6 +216,8 @@ public class ProfileBOD {
     public int hashCode() {
         int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
         result = 31 * result + (int) (abieId ^ (abieId >>> 32));
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (int) (asbiepId ^ (asbiepId >>> 32));
         result = 31 * result + (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
@@ -209,6 +235,8 @@ public class ProfileBOD {
         return "ProfileBOD{" +
                 "topLevelAbieId=" + topLevelAbieId +
                 ", abieId=" + abieId +
+                ", version='" + version + '\'' +
+                ", status='" + status + '\'' +
                 ", asbiepId=" + asbiepId +
                 ", asccpId=" + asccpId +
                 ", propertyTerm='" + propertyTerm + '\'' +

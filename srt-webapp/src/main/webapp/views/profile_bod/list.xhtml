@@ -55,7 +55,15 @@
                         </h:link>
                         <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
-                    <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                    <p:column style="width: 120px; text-align: center;" styleClass="ellipsis" headerText="Version"
+                              sortBy="#{profileBOD.version}">
+                        <h:outputText value="#{profileBOD.version}"/>
+                    </p:column>
+                    <p:column style="width: 120px; text-align: center;" styleClass="ellipsis" headerText="Status"
+                              sortBy="#{profileBOD.status}">
+                        <h:outputText value="#{profileBOD.status}"/>
+                    </p:column>
+                    <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
                               sortBy="#{profileBOD.creationTimestamp}">
                         <h:outputText value="#{profileBOD.creationTimestamp}">
                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>

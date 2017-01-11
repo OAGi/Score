@@ -103,8 +103,23 @@
                                                             styleClass="section-content"/>
                                                 </h:panelGrid>
                                             </p:panel>
+
                                             <p:panel id="topLevelBiePanelForEditing" header="Top-Level BIE Info">
                                                 <h:panelGrid columns="2" cellpadding="3">
+                                                    <h:outputText value="Version" styleClass="section-label"/>
+                                                    <h:inputText
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.abie.version}"
+                                                            styleClass="section-content input-section">
+                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                    </h:inputText>
+
+                                                    <h:outputText value="Status" styleClass="section-label"/>
+                                                    <h:inputText
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.abie.status}"
+                                                            styleClass="section-content input-section">
+                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                    </h:inputText>
+
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
@@ -576,6 +591,18 @@
                                             </p:panel>
                                             <p:panel header="Top-Level BIE Info">
                                                 <h:panelGrid columns="2" cellpadding="3">
+                                                    <h:outputText value="Version" styleClass="section-label"/>
+                                                    <h:inputText
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.abie.version}"
+                                                            styleClass="section-content input-section disabled"
+                                                            disabled="true"/>
+
+                                                    <h:outputText value="Status" styleClass="section-label"/>
+                                                    <h:inputText
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.abie.status}"
+                                                            styleClass="section-content input-section disabled"
+                                                            disabled="true"/>
+
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
