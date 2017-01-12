@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ascc")
 public class AssociationCoreComponent
-        implements CoreComponent, Serializable, Cloneable {
+        implements CoreComponentRelation, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 

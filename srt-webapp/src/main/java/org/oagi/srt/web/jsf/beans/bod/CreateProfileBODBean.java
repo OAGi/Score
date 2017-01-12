@@ -4,7 +4,6 @@ import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.ModuleRepository;

@@ -42,53 +42,53 @@ public class CoreComponentService {
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
 
-    public List<CoreComponent> getCoreComponents(
+    public List<CoreComponentRelation> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
         long accId = acc.getAccId();
         return getCoreComponents(accId, coreComponentProvider);
     }
 
-    public List<CoreComponent> getCoreComponents(
+    public List<CoreComponentRelation> getCoreComponents(
             long accId, CoreComponentProvider coreComponentProvider) {
         List<BasicCoreComponent> bcc_tmp_assoc = coreComponentProvider.getBCCs(accId);
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 
-        List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
+        List<CoreComponentRelation> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
         return coreComponents;
     }
 
-    public List<CoreComponent> getCoreComponentsWithoutAttributes(
+    public List<CoreComponentRelation> getCoreComponentsWithoutAttributes(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
         long accId = acc.getAccId();
         return getCoreComponentsWithoutAttributes(accId, coreComponentProvider);
     }
 
-    public List<CoreComponent> getCoreComponentsWithoutAttributes(
+    public List<CoreComponentRelation> getCoreComponentsWithoutAttributes(
             long accId, CoreComponentProvider coreComponentProvider) {
         List<BasicCoreComponent> bcc_tmp_assoc = coreComponentProvider.getBCCsWithoutAttributes(accId);
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 
-        List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
+        List<CoreComponentRelation> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
         return coreComponents;
     }
 
-    private List<CoreComponent> gatheringBySeqKey(
+    private List<CoreComponentRelation> gatheringBySeqKey(
             List<BasicCoreComponent> bccList, List<AssociationCoreComponent> asccList
     ) {
         int size = bccList.size() + asccList.size();
-        List<CoreComponent> tmp_assoc = new ArrayList(size);
+        List<CoreComponentRelation> tmp_assoc = new ArrayList(size);
         tmp_assoc.addAll(bccList);
         tmp_assoc.addAll(asccList);
         Collections.sort(tmp_assoc, (a, b) -> a.getSeqKey() - b.getSeqKey());
 
-        List<CoreComponent> coreComponents = new ArrayList(size);
+        List<CoreComponentRelation> coreComponents = new ArrayList(size);
         for (BasicCoreComponent basicCoreComponent : bccList) {
             if (BasicCoreComponentEntityType.Attribute == basicCoreComponent.getEntityType()) {
                 coreComponents.add(basicCoreComponent);
             }
         }
 
-        for (CoreComponent coreComponent : tmp_assoc) {
+        for (CoreComponentRelation coreComponent : tmp_assoc) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
                 if (BasicCoreComponentEntityType.Element == basicCoreComponent.getEntityType()) {

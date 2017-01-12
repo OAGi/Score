@@ -524,7 +524,7 @@ public class NodeService {
             while (!accList.isEmpty()) {
                 acc = accList.pollLast();
 
-                List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
+                List<CoreComponentRelation> childAssoc = queryNestedChildAssoc(acc);
                 childrenCount += childAssoc.size();
             }
 
@@ -544,7 +544,7 @@ public class NodeService {
             while (!accList.isEmpty()) {
                 acc = accList.pollLast();
 
-                List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
+                List<CoreComponentRelation> childAssoc = queryNestedChildAssoc(acc);
                 for (int i = 0; i < childAssoc.size(); i++) {
                     CoreComponent assoc = childAssoc.get(i);
                     if (assoc instanceof BasicCoreComponent) {
@@ -715,16 +715,16 @@ public class NodeService {
         }
     }
 
-    private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent acc) {
-        List<CoreComponent> coreComponents = queryChildAssoc(acc);
+    private List<CoreComponentRelation> queryNestedChildAssoc(AggregateCoreComponent acc) {
+        List<CoreComponentRelation> coreComponents = queryChildAssoc(acc);
         return getAssocList(coreComponents);
     }
 
-    private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+    private List<CoreComponentRelation> getAssocList(List<CoreComponentRelation> list) {
         Map<Integer, Boolean> hashCodes = new HashMap();
 
         for (int i = 0; i < list.size(); i++) {
-            CoreComponent srt = list.get(i);
+            CoreComponentRelation srt = list.get(i);
             if (srt instanceof AssociationCoreComponent) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) srt;
                 long toAsccpId = ascc.getToAsccpId();
@@ -745,7 +745,7 @@ public class NodeService {
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
-    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponent> coreComponents,
+    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponentRelation> coreComponents,
                                             int gPosition, Map<Integer, Boolean> hashCodes) {
         int hashCode = acc.hashCode() + coreComponents.hashCode() + gPosition;
         Boolean check = hashCodes.get(hashCode);
@@ -757,9 +757,9 @@ public class NodeService {
         return check;
     }
 
-    private List<CoreComponent> handleNestedGroup(AggregateCoreComponent acc,
-                                                  List<CoreComponent> coreComponents, int gPosition,
-                                                  Map<Integer, Boolean> hashCodes) {
+    private List<CoreComponentRelation> handleNestedGroup(AggregateCoreComponent acc,
+                                                          List<CoreComponentRelation> coreComponents, int gPosition,
+                                                          Map<Integer, Boolean> hashCodes) {
         /*
          * TODO: FIX ME
          * As of Nov 15th, 2016, When the User Extension is in Editing state
@@ -770,7 +770,7 @@ public class NodeService {
             return coreComponents;
         }
 
-        List<CoreComponent> bList = queryChildAssoc(acc);
+        List<CoreComponentRelation> bList = queryChildAssoc(acc);
         if (!bList.isEmpty()) {
             coreComponents.addAll(gPosition, bList);
             coreComponents.remove(gPosition + bList.size());
@@ -778,7 +778,7 @@ public class NodeService {
 
         long accId = acc.getAccId();
         for (int i = 0; i < coreComponents.size(); i++) {
-            CoreComponent coreComponent = coreComponents.get(i);
+            CoreComponentRelation coreComponent = coreComponents.get(i);
             if (coreComponent instanceof AssociationCoreComponent) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
                 long toAsccpId = ascc.getToAsccpId();
@@ -795,32 +795,32 @@ public class NodeService {
         return coreComponents;
     }
 
-    private List<CoreComponent> queryChildAssoc(AggregateCoreComponent acc) {
+    private List<CoreComponentRelation> queryChildAssoc(AggregateCoreComponent acc) {
         long accId = acc.getAccId();
         List<BasicCoreComponent> bcc_tmp_assoc = bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
         List<AssociationCoreComponent> ascc_tmp_assoc = asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, Published);
 
-        List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
+        List<CoreComponentRelation> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
         return coreComponents;
     }
 
-    private List<CoreComponent> gatheringBySeqKey(
+    private List<CoreComponentRelation> gatheringBySeqKey(
             List<BasicCoreComponent> bccList, List<AssociationCoreComponent> asccList
     ) {
         int size = bccList.size() + asccList.size();
-        List<CoreComponent> tmp_assoc = new ArrayList(size);
+        List<CoreComponentRelation> tmp_assoc = new ArrayList(size);
         tmp_assoc.addAll(bccList);
         tmp_assoc.addAll(asccList);
         Collections.sort(tmp_assoc, (a, b) -> a.getSeqKey() - b.getSeqKey());
 
-        List<CoreComponent> coreComponents = new ArrayList(size);
+        List<CoreComponentRelation> coreComponents = new ArrayList(size);
         for (BasicCoreComponent basicCoreComponent : bccList) {
             if (BasicCoreComponentEntityType.Attribute == basicCoreComponent.getEntityType()) {
                 coreComponents.add(basicCoreComponent);
             }
         }
 
-        for (CoreComponent coreComponent : tmp_assoc) {
+        for (CoreComponentRelation coreComponent : tmp_assoc) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
                 if (BasicCoreComponentEntityType.Element == basicCoreComponent.getEntityType()) {
@@ -1156,8 +1156,8 @@ public class NodeService {
         long basedAccId = acc.getBasedAccId();
         ACCNode accNode = new BaseACCNode(parent, acc);
 
-        List<CoreComponent> coreComponentList = coreComponentService.getCoreComponents(acc, dataContainer);
-        for (CoreComponent coreComponent : coreComponentList) {
+        List<CoreComponentRelation> coreComponentList = coreComponentService.getCoreComponents(acc, dataContainer);
+        for (CoreComponentRelation coreComponent : coreComponentList) {
             if (coreComponent instanceof BasicCoreComponent) {
                 createBCCPNode(dataContainer, accNode, (BasicCoreComponent) coreComponent);
             } else if (coreComponent instanceof AssociationCoreComponent) {
@@ -1319,7 +1319,7 @@ public class NodeService {
         public void fetch(Node parent) {
             ACCNode accNode = (ACCNode) parent;
 
-            List<CoreComponent> coreComponentList = coreComponentService.getCoreComponents(
+            List<CoreComponentRelation> coreComponentList = coreComponentService.getCoreComponents(
                     acc, new CoreComponentProviderImpl());
             for (CoreComponent coreComponent : coreComponentList) {
                 if (coreComponent instanceof BasicCoreComponent) {

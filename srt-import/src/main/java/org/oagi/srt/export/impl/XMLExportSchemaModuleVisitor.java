@@ -415,10 +415,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.setAttribute("id", accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
-        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(
+        List<CoreComponentRelation> coreComponents = coreComponentService.getCoreComponents(
                 accComplexType.getRawId(), coreComponentProvider);
         // for ASCC or BCC (Sequence Key != 0)
-        for (CoreComponent coreComponent : coreComponents) {
+        for (CoreComponentRelation coreComponent : coreComponents) {
             if (coreComponent.getDen().endsWith("Any Structured Content")) {
                 Element anyElement = new Element("any", XSD_NS);
 
@@ -532,7 +532,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         rootElement.addContent(complexTypeElement);
     }
 
-    private void setCardinalities(Element element, CoreComponent ascc) {
+    private void setCardinalities(Element element, CoreComponentRelation ascc) {
         element.setAttribute("minOccurs", Integer.toString(ascc.getCardinalityMin()));
         switch (ascc.getCardinalityMax()) {
             case -1:

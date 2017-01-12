@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 @Table(name = "bcc")
 public class BasicCoreComponent
-        implements CoreComponent, Serializable, Cloneable {
+        implements CoreComponentRelation, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 

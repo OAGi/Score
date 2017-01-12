@@ -1,10 +1,6 @@
 package org.oagi.srt.repository.entity;
 
-public interface CoreComponentProperty {
-
-    public String getGuid();
+public interface CoreComponentProperty extends CoreComponent {
 
     public String getPropertyTerm();
-
-    public String getDen();
 }

@@ -243,7 +243,7 @@ public class BusinessInformationEntityService {
         while (!accList.isEmpty()) {
             aggregateCoreComponent = accList.pollLast();
 
-            List<CoreComponent> childAssoc = queryNestedChildAssoc(createBIEContext, aggregateCoreComponent);
+            List<CoreComponentRelation> childAssoc = queryNestedChildAssoc(createBIEContext, aggregateCoreComponent);
             for (int i = 0; i < childAssoc.size(); i++) {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
@@ -268,17 +268,17 @@ public class BusinessInformationEntityService {
         }
     }
 
-    private List<CoreComponent> queryNestedChildAssoc(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, createBIEContext);
+    private List<CoreComponentRelation> queryNestedChildAssoc(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, createBIEContext);
         return getAssocList(createBIEContext, assoc);
     }
 
-    private List<CoreComponent> queryNestedChildAssoc_wo_attribute(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponentsWithoutAttributes(aggregateCoreComponent, createBIEContext);
+    private List<CoreComponentRelation> queryNestedChildAssoc_wo_attribute(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponentsWithoutAttributes(aggregateCoreComponent, createBIEContext);
         return getAssocList(createBIEContext, assoc);
     }
 
-    private List<CoreComponent> getAssocList(CreateBIEContext createBIEContext, List<CoreComponent> list) {
+    private List<CoreComponentRelation> getAssocList(CreateBIEContext createBIEContext, List<CoreComponentRelation> list) {
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
             if (srt instanceof AssociationCoreComponent && groupcheck(createBIEContext, (AssociationCoreComponent) srt)) {
@@ -298,11 +298,11 @@ public class BusinessInformationEntityService {
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
-    private List<CoreComponent> handleNestedGroup(CreateBIEContext createBIEContext,
-                                                  AggregateCoreComponent acc,
-                                                  List<CoreComponent> coreComponents, int gPosition) {
+    private List<CoreComponentRelation> handleNestedGroup(CreateBIEContext createBIEContext,
+                                                          AggregateCoreComponent acc,
+                                                          List<CoreComponentRelation> coreComponents, int gPosition) {
 
-        List<CoreComponent> bList = queryChildAssoc(createBIEContext, acc);
+        List<CoreComponentRelation> bList = queryChildAssoc(createBIEContext, acc);
         if (!bList.isEmpty()) {
             coreComponents.addAll(gPosition, bList);
             coreComponents.remove(gPosition + bList.size());
@@ -323,9 +323,9 @@ public class BusinessInformationEntityService {
         return coreComponents;
     }
 
-    private List<CoreComponent> queryChildAssoc(CreateBIEContext createBIEContext,
-                                                AggregateCoreComponent acc) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(acc, createBIEContext);
+    private List<CoreComponentRelation> queryChildAssoc(CreateBIEContext createBIEContext,
+                                                        AggregateCoreComponent acc) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponents(acc, createBIEContext);
         return assoc;
     }
 

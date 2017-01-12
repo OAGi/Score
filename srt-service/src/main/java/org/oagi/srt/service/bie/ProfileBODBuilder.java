@@ -194,9 +194,9 @@ public class ProfileBODBuilder {
         while (!accList.isEmpty()) {
             acc = accList.pollLast();
 
-            List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
+            List<CoreComponentRelation> childAssoc = queryNestedChildAssoc(acc);
             for (int i = 0; i < childAssoc.size(); i++) {
-                CoreComponent assoc = childAssoc.get(i);
+                CoreComponentRelation assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (Attribute == bcc.getEntityType()) {
@@ -205,7 +205,7 @@ public class ProfileBODBuilder {
                 }
             }
 
-            for (CoreComponent assoc : childAssoc) {
+            for (CoreComponentRelation assoc : childAssoc) {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (Element == bcc.getEntityType()) {
@@ -220,22 +220,22 @@ public class ProfileBODBuilder {
     }
 
 
-    private List<CoreComponent> queryNestedChildAssoc_wo_attribute(AggregateCoreComponent aggregateCoreComponent) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponentsWithoutAttributes(
+    private List<CoreComponentRelation> queryNestedChildAssoc_wo_attribute(AggregateCoreComponent aggregateCoreComponent) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponentsWithoutAttributes(
                 aggregateCoreComponent, dataContainer);
         return getAssocList(assoc);
     }
 
-    private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, dataContainer);
+    private List<CoreComponentRelation> queryNestedChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, dataContainer);
         return getAssocList(assoc);
     }
 
-    private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+    private List<CoreComponentRelation> getAssocList(List<CoreComponentRelation> list) {
         Map<Integer, Boolean> hashCodes = new HashMap();
 
         for (int i = 0; i < list.size(); i++) {
-            CoreComponent srt = list.get(i);
+            CoreComponentRelation srt = list.get(i);
             if (srt instanceof AssociationCoreComponent && dataContainer.groupcheck((AssociationCoreComponent) srt)) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) srt;
                 long toAsccpId = ascc.getToAsccpId();
@@ -248,7 +248,7 @@ public class ProfileBODBuilder {
         return list;
     }
 
-    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponent> coreComponents,
+    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponentRelation> coreComponents,
                                             int gPosition, Map<Integer, Boolean> hashCodes) {
         int hashCode = acc.hashCode() + coreComponents.hashCode() + gPosition;
         Boolean check = hashCodes.get(hashCode);
@@ -260,9 +260,9 @@ public class ProfileBODBuilder {
         return check;
     }
 
-    private List<CoreComponent> handleNestedGroup(AggregateCoreComponent acc,
-                                                  List<CoreComponent> coreComponents, int gPosition,
-                                                  Map<Integer, Boolean> hashCodes) {
+    private List<CoreComponentRelation> handleNestedGroup(AggregateCoreComponent acc,
+                                                          List<CoreComponentRelation> coreComponents, int gPosition,
+                                                          Map<Integer, Boolean> hashCodes) {
         /*
          * TODO: FIX ME
          * As of Nov 15th, 2016, When the User Extension is in Editing state
@@ -273,7 +273,7 @@ public class ProfileBODBuilder {
             return coreComponents;
         }
 
-        List<CoreComponent> bList = queryChildAssoc(acc);
+        List<CoreComponentRelation> bList = queryChildAssoc(acc);
         if (!bList.isEmpty()) {
             coreComponents.addAll(gPosition, bList);
             coreComponents.remove(gPosition + bList.size());
@@ -297,8 +297,8 @@ public class ProfileBODBuilder {
         return coreComponents;
     }
 
-    private List<CoreComponent> queryChildAssoc(AggregateCoreComponent acc) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(acc, dataContainer);
+    private List<CoreComponentRelation> queryChildAssoc(AggregateCoreComponent acc) {
+        List<CoreComponentRelation> assoc = coreComponentService.getCoreComponents(acc, dataContainer);
         return assoc;
     }
 
