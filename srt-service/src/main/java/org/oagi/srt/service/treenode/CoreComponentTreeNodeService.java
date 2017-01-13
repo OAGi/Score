@@ -5,9 +5,12 @@ import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.util.*;
 
 @Service
+@Transactional
 public class CoreComponentTreeNodeService {
 
     @Autowired
@@ -161,14 +164,13 @@ public class CoreComponentTreeNodeService {
         @Override
         public Collection<? extends CoreComponentPropertyTreeNode> getChildren() {
             if (children == null) {
-                List<CoreComponentRelation> ccList = getAssociationList();
+                List<CoreComponentRelation> ccList = getAssociations();
 
                 if (ccList.isEmpty()) {
                     children = Collections.emptyList();
                 } else {
                     children = new ArrayList();
 
-                    Collections.sort(ccList, Comparator.comparingInt(CoreComponentRelation::getSeqKey));
                     for (CoreComponentRelation cc : ccList) {
                         if (cc instanceof AssociationCoreComponent) {
                             AssociationCoreComponentPropertyTreeNode asccpNode =
@@ -186,17 +188,19 @@ public class CoreComponentTreeNodeService {
             return children;
         }
 
-        private List<CoreComponentRelation> getAssociationList() {
+        private List<CoreComponentRelation> getAssociations() {
             AggregateCoreComponent acc = getRaw();
             long accId = acc.getAccId();
 
-            List<CoreComponentRelation> ccList = new ArrayList();
+            List<CoreComponentRelation> coreComponentRelations = new ArrayList();
             List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(accId);
-            ccList.addAll(asccList);
+            coreComponentRelations.addAll(asccList);
             List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(accId);
-            ccList.addAll(bccList);
+            coreComponentRelations.addAll(bccList);
 
-            return ccList;
+            Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
+
+            return coreComponentRelations;
         }
     }
 
@@ -259,5 +263,17 @@ public class CoreComponentTreeNodeService {
         }
     }
 
+    public static <T extends CoreComponentRelation> Comparator<T> comparingCoreComponentRelation() {
+        return (Comparator<T> & Serializable)
+                (a, b) -> {
+                    int ask = a.getSeqKey();
+                    int bsk = b.getSeqKey();
+                    if (ask == 0 && bsk == 0) {
+                        return a.getCreationTimestamp().compareTo(b.getCreationTimestamp());
+                    } else {
+                        return ask - bsk;
+                    }
+                };
+    }
 
 }
