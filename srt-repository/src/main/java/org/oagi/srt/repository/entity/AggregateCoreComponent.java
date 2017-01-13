@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent implements CoreComponent, Serializable {
+public class AggregateCoreComponent implements CoreComponent, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 

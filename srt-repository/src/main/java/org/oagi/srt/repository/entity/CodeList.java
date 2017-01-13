@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "code_list")
-public class CodeList implements Serializable {
+public class CodeList implements TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "CODE_LIST_ID_SEQ";
 

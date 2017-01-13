@@ -5,4 +5,6 @@ import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 
 public interface AssociationCoreComponentPropertyTreeNode
         extends CoreComponentPropertyTreeNode<AssociationCoreComponentProperty, AssociationCoreComponent> {
+
+    public AggregateCoreComponentTreeNode getType();
 }

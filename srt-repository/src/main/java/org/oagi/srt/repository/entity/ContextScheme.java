@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "ctx_scheme")
-public class ContextScheme implements Serializable {
+public class ContextScheme implements TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_ID_SEQ";
 

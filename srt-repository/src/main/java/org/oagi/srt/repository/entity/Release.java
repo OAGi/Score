@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "release")
-public class Release implements Serializable {
+public class Release implements NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "RELEASE_ID_SEQ";
 

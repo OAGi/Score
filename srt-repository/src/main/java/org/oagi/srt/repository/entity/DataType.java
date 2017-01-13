@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "dt")
-public class DataType implements Serializable {
+public class DataType implements TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 

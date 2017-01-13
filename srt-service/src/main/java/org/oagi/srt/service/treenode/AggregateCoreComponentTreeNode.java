@@ -7,8 +7,6 @@ import java.util.Collection;
 public interface AggregateCoreComponentTreeNode
         extends CoreComponentTreeNode<AggregateCoreComponent> {
 
-    public AggregateCoreComponent getRaw();
-
     public AggregateCoreComponentTreeNode getBase();
 
     public int getChildrenCount();

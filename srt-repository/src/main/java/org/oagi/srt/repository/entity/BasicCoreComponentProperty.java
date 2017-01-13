@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity
 @Table(name = "bccp")
 public class BasicCoreComponentProperty
-        implements CoreComponentProperty, Serializable, Cloneable {
+        implements CoreComponentProperty, TimestampAware, NamespaceAware, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 

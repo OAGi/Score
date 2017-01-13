@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 @Table(name = "asccp")
 public class AssociationCoreComponentProperty
-        implements CoreComponentProperty, Serializable, Cloneable {
+        implements CoreComponentProperty, TimestampAware, NamespaceAware, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
