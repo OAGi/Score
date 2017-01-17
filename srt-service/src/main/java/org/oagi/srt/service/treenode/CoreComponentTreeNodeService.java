@@ -9,6 +9,9 @@ import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
+
 @Service
 @Transactional
 public class CoreComponentTreeNodeService {
@@ -129,7 +132,7 @@ public class CoreComponentTreeNodeService {
             implements AggregateCoreComponentTreeNode {
 
         private AggregateCoreComponentTreeNode base;
-        private int childrenCount = -1;
+        private Boolean hasChild = null;
         private Collection<CoreComponentPropertyTreeNode> children = null;
 
         private AggregateCoreComponentTreeNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
@@ -148,23 +151,31 @@ public class CoreComponentTreeNodeService {
         }
 
         @Override
-        public int getChildrenCount() {
-            if (childrenCount < 0) {
+        public boolean hasChild() {
+            if (hasChild == null) {
                 AggregateCoreComponent acc = getRaw();
                 long accId = acc.getAccId();
 
                 int asccCount = asccRepository.countByFromAccId(accId);
-                int bccCount = bccRepository.countByFromAccId(accId);
-
-                childrenCount = asccCount + bccCount;
+                if (asccCount > 0) {
+                    hasChild = true;
+                } else {
+                    int bccCount = bccRepository.countByFromAccId(accId);
+                    if (bccCount > 0) {
+                        hasChild = true;
+                    } else {
+                        hasChild = false;
+                    }
+                }
             }
-            return childrenCount;
+            return hasChild;
         }
 
         @Override
         public Collection<? extends CoreComponentPropertyTreeNode> getChildren() {
             if (children == null) {
-                List<CoreComponentRelation> ccList = getAssociations();
+                AggregateCoreComponent acc = getRaw();
+                List<CoreComponentRelation> ccList = getAssociations(acc);
 
                 if (ccList.isEmpty()) {
                     children = Collections.emptyList();
@@ -188,19 +199,39 @@ public class CoreComponentTreeNodeService {
             return children;
         }
 
-        private List<CoreComponentRelation> getAssociations() {
-            AggregateCoreComponent acc = getRaw();
+        private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc) {
             long accId = acc.getAccId();
 
             List<CoreComponentRelation> coreComponentRelations = new ArrayList();
             List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(accId);
-            coreComponentRelations.addAll(asccList);
+            for (int i = 0, len = asccList.size(); i < len; ++i) {
+                AssociationCoreComponent ascc = asccList.get(i);
+                AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc);
+                if (isGroup(roleOfAcc)) {
+                    coreComponentRelations.addAll(getAssociations(roleOfAcc));
+                } else {
+                    coreComponentRelations.add(ascc);
+                }
+            }
             List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(accId);
             coreComponentRelations.addAll(bccList);
 
             Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
 
             return coreComponentRelations;
+        }
+
+        private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent associationCoreComponent) {
+            long toAsccpId = associationCoreComponent.getToAsccpId();
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(toAsccpId);
+            long roleOfAccId = asccp.getRoleOfAccId();
+            AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
+            return acc;
+        }
+
+        private boolean isGroup(AggregateCoreComponent acc) {
+            OagisComponentType oagisComponentType = acc.getOagisComponentType();
+            return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
         }
     }
 

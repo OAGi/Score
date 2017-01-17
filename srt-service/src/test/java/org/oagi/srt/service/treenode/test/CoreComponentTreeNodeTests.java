@@ -2,26 +2,16 @@ package org.oagi.srt.service.treenode.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentRepository;
-import org.oagi.srt.repository.BasicCoreComponentRepository;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BasicCoreComponent;
-import org.oagi.srt.service.treenode.AggregateCoreComponentTreeNode;
-import org.oagi.srt.service.treenode.AssociationCoreComponentPropertyTreeNode;
-import org.oagi.srt.service.treenode.CoreComponentPropertyTreeNode;
-import org.oagi.srt.service.treenode.CoreComponentTreeNodeService;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.treenode.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +24,9 @@ public class CoreComponentTreeNodeTests {
 
     @Autowired
     private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -82,7 +75,6 @@ public class CoreComponentTreeNodeTests {
         assertThat(baseAccTreeNode).isNotNull();
         assertThat(baseAccTreeNode.getRaw()).isEqualTo(businessObjectDocumentTypeAcc);
 
-        assertThat(accTreeNode.getChildrenCount()).isEqualTo(1);
         Collection<? extends CoreComponentPropertyTreeNode> children = accTreeNode.getChildren();
         assertThat(children).isNotNull();
         assertThat(children.size()).isEqualTo(1);
@@ -157,5 +149,79 @@ public class CoreComponentTreeNodeTests {
                 bccRepository.findByFromAccId(businessObjectDocumentTypeAcc.getAccId());
         assertThat(bccList.size()).isEqualTo(4);
         Collections.sort(bccList, coreComponentTreeNodeService.comparingCoreComponentRelation());
+
+        AggregateCoreComponentTreeNode businessObjectDocumentTreeNode =
+                coreComponentTreeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc);
+        assertThat(businessObjectDocumentTreeNode).isNotNull();
+
+        Collection<? extends CoreComponentPropertyTreeNode> bccpTreeNodeChildren =
+                businessObjectDocumentTreeNode.getChildren().stream()
+                        .filter(e -> e instanceof BasicCoreComponentPropertyTreeNode)
+                        .collect(Collectors.toList());
+        assertThat(bccpTreeNodeChildren.size()).isEqualTo(4);
+
+        Map<String, BasicCoreComponent> bccGuidMap =
+                bccList.stream().collect(Collectors.toMap(e -> e.getGuid(), Function.identity()));
+        Map<String, CoreComponentPropertyTreeNode> bccTreeNodeGuidMap =
+                bccpTreeNodeChildren.stream().collect(Collectors.toMap(e -> e.getId(), Function.identity()));
+
+        assertBccpTreeNode(bccGuidMap, bccTreeNodeGuidMap, "oagis-id-0e403050beea4692a5b92eacf5c81b41");
+        assertBccpTreeNode(bccGuidMap, bccTreeNodeGuidMap, "oagis-id-57d07de3a9f842869240c629ad0127b6");
+        assertBccpTreeNode(bccGuidMap, bccTreeNodeGuidMap, "oagis-id-0be42556ff8d4d679ca7658169ab3d0c");
+        assertBccpTreeNode(bccGuidMap, bccTreeNodeGuidMap, "oagis-id-c0e5355ae62649a4b5e00fdc79144568");
+    }
+
+    private void assertBccpTreeNode(Map<String, BasicCoreComponent> bccGuidMap,
+                                    Map<String, CoreComponentPropertyTreeNode> bccTreeNodeGuidMap,
+                                    String guid) {
+        BasicCoreComponent bcc = bccGuidMap.get(guid);
+        assertThat(bcc).isNotNull();
+
+        BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+        assertThat(bccp).isNotNull();
+
+        CoreComponentPropertyTreeNode bccpTreeNode = bccTreeNodeGuidMap.get(bccp.getGuid());
+        assertThat(bccpTreeNode).isNotNull();
+        assertThat(bccpTreeNode.getRaw()).isEqualTo(bccp);
+        assertThat(bccpTreeNode.getRawRelation()).isEqualTo(bcc);
+    }
+
+    /*
+     * [ Model/Platform/2_2/Common/Components/Meta.xsd ]
+     *
+     * <xsd:complexType name="StateChangeBaseType" id="oagis-id-51533a96aced4db8ab6c6285e9fb5d9a">
+     *     <xsd:complexContent>
+     *         <xsd:extension base="IdentificationType">
+     *             <xsd:sequence>
+     *                 <xsd:element ref="FromStateCode" id="oagis-id-52641cf6bae64b05b84bebe1a55bc6b1" minOccurs="0"/>
+     *                 <xsd:element ref="ToStateCode" id="oagis-id-e116f4140c514850a9873bfc582c8418" minOccurs="0"/>
+     *                 <xsd:element ref="ChangeDateTime" id="oagis-id-df798c8c4e2c455890d75625988d35bb" minOccurs="0"/>
+     *                 <xsd:group ref="FreeFormTextGroup" id="oagis-id-d10e8dff43c44342b8819671c9a85ce3" minOccurs="0"/>
+     *             </xsd:sequence>
+     *         </xsd:extension>
+     *     </xsd:complexContent>
+     * </xsd:complexType>
+     *
+     * <xsd:group name="FreeFormTextGroup" id="oagis-id-5aa1636ad48544199515204796b77951">
+     *     <xsd:sequence>
+     *         <xsd:element ref="Description" id="oagis-id-4dc2f9f93d4540bebabf63ded72b7d2c" minOccurs="0" maxOccurs="unbounded"/>
+     *         <xsd:element ref="Note" id="oagis-id-41ef1010201645918eefa5093cb20583" minOccurs="0" maxOccurs="unbounded"/>
+     *     </xsd:sequence>
+     * </xsd:group>
+     *
+     * The 'StateChangeBaseType' ACC should have five(5) ASCCs as a children.
+     */
+    @Test
+    public void includeGroupElementsTest() {
+        String stateChangeBaseTypeGuid = "oagis-id-51533a96aced4db8ab6c6285e9fb5d9a";
+        AggregateCoreComponent stateChangeBaseTypeAcc = accRepository.findOneByGuid(stateChangeBaseTypeGuid);
+        assertThat(stateChangeBaseTypeAcc).isNotNull();
+
+        AggregateCoreComponentTreeNode stateChangeBaseTypeTreeNode =
+                coreComponentTreeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc);
+        assertThat(stateChangeBaseTypeTreeNode).isNotNull();
+
+        Collection<? extends CoreComponentPropertyTreeNode> children = stateChangeBaseTypeTreeNode.getChildren();
+        assertThat(children.size()).isEqualTo(5);
     }
 }

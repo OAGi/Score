@@ -9,7 +9,7 @@ public interface AggregateCoreComponentTreeNode
 
     public AggregateCoreComponentTreeNode getBase();
 
-    public int getChildrenCount();
+    public boolean hasChild();
 
     public Collection<? extends CoreComponentPropertyTreeNode> getChildren();
 
