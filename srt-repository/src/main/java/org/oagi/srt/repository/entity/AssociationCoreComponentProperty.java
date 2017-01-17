@@ -318,7 +318,9 @@ public class AssociationCoreComponentProperty
         clone.setCreationTimestamp(timestamp);
         clone.setLastUpdateTimestamp(timestamp);
         clone.setState(this.state);
-        clone.setModuleId(this.moduleId);
+        if (this.moduleId != null) {
+            clone.setModuleId(this.moduleId);
+        }
         clone.setNamespaceId(this.namespaceId);
         clone.setReusableIndicator(this.reusableIndicator);
         clone.setDeprecated(this.deprecated);
