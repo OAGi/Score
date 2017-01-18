@@ -75,11 +75,11 @@ public class CoreComponentTreeNodeTests {
         assertThat(baseAccTreeNode).isNotNull();
         assertThat(baseAccTreeNode.getRaw()).isEqualTo(businessObjectDocumentTypeAcc);
 
-        Collection<? extends CoreComponentPropertyTreeNode> children = accTreeNode.getChildren();
+        Collection<? extends CoreComponentTreeNode> children = accTreeNode.getChildren();
         assertThat(children).isNotNull();
         assertThat(children.size()).isEqualTo(1);
 
-        CoreComponentPropertyTreeNode child = children.iterator().next();
+        CoreComponentTreeNode child = children.iterator().next();
         assertThat(child).isInstanceOf(AssociationCoreComponentPropertyTreeNode.class);
         assertThat(((AssociationCoreComponentPropertyTreeNode) child).getRaw()).isEqualTo(dataAreaAsccp);
     }
@@ -154,7 +154,7 @@ public class CoreComponentTreeNodeTests {
                 coreComponentTreeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc);
         assertThat(businessObjectDocumentTreeNode).isNotNull();
 
-        Collection<? extends CoreComponentPropertyTreeNode> bccpTreeNodeChildren =
+        Collection<? extends CoreComponentTreeNode> bccpTreeNodeChildren =
                 businessObjectDocumentTreeNode.getChildren().stream()
                         .filter(e -> e instanceof BasicCoreComponentPropertyTreeNode)
                         .collect(Collectors.toList());
@@ -162,7 +162,7 @@ public class CoreComponentTreeNodeTests {
 
         Map<String, BasicCoreComponent> bccGuidMap =
                 bccList.stream().collect(Collectors.toMap(e -> e.getGuid(), Function.identity()));
-        Map<String, CoreComponentPropertyTreeNode> bccTreeNodeGuidMap =
+        Map<String, CoreComponentTreeNode> bccTreeNodeGuidMap =
                 bccpTreeNodeChildren.stream().collect(Collectors.toMap(e -> e.getId(), Function.identity()));
 
         assertBccpTreeNode(bccGuidMap, bccTreeNodeGuidMap, "oagis-id-0e403050beea4692a5b92eacf5c81b41");
@@ -172,7 +172,7 @@ public class CoreComponentTreeNodeTests {
     }
 
     private void assertBccpTreeNode(Map<String, BasicCoreComponent> bccGuidMap,
-                                    Map<String, CoreComponentPropertyTreeNode> bccTreeNodeGuidMap,
+                                    Map<String, CoreComponentTreeNode> bccTreeNodeGuidMap,
                                     String guid) {
         BasicCoreComponent bcc = bccGuidMap.get(guid);
         assertThat(bcc).isNotNull();
@@ -180,10 +180,11 @@ public class CoreComponentTreeNodeTests {
         BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
         assertThat(bccp).isNotNull();
 
-        CoreComponentPropertyTreeNode bccpTreeNode = bccTreeNodeGuidMap.get(bccp.getGuid());
+        CoreComponentTreeNode bccpTreeNode = bccTreeNodeGuidMap.get(bccp.getGuid());
         assertThat(bccpTreeNode).isNotNull();
+        assertThat(bccpTreeNode).isInstanceOf(BasicCoreComponentPropertyTreeNode.class);
         assertThat(bccpTreeNode.getRaw()).isEqualTo(bccp);
-        assertThat(bccpTreeNode.getRawRelation()).isEqualTo(bcc);
+        assertThat(((BasicCoreComponentPropertyTreeNode) bccpTreeNode).getRawRelation()).isEqualTo(bcc);
     }
 
     /*
@@ -221,7 +222,7 @@ public class CoreComponentTreeNodeTests {
                 coreComponentTreeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc);
         assertThat(stateChangeBaseTypeTreeNode).isNotNull();
 
-        Collection<? extends CoreComponentPropertyTreeNode> children = stateChangeBaseTypeTreeNode.getChildren();
+        Collection<? extends CoreComponentTreeNode> children = stateChangeBaseTypeTreeNode.getChildren();
         assertThat(children.size()).isEqualTo(5);
     }
 }

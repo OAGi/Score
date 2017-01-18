@@ -970,3 +970,18 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
     box-shadow: none !important;
     border: none !important;
 }
+
+.ACC-base-link {
+    color: #333 !important;
+    margin-left: 5px;
+}
+
+.CC-nav-back {
+    float: left;
+    color: #333 !important;
+}
+
+.CC-nav-forward {
+    float: right;
+    color: #333 !important;
+}

@@ -75,6 +75,7 @@ public class CoreComponentTreeNodeService {
 
         private final R raw;
         private final Namespace namespace;
+        private Map<String, Object> attributes = new HashMap();
 
         private AbstractCoreComponentTreeNode(R raw) {
             this.raw = raw;
@@ -100,6 +101,16 @@ public class CoreComponentTreeNodeService {
         @Override
         public R getRaw() {
             return raw;
+        }
+
+        @Override
+        public void setAttribute(String key, Object attr) {
+            attributes.put(key, attr);
+        }
+
+        @Override
+        public Object getAttribute(String key) {
+            return attributes.get(key);
         }
     }
 
@@ -133,7 +144,7 @@ public class CoreComponentTreeNodeService {
 
         private AggregateCoreComponentTreeNode base;
         private Boolean hasChild = null;
-        private Collection<CoreComponentPropertyTreeNode> children = null;
+        private Collection<CoreComponentTreeNode> children = null;
 
         private AggregateCoreComponentTreeNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
             super(aggregateCoreComponent);
@@ -144,8 +155,10 @@ public class CoreComponentTreeNodeService {
             if (base == null) {
                 AggregateCoreComponent acc = getRaw();
                 long basedAccId = acc.getBasedAccId();
-                AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
-                base = new AggregateCoreComponentTreeNodeImpl(basedAcc);
+                if (basedAccId > 0L) {
+                    AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+                    base = new AggregateCoreComponentTreeNodeImpl(basedAcc);
+                }
             }
             return base;
         }
@@ -156,11 +169,13 @@ public class CoreComponentTreeNodeService {
                 AggregateCoreComponent acc = getRaw();
                 long accId = acc.getAccId();
 
-                int asccCount = asccRepository.countByFromAccId(accId);
+                int asccCount = asccRepository.countByFromAccIdAndRevisionNumAndState(
+                        accId, 0, CoreComponentState.Published);
                 if (asccCount > 0) {
                     hasChild = true;
                 } else {
-                    int bccCount = bccRepository.countByFromAccId(accId);
+                    int bccCount = bccRepository.countByFromAccIdAndRevisionNumAndState(
+                            accId, 0, CoreComponentState.Published);
                     if (bccCount > 0) {
                         hasChild = true;
                     } else {
@@ -172,7 +187,7 @@ public class CoreComponentTreeNodeService {
         }
 
         @Override
-        public Collection<? extends CoreComponentPropertyTreeNode> getChildren() {
+        public Collection<? extends CoreComponentTreeNode> getChildren() {
             if (children == null) {
                 AggregateCoreComponent acc = getRaw();
                 List<CoreComponentRelation> ccList = getAssociations(acc);
@@ -203,7 +218,9 @@ public class CoreComponentTreeNodeService {
             long accId = acc.getAccId();
 
             List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(accId);
+            List<AssociationCoreComponent> asccList =
+                    asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+
             for (int i = 0, len = asccList.size(); i < len; ++i) {
                 AssociationCoreComponent ascc = asccList.get(i);
                 AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc);
@@ -213,7 +230,8 @@ public class CoreComponentTreeNodeService {
                     coreComponentRelations.add(ascc);
                 }
             }
-            List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(accId);
+            List<BasicCoreComponent> bccList =
+                    bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
             coreComponentRelations.addAll(bccList);
 
             Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
@@ -241,6 +259,8 @@ public class CoreComponentTreeNodeService {
 
         private final AssociationCoreComponent ascc;
         private AggregateCoreComponentTreeNode type;
+        private Boolean hasChild = null;
+        private Collection<CoreComponentTreeNode> children = null;
 
         private AssociationCoreComponentPropertyTreeNodeImpl(AssociationCoreComponent ascc) {
             super(asccpRepository.findOne(ascc.getToAsccpId()));
@@ -255,14 +275,42 @@ public class CoreComponentTreeNodeService {
         @Override
         public AggregateCoreComponentTreeNode getType() {
             if (type == null) {
-                AssociationCoreComponentProperty asccp = getRaw();
-                long roleOfAccId = asccp.getRoleOfAccId();
+                long roleOfAccId = getRoleOfAccId();
                 if (roleOfAccId > 0L) {
                     AggregateCoreComponent roleOfAcc = accRepository.findOne(roleOfAccId);
                     type = new AggregateCoreComponentTreeNodeImpl(roleOfAcc);
                 }
             }
             return type;
+        }
+
+        @Override
+        public boolean hasChild() {
+            if (hasChild == null) {
+                long roleOfAccId = getRoleOfAccId();
+                hasChild = (roleOfAccId > 0L);
+            }
+            return hasChild;
+        }
+
+        @Override
+        public Collection<? extends CoreComponentTreeNode> getChildren() {
+            if (children == null) {
+                AggregateCoreComponentTreeNode type = getType();
+                if (type != null) {
+                    children = new ArrayList();
+                    children.add(type);
+                } else {
+                    children = Collections.emptyList();
+                }
+            }
+            return children;
+        }
+
+        private long getRoleOfAccId() {
+            AssociationCoreComponentProperty asccp = getRaw();
+            long roleOfAccId = asccp.getRoleOfAccId();
+            return roleOfAccId;
         }
     }
 
@@ -272,6 +320,8 @@ public class CoreComponentTreeNodeService {
 
         private final BasicCoreComponent bcc;
         private DataType dataType;
+        private Boolean hasChild = null;
+        private Collection<CoreComponentPropertyTreeNode> children = null;
 
         private BasicCoreComponentPropertyTreeNodeImpl(BasicCoreComponent bcc) {
             super(bccpRepository.findOne(bcc.getToBccpId()));
@@ -291,6 +341,22 @@ public class CoreComponentTreeNodeService {
                 dataType = dtRepository.findOne(bdtId);
             }
             return dataType;
+        }
+
+        @Override
+        public boolean hasChild() {
+            if (hasChild == null) {
+                hasChild = false;
+            }
+            return hasChild;
+        }
+
+        @Override
+        public Collection<? extends CoreComponentTreeNode> getChildren() {
+            if (children == null) {
+                children = Collections.emptyList();
+            }
+            return children;
         }
     }
 

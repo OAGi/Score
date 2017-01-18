@@ -16,6 +16,7 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
+import org.oagi.srt.service.treenode.*;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -37,10 +38,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
@@ -62,6 +60,9 @@ public class ExtensionBean extends UIHandler {
     private ExtensionService extensionService;
 
     @Autowired
+    private CoreComponentTreeNodeService coreComponentTreeNodeService;
+
+    @Autowired
     private NodeService nodeService;
 
     @Autowired
@@ -74,7 +75,8 @@ public class ExtensionBean extends UIHandler {
     private AssociationCoreComponentProperty rootAsccp;
     private AggregateCoreComponent userExtensionAcc;
 
-    private TreeNode treeNode;
+    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
+    private int treeNodeLinkedListIndex = -1;
     private TreeNode selectedTreeNode;
 
     private DataType selectedBdt;
@@ -122,15 +124,40 @@ public class ExtensionBean extends UIHandler {
     }
 
     public TreeNode getTreeNode() {
-        return treeNode;
+        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        this.treeNode = treeNode;
+        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
+            treeNodeLinkedList.removeLast();
+        }
+        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
+
+    }
+
+    public boolean canBack() {
+        return (treeNodeLinkedListIndex > 0);
+    }
+
+    public boolean canForward() {
+        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
+    }
+
+    public void navigateBack() {
+        treeNodeLinkedListIndex--;
+    }
+
+    public void navigateForward() {
+        treeNodeLinkedListIndex++;
+    }
+
+    public void navigateForward(AggregateCoreComponent acc) {
+        TreeNode treeNode = createTreeNode(acc);
+        setTreeNode(treeNode);
     }
 
     public TreeNode getRootNode() {
-        return treeNode.getChildren().get(0);
+        return getTreeNode().getChildren().get(0);
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -162,28 +189,47 @@ public class ExtensionBean extends UIHandler {
     }
 
     public TreeNode createTreeNode(AggregateCoreComponent acc) {
-        CCNode ccNode = nodeService.createLazyCCNode(acc);
-        return createLazyTreeNode(ccNode);
+        AggregateCoreComponentTreeNode accNode =
+                coreComponentTreeNodeService.createCoreComponentTreeNode(acc);
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(accNode, root);
+        return root;
     }
 
-    private TreeNode createLazyTreeNode(CCNode ccNode) {
-        LazyTreeNodeBuilder lazyTreeNodeVisitor = new LazyTreeNodeBuilder();
-        ccNode.accept(lazyTreeNodeVisitor);
-        return lazyTreeNodeVisitor.getParent();
+    private TreeNode toTreeNode(CoreComponentTreeNode node, TreeNode parent) {
+        String type = null;
+        String name = null;
+        if (node instanceof AggregateCoreComponentTreeNode) {
+            AggregateCoreComponent acc = ((AggregateCoreComponentTreeNode) node).getRaw();
+            type = (targetAcc.equals(acc)) ? "ACC-Extension" : "ACC";
+            name = acc.getDen();
+        } else if (node instanceof AssociationCoreComponentPropertyTreeNode) {
+            type = "ASCCP";
+            name = ((AssociationCoreComponentPropertyTreeNode) node).getRaw().getPropertyTerm();
+        } else if (node instanceof BasicCoreComponentPropertyTreeNode) {
+            BasicCoreComponentPropertyTreeNode bccpNode = (BasicCoreComponentPropertyTreeNode) node;
+            BasicCoreComponent bcc = bccpNode.getRawRelation();
+            type = "BCCP" + (bcc.getEntityType() == BasicCoreComponentEntityType.Attribute ? "-Attribute" : "");
+            name = ((BasicCoreComponentPropertyTreeNode) node).getRaw().getPropertyTerm();
+        }
+        node.setAttribute("name", name);
+
+        TreeNode treeNode = new DefaultTreeNode(type, node, parent);
+        if (node.hasChild()) {
+            new DefaultTreeNode(null, treeNode); // append a dummy child
+        }
+        return treeNode;
     }
 
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        LazyNode lazyNode = (LazyNode) treeNode.getData();
-        if (!lazyNode.isFetched()) {
-            lazyNode.fetch();
-
-            LazyTreeNodeBuilder lazyTreeNodeBuilder = new LazyTreeNodeBuilder(treeNode);
+        CoreComponentTreeNode coreComponentTreeNode = (CoreComponentTreeNode) treeNode.getData();
+        if (coreComponentTreeNode.hasChild()) {
             treeNode.setChildren(new ArrayList()); // clear children
 
-            List<? extends Node> children = lazyNode.getChildren();
-            for (Node child : children) {
-                ((CCNode) child).accept(lazyTreeNodeBuilder);
+            Collection<CoreComponentTreeNode> children = coreComponentTreeNode.getChildren();
+            for (CoreComponentTreeNode child : children) {
+                toTreeNode(child, treeNode);
             }
         }
     }
