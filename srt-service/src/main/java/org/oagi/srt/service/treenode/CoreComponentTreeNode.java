@@ -1,13 +1,10 @@
 package org.oagi.srt.service.treenode;
 
-import org.oagi.srt.repository.entity.CoreComponent;
 import org.oagi.srt.repository.entity.Namespace;
 
 import java.util.Collection;
 
-public interface CoreComponentTreeNode<R extends CoreComponent> {
-
-    public R getRaw();
+public interface CoreComponentTreeNode extends Reloadable {
 
     public String getId();
 

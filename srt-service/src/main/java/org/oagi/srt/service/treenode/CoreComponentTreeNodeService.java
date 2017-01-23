@@ -55,6 +55,15 @@ public class CoreComponentTreeNodeService {
     }
 
     public BasicCoreComponentPropertyTreeNode createCoreComponentTreeNode(
+            AggregateCoreComponentTreeNode parent,
+            BasicCoreComponent basicCoreComponent) {
+        if (basicCoreComponent == null) {
+            throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
+        }
+        return new BasicCoreComponentPropertyTreeNodeImpl(parent, basicCoreComponent);
+    }
+
+    public BasicCoreComponentPropertyTreeNode createCoreComponentTreeNode(
             BasicCoreComponent basicCoreComponent) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
@@ -70,38 +79,18 @@ public class CoreComponentTreeNodeService {
         return new AssociationCoreComponentPropertyTreeNodeImpl(associationCoreComponent);
     }
 
-    private abstract class AbstractCoreComponentTreeNode<R extends CoreComponent>
-            implements CoreComponentTreeNode<R> {
+    public AssociationCoreComponentPropertyTreeNode createCoreComponentTreeNode(
+            AggregateCoreComponentTreeNode parent,
+            AssociationCoreComponent associationCoreComponent) {
+        if (associationCoreComponent == null) {
+            throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
+        }
+        return new AssociationCoreComponentPropertyTreeNodeImpl(parent, associationCoreComponent);
+    }
 
-        private final R raw;
-        private final Namespace namespace;
+    private abstract class AbstractCoreComponentTreeNode implements CoreComponentTreeNode {
+
         private Map<String, Object> attributes = new HashMap();
-
-        private AbstractCoreComponentTreeNode(R raw) {
-            this.raw = raw;
-
-            if (raw instanceof NamespaceAware) {
-                long namespaceId = ((NamespaceAware) raw).getNamespaceId();
-                this.namespace = (namespaceId > 0L) ? namespaceRepository.findOne(namespaceId) : null;
-            } else {
-                this.namespace = null;
-            }
-        }
-
-        @Override
-        public String getId() {
-            return raw.getGuid();
-        }
-
-        @Override
-        public Namespace getNamespace() {
-            return namespace;
-        }
-
-        @Override
-        public R getRaw() {
-            return raw;
-        }
 
         @Override
         public void setAttribute(String key, Object attr) {
@@ -114,46 +103,28 @@ public class CoreComponentTreeNodeService {
         }
     }
 
-    private abstract class AbstractCoreComponentPropertyTreeNode
-            <R extends CoreComponentProperty, A extends CoreComponentRelation>
-            extends AbstractCoreComponentTreeNode<R>
-            implements CoreComponentPropertyTreeNode<R, A> {
-
-        private AggregateCoreComponentTreeNode parent;
-
-        private AbstractCoreComponentPropertyTreeNode(R raw) {
-            super(raw);
-        }
-
-        @Override
-        public AggregateCoreComponentTreeNode getParent() {
-            if (parent == null) {
-                CoreComponentRelation coreComponentRelation = getRawRelation();
-                long fromAccId = coreComponentRelation.getFromAccId();
-                AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
-                parent = new AggregateCoreComponentTreeNodeImpl(fromAcc);
-            }
-            return parent;
-        }
-
-    }
-
     private class AggregateCoreComponentTreeNodeImpl
-            extends AbstractCoreComponentTreeNode<AggregateCoreComponent>
+            extends AbstractCoreComponentTreeNode
             implements AggregateCoreComponentTreeNode {
 
+        private final AggregateCoreComponent acc;
         private AggregateCoreComponentTreeNode base;
         private Boolean hasChild = null;
         private Collection<CoreComponentTreeNode> children = null;
 
         private AggregateCoreComponentTreeNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
-            super(aggregateCoreComponent);
+            this.acc = aggregateCoreComponent;
+        }
+
+        @Override
+        public AggregateCoreComponent getAggregateCoreComponent() {
+            return acc;
         }
 
         @Override
         public AggregateCoreComponentTreeNode getBase() {
             if (base == null) {
-                AggregateCoreComponent acc = getRaw();
+                AggregateCoreComponent acc = getAggregateCoreComponent();
                 long basedAccId = acc.getBasedAccId();
                 if (basedAccId > 0L) {
                     AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
@@ -164,9 +135,19 @@ public class CoreComponentTreeNodeService {
         }
 
         @Override
+        public String getId() {
+            return acc.getGuid();
+        }
+
+        @Override
+        public Namespace getNamespace() {
+            long namespaceId = acc.getNamespaceId();
+            return namespaceRepository.findOne(namespaceId);
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
-                AggregateCoreComponent acc = getRaw();
                 long accId = acc.getAccId();
 
                 int asccCount = asccRepository.countByFromAccIdAndRevisionNumAndState(
@@ -189,7 +170,6 @@ public class CoreComponentTreeNodeService {
         @Override
         public Collection<? extends CoreComponentTreeNode> getChildren() {
             if (children == null) {
-                AggregateCoreComponent acc = getRaw();
                 List<CoreComponentRelation> ccList = getAssociations(acc);
 
                 if (ccList.isEmpty()) {
@@ -200,11 +180,11 @@ public class CoreComponentTreeNodeService {
                     for (CoreComponentRelation cc : ccList) {
                         if (cc instanceof AssociationCoreComponent) {
                             AssociationCoreComponentPropertyTreeNode asccpNode =
-                                    createCoreComponentTreeNode((AssociationCoreComponent) cc);
+                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) cc);
                             children.add(asccpNode);
                         } else if (cc instanceof BasicCoreComponent) {
                             BasicCoreComponentPropertyTreeNode bccpNode =
-                                    createCoreComponentTreeNode((BasicCoreComponent) cc);
+                                    createCoreComponentTreeNode(this, (BasicCoreComponent) cc);
                             children.add(bccpNode);
                         }
                     }
@@ -251,25 +231,47 @@ public class CoreComponentTreeNodeService {
             OagisComponentType oagisComponentType = acc.getOagisComponentType();
             return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
         }
+
+        @Override
+        public void reload() {
+            hasChild = null;
+            children = null;
+        }
     }
 
     private class AssociationCoreComponentPropertyTreeNodeImpl
-            extends AbstractCoreComponentPropertyTreeNode<AssociationCoreComponentProperty, AssociationCoreComponent>
+            extends AbstractCoreComponentTreeNode
             implements AssociationCoreComponentPropertyTreeNode {
 
+        private AggregateCoreComponentTreeNode parent = null;
         private final AssociationCoreComponent ascc;
+        private final AssociationCoreComponentProperty asccp;
         private AggregateCoreComponentTreeNode type;
+
         private Boolean hasChild = null;
         private Collection<CoreComponentTreeNode> children = null;
 
         private AssociationCoreComponentPropertyTreeNodeImpl(AssociationCoreComponent ascc) {
-            super(asccpRepository.findOne(ascc.getToAsccpId()));
+            this(null, ascc);
+        }
+
+        private AssociationCoreComponentPropertyTreeNodeImpl(AggregateCoreComponentTreeNode parent,
+                                                             AssociationCoreComponent ascc) {
+            this.parent = parent;
             this.ascc = ascc;
+
+            long asccpId = ascc.getToAsccpId();
+            this.asccp = asccpRepository.findOne(asccpId);
         }
 
         @Override
-        public AssociationCoreComponent getRawRelation() {
+        public AssociationCoreComponent getAssociationCoreComponent() {
             return ascc;
+        }
+
+        @Override
+        public AssociationCoreComponentProperty getAssociationCoreComponentProperty() {
+            return asccp;
         }
 
         @Override
@@ -282,6 +284,17 @@ public class CoreComponentTreeNodeService {
                 }
             }
             return type;
+        }
+
+        @Override
+        public String getId() {
+            return getAssociationCoreComponentProperty().getGuid();
+        }
+
+        @Override
+        public Namespace getNamespace() {
+            long namespaceId = getAssociationCoreComponentProperty().getNamespaceId();
+            return namespaceRepository.findOne(namespaceId);
         }
 
         @Override
@@ -308,45 +321,88 @@ public class CoreComponentTreeNodeService {
         }
 
         private long getRoleOfAccId() {
-            AssociationCoreComponentProperty asccp = getRaw();
-            long roleOfAccId = asccp.getRoleOfAccId();
+            long roleOfAccId = getAssociationCoreComponentProperty().getRoleOfAccId();
             return roleOfAccId;
+        }
+
+        @Override
+        public AggregateCoreComponentTreeNode getParent() {
+            if (parent == null) {
+                long fromAccId = getAssociationCoreComponent().getFromAccId();
+                AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
+                parent = new AggregateCoreComponentTreeNodeImpl(fromAcc);
+            }
+            return parent;
+        }
+
+        @Override
+        public void reload() {
+            parent = null;
+            hasChild = null;
+            children = null;
         }
     }
 
     private class BasicCoreComponentPropertyTreeNodeImpl
-            extends AbstractCoreComponentPropertyTreeNode<BasicCoreComponentProperty, BasicCoreComponent>
+            extends AbstractCoreComponentTreeNode
             implements BasicCoreComponentPropertyTreeNode {
 
+        private AggregateCoreComponentTreeNode parent = null;
         private final BasicCoreComponent bcc;
+        private final BasicCoreComponentProperty bccp;
         private DataType dataType;
+
         private Boolean hasChild = null;
-        private Collection<CoreComponentPropertyTreeNode> children = null;
+        private Collection<BusinessDataTypeSupplementaryComponentTreeNode> children = null;
 
         private BasicCoreComponentPropertyTreeNodeImpl(BasicCoreComponent bcc) {
-            super(bccpRepository.findOne(bcc.getToBccpId()));
+            this(null, bcc);
+        }
+
+        private BasicCoreComponentPropertyTreeNodeImpl(AggregateCoreComponentTreeNode parent,
+                                                       BasicCoreComponent bcc) {
+            this.parent = parent;
             this.bcc = bcc;
+
+            long bccpId = bcc.getToBccpId();
+            this.bccp = bccpRepository.findOne(bccpId);
         }
 
         @Override
-        public BasicCoreComponent getRawRelation() {
+        public BasicCoreComponent getBasicCoreComponent() {
             return bcc;
+        }
+
+        @Override
+        public BasicCoreComponentProperty getBasicCoreComponentProperty() {
+            return bccp;
         }
 
         @Override
         public DataType getDataType() {
             if (dataType == null) {
-                BasicCoreComponentProperty bccp = getRaw();
-                long bdtId = bccp.getBdtId();
+                long bdtId = getBasicCoreComponentProperty().getBdtId();
                 dataType = dtRepository.findOne(bdtId);
             }
             return dataType;
         }
 
         @Override
+        public String getId() {
+            return getBasicCoreComponentProperty().getGuid();
+        }
+
+        @Override
+        public Namespace getNamespace() {
+            long namespaceId = getBasicCoreComponentProperty().getNamespaceId();
+            return namespaceRepository.findOne(namespaceId);
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
-                hasChild = false;
+                long bdtId = getDataType().getDtId();
+                hasChild = dtScRepository.countByOwnerDtId(bdtId) > 0;
             }
             return hasChild;
         }
@@ -354,9 +410,85 @@ public class CoreComponentTreeNodeService {
         @Override
         public Collection<? extends CoreComponentTreeNode> getChildren() {
             if (children == null) {
-                children = Collections.emptyList();
+                long bdtId = getDataType().getDtId();
+                List<DataTypeSupplementaryComponent> bdtScList = dtScRepository.findByOwnerDtId(bdtId);
+                if (bdtScList.isEmpty()) {
+                    children = Collections.emptyList();
+                } else {
+                    children = new ArrayList();
+                    for (DataTypeSupplementaryComponent bdtSc : bdtScList) {
+                        BusinessDataTypeSupplementaryComponentTreeNode child =
+                                new BusinessDataTypeSupplementaryComponentTreeNodeImpl(this, bdtSc);
+                        children.add(child);
+                    }
+                }
             }
             return children;
+        }
+
+        @Override
+        public AggregateCoreComponentTreeNode getParent() {
+            if (parent == null) {
+                long fromAccId = getBasicCoreComponent().getFromAccId();
+                AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
+                parent = new AggregateCoreComponentTreeNodeImpl(fromAcc);
+            }
+            return parent;
+        }
+
+        @Override
+        public void reload() {
+            parent = null;
+            hasChild = null;
+            children = null;
+        }
+    }
+
+    private class BusinessDataTypeSupplementaryComponentTreeNodeImpl
+            extends AbstractCoreComponentTreeNode
+            implements BusinessDataTypeSupplementaryComponentTreeNode {
+
+        private BasicCoreComponentPropertyTreeNode parent;
+        private DataTypeSupplementaryComponent dtSc;
+
+        public BusinessDataTypeSupplementaryComponentTreeNodeImpl(BasicCoreComponentPropertyTreeNode parent,
+                                                                  DataTypeSupplementaryComponent dtSc) {
+            this.parent = parent;
+            this.dtSc = dtSc;
+        }
+
+        @Override
+        public BasicCoreComponentPropertyTreeNode getParent() {
+            return parent;
+        }
+
+        @Override
+        public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent() {
+            return dtSc;
+        }
+
+        @Override
+        public String getId() {
+            return dtSc.getGuid();
+        }
+
+        @Override
+        public Namespace getNamespace() {
+            return (parent != null) ? parent.getNamespace() : null;
+        }
+
+        @Override
+        public boolean hasChild() {
+            return false;
+        }
+
+        @Override
+        public Collection<? extends CoreComponentTreeNode> getChildren() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public void reload() {
         }
     }
 

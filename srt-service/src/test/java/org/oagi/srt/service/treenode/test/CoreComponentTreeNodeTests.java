@@ -69,11 +69,11 @@ public class CoreComponentTreeNodeTests {
         AggregateCoreComponentTreeNode accTreeNode =
                 coreComponentTreeNodeService.createCoreComponentTreeNode(acknowledgeBOMAcc);
         assertThat(accTreeNode).isNotNull();
-        assertThat(accTreeNode.getRaw()).isEqualTo(acknowledgeBOMAcc);
+        assertThat(accTreeNode.getAggregateCoreComponent()).isEqualTo(acknowledgeBOMAcc);
 
         AggregateCoreComponentTreeNode baseAccTreeNode = accTreeNode.getBase();
         assertThat(baseAccTreeNode).isNotNull();
-        assertThat(baseAccTreeNode.getRaw()).isEqualTo(businessObjectDocumentTypeAcc);
+        assertThat(baseAccTreeNode.getAggregateCoreComponent()).isEqualTo(businessObjectDocumentTypeAcc);
 
         Collection<? extends CoreComponentTreeNode> children = accTreeNode.getChildren();
         assertThat(children).isNotNull();
@@ -81,7 +81,7 @@ public class CoreComponentTreeNodeTests {
 
         CoreComponentTreeNode child = children.iterator().next();
         assertThat(child).isInstanceOf(AssociationCoreComponentPropertyTreeNode.class);
-        assertThat(((AssociationCoreComponentPropertyTreeNode) child).getRaw()).isEqualTo(dataAreaAsccp);
+        assertThat(((AssociationCoreComponentPropertyTreeNode) child).getAssociationCoreComponentProperty()).isEqualTo(dataAreaAsccp);
     }
 
     /*
@@ -110,11 +110,11 @@ public class CoreComponentTreeNodeTests {
         AssociationCoreComponentPropertyTreeNode acknowledgeAsccTreeNode =
                 coreComponentTreeNodeService.createCoreComponentTreeNode(acknowledgeAscc);
         assertThat(acknowledgeAsccTreeNode).isNotNull();
-        assertThat(acknowledgeAsccTreeNode.getParent().getRaw()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
+        assertThat(acknowledgeAsccTreeNode.getParent().getAggregateCoreComponent()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
 
         String acknowledgeAsccpGuid = "oagis-id-d9589936aace44f5bd890ec462888263";
         AssociationCoreComponentProperty acknowledgeAsccp = asccpRepository.findOneByGuid(acknowledgeAsccpGuid);
-        assertThat(acknowledgeAsccTreeNode.getRaw()).isEqualTo(acknowledgeAsccp);
+        assertThat(acknowledgeAsccTreeNode.getAssociationCoreComponentProperty()).isEqualTo(acknowledgeAsccp);
 
         // Second ASCC, 'BOM'
         AssociationCoreComponent bomAscc = asccList.get(1);
@@ -124,8 +124,8 @@ public class CoreComponentTreeNodeTests {
 
         String bomAsccpGuid = "oagis-id-465ed46fd9a4422186327a77ed3b4fbf";
         AssociationCoreComponentProperty bomAsccp = asccpRepository.findOneByGuid(bomAsccpGuid);
-        assertThat(bomAsccTreeNode.getRaw()).isEqualTo(bomAsccp);
-        assertThat(bomAsccTreeNode.getParent().getRaw()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
+        assertThat(bomAsccTreeNode.getAssociationCoreComponentProperty()).isEqualTo(bomAsccp);
+        assertThat(bomAsccTreeNode.getParent().getAggregateCoreComponent()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
     }
 
     /*
@@ -180,11 +180,11 @@ public class CoreComponentTreeNodeTests {
         BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
         assertThat(bccp).isNotNull();
 
-        CoreComponentTreeNode bccpTreeNode = bccTreeNodeGuidMap.get(bccp.getGuid());
+        BasicCoreComponentPropertyTreeNode bccpTreeNode = (BasicCoreComponentPropertyTreeNode) bccTreeNodeGuidMap.get(bccp.getGuid());
         assertThat(bccpTreeNode).isNotNull();
         assertThat(bccpTreeNode).isInstanceOf(BasicCoreComponentPropertyTreeNode.class);
-        assertThat(bccpTreeNode.getRaw()).isEqualTo(bccp);
-        assertThat(((BasicCoreComponentPropertyTreeNode) bccpTreeNode).getRawRelation()).isEqualTo(bcc);
+        assertThat(bccpTreeNode.getBasicCoreComponentProperty()).isEqualTo(bccp);
+        assertThat(bccpTreeNode.getBasicCoreComponent()).isEqualTo(bcc);
     }
 
     /*

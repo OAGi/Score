@@ -12,6 +12,9 @@ public interface DataTypeSupplementaryComponentRepository extends JpaRepository<
     @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId = ?1")
     public List<DataTypeSupplementaryComponent> findByOwnerDtId(long ownerDtId);
 
+    @Query("select count(d) from DataTypeSupplementaryComponent d where d.ownerDtId = ?1")
+    public int countByOwnerDtId(long ownerDtId);
+
     @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId in ?1")
     public List<DataTypeSupplementaryComponent> findByOwnerDtIdIn(Collection<Long> ownerDtIds);
 
