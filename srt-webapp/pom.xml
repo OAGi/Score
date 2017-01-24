@@ -50,11 +50,6 @@
 			<version>${org.joinfaces.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.joinfaces</groupId>
-			<artifactId>jsf-spring-boot-integration</artifactId>
-			<version>${org.joinfaces.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
