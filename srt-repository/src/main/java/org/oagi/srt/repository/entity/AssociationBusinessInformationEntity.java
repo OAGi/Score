@@ -86,6 +86,7 @@ public class AssociationBusinessInformationEntity
 
     @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
+
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 

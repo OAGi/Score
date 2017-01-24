@@ -1,4 +1,4 @@
-package org.oagi.srt.service.treenode;
+package org.oagi.srt.model.treenode;
 
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;

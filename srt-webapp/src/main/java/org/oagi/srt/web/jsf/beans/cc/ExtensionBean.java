@@ -5,8 +5,9 @@ import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.service.treenode.*;
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -50,7 +51,7 @@ public class ExtensionBean extends UIHandler {
     private ExtensionService extensionService;
 
     @Autowired
-    private CoreComponentTreeNodeService coreComponentTreeNodeService;
+    private TreeNodeService treeNodeService;
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -174,7 +175,7 @@ public class ExtensionBean extends UIHandler {
 
     public TreeNode createTreeNode(AggregateCoreComponent acc) {
         AggregateCoreComponentTreeNode accNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(acc);
+                treeNodeService.createCoreComponentTreeNode(acc);
         TreeNode root = new DefaultTreeNode();
         toTreeNode(accNode, root);
         return root;
@@ -449,7 +450,7 @@ public class ExtensionBean extends UIHandler {
         ((CoreComponentTreeNode) rootNode.getData()).reload();
 
         AssociationCoreComponentPropertyTreeNode asccpNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(result.getAscc());
+                treeNodeService.createCoreComponentTreeNode(result.getAscc());
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -581,7 +582,7 @@ public class ExtensionBean extends UIHandler {
         ((CoreComponentTreeNode) rootNode.getData()).reload();
 
         BasicCoreComponentPropertyTreeNode bccpNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(result.getBcc());
+                treeNodeService.createCoreComponentTreeNode(result.getBcc());
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);

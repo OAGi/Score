@@ -1,10 +1,11 @@
-package org.oagi.srt.service.treenode.test;
+package org.oagi.srt.service.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.treenode.*;
+import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.service.TreeNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CoreComponentTreeNodeTests {
 
     @Autowired
-    private CoreComponentTreeNodeService coreComponentTreeNodeService;
+    private TreeNodeService treeNodeService;
 
     @Autowired
     private BasicCoreComponentRepository bccRepository;
@@ -67,7 +68,7 @@ public class CoreComponentTreeNodeTests {
         assertThat(dataAreaAsccp).isNotNull();
 
         AggregateCoreComponentTreeNode accTreeNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(acknowledgeBOMAcc);
+                treeNodeService.createCoreComponentTreeNode(acknowledgeBOMAcc);
         assertThat(accTreeNode).isNotNull();
         assertThat(accTreeNode.getAggregateCoreComponent()).isEqualTo(acknowledgeBOMAcc);
 
@@ -108,7 +109,7 @@ public class CoreComponentTreeNodeTests {
         // First ASCC, 'Acknowledge'
         AssociationCoreComponent acknowledgeAscc = asccList.get(0);
         AssociationCoreComponentPropertyTreeNode acknowledgeAsccTreeNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(acknowledgeAscc);
+                treeNodeService.createCoreComponentTreeNode(acknowledgeAscc);
         assertThat(acknowledgeAsccTreeNode).isNotNull();
         assertThat(acknowledgeAsccTreeNode.getParent().getAggregateCoreComponent()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
 
@@ -119,7 +120,7 @@ public class CoreComponentTreeNodeTests {
         // Second ASCC, 'BOM'
         AssociationCoreComponent bomAscc = asccList.get(1);
         AssociationCoreComponentPropertyTreeNode bomAsccTreeNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(bomAscc);
+                treeNodeService.createCoreComponentTreeNode(bomAscc);
         assertThat(bomAsccTreeNode).isNotNull();
 
         String bomAsccpGuid = "oagis-id-465ed46fd9a4422186327a77ed3b4fbf";
@@ -148,10 +149,10 @@ public class CoreComponentTreeNodeTests {
         List<BasicCoreComponent> bccList =
                 bccRepository.findByFromAccId(businessObjectDocumentTypeAcc.getAccId());
         assertThat(bccList.size()).isEqualTo(4);
-        Collections.sort(bccList, coreComponentTreeNodeService.comparingCoreComponentRelation());
+        Collections.sort(bccList, treeNodeService.comparingCoreComponentRelation());
 
         AggregateCoreComponentTreeNode businessObjectDocumentTreeNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc);
+                treeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc);
         assertThat(businessObjectDocumentTreeNode).isNotNull();
 
         Collection<? extends CoreComponentTreeNode> bccpTreeNodeChildren =
@@ -219,10 +220,78 @@ public class CoreComponentTreeNodeTests {
         assertThat(stateChangeBaseTypeAcc).isNotNull();
 
         AggregateCoreComponentTreeNode stateChangeBaseTypeTreeNode =
-                coreComponentTreeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc);
+                treeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc);
         assertThat(stateChangeBaseTypeTreeNode).isNotNull();
 
         Collection<? extends CoreComponentTreeNode> children = stateChangeBaseTypeTreeNode.getChildren();
         assertThat(children.size()).isEqualTo(5);
+    }
+
+    /*
+     * [ Model/Nouns/MoveInventory.xsd ]
+     *
+     * <xsd:complexType name="MoveInventoryLineBaseType" id="oagis-id-e2662d3d7d7f48b39d96618060fa23d1">
+     *     <xsd:complexContent>
+     *         <xsd:extension base="LineBaseType">
+     *             <xsd:sequence>
+     *                 <xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-e1416fb98f4e49e08561d8bc30f12dc2"/>
+     *                 <xsd:element ref="Quantity" id="oagis-id-62e28b26e83f4e4b86424f8c9304af79" minOccurs="0" maxOccurs="unbounded"/>
+     *                 <xsd:group ref="InventoryTransactionGroup" id="oagis-id-65821ff100e74edabad2e17b65fb9976"/>
+     *                 <xsd:element ref="InventoryDestination" id="oagis-id-a82cb4f077ca40f6a229aee26cf3b9c0" minOccurs="0" maxOccurs="unbounded"/>
+     *             </xsd:sequence>
+     *          </xsd:extension>
+     *     </xsd:complexContent>
+     * </xsd:complexType>
+     *
+     * [ Model/Platform/2_2/Common/Components/Components.xsd ]
+     *
+     * <xsd:group name="InventoryTransactionGroup" id="oagis-id-2a6ce090b58148e7b187c876d3df9f6c">
+     *     <xsd:sequence>
+     *         <xsd:element ref="GLEntityID" id="oagis-id-2035d0e33f0c4f93b1e04caa45ce40ec" minOccurs="0" maxOccurs="1"/>
+     *         <xsd:element ref="Facility" id="oagis-id-cc424d6701124b05b62a1e2ff8f865d4" minOccurs="0" maxOccurs="unbounded"/>
+     *         <xsd:element ref="Status" id="oagis-id-8f4f5ffb024f47a68f4737369267bc0d" minOccurs="0" maxOccurs="1"/>
+     *         <xsd:element ref="ReasonCode" id="oagis-id-b3adace75102464c87093383836018be" minOccurs="0" maxOccurs="unbounded"/>
+     *         <xsd:element ref="TransactionDateTime" id="oagis-id-5abafea1a19848b6b7dd5f7223e49e1c" minOccurs="0" maxOccurs="1"/>
+     *         <xsd:element ref="Party" id="oagis-id-4a341d1817604532a45c3ab7e26ab87a" minOccurs="0" maxOccurs="unbounded"/>
+     *     </xsd:sequence>
+     * </xsd:group>
+     */
+    @Test
+    public void orderingOfSequenceTest() {
+        String moveInventoryLineBaseTypeGuid = "oagis-id-e2662d3d7d7f48b39d96618060fa23d1";
+        AggregateCoreComponent moveInventoryLineBaseTypeAcc = accRepository.findOneByGuid(moveInventoryLineBaseTypeGuid);
+        assertThat(moveInventoryLineBaseTypeAcc).isNotNull();
+
+        AggregateCoreComponentTreeNode moveInventoryLineBaseTypeTreeNode =
+                treeNodeService.createCoreComponentTreeNode(moveInventoryLineBaseTypeAcc);
+        assertThat(moveInventoryLineBaseTypeTreeNode).isNotNull();
+
+        Collection<? extends CoreComponentTreeNode> children = moveInventoryLineBaseTypeTreeNode.getChildren();
+        assertThat(children.size()).isEqualTo(9);
+
+        int index = 0;
+        Map<Integer, String> indexGuidMap = new HashMap();
+        indexGuidMap.put(index++, "oagis-id-e1416fb98f4e49e08561d8bc30f12dc2");
+        indexGuidMap.put(index++, "oagis-id-62e28b26e83f4e4b86424f8c9304af79");
+        indexGuidMap.put(index++, "oagis-id-2035d0e33f0c4f93b1e04caa45ce40ec");
+        indexGuidMap.put(index++, "oagis-id-cc424d6701124b05b62a1e2ff8f865d4");
+        indexGuidMap.put(index++, "oagis-id-8f4f5ffb024f47a68f4737369267bc0d");
+        indexGuidMap.put(index++, "oagis-id-b3adace75102464c87093383836018be");
+        indexGuidMap.put(index++, "oagis-id-5abafea1a19848b6b7dd5f7223e49e1c");
+        indexGuidMap.put(index++, "oagis-id-4a341d1817604532a45c3ab7e26ab87a");
+        indexGuidMap.put(index++, "oagis-id-a82cb4f077ca40f6a229aee26cf3b9c0");
+
+        index = 0;
+        for (CoreComponentTreeNode child : children) {
+            if (child instanceof AssociationCoreComponentPropertyTreeNode) {
+                AssociationCoreComponentPropertyTreeNode asccpNode =
+                        (AssociationCoreComponentPropertyTreeNode) child;
+                assertThat(indexGuidMap.get(index++)).isEqualTo(asccpNode.getAssociationCoreComponent().getGuid());
+            } else if (child instanceof BasicCoreComponentPropertyTreeNode) {
+                BasicCoreComponentPropertyTreeNode bccpNode =
+                        (BasicCoreComponentPropertyTreeNode) child;
+                assertThat(indexGuidMap.get(index++)).isEqualTo(bccpNode.getBasicCoreComponent().getGuid());
+            }
+        }
     }
 }

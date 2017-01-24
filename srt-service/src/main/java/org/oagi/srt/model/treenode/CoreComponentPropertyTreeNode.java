@@ -1,4 +1,4 @@
-package org.oagi.srt.service.treenode;
+package org.oagi.srt.model.treenode;
 
 public interface CoreComponentPropertyTreeNode extends CoreComponentTreeNode {
 
