@@ -6,5 +6,6 @@ public interface BusinessDataTypeSupplementaryComponentTreeNode extends CoreComp
 
     public BasicCoreComponentPropertyTreeNode getParent();
 
-    public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent();
+    public DataTypeSupplementaryComponent getBusinessDataTypeSupplementaryComponent();
+    public DataTypeSupplementaryComponent getBdtSc();
 }

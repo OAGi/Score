@@ -1,9 +1,9 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.BBIERestrictionType;
-import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -233,25 +233,25 @@ public class CopyProfileBODBean {
     /*
      * handle BBIE Type
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailablePrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    private BBIENode getSelectedBBIENode() {
+    private BasicBusinessInformationEntityPropertyTreeNode getSelectedBasicBusinessInformationEntityPropertyTreeNode() {
         TreeNode treeNode = getSelectedTreeNode();
         Object data = treeNode.getData();
-        if (!(data instanceof BBIENode)) {
+        if (!(data instanceof BasicBusinessInformationEntityPropertyTreeNode)) {
             return null;
         }
-        return (BBIENode) data;
+        return (BasicBusinessInformationEntityPropertyTreeNode) data;
     }
 
     public String getBbieXbtName() {
-        return bieService.getBdtPrimitiveRestrictionName(getSelectedBBIENode());
+        return bieService.getBdtPrimitiveRestrictionName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieXbtName(String name) {
-        bieService.setBdtPrimitiveRestriction(getSelectedBBIENode(), name);
+        bieService.setBdtPrimitiveRestriction(getSelectedBasicBusinessInformationEntityPropertyTreeNode(), name);
     }
 
     public void onSelectBbieXbtName(SelectEvent event) {
@@ -259,7 +259,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieXbt(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 bieService.getBdtPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
@@ -272,15 +272,15 @@ public class CopyProfileBODBean {
     }
 
     public String getBbieCodeListName() {
-        return bieService.getCodeListName(getSelectedBBIENode());
+        return bieService.getCodeListName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieCodeListName(String name) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
         CodeList codeList = codeListMap.get(name);
         if (codeList != null) {
-            node.setCodeListId(codeList.getCodeListId());
+            node.getBasicBusinessInformationEntity().setCodeListId(codeList.getCodeListId());
         }
     }
 
@@ -289,7 +289,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieCodeList(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, CodeList> codeLists = bieService.getCodeLists(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(codeLists.keySet());
@@ -301,15 +301,15 @@ public class CopyProfileBODBean {
     }
 
     public String getBbieAgencyIdListName() {
-        return bieService.getBbieAgencyIdListName(getSelectedBBIENode());
+        return bieService.getBbieAgencyIdListName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieAgencyIdListName(String name) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         AgencyIdList agencyIdList = agencyIdListMap.get(name);
         if (agencyIdList != null) {
-            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+            node.getBasicBusinessInformationEntity().setAgencyIdListId(agencyIdList.getAgencyIdListId());
         }
     }
 
@@ -318,7 +318,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieAgencyIdList(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(agencyIdListMap.keySet());
@@ -332,25 +332,25 @@ public class CopyProfileBODBean {
     /*
      * handle BBIESC Type
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailableScPrimitiveRestrictions(BBIESCNode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailableScPrimitiveRestrictions(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    private BBIESCNode getSelectedBbieScNode() {
+    private BasicBusinessInformationEntitySupplementaryComponentTreeNode getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode() {
         TreeNode treeNode = getSelectedTreeNode();
         Object data = treeNode.getData();
-        if (!(data instanceof BBIESCNode)) {
+        if (!(data instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode)) {
             return null;
         }
-        return (BBIESCNode) data;
+        return (BasicBusinessInformationEntitySupplementaryComponentTreeNode) data;
     }
 
     public String getBbieScXbtName() {
-        return bieService.getBdtScPrimitiveRestrictionName(getSelectedBbieScNode());
+        return bieService.getBdtScPrimitiveRestrictionName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScXbtName(String name) {
-        bieService.setBdtScPrimitiveRestriction(getSelectedBbieScNode(), name);
+        bieService.setBdtScPrimitiveRestriction(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode(), name);
     }
 
     public void onSelectBbieScXbtName(SelectEvent event) {
@@ -358,7 +358,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieScXbt(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPrimitiveRestrictions =
                 bieService.getBdtScPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
@@ -371,15 +371,15 @@ public class CopyProfileBODBean {
     }
 
     public String getBbieScCodeListName() {
-        return bieService.getCodeListName(getSelectedBbieScNode());
+        return bieService.getCodeListName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScCodeListName(String name) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
         CodeList codeList = codeListMap.get(name);
         if (codeList != null) {
-            node.setCodeListId(codeList.getCodeListId());
+            node.getBasicBusinessInformationEntitySupplementaryComponent().setCodeListId(codeList.getCodeListId());
         }
     }
 
@@ -388,7 +388,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieScCodeList(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, CodeList> codeLists = bieService.getCodeLists(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(codeLists.keySet());
@@ -400,15 +400,15 @@ public class CopyProfileBODBean {
     }
 
     public String getBbieScAgencyIdListName() {
-        return bieService.getBbieAgencyIdListName(getSelectedBbieScNode());
+        return bieService.getBbieAgencyIdListName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScAgencyIdListName(String name) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         AgencyIdList agencyIdList = agencyIdListMap.get(name);
         if (agencyIdList != null) {
-            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+            node.getBasicBusinessInformationEntitySupplementaryComponent().setAgencyIdListId(agencyIdList.getAgencyIdListId());
         }
     }
 
@@ -417,7 +417,7 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInputForBbieScAgencyIdList(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(agencyIdListMap.keySet());

@@ -1,14 +1,15 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.handler.UIHandler;
+import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -208,12 +209,6 @@ public class ExtensionBean extends UIHandler {
         }
     }
 
-    private interface TreeNodeTypeNameResolver {
-        public String getType();
-
-        public String getName();
-    }
-
     private class AggregateCoreComponentTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
 
         private AggregateCoreComponentTreeNode node;
@@ -297,7 +292,7 @@ public class ExtensionBean extends UIHandler {
 
         @Override
         public String getName() {
-            DataTypeSupplementaryComponent bdtSc = node.getDataTypeSupplementaryComponent();
+            DataTypeSupplementaryComponent bdtSc = node.getBusinessDataTypeSupplementaryComponent();
             String name = bdtSc.getPropertyTerm() + ". " + bdtSc.getRepresentationTerm();
             return name;
         }

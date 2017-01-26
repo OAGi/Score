@@ -1,16 +1,16 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.BBIERestrictionType;
-import org.oagi.srt.model.bie.BBIESCNode;
-import org.oagi.srt.model.bie.TopLevelNode;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
+import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.NodeExpandEvent;
@@ -76,6 +76,8 @@ public class CreateProfileBODBean {
     private BusinessInformationEntityService bieService;
     @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
+    @Autowired
+    private TreeNodeService treeNodeService;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
     @Autowired
@@ -216,9 +218,9 @@ public class CreateProfileBODBean {
         this.treeNode = treeNode;
     }
 
-    public TopLevelNode getTopLevelNode() {
+    public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
         TreeNode treeNode = getTreeNode();
-        return (TopLevelNode) treeNode.getChildren().get(0).getData();
+        return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -236,25 +238,25 @@ public class CreateProfileBODBean {
     /*
      * handle BBIE Type
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailablePrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    private BBIENode getSelectedBBIENode() {
+    private BasicBusinessInformationEntityPropertyTreeNode getSelectedBasicBusinessInformationEntityPropertyTreeNode() {
         TreeNode treeNode = getSelectedTreeNode();
         Object data = treeNode.getData();
-        if (!(data instanceof BBIENode)) {
+        if (!(data instanceof BasicBusinessInformationEntityPropertyTreeNode)) {
             return null;
         }
-        return (BBIENode) data;
+        return (BasicBusinessInformationEntityPropertyTreeNode) data;
     }
 
     public String getBbieXbtName() {
-        return bieService.getBdtPrimitiveRestrictionName(getSelectedBBIENode());
+        return bieService.getBdtPrimitiveRestrictionName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieXbtName(String name) {
-        bieService.setBdtPrimitiveRestriction(getSelectedBBIENode(), name);
+        bieService.setBdtPrimitiveRestriction(getSelectedBasicBusinessInformationEntityPropertyTreeNode(), name);
     }
 
     public void onSelectBbieXbtName(SelectEvent event) {
@@ -262,7 +264,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieXbt(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 bieService.getBdtPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
@@ -275,15 +277,15 @@ public class CreateProfileBODBean {
     }
 
     public String getBbieCodeListName() {
-        return bieService.getCodeListName(getSelectedBBIENode());
+        return bieService.getCodeListName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieCodeListName(String name) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
         CodeList codeList = codeListMap.get(name);
         if (codeList != null) {
-            node.setCodeListId(codeList.getCodeListId());
+            node.getBasicBusinessInformationEntity().setCodeListId(codeList.getCodeListId());
         }
     }
 
@@ -292,7 +294,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieCodeList(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, CodeList> codeLists = bieService.getCodeLists(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(codeLists.keySet());
@@ -304,15 +306,15 @@ public class CreateProfileBODBean {
     }
 
     public String getBbieAgencyIdListName() {
-        return bieService.getBbieAgencyIdListName(getSelectedBBIENode());
+        return bieService.getBbieAgencyIdListName(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public void setBbieAgencyIdListName(String name) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         AgencyIdList agencyIdList = agencyIdListMap.get(name);
         if (agencyIdList != null) {
-            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+            node.getBasicBusinessInformationEntity().setAgencyIdListId(agencyIdList.getAgencyIdListId());
         }
     }
 
@@ -321,7 +323,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieAgencyIdList(String query) {
-        BBIENode node = getSelectedBBIENode();
+        BasicBusinessInformationEntityPropertyTreeNode node = getSelectedBasicBusinessInformationEntityPropertyTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(agencyIdListMap.keySet());
@@ -335,25 +337,25 @@ public class CreateProfileBODBean {
     /*
      * handle BBIESC Type
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailableScPrimitiveRestrictions(BBIESCNode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailableScPrimitiveRestrictions(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    private BBIESCNode getSelectedBbieScNode() {
+    private BasicBusinessInformationEntitySupplementaryComponentTreeNode getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode() {
         TreeNode treeNode = getSelectedTreeNode();
         Object data = treeNode.getData();
-        if (!(data instanceof BBIESCNode)) {
+        if (!(data instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode)) {
             return null;
         }
-        return (BBIESCNode) data;
+        return (BasicBusinessInformationEntitySupplementaryComponentTreeNode) data;
     }
 
     public String getBbieScXbtName() {
-        return bieService.getBdtScPrimitiveRestrictionName(getSelectedBbieScNode());
+        return bieService.getBdtScPrimitiveRestrictionName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScXbtName(String name) {
-        bieService.setBdtScPrimitiveRestriction(getSelectedBbieScNode(), name);
+        bieService.setBdtScPrimitiveRestriction(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode(), name);
     }
 
     public void onSelectBbieScXbtName(SelectEvent event) {
@@ -361,7 +363,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieScXbt(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPrimitiveRestrictions =
                 bieService.getBdtScPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
@@ -374,15 +376,15 @@ public class CreateProfileBODBean {
     }
 
     public String getBbieScCodeListName() {
-        return bieService.getCodeListName(getSelectedBbieScNode());
+        return bieService.getCodeListName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScCodeListName(String name) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
         CodeList codeList = codeListMap.get(name);
         if (codeList != null) {
-            node.setCodeListId(codeList.getCodeListId());
+            node.getBasicBusinessInformationEntitySupplementaryComponent().setCodeListId(codeList.getCodeListId());
         }
     }
 
@@ -391,7 +393,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieScCodeList(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, CodeList> codeLists = bieService.getCodeLists(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(codeLists.keySet());
@@ -403,15 +405,15 @@ public class CreateProfileBODBean {
     }
 
     public String getBbieScAgencyIdListName() {
-        return bieService.getBbieAgencyIdListName(getSelectedBbieScNode());
+        return bieService.getBbieAgencyIdListName(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public void setBbieScAgencyIdListName(String name) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         AgencyIdList agencyIdList = agencyIdListMap.get(name);
         if (agencyIdList != null) {
-            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+            node.getBasicBusinessInformationEntitySupplementaryComponent().setAgencyIdListId(agencyIdList.getAgencyIdListId());
         }
     }
 
@@ -420,7 +422,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInputForBbieScAgencyIdList(String query) {
-        BBIESCNode node = getSelectedBbieScNode();
+        BasicBusinessInformationEntitySupplementaryComponentTreeNode node = getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode();
         Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(agencyIdListMap.keySet());
@@ -476,9 +478,7 @@ public class CreateProfileBODBean {
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
-                        AssociationCoreComponentProperty selectedASCCP =
-                                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                        TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(selectedASCCP, selectedBusinessContext);
+                        TreeNode treeNode = createTreeNode();
                         setTreeNode(treeNode);
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
@@ -496,9 +496,135 @@ public class CreateProfileBODBean {
         }
     }
 
+    private TreeNode createTreeNode() {
+        AssociationCoreComponentProperty selectedASCCP =
+                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
+                treeNodeService.createBusinessInformationEntityTreeNode(selectedASCCP, selectedBusinessContext);
+        topLevelNode.setAttribute("isTopLevel", true);
+
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(topLevelNode, root);
+        setTreeNode(root);
+
+        return root;
+    }
+
+    private TreeNode toTreeNode(BusinessInformationEntityTreeNode node, TreeNode parent) {
+        TreeNodeTypeNameResolver typeNameResolver = getTreeNodeTypeNameResolver(node);
+        String name = typeNameResolver.getName();
+        node.setAttribute("name", name);
+
+        String type = typeNameResolver.getType();
+        TreeNode treeNode = new DefaultTreeNode(type, node, parent);
+        if (node.hasChild()) {
+            new DefaultTreeNode(null, treeNode);
+        }
+        return treeNode;
+    }
+
+    public TreeNodeTypeNameResolver getTreeNodeTypeNameResolver(BusinessInformationEntityTreeNode node) {
+        if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
+            return new AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
+                    (AssociationBusinessInformationEntityPropertyTreeNode) node);
+        } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
+            return new BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
+                    (BasicBusinessInformationEntityPropertyTreeNode) node);
+        } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
+            return new BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver(
+                    (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node);
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    private class AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
+
+        private AssociationBusinessInformationEntityPropertyTreeNode asbiepNode;
+
+        public AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
+                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode) {
+            this.asbiepNode = asbiepNode;
+        }
+
+        @Override
+        public String getType() {
+            Boolean isTopLevel = (Boolean) asbiepNode.getAttribute("isTopLevel");
+            if (isTopLevel != null && isTopLevel) {
+                return "ABIE";
+            }
+            return ("Extension".equals(getName())) ? "ASBIE-Extension" : "ASBIE";
+        }
+
+        @Override
+        public String getName() {
+            return asbiepNode.getAssociationCoreComponentProperty().getPropertyTerm();
+        }
+    }
+
+    private class BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
+
+        private BasicBusinessInformationEntityPropertyTreeNode bbiepNode;
+
+        public BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
+                BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
+            this.bbiepNode = bbiepNode;
+        }
+
+        @Override
+        public String getType() {
+            BasicBusinessInformationEntity bbie = bbiepNode.getBasicBusinessInformationEntity();
+            boolean isAttribute = (bbie.getSeqKey() == 0);
+            return (isAttribute ? "BBIE-Attribute" : "BBIE");
+        }
+
+        @Override
+        public String getName() {
+            return bbiepNode.getBasicCoreComponentProperty().getPropertyTerm();
+        }
+    }
+
+    private class BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
+
+        private BasicBusinessInformationEntitySupplementaryComponentTreeNode BasicBusinessInformationEntitySupplementaryComponentTreeNode;
+
+        public BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver(
+                BasicBusinessInformationEntitySupplementaryComponentTreeNode BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
+            this.BasicBusinessInformationEntitySupplementaryComponentTreeNode = BasicBusinessInformationEntitySupplementaryComponentTreeNode;
+        }
+
+        @Override
+        public String getType() {
+            return "BBIESC";
+        }
+
+        @Override
+        public String getName() {
+            DataTypeSupplementaryComponent bdtSc = BasicBusinessInformationEntitySupplementaryComponentTreeNode.getBusinessDataTypeSupplementaryComponent();
+            if (bdtSc.getRepresentationTerm().equalsIgnoreCase("Text") ||
+                    bdtSc.getPropertyTerm().contains(bdtSc.getRepresentationTerm())) {
+                return Utility.spaceSeparator(bdtSc.getPropertyTerm());
+            } else {
+                return Utility.spaceSeparator(bdtSc.getPropertyTerm().concat(bdtSc.getRepresentationTerm()));
+            }
+        }
+    }
+
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        bieTreeNodeHandler.expandLazyTreeNode(treeNode);
+
+        BusinessInformationEntityTreeNode bieNode = (BusinessInformationEntityTreeNode) treeNode.getData();
+        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
+        if (expanded == null || expanded == false) {
+            if (bieNode.hasChild()) {
+                treeNode.setChildren(new ArrayList()); // clear children
+
+                for (BusinessInformationEntityTreeNode child : bieNode.getChildren()) {
+                    toTreeNode(child, treeNode);
+                }
+            }
+            bieNode.setAttribute("expanded", true);
+        }
     }
 
     private void enableButtons() {
@@ -529,7 +655,7 @@ public class CreateProfileBODBean {
     @Transactional(rollbackFor = Throwable.class)
     public String submit() {
         progressListener = new ProgressListener();
-        bieTreeNodeHandler.submit(getTopLevelNode(), progressListener);
+        bieTreeNodeHandler.submit(null, progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }

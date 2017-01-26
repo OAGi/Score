@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.AggregateCoreComponent;
 public interface AggregateCoreComponentTreeNode extends CoreComponentTreeNode {
 
     public AggregateCoreComponent getAggregateCoreComponent();
+    public AggregateCoreComponent getAcc();
 
     public AggregateCoreComponentTreeNode getBase();
 

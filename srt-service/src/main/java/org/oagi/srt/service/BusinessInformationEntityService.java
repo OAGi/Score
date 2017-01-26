@@ -1,9 +1,9 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.BBIERestrictionType;
-import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.model.bie.BBIERestrictionType.*;
+import static org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
@@ -774,11 +774,11 @@ public class BusinessInformationEntityService {
     /*
      * for BBIE Primitive Restriction
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailablePrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node);
-        Map<BBIERestrictionType, BBIERestrictionType> availablePrimitiveRestrictions = new LinkedHashMap();
+        Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> availablePrimitiveRestrictions = new LinkedHashMap();
 
-        List<BBIERestrictionType> restrictionTypes = bdtPriRestriList.stream().map(e -> {
+        List<BasicBusinessInformationEntityRestrictionType> restrictionTypes = bdtPriRestriList.stream().map(e -> {
             if (e.getCdtAwdPriXpsTypeMapId() > 0L) {
                 return Primitive;
             } else if (e.getCodeListId() > 0L) {
@@ -812,8 +812,9 @@ public class BusinessInformationEntityService {
         return (sum == 0L);
     }
 
-    public String getBdtPrimitiveRestrictionName(BBIENode node) {
-        BusinessDataTypePrimitiveRestriction bdtPriRestri = node.getBdtPriRestri();
+    public String getBdtPrimitiveRestrictionName(BasicBusinessInformationEntityPropertyTreeNode node) {
+        BasicBusinessInformationEntity bbie = node.getBasicBusinessInformationEntity();
+        BusinessDataTypePrimitiveRestriction bdtPriRestri = bdtPriRestriRepository.findOne(bbie.getBdtPriRestriId());
         if (bdtPriRestri == null) {
             return null;
         }
@@ -829,15 +830,17 @@ public class BusinessInformationEntityService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void setBdtPrimitiveRestriction(BBIENode node, String name) {
+    public void setBdtPrimitiveRestriction(BasicBusinessInformationEntityPropertyTreeNode node, String name) {
         Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 getBdtPrimitiveRestrictions(node);
         BusinessDataTypePrimitiveRestriction bdtPriRestri =
                 bdtPrimitiveRestrictions.get(name);
-        node.setBdtPriRestri(bdtPriRestri);
+
+        BasicBusinessInformationEntity bbie = node.getBasicBusinessInformationEntity();
+        bbie.setBdtPriRestri(bdtPriRestri);
     }
 
-    public Map<String, BusinessDataTypePrimitiveRestriction> getBdtPrimitiveRestrictions(BBIENode node) {
+    public Map<String, BusinessDataTypePrimitiveRestriction> getBdtPrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
                 .filter(e -> e.getCdtAwdPriXpsTypeMapId() > 0L)
                 .collect(Collectors.toList());
@@ -855,17 +858,17 @@ public class BusinessInformationEntityService {
         return bdtPrimitiveRestrictions;
     }
 
-    public String getCodeListName(BBIENode node) {
+    public String getCodeListName(BasicBusinessInformationEntityPropertyTreeNode node) {
         Map<String, CodeList> codeListMap = getCodeLists(node);
         for (CodeList codeList : codeListMap.values()) {
-            if (codeList.getCodeListId() == node.getCodeListId()) {
+            if (codeList.getCodeListId() == node.getBasicBusinessInformationEntity().getCodeListId()) {
                 return codeList.getName();
             }
         }
         return null;
     }
 
-    public Map<String, CodeList> getCodeLists(BBIENode node) {
+    public Map<String, CodeList> getCodeLists(BasicBusinessInformationEntityPropertyTreeNode node) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
                 .filter(e -> e.getCodeListId() > 0L)
                 .collect(Collectors.toList());
@@ -892,17 +895,17 @@ public class BusinessInformationEntityService {
         return codeListMap;
     }
 
-    public String getBbieAgencyIdListName(BBIENode node) {
+    public String getBbieAgencyIdListName(BasicBusinessInformationEntityPropertyTreeNode node) {
         Map<String, AgencyIdList> agencyIdListMap = getAgencyIdListIds(node);
         for (AgencyIdList agencyIdList : agencyIdListMap.values()) {
-            if (agencyIdList.getAgencyIdListId() == node.getAgencyIdListId()) {
+            if (agencyIdList.getAgencyIdListId() == node.getBasicBusinessInformationEntity().getAgencyIdListId()) {
                 return agencyIdList.getName();
             }
         }
         return null;
     }
 
-    public Map<String, AgencyIdList> getAgencyIdListIds(BBIENode node) {
+    public Map<String, AgencyIdList> getAgencyIdListIds(BasicBusinessInformationEntityPropertyTreeNode node) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
                 .filter(e -> e.getAgencyIdListId() > 0L)
                 .collect(Collectors.toList());
@@ -920,7 +923,7 @@ public class BusinessInformationEntityService {
         return agencyIdListIdMap;
     }
 
-    private List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList(BBIENode node) {
+    private List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList(BasicBusinessInformationEntityPropertyTreeNode node) {
         BasicBusinessInformationEntity bbie = node.getBbie();
         BasicCoreComponent bcc = bccRepository.findOne(bbie.getBasedBccId());
         BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
@@ -932,11 +935,11 @@ public class BusinessInformationEntityService {
     /*
      * for BBIE_SC Primitive Restriction
      */
-    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIESCNode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailablePrimitiveRestrictions(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = getBdtScPriRestriList(node);
-        Map<BBIERestrictionType, BBIERestrictionType> availablePrimitiveRestrictions = new LinkedHashMap();
+        Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> availablePrimitiveRestrictions = new LinkedHashMap();
 
-        List<BBIERestrictionType> restrictionTypes = bdtScPriRestriList.stream().map(e -> {
+        List<BasicBusinessInformationEntityRestrictionType> restrictionTypes = bdtScPriRestriList.stream().map(e -> {
             if (e.getCdtScAwdPriXpsTypeMapId() > 0L) {
                 return Primitive;
             } else if (e.getCodeListId() > 0L) {
@@ -970,8 +973,10 @@ public class BusinessInformationEntityService {
         return (sum == 0L);
     }
 
-    public String getBdtScPrimitiveRestrictionName(BBIESCNode node) {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri = node.getBdtScPriRestri();
+    public String getBdtScPrimitiveRestrictionName(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
+        BasicBusinessInformationEntitySupplementaryComponent bbieSc = node.getBasicBusinessInformationEntitySupplementaryComponent();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                bdtScPriRestriRepository.findOne(bbieSc.getDtScPriRestriId());
         if (bdtScPriRestri == null) {
             return null;
         }
@@ -987,7 +992,7 @@ public class BusinessInformationEntityService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void setBdtScPrimitiveRestriction(BBIESCNode node, String name) {
+    public void setBdtScPrimitiveRestriction(BasicBusinessInformationEntitySupplementaryComponentTreeNode node, String name) {
         Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtPrimitiveRestrictions =
                 getBdtScPrimitiveRestrictions(node);
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
@@ -995,10 +1000,10 @@ public class BusinessInformationEntityService {
         if (bdtScPriRestri == null) {
             return;
         }
-        node.setBdtScPriRestri(bdtScPriRestri);
+        node.getBasicBusinessInformationEntitySupplementaryComponent().setDtScPriRestri(bdtScPriRestri);
     }
 
-    public Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBdtScPrimitiveRestrictions(BBIESCNode node) {
+    public Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBdtScPrimitiveRestrictions(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = getBdtScPriRestriList(node).stream()
                 .filter(e -> e.getCdtScAwdPriXpsTypeMapId() > 0L)
                 .collect(Collectors.toList());
@@ -1016,17 +1021,17 @@ public class BusinessInformationEntityService {
         return bdtPrimitiveRestrictions;
     }
 
-    public String getCodeListName(BBIESCNode node) {
+    public String getCodeListName(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         Map<String, CodeList> codeListMap = getCodeLists(node);
         for (CodeList codeList : codeListMap.values()) {
-            if (codeList.getCodeListId() == node.getCodeListId()) {
+            if (codeList.getCodeListId() == node.getBasicBusinessInformationEntitySupplementaryComponent().getCodeListId()) {
                 return codeList.getName();
             }
         }
         return null;
     }
 
-    public Map<String, CodeList> getCodeLists(BBIESCNode node) {
+    public Map<String, CodeList> getCodeLists(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = getBdtScPriRestriList(node).stream()
                 .filter(e -> e.getCodeListId() > 0L)
                 .collect(Collectors.toList());
@@ -1053,17 +1058,17 @@ public class BusinessInformationEntityService {
         return codeListMap;
     }
 
-    public String getBbieAgencyIdListName(BBIESCNode node) {
+    public String getBbieAgencyIdListName(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         Map<String, AgencyIdList> agencyIdListMap = getAgencyIdListIds(node);
         for (AgencyIdList agencyIdList : agencyIdListMap.values()) {
-            if (agencyIdList.getAgencyIdListId() == node.getAgencyIdListId()) {
+            if (agencyIdList.getAgencyIdListId() == node.getBasicBusinessInformationEntitySupplementaryComponent().getAgencyIdListId()) {
                 return agencyIdList.getName();
             }
         }
         return null;
     }
 
-    public Map<String, AgencyIdList> getAgencyIdListIds(BBIESCNode node) {
+    public Map<String, AgencyIdList> getAgencyIdListIds(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = getBdtScPriRestriList(node).stream()
                 .filter(e -> e.getAgencyIdListId() > 0L)
                 .collect(Collectors.toList());
@@ -1081,8 +1086,8 @@ public class BusinessInformationEntityService {
         return agencyIdListIdMap;
     }
 
-    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBdtScPriRestriList(BBIESCNode node) {
-        BasicBusinessInformationEntitySupplementaryComponent bbieSc = node.getBbieSc();
+    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBdtScPriRestriList(BasicBusinessInformationEntitySupplementaryComponentTreeNode node) {
+        BasicBusinessInformationEntitySupplementaryComponent bbieSc = node.getBasicBusinessInformationEntitySupplementaryComponent();
         long bdtScId = bbieSc.getDtScId();
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
                 bdtScPriRestriRepository.findByBdtScId(bdtScId);

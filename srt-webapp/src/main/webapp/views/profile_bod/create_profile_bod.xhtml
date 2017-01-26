@@ -128,7 +128,7 @@
                                                 update=":form:treeTable"/>
                                         <p:ajax event="select" update=":form:details"/>
                                         <p:column headerText="#{createProfileBODBean.getModule(createProfileBODBean.topLevelNode.asccp.moduleId)}">
-                                            <h:outputText value="#{node.name}"/>
+                                            <h:outputText value="#{createProfileBODBean.getTreeNodeTypeNameResolver(node).name}"/>
                                         </p:column>
                                     </p:treeTable>
                                 </div>
@@ -148,7 +148,7 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>
                                                         <h:outputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.name}"
+                                                                value="#{createProfileBODBean.getTreeNodeTypeNameResolver(createProfileBODBean.selectedTreeNode.data).name}"
                                                                 styleClass="section-content"/>
                                                     </h:panelGrid>
                                                 </p:panel>
@@ -156,35 +156,35 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Version" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.version}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.version}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Status" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.status}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.status}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
@@ -203,7 +203,7 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>
                                                         <h:outputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.name}"
+                                                                value="#{createProfileBODBean.getTreeNodeTypeNameResolver(createProfileBODBean.selectedTreeNode.data).name}"
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
@@ -289,21 +289,21 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="abiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
                                                         <h:inputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="abiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
@@ -323,7 +323,7 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>
                                                         <h:outputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.name}"
+                                                                value="#{createProfileBODBean.getTreeNodeTypeNameResolver(createProfileBODBean.selectedTreeNode.data).name}"
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
@@ -486,7 +486,7 @@
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>
                                                         <h:outputText
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.name}"
+                                                                value="#{createProfileBODBean.getTreeNodeTypeNameResolver(createProfileBODBean.selectedTreeNode.data).name}"
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>

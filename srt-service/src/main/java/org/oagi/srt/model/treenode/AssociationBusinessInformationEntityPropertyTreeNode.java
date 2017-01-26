@@ -7,13 +7,19 @@ import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 
 public interface AssociationBusinessInformationEntityPropertyTreeNode extends BusinessInformationEntityTreeNode {
 
+    public AssociationBusinessInformationEntityPropertyTreeNode getParent();
+
     public AssociationBusinessInformationEntityProperty getAssociationBusinessInformationEntityProperty();
+    public AssociationBusinessInformationEntityProperty getAsbiep();
 
     public AssociationCoreComponentProperty getAssociationCoreComponentProperty();
+    public AssociationCoreComponentProperty getAsccp();
 
     public AssociationBusinessInformationEntity getAssociationBusinessInformationEntity();
+    public AssociationBusinessInformationEntity getAsbie();
 
     public AssociationCoreComponent getAssociationCoreComponent();
+    public AssociationCoreComponent getAscc();
 
     public AggregateBusinessInformationEntityTreeNode getType();
 }

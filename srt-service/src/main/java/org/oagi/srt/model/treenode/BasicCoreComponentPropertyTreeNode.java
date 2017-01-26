@@ -7,8 +7,11 @@ import org.oagi.srt.repository.entity.DataType;
 public interface BasicCoreComponentPropertyTreeNode extends CoreComponentPropertyTreeNode {
 
     public BasicCoreComponent getBasicCoreComponent();
+    public BasicCoreComponent getBcc();
 
     public BasicCoreComponentProperty getBasicCoreComponentProperty();
+    public BasicCoreComponentProperty getBccp();
 
-    public DataType getDataType();
+    public DataType getBusinessDataType();
+    public DataType getBdt();
 }
