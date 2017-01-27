@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.component.treenode;
 
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 

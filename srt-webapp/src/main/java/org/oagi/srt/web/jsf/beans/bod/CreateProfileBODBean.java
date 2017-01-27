@@ -1,6 +1,5 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
@@ -9,8 +8,7 @@ import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.TreeNodeService;
-import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
-import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
+import org.oagi.srt.service.TreeNodeService.ProgressListener;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.NodeExpandEvent;
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class CreateProfileBODBean {
+public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -74,8 +72,6 @@ public class CreateProfileBODBean {
      */
     @Autowired
     private BusinessInformationEntityService bieService;
-    @Autowired
-    private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private TreeNodeService treeNodeService;
     @Autowired
@@ -478,8 +474,7 @@ public class CreateProfileBODBean {
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
-                        TreeNode treeNode = createTreeNode();
-                        setTreeNode(treeNode);
+                        createTreeNode();
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -508,106 +503,6 @@ public class CreateProfileBODBean {
         setTreeNode(root);
 
         return root;
-    }
-
-    private TreeNode toTreeNode(BusinessInformationEntityTreeNode node, TreeNode parent) {
-        TreeNodeTypeNameResolver typeNameResolver = getTreeNodeTypeNameResolver(node);
-        String name = typeNameResolver.getName();
-        node.setAttribute("name", name);
-
-        String type = typeNameResolver.getType();
-        TreeNode treeNode = new DefaultTreeNode(type, node, parent);
-        if (node.hasChild()) {
-            new DefaultTreeNode(null, treeNode);
-        }
-        return treeNode;
-    }
-
-    public TreeNodeTypeNameResolver getTreeNodeTypeNameResolver(BusinessInformationEntityTreeNode node) {
-        if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-            return new AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
-                    (AssociationBusinessInformationEntityPropertyTreeNode) node);
-        } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-            return new BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
-                    (BasicBusinessInformationEntityPropertyTreeNode) node);
-        } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-            return new BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver(
-                    (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node);
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    private class AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
-
-        private AssociationBusinessInformationEntityPropertyTreeNode asbiepNode;
-
-        public AssociationBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode) {
-            this.asbiepNode = asbiepNode;
-        }
-
-        @Override
-        public String getType() {
-            Boolean isTopLevel = (Boolean) asbiepNode.getAttribute("isTopLevel");
-            if (isTopLevel != null && isTopLevel) {
-                return "ABIE";
-            }
-            return ("Extension".equals(getName())) ? "ASBIE-Extension" : "ASBIE";
-        }
-
-        @Override
-        public String getName() {
-            return asbiepNode.getAssociationCoreComponentProperty().getPropertyTerm();
-        }
-    }
-
-    private class BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
-
-        private BasicBusinessInformationEntityPropertyTreeNode bbiepNode;
-
-        public BasicBusinessInformationEntityPropertyTreeNodeTypeNameResolver(
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
-            this.bbiepNode = bbiepNode;
-        }
-
-        @Override
-        public String getType() {
-            BasicBusinessInformationEntity bbie = bbiepNode.getBasicBusinessInformationEntity();
-            boolean isAttribute = (bbie.getSeqKey() == 0);
-            return (isAttribute ? "BBIE-Attribute" : "BBIE");
-        }
-
-        @Override
-        public String getName() {
-            return bbiepNode.getBasicCoreComponentProperty().getPropertyTerm();
-        }
-    }
-
-    private class BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
-
-        private BasicBusinessInformationEntitySupplementaryComponentTreeNode BasicBusinessInformationEntitySupplementaryComponentTreeNode;
-
-        public BasicBusinessInformationEntitySupplementaryComponentTreeNodeTypeNameResolver(
-                BasicBusinessInformationEntitySupplementaryComponentTreeNode BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-            this.BasicBusinessInformationEntitySupplementaryComponentTreeNode = BasicBusinessInformationEntitySupplementaryComponentTreeNode;
-        }
-
-        @Override
-        public String getType() {
-            return "BBIESC";
-        }
-
-        @Override
-        public String getName() {
-            DataTypeSupplementaryComponent bdtSc = BasicBusinessInformationEntitySupplementaryComponentTreeNode.getBusinessDataTypeSupplementaryComponent();
-            if (bdtSc.getRepresentationTerm().equalsIgnoreCase("Text") ||
-                    bdtSc.getPropertyTerm().contains(bdtSc.getRepresentationTerm())) {
-                return Utility.spaceSeparator(bdtSc.getPropertyTerm());
-            } else {
-                return Utility.spaceSeparator(bdtSc.getPropertyTerm().concat(bdtSc.getRepresentationTerm()));
-            }
-        }
     }
 
     public void expand(NodeExpandEvent expandEvent) {
@@ -655,7 +550,9 @@ public class CreateProfileBODBean {
     @Transactional(rollbackFor = Throwable.class)
     public String submit() {
         progressListener = new ProgressListener();
-        bieTreeNodeHandler.submit(null, progressListener);
+
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+        treeNodeService.submit(topLevelNode, getCurrentUser(), progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }

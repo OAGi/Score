@@ -2,16 +2,13 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.bie.ASBIENode;
-import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
-import org.oagi.srt.web.handler.UIHandler;
+import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
@@ -45,10 +42,12 @@ import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityS
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class EditProfileBODBean extends UIHandler {
+public class EditProfileBODBean extends AbstractProfileBODBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private TreeNodeService treeNodeService;
     @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
@@ -96,8 +95,7 @@ public class EditProfileBODBean extends UIHandler {
         }
         setTopLevelAbie(topLevelAbie);
 
-        TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(topLevelAbie);
-        setTreeNode(treeNode);
+        createTreeNode();
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
                 bieUserExtRevisionRepository.findByTopLevelAbieId(topLevelAbieId);
@@ -106,6 +104,18 @@ public class EditProfileBODBean extends UIHandler {
         if (!bieUserExtRevisionList.isEmpty()) {
             RequestContext.getCurrentInstance().execute("PF('notifyExtensionChange').show()");
         }
+    }
+
+    private TreeNode createTreeNode() {
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
+                treeNodeService.createBusinessInformationEntityTreeNode(topLevelAbie);
+        topLevelNode.setAttribute("isTopLevel", true);
+
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(topLevelNode, root);
+        setTreeNode(root);
+
+        return root;
     }
 
     public TopLevelAbie getTopLevelAbie() {
@@ -233,9 +243,9 @@ public class EditProfileBODBean extends UIHandler {
         this.treeNode = treeNode;
     }
 
-    public TopLevelNode getTopLevelNode() {
+    public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
         TreeNode treeNode = getTreeNode();
-        return (TopLevelNode) treeNode.getChildren().get(0).getData();
+        return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -453,13 +463,25 @@ public class EditProfileBODBean extends UIHandler {
      */
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        bieTreeNodeHandler.expandLazyTreeNode(treeNode);
+
+        BusinessInformationEntityTreeNode bieNode = (BusinessInformationEntityTreeNode) treeNode.getData();
+        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
+        if (expanded == null || expanded == false) {
+            if (bieNode.hasChild()) {
+                treeNode.setChildren(new ArrayList()); // clear children
+
+                for (BusinessInformationEntityTreeNode child : bieNode.getChildren()) {
+                    toTreeNode(child, treeNode);
+                }
+            }
+            bieNode.setAttribute("expanded", true);
+        }
     }
 
     @Transactional(readOnly = false, rollbackFor = Throwable.class)
     public void update() {
         try {
-            bieTreeNodeHandler.update(getTopLevelNode());
+            treeNodeService.update(getTopLevelNode(), getCurrentUser());
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
         } catch (Throwable t) {
@@ -472,8 +494,8 @@ public class EditProfileBODBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String updateState(AggregateBusinessInformationEntityState state) {
         try {
-            TopLevelNode topLevelNode = getTopLevelNode();
-            long topLevelAbieId = topLevelNode.getAbie().getOwnerTopLevelAbieId();
+            AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+            long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
             bieService.updateState(topLevelAbieId, state);
 
             return "/views/profile_bod/list.xhtml?faces-redirect=true";
@@ -550,7 +572,7 @@ public class EditProfileBODBean extends UIHandler {
             eAcc = extensionService.getExtensionAcc(asccp, isLocally);
         }
 
-        TopLevelNode topLevelNode = getTopLevelNode();
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
         return "/views/core_component/extension.xhtml?accId=" + eAcc.getAccId() +
                 "&rootAsccpId=" + topLevelNode.getAsccp().getAsccpId() + "&faces-redirect=true";
     }

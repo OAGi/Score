@@ -15,7 +15,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "bbie_sc")
-public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable, IdEntity, Usable {
+public class BasicBusinessInformationEntitySupplementaryComponent
+        implements BusinessInformationEntity, Usable, Serializable {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
 

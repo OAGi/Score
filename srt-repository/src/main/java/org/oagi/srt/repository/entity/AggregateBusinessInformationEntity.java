@@ -13,7 +13,7 @@ import java.util.*;
 @Entity
 @Table(name = "abie")
 public class AggregateBusinessInformationEntity
-        implements Serializable, TimestampAware, IdEntity, IGuidEntity {
+        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
 

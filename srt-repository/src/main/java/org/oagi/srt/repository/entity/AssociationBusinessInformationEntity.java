@@ -12,7 +12,7 @@ import java.util.*;
 @Entity
 @Table(name = "asbie")
 public class AssociationBusinessInformationEntity
-        implements Serializable, TimestampAware, IdEntity, BusinessInformationEntity, Usable {
+        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable, Serializable {
 
     public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
 
