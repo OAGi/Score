@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
@@ -421,5 +422,21 @@ public class AggregateBusinessInformationEntity
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public AggregateBusinessInformationEntity clone() {
+        AggregateBusinessInformationEntity clone = new AggregateBusinessInformationEntity();
+        clone.guid = Utility.generateGUID();
+        clone.basedAccId = this.basedAccId;
+        clone.bizCtxId = this.bizCtxId;
+        clone.definition = this.definition;
+        clone.state = this.state;
+        clone.clientId = this.clientId;
+        clone.version = this.version;
+        clone.status = this.status;
+        clone.remark = this.remark;
+        clone.bizTerm = this.bizTerm;
+        return clone;
     }
 }

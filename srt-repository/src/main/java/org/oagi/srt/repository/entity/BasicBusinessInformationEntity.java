@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -146,6 +147,10 @@ public class BasicBusinessInformationEntity
         this.fromAbieId = fromAbieId;
     }
 
+    public AggregateBusinessInformationEntity getFromAbie() {
+        return fromAbie;
+    }
+
     public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
         this.fromAbie = fromAbie;
     }
@@ -156,6 +161,10 @@ public class BasicBusinessInformationEntity
 
     public void setToBbiepId(long toBbiepId) {
         this.toBbiepId = toBbiepId;
+    }
+
+    public BasicBusinessInformationEntityProperty getToBbiep() {
+        return toBbiep;
     }
 
     public void setToBbiep(BasicBusinessInformationEntityProperty toBbiep) {
@@ -518,5 +527,28 @@ public class BasicBusinessInformationEntity
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public BasicBusinessInformationEntity clone() {
+        BasicBusinessInformationEntity clone = new BasicBusinessInformationEntity();
+        clone.guid = Utility.generateGUID();
+        clone.basedBccId = this.basedBccId;
+        clone.fromAbieId = this.fromAbieId;
+        clone.toBbiepId = this.toBbiepId;
+        clone.bdtPriRestriId = this.bdtPriRestriId;
+        clone.codeListId = this.codeListId;
+        clone.agencyIdListId = this.agencyIdListId;
+        clone.cardinalityMin = this.cardinalityMin;
+        clone.cardinalityMax = this.cardinalityMax;
+        clone.defaultValue = this.defaultValue;
+        clone.nillable = this.nillable;
+        clone.fixedValue = this.fixedValue;
+        clone.nill = this.nill;
+        clone.definition = this.definition;
+        clone.remark = this.remark;
+        clone.seqKey = this.seqKey;
+        clone.used = this.used;
+        return clone;
     }
 }

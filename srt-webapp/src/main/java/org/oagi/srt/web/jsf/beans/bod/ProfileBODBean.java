@@ -42,7 +42,7 @@ public class ProfileBODBean extends UIHandler {
         allProfileBODs = profileBODRepository.findAll();
         setProfileBODs(
                 allProfileBODs.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .sorted((a, b) -> b.getCreationTimestamp().compareTo(a.getCreationTimestamp()))
                         .collect(Collectors.toList())
         );
     }

@@ -79,7 +79,6 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private ModuleRepository moduleRepository;
 
-    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     public List<TopLevelConcept> getAllTopLevelConcepts() {
@@ -204,19 +203,6 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     public void setSelectedBusinessContext(BusinessContext selectedBusinessContext) {
         this.selectedBusinessContext = selectedBusinessContext;
-    }
-
-    public TreeNode getTreeNode() {
-        return treeNode;
-    }
-
-    public void setTreeNode(TreeNode treeNode) {
-        this.treeNode = treeNode;
-    }
-
-    public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
-        TreeNode treeNode = getTreeNode();
-        return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -474,7 +460,10 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
-                        createTreeNode();
+                        AssociationCoreComponentProperty selectedASCCP =
+                                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+
+                        createTreeNode(selectedASCCP, selectedBusinessContext);
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -488,37 +477,6 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
             return nextStep;
         } finally {
             enableButtons();
-        }
-    }
-
-    private TreeNode createTreeNode() {
-        AssociationCoreComponentProperty selectedASCCP =
-                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
-                treeNodeService.createBusinessInformationEntityTreeNode(selectedASCCP, selectedBusinessContext);
-        topLevelNode.setAttribute("isTopLevel", true);
-
-        TreeNode root = new DefaultTreeNode();
-        toTreeNode(topLevelNode, root);
-        setTreeNode(root);
-
-        return root;
-    }
-
-    public void expand(NodeExpandEvent expandEvent) {
-        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-
-        BusinessInformationEntityTreeNode bieNode = (BusinessInformationEntityTreeNode) treeNode.getData();
-        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
-        if (expanded == null || expanded == false) {
-            if (bieNode.hasChild()) {
-                treeNode.setChildren(new ArrayList()); // clear children
-
-                for (BusinessInformationEntityTreeNode child : bieNode.getChildren()) {
-                    toTreeNode(child, treeNode);
-                }
-            }
-            bieNode.setAttribute("expanded", true);
         }
     }
 

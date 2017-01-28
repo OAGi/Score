@@ -5,14 +5,77 @@ import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyT
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.model.treenode.BusinessInformationEntityTreeNode;
-import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
-import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
+import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
+import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
+@Component
 abstract class AbstractProfileBODBean extends UIHandler {
+
+    @Autowired
+    private TreeNodeService treeNodeService;
+
+    private TreeNode treeNode;
+
+    TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bixCtx) {
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
+                treeNodeService.createBusinessInformationEntityTreeNode(asccp, bixCtx);
+        return createTreeNode(topLevelNode);
+    }
+
+    TreeNode createTreeNode(TopLevelAbie topLevelAbie) {
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
+                treeNodeService.createBusinessInformationEntityTreeNode(topLevelAbie);
+        return createTreeNode(topLevelNode);
+    }
+
+    private TreeNode createTreeNode(AssociationBusinessInformationEntityPropertyTreeNode topLevelNode) {
+        topLevelNode.setAttribute("isTopLevel", true);
+
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(topLevelNode, root);
+        setTreeNode(root);
+
+        return root;
+    }
+
+    public TreeNode getTreeNode() {
+        return treeNode;
+    }
+
+    public void setTreeNode(TreeNode treeNode) {
+        this.treeNode = treeNode;
+    }
+
+    public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
+        TreeNode treeNode = getTreeNode();
+        return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
+    }
+
+    public void expand(NodeExpandEvent expandEvent) {
+        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
+
+        BusinessInformationEntityTreeNode bieNode = (BusinessInformationEntityTreeNode) treeNode.getData();
+        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
+        if (expanded == null || expanded == false) {
+            if (bieNode.hasChild()) {
+                treeNode.setChildren(new ArrayList()); // clear children
+
+                for (BusinessInformationEntityTreeNode child : bieNode.getChildren()) {
+                    toTreeNode(child, treeNode);
+                }
+            }
+            bieNode.setAttribute("expanded", true);
+        }
+    }
 
     TreeNode toTreeNode(BusinessInformationEntityTreeNode node, TreeNode parent) {
         TreeNodeTypeNameResolver typeNameResolver = getTreeNodeTypeNameResolver(node);

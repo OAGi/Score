@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -245,6 +246,7 @@ public class BasicBusinessInformationEntityProperty
                     bbiep.setOwnerTopLevelAbieId(bbiep.ownerTopLevelAbie.getTopLevelAbieId());
                 }
             }
+
             @Override
             public void onPostPersist(Object object) {
             }
@@ -318,5 +320,16 @@ public class BasicBusinessInformationEntityProperty
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public BasicBusinessInformationEntityProperty clone() {
+        BasicBusinessInformationEntityProperty clone = new BasicBusinessInformationEntityProperty();
+        clone.guid = Utility.generateGUID();
+        clone.basedBccpId = this.basedBccpId;
+        clone.definition = this.definition;
+        clone.remark = this.remark;
+        clone.bizTerm = this.bizTerm;
+        return clone;
     }
 }

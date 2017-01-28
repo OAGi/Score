@@ -1,14 +1,15 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
+import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.service.TreeNodeService;
+import org.oagi.srt.service.TreeNodeService.ProgressListener;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
-import org.oagi.srt.web.jsf.component.treenode.ProgressListener;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class CopyProfileBODBean {
+public class CopyProfileBODBean extends AbstractProfileBODBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -72,6 +73,8 @@ public class CopyProfileBODBean {
     private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
     private BusinessInformationEntityService bieService;
+    @Autowired
+    private TreeNodeService treeNodeService;
     @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
@@ -204,19 +207,6 @@ public class CopyProfileBODBean {
 
     public void setSelectedBusinessContext(BusinessContext selectedBusinessContext) {
         this.selectedBusinessContext = selectedBusinessContext;
-    }
-
-    public TreeNode getTreeNode() {
-        return treeNode;
-    }
-
-    public void setTreeNode(TreeNode treeNode) {
-        this.treeNode = treeNode;
-    }
-
-    public BaseTopLevelNode getTopLevelNode() {
-        TreeNode treeNode = getTreeNode();
-        return (BaseTopLevelNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -477,7 +467,8 @@ public class CopyProfileBODBean {
                         } else {
                             TopLevelAbie topLevelAbie =
                                     topLevelAbieRepository.findOne(selectedProfileBOD.getTopLevelAbieId());
-                            setTreeNode(bieTreeNodeHandler.createTreeNode(topLevelAbie));
+
+                            createTreeNode(topLevelAbie);
 
                             requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                             requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -528,7 +519,9 @@ public class CopyProfileBODBean {
     @Transactional(rollbackFor = Throwable.class)
     public String copy() {
         progressListener = new ProgressListener();
-        bieTreeNodeHandler.copy(getTopLevelNode(), getSelectedBusinessContext(), progressListener);
+
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+        treeNodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }

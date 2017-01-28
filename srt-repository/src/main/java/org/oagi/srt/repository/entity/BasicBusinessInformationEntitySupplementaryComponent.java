@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -115,6 +116,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
     public void setBbieId(long bbieId) {
         this.bbieId = bbieId;
+    }
+
+    public BasicBusinessInformationEntity getBbie() {
+        return bbie;
     }
 
     public void setBbie(BasicBusinessInformationEntity bbie) {
@@ -419,5 +424,26 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public BasicBusinessInformationEntitySupplementaryComponent clone() {
+        BasicBusinessInformationEntitySupplementaryComponent clone =
+                new BasicBusinessInformationEntitySupplementaryComponent();
+        clone.guid = Utility.generateGUID();
+        clone.bbieId = this.bbieId;
+        clone.dtScId = this.dtScId;
+        clone.dtScPriRestriId = this.dtScPriRestriId;
+        clone.codeListId = this.codeListId;
+        clone.agencyIdListId = this.agencyIdListId;
+        clone.cardinalityMin = this.cardinalityMin;
+        clone.cardinalityMax = this.cardinalityMax;
+        clone.defaultValue = this.defaultValue;
+        clone.fixedValue = this.fixedValue;
+        clone.definition = this.definition;
+        clone.remark = this.remark;
+        clone.bizTerm = this.bizTerm;
+        clone.used = this.used;
+        return clone;
     }
 }

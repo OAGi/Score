@@ -79,7 +79,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     private TopLevelAbie topLevelAbie;
     private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
-    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     private String selectedCodeListName;
@@ -95,7 +94,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         }
         setTopLevelAbie(topLevelAbie);
 
-        createTreeNode();
+        createTreeNode(topLevelAbie);
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
                 bieUserExtRevisionRepository.findByTopLevelAbieId(topLevelAbieId);
@@ -104,18 +103,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         if (!bieUserExtRevisionList.isEmpty()) {
             RequestContext.getCurrentInstance().execute("PF('notifyExtensionChange').show()");
         }
-    }
-
-    private TreeNode createTreeNode() {
-        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
-                treeNodeService.createBusinessInformationEntityTreeNode(topLevelAbie);
-        topLevelNode.setAttribute("isTopLevel", true);
-
-        TreeNode root = new DefaultTreeNode();
-        toTreeNode(topLevelNode, root);
-        setTreeNode(root);
-
-        return root;
     }
 
     public TopLevelAbie getTopLevelAbie() {
@@ -233,19 +220,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         }
 
         return false;
-    }
-
-    public TreeNode getTreeNode() {
-        return treeNode;
-    }
-
-    public void setTreeNode(TreeNode treeNode) {
-        this.treeNode = treeNode;
-    }
-
-    public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
-        TreeNode treeNode = getTreeNode();
-        return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -461,23 +435,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     /*
      * handle command buttons.
      */
-    public void expand(NodeExpandEvent expandEvent) {
-        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-
-        BusinessInformationEntityTreeNode bieNode = (BusinessInformationEntityTreeNode) treeNode.getData();
-        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
-        if (expanded == null || expanded == false) {
-            if (bieNode.hasChild()) {
-                treeNode.setChildren(new ArrayList()); // clear children
-
-                for (BusinessInformationEntityTreeNode child : bieNode.getChildren()) {
-                    toTreeNode(child, treeNode);
-                }
-            }
-            bieNode.setAttribute("expanded", true);
-        }
-    }
-
     @Transactional(readOnly = false, rollbackFor = Throwable.class)
     public void update() {
         try {

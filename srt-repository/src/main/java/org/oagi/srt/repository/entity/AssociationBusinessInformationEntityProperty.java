@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -116,6 +117,10 @@ public class AssociationBusinessInformationEntityProperty
 
     public void setRoleOfAbieId(long roleOfAbieId) {
         this.roleOfAbieId = roleOfAbieId;
+    }
+
+    public AggregateBusinessInformationEntity getRoleOfAbie() {
+        return roleOfAbie;
     }
 
     public void setRoleOfAbie(AggregateBusinessInformationEntity roleOfAbie) {
@@ -235,6 +240,7 @@ public class AssociationBusinessInformationEntityProperty
                     asbiep.setOwnerTopLevelAbieId(asbiep.ownerTopLevelAbie.getTopLevelAbieId());
                 }
             }
+
             @Override
             public void onPostPersist(Object object) {
             }
@@ -308,5 +314,17 @@ public class AssociationBusinessInformationEntityProperty
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public AssociationBusinessInformationEntityProperty clone() {
+        AssociationBusinessInformationEntityProperty clone = new AssociationBusinessInformationEntityProperty();
+        clone.guid = Utility.generateGUID();
+        clone.basedAsccpId = this.basedAsccpId;
+        clone.roleOfAbieId = this.roleOfAbieId;
+        clone.definition = this.definition;
+        clone.remark = this.remark;
+        clone.bizTerm = this.bizTerm;
+        return clone;
     }
 }

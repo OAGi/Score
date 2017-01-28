@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -124,16 +125,24 @@ public class AssociationBusinessInformationEntity
         this.fromAbieId = fromAbieId;
     }
 
-    public long getToAsbiepId() {
-        return toAsbiepId;
+    public AggregateBusinessInformationEntity getFromAbie() {
+        return fromAbie;
     }
 
     public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
         this.fromAbie = fromAbie;
     }
 
+    public long getToAsbiepId() {
+        return toAsbiepId;
+    }
+
     public void setToAsbiepId(long toAsbiepId) {
         this.toAsbiepId = toAsbiepId;
+    }
+
+    public AssociationBusinessInformationEntityProperty getToAsbiep() {
+        return toAsbiep;
     }
 
     public void setToAsbiep(AssociationBusinessInformationEntityProperty toAsbiep) {
@@ -398,5 +407,22 @@ public class AssociationBusinessInformationEntity
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    @Override
+    public AssociationBusinessInformationEntity clone() {
+        AssociationBusinessInformationEntity clone = new AssociationBusinessInformationEntity();
+        clone.guid = Utility.generateGUID();
+        clone.fromAbieId = this.fromAbieId;
+        clone.toAsbiepId = this.toAsbiepId;
+        clone.basedAsccId = this.basedAsccId;
+        clone.definition = this.definition;
+        clone.cardinalityMin = this.cardinalityMin;
+        clone.cardinalityMax = this.cardinalityMax;
+        clone.nillable = this.nillable;
+        clone.remark = this.remark;
+        clone.seqKey = this.seqKey;
+        clone.used = this.used;
+        return clone;
     }
 }

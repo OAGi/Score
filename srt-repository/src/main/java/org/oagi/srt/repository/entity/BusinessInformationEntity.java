@@ -16,4 +16,6 @@ public interface BusinessInformationEntity extends IdEntity, IGuidEntity {
 
     public void addUpdateEventListener(UpdateEventListener updateEventListener);
 
+    public BusinessInformationEntity clone();
+
 }

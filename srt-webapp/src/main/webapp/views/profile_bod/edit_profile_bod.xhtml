@@ -66,6 +66,10 @@
                                         update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column headerText="#{editProfileBODBean.getModule(editProfileBODBean.topLevelNode.asccp.moduleId)}">
+                                    <h:selectBooleanCheckbox rendered="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
+                                                             value="${node.used}" style="margin-right: 5px;">
+                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
+                                    </h:selectBooleanCheckbox>
                                     <h:outputText value="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).name}"/>
                                 </p:column>
                             </p:treeTable>
@@ -162,7 +166,7 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <f:ajax render="asbieHeaderPanelForEditing"/>
+                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -171,7 +175,8 @@
                                                     <h:outputText value="Min" styleClass="section-label"/>
                                                     <p:selectOneMenu
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="0" itemValue="0"/>
                                                         <f:selectItem itemLabel="1" itemValue="1"/>
                                                         <f:ajax render="asbiePanelForEditing"/>
@@ -180,7 +185,8 @@
                                                     <h:outputText value="Max" styleClass="section-label"/>
                                                     <p:selectOneMenu editable="true"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
-                                                                     styleClass="section-content input-section">
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
@@ -190,14 +196,16 @@
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
                                                     <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </h:inputText>
 
@@ -206,7 +214,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -216,14 +225,16 @@
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiepPanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiepPanelForEditing"/>
                                                     </h:inputText>
 
@@ -232,7 +243,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="asbiepPanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -242,14 +254,16 @@
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="abiePanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="abiePanelForEditing"/>
                                                     </h:inputText>
 
@@ -258,7 +272,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="abiePanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -282,7 +297,7 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <f:ajax render="bbieHeaderPanelForEditing"/>
+                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -291,7 +306,8 @@
                                                     <h:outputText value="Min" styleClass="section-label"/>
                                                     <p:selectOneMenu
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="0" itemValue="0"/>
                                                         <f:selectItem itemLabel="1" itemValue="1"/>
                                                         <f:ajax render="bbiePanelForEditing"/>
@@ -300,7 +316,8 @@
                                                     <h:outputText value="Max" styleClass="section-label"/>
                                                     <p:selectOneMenu editable="true"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
-                                                                     styleClass="section-content input-section">
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
@@ -310,21 +327,24 @@
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
                                                     <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.nillable}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </h:inputText>
 
@@ -333,7 +353,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -343,14 +364,16 @@
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiepPanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiepPanelForEditing"/>
                                                     </h:inputText>
 
@@ -359,7 +382,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbiepPanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -370,7 +394,8 @@
 
                                                     <h:selectOneMenu id="selectBdtPriRestriForEditing"
                                                                      style="width: 100px; margin-left: 20px; font-weight: normal !important;"
-                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}">
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <p:ajax update="bdtPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
@@ -389,7 +414,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieXbtName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieXbt}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieXbtName}"/>
@@ -403,7 +428,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieCodeListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieCodeList}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieCodeListName}"/>
@@ -417,7 +442,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieAgencyIdListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieAgencyIdList}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieAgencyIdListName}"/>
@@ -443,7 +468,7 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <f:ajax render="bbieScHeaderPanelForEditing"/>
+                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -452,7 +477,8 @@
                                                     <h:outputText value="Min" styleClass="section-label"/>
                                                     <p:selectOneMenu
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="0" itemValue="0"/>
                                                         <f:selectItem itemLabel="1" itemValue="1"/>
                                                         <f:ajax render="bbieScPanelForEditing"/>
@@ -461,7 +487,8 @@
                                                     <h:outputText value="Max" styleClass="section-label"/>
                                                     <p:selectOneMenu editable="true"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
-                                                                     styleClass="section-content input-section">
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
@@ -471,28 +498,32 @@
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Default" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.bizTerm}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.remark}"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputText>
 
@@ -501,7 +532,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
-                                                            styleClass="section-content input-section">
+                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
@@ -512,7 +544,8 @@
 
                                                     <h:selectOneMenu id="selectBdtScPriRestriForEditing"
                                                                      style="width: 100px; margin-left: 20px; font-weight: normal !important;"
-                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}">
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <p:ajax update="bdtScPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailableScPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
@@ -531,7 +564,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScXbtName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScXbt}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScXbtName}"/>
@@ -545,7 +578,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScCodeListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScCodeList}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScCodeListName}"/>
@@ -559,7 +592,7 @@
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScAgencyIdListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScAgencyIdList}"
-                                                                    dropdown="true"
+                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScAgencyIdListName}"/>
