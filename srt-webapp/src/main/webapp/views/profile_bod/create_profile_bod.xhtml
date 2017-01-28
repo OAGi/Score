@@ -713,18 +713,12 @@
 
                     var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
                     var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
-
-                    if (idx == 1 &amp;&amp; selected) {
-                        var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
-                        $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
-                    }
                 };
 
                 var onSubmit = function () {
                     disableButtons();
 
-                    PF('progressBlock').show();
-                    PF('progressBar').start();
+                    PF('loadingBlock').show();
                 };
             </script>
         </h:form>

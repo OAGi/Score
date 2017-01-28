@@ -180,14 +180,6 @@
         <span style="display: block; margin-top: 10px;">Processing...</span>
     </p:blockUI>
 
-    <p:blockUI widgetVar="progressBlock" block="body">
-        <p:progressBar id="progressBar" widgetVar="progressBar" ajax="true" interval="500"
-                       value="#{createProfileBODBean.submitProgress}"
-                       labelTemplate="{value}%" global="false">
-            <p:ajax event="complete" oncomplete="PF('progressBar').setValue(100); PF('progressBlock').hide();"/>
-        </p:progressBar>
-    </p:blockUI>
-
     <script>
         $(document).ready(function () {
             $('.fa-spin').parent().addClass('loading-block');

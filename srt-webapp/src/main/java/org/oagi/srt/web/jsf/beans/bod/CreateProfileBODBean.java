@@ -507,11 +507,16 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public String submit() {
-        progressListener = new ProgressListener();
+        try {
+            progressListener = new ProgressListener();
 
-        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
-        treeNodeService.submit(topLevelNode, getCurrentUser(), progressListener);
+            AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+            treeNodeService.submit(topLevelNode, getCurrentUser(), progressListener);
 
-        return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+        } finally {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.execute("PF('loadingBlock').hide()");
+        }
     }
 }

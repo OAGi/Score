@@ -518,11 +518,16 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public String copy() {
-        progressListener = new ProgressListener();
+        try {
+            progressListener = new ProgressListener();
 
-        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
-        treeNodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
+            AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+            treeNodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
 
-        return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+        } finally {
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.execute("PF('loadingBlock').hide()");
+        }
     }
 }
