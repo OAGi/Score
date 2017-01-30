@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h:panelGroup rendered="#{namespaceDetailBean.namespace.namespaceId > 0}">
+                    <h2 class="subhead-heading">Namespace Detail</h2>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{namespaceDetailBean.namespace.namespaceId == 0}">
+                    <h2 class="subhead-heading">Create Namespace</h2>
+                </h:panelGroup>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                        autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                <h:panelGrid columns="2" cellpadding="3">
+                    <h:outputText value="URI" styleClass="section-label"/>
+                    <h:inputText id="uri" value="#{namespaceDetailBean.namespace.uri}"
+                                 required="true"
+                                 requiredMessage="Please fill out 'URI' field."
+                                 maxlength="45"
+                                 label="URI" styleClass="section-content input-section">
+                        <f:validateLength maximum="100"/>
+                    </h:inputText>
+
+                    <h:outputText value="Prefix" styleClass="section-label"/>
+                    <h:inputText id="prefix" value="#{namespaceDetailBean.namespace.prefix}"
+                                 styleClass="section-content input-section"/>
+
+                    <h:outputText value="Description" styleClass="section-label"/>
+                    <h:inputTextarea value="#{namespaceDetailBean.namespace.description}"
+                                     rows="6" a:placeholder="Leave a description"
+                                     styleClass="section-content input-section"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:commandButton ajax="true" value="Create"
+                             rendered="#{namespaceDetailBean.namespace.namespaceId == 0}"
+                             action="#{namespaceDetailBean.update()}"/>
+
+            <p:commandButton ajax="true" value="Update"
+                             rendered="#{namespaceDetailBean.namespace.namespaceId != 0}"
+                             action="#{namespaceDetailBean.update()}"/>
+
+            <p:commandButton ajax="true" value="Discard"
+                             rendered="#{namespaceDetailBean.namespace.namespaceId > 0}"
+                             styleClass="danger"
+                             onclick="PF('confirmDiscard').show()"/>
+
+            <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    The namespace will be permanently removed.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     action="#{namespaceDetailBean.delete()}"
+                                     oncomplete="PF('confirmDiscard').hide()"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmDiscard').hide()"/>
+                </div>
+            </p:confirmDialog>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -8,6 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class UserService {
@@ -24,6 +28,14 @@ public class UserService {
 
     public User findByUserId(long userId) {
         return userRepository.findOne(userId);
+    }
+
+    public Map<Long, User> findByUserIds(Collection<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<User> userList = userRepository.findAllByUserIds(userIds);
+        return userList.stream().collect(Collectors.toMap(e -> e.getAppUserId(), Function.identity()));
     }
 
     public boolean exists(String username) {
