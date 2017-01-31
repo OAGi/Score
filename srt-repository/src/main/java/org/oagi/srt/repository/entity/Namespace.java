@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -74,7 +75,7 @@ public class Namespace implements TimestampAware, CreatorModifierAware, Serializ
     }
 
     public String getPrefix() {
-        return prefix;
+        return StringUtils.isEmpty(prefix) ? null : prefix;
     }
 
     public void setPrefix(String prefix) {

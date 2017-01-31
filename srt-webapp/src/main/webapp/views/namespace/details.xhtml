@@ -33,7 +33,10 @@
 
                     <h:outputText value="Prefix" styleClass="section-label"/>
                     <h:inputText id="prefix" value="#{namespaceDetailBean.namespace.prefix}"
-                                 styleClass="section-content input-section"/>
+                                 required="true"
+                                 requiredMessage="Please fill out 'Prefix' field."
+                                 maxlength="45"
+                                 label="Prefix" styleClass="section-content input-section"/>
 
                     <h:outputText value="Description" styleClass="section-label"/>
                     <h:inputTextarea value="#{namespaceDetailBean.namespace.description}"

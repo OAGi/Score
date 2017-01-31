@@ -50,6 +50,20 @@ public class NamespaceDetailBean extends UIHandler {
     }
 
     public String update() {
+        String uri = namespace.getUri();
+        if (namespaceService.isExistsUri(uri, namespace.getNamespaceId())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "URI is already taken."));
+            return null;
+        }
+
+        String prefix = namespace.getPrefix();
+        if (namespaceService.isExistsPrefix(prefix, namespace.getNamespaceId())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Prefix is already taken."));
+            return null;
+        }
+
         User user = getCurrentUser();
 
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);

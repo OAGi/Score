@@ -32,4 +32,12 @@ public class NamespaceService {
     public void update(Namespace namespace) {
         namespaceRepository.saveAndFlush(namespace);
     }
+
+    public boolean isExistsUri(String uri, long namespaceId) {
+        return namespaceRepository.existsByUriExceptNamespaceId((uri != null) ? uri.trim() : null, namespaceId);
+    }
+
+    public boolean isExistsPrefix(String prefix, long namespaceId) {
+        return namespaceRepository.existsByPrefixExceptNamespaceId((prefix != null) ? prefix.trim() : null, namespaceId);
+    }
 }
