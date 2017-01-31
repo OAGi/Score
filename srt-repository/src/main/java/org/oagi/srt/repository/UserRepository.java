@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.loginId = ?1")
     public User findOneByLoginId(String loginId);
 
-    @Query("select u from User u where u.appUserId in (?1)")
+    @Query("select u from User u where u.appUserId in ?1")
     public List<User> findAllByUserIds(Collection<Long> userIds);
 
     @Query("select u from User u where u.name = ?1")

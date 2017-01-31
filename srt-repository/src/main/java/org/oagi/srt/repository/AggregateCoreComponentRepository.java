@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AggregateCoreComponentRepository extends JpaRepository<AggregateCoreComponent, Long> {
@@ -30,4 +31,7 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select new AggregateCoreComponent(a.accId, a.basedAccId, a.definition) from AggregateCoreComponent a " +
             "where a.accId = ?1 and a.revisionNum = ?2")
     public AggregateCoreComponent findAccIdAndBasedAccIdAndDefinitionByAccIdAndRevisionNum(long accId, int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.state in ?1 order by a.creationTimestamp desc")
+    public List<AggregateCoreComponent> findByStates(Collection<CoreComponentState> states);
 }

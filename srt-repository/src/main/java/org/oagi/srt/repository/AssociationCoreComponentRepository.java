@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -79,4 +80,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Modifying
     @Query("delete from AssociationCoreComponent a where a.currentAsccId = ?1")
     public void deleteByCurrentAsccId(long currentAsccId);
+
+    @Query("select a from AssociationCoreComponent a where a.state in ?1 order by a.creationTimestamp desc")
+    public List<AssociationCoreComponent> findByStates(Collection<CoreComponentState> states);
 }

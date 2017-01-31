@@ -893,6 +893,20 @@ h6 {
     color: rgba(102, 102, 102, 0.5);
 }
 
+.option-radio-grid input[type=radio], .option-radio-grid input[type=checkbox] {
+    margin-right: 10px;
+}
+
+.option-radio-grid label {
+    font-weight: normal;
+    margin-right: 20px;
+}
+
+.option-radio-grid input[type=radio]:disabled + label {
+    text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5);
+    color: rgba(102, 102, 102, 0.5);
+}
+
 .ui-autocomplete-itemtip {
     border: solid 1px #4078c0;
     background: #fff !important;

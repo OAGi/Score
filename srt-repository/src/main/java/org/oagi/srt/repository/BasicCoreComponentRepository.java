@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreComponent, Long> {
@@ -73,4 +74,7 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Modifying
     @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
     public void deleteByCurrentBccId(long currentBccId);
+
+    @Query("select b from BasicCoreComponent b where b.state in ?1 order by b.creationTimestamp desc")
+    public List<BasicCoreComponent> findByStates(Collection<CoreComponentState> states);
 }

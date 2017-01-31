@@ -1,10 +1,12 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface BasicCoreComponentPropertyRepository extends JpaRepository<BasicCoreComponentProperty, Long> {
@@ -26,4 +28,7 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
 
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findBccpIdAndDenByGuid(String guid);
+
+    @Query("select b from BasicCoreComponentProperty b where b.state in ?1 order by b.creationTimestamp desc")
+    public List<BasicCoreComponentProperty> findByStates(Collection<CoreComponentState> states);
 }
