@@ -144,7 +144,7 @@ public class TreeNodeService {
         private final AggregateCoreComponent acc;
         private AggregateCoreComponentTreeNode base;
 
-        private Boolean hasChild = null;
+        private List<CoreComponentRelation> associations = null;
         private Collection<CoreComponentTreeNode> children = null;
 
         private AggregateCoreComponentTreeNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
@@ -185,46 +185,34 @@ public class TreeNodeService {
             return namespaceRepository.findOne(namespaceId);
         }
 
+        private List<CoreComponentRelation> associations() {
+            if (associations == null) {
+                associations = getAssociations(acc);
+            }
+            return associations;
+        }
+
         @Override
         public boolean hasChild() {
-            if (hasChild == null) {
-                long accId = acc.getAccId();
-
-                int asccCount = asccRepository.countByFromAccIdAndRevisionNumAndState(
-                        accId, 0, CoreComponentState.Published);
-                if (asccCount > 0) {
-                    hasChild = true;
-                } else {
-                    int bccCount = bccRepository.countByFromAccIdAndRevisionNumAndState(
-                            accId, 0, CoreComponentState.Published);
-                    if (bccCount > 0) {
-                        hasChild = true;
-                    } else {
-                        hasChild = false;
-                    }
-                }
-            }
-            return hasChild;
+            return associations().isEmpty() ? false : true;
         }
 
         @Override
         public Collection<? extends CoreComponentTreeNode> getChildren() {
             if (children == null) {
-                List<CoreComponentRelation> ccList = getAssociations(acc);
-
-                if (ccList.isEmpty()) {
+                if (associations().isEmpty()) {
                     children = Collections.emptyList();
                 } else {
                     children = new ArrayList();
 
-                    for (CoreComponentRelation cc : ccList) {
-                        if (cc instanceof AssociationCoreComponent) {
+                    for (CoreComponentRelation association : associations()) {
+                        if (association instanceof AssociationCoreComponent) {
                             AssociationCoreComponentPropertyTreeNode asccpNode =
-                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) cc);
+                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) association);
                             children.add(asccpNode);
-                        } else if (cc instanceof BasicCoreComponent) {
+                        } else if (association instanceof BasicCoreComponent) {
                             BasicCoreComponentPropertyTreeNode bccpNode =
-                                    createCoreComponentTreeNode(this, (BasicCoreComponent) cc);
+                                    createCoreComponentTreeNode(this, (BasicCoreComponent) association);
                             children.add(bccpNode);
                         }
                     }
@@ -236,7 +224,7 @@ public class TreeNodeService {
 
         @Override
         public void reload() {
-            hasChild = null;
+            associations = null;
             children = null;
         }
     }
