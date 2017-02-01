@@ -75,6 +75,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
     public void deleteByCurrentBccId(long currentBccId);
 
-    @Query("select b from BasicCoreComponent b where b.state in ?1 order by b.creationTimestamp desc")
-    public List<BasicCoreComponent> findByStates(Collection<CoreComponentState> states);
+    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 order by b.creationTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNum(int revisionNum);
+
+    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 and b.state in ?2 order by b.creationTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 }

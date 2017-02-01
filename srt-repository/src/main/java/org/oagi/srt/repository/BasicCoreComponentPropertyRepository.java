@@ -29,6 +29,9 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findBccpIdAndDenByGuid(String guid);
 
-    @Query("select b from BasicCoreComponentProperty b where b.state in ?1 order by b.creationTimestamp desc")
-    public List<BasicCoreComponentProperty> findByStates(Collection<CoreComponentState> states);
+    @Query("select b from BasicCoreComponentProperty b where b.revisionNum = ?1 order by b.creationTimestamp desc")
+    public List<BasicCoreComponentProperty> findAllByRevisionNum(int revisionNum);
+
+    @Query("select b from BasicCoreComponentProperty b where b.revisionNum = ?1 and b.state in ?2 order by b.creationTimestamp desc")
+    public List<BasicCoreComponentProperty> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 }

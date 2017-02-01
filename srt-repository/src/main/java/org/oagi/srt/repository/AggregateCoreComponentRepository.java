@@ -32,6 +32,9 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
             "where a.accId = ?1 and a.revisionNum = ?2")
     public AggregateCoreComponent findAccIdAndBasedAccIdAndDefinitionByAccIdAndRevisionNum(long accId, int revisionNum);
 
-    @Query("select a from AggregateCoreComponent a where a.state in ?1 order by a.creationTimestamp desc")
-    public List<AggregateCoreComponent> findByStates(Collection<CoreComponentState> states);
+    @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1 order by a.creationTimestamp desc")
+    public List<AggregateCoreComponent> findAllByRevisionNum(int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
+    public List<AggregateCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 }

@@ -91,9 +91,9 @@ public class CoreComponentBean {
     public List<AggregateCoreComponent> getAccList() {
         if (accList == null) {
             if (selectedStates == null || selectedStates.isEmpty()) {
-                accList = accRepository.findAll(new Sort(Sort.Direction.DESC, "creationTimestamp"));
+                accList = accRepository.findAllByRevisionNum(0);
             }
-            accList = accRepository.findByStates(selectedStates);
+            accList = accRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
         if (searchText != null) {
@@ -108,9 +108,9 @@ public class CoreComponentBean {
     public List<AssociationCoreComponent> getAsccList() {
         if (asccList == null) {
             if (selectedStates == null || selectedStates.isEmpty()) {
-                asccList = asccRepository.findAll(new Sort(Sort.Direction.DESC, "creationTimestamp"));
+                asccList = asccRepository.findAllByRevisionNum(0);
             }
-            asccList = asccRepository.findByStates(selectedStates);
+            asccList = asccRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
         if (searchText != null) {
@@ -125,9 +125,9 @@ public class CoreComponentBean {
     public List<AssociationCoreComponentProperty> getAsccpList() {
         if (asccpList == null) {
             if (selectedStates == null || selectedStates.isEmpty()) {
-                asccpList = asccpRepository.findAll(new Sort(Sort.Direction.DESC, "creationTimestamp"));
+                asccpList = asccpRepository.findAllByRevisionNum(0);
             }
-            asccpList = asccpRepository.findByStates(selectedStates);
+            asccpList = asccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
         if (searchText != null) {
@@ -142,9 +142,9 @@ public class CoreComponentBean {
     public List<BasicCoreComponent> getBccList() {
         if (bccList == null) {
             if (selectedStates == null || selectedStates.isEmpty()) {
-                bccList = bccRepository.findAll(new Sort(Sort.Direction.DESC, "creationTimestamp"));
+                bccList = bccRepository.findAllByRevisionNum(0);
             }
-            bccList = bccRepository.findByStates(selectedStates);
+            bccList = bccRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
         if (searchText != null) {
@@ -159,9 +159,9 @@ public class CoreComponentBean {
     public List<BasicCoreComponentProperty> getBccpList() {
         if (bccpList == null) {
             if (selectedStates == null || selectedStates.isEmpty()) {
-                bccpList = bccpRepository.findAll(new Sort(Sort.Direction.DESC, "creationTimestamp"));
+                bccpList = bccpRepository.findAllByRevisionNum(0);
             }
-            bccpList = bccpRepository.findByStates(selectedStates);
+            bccpList = bccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
         if (searchText != null) {
