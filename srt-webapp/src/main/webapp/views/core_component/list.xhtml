@@ -61,8 +61,18 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{acc.guid}">
-                    <p:column headerText="Object Class Term" sortBy="#{acc.objectClassTerm}">
-                        <h:outputText value="#{acc.objectClassTerm}"/>
+                    <p:column headerText="Object Class Term" sortBy="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}">
+                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                                rendered="#{acc.oagisComponentType eq 'UserExtensionGroup'}"
+                                outcome="/views/core_component/extension.jsf">
+                            <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(acc.accId)}"/>
+                        </h:link>
+                        <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                                      rendered="#{acc.oagisComponentType ne 'UserExtensionGroup'}"/>
+                    </p:column>
+
+                    <p:column style="width: 150px; text-align: center;" headerText="Type">
+                        <span class="label label-info">#{acc.oagisComponentType}</span>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"

@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -406,5 +407,16 @@ public class CoreComponentService {
 
             fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
         }
+    }
+
+    public AggregateCoreComponent newAggregateCoreComponent() {
+        AggregateCoreComponent acc = new AggregateCoreComponent();
+        acc.setGuid(Utility.generateGUID());
+        acc.setObjectClassTerm("A new ACC Object");
+        acc.setDen(acc.getObjectClassTerm() + ". Details");
+        acc.setOagisComponentType(OagisComponentType.Semantics);
+        acc.setState(CoreComponentState.Editing);
+
+        return acc;
     }
 }

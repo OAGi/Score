@@ -41,7 +41,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ExtensionBean extends UIHandler {
+public class ACCDetailBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -58,6 +58,7 @@ public class ExtensionBean extends UIHandler {
     private AggregateCoreComponentRepository accRepository;
 
     private AggregateCoreComponent targetAcc;
+    private AssociationCoreComponentProperty rootAsccp;
     private AggregateCoreComponent userExtensionAcc;
 
     private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
@@ -72,13 +73,16 @@ public class ExtensionBean extends UIHandler {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
+        AggregateCoreComponent targetAcc;
+        if (StringUtils.isEmpty(accId)) {
+            targetAcc = coreComponentService.newAggregateCoreComponent();
+        } else {
+            targetAcc = accRepository.findOne(Long.parseLong(accId));
+        }
         setTargetAcc(targetAcc);
 
         TreeNode treeNode = createTreeNode(targetAcc);
         setTreeNode(treeNode);
-
-        setUserExtensionAcc(extensionService.findUserExtensionAcc(targetAcc));
     }
 
     public AggregateCoreComponent getTargetAcc() {
@@ -785,3 +789,4 @@ public class ExtensionBean extends UIHandler {
         }
     }
 }
+

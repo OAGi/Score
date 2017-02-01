@@ -188,9 +188,23 @@ public class CoreComponentBean {
     public String getObjectClassTermByAccId(Long accId) {
         if (!accObjectClassTermMap.containsKey(accId)) {
             AggregateCoreComponent acc = accRepository.findOne(accId);
+            if (OagisComponentType.UserExtensionGroup == acc.getOagisComponentType()) {
+                Long parentAccId = getParentAccIdOfUserExtensionGroupAcc(acc.getAccId());
+                return getObjectClassTermByAccId(parentAccId);
+            }
             accObjectClassTermMap.put(accId, (acc != null) ? acc.getObjectClassTerm() : "");
         }
         return accObjectClassTermMap.get(accId);
+    }
+
+    public Long getParentAccIdOfUserExtensionGroupAcc(Long ueAccId) {
+        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(ueAccId);
+        List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccp.getAsccpId(), 0);
+        if (asccList.isEmpty() || asccList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        AssociationCoreComponent ascc = asccList.get(0);
+        return ascc.getFromAccId();
     }
 
     private Map<Long, String> asccpPropertyTermMap = new HashMap();

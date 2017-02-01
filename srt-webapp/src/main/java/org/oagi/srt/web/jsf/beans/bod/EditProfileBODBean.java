@@ -532,8 +532,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             eAcc = extensionService.getExtensionAcc(asccp, isLocally);
         }
 
-        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
-        return "/views/core_component/extension.xhtml?accId=" + eAcc.getAccId() +
-                "&rootAsccpId=" + topLevelNode.getAsccp().getAsccpId() + "&faces-redirect=true";
+        return "/views/core_component/extension.jsf?accId=" + eAcc.getAccId() + "&faces-redirect=true";
     }
 }
