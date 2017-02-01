@@ -1,8 +1,10 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.bie.ASBIENode;
-import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -11,9 +13,7 @@ import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -465,7 +465,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public String createABIEExtension(boolean isLocally) {
         TreeNode treeNode = getSelectedTreeNode();
-        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationBusinessInformationEntityPropertyTreeNode asbieNode =
+                (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
 
@@ -508,7 +509,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         if (treeNode == null) {
             return null;
         }
-        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationBusinessInformationEntityPropertyTreeNode asbieNode =
+                (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
 
         AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
@@ -522,7 +524,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public String redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) {
         TreeNode treeNode = getSelectedTreeNode();
-        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationBusinessInformationEntityPropertyTreeNode asbieNode =
+                (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
 
         if (eAcc == null) {
