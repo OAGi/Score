@@ -183,6 +183,36 @@ public class CoreComponentBean {
         return userNameMap.get(appUserId);
     }
 
+    private Map<Long, String> accObjectClassTermMap = new HashMap();
+
+    public String getObjectClassTermByAccId(Long accId) {
+        if (!accObjectClassTermMap.containsKey(accId)) {
+            AggregateCoreComponent acc = accRepository.findOne(accId);
+            accObjectClassTermMap.put(accId, (acc != null) ? acc.getObjectClassTerm() : "");
+        }
+        return accObjectClassTermMap.get(accId);
+    }
+
+    private Map<Long, String> asccpPropertyTermMap = new HashMap();
+
+    public String getPropertyTermByAsccpId(Long asccpId) {
+        if (!asccpPropertyTermMap.containsKey(asccpId)) {
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+            asccpPropertyTermMap.put(asccpId, (asccp != null) ? asccp.getPropertyTerm() : "");
+        }
+        return asccpPropertyTermMap.get(asccpId);
+    }
+
+    private Map<Long, String> bccpPropertyTermMap = new HashMap();
+
+    public String getPropertyTermByBccpId(Long bccpId) {
+        if (!bccpPropertyTermMap.containsKey(bccpId)) {
+            BasicCoreComponentProperty bccp = bccpRepository.findOne(bccpId);
+            bccpPropertyTermMap.put(bccpId, (bccp != null) ? bccp.getPropertyTerm() : "");
+        }
+        return bccpPropertyTermMap.get(bccpId);
+    }
+
     public String getSearchText() {
         return searchText;
     }

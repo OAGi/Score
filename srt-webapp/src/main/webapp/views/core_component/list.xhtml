@@ -99,8 +99,16 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{ascc.guid}">
-                    <p:column headerText="DEN" sortBy="#{ascc.den}">
-                        <h:outputText value="#{ascc.den}"/>
+
+                    <p:column headerText="Owner ACC" styleClass="ellipsis"
+                              sortBy="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}">
+                        <h:outputText id="objectClassTermOfAccOnAscc" value="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}"/>
+                        <p:tooltip for="objectClassTermOfAccOnAscc" value="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}"/>
+                    </p:column>
+
+                    <p:column style="width: 200px" headerText="ASCCP" styleClass="ellipsis"
+                              sortBy="#{coreComponentBean.getPropertyTermByAsccpId(ascc.toAsccpId)}">
+                        <h:outputText value="#{coreComponentBean.getPropertyTermByAsccpId(ascc.toAsccpId)}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
@@ -175,8 +183,16 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{bcc.guid}">
-                    <p:column headerText="DEN" sortBy="#{bcc.den}">
-                        <h:outputText value="#{bcc.den}"/>
+
+                    <p:column headerText="Owner ACC" styleClass="ellipsis"
+                              sortBy="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}">
+                        <h:outputText id="objectClassTermOfAccOnBcc" value="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}"/>
+                        <p:tooltip for="objectClassTermOfAccOnBcc" value="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}"/>
+                    </p:column>
+
+                    <p:column style="width: 200px" headerText="BCCP" styleClass="ellipsis"
+                              sortBy="#{coreComponentBean.getPropertyTermByBccpId(bcc.toBccpId)}">
+                        <h:outputText value="#{coreComponentBean.getPropertyTermByBccpId(bcc.toBccpId)}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
