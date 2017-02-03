@@ -4,21 +4,22 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.SessionScoped;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
+
 @Controller
-@Scope("view")
+@Scope(SCOPE_SESSION)
 @ManagedBean
-@ViewScoped
+@SessionScoped
 @Transactional(readOnly = true)
 public class CoreComponentBean {
 
@@ -42,12 +43,13 @@ public class CoreComponentBean {
     private List<BasicCoreComponentProperty> bccpList;
 
     private String type = "ACC";
-    private List<CoreComponentState> selectedStates = Arrays.asList(CoreComponentState.Editing);
+    private List<CoreComponentState> selectedStates;
 
     private String searchText;
 
     @PostConstruct
     public void init() {
+        selectedStates = Arrays.asList(CoreComponentState.Editing);
     }
 
     public String getType() {

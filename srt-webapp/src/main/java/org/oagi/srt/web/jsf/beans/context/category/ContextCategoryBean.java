@@ -11,14 +11,16 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.SessionScoped;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
+
 @Controller
-@Scope("view")
+@Scope(SCOPE_SESSION)
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class ContextCategoryBean extends UIHandler {
 
     @Autowired
