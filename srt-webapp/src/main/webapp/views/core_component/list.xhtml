@@ -67,8 +67,12 @@
                                 outcome="/views/core_component/extension.jsf">
                             <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(acc.accId)}"/>
                         </h:link>
-                        <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                      rendered="#{acc.oagisComponentType ne 'UserExtensionGroup'}"/>
+
+                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                                rendered="#{acc.oagisComponentType ne 'UserExtensionGroup'}"
+                                outcome="/views/core_component/acc_details.jsf">
+                            <f:param name="accId" value="#{acc.accId}"/>
+                        </h:link>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" headerText="Type">

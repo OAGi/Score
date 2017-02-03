@@ -41,7 +41,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ACCDetailBean extends UIHandler {
+public class AccDetailBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

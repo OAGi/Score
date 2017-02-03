@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.createdBy ? '' : '(Review)'} #{accDetailBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : accDetailBean.targetAcc.objectClassTerm}</h2>
+                <h2 class="subhead-heading">#{accDetailBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : accDetailBean.targetAcc.objectClassTerm}</h2>
             </div>
         </div>
         <h:form id="form">
@@ -62,17 +62,6 @@
                                         <p:tooltip id="toolTipBaseLink" for="baseLink" value="Click to show the base type." position="bottom"/>
                                     </p:column>
                                 </p:treeTable>
-
-                                <p:contextMenu for="treeTable" nodeType="ACC-Extension" rendered="#{accDetailBean.userExtensionAcc.state == 'Editing'}">
-                                    <p:menuitem value="Append ASCC" style="width: 100%;"
-                                                actionListener="#{accDetailBean.prepareAppendAscc}"
-                                                onclick="PF('leftBlockUI').show()"
-                                                update=":form"/>
-                                    <p:menuitem value="Append BCC" style="width: 100%;"
-                                                actionListener="#{accDetailBean.prepareAppendBcc}"
-                                                onclick="PF('leftBlockUI').show()"
-                                                update=":form"/>
-                                </p:contextMenu>
                             </p:panel>
                         </div>
 
@@ -647,24 +636,6 @@
                         </div>
                     </div>
                 </h:panelGroup>
-            </p:panel>
-
-            <p:panel id="btnGroup"
-                     rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.userExtensionAcc.createdBy) and
-                                 (accDetailBean.preparedAppend eq false)}">
-                <p:commandButton rendered="#{accDetailBean.userExtensionAcc.state == 'Editing'}"
-                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
-                                 action="#{accDetailBean.updateState('Candidate')}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-
-                <p:commandButton rendered="#{accDetailBean.userExtensionAcc.state == 'Candidate'}"
-                                 id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
-                                 action="#{accDetailBean.updateState('Editing')}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-                <p:commandButton rendered="#{accDetailBean.userExtensionAcc.state == 'Candidate'}"
-                                 id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{accDetailBean.updateState('Published')}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
