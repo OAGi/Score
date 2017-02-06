@@ -95,7 +95,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         AggregateCoreComponent anyACC = new AggregateCoreComponent();
         anyACC.setGuid(Utility.generateGUID());
         anyACC.setObjectClassTerm("Any Structured Content");
-        anyACC.setDen(anyACC.getObjectClassTerm() + ". Details");
         anyACC.setDefinition("This is corresponding to the xsd:any with the processContents = “strict” and any namespace.");
         anyACC.setOagisComponentType(Embedded);
         anyACC.setState(CoreComponentState.Published);
@@ -451,7 +450,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         String name = declaration.getName();
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
-        String den = objectClassTerm + ". Details";
 
         String definition = declaration.getDefinition();
         Module module = declaration.getModule();
@@ -466,7 +464,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
         acc.setGuid(typeGuid);
         acc.setObjectClassTerm(objectClassTerm);
-        acc.setDen(den);
         acc.setDefinition(definition);
 
         AggregateCoreComponent basedAcc = null;

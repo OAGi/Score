@@ -54,6 +54,9 @@
                         <p:commandButton value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
                                          update="pPanel"
                                          icon="ui-icon-search"/>
+                        <p:commandButton value="Create ACC" rendered="#{coreComponentBean.type == 'ACC'}"
+                                         action="#{coreComponentBean.createACC}"
+                                         style="float: right; padding: 3px 0 3px 0;"/>
                     </h:panelGroup>
                 </f:facet>
 

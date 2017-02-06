@@ -1,17 +1,22 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent implements CoreComponent, TimestampAware, NamespaceAware, Serializable {
+public class AggregateCoreComponent
+        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
@@ -101,31 +106,25 @@ public class AggregateCoreComponent implements CoreComponent, TimestampAware, Na
     private boolean isAbstract;
 
     public AggregateCoreComponent() {
+        init();
     }
 
     public AggregateCoreComponent(long accId, String den) {
+        init();
+
         this.accId = accId;
         this.den = den;
     }
 
     public AggregateCoreComponent(long accId, Long basedAccId, String definition) {
+        init();
+
         this.accId = accId;
         if (basedAccId != null) {
 
         }
         this.basedAccId = basedAccId;
         this.definition = definition;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
     }
 
     public long getAccId() {
@@ -150,6 +149,7 @@ public class AggregateCoreComponent implements CoreComponent, TimestampAware, Na
 
     public void setObjectClassTerm(String objectClassTerm) {
         this.objectClassTerm = objectClassTerm;
+        setDen(objectClassTerm + ". Details");
     }
 
     public String getDen() {
@@ -316,12 +316,64 @@ public class AggregateCoreComponent implements CoreComponent, TimestampAware, Na
         isAbstract = anAbstract;
     }
 
+    /*
+     * An 'abstract' property is accessed by JSF, ELException will be thrown
+     * because it's recognized as a keyword of Java.
+     * Hence, this alias uses instead of an original at that point.
+     */
+    public boolean isAbstractComponent() {
+        return isAbstract();
+    }
+
+    public void setAbstractComponent(boolean abstractComponent) {
+        setAbstract(abstractComponent);
+    }
+
     public boolean isExtension() {
         return OagisComponentType.Extension == getOagisComponentType();
     }
 
     public boolean isGlobalExtension() {
         return isExtension() && "All Extension".equals(getObjectClassTerm());
+    }
+
+    @Override
+    public AggregateCoreComponent clone() {
+        AggregateCoreComponent clone = new AggregateCoreComponent();
+        clone.setGuid(Utility.generateGUID());
+        clone.setObjectClassTerm(this.objectClassTerm);
+        clone.setDen(this.den);
+        clone.setDefinition(this.definition);
+        if (this.basedAccId != null) {
+            clone.setBasedAccId(this.basedAccId);
+        }
+        clone.setObjectClassQualifier(this.objectClassQualifier);
+        clone.setOagisComponentType(this.oagisComponentType);
+        if (this.moduleId != null) {
+            clone.setModuleId(this.moduleId);
+        }
+        if (this.namespaceId != null) {
+            clone.setNamespaceId(this.namespaceId);
+        }
+        clone.setCreatedBy(this.createdBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentAccId != null) {
+            clone.setCurrentAccId(this.currentAccId);
+        }
+        clone.setDeprecated(this.deprecated);
+        clone.setAbstract(this.isAbstract);
+        return clone;
     }
 
     @Override
@@ -395,6 +447,74 @@ public class AggregateCoreComponent implements CoreComponent, TimestampAware, Na
                 ", deprecated=" + deprecated +
                 ", isAbstract=" + isAbstract +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    private void init() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
     }
 
     @Transient

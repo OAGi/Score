@@ -4,6 +4,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
 import static org.oagi.srt.repository.entity.RevisionAction.Update;
 
 @Service
@@ -409,13 +411,31 @@ public class CoreComponentService {
         }
     }
 
-    public AggregateCoreComponent newAggregateCoreComponent() {
+    @Transactional
+    public AggregateCoreComponent newAggregateCoreComponent(User user) {
+        long requesterId = user.getAppUserId();
+
         AggregateCoreComponent acc = new AggregateCoreComponent();
         acc.setGuid(Utility.generateGUID());
         acc.setObjectClassTerm("A new ACC Object");
-        acc.setDen(acc.getObjectClassTerm() + ". Details");
         acc.setOagisComponentType(OagisComponentType.Semantics);
         acc.setState(CoreComponentState.Editing);
+        acc.setOwnerUserId(requesterId);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        acc.addPersistEventListener(eventListener);
+
+        acc = accRepository.saveAndFlush(acc);
+
+        AggregateCoreComponent accHistory = acc.clone();
+        int revisionNum = 1;
+        accHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        accHistory.setRevisionTrackingNum(revisionTrackingNum);
+        accHistory.setRevisionAction(Insert);
+        accHistory.setCurrentAccId(acc.getAccId());
+
+        accRepository.save(accHistory);
 
         return acc;
     }

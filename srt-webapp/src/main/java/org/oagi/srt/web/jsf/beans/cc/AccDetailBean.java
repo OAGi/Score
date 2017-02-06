@@ -1,12 +1,11 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.model.treenode.*;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
+import org.oagi.srt.service.NamespaceService;
 import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
@@ -31,6 +30,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
@@ -57,8 +57,16 @@ public class AccDetailBean extends UIHandler {
     @Autowired
     private AggregateCoreComponentRepository accRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private NamespaceService namespaceService;
+
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private AggregateCoreComponent targetAcc;
-    private AssociationCoreComponentProperty rootAsccp;
     private AggregateCoreComponent userExtensionAcc;
 
     private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
@@ -73,12 +81,7 @@ public class AccDetailBean extends UIHandler {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent targetAcc;
-        if (StringUtils.isEmpty(accId)) {
-            targetAcc = coreComponentService.newAggregateCoreComponent();
-        } else {
-            targetAcc = accRepository.findOne(Long.parseLong(accId));
-        }
+        AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
         setTargetAcc(targetAcc);
 
         TreeNode treeNode = createTreeNode(targetAcc);
@@ -314,6 +317,50 @@ public class AccDetailBean extends UIHandler {
 
     public void setPreparedAppend(boolean preparedAppend) {
         this.preparedAppend = preparedAppend;
+    }
+
+    public User getOwnerUser(AggregateCoreComponent acc) {
+        long ownerUserId = acc.getOwnerUserId();
+        return userRepository.findOne(ownerUserId);
+    }
+
+    public Map<String, OagisComponentType> availableOagisComponentTypes(AggregateCoreComponent acc) {
+        User owner = getOwnerUser(acc);
+
+        Map<String, OagisComponentType> availableOagisComponentTypes = new LinkedHashMap();
+        availableOagisComponentTypes.put("Base", OagisComponentType.Base);
+        availableOagisComponentTypes.put("Semantics", OagisComponentType.Semantics);
+        if (owner.isOagisDeveloperIndicator()) {
+            availableOagisComponentTypes.put("Extension", OagisComponentType.Extension);
+        }
+        availableOagisComponentTypes.put("Semantic Group", OagisComponentType.SemanticGroup);
+
+        return availableOagisComponentTypes;
+    }
+
+    public Map<String, Long> availableNamespaces(AggregateCoreComponent acc) {
+        User owner = getOwnerUser(acc);
+        if (owner.isOagisDeveloperIndicator()) {
+            return Collections.emptyMap();
+        }
+
+        List<Namespace> namespaces = namespaceService.findAll();
+        return namespaces.stream().filter(e -> !e.isStdNmsp())
+                .collect(Collectors.toMap(Namespace::getUri, Namespace::getNamespaceId));
+    }
+
+    public boolean canBeAbstract(AggregateCoreComponent acc) {
+        long basedAccId = acc.getBasedAccId();
+        if (basedAccId <= 0L) {
+            return false;
+        }
+
+        AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+        if (basedAcc == null) {
+            return false;
+        }
+
+        return basedAcc.isAbstract();
     }
 
     /*

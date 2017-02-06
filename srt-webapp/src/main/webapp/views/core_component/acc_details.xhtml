@@ -9,7 +9,9 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{accDetailBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : accDetailBean.targetAcc.objectClassTerm}</h2>
+                <h:panelGroup id="headerMessage">
+                    <h2 class="subhead-heading">#{accDetailBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : accDetailBean.targetAcc.objectClassTerm}</h2>
+                </h:panelGroup>
             </div>
         </div>
         <h:form id="form">
@@ -206,7 +208,7 @@
                                     <!--
                                         ACC
                                     -->
-                                    <h:panelGroup
+                                    <h:panelGroup id="accPanelGroup"
                                             rendered="#{accDetailBean.preparedAppend eq false and
                                                         fn:startsWith(accDetailBean.selectedTreeNode.type, 'ACC')}">
                                         <p:panel header="ACC">
@@ -220,14 +222,47 @@
                                                 <h:outputText value="Object Class Term" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{accDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                    <p:ajax update="headerMessage"/>
+                                                    <p:ajax update="leftPanel"/>
+                                                    <p:ajax update="accPanelGroup"/>
+                                                </h:inputText>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{accDetailBean.selectedTreeNode.data.acc.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
+
+                                                <h:outputText value="Component Type" styleClass="section-label"/>
+                                                <p:selectOneMenu
+                                                        value="#{accDetailBean.selectedTreeNode.data.acc.oagisComponentType}"
+                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                    <f:selectItems value="#{accDetailBean.availableOagisComponentTypes(accDetailBean.selectedTreeNode.data.acc)}"/>
+                                                    <f:ajax render="accPanel"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputText value="Abstract" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${accDetailBean.selectedTreeNode.data.acc.abstractComponent}"
+                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : '' or
+                                                                                                    accDetailBean.canBeAbstract(accDetailBean.selectedTreeNode.data.acc) eq false}"
+                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' or
+                                                                    accDetailBean.canBeAbstract(accDetailBean.selectedTreeNode.data.acc) eq false}">
+                                                    <f:ajax render="accPanel"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${accDetailBean.selectedTreeNode.data.acc.deprecated}"
+                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : '' or
+                                                                                                    accDetailBean.selectedTreeNode.data.acc.revisionNum lt 2}"
+                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' or
+                                                                    accDetailBean.selectedTreeNode.data.acc.revisionNum lt 2}">
+                                                    <f:ajax render="accPanel"/>
+                                                </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea

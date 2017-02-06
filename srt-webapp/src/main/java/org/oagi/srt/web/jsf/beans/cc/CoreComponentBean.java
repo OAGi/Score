@@ -2,6 +2,8 @@ package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -21,7 +23,7 @@ import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSIO
 @ManagedBean
 @SessionScoped
 @Transactional(readOnly = true)
-public class CoreComponentBean {
+public class CoreComponentBean extends UIHandler {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -35,6 +37,8 @@ public class CoreComponentBean {
     private BasicCoreComponentPropertyRepository bccpRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     private List<AggregateCoreComponent> accList;
     private List<AssociationCoreComponent> asccList;
@@ -355,5 +359,13 @@ public class CoreComponentBean {
         asccpList = null;
         bccList = null;
         bccpList = null;
+    }
+
+    @Transactional
+    public String createACC() {
+        User requester = getCurrentUser();
+        AggregateCoreComponent acc = coreComponentService.newAggregateCoreComponent(requester);
+
+        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&faces-redirect=true";
     }
 }

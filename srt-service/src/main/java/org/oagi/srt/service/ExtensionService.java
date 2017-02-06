@@ -134,7 +134,6 @@ public class ExtensionService {
         AggregateCoreComponent ueAcc = new AggregateCoreComponent();
         ueAcc.setGuid(Utility.generateGUID());
         ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
-        ueAcc.setDen(ueAcc.getObjectClassTerm() + ". Details");
         ueAcc.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAcc.setOagisComponentType(UserExtensionGroup);
         ueAcc.setCreatedBy(userId);
