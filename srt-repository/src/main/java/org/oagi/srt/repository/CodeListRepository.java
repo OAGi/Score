@@ -30,6 +30,9 @@ public interface CodeListRepository extends JpaRepository<CodeList, Long> {
     @Query("select c from CodeList c where c.name = ?1")
     public CodeList findOneByName(String name);
 
+    @Query("select c from CodeList c where c.basedCodeListId = ?1")
+    public List<CodeList> findByBasedCodeListId(long basedCodeListId);
+
     @Query("update CodeList c set c.state = ?1 where c.codeListId = ?2")
     public void updateStateByCodeListId(String state, long codeListId);
 }

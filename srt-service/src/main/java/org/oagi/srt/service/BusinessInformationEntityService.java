@@ -873,24 +873,34 @@ public class BusinessInformationEntityService {
                 .filter(e -> e.getCodeListId() > 0L)
                 .collect(Collectors.toList());
         BusinessDataTypePrimitiveRestriction bdtPriRestri = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-
-        Map<String, CodeList> codeListMap;
+        Collection<CodeList> codeListSet;
         if (bdtPriRestri != null) {
-            codeListMap = new LinkedHashMap();
+            codeListSet = new HashSet();
             CodeList codeList = codeListRepository.findOne(bdtPriRestri.getCodeListId());
             while (codeList != null) {
-                codeListMap.put(codeList.getName(), codeList);
+                codeListSet.add(codeList);
+
                 long basedCodeListId = codeList.getBasedCodeListId();
                 if (basedCodeListId > 0L) {
+                    codeListRepository.findByBasedCodeListId(basedCodeListId).stream().forEach(c -> {
+                        codeListSet.add(c);
+                    });
                     codeList = codeListRepository.findOne(basedCodeListId);
                 } else {
                     codeList = null;
                 }
             }
         } else {
-            codeListMap = codeListRepository.findAll().stream()
-                    .collect(Collectors.toMap(e -> e.getName(), Function.identity()));
+            codeListSet = codeListRepository.findAll();
         }
+
+        List<CodeList> codeLists = new ArrayList(codeListSet);
+        Collections.sort(codeLists, Comparator.comparing(CodeList::getName));
+
+        Map<String, CodeList> codeListMap = new LinkedHashMap();
+        codeLists.stream().forEach(c -> {
+            codeListMap.put(c.getName(), c);
+        });
 
         return codeListMap;
     }
