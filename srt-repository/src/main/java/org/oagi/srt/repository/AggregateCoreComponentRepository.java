@@ -3,6 +3,7 @@ package org.oagi.srt.repository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
@@ -37,4 +38,12 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
 
     @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
     public List<AggregateCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionTrackingNum = (" +
+            "select MAX(a.revisionTrackingNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId)")
+    public AggregateCoreComponent findLatestOneByCurrentAccId(long currentAccId);
+
+    @Modifying
+    @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1")
+    public void deleteByCurrentAccId(long currentAccId);
 }

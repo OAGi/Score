@@ -211,7 +211,23 @@
                                     <h:panelGroup id="accPanelGroup"
                                             rendered="#{accDetailBean.preparedAppend eq false and
                                                         fn:startsWith(accDetailBean.selectedTreeNode.type, 'ACC')}">
-                                        <p:panel header="ACC">
+                                        <p:panel id="accPanel">
+                                            <f:facet name="header">
+                                                <h:outputText value="ACC"/>
+                                                <span style="float: right;">
+                                                    <p:commandButton
+                                                            rendered="#{accDetailBean.selectedTreeNode.data.acc.state == 'Editing'}"
+                                                            value="Update" ajax="true"
+                                                            action="#{accDetailBean.updateAcc(accDetailBean.selectedTreeNode)}"
+                                                            disabled="#{accDetailBean.selectedTreeNode.data.acc.isDirty() eq false}"
+                                                            update=":form:details"/>
+                                                    <p:commandButton
+                                                            rendered="#{accDetailBean.selectedTreeNode.data.acc.state == 'Editing'}"
+                                                            value="Discard" ajax="true" styleClass="danger"
+                                                            action="#{accDetailBean.discardAcc(accDetailBean.selectedTreeNode)}"
+                                                            update=":form:treeTable, :form:details"/>
+                                                </span>
+                                            </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
@@ -220,13 +236,13 @@
                                                         disabled="true"/>
 
                                                 <h:outputText value="Object Class Term" styleClass="section-label"/>
-                                                <h:inputText
-                                                        value="#{accDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
-                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
-                                                    <p:ajax update="headerMessage"/>
-                                                    <p:ajax update="leftPanel"/>
-                                                    <p:ajax update="accPanelGroup"/>
+                                                <h:inputText required="true"
+                                                             requiredMessage="Please fill out 'Object Class Term' field."
+                                                             value="#{accDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
+                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                    <p:ajax listener="#{accDetailBean.onChangeObjectClassTerm(accDetailBean.selectedTreeNode.data)}"
+                                                            update="headerMessage, leftPanel, accPanel"/>
                                                 </h:inputText>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
@@ -243,6 +259,18 @@
                                                     <f:selectItems value="#{accDetailBean.availableOagisComponentTypes(accDetailBean.selectedTreeNode.data.acc)}"/>
                                                     <f:ajax render="accPanel"/>
                                                 </p:selectOneMenu>
+
+                                                <h:outputText value="Namespace" styleClass="section-label"/>
+                                                <p:autoComplete
+                                                        value="#{accDetailBean.selectedTreeNode.data.namespace}"
+                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}"
+                                                        completeMethod="#{accDetailBean.completeNamespace}"
+                                                        var="namespace" dropdown="true"
+                                                        itemLabel="#{namespace.uri}" itemValue="#{namespace}">
+                                                    <f:converter binding="#{namespaceConverter}"/>
+                                                    <p:ajax event="itemSelect" update="accPanel"/>
+                                                </p:autoComplete>
 
                                                 <h:outputText value="Abstract" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox
@@ -671,6 +699,24 @@
                         </div>
                     </div>
                 </h:panelGroup>
+            </p:panel>
+
+            <p:panel id="btnGroup"
+                     rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.createdBy) and
+                                 (accDetailBean.preparedAppend eq false)}">
+                <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
+                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                                 action="#{accDetailBean.updateState('Candidate')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
+                                 id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
+                                 action="#{accDetailBean.updateState('Editing')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
+                                 id="btnPublish" widgetVar="btnPublish" value="Publish"
+                                 action="#{accDetailBean.updateState('Published')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

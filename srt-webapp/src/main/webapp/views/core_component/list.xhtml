@@ -66,16 +66,21 @@
                              style="width: 100%; margin-bottom:20px" rowKey="#{acc.guid}">
                     <p:column headerText="Object Class Term" sortBy="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}">
                         <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                rendered="#{acc.oagisComponentType eq 'UserExtensionGroup'}"
+                                rendered="#{acc.oagisComponentType eq 'UserExtensionGroup' and
+                                          ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
                                 outcome="/views/core_component/extension.jsf">
                             <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(acc.accId)}"/>
                         </h:link>
 
                         <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                rendered="#{acc.oagisComponentType ne 'UserExtensionGroup'}"
+                                rendered="#{acc.oagisComponentType ne 'UserExtensionGroup' and
+                                          ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
                                 outcome="/views/core_component/acc_details.jsf">
                             <f:param name="accId" value="#{acc.accId}"/>
                         </h:link>
+
+                        <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                                      rendered="#{coreComponentBean.getCurrentUser().appUserId ne acc.ownerUserId and acc.state eq 'Editing'}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" headerText="Type">

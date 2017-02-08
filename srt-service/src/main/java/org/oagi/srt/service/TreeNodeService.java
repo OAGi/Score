@@ -176,13 +176,20 @@ public class TreeNodeService {
 
         @Override
         public String getId() {
-            return acc.getGuid();
+            return getAggregateCoreComponent().getGuid();
         }
 
         @Override
         public Namespace getNamespace() {
-            long namespaceId = acc.getNamespaceId();
+            long namespaceId = getAggregateCoreComponent().getNamespaceId();
             return namespaceRepository.findOne(namespaceId);
+        }
+
+        @Override
+        public void setNamespace(Namespace namespace) {
+            if (namespace != null) {
+                getAggregateCoreComponent().setNamespaceId(namespace.getNamespaceId());
+            }
         }
 
         private List<CoreComponentRelation> associations() {
@@ -348,6 +355,13 @@ public class TreeNodeService {
         }
 
         @Override
+        public void setNamespace(Namespace namespace) {
+            if (namespace != null) {
+                getAssociationCoreComponentProperty().setNamespaceId(namespace.getNamespaceId());
+            }
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
                 long roleOfAccId = getRoleOfAccId();
@@ -464,6 +478,13 @@ public class TreeNodeService {
         }
 
         @Override
+        public void setNamespace(Namespace namespace) {
+            if (namespace != null) {
+                getBasicCoreComponentProperty().setNamespaceId(namespace.getNamespaceId());
+            }
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
                 long bdtId = getBusinessDataType().getDtId();
@@ -546,6 +567,14 @@ public class TreeNodeService {
         public Namespace getNamespace() {
             return (parent != null) ? parent.getNamespace() : null;
         }
+
+        @Override
+        public void setNamespace(Namespace namespace) {
+            if (parent != null) {
+                parent.setNamespace(namespace);
+            }
+        }
+
 
         @Override
         public boolean hasChild() {

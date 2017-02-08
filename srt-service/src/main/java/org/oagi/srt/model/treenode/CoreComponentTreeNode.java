@@ -9,5 +9,6 @@ public interface CoreComponentTreeNode extends SRTTreeNode {
     public Collection<? extends CoreComponentTreeNode> getChildren();
 
     public Namespace getNamespace();
+    public void setNamespace(Namespace namespace);
 
 }

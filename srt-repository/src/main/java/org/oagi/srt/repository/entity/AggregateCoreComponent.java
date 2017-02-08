@@ -209,7 +209,9 @@ public class AggregateCoreComponent
     }
 
     public void setNamespaceId(long namespaceId) {
-        this.namespaceId = namespaceId;
+        if (namespaceId > 0L) {
+            this.namespaceId = namespaceId;
+        }
     }
 
     public long getCreatedBy() {

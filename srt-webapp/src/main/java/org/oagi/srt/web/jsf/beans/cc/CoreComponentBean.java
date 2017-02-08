@@ -40,12 +40,6 @@ public class CoreComponentBean extends UIHandler {
     @Autowired
     private CoreComponentService coreComponentService;
 
-    private List<AggregateCoreComponent> accList;
-    private List<AssociationCoreComponent> asccList;
-    private List<AssociationCoreComponentProperty> asccpList;
-    private List<BasicCoreComponent> bccList;
-    private List<BasicCoreComponentProperty> bccpList;
-
     private String type = "ACC";
     private List<CoreComponentState> selectedStates;
 
@@ -95,10 +89,10 @@ public class CoreComponentBean extends UIHandler {
     }
 
     public List<AggregateCoreComponent> getAccList() {
-        if (accList == null) {
-            if (selectedStates == null || selectedStates.isEmpty()) {
-                accList = accRepository.findAllByRevisionNum(0);
-            }
+        List<AggregateCoreComponent> accList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            accList = accRepository.findAllByRevisionNum(0);
+        } else {
             accList = accRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
@@ -112,10 +106,10 @@ public class CoreComponentBean extends UIHandler {
     }
 
     public List<AssociationCoreComponent> getAsccList() {
-        if (asccList == null) {
-            if (selectedStates == null || selectedStates.isEmpty()) {
-                asccList = asccRepository.findAllByRevisionNum(0);
-            }
+        List<AssociationCoreComponent> asccList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            asccList = asccRepository.findAllByRevisionNum(0);
+        } else {
             asccList = asccRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
@@ -129,10 +123,10 @@ public class CoreComponentBean extends UIHandler {
     }
 
     public List<AssociationCoreComponentProperty> getAsccpList() {
-        if (asccpList == null) {
-            if (selectedStates == null || selectedStates.isEmpty()) {
-                asccpList = asccpRepository.findAllByRevisionNum(0);
-            }
+        List<AssociationCoreComponentProperty> asccpList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            asccpList = asccpRepository.findAllByRevisionNum(0);
+        } else {
             asccpList = asccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
@@ -146,10 +140,10 @@ public class CoreComponentBean extends UIHandler {
     }
 
     public List<BasicCoreComponent> getBccList() {
-        if (bccList == null) {
-            if (selectedStates == null || selectedStates.isEmpty()) {
-                bccList = bccRepository.findAllByRevisionNum(0);
-            }
+        List<BasicCoreComponent> bccList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            bccList = bccRepository.findAllByRevisionNum(0);
+        } else {
             bccList = bccRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
@@ -163,10 +157,10 @@ public class CoreComponentBean extends UIHandler {
     }
 
     public List<BasicCoreComponentProperty> getBccpList() {
-        if (bccpList == null) {
-            if (selectedStates == null || selectedStates.isEmpty()) {
-                bccpList = bccpRepository.findAllByRevisionNum(0);
-            }
+        List<BasicCoreComponentProperty> bccpList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            bccpList = bccpRepository.findAllByRevisionNum(0);
+        } else {
             bccpList = bccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
         }
 
@@ -354,11 +348,6 @@ public class CoreComponentBean extends UIHandler {
     }
 
     private void reset() {
-        accList = null;
-        asccList = null;
-        asccpList = null;
-        bccList = null;
-        bccpList = null;
     }
 
     @Transactional

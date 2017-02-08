@@ -13,17 +13,15 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
-
 @Controller
-@Scope(SCOPE_SESSION)
+@Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class NamespaceBean extends UIHandler {
 
     @Autowired
@@ -44,9 +42,9 @@ public class NamespaceBean extends UIHandler {
         setNamespaceList(allNamespaceList);
 
         userMap = userService.findByUserIds(
-            allNamespaceList.stream()
-                    .map(Namespace::getOwnerUserId)
-                    .distinct().collect(Collectors.toList())
+                allNamespaceList.stream()
+                        .map(Namespace::getOwnerUserId)
+                        .distinct().collect(Collectors.toList())
         );
     }
 

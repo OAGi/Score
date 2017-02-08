@@ -30,7 +30,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
@@ -151,6 +150,19 @@ public class AccDetailBean extends UIHandler {
         setPreparedAppendBcc(false);
     }
 
+    public AggregateCoreComponent getSelectedAggregateCoreComponent() {
+        TreeNode treeNode = getSelectedTreeNode();
+        if (treeNode != null) {
+            Object data = treeNode.getData();
+            if (data instanceof AggregateCoreComponentTreeNode) {
+                AggregateCoreComponentTreeNode accTreeNode = (AggregateCoreComponentTreeNode) data;
+                return accTreeNode.getAggregateCoreComponent();
+            }
+        }
+
+        return null;
+    }
+
     public void onSelectTreeNode(NodeSelectEvent selectEvent) {
         setSelectedTreeNode(selectEvent.getTreeNode());
     }
@@ -178,16 +190,21 @@ public class AccDetailBean extends UIHandler {
     }
 
     private TreeNode toTreeNode(CoreComponentTreeNode node, TreeNode parent) {
-        TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
-        String name = treeNodeTypeNameResolver.getName();
-        node.setAttribute("name", name);
+        setNodeName(node);
 
+        TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
         String type = treeNodeTypeNameResolver.getType();
         TreeNode treeNode = new DefaultTreeNode(type, node, parent);
         if (node.hasChild()) {
             new DefaultTreeNode(null, treeNode); // append a dummy child
         }
         return treeNode;
+    }
+
+    private void setNodeName(CoreComponentTreeNode node) {
+        TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
+        String name = treeNodeTypeNameResolver.getName();
+        node.setAttribute("name", name);
     }
 
     private TreeNodeTypeNameResolver getTreeNodeTypeNameResolver(CoreComponentTreeNode node) {
@@ -338,15 +355,36 @@ public class AccDetailBean extends UIHandler {
         return availableOagisComponentTypes;
     }
 
-    public Map<String, Long> availableNamespaces(AggregateCoreComponent acc) {
+    public List<Namespace> availableNamespaces(AggregateCoreComponent acc) {
         User owner = getOwnerUser(acc);
         if (owner.isOagisDeveloperIndicator()) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
 
         List<Namespace> namespaces = namespaceService.findAll();
         return namespaces.stream().filter(e -> !e.isStdNmsp())
-                .collect(Collectors.toMap(Namespace::getUri, Namespace::getNamespaceId));
+                .collect(Collectors.toList());
+    }
+
+    public List<Namespace> completeNamespace(String query) {
+        AggregateCoreComponent acc = getSelectedAggregateCoreComponent();
+        List<Namespace> namespaces = availableNamespaces(acc);
+        if (StringUtils.isEmpty(query)) {
+            return namespaces;
+        } else {
+            return namespaces.stream()
+                    .filter(e -> e.getUri().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void onSelectNamespace(SelectEvent event) {
+        Namespace namespace = (Namespace) event.getObject();
+
+        AggregateCoreComponent acc = getSelectedAggregateCoreComponent();
+        if (namespace != null) {
+            acc.setNamespaceId(namespace.getNamespaceId());
+        }
     }
 
     public boolean canBeAbstract(AggregateCoreComponent acc) {
@@ -361,6 +399,50 @@ public class AccDetailBean extends UIHandler {
         }
 
         return basedAcc.isAbstract();
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateAcc(TreeNode treeNode) {
+        AggregateCoreComponentTreeNode accNode = (AggregateCoreComponentTreeNode) treeNode.getData();
+        AggregateCoreComponent acc = accNode.getAggregateCoreComponent();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.update(acc, requester);
+            acc.afterLoaded();
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discardAcc(TreeNode treeNode) {
+        AggregateCoreComponentTreeNode accNode = (AggregateCoreComponentTreeNode) treeNode.getData();
+        AggregateCoreComponent acc = accNode.getAggregateCoreComponent();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.discard(acc, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+        setSelectedTreeNode(null);
+
+        TreeNode parent = treeNode.getParent();
+        List<TreeNode> children = parent.getChildren();
+        children.remove(treeNode);
+
+        TreeNode root = getTreeNode();
+        reorderTreeNode(root);
+    }
+
+    public void onChangeObjectClassTerm(AggregateCoreComponentTreeNode accNode) {
+        setNodeName(accNode);
     }
 
     /*
@@ -770,9 +852,8 @@ public class AccDetailBean extends UIHandler {
         User requester = getCurrentUser();
         try {
             AggregateCoreComponent eAcc = getTargetAcc();
-            AggregateCoreComponent ueAcc = getUserExtensionAcc();
 
-            coreComponentService.updateState(eAcc, ueAcc, state, requester);
+            coreComponentService.updateState(eAcc, state, requester);
 
             TreeNode root = getTreeNode();
             updateState(root, state, requester);

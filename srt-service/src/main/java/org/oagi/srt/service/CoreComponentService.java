@@ -107,6 +107,100 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent newAggregateCoreComponent(User user) {
+        long requesterId = user.getAppUserId();
+
+        AggregateCoreComponent acc = new AggregateCoreComponent();
+        acc.setGuid(Utility.generateGUID());
+        acc.setObjectClassTerm("A new ACC Object");
+        acc.setOagisComponentType(OagisComponentType.Semantics);
+        acc.setState(CoreComponentState.Editing);
+        acc.setOwnerUserId(requesterId);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        acc.addPersistEventListener(eventListener);
+
+        acc = accRepository.saveAndFlush(acc);
+
+        AggregateCoreComponent accHistory = acc.clone();
+        int revisionNum = 1;
+        accHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        accHistory.setRevisionTrackingNum(revisionTrackingNum);
+        accHistory.setRevisionAction(Insert);
+        accHistory.setCurrentAccId(acc.getAccId());
+
+        accRepository.save(accHistory);
+
+        return acc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update(AggregateCoreComponent acc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = acc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentAccId = acc.getAccId();
+        AggregateCoreComponent latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
+        if (latestAcc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        accRepository.save(acc);
+
+        int nextRevisionTrackingNum = latestAcc.getRevisionTrackingNum() + 1;
+        AggregateCoreComponent accHistory = acc.clone();
+        accHistory.setRevisionNum(latestAcc.getRevisionNum());
+        accHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
+        accHistory.setRevisionAction(Update);
+        accHistory.setLastUpdatedBy(requesterId);
+        accHistory.setCurrentAccId(currentAccId);
+
+        accRepository.saveAndFlush(accHistory);
+
+        // to check RevisionTrackingNum
+        latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
+        long actualRevisionTrackingNum = latestAcc.getRevisionTrackingNum();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateState(AggregateCoreComponent acc,
+                            CoreComponentState state,
+                            User requester) {
+        if (acc.getCreatedBy() != requester.getAppUserId()) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+
+        updateChildrenState(acc, state, requester);
+        updateAccState(acc, state, requester);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(AggregateCoreComponent acc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = acc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentAccId = acc.getAccId();
+        AggregateCoreComponent latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
+        if (latestAcc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        long accId = acc.getAccId();
+        accRepository.deleteByCurrentAccId(accId); // To remove history
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void update(AssociationCoreComponent ascc, User requester) {
         long requesterId = requester.getAppUserId();
         long ownerId = ascc.getCreatedBy();
@@ -334,6 +428,10 @@ public class CoreComponentService {
         }
 
         AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        if (asccp == null) {
+            return;
+        }
+
         if (asccp.getState() != Published) {
             asccp.setState(state);
             asccp.setLastUpdatedBy(lastUpdatedBy);
@@ -409,34 +507,5 @@ public class CoreComponentService {
 
             fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
         }
-    }
-
-    @Transactional
-    public AggregateCoreComponent newAggregateCoreComponent(User user) {
-        long requesterId = user.getAppUserId();
-
-        AggregateCoreComponent acc = new AggregateCoreComponent();
-        acc.setGuid(Utility.generateGUID());
-        acc.setObjectClassTerm("A new ACC Object");
-        acc.setOagisComponentType(OagisComponentType.Semantics);
-        acc.setState(CoreComponentState.Editing);
-        acc.setOwnerUserId(requesterId);
-
-        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
-        acc.addPersistEventListener(eventListener);
-
-        acc = accRepository.saveAndFlush(acc);
-
-        AggregateCoreComponent accHistory = acc.clone();
-        int revisionNum = 1;
-        accHistory.setRevisionNum(revisionNum);
-        int revisionTrackingNum = 1;
-        accHistory.setRevisionTrackingNum(revisionTrackingNum);
-        accHistory.setRevisionAction(Insert);
-        accHistory.setCurrentAccId(acc.getAccId());
-
-        accRepository.save(accHistory);
-
-        return acc;
     }
 }
