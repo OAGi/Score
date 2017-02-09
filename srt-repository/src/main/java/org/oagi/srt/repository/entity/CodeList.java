@@ -145,10 +145,8 @@ public class CodeList implements TimestampAware, Serializable {
         return (agencyId == null) ? 0L : agencyId;
     }
 
-    public void setAgencyId(long agencyId) {
-        if (agencyId > 0) {
-            this.agencyId = agencyId;
-        }
+    public void setAgencyId(Long agencyId) {
+        this.agencyId = agencyId;
     }
 
     public String getVersionId() {

@@ -32,8 +32,16 @@
                     </h:inputText>
 
                     <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
-                    <h:inputText id="agencyIdListValueID" value="#{codeListCreateFromAnotherBean.codeList.agencyId}"
-                                 label="Agency ID" styleClass="section-content input-section"/>
+                    <p:autoComplete id="agencyIdListValueID"
+                                    value="#{codeListCreateFromAnotherBean.agencyIdListValue}"
+                                    styleClass="section-content input-section"
+                                    completeMethod="#{codeListCreateFromAnotherBean.completeAgencyIdListValue}"
+                                    var="agencyIdListValue" dropdown="true" scrollHeight="220"
+                                    itemLabel="#{agencyIdListValue.name.concat(' (').concat(agencyIdListValue.agencyIdListValueId).concat(')')}"
+                                    itemValue="#{agencyIdListValue}">
+                        <f:converter binding="#{agencyIdListValueConverter}"/>
+                        <p:ajax event="itemSelect" update="form"/>
+                    </p:autoComplete>
 
                     <h:outputText for="version" value="Version" styleClass="section-label"/>
                     <h:inputText id="version" value="#{codeListCreateFromAnotherBean.codeList.versionId}"

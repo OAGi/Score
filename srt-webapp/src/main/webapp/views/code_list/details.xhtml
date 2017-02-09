@@ -22,7 +22,7 @@
         </div>
         <c:choose>
             <c:when test="#{codeListDetailBean.codeList.state != 'Editing'}">
-                <h:form id="form">
+                <h:form id="formNotEditing">
                     <p:panel>
                         <h:panelGrid columns="2" cellpadding="3">
                             <h:outputText value="Name" styleClass="section-label"/>
@@ -32,7 +32,7 @@
                             <h:outputText value="#{codeListDetailBean.codeList.listId}" styleClass="section-content"/>
 
                             <h:outputText value="Agency ID" styleClass="section-label"/>
-                            <h:outputText value="#{codeListDetailBean.codeList.agencyId}" styleClass="section-content"/>
+                            <h:outputText value="#{codeListDetailBean.agencyIdListValue.name.concat(' (').concat(codeListDetailBean.agencyIdListValue.agencyIdListValueId).concat(')')}" styleClass="section-content"/>
 
                             <h:outputText value="Version" styleClass="section-label"/>
                             <h:outputText value="#{codeListDetailBean.codeList.versionId}"
@@ -120,9 +120,16 @@
                             </h:inputText>
 
                             <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
-                            <h:inputText id="agencyIdListValueID"
-                                         value="#{codeListDetailBean.codeList.agencyId}"
-                                         label="Agency ID" styleClass="section-content input-section"/>
+                            <p:autoComplete id="agencyIdListValueID"
+                                            value="#{codeListDetailBean.agencyIdListValue}"
+                                            styleClass="section-content input-section"
+                                            completeMethod="#{codeListDetailBean.completeAgencyIdListValue}"
+                                            var="agencyIdListValue" dropdown="true" scrollHeight="220"
+                                            itemLabel="#{agencyIdListValue.name.concat(' (').concat(agencyIdListValue.agencyIdListValueId).concat(')')}"
+                                            itemValue="#{agencyIdListValue}">
+                                <f:converter binding="#{agencyIdListValueConverter}"/>
+                                <p:ajax event="itemSelect" update="form"/>
+                            </p:autoComplete>
 
                             <h:outputText for="version" value="Version" styleClass="section-label"/>
                             <h:inputText id="version" value="#{codeListDetailBean.codeList.versionId}"

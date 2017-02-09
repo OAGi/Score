@@ -2,6 +2,8 @@ package org.oagi.srt.web.jsf.beans.codelist;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
@@ -9,6 +11,7 @@ import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,9 @@ public class CodeListBaseBean extends UIHandler {
 
     @Autowired
     private CodeListService codeListService;
+
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
 
     private CodeList codeList;
     private List<CodeListValue> codeListValues = new ArrayList();
@@ -47,6 +53,36 @@ public class CodeListBaseBean extends UIHandler {
 
     public void setCodeList(CodeList codeList) {
         this.codeList = codeList;
+    }
+
+    public AgencyIdListValue getAgencyIdListValue() {
+        long agencyId = getCodeList().getAgencyId();
+        if (agencyId > 0L) {
+            return agencyIdListValueRepository.findOne(agencyId);
+        } else {
+            return null;
+        }
+    }
+
+    public void setAgencyIdListValue(AgencyIdListValue agencyIdListValue) {
+        if (agencyIdListValue != null) {
+            getCodeList().setAgencyId(agencyIdListValue.getAgencyIdListValueId());
+        }
+    }
+
+    public List<AgencyIdListValue> getAgencyIdListValues() {
+        return agencyIdListValueRepository.findAll(new Sort(Sort.Direction.ASC, "agencyIdListValueId"));
+    }
+
+    public List<AgencyIdListValue> completeAgencyIdListValue(String query) {
+        List<AgencyIdListValue> agencyIdListValues = getAgencyIdListValues();
+        if (StringUtils.isEmpty(query)) {
+            return agencyIdListValues;
+        } else {
+            return agencyIdListValues.stream()
+                    .filter(e -> e.getName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
     }
 
     public List<CodeListValue> getCodeListValues() {
