@@ -14,7 +14,7 @@
         <h:form id="form">
             <p:panel>
                 <f:facet name="header">
-                    <p:autoComplete id="ccName" value="#{codeListBean.basedCodeListName}"
+                    <p:autoComplete id="ccName" value="#{codeListBean.codeListName}"
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
                                     completeMethod="#{codeListBean.completeInput}">
@@ -35,6 +35,11 @@
                     <p:column headerText="Name" sortBy="#{cVO.name}">
                         <h:link value="#{cVO.name}" outcome="/views/code_list/details.xhtml">
                             <f:param name="codeListId" value="#{cVO.codeListId}"/>
+                        </h:link>
+                    </p:column>
+                    <p:column headerText="Based Code List" sortBy="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}">
+                        <h:link value="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}" outcome="/views/code_list/details.xhtml">
+                            <f:param name="codeListId" value="#{cVO.basedCodeListId}"/>
                         </h:link>
                     </p:column>
                     <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">

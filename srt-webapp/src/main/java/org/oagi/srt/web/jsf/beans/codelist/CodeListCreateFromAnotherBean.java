@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.beans.codelist;
 
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.service.CodeListService;
@@ -39,8 +40,8 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
     public void setBasedCodeList(CodeList basedCodeList) {
         this.basedCodeList = basedCodeList;
         CodeList codeList = new CodeList();
-        codeList.setName(basedCodeList.getName());
-        codeList.setListId(basedCodeList.getListId());
+        codeList.setName(basedCodeList.getName() + "_Extension");
+        codeList.setListId(Utility.generateGUID());
         codeList.setAgencyId(basedCodeList.getAgencyId());
         codeList.setVersionId(basedCodeList.getVersionId());
         codeList.setDefinition(basedCodeList.getDefinition());

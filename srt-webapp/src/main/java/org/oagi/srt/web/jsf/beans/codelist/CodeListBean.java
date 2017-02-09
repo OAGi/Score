@@ -14,6 +14,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -25,8 +27,9 @@ public class CodeListBean extends UIHandler {
     @Autowired
     private CodeListService codeListService;
 
-    private String basedCodeListName;
+    private String codeListName;
     private List<CodeList> allCodeLists;
+    private Map<Long, CodeList> allCodeListMap;
     private List<CodeList> codeLists = new ArrayList();
 
     @PostConstruct
@@ -36,6 +39,8 @@ public class CodeListBean extends UIHandler {
 
     public List<CodeList> allCodeLists() {
         allCodeLists = codeListService.findAll(Sort.Direction.ASC, "name");
+        allCodeListMap = allCodeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         return allCodeLists;
     }
 
@@ -47,12 +52,12 @@ public class CodeListBean extends UIHandler {
         this.codeLists = codeLists;
     }
 
-    public String getBasedCodeListName() {
-        return basedCodeListName;
+    public String getCodeListName() {
+        return codeListName;
     }
 
-    public void setBasedCodeListName(String basedCodeListName) {
-        this.basedCodeListName = basedCodeListName;
+    public void setCodeListName(String codeListName) {
+        this.codeListName = codeListName;
     }
 
     public List<String> completeInput(String query) {
@@ -82,7 +87,7 @@ public class CodeListBean extends UIHandler {
     }
 
     public void search() {
-        String basedCodeListName = getBasedCodeListName();
+        String basedCodeListName = getCodeListName();
         if (StringUtils.isEmpty(basedCodeListName)) {
             setCodeLists(allCodeLists());
         } else {
@@ -94,4 +99,11 @@ public class CodeListBean extends UIHandler {
         }
     }
 
+    public String getBasedCodeListName(long basedCodeListId) {
+        if (basedCodeListId == 0L) {
+            return null;
+        }
+        CodeList basedCodeList = allCodeListMap.get(basedCodeListId);
+        return (basedCodeList != null) ? basedCodeList.getName() : null;
+    }
 }

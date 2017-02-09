@@ -1,6 +1,7 @@
 package org.oagi.srt.web.jsf.beans.codelist;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class CodeListBaseBean extends UIHandler {
     @Autowired
     private CodeListService codeListService;
 
-    private CodeList codeList = new CodeList();
+    private CodeList codeList;
     private List<CodeListValue> codeListValues = new ArrayList();
     private CodeListValue selectedCodeListValue;
     private List<CodeListValue> deleteCodeListValues = new ArrayList();
@@ -32,6 +34,12 @@ public class CodeListBaseBean extends UIHandler {
     private CodeListState state;
     private boolean confirmDifferentNameButSameIdentity;
     private boolean confirmSameListIdButDifferentIdentity;
+
+    @PostConstruct
+    public void init() {
+        codeList = new CodeList();
+        codeList.setListId(Utility.generateGUID());
+    }
 
     public CodeList getCodeList() {
         return codeList;
