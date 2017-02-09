@@ -260,18 +260,6 @@
                                                     <f:ajax render="accPanel"/>
                                                 </p:selectOneMenu>
 
-                                                <h:outputText value="Namespace" styleClass="section-label"/>
-                                                <p:autoComplete
-                                                        value="#{accDetailBean.selectedTreeNode.data.namespace}"
-                                                        styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}"
-                                                        completeMethod="#{accDetailBean.completeNamespace}"
-                                                        var="namespace" dropdown="true"
-                                                        itemLabel="#{namespace.uri}" itemValue="#{namespace}">
-                                                    <f:converter binding="#{namespaceConverter}"/>
-                                                    <p:ajax event="itemSelect" update="accPanel"/>
-                                                </p:autoComplete>
-
                                                 <h:outputText value="Abstract" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox
                                                         value="${accDetailBean.selectedTreeNode.data.acc.abstractComponent}"
