@@ -6,6 +6,7 @@ import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNod
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.model.treenode.BusinessInformationEntityTreeNode;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
@@ -16,12 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 abstract class AbstractProfileBODBean extends UIHandler {
 
     @Autowired
     private TreeNodeService treeNodeService;
+
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     private TreeNode treeNode;
 
@@ -175,5 +184,71 @@ abstract class AbstractProfileBODBean extends UIHandler {
                 return Utility.spaceSeparator(bdtSc.getPropertyTerm().concat(bdtSc.getRepresentationTerm()));
             }
         }
+    }
+
+    public Map<String, Integer> availableCardinalityMin(AssociationBusinessInformationEntity asbie) {
+        int originalCardinalityMin = coreComponentService.findOriginalCardinalityMin(asbie);
+        return availableCardinalityMin(originalCardinalityMin);
+    }
+
+    public Map<String, Integer> availableCardinalityMax(AssociationBusinessInformationEntity asbie) {
+        int originalCardinalityMax = coreComponentService.findOriginalCardinalityMax(asbie);
+        int cardinalityMin = asbie.getCardinalityMin();
+
+        return availableCardinalityMax(cardinalityMin, originalCardinalityMax);
+    }
+
+    public Map<String, Integer> availableCardinalityMin(BasicBusinessInformationEntity bbie) {
+        int originalCardinalityMin = coreComponentService.findOriginalCardinalityMin(bbie);
+        return availableCardinalityMin(originalCardinalityMin);
+    }
+
+    public Map<String, Integer> availableCardinalityMax(BasicBusinessInformationEntity bbie) {
+        int originalCardinalityMax = coreComponentService.findOriginalCardinalityMax(bbie);
+        int cardinalityMin = bbie.getCardinalityMin();
+
+        return availableCardinalityMax(cardinalityMin, originalCardinalityMax);
+    }
+
+    public Map<String, Integer> availableCardinalityMin(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
+        int originalCardinalityMin = coreComponentService.findOriginalCardinalityMin(bbieSc);
+        return availableCardinalityMin(originalCardinalityMin);
+    }
+
+    public Map<String, Integer> availableCardinalityMax(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
+        int originalCardinalityMax = coreComponentService.findOriginalCardinalityMax(bbieSc);
+        int cardinalityMin = bbieSc.getCardinalityMin();
+
+        return availableCardinalityMax(cardinalityMin, originalCardinalityMax);
+    }
+
+    private Map<String, Integer> availableCardinalityMin(int originalCardinalityMin) {
+        int startInclusive = 0;
+        int endInclusive = originalCardinalityMin;
+
+        Map<String, Integer> range = new LinkedHashMap();
+        for (int i = startInclusive; i <= endInclusive; ++i) {
+            range.put(Integer.toString(i), i);
+        }
+        return range;
+    }
+
+    private Map<String, Integer> availableCardinalityMax(int cardinalityMin, int originalCardinalityMax) {
+        if (originalCardinalityMax == -1) {
+            originalCardinalityMax = Integer.MAX_VALUE;
+        }
+
+        int startInclusive = cardinalityMin;
+        int endInclusive = Math.min(cardinalityMin + 10, originalCardinalityMax); // Limits that maxResults equal 10
+
+        Map<String, Integer> range = new LinkedHashMap();
+        for (int i = startInclusive; i <= endInclusive; ++i) {
+            range.put(Integer.toString(i), i);
+        }
+        if (originalCardinalityMax == Integer.MAX_VALUE) {
+            range.put("unbounded", -1);
+        }
+
+        return range;
     }
 }

@@ -46,8 +46,6 @@ public class AssociationBusinessInformationEntity
 
     @Column(nullable = false, updatable = false)
     private long basedAsccId;
-    @Transient
-    private AssociationCoreComponent basedAscc;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -155,10 +153,6 @@ public class AssociationBusinessInformationEntity
 
     public void setBasedAsccId(long basedAsccId) {
         this.basedAsccId = basedAsccId;
-    }
-
-    public void setBasedAscc(AssociationCoreComponent basedAscc) {
-        this.basedAscc = basedAscc;
     }
 
     public String getDefinition() {
@@ -326,9 +320,6 @@ public class AssociationBusinessInformationEntity
                 }
                 if (asbie.toAsbiep != null) {
                     asbie.setToAsbiepId(asbie.toAsbiep.getAsbiepId());
-                }
-                if (asbie.basedAscc != null) {
-                    asbie.setBasedAsccId(asbie.basedAscc.getAsccId());
                 }
                 if (asbie.ownerTopLevelAbie != null) {
                     asbie.setOwnerTopLevelAbieId(asbie.ownerTopLevelAbie.getTopLevelAbieId());

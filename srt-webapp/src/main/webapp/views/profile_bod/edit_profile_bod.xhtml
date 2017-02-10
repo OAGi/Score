@@ -173,12 +173,13 @@
                                             <p:panel id="asbiePanelForEditing" header="ASBIE">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
-                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </p:selectOneMenu>
 
@@ -187,7 +188,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                         <f:ajax render="asbiePanelForEditing"/>
@@ -304,12 +305,13 @@
                                             <p:panel id="bbiePanelForEditing" header="BBIE">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
-                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.bbie)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </p:selectOneMenu>
 
@@ -318,7 +320,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.bbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                         <f:ajax render="bbiePanelForEditing"/>
@@ -475,12 +477,13 @@
                                             <p:panel id="bbieScPanelForEditing" header="BBIE SC">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
-                                                            styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                            disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </p:selectOneMenu>
 
@@ -489,7 +492,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
                                                                      styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                         <f:ajax render="bbieScPanelForEditing"/>
@@ -679,12 +682,13 @@
                                             <p:panel header="ASBIE">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
-                                                            styleClass="section-content input-section disabled"
-                                                            disabled="true">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -692,7 +696,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                      styleClass="section-content input-section disabled"
                                                                      disabled="true">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </p:selectOneMenu>
@@ -786,12 +790,13 @@
                                             <p:panel header="BBIE">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
-                                                            styleClass="section-content input-section disabled"
-                                                            disabled="true">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.bbie)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -799,7 +804,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
                                                                      styleClass="section-content input-section disabled"
                                                                      disabled="true">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.bbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </p:selectOneMenu>
@@ -938,12 +943,13 @@
                                             <p:panel header="BBIE SC">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
-                                                    <p:selectOneMenu
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
-                                                            styleClass="section-content input-section disabled"
-                                                            disabled="true">
-                                                        <f:selectItem itemLabel="0" itemValue="0"/>
-                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMin(editProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
+                                                        <f:converter binding="#{cardinalityMinConverter}"/>
+                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -951,7 +957,7 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
                                                                      styleClass="section-content input-section disabled"
                                                                      disabled="true">
-                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </p:selectOneMenu>

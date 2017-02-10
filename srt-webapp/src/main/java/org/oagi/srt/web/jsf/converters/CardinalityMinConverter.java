@@ -15,40 +15,35 @@ import static javax.faces.application.FacesMessage.SEVERITY_ERROR;
 
 @Component
 @Scope("request")
-public class CardinalityMaxConverter implements Converter, Validator {
+public class CardinalityMinConverter implements Converter, Validator {
 
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-        int cardinalityMax = Integer.MIN_VALUE;
+        int cardinalityMin = Integer.MIN_VALUE;
         if (value instanceof String) {
-            if ("unbounded".equals(((String) value).toLowerCase())) {
-                cardinalityMax = -1;
-            } else {
-                try {
-                    cardinalityMax = Integer.parseInt((String) value);
-                } catch (NumberFormatException e) {
-                    throw new ValidatorException(
-                            new FacesMessage(SEVERITY_ERROR, "Error",
-                                    "'CardinalityMax' must be a number between -1 (unbounded) and " + Integer.MAX_VALUE));
-                }
+            try {
+                cardinalityMin = Integer.parseInt((String) value);
+            } catch (NumberFormatException e) {
+                throw new ValidatorException(
+                        new FacesMessage(SEVERITY_ERROR, "Error",
+                                "'CardinalityMin' must be a number between 0 and " + Integer.MAX_VALUE));
             }
         } else {
             if (value != null) {
                 try {
-                    cardinalityMax = (Integer) value;
+                    cardinalityMin = (Integer) value;
                 } catch (ClassCastException e) {
                     throw new ValidatorException(
                             new FacesMessage(SEVERITY_ERROR, "Error",
-                                    "'CardinalityMax' must be a number between -1 (unbounded) and " + Integer.MAX_VALUE));
+                                    "'CardinalityMin' must be a number between 0 and " + Integer.MAX_VALUE));
                 }
             }
-
         }
 
-        if (cardinalityMax < -1) {
+        if (cardinalityMin < 0) {
             throw new ValidatorException(
                     new FacesMessage(SEVERITY_ERROR, "Error",
-                            "'CardinalityMax' must be a number between -1 (unbounded) and " + Integer.MAX_VALUE));
+                            "'CardinalityMin' must be a number between 0 and " + Integer.MAX_VALUE));
         }
     }
 
@@ -58,17 +53,13 @@ public class CardinalityMaxConverter implements Converter, Validator {
         if (StringUtils.isEmpty(value)) {
             return null;
         }
-        if ("unbounded".equals(value.toLowerCase())) {
-            return "-1";
-        } else {
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                context.addMessage(component.getClientId(),
-                        new FacesMessage(SEVERITY_ERROR, "Error",
-                                "'CardinalityMax' must be a number between -1 (unbounded) and " + Integer.MAX_VALUE));
-                return null;
-            }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            context.addMessage(component.getClientId(),
+                    new FacesMessage(SEVERITY_ERROR, "Error",
+                            "'CardinalityMin' must be a number between 0 and " + Integer.MAX_VALUE));
+            return null;
         }
     }
 
@@ -80,14 +71,8 @@ public class CardinalityMaxConverter implements Converter, Validator {
                 return null;
             }
 
-            if ("-1".equals(value)) {
-                return "unbounded";
-            }
             return (String) value;
         } else if (value instanceof Integer) {
-            if (((Integer) value) == -1) {
-                return "unbounded";
-            }
             return Integer.toString((Integer) value);
         }
 

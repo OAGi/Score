@@ -963,7 +963,7 @@ public class TreeNodeService {
             asbie.setGuid(Utility.generateGUID());
             asbie.setFromAbie(fromAbie);
             asbie.setToAsbiep(asbiep);
-            asbie.setBasedAscc(ascc);
+            asbie.setBasedAsccId(ascc.getAsccId());
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
             asbie.setDefinition(ascc.getDefinition());

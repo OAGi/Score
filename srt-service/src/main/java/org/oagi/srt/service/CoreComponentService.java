@@ -37,6 +37,9 @@ public class CoreComponentService {
     private BasicCoreComponentPropertyRepository bccpRepository;
 
     @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
+    @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
     @Autowired
@@ -507,5 +510,41 @@ public class CoreComponentService {
 
             fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
         }
+    }
+
+    public int findOriginalCardinalityMin(AssociationBusinessInformationEntity asbie) {
+        long basedAsccId = asbie.getBasedAsccId();
+        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        return ascc.getCardinalityMin();
+    }
+
+    public int findOriginalCardinalityMax(AssociationBusinessInformationEntity asbie) {
+        long basedAsccId = asbie.getBasedAsccId();
+        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        return ascc.getCardinalityMax();
+    }
+
+    public int findOriginalCardinalityMin(BasicBusinessInformationEntity bbie) {
+        long basedBccId = bbie.getBasedBccId();
+        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        return bcc.getCardinalityMin();
+    }
+
+    public int findOriginalCardinalityMax(BasicBusinessInformationEntity bbie) {
+        long basedBccId = bbie.getBasedBccId();
+        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        return bcc.getCardinalityMax();
+    }
+
+    public int findOriginalCardinalityMin(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
+        long dtScId = bbieSc.getDtScId();
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        return dtSc.getCardinalityMin();
+    }
+
+    public int findOriginalCardinalityMax(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
+        long dtScId = bbieSc.getDtScId();
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        return dtSc.getCardinalityMax();
     }
 }
