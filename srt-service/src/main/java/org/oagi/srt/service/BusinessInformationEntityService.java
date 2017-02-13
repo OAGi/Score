@@ -903,16 +903,21 @@ public class BusinessInformationEntityService {
     }
 
     private List<CodeList> retrieveCodeListIncludeChildren(long codeListId) {
-        List<CodeList> children = codeListRepository.findByBasedCodeListId(codeListId);
+        CodeList codeList = codeListRepository.findOne(codeListId);
+        if (codeList.getState() != CodeListState.Published) {
+            return Collections.emptyList();
+        }
+
         Collection<CodeList> codeLists = new HashSet();
+        codeLists.add(codeList);
+
+        List<CodeList> children = codeListRepository.findByBasedCodeListId(codeListId).stream()
+                .filter(e -> e.getState() == CodeListState.Published).collect(Collectors.toList());
 
         for (CodeList child : children) {
             long childCodeListId = child.getCodeListId();
             codeLists.addAll(retrieveCodeListIncludeChildren(childCodeListId));
         }
-
-        CodeList codeList = codeListRepository.findOne(codeListId);
-        codeLists.add(codeList);
 
         return new ArrayList(codeLists);
     }
