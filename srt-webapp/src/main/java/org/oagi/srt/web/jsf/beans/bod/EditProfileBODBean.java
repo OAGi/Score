@@ -237,7 +237,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     /*
      * handle BBIE Type
      */
-    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType> getAvailablePrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
+    public Map<BasicBusinessInformationEntityRestrictionType, BasicBusinessInformationEntityRestrictionType>
+                                getAvailablePrimitiveRestrictions(BasicBusinessInformationEntityPropertyTreeNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 

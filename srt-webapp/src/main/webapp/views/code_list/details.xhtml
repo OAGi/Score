@@ -174,7 +174,7 @@
                     <p:panel>
                         <f:facet name="header">
                             <h:outputText value="Code List Values"/>
-                            <p:commandButton value="Add" style="float: right;"
+                            <p:commandButton value="Add" style="float: right;" onclick="$('.ui-paginator-last').click();"
                                              actionListener="#{codeListDetailBean.addCodeListValue}"
                                              update="tbl"/>
                         </f:facet>
@@ -189,14 +189,14 @@
                                 <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                          rendered="#{codeListValue.color ne 'BrightRed'}">
                                     <p:ajax update="tbl"
-                                            listener="#{codeListDetailBean.toggleColor(codeListValue.codeListValueId)}"/>
+                                            listener="#{codeListDetailBean.toggleColor(codeListValue)}"/>
                                 </h:selectBooleanCheckbox>
                             </p:column>
 
                             <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{codeListValue.value}"/>
+                                        <h:outputText value="#{codeListValue.value}" style="color: #{codeListCreateFromAnotherBean.getColor(codeListValue)}"/>
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"

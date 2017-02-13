@@ -108,20 +108,16 @@ public class CodeListBaseBean extends UIHandler {
         this.selectedCodeListValue = selectedCodeListValue;
     }
 
-    public void toggleColor(Long codeListValueId) {
-        for (CodeListValue codeListValue : codeListValues) {
-            if (codeListValue.getCodeListValueId() == codeListValueId) {
-                switch (codeListValue.getColor()) {
-                    case Blue:
-                        codeListValue.setColor(CodeListValue.Color.DullRed);
-                        break;
-                    case DullRed:
-                        codeListValue.setColor(CodeListValue.Color.Blue);
-                        break;
-                    default:
-                        break;
-                }
-            }
+    public void toggleColor(CodeListValue codeListValue) {
+        switch (codeListValue.getColor()) {
+            case Blue:
+                codeListValue.setColor(CodeListValue.Color.DullRed);
+                break;
+            case DullRed:
+                codeListValue.setColor(CodeListValue.Color.Blue);
+                break;
+            default:
+                break;
         }
     }
 
@@ -273,6 +269,21 @@ public class CodeListBaseBean extends UIHandler {
         }
 
         return true;
+    }
+
+    public String getColor(CodeListValue codeListValue) {
+        switch (codeListValue.getColor()) {
+            case Blue:
+                return "#0000cd";
+            case BrightRed:
+                return "#ff0000";
+            case DullRed:
+                return "#cd5c5c";
+            case Green:
+                return "#008000";
+            default:
+                throw new IllegalStateException();
+        }
     }
 
 }

@@ -873,29 +873,26 @@ public class BusinessInformationEntityService {
                 .filter(e -> e.getCodeListId() > 0L)
                 .collect(Collectors.toList());
         BusinessDataTypePrimitiveRestriction bdtPriRestri = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+
         Collection<CodeList> codeListSet;
         if (bdtPriRestri != null) {
-            codeListSet = new HashSet();
-            CodeList codeList = codeListRepository.findOne(bdtPriRestri.getCodeListId());
-            while (codeList != null) {
-                codeListSet.add(codeList);
+            long codeListId = bdtPriRestri.getCodeListId();
 
-                long basedCodeListId = codeList.getBasedCodeListId();
-                if (basedCodeListId > 0L) {
-                    codeListRepository.findByBasedCodeListId(basedCodeListId).stream().forEach(c -> {
-                        codeListSet.add(c);
-                    });
-                    codeList = codeListRepository.findOne(basedCodeListId);
-                } else {
-                    codeList = null;
-                }
+            CodeList codeList = codeListRepository.findOne(codeListId);
+            long basedCodeListId = codeList.getBasedCodeListId();
+            while (basedCodeListId != 0L) {
+                codeListId = basedCodeListId;
+                codeList = codeListRepository.findOne(codeListId);
+                basedCodeListId = codeList.getBasedCodeListId();
             }
+
+            codeListSet = retrieveCodeListIncludeChildren(codeListId);
         } else {
             codeListSet = codeListRepository.findAll();
         }
 
         List<CodeList> codeLists = new ArrayList(codeListSet);
-        Collections.sort(codeLists, Comparator.comparing(CodeList::getName));
+        Collections.sort(codeLists, Comparator.comparingLong(CodeList::getCodeListId));
 
         Map<String, CodeList> codeListMap = new LinkedHashMap();
         codeLists.stream().forEach(c -> {
@@ -903,6 +900,21 @@ public class BusinessInformationEntityService {
         });
 
         return codeListMap;
+    }
+
+    private List<CodeList> retrieveCodeListIncludeChildren(long codeListId) {
+        List<CodeList> children = codeListRepository.findByBasedCodeListId(codeListId);
+        Collection<CodeList> codeLists = new HashSet();
+
+        for (CodeList child : children) {
+            long childCodeListId = child.getCodeListId();
+            codeLists.addAll(retrieveCodeListIncludeChildren(childCodeListId));
+        }
+
+        CodeList codeList = codeListRepository.findOne(codeListId);
+        codeLists.add(codeList);
+
+        return new ArrayList(codeLists);
     }
 
     public String getBbieAgencyIdListName(BasicBusinessInformationEntityPropertyTreeNode node) {

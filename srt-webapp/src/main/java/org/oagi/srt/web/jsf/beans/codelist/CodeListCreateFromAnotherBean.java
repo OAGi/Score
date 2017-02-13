@@ -14,6 +14,9 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.CodeListValue.Color.BrightRed;
+import static org.oagi.srt.repository.entity.CodeListValue.Color.DullRed;
+
 @Controller
 @Scope("view")
 @ManagedBean
@@ -59,7 +62,13 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
                             copy.setName(e.getName());
                             copy.setDefinition(e.getDefinition());
                             copy.setDefinitionSource(e.getDefinitionSource());
-                            copy.setColor(e.getColor());
+                            CodeListValue.Color color = e.getColor();
+                            if (DullRed == color) {
+                                copy.setColor(BrightRed);
+                            } else {
+                                copy.setColor(color);
+                            }
+
                             return copy;
                         }).collect(Collectors.toList())
         );
