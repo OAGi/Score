@@ -240,6 +240,28 @@
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
+                                                <h:outputText value="Component Type" styleClass="section-label"/>
+                                                <p:selectOneMenu
+                                                        value="#{extensionBean.selectedTreeNode.data.acc.oagisComponentType}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                    <f:selectItems value="#{extensionBean.availableOagisComponentTypes(extensionBean.selectedTreeNode.data.acc)}"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputText value="Abstract" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.acc.abstractComponent}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.acc.deprecated}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                </h:selectBooleanCheckbox>
+
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.acc.definition}"

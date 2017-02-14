@@ -8,7 +8,6 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.TreeNodeService;
-import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -41,7 +40,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ExtensionBean extends UIHandler {
+public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

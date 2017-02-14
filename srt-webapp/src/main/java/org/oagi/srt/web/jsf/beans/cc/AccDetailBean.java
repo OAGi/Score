@@ -1,13 +1,15 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.model.treenode.*;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.AggregateCoreComponentRepository;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NamespaceService;
 import org.oagi.srt.service.TreeNodeService;
-import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -40,7 +42,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class AccDetailBean extends UIHandler {
+public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,9 +57,6 @@ public class AccDetailBean extends UIHandler {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private NamespaceService namespaceService;
@@ -334,25 +333,6 @@ public class AccDetailBean extends UIHandler {
 
     public void setPreparedAppend(boolean preparedAppend) {
         this.preparedAppend = preparedAppend;
-    }
-
-    public User getOwnerUser(AggregateCoreComponent acc) {
-        long ownerUserId = acc.getOwnerUserId();
-        return userRepository.findOne(ownerUserId);
-    }
-
-    public Map<String, OagisComponentType> availableOagisComponentTypes(AggregateCoreComponent acc) {
-        User owner = getOwnerUser(acc);
-
-        Map<String, OagisComponentType> availableOagisComponentTypes = new LinkedHashMap();
-        availableOagisComponentTypes.put("Base", OagisComponentType.Base);
-        availableOagisComponentTypes.put("Semantics", OagisComponentType.Semantics);
-        if (owner.isOagisDeveloperIndicator()) {
-            availableOagisComponentTypes.put("Extension", OagisComponentType.Extension);
-        }
-        availableOagisComponentTypes.put("Semantic Group", OagisComponentType.SemanticGroup);
-
-        return availableOagisComponentTypes;
     }
 
     public List<Namespace> availableNamespaces(AggregateCoreComponent acc) {
