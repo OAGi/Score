@@ -1,5 +1,7 @@
 package org.oagi.srt.web.jsf.beans.codelist;
 
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -27,6 +29,9 @@ public class CodeListBean extends UIHandler {
     @Autowired
     private CodeListService codeListService;
 
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
+
     private String codeListName;
     private List<CodeList> allCodeLists;
     private Map<Long, CodeList> allCodeListMap;
@@ -38,7 +43,7 @@ public class CodeListBean extends UIHandler {
     }
 
     public List<CodeList> allCodeLists() {
-        allCodeLists = codeListService.findAll(Sort.Direction.ASC, "name");
+        allCodeLists = codeListService.findAll(Sort.Direction.DESC, "creationTimestamp");
         allCodeListMap = allCodeLists.stream()
                 .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         return allCodeLists;
@@ -105,5 +110,13 @@ public class CodeListBean extends UIHandler {
         }
         CodeList basedCodeList = allCodeListMap.get(basedCodeListId);
         return (basedCodeList != null) ? basedCodeList.getName() : null;
+    }
+
+    public String getAgencyName(long agencyIdListValueId) {
+        if (agencyIdListValueId == 0L) {
+            return null;
+        }
+        AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOne(agencyIdListValueId);
+        return (agencyIdListValue != null) ? agencyIdListValue.getName() : null;
     }
 }

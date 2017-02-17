@@ -196,8 +196,16 @@ public class CodeListService {
                 codeListValue.setCodeListId(codeList.getCodeListId());
             }
             codeListValue.setUsedIndicator(usedIndicator);
-            codeListValue.setLockedIndicator(lockedIndicator);
-            codeListValue.setExtensionIndicator(extensionIndicator);
+            if (CodeListState.Published == codeList.getState() && usedIndicator == false) {
+                codeListValue.setLockedIndicator(true);
+            } else {
+                codeListValue.setLockedIndicator(lockedIndicator);
+            }
+            if (CodeListState.Published == codeList.getState()) {
+                codeListValue.setExtensionIndicator(false);
+            } else {
+                codeListValue.setExtensionIndicator(extensionIndicator);
+            }
 
             codeListValueRepository.save(codeListValue);
 

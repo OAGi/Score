@@ -97,9 +97,10 @@
                     </p:column>
 
                     <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
-                        <p:cellEditor>
+                        <p:cellEditor rendered="#{codeListValue.color eq 'Green'}">
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.value}" style="color: #{codeListCreateFromAnotherBean.getColor(codeListValue)}"/>
+                                <h:outputText value="#{codeListValue.value}"
+                                              style="color: #{codeListCreateFromAnotherBean.getColor(codeListValue)}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%" maxlength="100">
@@ -107,10 +108,13 @@
                                 </p:inputText>
                             </f:facet>
                         </p:cellEditor>
+
+                        <h:outputText value="#{codeListValue.value}" rendered="#{codeListValue.color ne 'Green'}"
+                                      style="color: #{codeListCreateFromAnotherBean.getColor(codeListValue)}"/>
                     </p:column>
 
                     <p:column style="width: 150px" headerText="Short Name" sortBy="#{codeListValue.name}">
-                        <p:cellEditor>
+                        <p:cellEditor rendered="#{codeListValue.color eq 'Green'}">
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.name}"/>
                             </f:facet>
@@ -121,10 +125,12 @@
                                 </p:inputText>
                             </f:facet>
                         </p:cellEditor>
+
+                        <h:outputText value="#{codeListValue.name}" rendered="#{codeListValue.color ne 'Green'}"/>
                     </p:column>
 
                     <p:column style="width: 400px" headerText="Definition" sortBy="#{codeListValue.definition}">
-                        <p:cellEditor>
+                        <p:cellEditor rendered="#{codeListValue.color eq 'Green'}">
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.definition}"/>
                             </f:facet>
@@ -133,10 +139,12 @@
                                              style="width: 100%"/>
                             </f:facet>
                         </p:cellEditor>
+
+                        <h:outputText value="#{codeListValue.definition}" rendered="#{codeListValue.color ne 'Green'}"/>
                     </p:column>
 
                     <p:column headerText="Definition Source" sortBy="#{codeListValue.definitionSource}">
-                        <p:cellEditor>
+                        <p:cellEditor rendered="#{codeListValue.color eq 'Green'}">
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.definitionSource}"/>
                             </f:facet>
@@ -147,6 +155,8 @@
                                 </p:inputText>
                             </f:facet>
                         </p:cellEditor>
+
+                        <h:outputText value="#{codeListValue.definitionSource}" rendered="#{codeListValue.color ne 'Green'}"/>
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">

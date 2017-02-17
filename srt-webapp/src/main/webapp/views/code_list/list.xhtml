@@ -43,12 +43,19 @@
                         </h:link>
                     </p:column>
                     <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
-                        <h:outputText value="#{cVO.agencyId}" style="float: right;"/>
+                        <h:outputText id="agencyId" value="#{cVO.agencyId}" style="float: right;"/>
+                        <p:tooltip id="toolTipAgencyId" for="agencyId" value="#{codeListBean.getAgencyName(cVO.agencyId)}" position="bottom"/>
                     </p:column>
                     <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
                         <h:outputText value="#{cVO.versionId}" style="float: right;"/>
                     </p:column>
-                    <p:column style="width: 100px; text-align: center;" headerText="Extensible">
+                    <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
+                              sortBy="#{cVO.creationTimestamp}">
+                        <h:outputText value="#{cVO.creationTimestamp}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width: 95px; text-align: center;" headerText="Extensible">
                         <h:panelGroup rendered="#{cVO.extensibleIndicator}">
                             <i class="fa fa-check" aria-hidden="true"></i>
                         </h:panelGroup>
