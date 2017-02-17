@@ -438,8 +438,10 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
      */
     @Transactional(readOnly = false, rollbackFor = Throwable.class)
     public void update() {
+        AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
         try {
-            treeNodeService.update(getTopLevelNode(), getCurrentUser());
+            treeNodeService.validate(topLevelNode);
+            treeNodeService.update(topLevelNode, getCurrentUser());
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
         } catch (Throwable t) {
@@ -451,6 +453,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public String updateState(AggregateBusinessInformationEntityState state) {
+        update();
+
         try {
             AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();

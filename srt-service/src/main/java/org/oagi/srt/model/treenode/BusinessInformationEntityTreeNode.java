@@ -7,4 +7,6 @@ import java.util.Collection;
 public interface BusinessInformationEntityTreeNode extends SRTTreeNode, Usable {
 
     public Collection<? extends BusinessInformationEntityTreeNode> getChildren();
+
+    public void validate();
 }

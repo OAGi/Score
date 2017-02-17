@@ -238,26 +238,24 @@
                                                 <p:panel id="asbiePanel" header="ASBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMin(copyProfileBODBean.selectedTreeNode.data.asbie)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
                                                             <f:validator binding="#{cardinalityMinConverter}"/>
-                                                            <f:ajax render="asbiePanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="asbiePanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMax(copyProfileBODBean.selectedTreeNode.data.asbie)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
                                                             <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                            <f:ajax render="asbiePanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="asbiePanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
                                                         <h:selectBooleanCheckbox
@@ -367,26 +365,24 @@
                                                 <p:panel id="bbiePanel" header="BBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMin(copyProfileBODBean.selectedTreeNode.data.bbie)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
                                                             <f:validator binding="#{cardinalityMinConverter}"/>
-                                                            <f:ajax render="bbiePanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="bbiePanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMax(copyProfileBODBean.selectedTreeNode.data.bbie)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
                                                             <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                            <f:ajax render="bbiePanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="bbiePanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
                                                         <h:selectBooleanCheckbox
@@ -539,26 +535,24 @@
                                                 <p:panel id="bbieScPanel" header="BBIE SC">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMin(copyProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
                                                             <f:validator binding="#{cardinalityMinConverter}"/>
-                                                            <f:ajax render="bbieScPanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="bbieScPanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <p:selectOneMenu editable="true"
-                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
-                                                                         styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
-                                                                         disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <f:selectItems value="#{copyProfileBODBean.availableCardinalityMax(copyProfileBODBean.selectedTreeNode.data.bbieSc)}"/>
+                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                                     styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                     disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
                                                             <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                            <f:ajax render="bbieScPanel"/>
-                                                        </p:selectOneMenu>
+                                                            <f:ajax listener="#{copyProfileBODBean.validate(copyProfileBODBean.selectedTreeNode.data)}"
+                                                                    render="bbieScPanel"/>
+                                                        </h:inputText>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                         <h:inputText

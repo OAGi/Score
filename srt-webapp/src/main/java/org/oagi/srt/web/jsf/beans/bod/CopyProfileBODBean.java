@@ -522,6 +522,7 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
             progressListener = new ProgressListener();
 
             AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+            treeNodeService.validate(topLevelNode);
             treeNodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
 
             return "/views/profile_bod/list.xhtml?faces-redirect=true";

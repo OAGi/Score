@@ -511,6 +511,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
             progressListener = new ProgressListener();
 
             AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
+            treeNodeService.validate(topLevelNode);
             treeNodeService.submit(topLevelNode, getCurrentUser(), progressListener);
 
             return "/views/profile_bod/list.xhtml?faces-redirect=true";

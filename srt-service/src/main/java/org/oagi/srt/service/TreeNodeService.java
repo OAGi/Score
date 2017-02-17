@@ -792,6 +792,10 @@ public class TreeNodeService {
         }
 
         @Override
+        public void validate() {
+        }
+
+        @Override
         public void reload() {
             hasChild = null;
             children = null;
@@ -949,6 +953,23 @@ public class TreeNodeService {
         @Override
         public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
             return type.getChildren();
+        }
+
+        @Override
+        public void validate() {
+            AssociationBusinessInformationEntity asbie = getAssociationBusinessInformationEntity();
+            if (asbie == null || !asbie.isDirty()) {
+                return;
+            }
+
+            int originalCardinalityMin = ascc.getCardinalityMin();
+            int originalCardinalityMax = ascc.getCardinalityMax();
+
+            int cardinalityMin = asbie.getCardinalityMin();
+            int cardinalityMax = asbie.getCardinalityMax();
+
+            ensureCardinalityMin(originalCardinalityMin, cardinalityMin, cardinalityMax);
+            ensureCardinalityMax(originalCardinalityMax, cardinalityMin, cardinalityMax);
         }
 
         @Override
@@ -1206,6 +1227,23 @@ public class TreeNodeService {
         }
 
         @Override
+        public void validate() {
+            BasicBusinessInformationEntity bbie = getBasicBusinessInformationEntity();
+            if (bbie == null || !bbie.isDirty()) {
+                return;
+            }
+
+            int originalCardinalityMin = bcc.getCardinalityMin();
+            int originalCardinalityMax = bcc.getCardinalityMax();
+
+            int cardinalityMin = bbie.getCardinalityMin();
+            int cardinalityMax = bbie.getCardinalityMax();
+
+            ensureCardinalityMin(originalCardinalityMin, cardinalityMin, cardinalityMax);
+            ensureCardinalityMax(originalCardinalityMax, cardinalityMin, cardinalityMax);
+        }
+
+        @Override
         public void reload() {
         }
 
@@ -1335,6 +1373,24 @@ public class TreeNodeService {
         }
 
         @Override
+        public void validate() {
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                    getBasicBusinessInformationEntitySupplementaryComponent();
+            if (bbieSc == null || !bbieSc.isDirty()) {
+                return;
+            }
+
+            int originalCardinalityMin = bdtSc.getCardinalityMin();
+            int originalCardinalityMax = bdtSc.getCardinalityMax();
+
+            int cardinalityMin = bbieSc.getCardinalityMin();
+            int cardinalityMax = bbieSc.getCardinalityMax();
+
+            ensureCardinalityMin(originalCardinalityMin, cardinalityMin, cardinalityMax);
+            ensureCardinalityMax(originalCardinalityMax, cardinalityMin, cardinalityMax);
+        }
+
+        @Override
         public void reload() {
         }
 
@@ -1352,6 +1408,32 @@ public class TreeNodeService {
                     parent.setUsed(used);
                 }
             }
+        }
+    }
+
+    private void ensureCardinalityMin(int originalCardinalityMin, int cardinalityMin, int cardinalityMax) {
+        if (cardinalityMax == -1) {
+            cardinalityMax = Integer.MAX_VALUE;
+        }
+
+        if (cardinalityMin < originalCardinalityMin) {
+            throw new IllegalStateException("'Min' must be greater than or equals to " + originalCardinalityMin + ".");
+        }
+        if (cardinalityMin > cardinalityMax) {
+            throw new IllegalStateException("'Min' must be less than or equals to " + cardinalityMax + ".");
+        }
+    }
+
+    private void ensureCardinalityMax(int originalCardinalityMax, int cardinalityMin, int cardinalityMax) {
+        if (cardinalityMax == -1) {
+            cardinalityMax = Integer.MAX_VALUE;
+        }
+
+        if (cardinalityMax > originalCardinalityMax) {
+            throw new IllegalStateException("'Max' must be less than or equals to " + originalCardinalityMax + ".");
+        }
+        if (cardinalityMax < cardinalityMin) {
+            throw new IllegalStateException("'Max' must be greater than or equals to " + cardinalityMin + ".");
         }
     }
 
@@ -1643,6 +1725,25 @@ public class TreeNodeService {
                 break;
         }
         return bbieSc;
+    }
+
+    public void validate(BusinessInformationEntityTreeNode bieNode) {
+        bieNode.validate();
+
+        Collection<? extends BusinessInformationEntityTreeNode> children = null;
+        if (bieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
+            children = ((AggregateBusinessInformationEntityTreeNodeImpl) bieNode).children;
+        } else  if (bieNode instanceof AssociationBusinessInformationEntityPropertyTreeNodeImpl) {
+            children = ((AssociationBusinessInformationEntityPropertyTreeNodeImpl) bieNode).type.children;
+        } else if (bieNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
+            children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bieNode).children;
+        }
+
+        if (children != null) {
+            for (BusinessInformationEntityTreeNode child : children) {
+                validate(child);
+            }
+        }
     }
 
     @Transactional
