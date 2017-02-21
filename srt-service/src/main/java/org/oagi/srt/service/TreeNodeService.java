@@ -1428,6 +1428,9 @@ public class TreeNodeService {
         if (cardinalityMax == -1) {
             cardinalityMax = Integer.MAX_VALUE;
         }
+        if (originalCardinalityMax == -1) {
+            originalCardinalityMax = Integer.MAX_VALUE;
+        }
 
         if (cardinalityMax > originalCardinalityMax) {
             throw new IllegalStateException("'Max' must be less than or equals to " + originalCardinalityMax + ".");
