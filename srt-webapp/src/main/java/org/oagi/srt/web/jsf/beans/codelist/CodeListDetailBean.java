@@ -46,11 +46,6 @@ public class CodeListDetailBean extends CodeListBaseBean {
         setCodeList(codeList);
 
         List<CodeListValue> codeListValues = codeListService.findByCodeList(codeList);
-        if (CodeListState.Published == codeListState) {
-            codeListValues = codeListValues.stream()
-                    .filter(e -> CodeListValue.Color.BrightRed != e.getColor())
-                    .collect(Collectors.toList());
-        }
         setCodeListValues(codeListValues);
     }
 }

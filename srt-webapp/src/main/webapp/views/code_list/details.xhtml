@@ -112,12 +112,21 @@
                                     autoUpdate="true"
                                     closable="true"/>
                         <h:panelGrid id="grid" columns="2">
+                            <h:outputText value="Based Code List" styleClass="section-label"
+                                          rendered="#{codeListDetailBean.basedCodeList != null}"/>
+                            <h:link value="#{codeListDetailBean.basedCodeList.name}" styleClass="section-content"
+                                    outcome="/views/code_list/details.jsf"
+                                    rendered="#{codeListDetailBean.basedCodeList != null}">
+                                <f:param name="codeListId" value="#{codeListDetailBean.basedCodeList.codeListId}"/>
+                            </h:link>
+
                             <h:outputText for="name" value="Name" styleClass="section-label"/>
                             <h:inputText id="name" value="#{codeListDetailBean.codeList.name}"
                                          required="true" maxlength="100"
                                          requiredMessage="Please fill out 'Name' field."
                                          label="Name" styleClass="section-content input-section">
                                 <f:validateLength maximum="100"/>
+                                <p:ajax update="form"/>
                             </h:inputText>
 
                             <h:outputText for="listID" value="List ID" styleClass="section-label"/>
@@ -126,6 +135,7 @@
                                          requiredMessage="Please fill out 'List ID' field."
                                          label="List ID" styleClass="section-content input-section">
                                 <f:validateLength maximum="100"/>
+                                <p:ajax update="form"/>
                             </h:inputText>
 
                             <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
@@ -146,11 +156,14 @@
                                          maxlength="10"
                                          label="Version" styleClass="section-content input-section">
                                 <f:validateLength maximum="10"/>
+                                <p:ajax update="form"/>
                             </h:inputText>
 
                             <h:outputText for="definition" value="Definition" styleClass="section-label"/>
                             <h:inputText id="definition" value="#{codeListDetailBean.codeList.definition}"
-                                         label="Definition" styleClass="section-content input-section"/>
+                                         label="Definition" styleClass="section-content input-section">
+                                <p:ajax update="form"/>
+                            </h:inputText>
 
                             <h:outputText for="definitionSource" value="Definition Source"
                                           styleClass="section-label"/>
@@ -158,12 +171,14 @@
                                          value="#{codeListDetailBean.codeList.definitionSource}"
                                          label="Definition Source" styleClass="section-content input-section">
                                 <f:validateLength maximum="100"/>
+                                <p:ajax update="form"/>
                             </h:inputText>
 
                             <h:outputText for="remark" value="Remark" styleClass="section-label"/>
                             <h:inputText id="remark" value="#{codeListDetailBean.codeList.remark}"
                                          label="Remark" styleClass="section-content input-section" maxlength="225">
                                 <f:validateLength maximum="225"/>
+                                <p:ajax update="form"/>
                             </h:inputText>
 
                             <h:outputText value="State" styleClass="section-label"/>
@@ -173,11 +188,19 @@
                             <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Published'}">
                                 <span class="label label-default section-content" style="color: #fff !important;">Published</span>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Discarded'}">
+                                <span class="label label-warning section-content" style="color: #fff !important;">Discarded</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Deleted'}">
+                                <span class="label label-danger section-content" style="color: #fff !important;">Deleted</span>
+                            </h:panelGroup>
 
                             <h:outputText for="name" value="Extensible" styleClass="section-label"/>
                             <h:selectBooleanCheckbox
                                     value="#{codeListDetailBean.codeList.extensibleIndicator}"
-                                    styleClass="section-content input-section" style="text-align: left;"/>
+                                    styleClass="section-content input-section" style="text-align: left;">
+                                <p:ajax update="form"/>
+                            </h:selectBooleanCheckbox>
                         </h:panelGrid>
                     </p:panel>
                     <p:panel>
@@ -196,7 +219,7 @@
                                      style="width: 100%; margin-bottom: 20px;">
                             <p:column style="text-align: center; width: 65px;" headerText="Used">
                                 <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
-                                                         rendered="#{codeListValue.color ne 'BrightRed'}">
+                                                         rendered="#{codeListValue.color ne 'BrightRed' and codeListValue.color ne 'Green'}">
                                     <p:ajax update="tbl"
                                             listener="#{codeListDetailBean.toggleColor(codeListValue)}"/>
                                 </h:selectBooleanCheckbox>

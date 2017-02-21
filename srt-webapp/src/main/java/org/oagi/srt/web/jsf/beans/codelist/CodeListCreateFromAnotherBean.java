@@ -27,8 +27,6 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
     @Autowired
     private CodeListService codeListService;
 
-    private CodeList basedCodeList;
-
     @PostConstruct
     public void init() {
         String codeListIdStr = FacesContext.getCurrentInstance().getExternalContext()
@@ -38,24 +36,17 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
         }
 
         Long codeListId = Long.parseLong(codeListIdStr);
-        CodeList codeList = codeListService.findOne(codeListId);
-        if (codeList == null) {
+        CodeList basedCodeList = codeListService.findOne(codeListId);
+        if (basedCodeList == null) {
             throw new IllegalAccessError();
         }
-        CodeListState codeListState = codeList.getState();
+        CodeListState codeListState = basedCodeList.getState();
         if (CodeListState.Published != codeListState) {
             throw new IllegalAccessError();
         }
 
-        setBasedCodeList(codeList);
-    }
+        setBasedCodeList(basedCodeList);
 
-    public CodeList getBasedCodeList() {
-        return basedCodeList;
-    }
-
-    public void setBasedCodeList(CodeList basedCodeList) {
-        this.basedCodeList = basedCodeList;
         CodeList codeList = new CodeList();
         codeList.setName(basedCodeList.getName() + "_Extension");
         codeList.setListId(Utility.generateGUID());
@@ -66,11 +57,11 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
         codeList.setRemark(basedCodeList.getRemark());
         codeList.setBasedCodeListId(basedCodeList.getCodeListId());
         codeList.setExtensibleIndicator(basedCodeList.isExtensibleIndicator());
+
         setCodeList(codeList);
 
         setCodeListValues(
                 codeListService.findByCodeList(basedCodeList).stream()
-                        .filter(e -> BrightRed != e.getColor() && DullRed != e.getColor())
                         .map(e -> {
                             CodeListValue copy = new CodeListValue();
                             copy.setValue(e.getValue());

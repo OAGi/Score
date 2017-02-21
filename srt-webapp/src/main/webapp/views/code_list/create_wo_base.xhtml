@@ -21,6 +21,7 @@
                                  requiredMessage="Please fill out 'Name' field."
                                  label="Name" styleClass="section-content input-section">
                         <f:validateLength maximum="100"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
 
                     <h:outputText for="listID" value="List ID" styleClass="section-label"/>
@@ -29,6 +30,7 @@
                                  requiredMessage="Please fill out 'List ID' field."
                                  label="List ID" styleClass="section-content input-section">
                         <f:validateLength maximum="100"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
 
                     <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
@@ -48,11 +50,14 @@
                                  required="true" requiredMessage="Please fill out 'Version' field." maxlength="10"
                                  label="Version" styleClass="section-content input-section">
                         <f:validateLength maximum="10"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
 
                     <h:outputText for="definition" value="Definition" styleClass="section-label"/>
                     <h:inputText id="definition" value="#{codeListCreateWithoutBaseBean.codeList.definition}"
-                                 label="Definition" styleClass="section-content input-section"/>
+                                 label="Definition" styleClass="section-content input-section">
+                        <p:ajax update="form"/>
+                    </h:inputText>
 
                     <h:outputText for="definitionSource" value="Definition Source"
                                   styleClass="section-label"/>
@@ -60,17 +65,21 @@
                                  value="#{codeListCreateWithoutBaseBean.codeList.definitionSource}"
                                  label="Definition Source" styleClass="section-content input-section">
                         <f:validateLength maximum="100"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
 
                     <h:outputText for="remark" value="Remark" styleClass="section-label"/>
                     <h:inputText id="remark" value="#{codeListCreateWithoutBaseBean.codeList.remark}"
                                  label="Remark" styleClass="section-content input-section" maxlength="225">
                         <f:validateLength maximum="225"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
 
                     <h:outputText for="name" value="Extensible?" styleClass="section-label"/>
                     <h:selectBooleanCheckbox value="#{codeListCreateWithoutBaseBean.codeList.extensibleIndicator}"
-                                             styleClass="section-content input-section" style="text-align: left;"/>
+                                             styleClass="section-content input-section" style="text-align: left;">
+                        <p:ajax update="form"/>
+                    </h:selectBooleanCheckbox>
                 </h:panelGrid>
             </p:panel>
             <p:panel>
@@ -90,7 +99,7 @@
                             <h:outputText value="Select"/>
                         </f:facet>
                         <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
-                                                 rendered="#{codeListValue.color ne 'BrightRed'}">
+                                                 rendered="#{codeListValue.color ne 'BrightRed' and codeListValue.color ne 'Green'}">
                             <p:ajax update="tbl"
                                     listener="#{codeListCreateWithoutBaseBean.toggleColor(codeListValue)}"/>
                         </h:selectBooleanCheckbox>

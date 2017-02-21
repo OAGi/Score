@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.CodeListValue.Color.BrightRed;
+
 @Component
 public class CodeListBaseBean extends UIHandler {
 
@@ -103,6 +105,12 @@ public class CodeListBaseBean extends UIHandler {
     }
 
     public List<CodeListValue> getCodeListValues() {
+        CodeList codeList = getCodeList();
+        if (CodeListState.Published == codeList.getState()) {
+            return codeListValues.stream()
+                    .filter(e -> BrightRed != e.getColor())
+                    .collect(Collectors.toList());
+        }
         return codeListValues;
     }
 
