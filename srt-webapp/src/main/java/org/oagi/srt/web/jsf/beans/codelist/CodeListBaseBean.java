@@ -33,6 +33,7 @@ public class CodeListBaseBean extends UIHandler {
     private AgencyIdListValueRepository agencyIdListValueRepository;
 
     private CodeList codeList;
+    private CodeList basedCodeList;
     private List<CodeListValue> codeListValues = new ArrayList();
     private CodeListValue selectedCodeListValue;
     private List<CodeListValue> deleteCodeListValues = new ArrayList();
@@ -53,6 +54,22 @@ public class CodeListBaseBean extends UIHandler {
 
     public void setCodeList(CodeList codeList) {
         this.codeList = codeList;
+
+        if (codeList != null) {
+            long basedCodeListId = codeList.getBasedCodeListId();
+            if (basedCodeListId > 0L) {
+                CodeList basedCodeList = codeListService.findOne(basedCodeListId);
+                setBasedCodeList(basedCodeList);
+            }
+        }
+    }
+
+    public CodeList getBasedCodeList() {
+        return basedCodeList;
+    }
+
+    public void setBasedCodeList(CodeList basedCodeList) {
+        this.basedCodeList = basedCodeList;
     }
 
     public AgencyIdListValue getAgencyIdListValue() {

@@ -25,6 +25,14 @@
                 <h:form id="formNotEditing">
                     <p:panel>
                         <h:panelGrid columns="2" cellpadding="3">
+                            <h:outputText value="Based Code List" styleClass="section-label"
+                                          rendered="#{codeListDetailBean.basedCodeList != null}"/>
+                            <h:link value="#{codeListDetailBean.basedCodeList.name}" styleClass="section-content"
+                                    outcome="/views/code_list/details.jsf"
+                                    rendered="#{codeListDetailBean.basedCodeList != null}">
+                                <f:param name="codeListId" value="#{codeListDetailBean.basedCodeList.codeListId}"/>
+                            </h:link>
+
                             <h:outputText value="Name" styleClass="section-label"/>
                             <h:outputText value="#{codeListDetailBean.codeList.name}" styleClass="section-content"/>
 
@@ -55,6 +63,12 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Published'}">
                                 <span class="label label-default section-content" style="color: #fff !important;">Published</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Discarded'}">
+                                <span class="label label-warning section-content" style="color: #fff !important;">Discarded</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Deleted'}">
+                                <span class="label label-danger section-content" style="color: #fff !important;">Deleted</span>
                             </h:panelGroup>
 
                             <h:outputText value="Extensible" styleClass="section-label"/>

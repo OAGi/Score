@@ -39,11 +39,12 @@ public class CodeListDetailBean extends CodeListBaseBean {
             throw new IllegalAccessError();
         }
         CodeListState codeListState = codeList.getState();
-        if (CodeListState.Deleted == codeListState || CodeListState.Discarded == codeListState) {
+        if (CodeListState.Deleted == codeListState) {
             throw new IllegalAccessError();
         }
 
         setCodeList(codeList);
+
         List<CodeListValue> codeListValues = codeListService.findByCodeList(codeList);
         if (CodeListState.Published == codeListState) {
             codeListValues = codeListValues.stream()

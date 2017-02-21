@@ -32,7 +32,7 @@
                              style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
                     <p:column headerText="Name" sortBy="#{businessContext.name}">
                         <h:link value="#{businessContext.name}" outcome="/views/business_context/details.xhtml">
-                                <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
+                            <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
                         </h:link>
                         <div>
                             <h:link value="GUID: #{businessContext.guid}" outcome="/views/business_context/details.xhtml"
