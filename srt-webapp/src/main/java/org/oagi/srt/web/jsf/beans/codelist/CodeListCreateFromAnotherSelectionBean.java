@@ -1,5 +1,7 @@
 package org.oagi.srt.web.jsf.beans.codelist;
 
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.service.CodeListService;
@@ -26,6 +28,9 @@ public class CodeListCreateFromAnotherSelectionBean extends CodeListBaseBean {
 
     @Autowired
     private CodeListService codeListService;
+
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
 
     private String codeListName;
     private List<CodeList> allCodeLists;
@@ -107,5 +112,13 @@ public class CodeListCreateFromAnotherSelectionBean extends CodeListBaseBean {
         }
         CodeList basedCodeList = allCodeListMap.get(basedCodeListId);
         return (basedCodeList != null) ? basedCodeList.getName() : null;
+    }
+
+    public String getAgencyName(long agencyIdListValueId) {
+        if (agencyIdListValueId == 0L) {
+            return null;
+        }
+        AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOne(agencyIdListValueId);
+        return (agencyIdListValue != null) ? agencyIdListValue.getName() : null;
     }
 }

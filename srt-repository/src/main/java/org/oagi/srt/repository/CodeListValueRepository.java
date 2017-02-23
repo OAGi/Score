@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CodeListValueRepository extends JpaRepository<CodeListValue, Long> {
 
-    @Query("select c from CodeListValue c where c.codeListId = ?1")
+    @Query("select c from CodeListValue c where c.codeListId = ?1 order by c.codeListValueId asc")
     public List<CodeListValue> findByCodeListId(long codeListId);
 
     @Query("select c from CodeListValue c where c.codeListId = ?1 and c.value = ?2")

@@ -3,6 +3,7 @@ package org.oagi.srt.web.jsf.beans.codelist;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -12,4 +13,8 @@ import javax.faces.bean.ViewScoped;
 @ViewScoped
 public class CodeListCreateWithoutBaseBean extends CodeListBaseBean {
 
+    @PostConstruct
+    public void init() {
+        setAllUsedIndicator(false);
+    }
 }

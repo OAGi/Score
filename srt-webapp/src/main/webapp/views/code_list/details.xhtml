@@ -206,8 +206,8 @@
                     <p:panel>
                         <f:facet name="header">
                             <h:outputText value="Code List Values"/>
-                            <p:commandButton value="Add" style="float: right;" onclick="$('.ui-paginator-last').click();"
-                                             actionListener="#{codeListDetailBean.addCodeListValue}"
+                            <p:commandButton value="Add" style="float: right;"
+                                             action="#{codeListDetailBean.addCodeListValue}"
                                              update="tbl"/>
                         </f:facet>
 
@@ -217,7 +217,12 @@
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom"
                                      style="width: 100%; margin-bottom: 20px;">
-                            <p:column style="text-align: center; width: 65px;" headerText="Used">
+                            <p:column style="text-align: center; width: 65px;">
+                                <f:facet name="header">
+                                    <h:selectBooleanCheckbox value="#{codeListDetailBean.allUsedIndicator}">
+                                        <p:ajax update="tbl" listener="#{codeListDetailBean.toggleAll()}"/>
+                                    </h:selectBooleanCheckbox>
+                                </f:facet>
                                 <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                          rendered="#{codeListValue.color ne 'BrightRed' and codeListValue.color ne 'Green'}">
                                     <p:ajax update="tbl"

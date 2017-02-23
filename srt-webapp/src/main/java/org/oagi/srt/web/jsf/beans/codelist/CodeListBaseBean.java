@@ -21,9 +21,12 @@ import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.CodeListValue.Color.Blue;
 import static org.oagi.srt.repository.entity.CodeListValue.Color.BrightRed;
+import static org.oagi.srt.repository.entity.CodeListValue.Color.DullRed;
 
 @Component
 public class CodeListBaseBean extends UIHandler {
@@ -39,6 +42,8 @@ public class CodeListBaseBean extends UIHandler {
     private List<CodeListValue> codeListValues = new ArrayList();
     private CodeListValue selectedCodeListValue;
     private List<CodeListValue> deleteCodeListValues = new ArrayList();
+
+    private boolean allUsedIndicator = true;
 
     private CodeListState state;
     private boolean confirmDifferentNameButSameIdentity;
@@ -123,6 +128,8 @@ public class CodeListBaseBean extends UIHandler {
         codeListValue.setColor(CodeListValue.Color.Green);
         codeListValue.setDisabled(false);
         codeListValues.add(codeListValue);
+
+        RequestContext.getCurrentInstance().execute("$('.ui-paginator-last').click()");
     }
 
     public CodeListValue getSelectedCodeListValue() {
@@ -136,13 +143,60 @@ public class CodeListBaseBean extends UIHandler {
     public void toggleColor(CodeListValue codeListValue) {
         switch (codeListValue.getColor()) {
             case Blue:
-                codeListValue.setColor(CodeListValue.Color.DullRed);
+                codeListValue.setColor(DullRed);
                 break;
             case DullRed:
-                codeListValue.setColor(CodeListValue.Color.Blue);
+                codeListValue.setColor(Blue);
                 break;
             default:
                 break;
+        }
+
+        if (isAllCodeListValuesCheckedUserdIndicator()) {
+            setAllUsedIndicator(true);
+        } else {
+            setAllUsedIndicator(false);
+        }
+    }
+
+    private boolean isAllCodeListValuesCheckedUserdIndicator() {
+        final AtomicBoolean result = new AtomicBoolean(true);
+        getCodeListValues().stream()
+                .filter(e -> e.getColor() == Blue || e.getColor() == DullRed)
+                .map(e -> e.isUsedIndicator())
+                .forEach(e -> {
+                    if (result.get()) {
+                        result.set(!e ? false : true);
+                    }
+                });
+        return result.get();
+    }
+
+    public boolean isAllUsedIndicator() {
+        return allUsedIndicator;
+    }
+
+    public void setAllUsedIndicator(boolean allUsedIndicator) {
+        this.allUsedIndicator = allUsedIndicator;
+    }
+
+    public void toggleAll() {
+        if (isAllUsedIndicator()) {
+            getCodeListValues().stream()
+                    .filter(e -> e.getColor() == Blue || e.getColor() == DullRed)
+                    .filter(e -> !e.isUsedIndicator())
+                    .forEach(e -> {
+                e.setUsedIndicator(false);
+                toggleColor(e);
+            });
+        } else {
+            getCodeListValues().stream()
+                    .filter(e -> e.getColor() == Blue || e.getColor() == DullRed)
+                    .filter(e -> e.isUsedIndicator())
+                    .forEach(e -> {
+                e.setUsedIndicator(true);
+                toggleColor(e);
+            });
         }
     }
 

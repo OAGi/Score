@@ -91,7 +91,7 @@
             <p:panel>
                 <f:facet name="header">
                     <h:outputText value="Code List Values"/>
-                    <p:commandButton value="Add" style="float: right;" onclick="$('.ui-paginator-last').click();"
+                    <p:commandButton value="Add" style="float: right;"
                                      actionListener="#{codeListCreateFromAnotherBean.addCodeListValue}" update="tbl"/>
                 </f:facet>
 
@@ -102,7 +102,9 @@
                              style="width: 100%; margin-bottom: 20px;">
                     <p:column style="text-align: center; width: 65px;">
                         <f:facet name="header">
-                            <h:outputText value="Select"/>
+                            <h:selectBooleanCheckbox value="#{codeListCreateFromAnotherBean.allUsedIndicator}">
+                                <p:ajax update="tbl" listener="#{codeListCreateFromAnotherBean.toggleAll()}"/>
+                            </h:selectBooleanCheckbox>
                         </f:facet>
                         <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                  rendered="#{codeListValue.color ne 'BrightRed' and codeListValue.color ne 'Green'}">

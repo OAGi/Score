@@ -85,7 +85,7 @@
             <p:panel>
                 <f:facet name="header">
                     <h:outputText value="Code List Values"/>
-                    <p:commandButton value="Add" style="float: right;" onclick="$('.ui-paginator-last').click();"
+                    <p:commandButton value="Add" style="float: right;"
                                      actionListener="#{codeListCreateWithoutBaseBean.addCodeListValue}" update="tbl"/>
                 </f:facet>
 
@@ -94,21 +94,10 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom"
                              style="width: 100%; margin-bottom: 20px;">
-                    <p:column style="text-align: center; width: 65px;">
-                        <f:facet name="header">
-                            <h:outputText value="Select"/>
-                        </f:facet>
-                        <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
-                                                 rendered="#{codeListValue.color ne 'BrightRed' and codeListValue.color ne 'Green'}">
-                            <p:ajax update="tbl"
-                                    listener="#{codeListCreateWithoutBaseBean.toggleColor(codeListValue)}"/>
-                        </h:selectBooleanCheckbox>
-                    </p:column>
-
                     <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.value}" style="color: #{codeListCreateFromAnotherBean.getColor(codeListValue)}"/>
+                                <h:outputText value="#{codeListValue.value}" style="color: #{codeListCreateWithoutBaseBean.getColor(codeListValue)}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%" maxlength="100">
