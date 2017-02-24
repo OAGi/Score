@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.*;
+
 @Entity
 @Table(name = "bbie")
 public class BasicBusinessInformationEntity
@@ -45,6 +47,9 @@ public class BasicBusinessInformationEntity
     private long toBbiepId;
     @Transient
     private BasicBusinessInformationEntityProperty toBbiep;
+
+    @Transient
+    private BasicBusinessInformationEntityRestrictionType restrictionType;
 
     @Column
     private Long bdtPriRestriId;
@@ -169,6 +174,14 @@ public class BasicBusinessInformationEntity
 
     public void setToBbiep(BasicBusinessInformationEntityProperty toBbiep) {
         this.toBbiep = toBbiep;
+    }
+
+    public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
+        return restrictionType;
+    }
+
+    public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
+        this.restrictionType = restrictionType;
     }
 
     public long getBdtPriRestriId() {
@@ -380,9 +393,45 @@ public class BasicBusinessInformationEntity
         result = 31 * result + (int) (basedBccId ^ (basedBccId >>> 32));
         result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
         result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
-        result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
-        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
-        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        if (restrictionType == Primitive) {
+            if (bdtPriRestriId != null) {
+                result = 31 * result + bdtPriRestriId.hashCode();
+            } else {
+                if (codeListId != null) {
+                    result = 31 * result + codeListId.hashCode();
+                } else if (agencyIdListId != null) {
+                    result = 31 * result + agencyIdListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
+        if (restrictionType == Code) {
+            if (codeListId != null) {
+                result = 31 * result + codeListId.hashCode();
+            } else {
+                if (bdtPriRestriId != null) {
+                    result = 31 * result + bdtPriRestriId.hashCode();
+                } else if (agencyIdListId != null) {
+                    result = 31 * result + agencyIdListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
+        if (restrictionType == Agency) {
+            if (agencyIdListId != null) {
+                result = 31 * result + agencyIdListId.hashCode();
+            } else {
+                if (bdtPriRestriId != null) {
+                    result = 31 * result + bdtPriRestriId.hashCode();
+                } else if (codeListId != null) {
+                    result = 31 * result + codeListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -453,12 +502,51 @@ public class BasicBusinessInformationEntity
                 if (bbie.ownerTopLevelAbie != null) {
                     bbie.setOwnerTopLevelAbieId(bbie.ownerTopLevelAbie.getTopLevelAbieId());
                 }
+
+                ensureRestrictionType();
             }
             @Override
             public void onPostPersist(Object object) {
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+                ensureRestrictionType();
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+
+            }
+        });
+    }
+
+    private void ensureRestrictionType() {
+        switch (restrictionType) {
+            case Primitive:
+                if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
+                    codeListId = null;
+                    agencyIdListId = null;
+                }
+
+                break;
+            case Code:
+                if (codeListId != null && codeListId > 0L) {
+                    bdtPriRestriId = null;
+                    agencyIdListId = null;
+                }
+
+                break;
+            case Agency:
+                if (agencyIdListId != null && agencyIdListId > 0L) {
+                    bdtPriRestriId = null;
+                    codeListId = null;
+                }
+
+                break;
+        }
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {
@@ -522,6 +610,16 @@ public class BasicBusinessInformationEntity
 
     @PostLoad
     public void afterLoaded() {
+        if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
+            setRestrictionType(Primitive);
+        } else if (codeListId != null && codeListId > 0L) {
+            setRestrictionType(Code);
+        } else if (agencyIdListId != null && agencyIdListId > 0L) {
+            setRestrictionType(Agency);
+        } else {
+            throw new IllegalStateException();
+        }
+
         hashCodeAfterLoaded = hashCode();
     }
 

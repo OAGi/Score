@@ -68,7 +68,8 @@
                                 <p:column headerText="#{editProfileBODBean.getModule(editProfileBODBean.topLevelNode.asccp.moduleId)}">
                                     <h:selectBooleanCheckbox rendered="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
                                                              value="${node.used}" style="margin-right: 5px;">
-                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
+                                        <p:ajax listener="#{editProfileBODBean.onChangeData(node)}"
+                                                update=":form:treeTable, :form:editingPanel, :form:btnGroup"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).name}"/>
                                 </p:column>
@@ -114,28 +115,32 @@
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.version}"
                                                             styleClass="section-content input-section">
-                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="topLevelBiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Status" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.status}"
                                                             styleClass="section-content input-section">
-                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="topLevelBiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                             styleClass="section-content input-section">
-                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="topLevelBiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                             styleClass="section-content input-section">
-                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="topLevelBiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -144,7 +149,8 @@
                                                             rows="6" autoResize="false"
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
-                                                        <f:ajax render="topLevelBiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="topLevelBiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -166,7 +172,8 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update=":form:treeTable, :form:editingPanel, :form:btnGroup"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -178,8 +185,8 @@
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
                                                         <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="asbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -189,8 +196,8 @@
                                                         <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="asbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -198,7 +205,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -206,7 +214,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -216,7 +225,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -227,7 +237,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -235,7 +246,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -245,7 +257,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="asbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="asbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -256,7 +269,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="abiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="abiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -264,7 +278,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="abiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="abiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -274,7 +289,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="abiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="abiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -297,7 +313,8 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update=":form:treeTable, :form:editingPanel, :form:btnGroup"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -309,8 +326,8 @@
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
                                                         <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -319,8 +336,8 @@
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -328,7 +345,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
@@ -336,7 +354,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -344,7 +363,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -354,7 +374,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiePanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -365,7 +386,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -373,7 +395,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -383,7 +406,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbiepPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbiepPanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -393,11 +417,12 @@
 
                                                     <h:selectOneMenu id="selectBdtPriRestriForEditing"
                                                                      style="width: 100px; margin-left: 20px; font-weight: normal !important;"
-                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType}"
                                                                      disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <p:ajax update="bdtPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bdtPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
@@ -408,7 +433,7 @@
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Primitive'}">
                                                     <h:outputText value="Primitive" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieXbtName}"
@@ -416,13 +441,13 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieXbtName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieXbtName}"
+                                                                update="bdtPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Code'}">
                                                     <h:outputText value="Code List" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieCodeListName}"
@@ -430,13 +455,13 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieCodeListName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieCodeListName}"
+                                                                update="bdtPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Agency'}">
                                                     <h:outputText value="Agency ID List" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieAgencyIdListName}"
@@ -444,8 +469,8 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieAgencyIdListName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieAgencyIdListName}"
+                                                                update="bdtPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -467,7 +492,8 @@
                                                     <h:selectBooleanCheckbox
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
-                                                        <p:ajax update=":form:treeTable, :form:editingPanel"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update=":form:treeTable, :form:editingPanel, :form:btnGroup"/>
                                                     </h:selectBooleanCheckbox>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -479,8 +505,8 @@
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
                                                         <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -489,8 +515,8 @@
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
                                                         <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <f:ajax listener="#{editProfileBODBean.validate(editProfileBODBean.selectedTreeNode.data)}"
-                                                                render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
@@ -498,7 +524,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Default" styleClass="section-label"/>
@@ -506,7 +533,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
@@ -514,7 +542,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.bizTerm}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
@@ -522,7 +551,8 @@
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.remark}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
@@ -532,7 +562,8 @@
                                                             a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                             disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputTextarea>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -542,11 +573,12 @@
 
                                                     <h:selectOneMenu id="selectBdtScPriRestriForEditing"
                                                                      style="width: 100px; margin-left: 20px; font-weight: normal !important;"
-                                                                     value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.restrictionType}"
                                                                      disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <p:ajax update="bdtScPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailableScPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
+                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
+                                                                update="bdtScPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
@@ -557,7 +589,7 @@
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Primitive'}">
                                                     <h:outputText value="Primitive" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScXbtName}"
@@ -565,13 +597,13 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieScXbtName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieScXbtName}"
+                                                                update="bdtScPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Code'}">
                                                     <h:outputText value="Code List" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScCodeListName}"
@@ -579,13 +611,13 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieScCodeListName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieScCodeListName}"
+                                                                update="bdtScPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
-                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
+                                                             rendered="#{editProfileBODBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Agency'}">
                                                     <h:outputText value="Agency ID List" styleClass="section-label"/>
 
                                                     <p:autoComplete value="#{editProfileBODBean.bbieScAgencyIdListName}"
@@ -593,8 +625,8 @@
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
-                                                                listener="#{editProfileBODBean.onSelectBbieScAgencyIdListName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForEditing"/>
+                                                                listener="#{editProfileBODBean.onSelectBbieScAgencyIdListName}"
+                                                                update="bdtScPriRestriPanelForEditing, :form:btnGroup"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -875,7 +907,7 @@
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieXbtName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
@@ -889,7 +921,7 @@
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieCodeListName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
@@ -903,7 +935,7 @@
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieAgencyIdListName}"/>
-                                                        <f:ajax render="bdtPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -1007,7 +1039,7 @@
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScXbtName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtScPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
@@ -1021,7 +1053,7 @@
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScCodeListName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtScPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
 
@@ -1035,7 +1067,7 @@
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScAgencyIdListName}"/>
-                                                        <f:ajax render="bdtScPriRestriPanelForPublished"/>
+                                                        <p:ajax update="bdtScPriRestriPanelForPublished"/>
                                                     </p:autoComplete>
                                                 </h:panelGrid>
                                             </p:panel>
@@ -1051,6 +1083,7 @@
             <p:panel id="btnGroup"
                      rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.ownerUserId}">
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
+                                 disabled="#{!editProfileBODBean.canUpdate()}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"

@@ -1,6 +1,5 @@
 package org.oagi.srt.model.treenode;
 
-import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.repository.entity.*;
 
 public interface BasicBusinessInformationEntityPropertyTreeNode extends BusinessInformationEntityTreeNode {

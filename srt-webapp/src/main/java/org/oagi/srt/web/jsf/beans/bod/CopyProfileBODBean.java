@@ -2,7 +2,6 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;

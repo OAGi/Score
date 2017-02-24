@@ -2,7 +2,6 @@ package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
 import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
@@ -17,7 +16,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType.*;
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;

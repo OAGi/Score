@@ -14,6 +14,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Agency;
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Code;
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Primitive;
+
 @Entity
 @Table(name = "bbie_sc")
 public class BasicBusinessInformationEntitySupplementaryComponent
@@ -44,6 +48,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
     @Column(nullable = false, updatable = false)
     private long dtScId;
+
+    @Transient
+    private BasicBusinessInformationEntityRestrictionType restrictionType;
 
     @Column
     private Long dtScPriRestriId;
@@ -138,6 +145,14 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         if (dtSc != null) {
             setDtScId(dtSc.getDtScId());
         }
+    }
+
+    public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
+        return restrictionType;
+    }
+
+    public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
+        this.restrictionType = restrictionType;
     }
 
     public long getDtScPriRestriId() {
@@ -290,9 +305,45 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (bbieId ^ (bbieId >>> 32));
         result = 31 * result + (int) (dtScId ^ (dtScId >>> 32));
-        result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
-        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
-        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        if (restrictionType == Primitive) {
+            if (dtScPriRestriId != null) {
+                result = 31 * result + dtScPriRestriId.hashCode();
+            } else {
+                if (codeListId != null) {
+                    result = 31 * result + codeListId.hashCode();
+                } else if (agencyIdListId != null) {
+                    result = 31 * result + agencyIdListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
+        if (restrictionType == Code) {
+            if (codeListId != null) {
+                result = 31 * result + codeListId.hashCode();
+            } else {
+                if (dtScPriRestriId != null) {
+                    result = 31 * result + dtScPriRestriId.hashCode();
+                } else if (agencyIdListId != null) {
+                    result = 31 * result + agencyIdListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
+        if (restrictionType == Agency) {
+            if (agencyIdListId != null) {
+                result = 31 * result + agencyIdListId.hashCode();
+            } else {
+                if (dtScPriRestriId != null) {
+                    result = 31 * result + dtScPriRestriId.hashCode();
+                } else if (codeListId != null) {
+                    result = 31 * result + codeListId.hashCode();
+                } else {
+                    result = 31 * result + 0;
+                }
+            }
+        }
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -349,6 +400,8 @@ public class BasicBusinessInformationEntitySupplementaryComponent
                 if (bbiesc.ownerTopLevelAbie != null) {
                     bbiesc.setOwnerTopLevelAbieId(bbiesc.ownerTopLevelAbie.getTopLevelAbieId());
                 }
+
+                ensureRestrictionType();
             }
 
             @Override
@@ -356,6 +409,43 @@ public class BasicBusinessInformationEntitySupplementaryComponent
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+                ensureRestrictionType();
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+
+            }
+        });
+    }
+
+    private void ensureRestrictionType() {
+        switch (restrictionType) {
+            case Primitive:
+                if (dtScPriRestriId != null && dtScPriRestriId > 0L) {
+                    codeListId = null;
+                    agencyIdListId = null;
+                }
+
+                break;
+            case Code:
+                if (codeListId != null && codeListId > 0L) {
+                    dtScPriRestriId = null;
+                    agencyIdListId = null;
+                }
+
+                break;
+            case Agency:
+                if (agencyIdListId != null && agencyIdListId > 0L) {
+                    dtScPriRestriId = null;
+                    codeListId = null;
+                }
+
+                break;
+        }
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {
@@ -419,6 +509,16 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
     @PostLoad
     public void afterLoaded() {
+        if (dtScPriRestriId != null && dtScPriRestriId > 0L) {
+            setRestrictionType(Primitive);
+        } else if (codeListId != null && codeListId > 0L) {
+            setRestrictionType(Code);
+        } else if (agencyIdListId != null && agencyIdListId > 0L) {
+            setRestrictionType(Agency);
+        } else {
+            throw new IllegalStateException();
+        }
+
         hashCodeAfterLoaded = hashCode();
     }
 

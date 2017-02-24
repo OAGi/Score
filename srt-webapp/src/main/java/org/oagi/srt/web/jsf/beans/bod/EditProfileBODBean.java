@@ -1,10 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -33,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Candidate;
@@ -261,6 +259,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieXbtName(SelectEvent event) {
         setBbieXbtName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public List<String> completeInputForBbieXbt(String query) {
@@ -291,6 +290,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieCodeListName(SelectEvent event) {
         setBbieCodeListName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public List<String> completeInputForBbieCodeList(String query) {
@@ -320,6 +320,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieAgencyIdListName(SelectEvent event) {
         setBbieAgencyIdListName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntityPropertyTreeNode());
     }
 
     public List<String> completeInputForBbieAgencyIdList(String query) {
@@ -360,6 +361,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieScXbtName(SelectEvent event) {
         setBbieScXbtName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public List<String> completeInputForBbieScXbt(String query) {
@@ -390,6 +392,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieScCodeListName(SelectEvent event) {
         setBbieScCodeListName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public List<String> completeInputForBbieScCodeList(String query) {
@@ -419,6 +422,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
 
     public void onSelectBbieScAgencyIdListName(SelectEvent event) {
         setBbieScAgencyIdListName(event.getObject().toString());
+        onChangeData(getSelectedBasicBusinessInformationEntitySupplementaryComponentTreeNode());
     }
 
     public List<String> completeInputForBbieScAgencyIdList(String query) {
@@ -440,7 +444,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     public void update() {
         AssociationBusinessInformationEntityPropertyTreeNode topLevelNode = getTopLevelNode();
         try {
-            treeNodeService.validate(topLevelNode);
             treeNodeService.update(topLevelNode, getCurrentUser());
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));

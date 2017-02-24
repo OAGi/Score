@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.model.treenode.BasicBusinessInformationEntityRestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -792,6 +791,16 @@ public class TreeNodeService {
         }
 
         @Override
+        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+            visitor.visit(this);
+            if (children != null) {
+                for (BusinessInformationEntityTreeNode child : children) {
+                    child.accept(visitor);
+                }
+            }
+        }
+
+        @Override
         public void validate() {
         }
 
@@ -956,6 +965,12 @@ public class TreeNodeService {
         }
 
         @Override
+        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+            visitor.visit(this);
+            type.accept(visitor);
+        }
+
+        @Override
         public void validate() {
             AssociationBusinessInformationEntity asbie = getAssociationBusinessInformationEntity();
             if (asbie == null || !asbie.isDirty()) {
@@ -1042,7 +1057,6 @@ public class TreeNodeService {
         private BasicCoreComponent bcc;
 
         private DataType bdt;
-        private BasicBusinessInformationEntityRestrictionType restrictionType;
 
         private Boolean hasChild = null;
         private List<BusinessInformationEntityTreeNode> children = null;
@@ -1081,8 +1095,6 @@ public class TreeNodeService {
             if (bbie == null) {
                 bbie = createBBIE(bcc, fromAbie, bbiep, bdtPriRestri, codeListId, seqKey);
             }
-
-            setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? Primitive : (bbie.getCodeListId() > 0L) ? Code : Agency);
         }
 
         private void setParent(AssociationBusinessInformationEntityPropertyTreeNode parent) {
@@ -1151,12 +1163,12 @@ public class TreeNodeService {
 
         @Override
         public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
-            return restrictionType;
+            return getBasicBusinessInformationEntity().getRestrictionType();
         }
 
         @Override
         public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
-            this.restrictionType = restrictionType;
+            getBasicBusinessInformationEntity().setRestrictionType(restrictionType);
         }
 
         @Override
@@ -1224,6 +1236,16 @@ public class TreeNodeService {
                 }
             }
             return children;
+        }
+
+        @Override
+        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+            visitor.visit(this);
+            if (children != null) {
+                for (BusinessInformationEntityTreeNode child : children) {
+                    child.accept(visitor);
+                }
+            }
         }
 
         @Override
@@ -1310,16 +1332,12 @@ public class TreeNodeService {
         private BasicBusinessInformationEntitySupplementaryComponent bbieSc;
         private DataTypeSupplementaryComponent bdtSc;
 
-        private BasicBusinessInformationEntityRestrictionType restrictionType;
-
         public BasicBusinessInformationEntitySupplementaryComponentTreeNodeImpl(BasicBusinessInformationEntityPropertyTreeNode parent,
                                                                                 BasicBusinessInformationEntitySupplementaryComponent bbieSc,
                                                                                 DataTypeSupplementaryComponent bdtSc) {
             this.parent = parent;
             this.bbieSc = bbieSc;
             this.bdtSc = bdtSc;
-
-            setRestrictionType((bbieSc.getDtScPriRestriId() > 0L) ? Primitive : (bbieSc.getCodeListId() > 0L) ? Code : Agency);
         }
 
         @Override
@@ -1349,12 +1367,12 @@ public class TreeNodeService {
 
         @Override
         public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
-            return restrictionType;
+            return getBasicBusinessInformationEntitySupplementaryComponent().getRestrictionType();
         }
 
         @Override
         public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
-            this.restrictionType = restrictionType;
+            getBasicBusinessInformationEntitySupplementaryComponent().setRestrictionType(restrictionType);
         }
 
         @Override
@@ -1370,6 +1388,11 @@ public class TreeNodeService {
         @Override
         public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
             return Collections.emptyList();
+        }
+
+        @Override
+        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+            visitor.visit(this);
         }
 
         @Override
@@ -1756,7 +1779,7 @@ public class TreeNodeService {
         updateHandler.update();
     }
 
-    private class BusinessInformationEntityTreeNodeUpdateHandler {
+    private class BusinessInformationEntityTreeNodeUpdateHandler implements BusinessInformationEntityTreeNodeVisitor {
         private AssociationBusinessInformationEntityPropertyTreeNode root;
         private User user;
 
@@ -1776,7 +1799,7 @@ public class TreeNodeService {
 
         public void update() {
             TopLevelAbie topLevelAbie = prepareForTopLevelAbieEntity();
-            gatheringBusinessInformationEntities(root);
+            root.accept(this);
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
             abieRepository.save(abieList);
@@ -1818,101 +1841,65 @@ public class TreeNodeService {
             bie.addUpdateEventListener(eventListener);
         }
 
-        private void gatheringBusinessInformationEntities(
-                BusinessInformationEntityTreeNode node) {
-            Collection<? extends BusinessInformationEntityTreeNode> children;
-
-            if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                        (AssociationBusinessInformationEntityPropertyTreeNode) node;
-
-                AssociationBusinessInformationEntity asbie =
-                        asbiepNode.getAssociationBusinessInformationEntity();
-
-                AssociationBusinessInformationEntityProperty asbiep =
-                        asbiepNode.getAssociationBusinessInformationEntityProperty();
-
-                AggregateBusinessInformationEntityTreeNode abieNode = asbiepNode.getType();
-                AggregateBusinessInformationEntity abie =
-                        abieNode.getAggregateBusinessInformationEntity();
-
-                if (abie != null && abie.getAbieId() > 0L && abie.isDirty()) {
-                    abieList.add(abie);
-                } else if (asbie != null && asbie.getAsbieId() > 0L && asbie.isDirty()) {
-                    asbieList.add(asbie);
-                } else if (asbiep != null && asbiep.getAsbiepId() > 0L && asbiep.isDirty()) {
-                    asbiepList.add(asbiep);
-                } else {
-                    if ((asbie != null && asbie.isDirty()) ||
-                        (asbiep != null && asbiep.isDirty()) ||
-                        (abie != null && abie.isDirty())) {
-                        if (abie != null) {
-                            abieList.add(abie);
-                        }
-                        if (asbie != null) {
-                            asbieList.add(asbie);
-                        }
-                        if (asbiep != null) {
-                            asbiepList.add(asbiep);
-                        }
-                    }
-                }
-
-                if (abieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
-                    children = ((AggregateBusinessInformationEntityTreeNodeImpl) abieNode).children;
-                    if (children == null) {
-                        children = Collections.emptyList();
-                    }
-                } else {
-                    children = node.getChildren();
-                }
-            } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                        (BasicBusinessInformationEntityPropertyTreeNode) node;
-
-                BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
-
-                BasicBusinessInformationEntityProperty bbiep =
-                        bbiepNode.getBasicBusinessInformationEntityProperty();
-
-                if (bbie != null && bbie.getBbieId() > 0L && bbie.isDirty()) {
-                    bbieList.add(bbie);
-                } else if (bbiep != null && bbiep.getBbiepId() > 0L && bbiep.isDirty()) {
-                    bbiepList.add(bbiep);
-                } else if ((bbie != null && bbie.isDirty()) || (bbiep != null && bbiep.isDirty())) {
-                    if (bbie != null) {
-                        bbieList.add(bbie);
-                    }
-                    if (bbiep != null) {
-                        bbiepList.add(bbiep);
-                    }
-                }
-
-                if (bbiepNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
-                    children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bbiepNode).children;
-                    if (children == null) {
-                        children = Collections.emptyList();
-                    }
-                } else {
-                    children = node.getChildren();
-                }
-            } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-                BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                        (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node;
-
-                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                        handleBBIEScBdtScPriRestri(bbieScNode);
-                if (bbieSc != null && bbieSc.isDirty()) {
-                    bbieScList.add(bbieSc);
-                }
-
-                children = node.getChildren();
-            } else {
-                throw new IllegalStateException();
+        @Override
+        public void visit(AggregateBusinessInformationEntityTreeNode abieNode) {
+            AggregateBusinessInformationEntity abie = abieNode.getAggregateBusinessInformationEntity();
+            if (abie != null && abie.isDirty()) {
+                abieList.add(abie);
             }
+        }
 
-            for (BusinessInformationEntityTreeNode child : children) {
-                gatheringBusinessInformationEntities(child);
+        @Override
+        public void visit(AssociationBusinessInformationEntityPropertyTreeNode asbiepNode) {
+            AssociationBusinessInformationEntity asbie =
+                    asbiepNode.getAssociationBusinessInformationEntity();
+
+            AssociationBusinessInformationEntityProperty asbiep =
+                    asbiepNode.getAssociationBusinessInformationEntityProperty();
+
+            if (asbie != null && asbie.getAsbieId() > 0L && asbie.isDirty()) {
+                asbieList.add(asbie);
+            } else if (asbiep != null && asbiep.getAsbiepId() > 0L && asbiep.isDirty()) {
+                asbiepList.add(asbiep);
+            } else {
+                if ((asbie != null && asbie.isDirty()) || (asbiep != null && asbiep.isDirty())) {
+                    if (asbie != null) {
+                        asbieList.add(asbie);
+                    }
+                    if (asbiep != null) {
+                        asbiepList.add(asbiep);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void visit(BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
+            BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
+
+            BasicBusinessInformationEntityProperty bbiep =
+                    bbiepNode.getBasicBusinessInformationEntityProperty();
+
+            if (bbie != null && bbie.getBbieId() > 0L && bbie.isDirty()) {
+                bbieList.add(bbie);
+            } else if (bbiep != null && bbiep.getBbiepId() > 0L && bbiep.isDirty()) {
+                bbiepList.add(bbiep);
+            } else if ((bbie != null && bbie.isDirty()) || (bbiep != null && bbiep.isDirty())) {
+                if (bbie != null) {
+                    bbieList.add(bbie);
+                }
+                if (bbiep != null) {
+                    bbiepList.add(bbiep);
+                }
+            }
+        }
+
+        @Override
+        public void visit(BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode) {
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                    handleBBIEScBdtScPriRestri(bbieScNode);
+            if (bbieSc != null && bbieSc.isDirty()) {
+                bbieScList.add(bbieSc);
             }
         }
     }

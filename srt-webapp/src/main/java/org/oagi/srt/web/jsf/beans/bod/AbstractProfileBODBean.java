@@ -1,10 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
-import org.oagi.srt.model.treenode.BusinessInformationEntityTreeNode;
+import org.oagi.srt.model.treenode.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.TreeNodeService;
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 abstract class AbstractProfileBODBean extends UIHandler {
@@ -30,6 +28,7 @@ abstract class AbstractProfileBODBean extends UIHandler {
     private CoreComponentService coreComponentService;
 
     private TreeNode treeNode;
+    private boolean canUpdate;
 
     TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bixCtx) {
         AssociationBusinessInformationEntityPropertyTreeNode topLevelNode =
@@ -64,6 +63,75 @@ abstract class AbstractProfileBODBean extends UIHandler {
     public AssociationBusinessInformationEntityPropertyTreeNode getTopLevelNode() {
         TreeNode treeNode = getTreeNode();
         return (AssociationBusinessInformationEntityPropertyTreeNode) treeNode.getChildren().get(0).getData();
+    }
+
+    public boolean canUpdate() {
+        return canUpdate;
+    }
+
+    public void onChangeData(BusinessInformationEntityTreeNode bieTreeNode) {
+        try {
+            validate(bieTreeNode);
+        } catch (Throwable t) {
+            canUpdate = false;
+            throw t;
+        }
+
+        AtomicInteger dirtyCount = new AtomicInteger();
+        getTopLevelNode().accept(new BusinessInformationEntityTreeNodeVisitor() {
+            @Override
+            public void visit(AggregateBusinessInformationEntityTreeNode abieNode) {
+                AggregateBusinessInformationEntity abie = abieNode.getAggregateBusinessInformationEntity();
+                if (abie != null && abie.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+            }
+
+            @Override
+            public void visit(AssociationBusinessInformationEntityPropertyTreeNode asbiepNode) {
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAssociationBusinessInformationEntity();
+                if (asbie != null && asbie.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+                AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAssociationBusinessInformationEntityProperty();
+                if (asbiep != null && asbiep.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+            }
+
+            @Override
+            public void visit(BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
+                BasicBusinessInformationEntity bbie = bbiepNode.getBasicBusinessInformationEntity();
+                if (bbie != null && bbie.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+                BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBasicBusinessInformationEntityProperty();
+                if (bbiep != null && bbiep.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+            }
+
+            @Override
+            public void visit(BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode) {
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                        bbieScNode.getBasicBusinessInformationEntitySupplementaryComponent();
+                if (bbieSc != null && bbieSc.isDirty()) {
+                    dirtyCount.incrementAndGet();
+                }
+            }
+        });
+
+        canUpdate = (dirtyCount.get() > 0) ? true : false;
+    }
+
+    public void validate(BusinessInformationEntityTreeNode bieNode) {
+        try {
+            bieNode.validate();
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
     }
 
     public void expand(NodeExpandEvent expandEvent) {
@@ -180,16 +248,6 @@ abstract class AbstractProfileBODBean extends UIHandler {
             } else {
                 return Utility.spaceSeparator(bdtSc.getPropertyTerm().concat(bdtSc.getRepresentationTerm()));
             }
-        }
-    }
-
-    public void validate(BusinessInformationEntityTreeNode bieNode) {
-        try {
-            bieNode.validate();
-        } catch (Throwable t) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
-            throw t;
         }
     }
 }

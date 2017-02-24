@@ -1,5 +1,6 @@
 package org.oagi.srt.model.treenode;
 
+import org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 

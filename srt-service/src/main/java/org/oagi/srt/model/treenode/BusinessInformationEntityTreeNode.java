@@ -8,5 +8,7 @@ public interface BusinessInformationEntityTreeNode extends SRTTreeNode, Usable {
 
     public Collection<? extends BusinessInformationEntityTreeNode> getChildren();
 
+    public void accept(BusinessInformationEntityTreeNodeVisitor visitor);
+
     public void validate();
 }

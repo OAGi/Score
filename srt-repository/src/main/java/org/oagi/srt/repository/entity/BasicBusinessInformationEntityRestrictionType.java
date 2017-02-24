@@ -1,4 +1,4 @@
-package org.oagi.srt.model.treenode;
+package org.oagi.srt.repository.entity;
 
 public enum BasicBusinessInformationEntityRestrictionType {
     Primitive,
