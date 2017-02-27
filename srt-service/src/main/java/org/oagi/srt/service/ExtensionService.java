@@ -41,9 +41,6 @@ public class ExtensionService {
     private NamespaceRepository namespaceRepository;
 
     @Autowired
-    private NodeService nodeService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Transactional(rollbackFor = Throwable.class)

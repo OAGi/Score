@@ -1,14 +1,13 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
+import org.oagi.srt.model.treenode.BasicBusinessInformationEntitySupplementaryComponentTreeNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.TreeNodeService;
-import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.TreeNode;
@@ -30,10 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Candidate;
 
 @Controller
 @Scope("view")
@@ -47,13 +43,9 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private TreeNodeService treeNodeService;
     @Autowired
-    private BIETreeNodeHandler bieTreeNodeHandler;
-    @Autowired
     private BusinessInformationEntityService bieService;
     @Autowired
     private ExtensionService extensionService;
-    @Autowired
-    private NodeService nodeService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
@@ -141,37 +133,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         }
 
         return sb.toString();
-    }
-
-    @Transactional(rollbackFor = Throwable.class)
-    public void uptakeExtensions(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
-        try {
-            TopLevelAbie topLevelAbie = getTopLevelAbie();
-            if (Candidate == topLevelAbie.getState()) {
-                RequestContext.getCurrentInstance().execute("PF('confirmChangeStateToEditing').show()");
-            } else {
-                for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
-                    BIENode userExtBieNode = nodeService.createBIENode(bieUserExtRevision);
-                    bieTreeNodeHandler.append(userExtBieNode, topLevelAbie);
-                }
-
-                discard(bieUserExtRevisionList);
-            }
-        } finally {
-            RequestContext.getCurrentInstance().execute("PF('loadingBlock').hide()");
-        }
-    }
-
-    @Transactional(rollbackFor = Throwable.class)
-    public void uptakeExtensionsWithChangingState(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList,
-                                                  AggregateBusinessInformationEntityState state) {
-        updateState(state);
-
-        TopLevelAbie topLevelAbie = getTopLevelAbie();
-        topLevelAbie = topLevelAbieRepository.findOne(topLevelAbie.getTopLevelAbieId());
-        setTopLevelAbie(topLevelAbie);
-
-        uptakeExtensions(bieUserExtRevisionList);
     }
 
     @Transactional(rollbackFor = Throwable.class)

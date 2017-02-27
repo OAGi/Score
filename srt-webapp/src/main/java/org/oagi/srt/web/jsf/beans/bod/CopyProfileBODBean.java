@@ -8,7 +8,6 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.TreeNodeService;
 import org.oagi.srt.service.TreeNodeService.ProgressListener;
-import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
@@ -74,8 +73,6 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     private BusinessInformationEntityService bieService;
     @Autowired
     private TreeNodeService treeNodeService;
-    @Autowired
-    private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
     @Autowired
