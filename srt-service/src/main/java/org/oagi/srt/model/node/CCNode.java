@@ -1,12 +1,12 @@
-package org.oagi.srt.model.treenode;
+package org.oagi.srt.model.node;
 
 import org.oagi.srt.repository.entity.Namespace;
 
 import java.util.Collection;
 
-public interface CoreComponentTreeNode extends SRTTreeNode {
+public interface CCNode extends SRTNode {
 
-    public Collection<? extends CoreComponentTreeNode> getChildren();
+    public Collection<? extends CCNode> getChildren();
 
     public Namespace getNamespace();
     public void setNamespace(Namespace namespace);

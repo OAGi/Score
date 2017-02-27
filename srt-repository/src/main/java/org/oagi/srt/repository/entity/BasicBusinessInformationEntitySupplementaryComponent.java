@@ -390,15 +390,16 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         addPersistEventListener(new PersistEventListener() {
             @Override
             public void onPrePersist(Object object) {
-                BasicBusinessInformationEntitySupplementaryComponent bbiesc = (BasicBusinessInformationEntitySupplementaryComponent) object;
-                if (bbiesc.bbie != null) {
-                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                        (BasicBusinessInformationEntitySupplementaryComponent) object;
+                if (bbieSc.bbie != null) {
+                    bbieSc.setBbieId(bbieSc.bbie.getBbieId());
                 }
-                if (bbiesc.bbie != null) {
-                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                if (bbieSc.bbie != null) {
+                    bbieSc.setBbieId(bbieSc.bbie.getBbieId());
                 }
-                if (bbiesc.ownerTopLevelAbie != null) {
-                    bbiesc.setOwnerTopLevelAbieId(bbiesc.ownerTopLevelAbie.getTopLevelAbieId());
+                if (bbieSc.ownerTopLevelAbie != null) {
+                    bbieSc.setOwnerTopLevelAbieId(bbieSc.ownerTopLevelAbie.getTopLevelAbieId());
                 }
 
                 ensureRestrictionType();
@@ -406,6 +407,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
             @Override
             public void onPostPersist(Object object) {
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                        (BasicBusinessInformationEntitySupplementaryComponent) object;
+                bbieSc.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -417,7 +421,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent
 
             @Override
             public void onPostUpdate(Object object) {
-
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                        (BasicBusinessInformationEntitySupplementaryComponent) object;
+                bbieSc.afterLoaded();
             }
         });
     }

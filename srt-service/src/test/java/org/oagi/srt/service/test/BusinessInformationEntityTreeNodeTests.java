@@ -2,13 +2,13 @@ package org.oagi.srt.service.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.model.treenode.AssociationBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BasicBusinessInformationEntityPropertyTreeNode;
-import org.oagi.srt.model.treenode.BusinessInformationEntityTreeNode;
+import org.oagi.srt.model.node.ASBIEPNode;
+import org.oagi.srt.model.node.BBIEPNode;
+import org.oagi.srt.model.node.BIENode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.service.TreeNodeService;
+import org.oagi.srt.service.NodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BusinessInformationEntityTreeNodeTests {
 
     @Autowired
-    private TreeNodeService treeNodeService;
+    private NodeService treeNodeService;
 
     @Autowired
     private BasicCoreComponentRepository bccRepository;
@@ -79,19 +79,19 @@ public class BusinessInformationEntityTreeNodeTests {
      */
     @Test
     public void createAggregateCoreComponentTreeNode() {
-        AssociationBusinessInformationEntityPropertyTreeNode acknowledgePurchaseOrderTreeNode =
+        ASBIEPNode acknowledgePurchaseOrderTreeNode =
                 createAcknowledgePurchaseOrderTreeNode();
 
-        Collection<? extends BusinessInformationEntityTreeNode> children = acknowledgePurchaseOrderTreeNode.getChildren();
+        Collection<? extends BIENode> children = acknowledgePurchaseOrderTreeNode.getChildren();
         assertThat(children.size()).isEqualTo(6);
     }
 
     @Test
     public void orderingOfSequenceTest() {
-        AssociationBusinessInformationEntityPropertyTreeNode acknowledgePurchaseOrderTreeNode =
+        ASBIEPNode acknowledgePurchaseOrderTreeNode =
                 createAcknowledgePurchaseOrderTreeNode();
 
-        Collection<? extends BusinessInformationEntityTreeNode> children = acknowledgePurchaseOrderTreeNode.getChildren();
+        Collection<? extends BIENode> children = acknowledgePurchaseOrderTreeNode.getChildren();
 
         int index = 0;
         Map<Integer, String> indexGuidMap = new HashMap();
@@ -103,27 +103,25 @@ public class BusinessInformationEntityTreeNodeTests {
         indexGuidMap.put(index++, "oagis-id-5e5d4c16841548cda5efa87ef1658822");
 
         index = 0;
-        for (BusinessInformationEntityTreeNode child : children) {
-            if (child instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                        (AssociationBusinessInformationEntityPropertyTreeNode) child;
-                assertThat(indexGuidMap.get(index++)).isEqualTo(asbiepNode.getAssociationCoreComponent().getGuid());
-            } else if (child instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                        (BasicBusinessInformationEntityPropertyTreeNode) child;
-                assertThat(indexGuidMap.get(index++)).isEqualTo(bbiepNode.getBasicCoreComponent().getGuid());
+        for (BIENode child : children) {
+            if (child instanceof ASBIEPNode) {
+                ASBIEPNode asbiepNode = (ASBIEPNode) child;
+                assertThat(indexGuidMap.get(index++)).isEqualTo(asbiepNode.getAscc().getGuid());
+            } else if (child instanceof BBIEPNode) {
+                BBIEPNode bbiepNode = (BBIEPNode) child;
+                assertThat(indexGuidMap.get(index++)).isEqualTo(bbiepNode.getBcc().getGuid());
             }
         }
     }
 
-    private AssociationBusinessInformationEntityPropertyTreeNode createAcknowledgePurchaseOrderTreeNode() {
+    private ASBIEPNode createAcknowledgePurchaseOrderTreeNode() {
         String acknowledgePurchaseOrderAsccpGuid = "oagis-id-153587c9a1ba4b27bc594184dc377182";
         AssociationCoreComponentProperty acknowledgePurchaseOrderAsccp =
                 asccpRepository.findOneByGuid(acknowledgePurchaseOrderAsccpGuid);
         assertThat(acknowledgePurchaseOrderAsccp).isNotNull();
         BusinessContext bizCtx = new BusinessContext();
 
-        AssociationBusinessInformationEntityPropertyTreeNode acknowledgePurchaseOrderTreeNode =
+        ASBIEPNode acknowledgePurchaseOrderTreeNode =
                 treeNodeService.createBusinessInformationEntityTreeNode(acknowledgePurchaseOrderAsccp, bizCtx);
         assertThat(acknowledgePurchaseOrderTreeNode).isNotNull();
         assertThat(acknowledgePurchaseOrderTreeNode.hasChild()).isEqualTo(true);

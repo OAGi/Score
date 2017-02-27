@@ -1,13 +1,13 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.service.TreeNodeService;
+import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -51,7 +51,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     private ExtensionService extensionService;
 
     @Autowired
-    private TreeNodeService treeNodeService;
+    private NodeService nodeService;
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -152,24 +152,24 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         if (treeNode == null) {
             return null;
         }
-        CoreComponentTreeNode node = (CoreComponentTreeNode) treeNode.getData();
-        if (node instanceof AssociationCoreComponentPropertyTreeNode) {
-            AssociationCoreComponentPropertyTreeNode asccpNode = (AssociationCoreComponentPropertyTreeNode) node;
-            return asccpNode.getAssociationCoreComponentProperty().getState();
+        CCNode node = (CCNode) treeNode.getData();
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            return asccpNode.getAsccp().getState();
         } else {
             return null;
         }
     }
 
     public TreeNode createTreeNode(AggregateCoreComponent acc) {
-        AggregateCoreComponentTreeNode accNode =
-                treeNodeService.createCoreComponentTreeNode(acc);
+        ACCNode accNode =
+                nodeService.createCoreComponentTreeNode(acc);
         TreeNode root = new DefaultTreeNode();
         toTreeNode(accNode, root);
         return root;
     }
 
-    private TreeNode toTreeNode(CoreComponentTreeNode node, TreeNode parent) {
+    private TreeNode toTreeNode(CCNode node, TreeNode parent) {
         TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
         String name = treeNodeTypeNameResolver.getName();
         node.setAttribute("name", name);
@@ -182,15 +182,15 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         return treeNode;
     }
 
-    private TreeNodeTypeNameResolver getTreeNodeTypeNameResolver(CoreComponentTreeNode node) {
-        if (node instanceof AggregateCoreComponentTreeNode) {
-            return new AggregateCoreComponentTreeNodeTypeNameResolver((AggregateCoreComponentTreeNode) node);
-        } else if (node instanceof AssociationCoreComponentPropertyTreeNode) {
-            return new AssociationCoreComponentPropertyTreeNodeTypeNameResolver((AssociationCoreComponentPropertyTreeNode) node);
-        } else if (node instanceof BasicCoreComponentPropertyTreeNode) {
-            return new BasicCoreComponentPropertyTreeNodeTypeNameResolver((BasicCoreComponentPropertyTreeNode) node);
-        } else if (node instanceof BusinessDataTypeSupplementaryComponentTreeNode) {
-            return new BusinessDataTypeSupplementaryComponentTreeNodeTypeNameResolver((BusinessDataTypeSupplementaryComponentTreeNode) node);
+    private TreeNodeTypeNameResolver getTreeNodeTypeNameResolver(CCNode node) {
+        if (node instanceof ACCNode) {
+            return new AggregateCoreComponentTreeNodeTypeNameResolver((ACCNode) node);
+        } else if (node instanceof ASCCPNode) {
+            return new AssociationCoreComponentPropertyTreeNodeTypeNameResolver((ASCCPNode) node);
+        } else if (node instanceof BCCPNode) {
+            return new BasicCoreComponentPropertyTreeNodeTypeNameResolver((BCCPNode) node);
+        } else if (node instanceof BDTSCNode) {
+            return new BusinessDataTypeSupplementaryComponentTreeNodeTypeNameResolver((BDTSCNode) node);
         } else {
             throw new IllegalStateException();
         }
@@ -198,33 +198,33 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     private class AggregateCoreComponentTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
 
-        private AggregateCoreComponentTreeNode node;
+        private ACCNode node;
 
         public AggregateCoreComponentTreeNodeTypeNameResolver(
-                AggregateCoreComponentTreeNode node) {
+                ACCNode node) {
             this.node = node;
         }
 
         @Override
         public String getType() {
-            AggregateCoreComponent acc = node.getAggregateCoreComponent();
+            AggregateCoreComponent acc = node.getAcc();
             String type = (targetAcc.equals(acc)) ? "ACC-Extension" : "ACC";
             return type;
         }
 
         @Override
         public String getName() {
-            AggregateCoreComponent acc = node.getAggregateCoreComponent();
+            AggregateCoreComponent acc = node.getAcc();
             return acc.getDen();
         }
     }
 
     private class AssociationCoreComponentPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
 
-        private AssociationCoreComponentPropertyTreeNode node;
+        private ASCCPNode node;
 
         public AssociationCoreComponentPropertyTreeNodeTypeNameResolver(
-                AssociationCoreComponentPropertyTreeNode node) {
+                ASCCPNode node) {
             this.node = node;
         }
 
@@ -235,40 +235,40 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
         @Override
         public String getName() {
-            AssociationCoreComponentProperty asccp = node.getAssociationCoreComponentProperty();
+            AssociationCoreComponentProperty asccp = node.getAsccp();
             return asccp.getPropertyTerm();
         }
     }
 
     private class BasicCoreComponentPropertyTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
 
-        private BasicCoreComponentPropertyTreeNode node;
+        private BCCPNode node;
 
         public BasicCoreComponentPropertyTreeNodeTypeNameResolver(
-                BasicCoreComponentPropertyTreeNode node) {
+                BCCPNode node) {
             this.node = node;
         }
 
         @Override
         public String getType() {
-            BasicCoreComponent bcc = node.getBasicCoreComponent();
+            BasicCoreComponent bcc = node.getBcc();
             String type = "BCCP" + (bcc.getEntityType() == BasicCoreComponentEntityType.Attribute ? "-Attribute" : "");
             return type;
         }
 
         @Override
         public String getName() {
-            BasicCoreComponentProperty bccp = node.getBasicCoreComponentProperty();
+            BasicCoreComponentProperty bccp = node.getBccp();
             return bccp.getPropertyTerm();
         }
     }
 
     private class BusinessDataTypeSupplementaryComponentTreeNodeTypeNameResolver implements TreeNodeTypeNameResolver {
 
-        private BusinessDataTypeSupplementaryComponentTreeNode node;
+        private BDTSCNode node;
 
         public BusinessDataTypeSupplementaryComponentTreeNodeTypeNameResolver(
-                BusinessDataTypeSupplementaryComponentTreeNode node) {
+                BDTSCNode node) {
             this.node = node;
         }
 
@@ -279,7 +279,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
         @Override
         public String getName() {
-            DataTypeSupplementaryComponent bdtSc = node.getBusinessDataTypeSupplementaryComponent();
+            DataTypeSupplementaryComponent bdtSc = node.getBdtSc();
             String name = bdtSc.getPropertyTerm() + ". " + bdtSc.getRepresentationTerm();
             return name;
         }
@@ -287,13 +287,13 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        CoreComponentTreeNode coreComponentTreeNode = (CoreComponentTreeNode) treeNode.getData();
+        CCNode coreComponentTreeNode = (CCNode) treeNode.getData();
         Boolean expanded = (Boolean) coreComponentTreeNode.getAttribute("expanded");
         if (expanded == null || expanded == false) {
             if (coreComponentTreeNode.hasChild()) {
                 treeNode.setChildren(new ArrayList()); // clear children
 
-                for (CoreComponentTreeNode child : coreComponentTreeNode.getChildren()) {
+                for (CCNode child : coreComponentTreeNode.getChildren()) {
                     toTreeNode(child, treeNode);
                 }
             }
@@ -429,10 +429,10 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
 
         TreeNode rootNode = getRootNode();
-        ((CoreComponentTreeNode) rootNode.getData()).reload();
+        ((CCNode) rootNode.getData()).reload();
 
-        AssociationCoreComponentPropertyTreeNode asccpNode =
-                treeNodeService.createCoreComponentTreeNode(result.getAscc());
+        ASCCPNode asccpNode =
+                nodeService.createCoreComponentTreeNode(result.getAscc());
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -561,10 +561,10 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
 
         TreeNode rootNode = getRootNode();
-        ((CoreComponentTreeNode) rootNode.getData()).reload();
+        ((CCNode) rootNode.getData()).reload();
 
-        BasicCoreComponentPropertyTreeNode bccpNode =
-                treeNodeService.createCoreComponentTreeNode(result.getBcc());
+        BCCPNode bccpNode =
+                nodeService.createCoreComponentTreeNode(result.getBcc());
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -576,8 +576,8 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updateAscc(TreeNode treeNode) {
-        AssociationCoreComponentPropertyTreeNode asccpNode = (AssociationCoreComponentPropertyTreeNode) treeNode.getData();
-        AssociationCoreComponent ascc = asccpNode.getAssociationCoreComponent();
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        AssociationCoreComponent ascc = asccpNode.getAscc();
         User requester = getCurrentUser();
 
         try {
@@ -592,8 +592,8 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public void discardAscc(TreeNode treeNode) {
-        AssociationCoreComponentPropertyTreeNode asccpNode = (AssociationCoreComponentPropertyTreeNode) treeNode.getData();
-        AssociationCoreComponent ascc = asccpNode.getAssociationCoreComponent();
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        AssociationCoreComponent ascc = asccpNode.getAscc();
         User requester = getCurrentUser();
 
         try {
@@ -616,8 +616,8 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updateBcc(TreeNode treeNode) {
-        BasicCoreComponentPropertyTreeNode bccpNode = (BasicCoreComponentPropertyTreeNode) treeNode.getData();
-        BasicCoreComponent bcc = bccpNode.getBasicCoreComponent();
+        BCCPNode bccpNode = (BCCPNode) treeNode.getData();
+        BasicCoreComponent bcc = bccpNode.getBcc();
         if (!bccpNode.getChildren().isEmpty() && Element == bcc.getEntityType()) {
             throw new IllegalStateException("Only BBIE without SCs can be made Attribute.");
         }
@@ -642,8 +642,8 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Transactional(rollbackFor = Throwable.class)
     public void discardBcc(TreeNode treeNode) {
-        BasicCoreComponentPropertyTreeNode bccpNode = (BasicCoreComponentPropertyTreeNode) treeNode.getData();
-        BasicCoreComponent bcc = bccpNode.getBasicCoreComponent();
+        BCCPNode bccpNode = (BCCPNode) treeNode.getData();
+        BasicCoreComponent bcc = bccpNode.getBcc();
         User requester = getCurrentUser();
 
         try {
@@ -693,22 +693,22 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     private int getSeqKey(TreeNode treeNode) {
         Object data = treeNode.getData();
-        if (data instanceof AssociationCoreComponentPropertyTreeNode) {
-            return ((AssociationCoreComponentPropertyTreeNode) data).getAssociationCoreComponent().getSeqKey();
-        } else if (data instanceof BasicCoreComponentPropertyTreeNode) {
-            return ((BasicCoreComponentPropertyTreeNode) data).getBasicCoreComponent().getSeqKey();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAscc().getSeqKey();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBcc().getSeqKey();
         }
         return -1;
     }
 
     private Date getCreationTimestamp(TreeNode treeNode) {
         Object data = treeNode.getData();
-        if (data instanceof AssociationCoreComponentPropertyTreeNode) {
-            return ((AssociationCoreComponentPropertyTreeNode) data).getAssociationCoreComponentProperty().getCreationTimestamp();
-        } else if (data instanceof BasicCoreComponentPropertyTreeNode) {
-            return ((BasicCoreComponentPropertyTreeNode) data).getBasicCoreComponentProperty().getCreationTimestamp();
-        } else if (data instanceof AggregateCoreComponentTreeNode) {
-            return ((AggregateCoreComponentTreeNode) data).getAggregateCoreComponent().getCreationTimestamp();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAsccp().getCreationTimestamp();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBccp().getCreationTimestamp();
+        } else if (data instanceof ACCNode) {
+            return ((ACCNode) data).getAcc().getCreationTimestamp();
         }
         return null;
     }
@@ -738,40 +738,40 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         long lastUpdatedBy = requester.getAppUserId();
         Object data = treeNode.getData();
 
-        if (data instanceof AggregateCoreComponentTreeNode) {
-            AggregateCoreComponentTreeNode accNode = ((AggregateCoreComponentTreeNode) data);
-            AggregateCoreComponent acc = accNode.getAggregateCoreComponent();
+        if (data instanceof ACCNode) {
+            ACCNode accNode = ((ACCNode) data);
+            AggregateCoreComponent acc = accNode.getAcc();
             if (acc.getState() != Published) {
                 acc.setState(state);
                 acc.setLastUpdatedBy(lastUpdatedBy);
                 acc.afterLoaded();
             }
-        } else if (data instanceof AssociationCoreComponentPropertyTreeNode) {
-            AssociationCoreComponentPropertyTreeNode asccpNode = ((AssociationCoreComponentPropertyTreeNode) data);
-            AssociationCoreComponent ascc = asccpNode.getAssociationCoreComponent();
+        } else if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = ((ASCCPNode) data);
+            AssociationCoreComponent ascc = asccpNode.getAscc();
             if (ascc.getState() != Published) {
                 ascc.setState(state);
                 ascc.setLastUpdatedBy(lastUpdatedBy);
                 ascc.afterLoaded();
             }
 
-            AssociationCoreComponentProperty asccp = asccpNode.getAssociationCoreComponentProperty();
+            AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
             if (asccp.getState() != Published) {
                 asccp.setState(state);
                 asccp.setLastUpdatedBy(lastUpdatedBy);
                 asccp.afterLoaded();
             }
-        } else if (data instanceof BasicCoreComponentPropertyTreeNode) {
-            BasicCoreComponentPropertyTreeNode bccpNode = ((BasicCoreComponentPropertyTreeNode) data);
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = ((BCCPNode) data);
 
-            BasicCoreComponent bcc = bccpNode.getBasicCoreComponent();
+            BasicCoreComponent bcc = bccpNode.getBcc();
             if (bcc.getState() != Published) {
                 bcc.setState(state);
                 bcc.setLastUpdatedBy(lastUpdatedBy);
                 bcc.afterLoaded();
             }
 
-            BasicCoreComponentProperty bccp = bccpNode.getBasicCoreComponentProperty();
+            BasicCoreComponentProperty bccp = bccpNode.getBccp();
             if (bccp.getState() != Published) {
                 bccp.setState(state);
                 bccp.setLastUpdatedBy(lastUpdatedBy);

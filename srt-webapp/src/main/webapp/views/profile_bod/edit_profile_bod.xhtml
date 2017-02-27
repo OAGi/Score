@@ -1085,17 +1085,25 @@
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  disabled="#{!editProfileBODBean.canUpdate()}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
-                                 action="#{editProfileBODBean.update()}"/>
-                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
-                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
-                                 action="#{editProfileBODBean.updateState('Candidate')}"/>
+                                 actionListener="#{editProfileBODBean.update()}"
+                                 action="#{editProfileBODBean.afterUpdate()}"
+                                 update=":form:btnGroup"/>
 
+                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
+                                 disabled="#{editProfileBODBean.canUpdate()}"
+                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                                 action="#{editProfileBODBean.updateState('Candidate')}"
+                                 update=":form:btnGroup"/>
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
+                                 disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
-                                 action="#{editProfileBODBean.updateState('Editing')}"/>
+                                 action="#{editProfileBODBean.updateState('Editing')}"
+                                 update=":form:btnGroup"/>
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
+                                 disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{editProfileBODBean.updateState('Published')}"/>
+                                 action="#{editProfileBODBean.updateState('Published')}"
+                                 update=":form:btnGroup"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

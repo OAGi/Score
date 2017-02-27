@@ -243,9 +243,22 @@ public class AssociationBusinessInformationEntityProperty
 
             @Override
             public void onPostPersist(Object object) {
+                AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
+                asbiep.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+                AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
+                asbiep.afterLoaded();
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

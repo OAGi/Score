@@ -507,6 +507,8 @@ public class BasicBusinessInformationEntity
             }
             @Override
             public void onPostPersist(Object object) {
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
+                bbie.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -518,7 +520,8 @@ public class BasicBusinessInformationEntity
 
             @Override
             public void onPostUpdate(Object object) {
-
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
+                bbie.afterLoaded();
             }
         });
     }

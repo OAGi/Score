@@ -16,7 +16,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.repository.entity.CodeListValue.Color.*;
+import static org.oagi.srt.repository.entity.CodeListValue.Color.Blue;
+import static org.oagi.srt.repository.entity.CodeListValue.Color.Green;
 
 @Controller
 @Scope("view")

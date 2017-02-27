@@ -249,9 +249,22 @@ public class BasicBusinessInformationEntityProperty
 
             @Override
             public void onPostPersist(Object object) {
+                BasicBusinessInformationEntityProperty bbiep = (BasicBusinessInformationEntityProperty) object;
+                bbiep.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+                BasicBusinessInformationEntityProperty bbiep = (BasicBusinessInformationEntityProperty) object;
+                bbiep.afterLoaded();
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

@@ -1,7 +1,7 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.treenode.*;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
@@ -23,7 +23,7 @@ import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGro
 
 @Service
 @Transactional
-public class TreeNodeService {
+public class NodeService {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -79,49 +79,49 @@ public class TreeNodeService {
     @Autowired
     private BusinessContextRepository businessContextRepository;
 
-    public AggregateCoreComponentTreeNode createCoreComponentTreeNode(
+    public ACCNode createCoreComponentTreeNode(
             AggregateCoreComponent aggregateCoreComponent) {
         if (aggregateCoreComponent == null) {
             throw new IllegalArgumentException("'aggregateCoreComponent' argument must not be null.");
         }
-        return new AggregateCoreComponentTreeNodeImpl(aggregateCoreComponent);
+        return new AggregateCoreComponentNodeImpl(aggregateCoreComponent);
     }
 
-    public BasicCoreComponentPropertyTreeNode createCoreComponentTreeNode(
-            AggregateCoreComponentTreeNode parent,
+    public BCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
             BasicCoreComponent basicCoreComponent) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyTreeNodeImpl(parent, basicCoreComponent);
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponent);
     }
 
-    public BasicCoreComponentPropertyTreeNode createCoreComponentTreeNode(
+    public BCCPNode createCoreComponentTreeNode(
             BasicCoreComponent basicCoreComponent) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyTreeNodeImpl(basicCoreComponent);
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponent);
     }
 
-    public AssociationCoreComponentPropertyTreeNode createCoreComponentTreeNode(
+    public ASCCPNode createCoreComponentTreeNode(
             AssociationCoreComponent associationCoreComponent) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyTreeNodeImpl(associationCoreComponent);
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponent);
     }
 
-    public AssociationCoreComponentPropertyTreeNode createCoreComponentTreeNode(
-            AggregateCoreComponentTreeNode parent,
+    public ASCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
             AssociationCoreComponent associationCoreComponent) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyTreeNodeImpl(parent, associationCoreComponent);
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent);
     }
 
-    private abstract class AbstractSRTTreeNode implements SRTTreeNode {
+    private abstract class AbstractSRTNode implements SRTNode {
 
         private Map<String, Object> attributes = new HashMap();
 
@@ -136,38 +136,33 @@ public class TreeNodeService {
         }
     }
 
-    private class AggregateCoreComponentTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements AggregateCoreComponentTreeNode {
+    private class AggregateCoreComponentNodeImpl
+            extends AbstractSRTNode
+            implements ACCNode {
 
         private final AggregateCoreComponent acc;
-        private AggregateCoreComponentTreeNode base;
+        private ACCNode base;
 
         private List<CoreComponentRelation> associations = null;
-        private Collection<CoreComponentTreeNode> children = null;
+        private Collection<CCNode> children = null;
 
-        private AggregateCoreComponentTreeNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
+        private AggregateCoreComponentNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
             this.acc = aggregateCoreComponent;
         }
 
         @Override
-        public AggregateCoreComponent getAggregateCoreComponent() {
+        public AggregateCoreComponent getAcc() {
             return acc;
         }
 
         @Override
-        public AggregateCoreComponent getAcc() {
-            return getAggregateCoreComponent();
-        }
-
-        @Override
-        public AggregateCoreComponentTreeNode getBase() {
+        public ACCNode getBase() {
             if (base == null) {
-                AggregateCoreComponent acc = getAggregateCoreComponent();
+                AggregateCoreComponent acc = getAcc();
                 long basedAccId = acc.getBasedAccId();
                 if (basedAccId > 0L) {
                     AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
-                    base = new AggregateCoreComponentTreeNodeImpl(basedAcc);
+                    base = new AggregateCoreComponentNodeImpl(basedAcc);
                 }
             }
             return base;
@@ -175,19 +170,19 @@ public class TreeNodeService {
 
         @Override
         public String getId() {
-            return getAggregateCoreComponent().getGuid();
+            return getAcc().getGuid();
         }
 
         @Override
         public Namespace getNamespace() {
-            long namespaceId = getAggregateCoreComponent().getNamespaceId();
+            long namespaceId = getAcc().getNamespaceId();
             return namespaceRepository.findOne(namespaceId);
         }
 
         @Override
         public void setNamespace(Namespace namespace) {
             if (namespace != null) {
-                getAggregateCoreComponent().setNamespaceId(namespace.getNamespaceId());
+                getAcc().setNamespaceId(namespace.getNamespaceId());
             }
         }
 
@@ -204,7 +199,7 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends CoreComponentTreeNode> getChildren() {
+        public Collection<? extends CCNode> getChildren() {
             if (children == null) {
                 if (associations().isEmpty()) {
                     children = Collections.emptyList();
@@ -213,11 +208,11 @@ public class TreeNodeService {
 
                     for (CoreComponentRelation association : associations()) {
                         if (association instanceof AssociationCoreComponent) {
-                            AssociationCoreComponentPropertyTreeNode asccpNode =
+                            ASCCPNode asccpNode =
                                     createCoreComponentTreeNode(this, (AssociationCoreComponent) association);
                             children.add(asccpNode);
                         } else if (association instanceof BasicCoreComponent) {
-                            BasicCoreComponentPropertyTreeNode bccpNode =
+                            BCCPNode bccpNode =
                                     createCoreComponentTreeNode(this, (BasicCoreComponent) association);
                             children.add(bccpNode);
                         }
@@ -285,24 +280,24 @@ public class TreeNodeService {
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
-    private class AssociationCoreComponentPropertyTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements AssociationCoreComponentPropertyTreeNode {
+    private class AssociationCoreComponentPropertyNodeImpl
+            extends AbstractSRTNode
+            implements ASCCPNode {
 
-        private AggregateCoreComponentTreeNode parent = null;
+        private ACCNode parent = null;
         private final AssociationCoreComponent ascc;
         private final AssociationCoreComponentProperty asccp;
-        private AggregateCoreComponentTreeNode type;
+        private ACCNode type;
 
         private Boolean hasChild = null;
-        private Collection<CoreComponentTreeNode> children = null;
+        private Collection<CCNode> children = null;
 
-        private AssociationCoreComponentPropertyTreeNodeImpl(AssociationCoreComponent ascc) {
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponent ascc) {
             this(null, ascc);
         }
 
-        private AssociationCoreComponentPropertyTreeNodeImpl(AggregateCoreComponentTreeNode parent,
-                                                             AssociationCoreComponent ascc) {
+        private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
+                                                         AssociationCoreComponent ascc) {
             this.parent = parent;
             this.ascc = ascc;
 
@@ -311,32 +306,22 @@ public class TreeNodeService {
         }
 
         @Override
-        public AssociationCoreComponent getAssociationCoreComponent() {
+        public AssociationCoreComponent getAscc() {
             return ascc;
         }
 
         @Override
-        public AssociationCoreComponent getAscc() {
-            return getAssociationCoreComponent();
-        }
-
-        @Override
-        public AssociationCoreComponentProperty getAssociationCoreComponentProperty() {
+        public AssociationCoreComponentProperty getAsccp() {
             return asccp;
         }
 
         @Override
-        public AssociationCoreComponentProperty getAsccp() {
-            return getAssociationCoreComponentProperty();
-        }
-
-        @Override
-        public AggregateCoreComponentTreeNode getType() {
+        public ACCNode getType() {
             if (type == null) {
                 long roleOfAccId = getRoleOfAccId();
                 if (roleOfAccId > 0L) {
                     AggregateCoreComponent roleOfAcc = accRepository.findOne(roleOfAccId);
-                    type = new AggregateCoreComponentTreeNodeImpl(roleOfAcc);
+                    type = new AggregateCoreComponentNodeImpl(roleOfAcc);
                 }
             }
             return type;
@@ -344,19 +329,19 @@ public class TreeNodeService {
 
         @Override
         public String getId() {
-            return getAssociationCoreComponentProperty().getGuid();
+            return getAsccp().getGuid();
         }
 
         @Override
         public Namespace getNamespace() {
-            long namespaceId = getAssociationCoreComponentProperty().getNamespaceId();
+            long namespaceId = getAsccp().getNamespaceId();
             return namespaceRepository.findOne(namespaceId);
         }
 
         @Override
         public void setNamespace(Namespace namespace) {
             if (namespace != null) {
-                getAssociationCoreComponentProperty().setNamespaceId(namespace.getNamespaceId());
+                getAsccp().setNamespaceId(namespace.getNamespaceId());
             }
         }
 
@@ -370,9 +355,9 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends CoreComponentTreeNode> getChildren() {
+        public Collection<? extends CCNode> getChildren() {
             if (children == null) {
-                AggregateCoreComponentTreeNode type = getType();
+                ACCNode type = getType();
                 if (type != null) {
                     children = new ArrayList();
                     children.add(type);
@@ -384,16 +369,16 @@ public class TreeNodeService {
         }
 
         private long getRoleOfAccId() {
-            long roleOfAccId = getAssociationCoreComponentProperty().getRoleOfAccId();
+            long roleOfAccId = getAsccp().getRoleOfAccId();
             return roleOfAccId;
         }
 
         @Override
-        public AggregateCoreComponentTreeNode getParent() {
+        public ACCNode getParent() {
             if (parent == null) {
-                long fromAccId = getAssociationCoreComponent().getFromAccId();
+                long fromAccId = getAscc().getFromAccId();
                 AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
-                parent = new AggregateCoreComponentTreeNodeImpl(fromAcc);
+                parent = new AggregateCoreComponentNodeImpl(fromAcc);
             }
             return parent;
         }
@@ -406,24 +391,24 @@ public class TreeNodeService {
         }
     }
 
-    private class BasicCoreComponentPropertyTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements BasicCoreComponentPropertyTreeNode {
+    private class BasicCoreComponentPropertyNodeImpl
+            extends AbstractSRTNode
+            implements BCCPNode {
 
-        private AggregateCoreComponentTreeNode parent = null;
+        private ACCNode parent = null;
         private final BasicCoreComponent bcc;
         private final BasicCoreComponentProperty bccp;
         private DataType dataType;
 
         private Boolean hasChild = null;
-        private Collection<BusinessDataTypeSupplementaryComponentTreeNode> children = null;
+        private Collection<BDTSCNode> children = null;
 
-        private BasicCoreComponentPropertyTreeNodeImpl(BasicCoreComponent bcc) {
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc) {
             this(null, bcc);
         }
 
-        private BasicCoreComponentPropertyTreeNodeImpl(AggregateCoreComponentTreeNode parent,
-                                                       BasicCoreComponent bcc) {
+        private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
+                                                   BasicCoreComponent bcc) {
             this.parent = parent;
             this.bcc = bcc;
 
@@ -432,78 +417,63 @@ public class TreeNodeService {
         }
 
         @Override
-        public BasicCoreComponent getBasicCoreComponent() {
+        public BasicCoreComponent getBcc() {
             return bcc;
         }
 
         @Override
-        public BasicCoreComponent getBcc() {
-            return getBasicCoreComponent();
-        }
-
-        @Override
-        public BasicCoreComponentProperty getBasicCoreComponentProperty() {
+        public BasicCoreComponentProperty getBccp() {
             return bccp;
         }
 
         @Override
-        public BasicCoreComponentProperty getBccp() {
-            return getBasicCoreComponentProperty();
-        }
-
-        @Override
-        public DataType getBusinessDataType() {
+        public DataType getBdt() {
             if (dataType == null) {
-                long bdtId = getBasicCoreComponentProperty().getBdtId();
+                long bdtId = getBccp().getBdtId();
                 dataType = dtRepository.findOne(bdtId);
             }
             return dataType;
         }
 
         @Override
-        public DataType getBdt() {
-            return getBusinessDataType();
-        }
-
-        @Override
         public String getId() {
-            return getBasicCoreComponentProperty().getGuid();
+            return getBccp().getGuid();
         }
 
         @Override
         public Namespace getNamespace() {
-            long namespaceId = getBasicCoreComponentProperty().getNamespaceId();
+            long namespaceId = getBccp().getNamespaceId();
             return namespaceRepository.findOne(namespaceId);
         }
 
         @Override
         public void setNamespace(Namespace namespace) {
             if (namespace != null) {
-                getBasicCoreComponentProperty().setNamespaceId(namespace.getNamespaceId());
+                getBccp().setNamespaceId(namespace.getNamespaceId());
             }
         }
 
         @Override
         public boolean hasChild() {
             if (hasChild == null) {
-                long bdtId = getBusinessDataType().getDtId();
+                long bdtId = getBdt().getDtId();
                 hasChild = dtScRepository.countByOwnerDtId(bdtId) > 0;
             }
             return hasChild;
         }
 
         @Override
-        public Collection<? extends CoreComponentTreeNode> getChildren() {
+        public Collection<? extends CCNode> getChildren() {
             if (children == null) {
-                long bdtId = getBusinessDataType().getDtId();
+                long bdtId = getBdt().getDtId();
                 List<DataTypeSupplementaryComponent> bdtScList = dtScRepository.findByOwnerDtId(bdtId);
                 if (bdtScList.isEmpty()) {
                     children = Collections.emptyList();
                 } else {
                     children = new ArrayList();
                     for (DataTypeSupplementaryComponent bdtSc : bdtScList) {
-                        BusinessDataTypeSupplementaryComponentTreeNode child =
-                                new BusinessDataTypeSupplementaryComponentTreeNodeImpl(this, bdtSc);
+                        BDTSCNode child =
+                                new BusinessDataTypeSupplementaryComponentNodeImpl(this, bdtSc);
                         children.add(child);
                     }
                 }
@@ -512,11 +482,11 @@ public class TreeNodeService {
         }
 
         @Override
-        public AggregateCoreComponentTreeNode getParent() {
+        public ACCNode getParent() {
             if (parent == null) {
-                long fromAccId = getBasicCoreComponent().getFromAccId();
+                long fromAccId = getBcc().getFromAccId();
                 AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
-                parent = new AggregateCoreComponentTreeNodeImpl(fromAcc);
+                parent = new AggregateCoreComponentNodeImpl(fromAcc);
             }
             return parent;
         }
@@ -529,37 +499,32 @@ public class TreeNodeService {
         }
     }
 
-    private class BusinessDataTypeSupplementaryComponentTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements BusinessDataTypeSupplementaryComponentTreeNode {
+    private class BusinessDataTypeSupplementaryComponentNodeImpl
+            extends AbstractSRTNode
+            implements BDTSCNode {
 
-        private BasicCoreComponentPropertyTreeNode parent;
+        private BCCPNode parent;
         private DataTypeSupplementaryComponent dtSc;
 
-        public BusinessDataTypeSupplementaryComponentTreeNodeImpl(BasicCoreComponentPropertyTreeNode parent,
-                                                                  DataTypeSupplementaryComponent dtSc) {
+        public BusinessDataTypeSupplementaryComponentNodeImpl(BCCPNode parent,
+                                                              DataTypeSupplementaryComponent dtSc) {
             this.parent = parent;
             this.dtSc = dtSc;
         }
 
         @Override
-        public BasicCoreComponentPropertyTreeNode getParent() {
+        public BCCPNode getParent() {
             return parent;
         }
 
         @Override
-        public DataTypeSupplementaryComponent getBusinessDataTypeSupplementaryComponent() {
+        public DataTypeSupplementaryComponent getBdtSc() {
             return dtSc;
         }
 
         @Override
-        public DataTypeSupplementaryComponent getBdtSc() {
-            return getBusinessDataTypeSupplementaryComponent();
-        }
-
-        @Override
         public String getId() {
-            return dtSc.getGuid();
+            return getBdtSc().getGuid();
         }
 
         @Override
@@ -581,7 +546,7 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends CoreComponentTreeNode> getChildren() {
+        public Collection<? extends CCNode> getChildren() {
             return Collections.emptyList();
         }
 
@@ -603,8 +568,8 @@ public class TreeNodeService {
                 };
     }
 
-    public AssociationBusinessInformationEntityPropertyTreeNode createBusinessInformationEntityTreeNode(AssociationCoreComponentProperty asccp,
-                                                                                                        BusinessContext bizCtx) {
+    public ASBIEPNode createBusinessInformationEntityTreeNode(AssociationCoreComponentProperty asccp,
+                                                              BusinessContext bizCtx) {
         if (asccp == null) {
             throw new IllegalArgumentException("'asccp' argument must not be null.");
         }
@@ -612,10 +577,10 @@ public class TreeNodeService {
             throw new IllegalArgumentException("'bizCtx' argument must not be null.");
         }
 
-        return new AssociationBusinessInformationEntityPropertyTreeNodeImpl(asccp, bizCtx);
+        return new AssociationBIEPropertyNodeImpl(asccp, bizCtx);
     }
 
-    public AssociationBusinessInformationEntityPropertyTreeNode createBusinessInformationEntityTreeNode(
+    public ASBIEPNode createBusinessInformationEntityTreeNode(
             TopLevelAbie topLevelAbie) {
 
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
@@ -624,33 +589,33 @@ public class TreeNodeService {
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
 
-        AggregateBusinessInformationEntityTreeNodeImpl abieNode =
-                new AggregateBusinessInformationEntityTreeNodeImpl(abie, acc, bizCtx);
+        ABIENodeImpl abieNode =
+                new ABIENodeImpl(abie, acc, bizCtx);
 
-        return new AssociationBusinessInformationEntityPropertyTreeNodeImpl(asbiep, asccp, abieNode);
+        return new AssociationBIEPropertyNodeImpl(asbiep, asccp, abieNode);
     }
 
-    private class AggregateBusinessInformationEntityTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements AggregateBusinessInformationEntityTreeNode {
+    private class ABIENodeImpl
+            extends AbstractSRTNode
+            implements ABIENode {
 
-        private AssociationBusinessInformationEntityPropertyTreeNode parent;
+        private ASBIEPNode parent;
 
         private AggregateBusinessInformationEntity abie;
         private AggregateCoreComponent basedAcc;
         private BusinessContext bizCtx;
 
         private Boolean hasChild = null;
-        private List<BusinessInformationEntityTreeNode> children = null;
+        private List<BIENode> children = null;
 
-        public AggregateBusinessInformationEntityTreeNodeImpl(AggregateCoreComponent acc, BusinessContext bizCtx) {
+        public ABIENodeImpl(AggregateCoreComponent acc, BusinessContext bizCtx) {
             this.abie = createABIE(acc, bizCtx);
             this.basedAcc = acc;
             this.bizCtx = bizCtx;
         }
 
-        public AggregateBusinessInformationEntityTreeNodeImpl(AggregateBusinessInformationEntity abie,
-                                                              AggregateCoreComponent acc, BusinessContext bizCtx) {
+        public ABIENodeImpl(AggregateBusinessInformationEntity abie,
+                            AggregateCoreComponent acc, BusinessContext bizCtx) {
             this.abie = abie;
             this.basedAcc = acc;
             this.bizCtx = bizCtx;
@@ -675,11 +640,11 @@ public class TreeNodeService {
             return abie;
         }
 
-        public AssociationBusinessInformationEntityPropertyTreeNode getParent() {
+        public ASBIEPNode getParent() {
             return parent;
         }
 
-        private void setParent(AssociationBusinessInformationEntityPropertyTreeNode parent) {
+        private void setParent(ASBIEPNode parent) {
             this.parent = parent;
         }
 
@@ -689,23 +654,13 @@ public class TreeNodeService {
         }
 
         @Override
-        public AggregateBusinessInformationEntity getAggregateBusinessInformationEntity() {
+        public AggregateBusinessInformationEntity getAbie() {
             return abie;
         }
 
         @Override
-        public AggregateBusinessInformationEntity getAbie() {
-            return getAggregateBusinessInformationEntity();
-        }
-
-        @Override
-        public AggregateCoreComponent getAggregateCoreComponent() {
-            return basedAcc;
-        }
-
-        @Override
         public AggregateCoreComponent getAcc() {
-            return getAggregateCoreComponent();
+            return basedAcc;
         }
 
         @Override
@@ -744,7 +699,7 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
+        public Collection<? extends BIENode> getChildren() {
             if (children == null) {
                 children = new ArrayList();
 
@@ -764,16 +719,16 @@ public class TreeNodeService {
                     for (CoreComponentRelation relation : associations) {
                         if (relation instanceof AssociationCoreComponent) {
                             AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
-                            AssociationBusinessInformationEntityPropertyTreeNodeImpl asbieChild =
-                                    new AssociationBusinessInformationEntityPropertyTreeNodeImpl(abie, ascc, bizCtx, ++seqKey);
+                            AssociationBIEPropertyNodeImpl asbieChild =
+                                    new AssociationBIEPropertyNodeImpl(abie, ascc, bizCtx, ++seqKey);
                             asbieChild.setParent(parent);
 
                             children.add(asbieChild);
                         } else if (relation instanceof BasicCoreComponent) {
                             BasicCoreComponent bcc = (BasicCoreComponent) relation;
 
-                            BasicBusinessInformationEntityPropertyTreeNodeImpl bbieChild =
-                                    new BasicBusinessInformationEntityPropertyTreeNodeImpl(
+                            BasicBIEPropertyNodeImpl bbieChild =
+                                    new BasicBIEPropertyNodeImpl(
                                             abie, bcc, (bcc.getEntityType() == Attribute ? 0 : ++seqKey));
                             bbieChild.setParent(parent);
 
@@ -791,10 +746,10 @@ public class TreeNodeService {
         }
 
         @Override
-        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+        public void accept(BIENodeVisitor visitor) {
             visitor.visit(this);
             if (children != null) {
-                for (BusinessInformationEntityTreeNode child : children) {
+                for (BIENode child : children) {
                     child.accept(visitor);
                 }
             }
@@ -820,11 +775,11 @@ public class TreeNodeService {
         }
     }
 
-    private class AssociationBusinessInformationEntityPropertyTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements AssociationBusinessInformationEntityPropertyTreeNode {
+    private class AssociationBIEPropertyNodeImpl
+            extends AbstractSRTNode
+            implements ASBIEPNode {
 
-        private AssociationBusinessInformationEntityPropertyTreeNode parent;
+        private ASBIEPNode parent;
 
         private AssociationBusinessInformationEntity asbie;
         private AssociationCoreComponent ascc;
@@ -832,24 +787,24 @@ public class TreeNodeService {
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationCoreComponentProperty asccp;
 
-        private AggregateBusinessInformationEntityTreeNodeImpl type;
+        private ABIENodeImpl type;
 
-        public AssociationBusinessInformationEntityPropertyTreeNodeImpl(AssociationCoreComponentProperty asccp,
-                                                                        BusinessContext bizCtx) {
+        public AssociationBIEPropertyNodeImpl(AssociationCoreComponentProperty asccp,
+                                              BusinessContext bizCtx) {
             this.asccp = asccp;
 
             long roleOfAccId = asccp.getRoleOfAccId();
             AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
-            type = new AggregateBusinessInformationEntityTreeNodeImpl(acc, bizCtx);
+            type = new ABIENodeImpl(acc, bizCtx);
             type.setParent(this);
 
-            AggregateBusinessInformationEntity roleOfAbie = type.getAggregateBusinessInformationEntity();
+            AggregateBusinessInformationEntity roleOfAbie = type.getAbie();
             asbiep = createASBIEP(asccp, roleOfAbie);
         }
 
-        public AssociationBusinessInformationEntityPropertyTreeNodeImpl(AssociationBusinessInformationEntityProperty asbiep,
-                                                                        AssociationCoreComponentProperty asccp,
-                                                                        AggregateBusinessInformationEntityTreeNodeImpl type) {
+        public AssociationBIEPropertyNodeImpl(AssociationBusinessInformationEntityProperty asbiep,
+                                              AssociationCoreComponentProperty asccp,
+                                              ABIENodeImpl type) {
             this.asbiep = asbiep;
             this.asccp = asccp;
             this.type = type;
@@ -857,10 +812,10 @@ public class TreeNodeService {
             type.setParent(this);
         }
 
-        public AssociationBusinessInformationEntityPropertyTreeNodeImpl(AggregateBusinessInformationEntity fromAbie,
-                                                                        AssociationCoreComponent ascc,
-                                                                        BusinessContext bizCtx,
-                                                                        int seqKey) {
+        public AssociationBIEPropertyNodeImpl(AggregateBusinessInformationEntity fromAbie,
+                                              AssociationCoreComponent ascc,
+                                              BusinessContext bizCtx,
+                                              int seqKey) {
             this.ascc = ascc;
 
             long abieId = fromAbie.getAbieId();
@@ -878,7 +833,7 @@ public class TreeNodeService {
                 long roleOfAccId = asccp.getRoleOfAccId();
                 AggregateCoreComponent basedAcc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
 
-                type = new AggregateBusinessInformationEntityTreeNodeImpl(roleOfAbie, basedAcc, bizCtx);
+                type = new ABIENodeImpl(roleOfAbie, basedAcc, bizCtx);
 
             } else {
                 long toAsccpId = ascc.getToAsccpId();
@@ -886,8 +841,8 @@ public class TreeNodeService {
                 long roleOfAccId = asccp.getRoleOfAccId();
                 AggregateCoreComponent basedAcc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
 
-                type = new AggregateBusinessInformationEntityTreeNodeImpl(basedAcc, bizCtx);
-                AggregateBusinessInformationEntity roleOfAbie = type.getAggregateBusinessInformationEntity();
+                type = new ABIENodeImpl(basedAcc, bizCtx);
+                AggregateBusinessInformationEntity roleOfAbie = type.getAbie();
                 asbiep = createASBIEP(asccp, roleOfAbie);
                 asbie = createASBIE(fromAbie, asbiep, ascc, seqKey);
             }
@@ -896,11 +851,11 @@ public class TreeNodeService {
         }
 
         @Override
-        public AssociationBusinessInformationEntityPropertyTreeNode getParent() {
+        public ASBIEPNode getParent() {
             return parent;
         }
 
-        private void setParent(AssociationBusinessInformationEntityPropertyTreeNode parent) {
+        private void setParent(ASBIEPNode parent) {
             this.parent = parent;
         }
 
@@ -910,47 +865,27 @@ public class TreeNodeService {
         }
 
         @Override
-        public AssociationBusinessInformationEntity getAssociationBusinessInformationEntity() {
+        public AssociationBusinessInformationEntity getAsbie() {
             return asbie;
         }
 
         @Override
-        public AssociationBusinessInformationEntity getAsbie() {
-            return getAssociationBusinessInformationEntity();
-        }
-
-        @Override
-        public AssociationCoreComponent getAssociationCoreComponent() {
+        public AssociationCoreComponent getAscc() {
             return ascc;
         }
 
         @Override
-        public AssociationCoreComponent getAscc() {
-            return getAssociationCoreComponent();
-        }
-
-        @Override
-        public AssociationBusinessInformationEntityProperty getAssociationBusinessInformationEntityProperty() {
+        public AssociationBusinessInformationEntityProperty getAsbiep() {
             return asbiep;
         }
 
         @Override
-        public AssociationBusinessInformationEntityProperty getAsbiep() {
-            return getAssociationBusinessInformationEntityProperty();
-        }
-
-        @Override
-        public AssociationCoreComponentProperty getAssociationCoreComponentProperty() {
+        public AssociationCoreComponentProperty getAsccp() {
             return asccp;
         }
 
         @Override
-        public AssociationCoreComponentProperty getAsccp() {
-            return getAssociationCoreComponentProperty();
-        }
-
-        @Override
-        public AggregateBusinessInformationEntityTreeNode getType() {
+        public ABIENode getType() {
             return type;
         }
 
@@ -960,19 +895,19 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
+        public Collection<? extends BIENode> getChildren() {
             return type.getChildren();
         }
 
         @Override
-        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+        public void accept(BIENodeVisitor visitor) {
             visitor.visit(this);
             type.accept(visitor);
         }
 
         @Override
         public void validate() {
-            AssociationBusinessInformationEntity asbie = getAssociationBusinessInformationEntity();
+            AssociationBusinessInformationEntity asbie = getAsbie();
             if (asbie == null || !asbie.isDirty()) {
                 return;
             }
@@ -1021,11 +956,13 @@ public class TreeNodeService {
 
         @Override
         public boolean isUsed() {
+            AssociationBusinessInformationEntity asbie = getAsbie();
             return (asbie != null) ? asbie.isUsed() : true;
         }
 
         @Override
         public void setUsed(boolean used) {
+            AssociationBusinessInformationEntity asbie = getAsbie();
             if (asbie != null) {
                 asbie.setUsed(used);
             }
@@ -1036,7 +973,7 @@ public class TreeNodeService {
                 }
             } else {
                 if (type.children != null) {
-                    for (BusinessInformationEntityTreeNode node : getChildren()) {
+                    for (BIENode node : getChildren()) {
                         node.setUsed(used);
                     }
                 }
@@ -1044,11 +981,11 @@ public class TreeNodeService {
         }
     }
 
-    private class BasicBusinessInformationEntityPropertyTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements BasicBusinessInformationEntityPropertyTreeNode {
+    private class BasicBIEPropertyNodeImpl
+            extends AbstractSRTNode
+            implements BBIEPNode {
 
-        private AssociationBusinessInformationEntityPropertyTreeNode parent;
+        private ASBIEPNode parent;
 
         private BasicBusinessInformationEntityProperty bbiep;
         private BasicCoreComponentProperty bccp;
@@ -1059,11 +996,11 @@ public class TreeNodeService {
         private DataType bdt;
 
         private Boolean hasChild = null;
-        private List<BusinessInformationEntityTreeNode> children = null;
+        private List<BIENode> children = null;
 
-        public BasicBusinessInformationEntityPropertyTreeNodeImpl(AggregateBusinessInformationEntity fromAbie,
-                                                                  BasicCoreComponent bcc,
-                                                                  int seqKey) {
+        public BasicBIEPropertyNodeImpl(AggregateBusinessInformationEntity fromAbie,
+                                        BasicCoreComponent bcc,
+                                        int seqKey) {
             this.bcc = bcc;
 
             long abieId = fromAbie.getAbieId();
@@ -1097,12 +1034,12 @@ public class TreeNodeService {
             }
         }
 
-        private void setParent(AssociationBusinessInformationEntityPropertyTreeNode parent) {
+        private void setParent(ASBIEPNode parent) {
             this.parent = parent;
         }
 
         @Override
-        public AssociationBusinessInformationEntityPropertyTreeNode getParent() {
+        public ASBIEPNode getParent() {
             return parent;
         }
 
@@ -1112,63 +1049,38 @@ public class TreeNodeService {
         }
 
         @Override
-        public BasicBusinessInformationEntity getBasicBusinessInformationEntity() {
+        public BasicBusinessInformationEntity getBbie() {
             return bbie;
         }
 
         @Override
-        public BasicBusinessInformationEntity getBbie() {
-            return getBasicBusinessInformationEntity();
-        }
-
-        @Override
-        public BasicCoreComponent getBasicCoreComponent() {
+        public BasicCoreComponent getBcc() {
             return bcc;
         }
 
         @Override
-        public BasicCoreComponent getBcc() {
-            return getBasicCoreComponent();
-        }
-
-        @Override
-        public BasicBusinessInformationEntityProperty getBasicBusinessInformationEntityProperty() {
+        public BasicBusinessInformationEntityProperty getBbiep() {
             return bbiep;
         }
 
         @Override
-        public BasicBusinessInformationEntityProperty getBbiep() {
-            return getBasicBusinessInformationEntityProperty();
-        }
-
-        @Override
-        public BasicCoreComponentProperty getBasicCoreComponentProperty() {
+        public BasicCoreComponentProperty getBccp() {
             return bccp;
         }
 
         @Override
-        public BasicCoreComponentProperty getBccp() {
-            return getBasicCoreComponentProperty();
-        }
-
-        @Override
-        public DataType getBusinessDataType() {
+        public DataType getBdt() {
             return bdt;
         }
 
         @Override
-        public DataType getBdt() {
-            return getBusinessDataType();
-        }
-
-        @Override
         public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
-            return getBasicBusinessInformationEntity().getRestrictionType();
+            return getBbie().getRestrictionType();
         }
 
         @Override
         public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
-            getBasicBusinessInformationEntity().setRestrictionType(restrictionType);
+            getBbie().setRestrictionType(restrictionType);
         }
 
         @Override
@@ -1181,7 +1093,7 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
+        public Collection<? extends BIENode> getChildren() {
             if (children == null) {
 
                 long bdtId = bdt.getDtId();
@@ -1230,8 +1142,8 @@ public class TreeNodeService {
                     long dtScId = bbieSc.getDtScId();
                     DataTypeSupplementaryComponent bdtSc = dtScRepository.findOne(dtScId);
 
-                    BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                            new BasicBusinessInformationEntitySupplementaryComponentTreeNodeImpl(this, bbieSc, bdtSc);
+                    BBIESCNode bbieScNode =
+                            new BasicBIESupplementaryComponentNodeImpl(this, bbieSc, bdtSc);
                     children.add(bbieScNode);
                 }
             }
@@ -1239,10 +1151,10 @@ public class TreeNodeService {
         }
 
         @Override
-        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+        public void accept(BIENodeVisitor visitor) {
             visitor.visit(this);
             if (children != null) {
-                for (BusinessInformationEntityTreeNode child : children) {
+                for (BIENode child : children) {
                     child.accept(visitor);
                 }
             }
@@ -1250,7 +1162,7 @@ public class TreeNodeService {
 
         @Override
         public void validate() {
-            BasicBusinessInformationEntity bbie = getBasicBusinessInformationEntity();
+            BasicBusinessInformationEntity bbie = getBbie();
             if (bbie == null || !bbie.isDirty()) {
                 return;
             }
@@ -1316,7 +1228,7 @@ public class TreeNodeService {
                 }
             } else {
                 if (children != null) {
-                    for (BusinessInformationEntityTreeNode node : getChildren()) {
+                    for (BIENode node : getChildren()) {
                         node.setUsed(used);
                     }
                 }
@@ -1324,55 +1236,45 @@ public class TreeNodeService {
         }
     }
 
-    private class BasicBusinessInformationEntitySupplementaryComponentTreeNodeImpl
-            extends AbstractSRTTreeNode
-            implements BasicBusinessInformationEntitySupplementaryComponentTreeNode {
+    private class BasicBIESupplementaryComponentNodeImpl
+            extends AbstractSRTNode
+            implements BBIESCNode {
 
-        private BasicBusinessInformationEntityPropertyTreeNode parent;
+        private BBIEPNode parent;
         private BasicBusinessInformationEntitySupplementaryComponent bbieSc;
         private DataTypeSupplementaryComponent bdtSc;
 
-        public BasicBusinessInformationEntitySupplementaryComponentTreeNodeImpl(BasicBusinessInformationEntityPropertyTreeNode parent,
-                                                                                BasicBusinessInformationEntitySupplementaryComponent bbieSc,
-                                                                                DataTypeSupplementaryComponent bdtSc) {
+        public BasicBIESupplementaryComponentNodeImpl(BBIEPNode parent,
+                                                      BasicBusinessInformationEntitySupplementaryComponent bbieSc,
+                                                      DataTypeSupplementaryComponent bdtSc) {
             this.parent = parent;
             this.bbieSc = bbieSc;
             this.bdtSc = bdtSc;
         }
 
         @Override
-        public BasicBusinessInformationEntityPropertyTreeNode getParent() {
+        public BBIEPNode getParent() {
             return parent;
         }
 
         @Override
-        public BasicBusinessInformationEntitySupplementaryComponent getBasicBusinessInformationEntitySupplementaryComponent() {
+        public BasicBusinessInformationEntitySupplementaryComponent getBbieSc() {
             return bbieSc;
         }
 
         @Override
-        public BasicBusinessInformationEntitySupplementaryComponent getBbieSc() {
-            return getBasicBusinessInformationEntitySupplementaryComponent();
-        }
-
-        @Override
-        public DataTypeSupplementaryComponent getBusinessDataTypeSupplementaryComponent() {
+        public DataTypeSupplementaryComponent getBdtSc() {
             return bdtSc;
         }
 
         @Override
-        public DataTypeSupplementaryComponent getBdtSc() {
-            return getBusinessDataTypeSupplementaryComponent();
-        }
-
-        @Override
         public BasicBusinessInformationEntityRestrictionType getRestrictionType() {
-            return getBasicBusinessInformationEntitySupplementaryComponent().getRestrictionType();
+            return getBbieSc().getRestrictionType();
         }
 
         @Override
         public void setRestrictionType(BasicBusinessInformationEntityRestrictionType restrictionType) {
-            getBasicBusinessInformationEntitySupplementaryComponent().setRestrictionType(restrictionType);
+            getBbieSc().setRestrictionType(restrictionType);
         }
 
         @Override
@@ -1386,19 +1288,19 @@ public class TreeNodeService {
         }
 
         @Override
-        public Collection<? extends BusinessInformationEntityTreeNode> getChildren() {
+        public Collection<? extends BIENode> getChildren() {
             return Collections.emptyList();
         }
 
         @Override
-        public void accept(BusinessInformationEntityTreeNodeVisitor visitor) {
+        public void accept(BIENodeVisitor visitor) {
             visitor.visit(this);
         }
 
         @Override
         public void validate() {
             BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                    getBasicBusinessInformationEntitySupplementaryComponent();
+                    getBbieSc();
             if (bbieSc == null || !bbieSc.isDirty()) {
                 return;
             }
@@ -1464,7 +1366,7 @@ public class TreeNodeService {
     }
 
     @Transactional
-    public TopLevelAbie submit(AssociationBusinessInformationEntityPropertyTreeNode bieNode,
+    public TopLevelAbie submit(ASBIEPNode bieNode,
                                User user, ProgressListener progressListener) {
         Boolean isTopLevel = (Boolean) bieNode.getAttribute("isTopLevel");
         if (isTopLevel == null || isTopLevel == false) {
@@ -1527,7 +1429,7 @@ public class TreeNodeService {
     }
 
     private class BusinessInformationEntityTreeNodeSubmitHandler {
-        private AssociationBusinessInformationEntityPropertyTreeNode root;
+        private ASBIEPNode root;
         private User user;
         private ProgressListener progressListener;
 
@@ -1539,7 +1441,7 @@ public class TreeNodeService {
         private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
         public BusinessInformationEntityTreeNodeSubmitHandler(
-                AssociationBusinessInformationEntityPropertyTreeNode root,
+                ASBIEPNode root,
                 User user) {
             this.root = root;
             this.user = user;
@@ -1586,7 +1488,7 @@ public class TreeNodeService {
             topLevelAbie.setState(Editing);
             topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 
-            AggregateBusinessInformationEntity abie = root.getType().getAggregateBusinessInformationEntity();
+            AggregateBusinessInformationEntity abie = root.getType().getAbie();
             preset(abie, topLevelAbie);
             abie = abieRepository.saveAndFlush(abie);
             abie.afterLoaded();
@@ -1595,7 +1497,7 @@ public class TreeNodeService {
             topLevelAbieRepository.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
-            asbiepList.add(root.getAssociationBusinessInformationEntityProperty());
+            asbiepList.add(root.getAsbiep());
 
             return topLevelAbie;
         }
@@ -1612,22 +1514,18 @@ public class TreeNodeService {
         }
 
         private void gatheringBusinessInformationEntities(
-                BusinessInformationEntityTreeNode node) {
-            Collection<? extends BusinessInformationEntityTreeNode> children;
+                BIENode node) {
+            Collection<? extends BIENode> children;
 
-            if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                        (AssociationBusinessInformationEntityPropertyTreeNode) node;
+            if (node instanceof ASBIEPNode) {
+                ASBIEPNode asbiepNode = (ASBIEPNode) node;
 
-                AssociationBusinessInformationEntity asbie =
-                        asbiepNode.getAssociationBusinessInformationEntity();
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+                AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
 
-                AssociationBusinessInformationEntityProperty asbiep =
-                        asbiepNode.getAssociationBusinessInformationEntityProperty();
-
-                AggregateBusinessInformationEntityTreeNode abieNode = asbiepNode.getType();
+                ABIENode abieNode = asbiepNode.getType();
                 AggregateBusinessInformationEntity abie =
-                        abieNode.getAggregateBusinessInformationEntity();
+                        abieNode.getAbie();
 
                 if ((asbie != null && asbie.isDirty()) ||
                     (asbiep != null && asbiep.isDirty()) ||
@@ -1643,22 +1541,18 @@ public class TreeNodeService {
                     }
                 }
 
-                if (abieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
-                    children = ((AggregateBusinessInformationEntityTreeNodeImpl) abieNode).children;
+                if (abieNode instanceof ABIENodeImpl) {
+                    children = ((ABIENodeImpl) abieNode).children;
                     if (children == null) {
                         children = Collections.emptyList();
                     }
                 } else {
                     children = node.getChildren();
                 }
-            } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                        (BasicBusinessInformationEntityPropertyTreeNode) node;
-
+            } else if (node instanceof BBIEPNode) {
+                BBIEPNode bbiepNode = (BBIEPNode) node;
                 BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
-
-                BasicBusinessInformationEntityProperty bbiep =
-                        bbiepNode.getBasicBusinessInformationEntityProperty();
+                BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBbiep();
 
                 if ((bbie != null && bbie.isDirty()) ||
                     (bbiep != null && bbiep.isDirty())) {
@@ -1670,20 +1564,17 @@ public class TreeNodeService {
                     }
                 }
 
-                if (bbiepNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
-                    children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bbiepNode).children;
+                if (bbiepNode instanceof BasicBIEPropertyNodeImpl) {
+                    children = ((BasicBIEPropertyNodeImpl) bbiepNode).children;
                     if (children == null) {
                         children = Collections.emptyList();
                     }
                 } else {
                     children = node.getChildren();
                 }
-            } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-                BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                        (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node;
-
-                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                        handleBBIEScBdtScPriRestri(bbieScNode);
+            } else if (node instanceof BBIESCNode) {
+                BBIESCNode bbieScNode = (BBIESCNode) node;
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
                 if (bbieSc != null && bbieSc.isDirty()) {
                     bbieScList.add(bbieSc);
                 }
@@ -1693,14 +1584,14 @@ public class TreeNodeService {
                 throw new IllegalStateException();
             }
 
-            for (BusinessInformationEntityTreeNode child : children) {
+            for (BIENode child : children) {
                 gatheringBusinessInformationEntities(child);
             }
         }
     }
 
     private BasicBusinessInformationEntity handleBBIEBdtPriRestri(
-            BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
+            BBIEPNode bbiepNode) {
         BasicBusinessInformationEntity bbie = bbiepNode.getBbie();
         BasicBusinessInformationEntityRestrictionType restrictionType = bbiepNode.getRestrictionType();
         switch (restrictionType) {
@@ -1727,7 +1618,7 @@ public class TreeNodeService {
     }
 
     private BasicBusinessInformationEntitySupplementaryComponent handleBBIEScBdtScPriRestri(
-            BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode) {
+            BBIESCNode bbieScNode) {
         BasicBusinessInformationEntitySupplementaryComponent bbieSc = bbieScNode.getBbieSc();
         BasicBusinessInformationEntityRestrictionType restrictionType = bbieScNode.getRestrictionType();
         switch (restrictionType) {
@@ -1753,34 +1644,80 @@ public class TreeNodeService {
         return bbieSc;
     }
 
-    public void validate(BusinessInformationEntityTreeNode bieNode) {
+    public void validate(BIENode bieNode) {
         bieNode.validate();
 
-        Collection<? extends BusinessInformationEntityTreeNode> children = null;
-        if (bieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
-            children = ((AggregateBusinessInformationEntityTreeNodeImpl) bieNode).children;
-        } else  if (bieNode instanceof AssociationBusinessInformationEntityPropertyTreeNodeImpl) {
-            children = ((AssociationBusinessInformationEntityPropertyTreeNodeImpl) bieNode).type.children;
-        } else if (bieNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
-            children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bieNode).children;
+        Collection<? extends BIENode> children = null;
+        if (bieNode instanceof ABIENodeImpl) {
+            children = ((ABIENodeImpl) bieNode).children;
+        } else  if (bieNode instanceof AssociationBIEPropertyNodeImpl) {
+            children = ((AssociationBIEPropertyNodeImpl) bieNode).type.children;
+        } else if (bieNode instanceof BasicBIEPropertyNodeImpl) {
+            children = ((BasicBIEPropertyNodeImpl) bieNode).children;
         }
 
         if (children != null) {
-            for (BusinessInformationEntityTreeNode child : children) {
+            for (BIENode child : children) {
                 validate(child);
             }
         }
     }
 
     @Transactional
-    public void update(AssociationBusinessInformationEntityPropertyTreeNode bieNode, User user) {
-        BusinessInformationEntityTreeNodeUpdateHandler updateHandler =
-                new BusinessInformationEntityTreeNodeUpdateHandler(bieNode, user);
+    public void update(ASBIEPNode bieNode, User user) {
+        BusinessInformationEntityNodeUpdateHandler updateHandler =
+                new BusinessInformationEntityNodeUpdateHandler(bieNode, user);
         updateHandler.update();
     }
 
-    private class BusinessInformationEntityTreeNodeUpdateHandler implements BusinessInformationEntityTreeNodeVisitor {
-        private AssociationBusinessInformationEntityPropertyTreeNode root;
+    public void afterUpdate(ASBIEPNode bieNode) {
+        bieNode.accept(new BIENodeVisitor() {
+            @Override
+            public void visit(ABIENode abieNode) {
+                AggregateBusinessInformationEntity abie = abieNode.getAbie();
+                if (abie != null) {
+                    abie.afterLoaded();
+                }
+            }
+
+            @Override
+            public void visit(ASBIEPNode asbiepNode) {
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+                if (asbie != null) {
+                    asbie.afterLoaded();
+                }
+
+                AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
+                if (asbiep != null) {
+                    asbiep.afterLoaded();
+                }
+            }
+
+            @Override
+            public void visit(BBIEPNode bbiepNode) {
+                BasicBusinessInformationEntity bbie = bbiepNode.getBbie();
+                if (bbie != null) {
+                    bbie.afterLoaded();
+                }
+
+                BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBbiep();
+                if (bbiep != null) {
+                    bbiep.afterLoaded();
+                }
+            }
+
+            @Override
+            public void visit(BBIESCNode bbieScNode) {
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = bbieScNode.getBbieSc();
+                if (bbieSc != null) {
+                    bbieSc.afterLoaded();
+                }
+            }
+        });
+    }
+
+    private class BusinessInformationEntityNodeUpdateHandler implements BIENodeVisitor {
+        private ASBIEPNode root;
         private User user;
 
         private Set<AggregateBusinessInformationEntity> abieList = new LinkedHashSet();
@@ -1790,8 +1727,8 @@ public class TreeNodeService {
         private Set<BasicBusinessInformationEntityProperty> bbiepList = new LinkedHashSet();
         private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
-        public BusinessInformationEntityTreeNodeUpdateHandler(
-                AssociationBusinessInformationEntityPropertyTreeNode root,
+        public BusinessInformationEntityNodeUpdateHandler(
+                ASBIEPNode root,
                 User user) {
             this.root = root;
             this.user = user;
@@ -1821,7 +1758,7 @@ public class TreeNodeService {
         }
 
         private TopLevelAbie prepareForTopLevelAbieEntity() {
-            long topLevelAbieId = root.getType().getAggregateBusinessInformationEntity().getOwnerTopLevelAbieId();
+            long topLevelAbieId = root.getType().getAbie().getOwnerTopLevelAbieId();
             TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
 
             return topLevelAbie;
@@ -1842,27 +1779,25 @@ public class TreeNodeService {
         }
 
         @Override
-        public void visit(AggregateBusinessInformationEntityTreeNode abieNode) {
-            AggregateBusinessInformationEntity abie = abieNode.getAggregateBusinessInformationEntity();
-            if (abie != null && abie.isDirty()) {
+        public void visit(ABIENode abieNode) {
+            AggregateBusinessInformationEntity abie = abieNode.getAbie();
+            if (abie != null && (abie.isDirty() || abie.getAbieId() == 0L)) {
                 abieList.add(abie);
             }
         }
 
         @Override
-        public void visit(AssociationBusinessInformationEntityPropertyTreeNode asbiepNode) {
-            AssociationBusinessInformationEntity asbie =
-                    asbiepNode.getAssociationBusinessInformationEntity();
-
-            AssociationBusinessInformationEntityProperty asbiep =
-                    asbiepNode.getAssociationBusinessInformationEntityProperty();
+        public void visit(ASBIEPNode asbiepNode) {
+            AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+            AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
 
             if (asbie != null && asbie.getAsbieId() > 0L && asbie.isDirty()) {
                 asbieList.add(asbie);
             } else if (asbiep != null && asbiep.getAsbiepId() > 0L && asbiep.isDirty()) {
                 asbiepList.add(asbiep);
             } else {
-                if ((asbie != null && asbie.isDirty()) || (asbiep != null && asbiep.isDirty())) {
+                if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() == 0L)) ||
+                    (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() == 0L))) {
                     if (asbie != null) {
                         asbieList.add(asbie);
                     }
@@ -1874,17 +1809,16 @@ public class TreeNodeService {
         }
 
         @Override
-        public void visit(BasicBusinessInformationEntityPropertyTreeNode bbiepNode) {
+        public void visit(BBIEPNode bbiepNode) {
             BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
-
-            BasicBusinessInformationEntityProperty bbiep =
-                    bbiepNode.getBasicBusinessInformationEntityProperty();
+            BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBbiep();
 
             if (bbie != null && bbie.getBbieId() > 0L && bbie.isDirty()) {
                 bbieList.add(bbie);
             } else if (bbiep != null && bbiep.getBbiepId() > 0L && bbiep.isDirty()) {
                 bbiepList.add(bbiep);
-            } else if ((bbie != null && bbie.isDirty()) || (bbiep != null && bbiep.isDirty())) {
+            } else if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() == 0L)) ||
+                       (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() == 0L))) {
                 if (bbie != null) {
                     bbieList.add(bbie);
                 }
@@ -1895,17 +1829,16 @@ public class TreeNodeService {
         }
 
         @Override
-        public void visit(BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode) {
-            BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                    handleBBIEScBdtScPriRestri(bbieScNode);
-            if (bbieSc != null && bbieSc.isDirty()) {
+        public void visit(BBIESCNode bbieScNode) {
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
+            if (bbieSc != null && (bbieSc.isDirty() || bbieSc.getBbieScId() == 0L)) {
                 bbieScList.add(bbieSc);
             }
         }
     }
 
     @Transactional
-    public TopLevelAbie copy(AssociationBusinessInformationEntityPropertyTreeNode bieNode, User user,
+    public TopLevelAbie copy(ASBIEPNode bieNode, User user,
                              BusinessContext bizCtx, ProgressListener progressListener) {
         BusinessInformationEntityTreeNodeCopyHandler copyHandler =
                 new BusinessInformationEntityTreeNodeCopyHandler(bieNode, user, bizCtx);
@@ -1915,7 +1848,7 @@ public class TreeNodeService {
     }
 
     private class BusinessInformationEntityTreeNodeCopyHandler {
-        private AssociationBusinessInformationEntityPropertyTreeNode root;
+        private ASBIEPNode root;
         private User user;
         private BusinessContext bizCtx;
 
@@ -1936,7 +1869,7 @@ public class TreeNodeService {
         private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
         public BusinessInformationEntityTreeNodeCopyHandler(
-                AssociationBusinessInformationEntityPropertyTreeNode root,
+                ASBIEPNode root,
                 User user, BusinessContext bizCtx) {
             this.root = root;
             this.user = user;
@@ -1949,10 +1882,10 @@ public class TreeNodeService {
 
         public TopLevelAbie copy() {
             TopLevelAbie topLevelAbie = prepareForTopLevelAbieEntity();
-            for (BusinessInformationEntityTreeNode child : root.getChildren()) {
+            for (BIENode child : root.getChildren()) {
                 removeIdentifierOfBusinessInformationEntities(child);
             }
-            for (BusinessInformationEntityTreeNode child : root.getChildren()) {
+            for (BIENode child : root.getChildren()) {
                 gatheringBusinessInformationEntities(child);
             }
 
@@ -1990,7 +1923,7 @@ public class TreeNodeService {
             topLevelAbie.setState(Editing);
             topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 
-            AggregateBusinessInformationEntity abie = root.getType().getAggregateBusinessInformationEntity();
+            AggregateBusinessInformationEntity abie = root.getType().getAbie();
             long abieId = abie.getAbieId();
             abie = abie.clone();
             preset(abie, topLevelAbie);
@@ -2002,7 +1935,7 @@ public class TreeNodeService {
             topLevelAbieRepository.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
-            AssociationBusinessInformationEntityProperty asbiep = root.getAssociationBusinessInformationEntityProperty();
+            AssociationBusinessInformationEntityProperty asbiep = root.getAsbiep();
             long asbiepId = asbiep.getAsbiepId();
             asbiep = asbiep.clone();
             asbiep.setRoleOfAbie(abie);
@@ -2033,39 +1966,35 @@ public class TreeNodeService {
         }
 
         private void removeIdentifierOfBusinessInformationEntities(
-                BusinessInformationEntityTreeNode node) {
+                BIENode node) {
 
-            Collection<? extends BusinessInformationEntityTreeNode> children = null;
+            Collection<? extends BIENode> children = null;
 
-            if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                        (AssociationBusinessInformationEntityPropertyTreeNode) node;
+            if (node instanceof ASBIEPNode) {
+                ASBIEPNode asbiepNode = (ASBIEPNode) node;
 
-                AssociationBusinessInformationEntity asbie =
-                        asbiepNode.getAssociationBusinessInformationEntity();
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
                 if (asbie != null && asbie.getAsbieId() > 0L) {
                     prevAsbieIdMap.put(asbie.getAsbieId(), asbie.clone());
                 }
 
-                AssociationBusinessInformationEntityProperty asbiep =
-                        asbiepNode.getAssociationBusinessInformationEntityProperty();
+                AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
                 if (asbiep != null && asbiep.getAsbiepId() > 0L) {
                     prevAsbiepIdMap.put(asbiep.getAsbiepId(), asbiep.clone());
                 }
 
-                AggregateBusinessInformationEntityTreeNode abieNode = asbiepNode.getType();
+                ABIENode abieNode = asbiepNode.getType();
                 AggregateBusinessInformationEntity abie =
-                        abieNode.getAggregateBusinessInformationEntity();
+                        abieNode.getAbie();
                 if (abie != null && abie.getAbieId() > 0L) {
                     prevAbieIdMap.put(abie.getAbieId(), abie.clone());
                 }
 
-                if (abieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
-                    children = ((AggregateBusinessInformationEntityTreeNodeImpl) abieNode).children;
+                if (abieNode instanceof ABIENodeImpl) {
+                    children = ((ABIENodeImpl) abieNode).children;
                 }
-            } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                        (BasicBusinessInformationEntityPropertyTreeNode) node;
+            } else if (node instanceof BBIEPNode) {
+                BBIEPNode bbiepNode = (BBIEPNode) node;
 
                 BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
                 if (bbie != null && bbie.getBbieId() > 0L) {
@@ -2073,20 +2002,18 @@ public class TreeNodeService {
                 }
 
                 BasicBusinessInformationEntityProperty bbiep =
-                        bbiepNode.getBasicBusinessInformationEntityProperty();
+                        bbiepNode.getBbiep();
                 if (bbiep != null && bbiep.getBbiepId() > 0L) {
                     prevBbiepIdMap.put(bbiep.getBbiepId(), bbiep.clone());
                 }
 
-                if (bbiepNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
-                    children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bbiepNode).children;
+                if (bbiepNode instanceof BasicBIEPropertyNodeImpl) {
+                    children = ((BasicBIEPropertyNodeImpl) bbiepNode).children;
                 }
-            } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-                BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                        (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node;
+            } else if (node instanceof BBIESCNode) {
+                BBIESCNode bbieScNode = (BBIESCNode) node;
 
-                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                        handleBBIEScBdtScPriRestri(bbieScNode);
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
                 if (bbieSc != null && bbieSc.getBbieScId() > 0L) {
                     prevBbieScIdMap.put(bbieSc.getBbieScId(), bbieSc.clone());
                 }
@@ -2098,30 +2025,26 @@ public class TreeNodeService {
                 if (children == null) {
                     children = node.getChildren();
                 }
-                for (BusinessInformationEntityTreeNode child : children) {
+                for (BIENode child : children) {
                     removeIdentifierOfBusinessInformationEntities(child);
                 }
             }
         }
 
         private void gatheringBusinessInformationEntities(
-                BusinessInformationEntityTreeNode node) {
+                BIENode node) {
 
-            Collection<? extends BusinessInformationEntityTreeNode> children = null;
+            Collection<? extends BIENode> children = null;
 
-            if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                        (AssociationBusinessInformationEntityPropertyTreeNode) node;
+            if (node instanceof ASBIEPNode) {
+                ASBIEPNode asbiepNode =
+                        (ASBIEPNode) node;
 
-                AssociationBusinessInformationEntity asbie =
-                        asbiepNode.getAssociationBusinessInformationEntity();
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+                AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
 
-                AssociationBusinessInformationEntityProperty asbiep =
-                        asbiepNode.getAssociationBusinessInformationEntityProperty();
-
-                AggregateBusinessInformationEntityTreeNode abieNode = asbiepNode.getType();
-                AggregateBusinessInformationEntity abie =
-                        abieNode.getAggregateBusinessInformationEntity();
+                ABIENode abieNode = asbiepNode.getType();
+                AggregateBusinessInformationEntity abie = abieNode.getAbie();
 
                 if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() > 0L)) ||
                     (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
@@ -2197,17 +2120,16 @@ public class TreeNodeService {
                     }
                 }
 
-                if (abieNode instanceof AggregateBusinessInformationEntityTreeNodeImpl) {
-                    children = ((AggregateBusinessInformationEntityTreeNodeImpl) abieNode).children;
+                if (abieNode instanceof ABIENodeImpl) {
+                    children = ((ABIENodeImpl) abieNode).children;
                 }
-            } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                        (BasicBusinessInformationEntityPropertyTreeNode) node;
+            } else if (node instanceof BBIEPNode) {
+                BBIEPNode bbiepNode = (BBIEPNode) node;
 
                 BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
 
                 BasicBusinessInformationEntityProperty bbiep =
-                        bbiepNode.getBasicBusinessInformationEntityProperty();
+                        bbiepNode.getBbiep();
 
                 if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() > 0L)) ||
                     (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
@@ -2259,15 +2181,13 @@ public class TreeNodeService {
                     }
                 }
 
-                if (bbiepNode instanceof BasicBusinessInformationEntityPropertyTreeNodeImpl) {
-                    children = ((BasicBusinessInformationEntityPropertyTreeNodeImpl) bbiepNode).children;
+                if (bbiepNode instanceof BasicBIEPropertyNodeImpl) {
+                    children = ((BasicBIEPropertyNodeImpl) bbiepNode).children;
                 }
-            } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-                BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                        (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node;
+            } else if (node instanceof BBIESCNode) {
+                BBIESCNode bbieScNode = (BBIESCNode) node;
 
-                BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                        handleBBIEScBdtScPriRestri(bbieScNode);
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
 
                 if (bbieSc != null && (bbieSc.isDirty() || bbieSc.getBbieScId() > 0L)) {
                     if (bbieSc.getBbieScId() > 0L) {
@@ -2297,49 +2217,42 @@ public class TreeNodeService {
                 if (children == null) {
                     children = node.getChildren();
                 }
-                for (BusinessInformationEntityTreeNode child : children) {
+                for (BIENode child : children) {
                     gatheringBusinessInformationEntities(child);
                 }
             }
         }
 
-        private boolean isDirtyOfAnyChild(Collection<? extends BusinessInformationEntityTreeNode> children) {
-            for (BusinessInformationEntityTreeNode node : children) {
-                if (node instanceof AssociationBusinessInformationEntityPropertyTreeNode) {
-                    AssociationBusinessInformationEntityPropertyTreeNode asbiepNode =
-                            (AssociationBusinessInformationEntityPropertyTreeNode) node;
+        private boolean isDirtyOfAnyChild(Collection<? extends BIENode> children) {
+            for (BIENode node : children) {
+                if (node instanceof ASBIEPNode) {
+                    ASBIEPNode asbiepNode = (ASBIEPNode) node;
 
-                    AssociationBusinessInformationEntity asbie =
-                            asbiepNode.getAssociationBusinessInformationEntity();
+                    AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+                    AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
 
-                    AssociationBusinessInformationEntityProperty asbiep =
-                            asbiepNode.getAssociationBusinessInformationEntityProperty();
-
-                    AggregateBusinessInformationEntityTreeNode abieNode = asbiepNode.getType();
-                    AggregateBusinessInformationEntity abie =
-                            abieNode.getAggregateBusinessInformationEntity();
+                    ABIENode abieNode = asbiepNode.getType();
+                    AggregateBusinessInformationEntity abie = abieNode.getAbie();
 
                     if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() > 0L)) ||
                         (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
                         (abie != null && (abie.isDirty()) || abie.getAbieId() > 0L)) {
                         return true;
                     }
-                } else if (node instanceof BasicBusinessInformationEntityPropertyTreeNode) {
-                    BasicBusinessInformationEntityPropertyTreeNode bbiepNode =
-                            (BasicBusinessInformationEntityPropertyTreeNode) node;
+                } else if (node instanceof BBIEPNode) {
+                    BBIEPNode bbiepNode = (BBIEPNode) node;
 
                     BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
 
                     BasicBusinessInformationEntityProperty bbiep =
-                            bbiepNode.getBasicBusinessInformationEntityProperty();
+                            bbiepNode.getBbiep();
 
                     if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() > 0L)) ||
                         (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
                         return true;
                     }
-                } else if (node instanceof BasicBusinessInformationEntitySupplementaryComponentTreeNode) {
-                    BasicBusinessInformationEntitySupplementaryComponentTreeNode bbieScNode =
-                            (BasicBusinessInformationEntitySupplementaryComponentTreeNode) node;
+                } else if (node instanceof BBIESCNode) {
+                    BBIESCNode bbieScNode = (BBIESCNode) node;
 
                     BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                             handleBBIEScBdtScPriRestri(bbieScNode);

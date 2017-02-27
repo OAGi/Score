@@ -1,17 +1,15 @@
-package org.oagi.srt.model.treenode;
+package org.oagi.srt.model.node;
 
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
-public interface BasicBusinessInformationEntitySupplementaryComponentTreeNode extends BusinessInformationEntityTreeNode {
+public interface BBIESCNode extends BIENode {
 
-    public BasicBusinessInformationEntityPropertyTreeNode getParent();
+    public BBIEPNode getParent();
 
-    public BasicBusinessInformationEntitySupplementaryComponent getBasicBusinessInformationEntitySupplementaryComponent();
     public BasicBusinessInformationEntitySupplementaryComponent getBbieSc();
 
-    public DataTypeSupplementaryComponent getBusinessDataTypeSupplementaryComponent();
     public DataTypeSupplementaryComponent getBdtSc();
 
     public BasicBusinessInformationEntityRestrictionType getRestrictionType();

@@ -351,9 +351,22 @@ public class AggregateBusinessInformationEntity
 
             @Override
             public void onPostPersist(Object object) {
+                AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
+                abie.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+                AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
+                abie.afterLoaded();
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

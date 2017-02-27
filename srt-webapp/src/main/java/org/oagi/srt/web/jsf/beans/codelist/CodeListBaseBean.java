@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.repository.entity.CodeListValue.Color.Blue;
-import static org.oagi.srt.repository.entity.CodeListValue.Color.BrightRed;
-import static org.oagi.srt.repository.entity.CodeListValue.Color.DullRed;
+import static org.oagi.srt.repository.entity.CodeListValue.Color.*;
 
 @Component
 public class CodeListBaseBean extends UIHandler {

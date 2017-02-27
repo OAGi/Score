@@ -327,9 +327,22 @@ public class AssociationBusinessInformationEntity
             }
             @Override
             public void onPostPersist(Object object) {
+                AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) object;
+                asbie.afterLoaded();
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+            }
+
+            @Override
+            public void onPostUpdate(Object object) {
+                AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) object;
+                asbie.afterLoaded();
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {
