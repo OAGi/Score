@@ -55,7 +55,7 @@
                                         <p:commandLink rendered="#{ fn:startsWith(node['class'].simpleName, 'AggregateCoreComponent')
                                                                 and node.base != null }"
                                                        styleClass="ACC-base-link"
-                                                       actionListener="#{extensionBean.navigateForward(node.base.aggregateCoreComponent)}"
+                                                       actionListener="#{extensionBean.navigateForward(node.base.acc)}"
                                                        update=":form:treeTable" id="baseLink">
                                             <i class="fa fa-level-up" aria-hidden="true"></i>
                                         </p:commandLink>

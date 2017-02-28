@@ -3,7 +3,6 @@ package org.oagi.srt.web.jsf.beans.cc;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -13,7 +12,9 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
@@ -23,7 +24,7 @@ import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSIO
 @ManagedBean
 @SessionScoped
 @Transactional(readOnly = true)
-public class CoreComponentBean extends UIHandler {
+public class CoreComponentBean extends AbstractCoreComponentBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -36,7 +37,7 @@ public class CoreComponentBean extends UIHandler {
     @Autowired
     private BasicCoreComponentPropertyRepository bccpRepository;
     @Autowired
-    private UserRepository userRepository;
+    private DataTypeRepository dataTypeRepository;
     @Autowired
     private CoreComponentService coreComponentService;
 
@@ -173,60 +174,6 @@ public class CoreComponentBean extends UIHandler {
         }
     }
 
-    private Map<Long, String> userNameMap = new HashMap();
-
-    public String getUserName(Long appUserId) {
-        if (!userNameMap.containsKey(appUserId)) {
-            User user = userRepository.findOne(appUserId);
-            userNameMap.put(appUserId, (user != null) ? user.getLoginId() : "");
-        }
-        return userNameMap.get(appUserId);
-    }
-
-    private Map<Long, String> accObjectClassTermMap = new HashMap();
-
-    public String getObjectClassTermByAccId(Long accId) {
-        if (!accObjectClassTermMap.containsKey(accId)) {
-            AggregateCoreComponent acc = accRepository.findOne(accId);
-            if (OagisComponentType.UserExtensionGroup == acc.getOagisComponentType()) {
-                Long parentAccId = getParentAccIdOfUserExtensionGroupAcc(acc.getAccId());
-                return getObjectClassTermByAccId(parentAccId);
-            }
-            accObjectClassTermMap.put(accId, (acc != null) ? acc.getObjectClassTerm() : "");
-        }
-        return accObjectClassTermMap.get(accId);
-    }
-
-    public Long getParentAccIdOfUserExtensionGroupAcc(Long ueAccId) {
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(ueAccId);
-        List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccp.getAsccpId(), 0);
-        if (asccList.isEmpty() || asccList.size() > 1) {
-            throw new IllegalStateException();
-        }
-        AssociationCoreComponent ascc = asccList.get(0);
-        return ascc.getFromAccId();
-    }
-
-    private Map<Long, String> asccpPropertyTermMap = new HashMap();
-
-    public String getPropertyTermByAsccpId(Long asccpId) {
-        if (!asccpPropertyTermMap.containsKey(asccpId)) {
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
-            asccpPropertyTermMap.put(asccpId, (asccp != null) ? asccp.getPropertyTerm() : "");
-        }
-        return asccpPropertyTermMap.get(asccpId);
-    }
-
-    private Map<Long, String> bccpPropertyTermMap = new HashMap();
-
-    public String getPropertyTermByBccpId(Long bccpId) {
-        if (!bccpPropertyTermMap.containsKey(bccpId)) {
-            BasicCoreComponentProperty bccp = bccpRepository.findOne(bccpId);
-            bccpPropertyTermMap.put(bccpId, (bccp != null) ? bccp.getPropertyTerm() : "");
-        }
-        return bccpPropertyTermMap.get(bccpId);
-    }
-
     public String getSearchText() {
         return searchText;
     }
@@ -356,5 +303,14 @@ public class CoreComponentBean extends UIHandler {
         AggregateCoreComponent acc = coreComponentService.newAggregateCoreComponent(requester);
 
         return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&faces-redirect=true";
+    }
+
+    @Transactional
+    public String createBCCP(long bdtId) {
+        User requester = getCurrentUser();
+        DataType bdt = dataTypeRepository.findOne(bdtId);
+        BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
+
+        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&faces-redirect=true";
     }
 }

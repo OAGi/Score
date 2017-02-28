@@ -4,11 +4,14 @@ import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "asccp")
@@ -99,28 +102,22 @@ public class AssociationCoreComponentProperty
     private boolean nillable;
 
     public AssociationCoreComponentProperty() {
+        init();
     }
 
     public AssociationCoreComponentProperty(long asccpId, String den) {
+        init();
+
         this.asccpId = asccpId;
         this.den = den;
     }
 
     public AssociationCoreComponentProperty(long asccpId, long roleOfAccId, String definition) {
+        init();
+
         this.asccpId = asccpId;
         this.roleOfAccId = roleOfAccId;
         this.definition = definition;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
     }
 
     public long getAsccpId() {
@@ -406,6 +403,74 @@ public class AssociationCoreComponentProperty
                 ", currentAsccpId=" + currentAsccpId +
                 ", nillable=" + nillable +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    private void init() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
     }
 
     @Transient

@@ -121,6 +121,23 @@ public class NodeService {
         return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent);
     }
 
+    public ASCCPNode createCoreComponentTreeNode(
+            AssociationCoreComponentProperty associationCoreComponentProperty) {
+        if (associationCoreComponentProperty == null) {
+            throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
+        }
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponentProperty);
+    }
+
+    public ASCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            AssociationCoreComponentProperty associationCoreComponentProperty) {
+        if (associationCoreComponentProperty == null) {
+            throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
+        }
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty);
+    }
+
     private abstract class AbstractSRTNode implements SRTNode {
 
         private Map<String, Object> attributes = new HashMap();
@@ -285,7 +302,7 @@ public class NodeService {
             implements ASCCPNode {
 
         private ACCNode parent = null;
-        private final AssociationCoreComponent ascc;
+        private AssociationCoreComponent ascc;
         private final AssociationCoreComponentProperty asccp;
         private ACCNode type;
 
@@ -296,6 +313,10 @@ public class NodeService {
             this(null, ascc);
         }
 
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponentProperty asccp) {
+            this(null, asccp);
+        }
+
         private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
                                                          AssociationCoreComponent ascc) {
             this.parent = parent;
@@ -303,6 +324,12 @@ public class NodeService {
 
             long asccpId = ascc.getToAsccpId();
             this.asccp = asccpRepository.findOne(asccpId);
+        }
+
+        private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
+                                                         AssociationCoreComponentProperty asccp) {
+            this.parent = parent;
+            this.asccp = asccp;
         }
 
         @Override

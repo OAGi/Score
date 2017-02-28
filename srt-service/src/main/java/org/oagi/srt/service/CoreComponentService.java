@@ -139,6 +139,68 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponentProperty newAssociationCoreComponentProperty(User user, AggregateCoreComponent roleOfAcc) {
+        long requesterId = user.getAppUserId();
+
+        AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
+        asccp.setGuid(Utility.generateGUID());
+        asccp.setPropertyTerm("A new ASCCP property");
+        asccp.setRoleOfAccId(roleOfAcc.getAccId());
+        asccp.setState(CoreComponentState.Editing);
+        asccp.setOwnerUserId(requesterId);
+        asccp.setNamespaceId(roleOfAcc.getNamespaceId());
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        asccp.addPersistEventListener(eventListener);
+
+        asccp = asccpRepository.saveAndFlush(asccp);
+
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        int revisionNum = 1;
+        asccpHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        asccpHistory.setRevisionAction(Insert);
+        asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+
+        asccpRepository.save(asccpHistory);
+
+        return asccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponentProperty newBasicCoreComponentProperty(User user, DataType bdt) {
+        long requesterId = user.getAppUserId();
+
+        BasicCoreComponentProperty bccp = new BasicCoreComponentProperty();
+        bccp.setGuid(Utility.generateGUID());
+        String propertyTerm = "A new BCCP property";
+        bccp.setPropertyTerm(propertyTerm);
+        bccp.setRepresentationTerm(bdt.getDataTypeTerm());
+        bccp.setBdtId(bdt.getDtId());
+        bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + bdt.getDataTypeTerm());
+        bccp.setState(CoreComponentState.Editing);
+        bccp.setOwnerUserId(requesterId);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        bccp.addPersistEventListener(eventListener);
+
+        bccp = bccpRepository.saveAndFlush(bccp);
+
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        int revisionNum = 1;
+        bccpHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setCurrentBccpId(bccp.getBccpId());
+
+        bccpRepository.save(bccpHistory);
+
+        return bccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void update(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
         long ownerId = acc.getCreatedBy();
@@ -183,6 +245,18 @@ public class CoreComponentService {
 
         updateChildrenState(acc, state, requester);
         updateAccState(acc, state, requester);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateState(AssociationCoreComponentProperty asccp,
+                            CoreComponentState state,
+                            User requester) {
+        if (asccp.getCreatedBy() != requester.getAppUserId()) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+
+        updateAsccpState(asccp, state, requester);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -431,9 +505,17 @@ public class CoreComponentService {
         }
 
         AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        updateAsccpState(asccp, state, requester);
+    }
+
+    private void updateAsccpState(AssociationCoreComponentProperty asccp,
+                                  CoreComponentState state,
+                                  User requester) {
         if (asccp == null) {
             return;
         }
+
+        long lastUpdatedBy = requester.getAppUserId();
 
         if (asccp.getState() != Published) {
             asccp.setState(state);

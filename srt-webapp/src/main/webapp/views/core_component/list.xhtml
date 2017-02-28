@@ -54,8 +54,15 @@
                         <p:commandButton value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
                                          update="pPanel"
                                          icon="ui-icon-search"/>
+
                         <p:commandButton value="Create ACC" rendered="#{coreComponentBean.type == 'ACC'}"
                                          action="#{coreComponentBean.createACC}"
+                                         style="float: right; padding: 3px 0 3px 0;"/>
+                        <p:commandButton value="Create ASCCP" rendered="#{coreComponentBean.type == 'ASCCP'}"
+                                         action="/views/core_component/select_acc.xhtml?faces-redirect=true"
+                                         style="float: right; padding: 3px 0 3px 0;"/>
+                        <p:commandButton value="Create BCCP" rendered="#{coreComponentBean.type == 'BCCP'}"
+                                         action="#{coreComponentBean.createBCCP}"
                                          style="float: right; padding: 3px 0 3px 0;"/>
                     </h:panelGroup>
                 </f:facet>
@@ -167,8 +174,16 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{asccp.guid}">
+
                     <p:column headerText="Property Term" sortBy="#{asccp.propertyTerm}">
-                        <h:outputText value="#{asccp.propertyTerm}"/>
+                        <h:link value="#{asccp.propertyTerm}"
+                                rendered="#{(coreComponentBean.getCurrentUser().appUserId eq asccp.ownerUserId) or asccp.state ne 'Editing'}"
+                                outcome="/views/core_component/asccp_details.jsf">
+                            <f:param name="asccpId" value="#{asccp.asccpId}"/>
+                        </h:link>
+
+                        <h:outputText value="#{asccp.propertyTerm}"
+                                      rendered="#{(coreComponentBean.getCurrentUser().appUserId ne asccp.ownerUserId) and asccp.state eq 'Editing'}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
