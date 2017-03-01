@@ -43,9 +43,6 @@ public class CoreComponentService {
     private TopLevelAbieRepository topLevelAbieRepository;
 
     @Autowired
-    private AggregateBusinessInformationEntityRepository abieRepository;
-
-    @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
 
     public List<CoreComponentRelation> getCoreComponents(
@@ -409,6 +406,59 @@ public class CoreComponentService {
             long fromAccId = bcc.getFromAccId();
             decreaseSeqKeyGreaterThan(fromAccId, seqKey);
         }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update(AssociationCoreComponentProperty asccp, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = asccp.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentAsccpId = asccp.getAsccpId();
+        AssociationCoreComponentProperty latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
+        if (latestAsccp == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        asccpRepository.save(asccp);
+
+        int nextRevisionTrackingNum = latestAsccp.getRevisionTrackingNum() + 1;
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        asccpHistory.setRevisionNum(latestAsccp.getRevisionNum());
+        asccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
+        asccpHistory.setRevisionAction(Update);
+        asccpHistory.setLastUpdatedBy(requesterId);
+        asccpHistory.setCurrentAsccpId(currentAsccpId);
+
+        asccpRepository.saveAndFlush(asccpHistory);
+
+        // to check RevisionTrackingNum
+        latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
+        long actualRevisionTrackingNum = latestAsccp.getRevisionTrackingNum();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(AssociationCoreComponentProperty asccp, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = asccp.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentAsccpId = asccp.getAsccpId();
+        AssociationCoreComponentProperty latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
+        if (latestAsccp == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        long asccpId = asccp.getAsccpId();
+        asccpRepository.deleteByCurrentAsccpId(asccpId); // To remove history
+        asccpRepository.delete(asccp);
     }
 
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {

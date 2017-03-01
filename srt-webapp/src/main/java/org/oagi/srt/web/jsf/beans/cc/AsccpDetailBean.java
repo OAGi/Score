@@ -4,6 +4,7 @@ import org.oagi.srt.model.node.ACCNode;
 import org.oagi.srt.model.node.ASCCPNode;
 import org.oagi.srt.model.node.BCCPNode;
 import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
@@ -42,6 +43,9 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     private CoreComponentService coreComponentService;
 
     @Autowired
+    private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
 
     private AssociationCoreComponentProperty targetAsccp;
@@ -64,6 +68,11 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         if (Editing == targetAsccp.getState() && getCurrentUser().getAppUserId() != targetAsccp.getOwnerUserId()) {
             throw new IllegalStateException();
         }
+
+        long roleOfAccId = targetAsccp.getRoleOfAccId();
+        AggregateCoreComponent roleOfAcc = accRepository.findOne(roleOfAccId);
+        targetAsccp.setRoleOfAcc(roleOfAcc);
+        targetAsccp.afterLoaded();
 
         setTargetAsccp(targetAsccp);
 
@@ -154,8 +163,8 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         }
     }
 
-    public void onChangeObjectClassTerm(ACCNode accNode) {
-        setNodeName(accNode);
+    public void onChangePropertyTerm(ASCCPNode asccpNode) {
+        setNodeName(asccpNode);
     }
 
     private void reorderTreeNode(TreeNode treeNode) {
@@ -212,7 +221,6 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
         try {
             AssociationCoreComponentProperty tAsccp = getTargetAsccp();
-
             coreComponentService.updateState(tAsccp, state, requester);
 
             TreeNode root = getTreeNode();
@@ -225,6 +233,39 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateAsccp(TreeNode treeNode) {
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.update(asccp, requester);
+            asccp.afterLoaded();
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public String discardAsccp(TreeNode treeNode) {
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.discard(asccp, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+        return "/views/core_component/list.xhtml?faces-redirect=true";
     }
 }
 

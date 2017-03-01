@@ -1,8 +1,10 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
@@ -62,4 +64,12 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
     public List<AssociationCoreComponentProperty> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionTrackingNum = (" +
+            "select MAX(a.revisionTrackingNum) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 group by a.currentAsccpId)")
+    public AssociationCoreComponentProperty findLatestOneByCurrentAsccpId(long currentAsccpId);
+
+    @Modifying
+    @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
+    public void deleteByCurrentAsccpId(long currentAsccpId);
 }

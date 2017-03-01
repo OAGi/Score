@@ -375,6 +375,13 @@
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${asccpDetailBean.selectedTreeNode.data.asccp.deprecated}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                </h:selectBooleanCheckbox>
+
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.definition}"

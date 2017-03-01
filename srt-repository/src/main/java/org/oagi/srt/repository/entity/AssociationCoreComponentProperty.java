@@ -45,6 +45,8 @@ public class AssociationCoreComponentProperty
 
     @Column
     private Long roleOfAccId;
+    @Transient
+    private AggregateCoreComponent roleOfAcc;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -142,6 +144,14 @@ public class AssociationCoreComponentProperty
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
+        if (roleOfAcc != null && !StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + roleOfAcc.getObjectClassTerm());
+        }
+    }
+
+    public void setPropertyTerm(String propertyTerm, AggregateCoreComponent roleOfAcc) {
+        setPropertyTerm(propertyTerm);
+        setRoleOfAcc(roleOfAcc);
     }
 
     public String getDefinition() {
@@ -160,6 +170,16 @@ public class AssociationCoreComponentProperty
 
     public void setRoleOfAccId(Long roleOfAccId) {
         this.roleOfAccId = roleOfAccId;
+    }
+
+    public void setRoleOfAcc(AggregateCoreComponent roleOfAcc) {
+        this.roleOfAcc = roleOfAcc;
+        if (roleOfAcc != null) {
+            setRoleOfAccId(roleOfAcc.getAccId());
+        }
+        if (!StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + roleOfAcc.getObjectClassTerm());
+        }
     }
 
     public String getDen() {
