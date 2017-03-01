@@ -138,6 +138,23 @@ public class NodeService {
         return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty);
     }
 
+    public BCCPNode createCoreComponentTreeNode(
+            BasicCoreComponentProperty basicCoreComponentProperty) {
+        if (basicCoreComponentProperty == null) {
+            throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
+        }
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponentProperty);
+    }
+
+    public BCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            BasicCoreComponentProperty basicCoreComponentProperty) {
+        if (basicCoreComponentProperty == null) {
+            throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
+        }
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponentProperty);
+    }
+
     private abstract class AbstractSRTNode implements SRTNode {
 
         private Map<String, Object> attributes = new HashMap();
@@ -423,7 +440,7 @@ public class NodeService {
             implements BCCPNode {
 
         private ACCNode parent = null;
-        private final BasicCoreComponent bcc;
+        private BasicCoreComponent bcc;
         private final BasicCoreComponentProperty bccp;
         private DataType dataType;
 
@@ -434,6 +451,10 @@ public class NodeService {
             this(null, bcc);
         }
 
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponentProperty bccp) {
+            this(null, bccp);
+        }
+
         private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
                                                    BasicCoreComponent bcc) {
             this.parent = parent;
@@ -441,6 +462,12 @@ public class NodeService {
 
             long bccpId = bcc.getToBccpId();
             this.bccp = bccpRepository.findOne(bccpId);
+        }
+
+        private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
+                                                   BasicCoreComponentProperty bccp) {
+            this.parent = parent;
+            this.bccp = bccp;
         }
 
         @Override

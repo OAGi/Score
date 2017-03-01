@@ -17,7 +17,7 @@ import java.util.Map;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 @Controller
-@Scope(SCOPE_SESSION)
+@Scope("view")
 @ManagedBean
 @SessionScoped
 @Transactional(readOnly = true)

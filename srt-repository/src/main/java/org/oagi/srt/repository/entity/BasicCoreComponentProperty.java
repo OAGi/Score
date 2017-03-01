@@ -15,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "bccp")
 public class BasicCoreComponentProperty
-        implements CoreComponentProperty, TimestampAware, NamespaceAware, Serializable, Cloneable {
+        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 
@@ -43,6 +43,8 @@ public class BasicCoreComponentProperty
 
     @Column(nullable = false)
     private long bdtId;
+    @Transient
+    private DataType bdt;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -189,6 +191,13 @@ public class BasicCoreComponentProperty
 
     public void setBdtId(long bdtId) {
         this.bdtId = bdtId;
+    }
+
+    public void setBdt(DataType bdt) {
+        this.bdt = bdt;
+        if (bdt != null) {
+            setRepresentationTerm(bdt.getDataTypeTerm());
+        }
     }
 
     public String getDen() {
@@ -356,7 +365,9 @@ public class BasicCoreComponentProperty
         if (this.moduleId != null) {
             clone.setModuleId(this.moduleId);
         }
-        clone.setNamespaceId(this.namespaceId);
+        if (this.namespaceId != null) {
+            clone.setNamespaceId(this.namespaceId);
+        }
         clone.setDeprecated(this.deprecated);
         clone.setRevisionNum(this.revisionNum);
         clone.setRevisionTrackingNum(this.revisionTrackingNum);

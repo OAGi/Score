@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -80,4 +81,7 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 and b.state in ?2 order by b.creationTimestamp desc")
     public List<BasicCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select b from BasicCoreComponent b where b.toBccpId = ?1 and b.revisionNum = ?2")
+    public List<BasicCoreComponent> findByToBccpIdAndRevisionNum(long toBccpId, int revisionNum);
 }

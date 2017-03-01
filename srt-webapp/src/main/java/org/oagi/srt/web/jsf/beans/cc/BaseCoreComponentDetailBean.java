@@ -60,6 +60,13 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         return root;
     }
 
+    public TreeNode createTreeNode(BasicCoreComponentProperty bccp) {
+        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(bccp);
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(bccpNode, root);
+        return root;
+    }
+
     TreeNode toTreeNode(CCNode node, TreeNode parent) {
         setNodeName(node);
 
@@ -156,7 +163,12 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         @Override
         public String getType() {
             BasicCoreComponent bcc = node.getBcc();
-            String type = "BCCP" + (bcc.getEntityType() == BasicCoreComponentEntityType.Attribute ? "-Attribute" : "");
+            String type;
+            if (bcc != null) {
+                type = "BCCP" + (bcc.getEntityType() == BasicCoreComponentEntityType.Attribute ? "-Attribute" : "");
+            } else {
+                type = "BCCP";
+            }
             return type;
         }
 

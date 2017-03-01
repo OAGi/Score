@@ -304,13 +304,4 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
         return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&faces-redirect=true";
     }
-
-    @Transactional
-    public String createBCCP(long bdtId) {
-        User requester = getCurrentUser();
-        DataType bdt = dataTypeRepository.findOne(bdtId);
-        BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
-
-        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&faces-redirect=true";
-    }
 }

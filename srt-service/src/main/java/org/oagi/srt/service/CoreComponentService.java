@@ -257,6 +257,18 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public void updateState(BasicCoreComponentProperty bccp,
+                            CoreComponentState state,
+                            User requester) {
+        if (bccp.getCreatedBy() != requester.getAppUserId()) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+
+        updateBccpState(bccp, state, requester);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void discard(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
         long ownerId = acc.getCreatedBy();
@@ -438,7 +450,7 @@ public class CoreComponentService {
         latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
         long actualRevisionTrackingNum = latestAsccp.getRevisionTrackingNum();
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+            throw new ConcurrentModificationException("AssociationCoreComponentProperty was modified outside of this operation");
         }
     }
 
@@ -459,6 +471,59 @@ public class CoreComponentService {
         long asccpId = asccp.getAsccpId();
         asccpRepository.deleteByCurrentAsccpId(asccpId); // To remove history
         asccpRepository.delete(asccp);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update(BasicCoreComponentProperty bccp, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = bccp.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentBccpId = bccp.getBccpId();
+        BasicCoreComponentProperty latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
+        if (latestBccp == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        bccpRepository.save(bccp);
+
+        int nextRevisionTrackingNum = latestBccp.getRevisionTrackingNum() + 1;
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        bccpHistory.setRevisionNum(latestBccp.getRevisionNum());
+        bccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
+        bccpHistory.setRevisionAction(Update);
+        bccpHistory.setLastUpdatedBy(requesterId);
+        bccpHistory.setCurrentBccpId(currentBccpId);
+
+        bccpRepository.saveAndFlush(bccpHistory);
+
+        // to check RevisionTrackingNum
+        latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
+        long actualRevisionTrackingNum = latestBccp.getRevisionTrackingNum();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("BasicCoreComponentProperty was modified outside of this operation");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(BasicCoreComponentProperty bccp, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = bccp.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentBccpId = bccp.getBccpId();
+        BasicCoreComponentProperty latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
+        if (latestBccp == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        long bccpId = bccp.getBccpId();
+        bccpRepository.deleteByCurrentBccpId(bccpId); // To remove history
+        bccpRepository.delete(bccp);
     }
 
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
@@ -583,6 +648,34 @@ public class CoreComponentService {
         }
 
         asccRepository.save(asccList.stream()
+                .filter(e -> e.isDirty()).collect(Collectors.toList()));
+    }
+
+    private void updateBccpState(BasicCoreComponentProperty bccp,
+                                 CoreComponentState state,
+                                 User requester) {
+        if (bccp == null) {
+            return;
+        }
+
+        long lastUpdatedBy = requester.getAppUserId();
+
+        if (bccp.getState() != Published) {
+            bccp.setState(state);
+            bccp.setLastUpdatedBy(lastUpdatedBy);
+            bccpRepository.save(bccp);
+        }
+
+        long bccpId = bccp.getBccpId();
+        List<BasicCoreComponent> bccList = bccRepository.findByToBccpIdAndRevisionNum(bccpId, 0);
+        for (BasicCoreComponent bcc : bccList) {
+            if (bcc.getState() != Published) {
+                bcc.setState(state);
+                bcc.setLastUpdatedBy(lastUpdatedBy);
+            }
+        }
+
+        bccRepository.save(bccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
     }
 
