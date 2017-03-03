@@ -57,8 +57,8 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select count(a) from AssociationCoreComponent a where a.fromAccId = ?1")
     public int countByFromAccId(long fromAccId);
 
-    @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionTrackingNum = (" +
-            "select MAX(a.revisionTrackingNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId)")
+    @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionNum = (" +
+            "select MAX(a.revisionNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId)")
     public AssociationCoreComponent findLatestOneByCurrentAsccId(long currentAsccId);
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId in ?1")

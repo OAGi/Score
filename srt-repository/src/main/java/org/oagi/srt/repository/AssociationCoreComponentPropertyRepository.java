@@ -65,8 +65,8 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
     public List<AssociationCoreComponentProperty> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionTrackingNum = (" +
-            "select MAX(a.revisionTrackingNum) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 group by a.currentAsccpId)")
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = (" +
+            "select MAX(a.revisionNum) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 group by a.currentAsccpId)")
     public AssociationCoreComponentProperty findLatestOneByCurrentAsccpId(long currentAsccpId);
 
     @Modifying

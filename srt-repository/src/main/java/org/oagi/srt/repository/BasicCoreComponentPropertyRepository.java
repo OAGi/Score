@@ -35,8 +35,8 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select b from BasicCoreComponentProperty b where b.revisionNum = ?1 and b.state in ?2 order by b.creationTimestamp desc")
     public List<BasicCoreComponentProperty> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
-    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionTrackingNum = (" +
-            "select MAX(b.revisionTrackingNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 group by b.currentBccpId)")
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = (" +
+            "select MAX(b.revisionNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 group by b.currentBccpId)")
     public BasicCoreComponentProperty findLatestOneByCurrentBccpId(long currentBccpId);
 
     @Modifying

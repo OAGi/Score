@@ -209,10 +209,10 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         }
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public String createABIEExtension(boolean isLocally) {
         TreeNode treeNode = getSelectedTreeNode();
-        ASBIEPNode asbieNode =
-                (ASBIEPNode) treeNode.getData();
+        ASBIEPNode asbieNode = (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
 
@@ -221,18 +221,19 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         if (ueAcc != null) {
             CoreComponentState ueAccState = ueAcc.getState();
 
-            if ( user.getAppUserId() == ueAcc.getOwnerUserId() ) {
-                return redirectABIEExtension(isLocally, eAcc);
+            boolean isSameBetweenRequesterAndOwner = user.getAppUserId() == ueAcc.getOwnerUserId();
+            if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Published) {
+                if (!isSameBetweenRequesterAndOwner) {
+                    User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
+                    FacesContext.getCurrentInstance().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
+                    return null;
+                }
             }
 
-            if ( (ueAccState == CoreComponentState.Candidate || ueAccState == CoreComponentState.Published) ) {
+            if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Candidate) {
                 return redirectABIEExtension(isLocally, eAcc);
             }
-
-            User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
-            return null;
         }
 
         try {

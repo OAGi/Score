@@ -3,6 +3,7 @@ package org.oagi.srt.service;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
@@ -59,11 +60,12 @@ public class ExtensionService {
                 throw new PermissionDeniedDataAccessException(
                         "The component is currently edited by another user - " + owner.getName(), new IllegalStateException());
             } else {
-                return eAcc;
+                updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, user);
             }
+        } else {
+            createNewUserExtensionGroupACC(eAcc, user);
         }
 
-        createNewUserExtensionGroupACC(eAcc, user);
         return eAcc;
     }
 
@@ -115,13 +117,31 @@ public class ExtensionService {
     public AggregateCoreComponent createNewUserExtensionGroupACC(
             AggregateCoreComponent eAcc, User currentLoginUser) {
         AggregateCoreComponent ueAcc = createACCForExtension(eAcc, currentLoginUser);
-        createACCHistoryForExtension(ueAcc);
+        createACCHistoryForExtension(ueAcc, 1);
 
         AssociationCoreComponentProperty ueAsccp = createASCCPForExtension(eAcc, currentLoginUser, ueAcc);
-        createASCCPHistoryForExtension(ueAsccp);
+        createASCCPHistoryForExtension(ueAsccp, 1);
 
         AssociationCoreComponent ueAscc = createASCCForExtension(eAcc, currentLoginUser, ueAcc, ueAsccp);
-        createASCCHistoryForExtension(ueAscc);
+        createASCCHistoryForExtension(ueAscc, 1);
+
+        return ueAcc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent updateRevisionNumberOfUserExtensionGroupACC(
+            AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc, User currentLoginUser) {
+        updateStateACCForException(ueAcc, currentLoginUser);
+        AggregateCoreComponent latestHistoryAcc = accRepository.findLatestOneByCurrentAccId(ueAcc.getAccId());
+        createACCHistoryForExtension(ueAcc, latestHistoryAcc.getRevisionNum() + 1);
+
+        AssociationCoreComponentProperty ueAsccp = getASCCPForExtension(ueAcc);
+        AssociationCoreComponentProperty latestHistoryAsccp = asccpRepository.findLatestOneByCurrentAsccpId(ueAsccp.getAsccpId());
+        createASCCPHistoryForExtension(ueAsccp, latestHistoryAsccp.getRevisionNum() + 1);
+
+        AssociationCoreComponent ueAscc = getASCCForException(eAcc, ueAsccp);
+        AssociationCoreComponent latestHistoryAscc = asccRepository.findLatestOneByCurrentAsccId(ueAscc.getAsccId());
+        createASCCHistoryForExtension(ueAscc, latestHistoryAscc.getRevisionNum() + 1);
 
         return ueAcc;
     }
@@ -143,7 +163,14 @@ public class ExtensionService {
         return accRepository.saveAndFlush(ueAcc);
     }
 
-    private void createACCHistoryForExtension(AggregateCoreComponent ueAcc) {
+    private AggregateCoreComponent updateStateACCForException(AggregateCoreComponent ueAcc, User currentLoginUser) {
+        ueAcc.setState(Editing);
+        ueAcc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
+        accRepository.save(ueAcc);
+        return ueAcc;
+    }
+
+    private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum) {
         AggregateCoreComponent accHistory = new AggregateCoreComponent();
         accHistory.setGuid(Utility.generateGUID());
         accHistory.setObjectClassTerm(ueAcc.getObjectClassTerm());
@@ -154,7 +181,7 @@ public class ExtensionService {
         accHistory.setLastUpdatedBy(ueAcc.getLastUpdatedBy());
         accHistory.setOwnerUserId(ueAcc.getOwnerUserId());
         accHistory.setState(ueAcc.getState());
-        accHistory.setRevisionNum(1);
+        accHistory.setRevisionNum(revisionNum);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(Insert);
         accHistory.setCurrentAccId(ueAcc.getAccId());
@@ -173,8 +200,13 @@ public class ExtensionService {
         return asccpRepository.saveAndFlush(ueAsccp);
     }
 
-    private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp) {
-        AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp);
+    private AssociationCoreComponentProperty getASCCPForExtension(AggregateCoreComponent ueAcc) {
+        long roleOfAccId = ueAcc.getAccId();
+        return asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+    }
+
+    private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum) {
+        AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp, revisionNum);
         asccpRepository.saveAndFlush(asccpHistory);
     }
 
@@ -189,8 +221,15 @@ public class ExtensionService {
         return asccRepository.saveAndFlush(ueAscc);
     }
 
-    private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc) {
-        AssociationCoreComponent asccHistory = createASCCHistory(ueAscc);
+    private AssociationCoreComponent getASCCForException(AggregateCoreComponent eAcc,
+                                                         AssociationCoreComponentProperty ueAsccp) {
+        long fromAccId = eAcc.getAccId();
+        long toAsccpId = ueAsccp.getAsccpId();
+        return asccRepository.findByFromAccIdAndToAsccpIdAndRevisionNumAndState(fromAccId, toAsccpId, 0, Published);
+    }
+
+    private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum) {
+        AssociationCoreComponent asccHistory = createASCCHistory(ueAscc, revisionNum);
         asccRepository.saveAndFlush(asccHistory);
     }
 
@@ -211,9 +250,9 @@ public class ExtensionService {
         return ueAsccp;
     }
 
-    private AssociationCoreComponentProperty createASCCPHistory(AssociationCoreComponentProperty tAsccp) {
+    private AssociationCoreComponentProperty createASCCPHistory(AssociationCoreComponentProperty tAsccp, int revisionNum) {
         AssociationCoreComponentProperty asccpHistory = tAsccp.clone();
-        asccpHistory.setRevisionNum(1);
+        asccpHistory.setRevisionNum(revisionNum);
         asccpHistory.setRevisionTrackingNum(1);
         asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(tAsccp.getAsccpId());
@@ -243,9 +282,9 @@ public class ExtensionService {
         return ascc;
     }
 
-    private AssociationCoreComponent createASCCHistory(AssociationCoreComponent tAscc) {
+    private AssociationCoreComponent createASCCHistory(AssociationCoreComponent tAscc, int revisionNum) {
         AssociationCoreComponent asccHistory = tAscc.clone();
-        asccHistory.setRevisionNum(1);
+        asccHistory.setRevisionNum(revisionNum);
         asccHistory.setRevisionTrackingNum(1);
         asccHistory.setRevisionAction(Insert);
         asccHistory.setCurrentAsccId(tAscc.getAsccId());
@@ -365,7 +404,7 @@ public class ExtensionService {
         AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
         asccRepository.saveAndFlush(tAscc);
 
-        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc);
+        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc, tAscc.getRevisionNum() + 1);
         asccRepository.saveAndFlush(tAsccHistory);
 
         return new AppendAsccResult(tAscc, tAsccHistory);
@@ -414,14 +453,14 @@ public class ExtensionService {
         AssociationCoreComponentProperty tAsccp = createASCCP(pAcc, user);
         asccpRepository.saveAndFlush(tAsccp);
 
-        AssociationCoreComponentProperty tAsccpHistory = createASCCPHistory(tAsccp);
+        AssociationCoreComponentProperty tAsccpHistory = createASCCPHistory(tAsccp, tAsccp.getRevisionNum() + 1);
         asccpRepository.saveAndFlush(tAsccpHistory);
 
         int seqKey = nextSeqKey(pAcc);
         AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
         asccRepository.saveAndFlush(tAscc);
 
-        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc);
+        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc, tAscc.getRevisionNum() + 1);
         asccRepository.saveAndFlush(tAsccHistory);
 
         return new CreateAsccResult(tAsccp, tAsccpHistory, tAscc, tAsccHistory);
