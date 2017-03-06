@@ -199,6 +199,10 @@ public class BasicCoreComponent
         this.den = den;
     }
 
+    public void setDen(AggregateCoreComponent acc, BasicCoreComponentProperty bccp) {
+        setDen(acc.getObjectClassTerm() + ". " + bccp.getDen());
+    }
+
     public String getDefinition() {
         return definition;
     }

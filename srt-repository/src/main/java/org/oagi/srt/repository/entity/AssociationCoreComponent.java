@@ -179,6 +179,10 @@ public class AssociationCoreComponent
         this.den = den;
     }
 
+    public void setDen(AggregateCoreComponent acc, AssociationCoreComponentProperty asccp) {
+        setDen(acc.getObjectClassTerm() + ". " + asccp.getDen());
+    }
+
     public String getDefinition() {
         return definition;
     }

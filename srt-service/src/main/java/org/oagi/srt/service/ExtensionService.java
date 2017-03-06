@@ -270,7 +270,7 @@ public class ExtensionService {
         ascc.setSeqKey(seqKey);
         ascc.setFromAccId(pAcc.getAccId());
         ascc.setToAsccpId(tAsccp.getAsccpId());
-        ascc.setDen(pAcc.getObjectClassTerm() + ". " + tAsccp.getDen());
+        ascc.setDen(pAcc, tAsccp);
         ascc.setDefinition(null);
         ascc.setDeprecated(false);
         ascc.setCreatedBy(userId);
@@ -331,7 +331,7 @@ public class ExtensionService {
         bcc.setEntityType(Element);
         bcc.setFromAccId(pAcc.getAccId());
         bcc.setToBccpId(tBccp.getBccpId());
-        bcc.setDen(pAcc.getObjectClassTerm() + ". " + tBccp.getDen());
+        bcc.setDen(pAcc, tBccp);
         bcc.setDefinition(null);
         bcc.setDeprecated(false);
         bcc.setCreatedBy(userId);

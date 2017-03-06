@@ -32,6 +32,7 @@ import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
@@ -495,7 +496,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     public void updateBcc(TreeNode treeNode) {
         BCCPNode bccpNode = (BCCPNode) treeNode.getData();
         BasicCoreComponent bcc = bccpNode.getBcc();
-        if (!bccpNode.getChildren().isEmpty() && Element == bcc.getEntityType()) {
+        if (!bccpNode.getChildren().isEmpty() && Attribute == bcc.getEntityType()) {
             throw new IllegalStateException("Only BBIE without SCs can be made Attribute.");
         }
 

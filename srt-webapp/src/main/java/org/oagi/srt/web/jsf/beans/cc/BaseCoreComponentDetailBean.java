@@ -118,7 +118,7 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
             String type;
 
             if (targetAcc != null && targetAcc.equals(acc)) {
-                type = "ACC-Extension";
+                type = "ACC-Target";
             } else {
                 type = "ACC";
             }

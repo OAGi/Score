@@ -1,6 +1,9 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.*;
+import org.oagi.srt.model.node.ACCNode;
+import org.oagi.srt.model.node.ASCCPNode;
+import org.oagi.srt.model.node.BCCPNode;
+import org.oagi.srt.model.node.CCNode;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
@@ -10,12 +13,9 @@ import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NamespaceService;
 import org.oagi.srt.service.NodeService;
-import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
-import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +34,8 @@ import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
-import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -101,6 +100,41 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void setTargetAcc(AggregateCoreComponent targetAcc) {
         this.targetAcc = targetAcc;
+    }
+
+    public boolean isDirty() {
+        return isDirty(getRootNode());
+    }
+
+    public boolean isDirty(TreeNode treeNode) {
+        Object data = treeNode.getData();
+        if (data instanceof ACCNode) {
+            ACCNode accNode = (ACCNode) data;
+            AggregateCoreComponent acc = accNode.getAcc();
+            if (acc.isDirty()) {
+                return true;
+            }
+        } else if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) data;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (ascc.isDirty()) {
+                return true;
+            }
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) data;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (bcc.isDirty()) {
+                return true;
+            }
+        }
+
+        for (TreeNode childNode : treeNode.getChildren()) {
+            if (isDirty(childNode)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public AggregateCoreComponent getUserExtensionAcc() {
@@ -259,6 +293,17 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        for (TreeNode child : treeNode.getChildren()) {
+            if (isDirty(child)) {
+                Object data = child.getData();
+                if (data instanceof ASCCPNode) {
+                    updateAscc(child);
+                } else if (data instanceof BCCPNode) {
+                    updateBcc(child);
+                }
+            }
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -286,6 +331,22 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void onChangeObjectClassTerm(ACCNode accNode) {
+        for (CCNode child : accNode.getChildren()) {
+            if (child instanceof ASCCPNode) {
+                ASCCPNode asccpNode = (ASCCPNode) child;
+                AggregateCoreComponent acc = accNode.getAcc();
+                AssociationCoreComponent ascc = asccpNode.getAscc();
+                AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
+                ascc.setDen(acc, asccp);
+            } else if (child instanceof BCCPNode) {
+                BCCPNode bccpNode = (BCCPNode) child;
+                AggregateCoreComponent acc = accNode.getAcc();
+                BasicCoreComponent bcc = bccpNode.getBcc();
+                BasicCoreComponentProperty bccp = bccpNode.getBccp();
+                bcc.setDen(acc, bccp);
+            }
+        }
+
         setNodeName(accNode);
     }
 
@@ -394,7 +455,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
 
         AssociationCoreComponentProperty tAsccp = asccpRepository.findOne(selectedAsccpLookup.getAsccpId());
-        AggregateCoreComponent pAcc = getUserExtensionAcc();
+        AggregateCoreComponent pAcc = getTargetAcc();
 
         if (extensionService.exists(pAcc, tAsccp)) {
             FacesContext.getCurrentInstance().addMessage(null,
@@ -409,8 +470,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
-        ASCCPNode asccpNode =
-                nodeService.createCoreComponentTreeNode(result.getAscc());
+        ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(result.getAscc());
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -526,7 +586,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
 
         BasicCoreComponentProperty tBccp = bccpRepository.findOne(selectedBccpLookup.getBccpId());
-        AggregateCoreComponent pAcc = getUserExtensionAcc();
+        AggregateCoreComponent pAcc = getTargetAcc();
 
         if (extensionService.exists(pAcc, tBccp)) {
             FacesContext.getCurrentInstance().addMessage(null,
@@ -541,8 +601,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
-        BCCPNode bccpNode =
-                nodeService.createCoreComponentTreeNode(result.getBcc());
+        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(result.getBcc());
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -596,7 +655,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     public void updateBcc(TreeNode treeNode) {
         BCCPNode bccpNode = (BCCPNode) treeNode.getData();
         BasicCoreComponent bcc = bccpNode.getBcc();
-        if (!bccpNode.getChildren().isEmpty() && Element == bcc.getEntityType()) {
+        if (!bccpNode.getChildren().isEmpty() && Attribute == bcc.getEntityType()) {
             throw new IllegalStateException("Only BBIE without SCs can be made Attribute.");
         }
 

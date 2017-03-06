@@ -222,13 +222,6 @@ public class CoreComponentService {
         accHistory.setCurrentAccId(currentAccId);
 
         accRepository.saveAndFlush(accHistory);
-
-        // to check RevisionTrackingNum
-        latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
-        long actualRevisionTrackingNum = latestAcc.getRevisionTrackingNum();
-        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
-        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -311,13 +304,6 @@ public class CoreComponentService {
         asccHistory.setCurrentAsccId(currentAsccId);
 
         asccRepository.saveAndFlush(asccHistory);
-
-        // to check RevisionTrackingNum
-        latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
-        long actualRevisionTrackingNum = latestAscc.getRevisionTrackingNum();
-        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
-        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -386,13 +372,6 @@ public class CoreComponentService {
         bccHistory.setCurrentBccId(currentBccId);
 
         bccRepository.saveAndFlush(bccHistory);
-
-        // to check RevisionTrackingNum
-        latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
-        long actualRevisionTrackingNum = latestBcc.getRevisionTrackingNum();
-        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
-        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -445,13 +424,6 @@ public class CoreComponentService {
         asccpHistory.setCurrentAsccpId(currentAsccpId);
 
         asccpRepository.saveAndFlush(asccpHistory);
-
-        // to check RevisionTrackingNum
-        latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
-        long actualRevisionTrackingNum = latestAsccp.getRevisionTrackingNum();
-        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("AssociationCoreComponentProperty was modified outside of this operation");
-        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -498,13 +470,6 @@ public class CoreComponentService {
         bccpHistory.setCurrentBccpId(currentBccpId);
 
         bccpRepository.saveAndFlush(bccpHistory);
-
-        // to check RevisionTrackingNum
-        latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
-        long actualRevisionTrackingNum = latestBccp.getRevisionTrackingNum();
-        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
-            throw new ConcurrentModificationException("BasicCoreComponentProperty was modified outside of this operation");
-        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
