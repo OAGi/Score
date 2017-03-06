@@ -56,11 +56,11 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionNum = (" +
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId)")
-    public BasicCoreComponent findLatestOneByCurrentBccId(long currentBccId);
+    public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccId(long currentBccId);
 
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionNum = (" +
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 and b.seqKey > 0 group by b.currentBccId)")
-    public BasicCoreComponent findLatestOneByCurrentBccIdAndSeqKeyIsNotZero(long currentBccId);
+    public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccIdAndSeqKeyIsNotZero(long currentBccId);
 
     @Modifying
     @Query("update BasicCoreComponent b set b.seqKey = b.seqKey + 1 " +

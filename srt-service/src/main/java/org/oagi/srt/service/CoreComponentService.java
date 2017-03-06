@@ -206,22 +206,34 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAccId = acc.getAccId();
-        AggregateCoreComponent latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
-        if (latestAcc == null) {
+        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        if (latestHistoryAccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         accRepository.save(acc);
 
-        int nextRevisionTrackingNum = latestAcc.getRevisionTrackingNum() + 1;
+        int latestRevisionTrackingNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AggregateCoreComponent accHistory = acc.clone();
-        accHistory.setRevisionNum(latestAcc.getRevisionNum());
+        accHistory.setRevisionNum(latestHistoryAccList.get(0).getRevisionNum());
         accHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         accHistory.setRevisionAction(Update);
         accHistory.setLastUpdatedBy(requesterId);
         accHistory.setCurrentAccId(currentAccId);
 
         accRepository.saveAndFlush(accHistory);
+
+        // to check RevisionTrackingNum
+        latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        int actualRevisionTrackingNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -270,13 +282,14 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAccId = acc.getAccId();
-        AggregateCoreComponent latestAcc = accRepository.findLatestOneByCurrentAccId(currentAccId);
-        if (latestAcc == null) {
+        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        if (latestHistoryAccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         long accId = acc.getAccId();
         accRepository.deleteByCurrentAccId(accId); // To remove history
+        accRepository.delete(acc);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -288,22 +301,34 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccId = ascc.getAsccId();
-        AssociationCoreComponent latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
-        if (latestAscc == null) {
+        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        if (latestHistoryAsccList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         asccRepository.save(ascc);
 
-        int nextRevisionTrackingNum = latestAscc.getRevisionTrackingNum() + 1;
+        int latestRevisionTrackingNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponent asccHistory = ascc.clone();
-        asccHistory.setRevisionNum(latestAscc.getRevisionNum());
+        asccHistory.setRevisionNum(latestHistoryAsccList.get(0).getRevisionNum());
         asccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
 
         asccRepository.saveAndFlush(asccHistory);
+
+        // to check RevisionTrackingNum
+        latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        int actualRevisionTrackingNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -315,8 +340,8 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccId = ascc.getAsccId();
-        AssociationCoreComponent latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
-        if (latestAscc == null) {
+        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        if (latestHistoryAsccList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
@@ -338,8 +363,8 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccId = bcc.getBccId();
-        BasicCoreComponent latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
-        if (latestBcc == null) {
+        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        if (latestHistoryBccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
@@ -363,15 +388,27 @@ public class CoreComponentService {
 
         bccRepository.save(bcc);
 
-        int nextRevisionTrackingNum = latestBcc.getRevisionTrackingNum() + 1;
+        int latestRevisionTrackingNum = latestHistoryBccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponent bccHistory = bcc.clone();
-        bccHistory.setRevisionNum(latestBcc.getRevisionNum());
+        bccHistory.setRevisionNum(latestHistoryBccList.get(0).getRevisionNum());
         bccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
 
         bccRepository.saveAndFlush(bccHistory);
+
+        // to check RevisionTrackingNum
+        latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        int actualRevisionTrackingNum = latestHistoryBccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -383,8 +420,8 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccId = bcc.getBccId();
-        BasicCoreComponent latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
-        if (latestBcc == null) {
+        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        if (latestHistoryBccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
@@ -408,22 +445,35 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccpId = asccp.getAsccpId();
-        AssociationCoreComponentProperty latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
-        if (latestAsccp == null) {
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList =
+                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        if (latestHistoryAsccpList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         asccpRepository.save(asccp);
 
-        int nextRevisionTrackingNum = latestAsccp.getRevisionTrackingNum() + 1;
+        int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponentProperty asccpHistory = asccp.clone();
-        asccpHistory.setRevisionNum(latestAsccp.getRevisionNum());
+        asccpHistory.setRevisionNum(latestHistoryAsccpList.get(0).getRevisionNum());
         asccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccpHistory.setRevisionAction(Update);
         asccpHistory.setLastUpdatedBy(requesterId);
         asccpHistory.setCurrentAsccpId(currentAsccpId);
 
         asccpRepository.saveAndFlush(asccpHistory);
+
+        // to check RevisionTrackingNum
+        latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        int actualRevisionTrackingNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AssociationCoreComponentProperty was modified outside of this operation");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -435,8 +485,9 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccpId = asccp.getAsccpId();
-        AssociationCoreComponentProperty latestAsccp = asccpRepository.findLatestOneByCurrentAsccpId(currentAsccpId);
-        if (latestAsccp == null) {
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList =
+                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        if (latestHistoryAsccpList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
@@ -454,22 +505,35 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccpId = bccp.getBccpId();
-        BasicCoreComponentProperty latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
-        if (latestBccp == null) {
+        List<BasicCoreComponentProperty> latestHistoryBccpList =
+                bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        if (latestHistoryBccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         bccpRepository.save(bccp);
 
-        int nextRevisionTrackingNum = latestBccp.getRevisionTrackingNum() + 1;
+        int latestRevisionTrackingNum = latestHistoryBccpList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponentProperty bccpHistory = bccp.clone();
-        bccpHistory.setRevisionNum(latestBccp.getRevisionNum());
+        bccpHistory.setRevisionNum(latestHistoryBccpList.get(0).getRevisionNum());
         bccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccpHistory.setRevisionAction(Update);
         bccpHistory.setLastUpdatedBy(requesterId);
         bccpHistory.setCurrentBccpId(currentBccpId);
 
         bccpRepository.saveAndFlush(bccpHistory);
+
+        // to check RevisionTrackingNum
+        latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        int actualRevisionTrackingNum = latestHistoryBccpList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("BasicCoreComponentProperty was modified outside of this operation");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -481,8 +545,8 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccpId = bccp.getBccpId();
-        BasicCoreComponentProperty latestBccp = bccpRepository.findLatestOneByCurrentBccpId(currentBccpId);
-        if (latestBccp == null) {
+        List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        if (latestHistoryBccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
@@ -493,8 +557,10 @@ public class CoreComponentService {
 
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
         long bccId = latestBcc.getBccId();
-        BasicCoreComponent latestHistory = bccRepository.findLatestOneByCurrentBccIdAndSeqKeyIsNotZero(bccId);
-        return (latestHistory != null) ? latestHistory.getSeqKey() : 0;
+        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(bccId);
+        return latestHistoryBccList.stream()
+                .mapToInt(e -> e.getSeqKey())
+                .max().orElseGet(() -> 0);
     }
 
     private void increaseSeqKeyGreaterThan(long fromAccId, int seqKey) {

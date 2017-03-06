@@ -132,16 +132,25 @@ public class ExtensionService {
     public AggregateCoreComponent updateRevisionNumberOfUserExtensionGroupACC(
             AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc, User currentLoginUser) {
         updateStateACCForException(ueAcc, currentLoginUser);
-        AggregateCoreComponent latestHistoryAcc = accRepository.findLatestOneByCurrentAccId(ueAcc.getAccId());
-        createACCHistoryForExtension(ueAcc, latestHistoryAcc.getRevisionNum() + 1);
+        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(ueAcc.getAccId());
+        int latestRevisionTrackingNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        createACCHistoryForExtension(ueAcc, latestRevisionTrackingNum + 1);
 
         AssociationCoreComponentProperty ueAsccp = getASCCPForExtension(ueAcc);
-        AssociationCoreComponentProperty latestHistoryAsccp = asccpRepository.findLatestOneByCurrentAsccpId(ueAsccp.getAsccpId());
-        createASCCPHistoryForExtension(ueAsccp, latestHistoryAsccp.getRevisionNum() + 1);
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(ueAsccp.getAsccpId());
+        latestRevisionTrackingNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        createASCCPHistoryForExtension(ueAsccp, latestRevisionTrackingNum + 1);
 
         AssociationCoreComponent ueAscc = getASCCForException(eAcc, ueAsccp);
-        AssociationCoreComponent latestHistoryAscc = asccRepository.findLatestOneByCurrentAsccId(ueAscc.getAsccId());
-        createASCCHistoryForExtension(ueAscc, latestHistoryAscc.getRevisionNum() + 1);
+        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(ueAscc.getAsccId());
+        latestRevisionTrackingNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionTrackingNum())
+                .max().getAsInt();
+        createASCCHistoryForExtension(ueAscc, latestRevisionTrackingNum + 1);
 
         return ueAcc;
     }
