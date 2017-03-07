@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgeOpportunity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Opportunity.xsd"/>
+	<xsd:element name="CancelAcknowledgeOpportunity" type="CancelAcknowledgeOpportunityType" id="oagis-id-45855049b9604a6ab32a91e559a56130">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeOpportunity is to enable an application to provide Opportunity information from one business application to another business application. The CancelAcknowledgeOpportunityis provided in response to the ProcessCart in order to request a CancelAcknowledge to process the cart. The Chagne is directed from the owner of the information (the receiver of the Process) the originator of the Process.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeOpportunityType" id="oagis-id-6f271d85146a4015bdf7f352628d8e7b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeOpportunityDataAreaType" id="oagis-id-1936a6f8ba094b2d97c88cd036d1eb81">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeOpportunity. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (Opportunity).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeOpportunityDataAreaType" id="oagis-id-6ff5f1784886419bb9a6158dbbadda27">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-746f5373d28444c1860737fa910d35be"/>
+			<xsd:element ref="Opportunity" maxOccurs="unbounded" id="oagis-id-5dfe2afe9d3b404188620c1fc2404009"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

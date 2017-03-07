@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessRequisition.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="WorkOrder" type="WorkOrderType" id="oagis-id-e24f036c5c5f4ff69d0b1aa24ebff18f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a request for the purchase of goods or services.  Typically, a WorkOrder leads to the creation of a purchase order to a specific supplier.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="WorkOrderType" id="oagis-id-74931af7739043cd9ef4360f36ff1120">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a request for the purchase of goods or services.  Typically, a WorkOrder leads to the creation of a purchase order to a specific supplier.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="WorkOrderHeader" minOccurs="0" id="oagis-id-1f4b905fb3b34f8fa44c4a1a28da863c"/>
+			<xsd:element ref="WorkOrderLine" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c7098888f28848f0846b75e9b5239dec"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f17dd1fe69dc4728b41eb8086a8621e3"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-380716cc787b4997aafffb5ea5a7d1a8"/>
+	</xsd:complexType>
+	<xsd:element name="WorkOrderHeader" type="WorkOrderHeaderType" id="oagis-id-bb68cd93e59645c19f48c6644671f772">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the WorkOrder.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="WorkOrderHeaderType" id="oagis-id-b6cec74e08f14016b3cb7b87074a1904">
+		<xsd:complexContent>
+			<xsd:extension base="WorkOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WorkOrderHeaderExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-fb34819dfdc845e7abac10bae3e7212c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WorkOrderHeaderBaseType" id="oagis-id-f5532bd4c0224d648f32df68d43c5177">
+		<xsd:complexContent>
+			<xsd:extension base="RequestHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseOrderReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-f3d586d4fad64742b191b70d9d9eb973"/>
+					<xsd:element ref="BuyerParty" minOccurs="0" id="oagis-id-7c2360f1201849ceb486e378b56d59c1"/>
+					<xsd:element ref="RequesterParty" minOccurs="0" id="oagis-id-3f2807c11ad84c848407e030314caefb"/>
+					<xsd:element ref="RequiredDeliveryDateTime" minOccurs="0" id="oagis-id-8fbcac57d00342059d8f0f1ef0945e26"/>
+					<xsd:element ref="SalesOrderReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-65f32ba4580c4a43b35bf9998dc8b895"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="WorkOrderLine" type="WorkOrderLineType" id="oagis-id-3016587505a64e6e92a24ff033226aa0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the requested item and its attributes.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="WorkOrderLineType" id="oagis-id-d98392cf8494455bbad28af1c86c2a56">
+		<xsd:complexContent>
+			<xsd:extension base="WorkOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="WorkOrderSubLine" type="WorkOrderSubLineType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-31341d09ff1c474e91ecda91e59536b1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Used if the item on the REQLINE needs to be divided into smaller units such as sub-components or subassemblies.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Extension" type="WorkOrderLineExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-996e471dced342118c2b76f5b445666b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WorkOrderLineBaseType" id="oagis-id-867d32a451ee45e9a140c90bb306a3f2">
+		<xsd:complexContent>
+			<xsd:extension base="RequestLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RequestedQuantity" minOccurs="0" maxOccurs="unbounded" id="oagis-id-6021cbe1fbaa4b23a48ea13c0ceba343"/>
+					<xsd:element ref="RequesterParty" minOccurs="0" id="oagis-id-9316b1511c38403aa3df655bffaeebb2"/>
+					<xsd:element ref="WorkOrderSchedule" minOccurs="0" maxOccurs="unbounded" id="oagis-id-b368c6d4d1104cf9baf1009d4f1299be"/>
+					<xsd:element ref="OperationReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-59413dd2488e479e80aa7ee00d24c735"/>
+					<xsd:element ref="ResourceAllocation" minOccurs="0" maxOccurs="unbounded" id="oagis-id-847bbd6b12664341857741b7c19aeff4"/>
+					<xsd:element ref="Distribution" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c473618698b94994be3464b10c92fbb6"/>
+					<xsd:element ref="EstimatedAllocateResources" minOccurs="0" maxOccurs="unbounded" id="oagis-id-39a368aeb05a4e36a91f95440bb4377b"/>
+					<xsd:element ref="Operation" minOccurs="0" maxOccurs="unbounded" id="oagis-id-56906424f8194dc4835b6716ea3be40c">
+						<xsd:annotation>
+							<xsd:documentation>Describes the details of WorkOrderLineActivity and its execution requirement</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Specification" minOccurs="0" maxOccurs="unbounded" id="oagis-id-e32684babf324064af631501fd3aecb1"/>
+					<xsd:element ref="BOMReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-8f9f3cc9133d415ba4c7883137f9c70d"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+	<xsd:element name="WorkOrderSchedule" type="WorkOrderScheduldeType" id="oagis-id-f1d8dab461114cc69b075655b61fcf22"/>
+	<xsd:complexType name="WorkOrderScheduldeType" id="oagis-id-7c1b703a260a43abb267293400bcc988">
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WorkOrderScheduleExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-99f193fc8fe74df8b9c38aedeee10579"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+	<xsd:element name="WorkOrderSubLine" type="WorkOrderSubLineType" id="oagis-id-62902c48b3154bf0b43b111aaf67b191">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Used if the item on the WorkOrderLine needs to be divided into smaller units such as sub-components or subassemblies.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="WorkOrderSubLineType" id="oagis-id-a45ed2c7eec044bf89bc93a6a32bcaa6">
+		<xsd:complexContent>
+			<xsd:extension base="WorkOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WorkOrderSubLineExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-b6636d701c914de2bac40744e109440a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+	<!---->
+</xsd:schema>

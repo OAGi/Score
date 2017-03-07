@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/ProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="ProjectAccounting" type="ProjectAccountingType" id="oagis-id-73b8bf178cdf4d32979ff0b4f266b49e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This is used to enable all relevant sub-systems that submit single sided transactions to send information to a Project Accounting Application. This would include, but not necessarily be limited to: Accounts Payable, Accounts Receivable, Budget, Order Management, Purchasing, Time and Labor, Travel and Expense.
+
+ProjectAccounting is a synonym for Project, and the LoadProjectAccounting BOD has the effect of populating the Project's TotalCost field or the ProjectActivities' Cost fields.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProjectAccountingBaseType" id="oagis-id-803d4dd0431142199e223c21e8493837">
+		<xsd:complexContent>
+			<xsd:extension base="ProjectReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PaymentDateTime" id="oagis-id-2fe10502191e438ab03838a9a5fbe4b4" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Item" id="oagis-id-d44458c459dc43b2b4afa11a2a5df0ac" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemQuantity" id="oagis-id-f259c36ee9db47f2ac9aa2ca076605a9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductLineID" id="oagis-id-b3a885f540a14c74b1f7eafcc05fecd3" minOccurs="0"/>
+					<xsd:element ref="EmployeeID" id="oagis-id-ba6dc56ca610416fb62ccab53f54b3cd" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An identifier that identifies an employee.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FixedAssetID" id="oagis-id-42d30654add5448c86aa462519a84651" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the FixedAssetID associated with an associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="JobCode" id="oagis-id-05e8ea2803f34dccbf058257d1a47ba0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is a grouping of similar or equivalent job descriptions</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EnterpriseUnit" id="oagis-id-03afdc9a924d41609fe91d93a75d7a95" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the agiven portion of an organization.
+
+Some commonly defined  Units are identified here.
+
+These units are typically used to track financial data in reporting systems within an organization. Similar to Business Units, Organizational Units are only  relevant within an enterprise</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PurchaseOrderReference" id="oagis-id-f5b5432093e744aaa405b419d067baf8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a PurchaseOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesOrderReference" id="oagis-id-88c73fc3f92149dd8086453fba6eb976" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a SalesOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="VoucherReference" id="oagis-id-b987b4d765dc4e3d857da93a6a4ca056" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a voucher document. This is typically an internal voucher, possibly created as a a payable reference against an external invoice </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-1e862e84abed47ff9f790962b480d3e2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-41fd5c3e53fb4fbaaa1a149bebfd5279"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProjectAccountingType" id="oagis-id-836f5c613d47483f88b91667eff151b5">
+		<xsd:complexContent>
+			<xsd:extension base="ProjectAccountingBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProjectAccountingExtensionType" id="oagis-id-db39d030b9044cad9f241968a27f13b9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

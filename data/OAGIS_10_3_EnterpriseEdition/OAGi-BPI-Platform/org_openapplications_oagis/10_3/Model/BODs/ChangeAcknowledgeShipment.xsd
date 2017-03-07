@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeShipment.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Shipment.xsd"/>
+	<xsd:element name="ChangeAcknowledgeShipment" type="ChangeAcknowledgeShipmentType" id="oagis-id-c268845d360a4b3bbe9d857197201735">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeShipment Business Object Document is to ChangeAcknowledge receipt of the Shipment</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeShipmentType" id="oagis-id-a2e80d50d99448a8af4e140fc3ea6985">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeShipmentDataAreaType" id="oagis-id-e29d7d76e3be4a769f0f963ec1473f82">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeShipment. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (Shipment).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeShipmentDataAreaType" id="oagis-id-290ed87de6d74dd59ef3e8dfb4d22c09">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-1df7b2e3655b4599aa529dd84bc55dbd"/>
+			<xsd:element ref="Shipment" maxOccurs="unbounded" id="oagis-id-c1bd7ea7068d4ef09329b66c2cae8372"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

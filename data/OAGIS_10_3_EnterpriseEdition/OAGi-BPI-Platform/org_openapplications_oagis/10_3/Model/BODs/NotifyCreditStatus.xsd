@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyCreditStatus.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CreditStatus.xsd"/>
+        <xsd:element name="NotifyCreditStatus" type="NotifyCreditStatusType" id="oagis-id-11b754512b4d4f3cb3818dec836bdb38">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyCreditStatus is to supply CreditStatus information to another business application module. 
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyCreditStatusType" id="oagis-id-53456b3611534cdfa4456eac25574970">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyCreditStatusDataAreaType" id="oagis-id-b1a58680fb0e4e799f5cd250ae82b56a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyCreditStatus. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (CreditStatus).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyCreditStatusDataAreaType" id="oagis-id-114da7406fb241bd921f18a7abba77ec">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-00966d59eec44b6cb782f5b9c043160b"/>
+                        <xsd:element ref="CreditStatus" maxOccurs="unbounded" id="oagis-id-85f897602534483cbef4d00e52b5a671"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

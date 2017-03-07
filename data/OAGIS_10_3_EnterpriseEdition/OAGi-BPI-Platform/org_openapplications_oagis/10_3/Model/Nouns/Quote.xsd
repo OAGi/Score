@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/Quote.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="Quote" type="QuoteType" id="oagis-id-bd6dcbe14c3547cbbc7d7d1a4cb7cae1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a document describing the prices of goods or services provided by a vendor.  The Quote includes the terms of the purchase, delivery proposals, identification of goods or services ordered, as well as their quantities.The Quote noun is used in conjunction with the RFQ noun to form a Business-to-Business negotiation dialogue concerning the goods or services specified.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="QuoteHeader" type="QuoteHeaderType" id="oagis-id-ed89a4a4b72d4c7abffae4e4364de384">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">- Information that applies to the entire quote.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="QuoteLine" type="QuoteLineType" id="oagis-id-479b440ab7994c52b58737bc14236784">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The item or product quoted along with quantity, price and other descriptive information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="QuoteSubLine" type="QuoteSubLineType" id="oagis-id-e9f989e58dc04d378f3fb163c9fb8377">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Subline represents any additional information concerning the product on the Line.  The Subline can be used to describe a specific configuration of the ordered item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="QuoteSchedule" type="QuoteScheduleType" id="oagis-id-729ffd6e820741f2a20876d6c0097b18">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Indicates the schedule for the delivery of this line item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="QuoteType" id="oagis-id-78fe0fb6ac94488c80fc36571e8654a6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the Quote structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="QuoteHeader" id="oagis-id-889a381daa964845b3d4d4d22504b41d" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">- Information that applies to the entire quote.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="QuoteLine" id="oagis-id-e2963a63622e4065a32b3ea3e77d29f2" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The item or product quoted along with quantity, price and other descriptive information.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-80c2b7301f9245ca8bfa86a4bd79372e"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-8bdf64cf6dc04272877e5135324ee60b"/>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteHeaderBaseType" id="oagis-id-5b35f04f0a2041d8be8e49eca58fb2ce">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the Quote Header structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RFQReference" id="oagis-id-bfc46565cc5243eb9baf3389f4f6f7a3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a RFQ</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-2d8dbd3cfa90460ca755f4466821145d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="QualificationTerm" id="oagis-id-7e15c6faf6e841d5902ac414d66bb7e1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to describe preferences that will be used to evaluate responses to an RFQ. For example, to identify a preference for sharing CAD data in VRML format the ID = VRML, Type = CAD and Value = 1 or Yes</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderCommission" id="oagis-id-f5a24c175ad94218aa19fbc6f5c11797" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the relevant information about the salesperson and the associated commission information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Message" id="oagis-id-8c777ee6695045e6a0bc459e5fb1586e" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteHeaderType" id="oagis-id-982a227b35ba445d8d7daa2b90716ca6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the Quote Header structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="QuoteHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="QuoteHeaderExtensionType" id="oagis-id-0a100af3ea694aee97f9494a190bb074" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteLineBaseType" id="oagis-id-6b822f4f0ad041eb956fb33299f218b7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the Quote Line structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="QuoteQuantity" minOccurs="0" maxOccurs="unbounded" id="oagis-id-eafafe809f4c4713a20e61250536965c"/>
+					<xsd:element ref="RFQReference" id="oagis-id-8851546b4a194efc87cedd19d4a097ba" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a RFQ</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-9db543a71cac4a179da2d0bf795a29d8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PromisedShipDateTime" id="oagis-id-1961db965340449fb7a7a6cabdd5fb42" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the associated object was promised to be shipped from the supplier.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PromisedDeliveryDateTime" id="oagis-id-2ccca10a91c7449eb78edf3ddc445d91" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the associated was promised to be delivered to the customer or consumer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DeliveryTimeTolerance" id="oagis-id-10ce38e9be744f2bbd73cee1b6d698b9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicated the flexibility in the required delivery date that is allowed by the requestor</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderCommission" id="oagis-id-2dbf7ca6eb15456690b1df997af7fa83" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the relevant information about the salesperson and the associated commission information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Message" id="oagis-id-0c4650b380d1448f820ff7e98c4a1b04" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="QuoteSchedule" id="oagis-id-5994a068b3dc4ead980f6de4b35e1eab" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Indicates the schedule for the delivery of this line item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteLineType" id="oagis-id-ace6c4deae7645dc943ac6ca27234179">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the Quote Line structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="QuoteLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="QuoteSubLine" id="oagis-id-5d3ed9a102fa4975a4f7e26c3d3bc4d9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Subline represents any additional information concerning the product on the Line.  The Subline can be used to describe a specific configuration of the ordered item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Extension" type="QuoteLineExtensionType" id="oagis-id-2b04d4070d234e5ea3b84226a7de9979" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteSubLineType" id="oagis-id-2cbfb72f3378455ca015e6775ca96793">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines the QuoteSubLine structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="QuoteLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="QuoteSubLineExtensionType" id="oagis-id-e7f61ee27ec641e3822cdcf9bbfeadea" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteScheduleBaseType" id="oagis-id-8f6258947eb242b498989a844874e6fd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Indicates the schedule for the order items to be delivered.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PromisedDeliveryDateTime" id="oagis-id-1986856c72dd43c7a0c85a657cb6b640" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the associated was promised to be delivered to the customer or consumer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PromisedShipDateTime" id="oagis-id-e4e55327b5ac46699a29dfcd5591dce9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the associated object was promised to be shipped from the supplier.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderCommission" id="oagis-id-2d5c34faf63446e89960b3c19de1ef6d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the relevant information about the salesperson and the associated commission information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="QuoteScheduleType" id="oagis-id-0e0f267a696546d8a04d5f379c3ef336">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Indicates the schedule for the order items to be delivered.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="QuoteScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="QuoteScheduleExtensionType" id="oagis-id-78c2e1fc06664e1ca9f68684664af638" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

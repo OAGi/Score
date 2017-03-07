@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+        <xsd:element name="ShowOperation" type="ShowOperationType" id="oagis-id-345cbaafe29d4fedbe6114ac17cb19f7">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowOperation is to enable an application to request specific online shopping Operation from another business application module.  The response to the GetOperation is the ShowOperation.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowOperationType" id="oagis-id-07496179b0224cbcb0cb9e6b68923d9d">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowOperationDataAreaType" id="oagis-id-623adcc7c4764a99a325b6b292a2e048">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowOperation. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowOperationDataAreaType" id="oagis-id-f42df7f1781c41768505d95dd7069f10">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-f1e14f541b9f44cb8815f5594647dbeb"/>
+                        <xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-9d3a4490d79d48c993a281723c96c22e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

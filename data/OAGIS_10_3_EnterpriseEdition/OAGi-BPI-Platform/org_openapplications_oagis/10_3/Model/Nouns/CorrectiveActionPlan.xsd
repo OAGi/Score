@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/CorrectiveActionPlan.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="CorrectiveActionPlan" type="CorrectiveActionPlanType" id="oagis-id-c790cae18fc14eb9a5665f2a3e5dbd39">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A formal description of the problem and the plan (including schedule) for eliminating its recurrence.  This is typically offered to the party(ies) affected by the problem for approval prior to the plan’s implementation. AcknowledgeCorrectiveActionPlan acknowledges an agreement of proposed plan or not.			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CorrectiveActionPlanType" id="oagis-id-76d24ae320574878882c696cb9ed50e0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A formal description of the problem and the plan (including schedule) for eliminating its recurrence.  This is typically offered to the party(ies) affected by the problem for approval prior to the plan’s implementation. AcknowledgeCorrectiveActionPlan acknowledges an agreement of proposed plan or not.			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CorrectiveActionPlanBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CorrectiveActionPlanExtensionType" id="oagis-id-20fe8354a41947b1b80119017b366478" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CorrectiveActionPlanBaseType" id="oagis-id-6d851009b288456f93b891b0959795ec">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="CorrectiveActionPlanDocumentReference" id="oagis-id-860e1675f1d543d3b2735246960cb33f" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Status" id="oagis-id-b0b2dc3eebc640d5a53db7216b7ed809" minOccurs="0"/>
+					<xsd:element ref="CorrectiveActionRequestReference" id="oagis-id-8b1edcffe7c243ad9d8b51c4257c7aad" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ResponsiblePersonReferenceID" id="oagis-id-be0c354bda9946dfaa5da4e08ce2ab07" minOccurs="0"/>
+					<xsd:element ref="CorrectiveActionPlanApproval" id="oagis-id-1ac0e93e9b5546548cbd6767f51e6c18" minOccurs="0"/>
+					<xsd:element ref="RootCauseNote" id="oagis-id-5970e4627aa5413d9df4290bfce87e1f" minOccurs="0"/>
+					<xsd:element ref="Item" id="oagis-id-3b37748434ad4c35b926823c36b8fcf7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="LastModifiedByPersonContact" id="oagis-id-8afd9d59b6414c658a9fa61534c179a1" minOccurs="0"/>
+					<xsd:element ref="PlannedTimePeriod" id="oagis-id-12d26bb1ea8d4f1fb9b27d5a46043fd9" minOccurs="0"/>
+					<xsd:element ref="Classification" id="oagis-id-38c2a8edd0ee4a57a406cf6ce2a8f973" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PlannedCorrectiveActionReference" id="oagis-id-92d4af57721d478ab51f7b864aa5707b" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CorrectiveActionPlanApproval" type="CorrectiveActionPlanApprovalType" id="oagis-id-cdbfbe72318a4ccdb0088e57905e3f7c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information related to the approval of a CorrectiveActionPlan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CorrectiveActionPlanApprovalType" id="oagis-id-51138abea7bb4ea9bb4a6e08e29f11cf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information related to the approval of a CorrectiveActionPlan</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CorrectiveActionPlanApprovalBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CorrectiveActionPlanApprovalExtensionType" id="oagis-id-01e9a46f51434d529905391fe2f63c6c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CorrectiveActionPlanApprovalBaseType" id="oagis-id-91d0fc8cd86849cf8f4015e297ff2fa3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="DocumentReference" id="oagis-id-58ed70a8a53a4346b24c40aad994170a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-5095d341ee4b48e3b2434930e78b1b5f" minOccurs="0"/>
+					<xsd:element ref="ApprovalPersonContact" id="oagis-id-f8cd5687a3cc4fd2917be929d0dfd623" minOccurs="0"/>
+					<xsd:element ref="ApprovalEffectiveTimePeriod" id="oagis-id-bd7819f8b6ed4fe4942bca2a6c4fc091" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+</xsd:schema>

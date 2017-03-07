@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelEngineeringChangeOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EngineeringChangeOrder.xsd"/>
+        <xsd:element name="CancelEngineeringChangeOrder" type="CancelEngineeringChangeOrderType" id="oagis-id-1f5d0452fe4e4c018730e89413f2e2d5">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelEngineeringChangeOrder is to publish to a business application or system the need to cancel an EngineeringChangeOrder or one or more of its elements</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="CancelEngineeringChangeOrderType" id="oagis-id-07a8eeb26d4d47bbb6fa9b4af31b705b">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="CancelEngineeringChangeOrderDataAreaType" id="oagis-id-fc3261d6fd484bf483826fee6dd32ca2">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelEngineeringChangeOrder. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (EngineeringChangeOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="CancelEngineeringChangeOrderDataAreaType" id="oagis-id-6c9499002d444b9296f1f00e14f0efe3">
+                <xsd:sequence>
+                        <xsd:element ref="Cancel" id="oagis-id-3e3a4cc91fb5428f9de07a14e15e6cdd"/>
+                        <xsd:element ref="EngineeringChangeOrder" maxOccurs="unbounded" id="oagis-id-1b53ea476742442295209f2363843523"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

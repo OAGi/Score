@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/AcknowledgeCorrectiveActionRequest.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveActionRequest.xsd"/>
+	<xsd:element name="AcknowledgeCorrectiveActionRequest" type="AcknowledgeCorrectiveActionRequestType" id="oagis-id-f8765f08dd1d4489937f0bf28b0659b7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeCorrectiveActionRequest is to communicate to a business application module or system the need to initiate the creation of a CorrectiveActionRequest structure.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeCorrectiveActionRequestType" id="oagis-id-76ed93edd021418f821f838368446b8e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeCorrectiveActionRequestDataAreaType" id="oagis-id-f5a17c0a42da44babdc10667b216968a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeCorrectiveActionRequest. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (CorrectiveActionRequest).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeCorrectiveActionRequestDataAreaType" id="oagis-id-43e7fc8dafdc4433b06b5f3b6f07cc54">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-378e8983e40546498f8e27a342027a58"/>
+			<xsd:element ref="CorrectiveActionRequest" id="oagis-id-aa1a2ce645354f17833e3522484d9f65"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

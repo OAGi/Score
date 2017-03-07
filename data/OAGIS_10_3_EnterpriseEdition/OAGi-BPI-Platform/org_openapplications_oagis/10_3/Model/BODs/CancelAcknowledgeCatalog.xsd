@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgeCatalog.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Catalog.xsd"/>
+	<xsd:element name="CancelAcknowledgeCatalog" type="CancelAcknowledgeCatalogType" id="oagis-id-bee9c2793e824f66972ca5cd7f768892">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CancelAcknowledgeCatalog is used to CancelAcknowledgehronize catalog information across systems. The CancelAcknowledge indicates that the send of the CancelAcknowledgeCatalog is the owner of the information being passed, additionally it is understood that the receiver of the CancelAcknowledgeCatalog is a sub-system that must accept the data as provided by the owne of the information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeCatalogType" id="oagis-id-e7d8874380e84d8aa6a2025dd119ec86">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeCatalogDataAreaType" id="oagis-id-3f90c0b7467a430182505e24447294df">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeCatalog. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (Catalog).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeCatalogDataAreaType" id="oagis-id-6adb3a9e48414a5793256b8869fee300">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-a89c6d22d7e04af0ae6737f06df3c608"/>
+			<xsd:element ref="Catalog" maxOccurs="unbounded" id="oagis-id-4a3c5c40202c4ed6913812c6f76a40c2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

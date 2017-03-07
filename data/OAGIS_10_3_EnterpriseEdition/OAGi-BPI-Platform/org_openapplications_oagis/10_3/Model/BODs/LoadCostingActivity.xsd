@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/LoadCostingActivity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CostingActivity.xsd"/>
+	<xsd:element name="LoadCostingActivity" type="LoadCostingActivityType" id="oagis-id-ab53277c75d84993b04a646caf9126a5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadCostingActivity is to enable an application to request specific CostingActivity information from another business application module.  The response to the LoadCostingActivity is the ShowCostingActivity.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LoadCostingActivityType" id="oagis-id-053212b4d48b4c73bad8c135fb7d758a">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="LoadCostingActivityDataAreaType" id="oagis-id-f32adb69431440578b4c739f68ee7329">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadCostingActivity. The information consists of a Verb and one or more Nouns. The verb (Load) indicates the action to be performed on the Noun (CostingActivity).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LoadCostingActivityDataAreaType" id="oagis-id-f3599c44ff9b4570a7a4446dbbb8b5a1">
+		<xsd:sequence>
+			<xsd:element ref="Load" id="oagis-id-c944f43d9e884f4eaed2f0fbe1419519"/>
+			<xsd:element ref="CostingActivity" maxOccurs="unbounded" id="oagis-id-bb6d7295631c4d59a93b295daa97b0fc"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

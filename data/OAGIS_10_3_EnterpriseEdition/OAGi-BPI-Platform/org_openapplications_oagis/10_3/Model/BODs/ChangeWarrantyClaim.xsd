@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeWarrantyClaim.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarrantyClaim.xsd"/>
+	<xsd:element name="ChangeWarrantyClaim" type="ChangeWarrantyClaimType" id="oagis-id-2efc98b664984a16967ea9a8789f07a0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeWarrantyClaim is to transmit an WarrantyClaim from a supplier to a customer. Indicating that the receiver of the WarrantyClaim is to Change the WarrantyClaim for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeWarrantyClaimType" id="oagis-id-60105b279ff7470bb2b1a136cbc90736">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeWarrantyClaimDataAreaType" id="oagis-id-01bc07f7d6484c50bcb821d6a7ca56d9">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeWarrantyClaim. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (WarrantyClaim).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeWarrantyClaimDataAreaType" id="oagis-id-c520ea629dc94099beb7d440ea1b4388">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-2baa6ec1adea4772962e93163fbdbb9e"/>
+			<xsd:element ref="WarrantyClaim" maxOccurs="unbounded" id="oagis-id-61bc6643ba294b8686085124b67e6e9b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

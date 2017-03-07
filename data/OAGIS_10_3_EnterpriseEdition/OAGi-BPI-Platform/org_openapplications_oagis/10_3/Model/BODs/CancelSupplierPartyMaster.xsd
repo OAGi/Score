@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelSupplierPartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SupplierPartyMaster.xsd"/>
+	<xsd:element name="CancelSupplierPartyMaster" type="CancelSupplierPartyMasterType" id="oagis-id-bee47d5d734a457da01b347c286da74b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CancelSupplerPartyMaster is used to Cancelhronize SupplierPartyMaster data across systems. Using the Cancel indicates that the sender of the Cancel is the owner of the date and the receiver of the Cancel is a sub-system that must accept the data as provided.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelSupplierPartyMasterType" id="oagis-id-2dd2662165a24862b655af2c1a4a8f9e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelSupplierPartyMasterDataAreaType" id="oagis-id-197c0736f3d34fffa5ef6fc06e84e6aa">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelSupplierPartyMaster. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (SupplierPartyMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelSupplierPartyMasterDataAreaType" id="oagis-id-b3517d4b553d4c34b0c915854d3207f1">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-7e8b6ea6a74446dca32ee46b5c357160"/>
+			<xsd:element ref="SupplierPartyMaster" maxOccurs="unbounded" id="oagis-id-75646c5a0b08409f93376440ad84ec9a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

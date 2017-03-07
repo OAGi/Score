@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/RiskControlLibrary.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="RiskControlLibrary" type="RiskControlLibraryType" id="oagis-id-e7e7520401414152a39cbc7cf7c0c72e"/>
+	<xsd:element name="ControlProcess" type="ControlProcessType" id="oagis-id-4487194114394277aca4e36e50e2bb57"/>
+	<xsd:element name="Risk" type="RiskType" id="oagis-id-e29e63c90fea4c8ba4a375744af64b50"/>
+	<xsd:element name="Control" type="ControlType" id="oagis-id-1c9a8d5701bd468285012d3badb0f94e"/>
+	<xsd:element name="TestingProcedure" type="TestingProcedureType" id="oagis-id-cd19a2c56d04479fb7a5a5acac12ac50"/>
+	<xsd:element name="ControlAssertion" type="ControlAssertionCodeType" id="oagis-id-8461a61e491447e5afebfe5df739ed0f"/>
+	<xsd:element name="ControlComponent" type="ControlComponentCodeType" id="oagis-id-03b3668fb88d44149afae57b384690fc"/>
+	<xsd:element name="ControlCodeType" type="ControlCodeType" id="oagis-id-c2815691ba4a41638cb6a26d04339ddf"/>
+	<xsd:element name="ControlObjectiveCategory" type="RiskCodeType" id="oagis-id-c17adb973a17431c8910b902bb838999"/>
+	<xsd:element name="TestingProcedureStep" type="TestingProcedureStepType" id="oagis-id-c0d8f7ce88174443bffe23f136bdca45"/>
+	<xsd:element name="TestedControlIDs" type="SequencedIDsType" id="oagis-id-d2425bf362ca4964891d850e40090c00"/>
+	<xsd:complexType name="RiskControlLibraryBaseType" id="oagis-id-e8817c38b72a41d69fb26c3dc9ec03b8">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-6925f62352ad4752b333b3a3c2083c52" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PublisherParty" id="oagis-id-d4c12288eda5439ea71cf80bbf550d60" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the publisher organization/entity of the Catalog or transaction in which it is associated for the associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ControlProcess" id="oagis-id-4a035c5bba7e44fa92e365376464c241" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Risk" id="oagis-id-74642f877a95419f83f0d0d8e942e2da" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Control" id="oagis-id-5aeae002af6b4ea18085a8683dec5e47" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestingProcedure" id="oagis-id-12402e7797694c429c35c54fbcb5bdd6" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Party" id="oagis-id-162044279f1f40e1a8bb0ba0a9e62b3e" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-db2a4f387f424ba0bde0aaa796d70497"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3a4b2618c85744c3ba77645fd13c0d9f"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RiskControlLibraryType" id="oagis-id-a3a862c7938c49aba7d7bae192d41926">
+		<xsd:complexContent>
+			<xsd:extension base="RiskControlLibraryBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RiskControlLibraryExtensionType" id="oagis-id-911bb86b03964546be672e76029de079" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RiskControlComponentBaseType" id="oagis-id-01a3718be20549e08b0cc2dc742973d5">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-8a3c6b7875b24179a6d5237be91f370f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-734c64eee2244f939d95e715145263cc"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-194a3e61ca994214b8c6d9fa8f3d68e7"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ControlProcessBaseType" id="oagis-id-421f7cab5bb74def97da6156d93d3873">
+		<xsd:complexContent>
+			<xsd:extension base="RiskControlComponentBaseType">
+				<xsd:sequence>
+					<xsd:element ref="OwnerParty" id="oagis-id-b67f6a84ced94a53bc8f70a6d1f2c8f0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to identify who or which organization owns the item or part. The content of this field is user defined based on a specific Customer or Supplier.
+
+Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-033fb5bf8f004e72b7550f1c9284e4a3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-ee64fc3a1b284d8da6d307723ad6311e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A code to reflect the approval status of a process.  A process may be approved as a way of performing a task.  A non standard process may be approved because of local legal or cultural norms.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SignificantProcessIndicator" id="oagis-id-12b892654b4448b5bfefa9cf2a60beff" minOccurs="0"/>
+					<xsd:element ref="StandardProcessIndicator" id="oagis-id-663d400df304486284adfdd49c2fc676" minOccurs="0"/>
+					<xsd:element ref="CategoryCodes" id="oagis-id-418912fad39c40a18274b18a00a29706" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides a list of category codes that identify the capabilities and features of the associated object.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentProcessID" id="oagis-id-f05f0198260a4e6e967e8f022edaa9bb" minOccurs="0"/>
+					<xsd:element ref="ExposedRiskIDs" id="oagis-id-b380d059f2ba4dd38a3fb82e5a89e304" minOccurs="0"/>
+					<xsd:element ref="GeneralLedgerAccount" id="oagis-id-42b04835ef8640a190057161d69d836f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An account on the general ledger for the associated document and component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationalMeasureIDs" id="oagis-id-7e34577ae0e94ed1b70af8340655b977" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ControlProcessType" id="oagis-id-ae6c72f59fee4dadbcf5b296b4c46ef7">
+		<xsd:complexContent>
+			<xsd:extension base="ControlProcessBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ControlProcessExtensionType" id="oagis-id-153b94af5c7c4f6b84013328db82dd3f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RiskBaseType" id="oagis-id-1d1cacfa71b34b1a86c65ce5b12038dd">
+		<xsd:complexContent>
+			<xsd:extension base="RiskControlComponentBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-67ea44126f4c40e5ab7254d2eea1b091" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A code to reflect the approval status of a process.  A process may be approved as a way of performing a task.  A non standard process may be approved because of local legal or cultural norms.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MaterialRiskIndicator" id="oagis-id-9df9a341074548f994a3ecd2da975e55" minOccurs="0"/>
+					<xsd:element ref="MaterialityValueAssessmentAmount" id="oagis-id-79ac4af29ee543918b1388adb8d10750" minOccurs="0"/>
+					<xsd:element ref="MaterialityOperationalAssessmentAmount" id="oagis-id-86d0a3ba81c44456b8a086e1b1402a03" minOccurs="0"/>
+					<xsd:element ref="LikelihoodAssessmentText" id="oagis-id-36d50a91c98941f7b635f6fd81bed191" minOccurs="0"/>
+					<xsd:element ref="ImpactAssessmentText" id="oagis-id-6498350994264d9590cc2453e1172643" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="MitigatingControlID" id="oagis-id-a647279af6bf4e0da55b79facec184d7" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RiskType" id="oagis-id-0b0b9ec002a840a69841a749a04048fd">
+		<xsd:complexContent>
+			<xsd:extension base="RiskBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RiskExtensionType" id="oagis-id-f6a6372c44154d8e952d692724b4ad00" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ControlBaseType" id="oagis-id-d88056eb5f074c11a3b17d6c10531e4c">
+		<xsd:complexContent>
+			<xsd:extension base="RiskControlComponentBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ControlCodeType" id="oagis-id-2a6e72aa0b7f450ba73366f80fdfb660" minOccurs="0"/>
+					<xsd:element ref="PreventIndicator" id="oagis-id-2c118af8da2e4995baf32230df3b6aba" minOccurs="0"/>
+					<xsd:element ref="DetectIndicator" id="oagis-id-d1ffa876778f4df1ae0707d74e2ae8a2" minOccurs="0"/>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-24a7ce17a38b43d3b8b9c6c952f5f05c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A code to reflect the approval status of a process.  A process may be approved as a way of performing a task.  A non standard process may be approved because of local legal or cultural norms.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ControlComponent" id="oagis-id-164b70c4fece48cc95edf93260ca8d66" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ControlObjectiveCategory" id="oagis-id-ed6e7a0123c74fc18ee98c42b2b6766e" minOccurs="0"/>
+					<xsd:element ref="ControlAssertion" id="oagis-id-5ba15a60603c4e0da25d43433d2cc8c5" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ControlType" id="oagis-id-c909aea407f34af092a13dc372c3dff3">
+		<xsd:complexContent>
+			<xsd:extension base="ControlBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ControlExtensionType" id="oagis-id-5abaa4c5a5df403e9f223e610aca2137" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestingProcedureBaseType" id="oagis-id-c10ac9473f2e418d851ba897ecddb6ad">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-47a5c913abb1447d8ebb134329cb0efa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A code to reflect the approval status of a process.  A process may be approved as a way of performing a task.  A non standard process may be approved because of local legal or cultural norms.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TestingProcedureStep" id="oagis-id-d04044537bf54a7f9cfd00bf2b23ea18" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestedControlIDs" id="oagis-id-7ba8a56a5f6c4bae94454f582d99e531" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-fb320eee82424ef58b0343edb16a5782"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-952811ee92a84a449c842d81ef14e1c2"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestingProcedureType" id="oagis-id-37c05f2dbe4b478f9a1a718697422c08">
+		<xsd:complexContent>
+			<xsd:extension base="TestingProcedureBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestingProcedureExtensionType" id="oagis-id-a370befa6d524a3fae26cdb221514832" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestingProcedureStepBaseType" id="oagis-id-2aa6153b109e4bcf8a11bc7e6e1187e7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Sequence Number of the Testing Procedure Step . For example Step C.1 in a Bank Reconciliation may be performed
+          as step number 7</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-6723433e9cc941078cc014742525fbda" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-4a24c0d52d884d16babbf80997947a47"/>
+					<xsd:element ref="ApprovalStatus" id="oagis-id-eae9b997d9244e1f9ac28031dbfe9b57" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A code to reflect the approval status of a process.  A process may be approved as a way of performing a task.  A non standard process may be approved because of local legal or cultural norms.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-2b3b879590d24004851a7593940ac72d">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestingProcedureStepType" id="oagis-id-9af3badd0c3f4798bbb822c9dae7f5d2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Sequence Number of the Testing Procedure Step . For example Step C.1 in a Bank Reconciliation may be performed
+          as step number 7</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TestingProcedureStepBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestingProcedureStepExtensionType" id="oagis-id-7dadf7e6a4a44e6c9cfa88f503589195" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    9.4-RC-1  
+   Date:               02 March 2009 
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/9_4-RC-1/Developer/Nouns/ShippersExportDeclaration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="ShippersExportDeclaration" type="ShippersExportDeclarationType" id="oagis-id-c3051a15504d47cf92022de4119b30b5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A ShippersExportDeclaration document identifies and describes a specific collection of goods to be transported by a carrier and delivered to one or more business partner destinations.   A ShippersExportDeclaration document represents the extent and content of "transportation work" to be done by the carrier.  For transportation efficiency, a ShippersExportDeclaration document typically consolidates deliveries to multiple destinations within a certain geographic region and may provide carrier routing instructions to each delivery stop.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ShippersExportDeclarationHeader" type="ShippersExportDeclarationHeaderType" id="oagis-id-a1d83c27f2ab46ad90cce8f77ff99db9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the document that is used to transport a specific quantity of material goods from a supplier to a single customer business partner destination.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ShippersExportDeclarationLine" type="ShippersExportDeclarationLineType" id="oagis-id-4971c64e794c4b6e9bc6bad1b51d4d5d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the planned and actual quantities.  This information usually directly references a line item or shipment schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShippersExportDeclarationType" id="oagis-id-65234159512c458fbedfce0f5c398160">
+		<xsd:sequence>
+			<xsd:element ref="ShippersExportDeclarationHeader" id="oagis-id-21ec8c30f8004fe48601e91232dd4965" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the document that is used to transport a specific quantity of material goods from a supplier to a single customer business partner destination.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ShippersExportDeclarationLine" id="oagis-id-650cf9fb0fad46debd42fcf5ea18b93f" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the planned and actual quantities.  This information usually directly references a line item or shipment schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-8e2a4d2656214dbcaaf34d7eae889c80"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-b0b0a7855fe44b40b928c0cbe61a22e7"/>
+	</xsd:complexType>
+	<xsd:complexType name="ShippersExportDeclarationHeaderBaseType" id="oagis-id-b894f51f74d4431294ee1f988faaece6">
+		<xsd:complexContent>
+			<xsd:extension base="ExportDeclarationHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Event" id="oagis-id-09ee76094ba349f3a27a8c917fbf577a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShippersExportDeclarationHeaderType" id="oagis-id-9dde445a83b1497a8dedcd8cf97a3f5e">
+		<xsd:complexContent>
+			<xsd:extension base="ShippersExportDeclarationHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ShippersExportDeclarationHeaderExtensionType" id="oagis-id-4787295e1bb54825988c5e46e63072e5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShippersExportDeclarationLineBaseType" id="oagis-id-3f32c18de215403f97337310b7e603d1">
+		<xsd:complexContent>
+			<xsd:extension base="ExportDeclarationLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ContainsHazardousMaterialIndicator" id="oagis-id-8716d097e81c4e4f8a3d55ad718adc83" minOccurs="0"/>
+					<xsd:element ref="ItemInstance" id="oagis-id-b289cfffaeaa45da9c6567780c47b2d0" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Quantity" id="oagis-id-0ee96e96096445bbbdc798e7b88956f3" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShippersExportDeclarationLineType" id="oagis-id-43973309bf3943a493d2cd03e99a571e">
+		<xsd:complexContent>
+			<xsd:extension base="ShippersExportDeclarationLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ShippersExportDeclarationLineExtensionType" id="oagis-id-20ec1941935f4e33b472386e697556ad" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

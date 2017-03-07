@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/SplitWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="SplitWIP" type="SplitWIPType" id="oagis-id-3282f01fce834417b8233d1185a9a835">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">SplitWIP is used to notify a Manufacturing Application of the creation of multiple production lots from a single production lot of a product being made on a production order. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="SplitWIPHeader" type="WIPEventHeaderType" id="oagis-id-be4316ed09c04a4a9a34558e73f3371a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about the split event.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="SplitWIPSource" type="SplitWIPSourceType" id="oagis-id-b3f7f86ebb534a788feca095c6174e11">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Split transaction to be processed.  This component specifies the source (parent) production order from which to perform the split transaction.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="SplitWIPDestination" type="SplitWIPDestinationType" id="oagis-id-605b18f8a1b043f69c6af2e96f32b3eb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Split transaction to be processed.  Instances of this component are the target (children) production orders to which to perform the split transaction.  If the parent production order (specified in the SplitWIPSource component) is also a resulting child production lot, it must be specified again as a child production order (ie. you must define the SplitWIPSource again as an instance in the SplitWIPDestination).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SplitWIPType" id="oagis-id-c19a375bd9274fb3bc87c32e0c0b6a24">
+		<xsd:sequence>
+			<xsd:element ref="SplitWIPHeader" id="oagis-id-f9dbdc96c2e44dde95aa96665f71714f" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about the split event.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="SplitWIPSource" id="oagis-id-369d4708bfe448a99ca36cb736ed2232" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Split transaction to be processed.  This component specifies the source (parent) production order from which to perform the split transaction.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="SplitWIPDestination" id="oagis-id-8e0dd77be8b145b19aa1e7bc6f9d0116" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Split transaction to be processed.  Instances of this component are the target (children) production orders to which to perform the split transaction.  If the parent production order (specified in the SplitWIPSource component) is also a resulting child production lot, it must be specified again as a child production order (ie. you must define the SplitWIPSource again as an instance in the SplitWIPDestination).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-41a6be466d8245d8bbe29a778bf9ef5c"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f09fa16b91cb44889169bf20fa1549a0"/>
+	</xsd:complexType>
+	<xsd:complexType name="SplitWIPSourceBaseType" id="oagis-id-7a1dc31e91d748739649c9e616751506">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-495d184395c647e9af54f9a86cec125a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationReference" id="oagis-id-f97dcc7208c245a49a7c3de47e9df7e4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SplitWIPSourceType" id="oagis-id-00110626e82f4fb18c809c0c2f7686f5">
+		<xsd:complexContent>
+			<xsd:extension base="SplitWIPSourceBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="SplitWIPSourceExtensionType" id="oagis-id-3ae053b58a154e73869cd02492c74081" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SplitWIPDestinationBaseType" id="oagis-id-d153d50792df4d4db1bc327dcfb3b2b6">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemQuantity" id="oagis-id-77b76d02b10546ab802a0990fdf56c8a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-7276ff3e2c004fa586e74c810eb147ee" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Quantity" id="oagis-id-33efc58592914f3ea9e11be8532321f8" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-63a189a892aa405cbf7df8a35fbd5955" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SplitWIPDestinationType" id="oagis-id-16edbb5e2d034d2cb824f4f333427139">
+		<xsd:complexContent>
+			<xsd:extension base="SplitWIPDestinationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="SplitWIPDestinationExtensionType" id="oagis-id-485d280d010846ee9abb6e6db4bad7f5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

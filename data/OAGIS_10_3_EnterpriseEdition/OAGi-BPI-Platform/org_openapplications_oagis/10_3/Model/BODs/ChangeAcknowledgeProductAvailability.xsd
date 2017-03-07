@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+	<xsd:element name="ChangeAcknowledgeProductAvailability" type="ChangeAcknowledgeProductAvailabilityType" id="oagis-id-406f1cffdb894aa889cfe133d8d15858">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The ChangeAcknowledgeProductAvailability may be used to obtain limited information ChangeAcknowledgeing about documents that match certain selection criteria in a GetChangeAcknowledgeProductAvailability.
+
+Additional information about a specific ProductAvailability may be obtained through ShowProductAvailability by using the ChangeAcknowledgeing information to populate a GetProductAvailability request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeProductAvailabilityType" id="oagis-id-109bc57fe81e4302a66ee8270c800be5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeProductAvailabilityDataAreaType" id="oagis-id-689a910745de4e9e87a458e51dbee529">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeProductAvailability. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (ProductAvailability).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeProductAvailabilityDataAreaType" id="oagis-id-f1f75f0fe73e48deacc445351f70b0ce">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-39d58a7fedb04c5387de2f9d76e06877"/>
+			<xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-289ae7e8fc2b4f49884fd005de10acc4"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyOnlineOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/OnlineOrder.xsd"/>
+        <xsd:element name="NotifyOnlineOrder" type="NotifyOnlineOrderType" id="oagis-id-90f112174fbf408f96807588045fed02">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyOnlineOrder is to enable an application to provide online shopping OnlineOrders from another business application module.  The NotifyOnlineOrder is provided in a a publishe/subscribe or broadcast buiness exchange wher the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyOnlineOrderType" id="oagis-id-0d3ed9100c49412e919835bf1815a0a1">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyOnlineOrderDataAreaType" id="oagis-id-2fcc7c259bed4e488624f71c70e0400e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyOnlineOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (OnlineOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyOnlineOrderDataAreaType" id="oagis-id-af23792a3f2e48f29f9e742fc16e5438">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-fefef8e8a2004079b0ce2f7d05a7de0a"/>
+                        <xsd:element ref="OnlineOrder" maxOccurs="unbounded" id="oagis-id-63fbc583c7254dcaacf22f4766ad001e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 9_6  
+   Date:               02 Jul 2012
+   Copyright 1997-2012, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2012). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/9_6/Developer/Global/Nouns/MoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="MoveProductForecast" type="MoveProductForecastType" id="oagis-id-e6b602273eca4184b89eadc8abb434a4"/>
+	<xsd:element name="MoveProductForecastHeader" type="MoveProductForecasttHeaderType" id="oagis-id-dc6cab353fbc420f80571c3e32e42270">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the things common to the entire Movement.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MoveProductForecastLine" type="MoveProductForecastLineType" id="oagis-id-02cee00056044d82bb1901b786994258">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the line items being Movemented providing information about the source and destination of the Movement.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MoveProductForecastType" id="oagis-id-4eb93c0f7a924922be536e7088e93825">
+		<xsd:sequence>
+			<xsd:element ref="MoveProductForecastHeader" id="oagis-id-a29ca4fd381b4c1296e7a5080bc322d1" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the things common to the entire Movement.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MoveProductForecastLine" id="oagis-id-a4c8446a6a024fe0ac56867f5e34e254" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the line items being Movemented providing information about the source and destination of the Movement.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-81dd14be251c4def934cfaf22c755243"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-1d4ed8ae1a814a15bf9e4b1769934e87"/>
+	</xsd:complexType>
+	<xsd:complexType name="MoveProductForecasttHeaderBaseType" id="oagis-id-0669c915391844a6bf67244db072dffd">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="TransferTypeCode" id="oagis-id-ca559cd24ad549249a60fa11b3fff27e" minOccurs="0"/>
+					<xsd:element ref="ForecastDateTime" id="oagis-id-d4b0a603045a495ca080b2b885128b2f" minOccurs="0"/>
+					<xsd:element ref="BillToParty" id="oagis-id-c303038d9a6547578f03ab5ff0924350" minOccurs="0"/>
+					<xsd:element ref="Payment" id="oagis-id-f8dcc241434d46969a2c07e6fbdff7d2" minOccurs="0"/>
+					<xsd:element ref="OwnerParty" id="oagis-id-3fdb243716154d5fa4e53c336e13d930" minOccurs="0"/>
+					<xsd:element ref="SoldToParty" id="oagis-id-4dd2de98e6c446a5aff4307cd06158e7" minOccurs="0"/>
+					<xsd:element ref="CarrierParty" id="oagis-id-bec55f475aaf44d9b192a97d71c33ca3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipFromParty" id="oagis-id-f9fd80c71c134aef9e043873c932a92c" minOccurs="0"/>
+					<xsd:element ref="ShipFromLocation" id="oagis-id-fa5628c2d83946c091440057588075cb" minOccurs="0"/>
+					<xsd:element ref="WarehouseParty" id="oagis-id-20a247a43d5548d4b12ccd80fadf8750" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipToParty" id="oagis-id-86af47c8dcaa49aabb6523fe9622b184" minOccurs="0"/>
+					<xsd:element ref="DeliverToParty" id="oagis-id-07759fe437c745dabda9a293179e9134" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-5f6778dca5c140b19cbfc261a7c0a13c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipToLocation" id="oagis-id-c0ac5f1e480c4574b527e67e73a7f896" minOccurs="0"/>
+					<xsd:element ref="TransportStep" id="oagis-id-a7812e096a35442a9eb4136f7dd1bc71" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="ShippingWeightAndVolumeGroup" id="oagis-id-d98eccd0281248a784d978c373903d69"/>
+					<xsd:element ref="TotalCostAmount" id="oagis-id-3cc10c7416f946e5b578d8d38d91f340" minOccurs="0"/>
+					<xsd:element ref="Tax" id="oagis-id-f6190517a3174f15946b519fb66bd4c4" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TotalTax" id="oagis-id-4847cea7e6f04ea087fc2a30f114ecf6" minOccurs="0"/>
+					<xsd:element ref="TotalTaxAmount" id="oagis-id-c9d47185323c4d5499e8b609b90b91ac" minOccurs="0"/>
+					<xsd:element ref="TotalAmount" id="oagis-id-a6fd6f7b8dea43f88b5ba2ecd9cae11c" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MoveProductForecasttHeaderType" id="oagis-id-3f7ea8722477444ca1de5db8a0fe2f3a">
+		<xsd:complexContent>
+			<xsd:extension base="MoveProductForecasttHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MoveProductForecasttHeaderExtensionType" id="oagis-id-ab5a3e085bfd4f9097adf98d6c686416" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MoveProductForecastLineBaseType" id="oagis-id-1b010c9dcf874031adff2f8d9c27da9d">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-8fd25f514e9244d881a2e1369a61893b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-6afd24189e824489a5b03138e504c2ab" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Status" id="oagis-id-2bc5cf207b6043c0886855677ee87953" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReasonCode" id="oagis-id-7b59fe70c285405395b785e3380570d6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransferTypeCode" id="oagis-id-2e85c358d48d41b3a3f38403ada5dc6c" minOccurs="0"/>
+					<xsd:element ref="ForecastDateTime" id="oagis-id-59835882db064357b619ea18cad2a19f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The datetime of occurence of the transaction</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BillToParty" id="oagis-id-c7cbf6388e2f4bdcb61184fea7b2de74" minOccurs="0"/>
+					<xsd:element ref="Payment" id="oagis-id-b8b6fe295e644bdcafbb2c4ffeaf18e9" minOccurs="0"/>
+					<xsd:element ref="OwnerParty" id="oagis-id-60493b6b35e3469a809575af5ac0cb54" minOccurs="0"/>
+					<xsd:element ref="SoldToParty" id="oagis-id-08c19be8800140628751bd3fd64e6b56" minOccurs="0"/>
+					<xsd:element ref="ShipFromParty" id="oagis-id-6091d31183654dd0a199b24cabaf4406" minOccurs="0"/>
+					<xsd:element ref="ShipFromLocation" id="oagis-id-fceb0bc5ce234551a72ef9096618ce82" minOccurs="0"/>
+					<xsd:element ref="CarrierParty" id="oagis-id-2d3400b19c944f0a8ec54a81c15aeb89" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="WarehouseParty" id="oagis-id-34c9600c0d664718a7fe180f5def031e" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DeliverToParty" id="oagis-id-071be49ecaa543879d5550b6f708f6c8" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-a1f29be12be24a149327e4d261e3ee95" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipToLocation" id="oagis-id-dd590f4099b44ca6bc38461360015faa" minOccurs="0"/>
+					<xsd:element ref="ShipmentUnit" id="oagis-id-26f85d16aecd42a49228f7cb087349b9" minOccurs="0"/>
+					<xsd:element ref="TransportStep" id="oagis-id-5aaf7fb080cf424182749368918475d9" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TotalCostAmount" id="oagis-id-127d65f02a3f4726b703edd37cbaedc7" minOccurs="0"/>
+					<xsd:element ref="Tax" id="oagis-id-e80c3b29a03543eebe428dd8dd215a09" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TotalTax" id="oagis-id-14e82f6e8893482896dba7903988a3c7" minOccurs="0"/>
+					<xsd:element ref="TotalTaxAmount" id="oagis-id-2b60bb60d4bb45eb95272a201eebed1f" minOccurs="0"/>
+					<xsd:element ref="TotalAmount" id="oagis-id-9dd2d7e4d0e0489b9bd4a07b1a48a5db" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MoveProductForecastLineType" id="oagis-id-c0032aca12664bcbacf2d366e055cff0">
+		<xsd:complexContent>
+			<xsd:extension base="MoveProductForecastLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MoveProductForecastLineExtensionType" id="oagis-id-c04562d482e9488e87f0a4bffadbeeb4" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

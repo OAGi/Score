@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/GetReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+        <xsd:element name="GetReceiveDelivery" type="GetReceiveDeliveryType" id="oagis-id-cc151ef5e0e1445387e6fb4fbc608083">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The GetReceiveDelivery may be used to request information about a specific expected (unreceived) or previously received goods delivery.  The response to the GetReceiveDelivery request is ShowReceiveDelivery.
+
+For expected deliveries, the ShowReceiveDelivery document content may act as a receiving template or checklist to identify the quantity and shipping configuration of the expected goods.  The ShowReceiveDelivery supports describing shipment content at either the line item level and/or the ship unit level.  Intermediate transportation/logistics providers or freight forwarding partners can use this document to acknowledge the receipt of entire shipping units without detailing the corresponding contents. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetReceiveDeliveryType" id="oagis-id-f463a08eec3d448ea4ab85a5245379b3">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetReceiveDeliveryDataAreaType" id="oagis-id-c466541bb9b44de19df70d2ff0d2ffb9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetReceiveDeliveryDataAreaType" id="oagis-id-0cdcc84152ff4b3f8dae3408af37ca16">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-a161c4e417824756bf7a3b69b42ffb22"/>
+                        <xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-2ae41f6a8f8b4acaa4e8a42cc6df0fa4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgePickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+	<xsd:element name="CancelAcknowledgePickList" type="CancelAcknowledgePickListType" id="oagis-id-16756332e93d4eb78a285973d6714e5f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgePickList is to CancelAcknowledge the details of an individual Picking List from a plant level to an ERP system. This BOD will usually cause CancelAcknowledges to occur.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgePickListType" id="oagis-id-7abc8c8bb24d4f969271532a5c4f3e8e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgePickListDataAreaType" id="oagis-id-ec4614df371d4214965a256631b4262d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgePickList. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgePickListDataAreaType" id="oagis-id-a322f97243e34c46b8bb5bb1cff58619">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-37855e3b4d484a6fb52d83f9732978eb"/>
+			<xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-bf634ec1b37e4901bef1c6dd4ee8b1e0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

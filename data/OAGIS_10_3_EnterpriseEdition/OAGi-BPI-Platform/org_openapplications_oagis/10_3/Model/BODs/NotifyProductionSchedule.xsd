@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyProductionSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductionSchedule.xsd"/>
+        <xsd:element name="NotifyProductionSchedule" type="NotifyProductionScheduleType" id="oagis-id-6bc85814ae604cda86a738d0a6d94959">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyProductionSchedule is to synchronize the information known about ProductionSchedules between systems. The NotifyProductionSchedule MUST be generated from the system that own the ProductionSchedule and sent to systems that count on the sending system to maintain the ProductionSchedule information.
+
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyProductionScheduleType" id="oagis-id-4909793c2e954c4b95a8e400acce7726">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyProductionScheduleDataAreaType" id="oagis-id-5973018baea24a9aafb625e7e3839dcf">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyProductionSchedule. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (ProductionSchedule).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyProductionScheduleDataAreaType" id="oagis-id-174867baf5ea487da7fd421b6403714a">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-f2a8b09328e0466f912d15c06a3410e1"/>
+                        <xsd:element ref="ProductionSchedule" maxOccurs="unbounded" id="oagis-id-df9ca0ec285a4c3bad948bf8506adc9c"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelWorkOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WorkOrder.xsd"/>
+	<xsd:element name="CancelWorkOrder" type="CancelWorkOrderType" id="oagis-id-f8d2e5b5389942bd8abb7bfb87f138e8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelWorkOrder is to communicate to a business application module or system the need to initiate the creation of a WorkOrder structure.
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelWorkOrderType" id="oagis-id-0aeeefc9bb2f47a4b7570997315664ac">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelWorkOrderDataAreaType" id="oagis-id-b43c798f146146eda72e8c8580cc91e6">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelWorkOrder. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (WorkOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelWorkOrderDataAreaType" id="oagis-id-acfb638e786c4f6abec8a7d2ad3e5df0">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-9b1fc59af9734c648c12a3794db6fb25"/>
+			<xsd:element ref="WorkOrder" id="oagis-id-7aea5df0f49c4acaa4b7f9aa3dc1d1a0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

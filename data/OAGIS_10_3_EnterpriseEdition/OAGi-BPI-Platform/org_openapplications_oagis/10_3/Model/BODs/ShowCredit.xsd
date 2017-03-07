@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowCredit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Credit.xsd"/>
+        <xsd:element name="ShowCredit" type="ShowCreditType" id="oagis-id-80f682e8079e41529ea2c3f16eb85779">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowCredit is to provide credit information concerning a trading partner.  The ShowCredit is the reply required by the GetCredit BOD.  This BOD type may also be used as an information mechanism that is triggered by a business event and not a Get request.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowCreditType" id="oagis-id-e17bd029a7f24a57b9a7f416d29d5aca">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowCreditDataAreaType" id="oagis-id-866a4a3452214738ae4102032be4e70e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowCredit. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Credit).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowCreditDataAreaType" id="oagis-id-dab1654a4ea744beb5c3d8c25ba279df">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-cdaf1b49ef644c5287a946aad07598f1"/>
+                        <xsd:element ref="Credit" maxOccurs="unbounded" id="oagis-id-e970793c9c9748a082e0a3a1c14f8ac5"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

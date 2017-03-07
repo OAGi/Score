@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/AcknowledgeOnlineOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/OnlineOrder.xsd"/>
+        <xsd:element name="AcknowledgeOnlineOrder" type="AcknowledgeOnlineOrderType" id="oagis-id-080908a62c9748469488ac9d37104c84">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeOnlineOrder is to enable an application to provide online shopping OnlineOrders from another business application module.  The AcknowledgeOnlineOrder is provided in response to the ProcessOnlineOrder in order to accept or reject the request to process the OnlineOrder.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeOnlineOrderType" id="oagis-id-eadbbf75f4d04ed3ac211f4aa7faa6b5">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeOnlineOrderDataAreaType" id="oagis-id-84ee5708417f40acaec677ec21f00d62">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeOnlineOrder. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (OnlineOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeOnlineOrderDataAreaType" id="oagis-id-e44fd02798ca46539634a9e614f9e2c1">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-51e7df1a034d4c8b945820c77c5e1141"/>
+                        <xsd:element ref="OnlineOrder" maxOccurs="unbounded" id="oagis-id-25927766d6d944beb6d3253314fd7b62"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10rc2  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downChange package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10rc2/Model/BODs/ChangeJournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/JournalEntry.xsd"/>
+	<xsd:element name="ChangeJournalEntry" type="ChangeJournalEntryType" id="oagis-id-25ff79a3cdeb4a848bef969548101080">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeJournalEntry is to enable an application or component to respond to a ProcessJournalEntry.
+
+The response to the ChangeJournalEntry is the response to the ProcessJournalEntry. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeJournalEntryType" id="oagis-id-5bf891da6473417d84b5571e6e29f165">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeJournalEntryDataAreaType" id="oagis-id-3d0d6654afe14a2989d01be41063eda4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeJournalEntry. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (JournalEntry). In response to the PostJournalEntry.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeJournalEntryDataAreaType" id="oagis-id-92c3f0a9bb52462d980dacbb14700917">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-6ef5755a115f451ab6ee897412cb4dd7"/>
+			<xsd:element ref="JournalEntry" maxOccurs="unbounded" id="oagis-id-3ebb1f0f6735488ea18e6358e09ab5c7"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

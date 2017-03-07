@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               		 06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/BatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="BatchCertificateOfAnalysis" type="BatchCertificateOfAnalysisType" id="oagis-id-2da2825af3fe4d35b5f5c8ca5b471c4f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ItemCertificateOfAnalysis represents the Certificate(s) of Analysis performed on an Item</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BatchCertificateOfAnalysisHeader" type="BatchCertificateOfAnalysisHeaderType" id="oagis-id-00fa774d9fab4a8493ddd7655caf99bf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the .</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BatchCertificateOfAnalysisLine" type="CertificateOfAnalysisLineType" id="oagis-id-fa9d6f3a89f341819a7e69a6cbd993a6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the individual items on the pre-determined Bill of Material structure.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BatchCertificateOfAnalysisType" id="oagis-id-dbe8dcfe56c44bb797c8aa366221e224">
+		<xsd:sequence>
+			<xsd:element ref="BatchCertificateOfAnalysisHeader" id="oagis-id-0c7351df1a9c4bcfa566403ba56e976e" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the default values of a request to or show of a Certificate of Analysis (CertificateOfAnalysis) for a batch</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BatchCertificateOfAnalysisLine" id="oagis-id-12d6696cecb347209f6f32b13d48b359" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the individual details of a request or a result from a CertificateOfAnalysis for a batch </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-705e72260f154b54b52a3531cb3b0fda"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-8274e58d5aff4a8d8afc875d397d31a6"/>
+	</xsd:complexType>
+	<xsd:complexType name="BatchCertificateOfAnalysisHeaderBaseType" id="oagis-id-05e5f73e512b44ad81154b585888d14b">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Batch" id="oagis-id-2918f718b8174fe2a85c625e0331c641" minOccurs="0"/>
+					<xsd:element ref="PriorityCode" id="oagis-id-c2b300cd9a1a45afb1642e148916eb0b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufactureDateTime" id="oagis-id-ddec0240904b48f3a51bf3695797528f" minOccurs="0"/>
+					<xsd:element ref="ShippedQuantity" id="oagis-id-876eb331ff63480cb000da8e7ea7eb3e" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipmentDateTime" id="oagis-id-2a770b86ce6e4d98b5dae7166e3b63ea" minOccurs="0"/>
+					<xsd:element ref="SupplierParty" id="oagis-id-ba7b45dee16d4069a1323f75a85d4d1e" minOccurs="0"/>
+					<xsd:element ref="ManufacturingParty" id="oagis-id-9967741092d34a569bbc4cbca3fe82bf" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-738114a3355c4c898d26786577954a22" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BatchCertificateOfAnalysisHeaderType" id="oagis-id-f250839a4e6b4dc5ad6ac7f330047a5b">
+		<xsd:complexContent>
+			<xsd:extension base="BatchCertificateOfAnalysisHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BatchCertificateOfAnalysisHeaderExtensionType" id="oagis-id-c77ac7ea3ade48829fd82b7414724c71" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

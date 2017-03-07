@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseCorrectiveActionRequest.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveActionRequest.xsd"/>
+	<xsd:element name="SyncResponseCorrectiveActionRequest" type="SyncResponseCorrectiveActionRequestType" id="oagis-id-c3f3722fbe5e4d0d982e77d246244c17">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseCorrectiveActionRequest is to communicate to a business application module or system the need to initiate the creation of a CorrectiveActionRequest structure.
+			
+A SyncResponse is the response to a Sync. In this case a SyncResponseCorrectiveActionRequest is in response to SyncCorrectiveActionRequest. The SyncResponse reports the results of the Sync.
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseCorrectiveActionRequestType" id="oagis-id-9f60caa60ed44843b2e086da9202099a">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseCorrectiveActionRequestDataAreaType" id="oagis-id-d6e59ec8ea534aafa5dadfc03d4c1307">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseCorrectiveActionRequest. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (CorrectiveActionRequest).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseCorrectiveActionRequestDataAreaType" id="oagis-id-7fef4b05dd2c46ed8982ce3973c4df0a">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-d2713328f9744387b41fbcf3b4e749b8"/>
+			<xsd:element ref="CorrectiveActionRequest" id="oagis-id-9df6eb93032f4a2d98f025f5f8ae4463"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

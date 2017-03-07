@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelFreightInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/FreightInvoice.xsd"/>
+	<xsd:element name="CancelFreightInvoice" type="CancelFreightInvoiceType" id="oagis-id-9a9712fe95744fcf8748d1c593ff920a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Cancel Purchaseorder is to request another business application to make changes to an existing Purchase Order.  This change must refer to the original document and/or item ordered.  The change processing assumes replacement of fields sent, with the exception the identifying fields of the Purchase Order.
+
+If any of these key fields require changing, (i.e. the FreightInvoice Document Id or a LineNumber) that constitutes a cancellation of the request and/or the addition of another Purchase Order.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelFreightInvoiceType" id="oagis-id-0618b1065e18458d891fad84a5011a40">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelFreightInvoiceDataAreaType" id="oagis-id-4eed962f6d8045d295b9fa88d4752855">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelFreightInvoice. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (FreightInvoice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelFreightInvoiceDataAreaType" id="oagis-id-0482233e9fd84ceeab1a5d5346e6756d">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-0f5d95c2fbf54612b135c64b209d9f5b"/>
+			<xsd:element ref="FreightInvoice" maxOccurs="unbounded" id="oagis-id-a2e7d65aef014882b444f2e695bd42e7"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
