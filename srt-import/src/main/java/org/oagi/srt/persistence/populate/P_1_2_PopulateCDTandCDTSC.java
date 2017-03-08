@@ -177,7 +177,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMap("Identifier", "NormalizedString", "xsd:normalizedString");
         cdtAwdPriXpsTypeMap("Identifier", "String", "xsd:string");
         cdtAwdPriXpsTypeMap("Identifier", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Indicator", "Boolean", "xbt_BooleanTrueFalseType");
+        cdtAwdPriXpsTypeMap("Indicator", "Boolean", "xbt_BooleanType");
         cdtAwdPriXpsTypeMap("Measure", "Decimal", "xsd:decimal");
         cdtAwdPriXpsTypeMap("Measure", "Double", "xsd:double");
         cdtAwdPriXpsTypeMap("Measure", "Double", "xsd:float");

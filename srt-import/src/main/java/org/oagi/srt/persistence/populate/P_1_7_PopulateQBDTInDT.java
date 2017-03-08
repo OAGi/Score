@@ -604,7 +604,7 @@ public class P_1_7_PopulateQBDTInDT {
                     String attrType = attrElement.getAttribute("type");
                     if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
                         representation_term = "Text";
-                    else if (attrType.equals("xbt_BooleanTrueFalseType"))
+                    else if (attrType.equals("xbt_BooleanType"))
                         representation_term = "Indicator";
                     else if (attrName.equals("preferred")){
                         representation_term = "Indicator";
