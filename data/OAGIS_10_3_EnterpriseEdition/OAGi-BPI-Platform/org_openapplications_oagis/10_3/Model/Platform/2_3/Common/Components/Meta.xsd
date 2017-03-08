@@ -82,8 +82,8 @@ This element supports any digital signature specification that is available toda
 This allows the user to carry a digital signature in the xml instance of a BOD. The choice of which digital signature to use is left up to the user and their integration needs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="ScenarioID" type="IDType" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2" minOccurs="0"/>
-			<xsd:element name="CorrelationID" type="IDType" id="oagis-id-8608944406234866817301e39693fd90" minOccurs="0"/>
+			<xsd:element ref="ScenarioID" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd3" minOccurs="0"/>
+			<xsd:element ref="CorrelationID" id="oagis-id-8608944406234866817301e39693fd91" minOccurs="0"/>
 			<xsd:element ref="BODID" id="oagis-id-afa1894b0cd449b68f65ec602f2e9c96" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The BODId provides a place to carry a Globally Unique Identifier (GUID) that will make each Business Object Document instance uniquely identifiable.
@@ -1202,6 +1202,8 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 			<xsd:element ref="BusinessObjectDocument" id="oagis-id-997a1b1b329942448f88ca5b515b0556"/>
 		</xsd:sequence>
 	</xsd:complexType>
+	<xsd:element name="ScenarioID" type="IDType" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2"/>
+	<xsd:element name="CorrelationID" type="IDType" id="oagis-id-8608944406234866817301e39693fd90"/>
 	<xsd:element name="BusinessObjectDocument" type="BusinessObjectDocumentType" id="oagis-id-31e578bda6d249818dfc52181497de86"/>
 	<!---->
 </xsd:schema>

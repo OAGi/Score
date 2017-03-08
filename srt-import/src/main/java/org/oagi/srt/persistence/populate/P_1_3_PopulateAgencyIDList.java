@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.oagi.srt.common.ImportConstants.*;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
@@ -59,7 +60,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
-        String moduleName = "IdentifierScheme_AgencyIdentification_3055_D08B";
+        String moduleName = IDENTIFIER_SCHEME_AGENCY_IDENTIFICATION_FILENAME;
         Module module = moduleRepository.findByModuleContaining(moduleName);
         if (module == null) {
             throw new IllegalStateException("Can't find " + moduleName + " module. We need to import `module` first perfectly.");
@@ -82,9 +83,9 @@ public class P_1_3_PopulateAgencyIDList {
             }
         }
 
-        agencyIdList.setName("clm63055D08B_AgencyIdentification");
-        agencyIdList.setListId("3055");
-        agencyIdList.setVersionId("D08B");
+        agencyIdList.setName(AGENCY_IDENTIFICATION_NAME);
+        agencyIdList.setListId(AGENCY_IDENTIFICATION_LIST_ID);
+        agencyIdList.setVersionId(AGENCY_IDENTIFICATION_VERSION_ID);
         agencyIdList.setModule(module);
         agencyIdList.setDefinition("Schema agency:  UN/CEFACT\n" +
                 "Schema version: 4.5\n" +
@@ -100,7 +101,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private void agencyIDListValue(Collection<AgencyIdList> agencyIdLists) throws Exception {
-        String path1 = ImportConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
+        String path1 = ImportConstants.filepath("AgencyID") + IDENTIFIER_SCHEME_AGENCY_IDENTIFICATION_FILENAME + ".xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         XPathExpression cctsNameExp = xh.compile(".//*[local-name()=\"ccts_Name\"]");

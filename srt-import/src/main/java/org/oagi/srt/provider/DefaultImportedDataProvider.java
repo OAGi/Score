@@ -70,9 +70,8 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
     @Override
     public void afterPropertiesSet() throws Exception {
         long s = System.currentTimeMillis();
-        Sort moduleSort = new Sort(Sort.Direction.ASC, "module");
 
-        findAgencyIdListList = agencyIdListRepository.findAll(moduleSort);
+        findAgencyIdListList = agencyIdListRepository.findAll(new Sort(Sort.Direction.ASC, "module"));
         findAgencyIdListMap = findAgencyIdListList.stream()
                 .collect(Collectors.toMap(AgencyIdList::getAgencyIdListId, Function.identity()));
 
@@ -86,7 +85,7 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findCodeListValueByCodeListIdMap = codeListValueRepository.findAll().stream()
                 .collect(Collectors.groupingBy(CodeListValue::getCodeListId));
 
-        findDtList = dataTypeRepository.findAll(moduleSort);
+        findDtList = dataTypeRepository.findAll(new Sort(Sort.Direction.ASC, "module"));
         findDtMap = findDtList.stream()
                 .collect(Collectors.toMap(DataType::getDtId, Function.identity()));
 
@@ -105,17 +104,17 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findXbtMap = xbtRepository.findAll().stream()
                 .collect(Collectors.toMap(XSDBuiltInType::getXbtId, Function.identity()));
 
-        findACCList = accRepository.findAll(moduleSort);
+        findACCList = accRepository.findAll(new Sort(Sort.Direction.ASC, "moduleId"));
         findAccMap = findACCList.stream()
                 .collect(Collectors.toMap(AggregateCoreComponent::getAccId, Function.identity()));
 
-        findASCCPList = asccpRepository.findAll(moduleSort);
+        findASCCPList = asccpRepository.findAll(new Sort(Sort.Direction.ASC, "moduleId"));
         findAsccpMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getAsccpId, Function.identity()));
         findAsccpByGuidMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getGuid, Function.identity()));
 
-        findBCCPList = bccpRepository.findAll(moduleSort);
+        findBCCPList = bccpRepository.findAll(new Sort(Sort.Direction.ASC, "moduleId"));
         findBccpMap = findBCCPList.stream()
                 .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
 

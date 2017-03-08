@@ -71,7 +71,7 @@ public class PopulateModules {
         logger.info("### Module population Start");
         printTitle("Schemas not considered for import and import them as blobs");
 
-        release = releaseRepository.findOneByReleaseNum(OAGIS_VERSION);
+        release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
         namespace = namespaceRepository.findByUri("http://www.openapplications.org/oagis/10");
 
         populateModule(baseDataDirectory);

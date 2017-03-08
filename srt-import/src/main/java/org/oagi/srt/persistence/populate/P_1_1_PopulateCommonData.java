@@ -99,7 +99,7 @@ public class P_1_1_PopulateCommonData {
         printTitle("Populate OAGIS release " + OAGIS_VERSION);
 
         Release release = new Release();
-        release.setReleaseNum(OAGIS_VERSION);
+        release.setReleaseNum(Double.toString(OAGIS_VERSION));
         release.setNamespaceId(namespace.getNamespaceId());
         release.setReleaseNote(OAGIS_RELEASE_NOTE);
 

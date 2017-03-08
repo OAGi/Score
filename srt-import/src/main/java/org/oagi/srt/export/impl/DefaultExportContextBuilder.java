@@ -15,6 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     private ImportedDataProvider importedDataProvider;
 
     @Override
+    @Transactional
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
 

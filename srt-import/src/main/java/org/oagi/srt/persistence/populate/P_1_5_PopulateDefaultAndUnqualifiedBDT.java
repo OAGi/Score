@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 
-import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
+import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
@@ -137,6 +137,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dataTypeTermNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
         }
         Element dataTypeTermElement = (Element) dataTypeTermNode;
+        if (dataTypeTermElement == null) {
+            throw new IllegalStateException();
+        }
         logger.debug("### " + dataTypeTermElement.getTextContent());
         try {
             dataTypeTerm = dataTypeTermElement.getTextContent().substring(0, dataTypeTermElement.getTextContent().indexOf(". Type"));
@@ -1042,8 +1045,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
-        } else if (type.equals(AGENCY_ID_LIST_NAME + "ContentType")) {
-            AgencyIdList agencyIdList = agencyIdListRepository.findOneByName(AGENCY_ID_LIST_NAME);
+        } else if (type.equals(AGENCY_IDENTIFICATION_NAME + "ContentType")) {
+            AgencyIdList agencyIdList = agencyIdListRepository.findOneByName(AGENCY_IDENTIFICATION_NAME);
 
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtSc.getDtScId());

@@ -33,7 +33,7 @@ public class ImportUtil {
 
     public long getReleaseId() {
         if (releaseId == 0L) {
-            releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
+            releaseId = releaseRepository.findReleaseIdByReleaseNum(Double.toString(OAGIS_VERSION));
         }
         return releaseId;
     }

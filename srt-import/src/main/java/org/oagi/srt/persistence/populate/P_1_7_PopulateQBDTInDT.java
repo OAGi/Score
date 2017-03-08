@@ -36,8 +36,8 @@ import javax.xml.xpath.XPathExpression;
 import java.io.File;
 import java.util.*;
 
+import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
-import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
@@ -186,7 +186,7 @@ public class P_1_7_PopulateQBDTInDT {
                 if (node == null) {
                     xPathExpression = Context.xPath.compile("//xsd:simpleType[@name='" + typeName + "']");
                     node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
-                    if(node == null) {
+                    if (node == null) {
                         return;
                     }
                 }
@@ -372,8 +372,7 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtScPriRestriListForSaving.add(bdtScPriRestri);
             }
 
-        }
-        else { // else if (new SC)
+        } else { // else if (new SC)
             populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtscVO, type);
         }
 
@@ -606,7 +605,7 @@ public class P_1_7_PopulateQBDTInDT {
                         representation_term = "Text";
                     else if (attrType.equals("xbt_BooleanType"))
                         representation_term = "Indicator";
-                    else if (attrName.equals("preferred")){
+                    else if (attrName.equals("preferred") || attrName.equals("preferredIndicator")) {
                         representation_term = "Indicator";
                     }
                 }
@@ -639,9 +638,9 @@ public class P_1_7_PopulateQBDTInDT {
 
                 logger.trace(attrName + " " + representation_term);
 
-                for(int j=0; j<dtsc_vos.size(); j++){
-                    if(dtSc.getPropertyTerm().equals(dtsc_vos.get(j).getPropertyTerm()) &&
-                       dtSc.getRepresentationTerm().equals(dtsc_vos.get(j).getRepresentationTerm())){
+                for (int j = 0; j < dtsc_vos.size(); j++) {
+                    if (dtSc.getPropertyTerm().equals(dtsc_vos.get(j).getPropertyTerm()) &&
+                            dtSc.getRepresentationTerm().equals(dtsc_vos.get(j).getRepresentationTerm())) {
                         dtSc.setBasedDtScId(dtsc_vos.get(j).getDtScId());
                         isNew = false;
                         break;
@@ -701,7 +700,7 @@ public class P_1_7_PopulateQBDTInDT {
 
             DataTypeSupplementaryComponent duplicate = checkDuplicate(inheritedDtSc);
 
-            if(duplicate==null) {
+            if (duplicate == null) {
 
                 inheritedDtSc.setCardinalityMin(baseDtsc.getCardinalityMin());
                 inheritedDtSc.setCardinalityMax(baseDtsc.getCardinalityMax());
@@ -734,7 +733,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public long getAgencyListID() throws Exception {
-        return agencyIdListRepository.findOneByName(AGENCY_ID_LIST_NAME).getAgencyIdListId();
+        return agencyIdListRepository.findOneByName(AGENCY_IDENTIFICATION_NAME).getAgencyIdListId();
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid) throws Exception {

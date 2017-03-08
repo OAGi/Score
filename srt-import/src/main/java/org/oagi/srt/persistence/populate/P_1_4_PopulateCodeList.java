@@ -223,7 +223,11 @@ public class P_1_4_PopulateCodeList {
                     if (!unionMemberStr.equals(checkEnumType)) { //find base code list!
                         unionMemberStr = unionMemberStr.replace("ContentType", "");
 
-                        CodeList baseCodelistVO = codeListRepository.findByNameContaining(unionMemberStr).get(0);
+                        List<CodeList> codeLists = codeListRepository.findByNameContaining(unionMemberStr);
+                        if (codeLists.isEmpty()) {
+                            throw new IllegalStateException();
+                        }
+                        CodeList baseCodelistVO = codeLists.get(0);
 
                         String guid = element.getAttribute("id");
                         CodeList codelistVO = codeListRepository.findOneByGuid(guid);

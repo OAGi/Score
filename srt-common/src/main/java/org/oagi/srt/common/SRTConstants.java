@@ -22,12 +22,10 @@ public class SRTConstants {
 	public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";
 	public static final String TAB_TOP_LEVEL_ABIE_COPY_UC_BIE = "edit_bod";
 
-	public static final String AGENCY_ID_LIST_NAME = "clm63055D08B_AgencyIdentification";
-
 	/*
 	 * To choose OAGIS version
 	 */
-	public static final String OAGIS_VERSION = "10.2";
+	public static final double OAGIS_VERSION = 10.3D;
 
 	public static final String FOREIGNKEY_ERROR_MSG = "a foreign key constraint fails";
 	public static final String CANNOT_DELETE_CONTEXT_CATEGORTY = "Fail to delete. The context category is referenced by the following context schemes: ";

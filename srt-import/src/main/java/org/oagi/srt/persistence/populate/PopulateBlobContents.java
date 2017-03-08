@@ -50,7 +50,7 @@ public class PopulateBlobContents {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws IOException {
-        Release release = releaseRepository.findOneByReleaseNum(OAGIS_VERSION);
+        Release release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
 
         Collection<File> files = Arrays.asList(
                 new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/Common/DataTypes"),

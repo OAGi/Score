@@ -5190,7 +5190,7 @@ In the case of an Operation is the location that the Operation its resulting mat
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="StairCase" id="oagis-id-c28681cf1bb7482b9fbb607189c657fb" minOccurs="0"/>
-					<xsd:element name="Door" type="TextType" id="oagis-id-d5cf91586ae34aa1a2db37ddef6e86dd" minOccurs="0"/>
+                    <xsd:element ref="Door" id="oagis-id-d5cf91586ae34aa1a2db37ddef6e86de" minOccurs="0"/>
 					<xsd:element ref="PostOfficeBox" id="oagis-id-66718baa857a4923837bdce3de752c92" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a Post Office Box number</xsd:documentation>
@@ -5327,7 +5327,7 @@ In the case of an Operation is the location that the Operation its resulting mat
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="preferredIndicator" type="xbt_BooleanType" id="oagis-id-ee8e533f921f4418bb1784fbe2bdb29e"/>
+				<xsd:attribute name="preferredIndicator" type="IndicatorType_CVW231" id="oagis-id-ee8e533f921f4418bb1784fbe2bdb29e"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -5492,7 +5492,7 @@ In the case of an Operation is the location that the Operation its resulting mat
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="preferredIndicator" type="xbt_BooleanType" id="oagis-id-16fb45849e104ff6a21aa0710af42b4d"/>
+				<xsd:attribute name="preferredIndicator" type="IndicatorType_CVW231" id="oagis-id-16fb45849e104ff6a21aa0710af42b4d"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -5543,7 +5543,7 @@ In the case of an Operation is the location that the Operation its resulting mat
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A text description of the responsibility of the associated entity.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="OrganizationUnitID" type="IDType" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960b" minOccurs="0"/>
+                    <xsd:element ref="OrganizationUnitID" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960c" minOccurs="0"/>
 					<xsd:element ref="Communication" id="oagis-id-5fa6ff9600f24706be4f0648d862a155" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="TelephoneCommunication" id="oagis-id-c22d89345dd849d8969abb27874f3234" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="EMailAddressCommunication" id="oagis-id-be75aca323c6453485d7ea2734ba9937" minOccurs="0" maxOccurs="unbounded"/>
@@ -5593,15 +5593,10 @@ In the case of an Operation is the location that the Operation its resulting mat
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">To whom the corrective action is assigned.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="LastModifiedByPersonContact" id="oagis-id-a50fde8d34ca4f37b5f813d7deb62c60">
+	<xsd:element name="LastModifiedByPersonContact" type="ContactType" id="oagis-id-a50fde8d34ca4f37b5f813d7deb62c60">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The person who did the last modification to this document.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexType id="oagis-id-fa8eefcc15ab4d438acf7168c8dfd58d">
-			<xsd:complexContent>
-				<xsd:extension base="ContactType"/>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="RequesterContact" type="ContactType" abstract="false" nillable="false" id="oagis-id-f91f4d85b2764112a7f05af19aff064b">
 		<xsd:annotation>
@@ -13629,7 +13624,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		<xsd:complexContent>
 			<xsd:extension base="IdentificationType">
 				<xsd:sequence>
-					<xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111" minOccurs="0"/>
+                    <xsd:element ref="PurposeCode" id="oagis-id-153c772c244644e1af1ec038a241d112" minOccurs="0"/>
 					<xsd:element ref="AddressLine" id="oagis-id-5de5e2bee7784ecaaebfaf7350763c74" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-c86139e51f994586aed7e904059da37a"/>
@@ -13997,7 +13992,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		<xsd:complexContent>
 			<xsd:extension base="IdentificationType">
 				<xsd:sequence>
-					<xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd" minOccurs="0"/>
+                    <xsd:element ref="ResultName" id="oagis-id-8264b83fb73244f4825421ffefe866ce" minOccurs="0"/>
 					<xsd:element ref="Qualitative" id="oagis-id-1394bdc074bd4865b22cc034d5a033b0" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Quantitative" id="oagis-id-876a9512306c431e96953632e8e1bd05" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
@@ -15476,5 +15471,9 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+    <xsd:element name="Door" type="TextType" id="oagis-id-d5cf91586ae34aa1a2db37ddef6e86dd"/>
+    <xsd:element name="OrganizationUnitID" type="IDType" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960b"/>
+    <xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111"/>
+    <xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd"/>
 	<!---->
 </xsd:schema>

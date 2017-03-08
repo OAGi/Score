@@ -75,7 +75,7 @@
 	<xsd:simpleType name="oacl_CAPACodeContentType" id="oagis-id-dcd5a1b484b843af9f3b3602caef1d3d">
 		<xsd:union memberTypes="oacl_CAPACodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_CAPAResourceTypeCodeEnumurationType" id="oagis-id-cd6812100444436fb41f5d6da05f9d34">
+	<xsd:simpleType name="oacl_CAPAResourceTypeCodeEnumerationType" id="oagis-id-cd6812100444436fb41f5d6da05f9d34">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Person"/>
 			<xsd:enumeration value="Location"/>
@@ -84,7 +84,7 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_CAPAResourceTypeCodeContentType" id="oagis-id-82464202cfec4a1db534f01e87d187b1">
-		<xsd:union memberTypes="oacl_CAPAResourceTypeCodeEnumurationType xsd:token"/>
+		<xsd:union memberTypes="oacl_CAPAResourceTypeCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_CategoryCodeEnumerationType" id="oagis-id-ae69554cc74b4fc6a57977bb382b5f5a">
 		<xsd:restriction base="xsd:token"/>

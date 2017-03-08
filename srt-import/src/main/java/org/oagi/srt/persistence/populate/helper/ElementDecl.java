@@ -14,6 +14,9 @@ public class ElementDecl extends AbstractDeclaration {
     private void setTypeDecl(XSElementDecl xsElementDecl) {
         XSType xsType = xsElementDecl.getType();
         String typeName = xsType.getName();
+        if (typeName == null) {
+            throw new IllegalStateException();
+        }
         String expression = null;
         if (typeName.endsWith("Group")) {
             expression = "//xsd:group[@name='" + xsType.getName() + "']";
