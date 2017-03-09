@@ -828,7 +828,7 @@ The following are a couple of examples: Setup, Teardown, Run</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ScheduleStateCode" type="OpenCodeType" nillable="true" id="oagis-id-059b80a0a0fa41f39f71567b41b6f6fe"/>
-	<xsd:element name="ScreeningListQualifierValue" type="RecordFieldValueType" nillable="true" id="oagis-id-6bf454153e454f8887b5fc29515af355"/>
+	<xsd:element name="ScreeningListQualifierValue" type="RecordOpenFieldValueType" nillable="true" id="oagis-id-6bf454153e454f8887b5fc29515af355"/>
 	<xsd:element name="ScreeningSearchTypeCode" type="OpenCodeType" nillable="true" id="oagis-id-5e9f2ea384824ea49fe75980bf87cf82">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">HR/XML 3.0: Classifies the type of screening service to be performed.</xsd:documentation>
@@ -3752,7 +3752,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="PrioritySequenceValue" type="ValueType_039C44" nillable="true" id="oagis-id-19bea1e4239945c58e05b7e8c48f78fd"/>
-	<xsd:element name="ScreeningListRecordValue" type="RecordFieldValueType" nillable="true" id="oagis-id-0bf74583b97c4cb1a1b30f830b01551c"/>
+	<xsd:element name="ScreeningListRecordValue" type="RecordOpenFieldValueType" nillable="true" id="oagis-id-0bf74583b97c4cb1a1b30f830b01551c"/>
 	<xsd:element name="SecondValue" type="OpenFieldValueType" nillable="true" id="oagis-id-b0ab513e45ea4cbdba16b7b24c76ef9f"/>
 	<xsd:element name="Value" type="ValueType" nillable="true" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9"/>
 	<!--=======================-->
@@ -4007,7 +4007,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="RecordFieldValueType" id="oagis-id-de22296a3390465eb652dc43a7676bc0">
+	<xsd:complexType name="RecordOpenFieldValueType" id="oagis-id-de22296a3390465eb652dc43a7676bc0">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenFieldValueType"/>
 		</xsd:simpleContent>
@@ -4112,7 +4112,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:element name="UpperLimit" type="NameValuePairValueType" nillable="true" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
 	<xsd:element name="LowerLimit" type="NameValuePairValueType" nillable="true" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
-	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" nillable="true" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
+	<xsd:element name="RecordFieldValue" type="RecordOpenFieldValueType" nillable="true" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
 	<xsd:element name="AcceptableValue" type="NameValuePairValueType" nillable="true" id="oagis-id-8481f83d71d14f10b59d46027d363265">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The value that would represents a satisfactory outcome </xsd:documentation>
@@ -8236,11 +8236,6 @@ supplementary information.</ccts_Definition>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:complexType name="OpenRecordFieldValueType" id="oagis-id-3e4fddf92fe340eea22d082abd905c0c">
-		<xsd:simpleContent>
-			<xsd:extension base="RecordFieldValueType"/>
 		</xsd:simpleContent>
 	</xsd:complexType>
 </xsd:schema>
