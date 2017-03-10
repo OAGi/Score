@@ -39,7 +39,7 @@ All Quantity information will be updated as replacing the entire field, not incr
 		<xsd:complexContent>
 			<xsd:extension base="ItemInstanceBaseType">
 				<xsd:sequence>
-					<xsd:element ref="GLEntityID" id="oagis-id-2035d0e33f0c4f93b1e04caa45ce40ec" minOccurs="0">
+					<xsd:element ref="GLEntityID" id="oagis-id-95e7d287fbad4f40aaf6f0b493d8363d" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
 
@@ -48,17 +48,17 @@ It is normally the primary balancing segment of the GL Account structure.  Typic
 Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="Status" id="oagis-id-8f4f5ffb024f47a68f4737369267bc0d" minOccurs="0">
+					<xsd:element ref="Status" id="oagis-id-ca506eca8a2048f5aa0646cdbf94d77e" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="ReasonCode" id="oagis-id-b3adace75102464c87093383836018be" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="ReasonCode" id="oagis-id-cb2f0f3086414f33a44306187a3f64d0" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="TransactionDateTime" id="oagis-id-5abafea1a19848b6b7dd5f7223e49e1c" minOccurs="0">
+					<xsd:element ref="TransactionDateTime" id="oagis-id-4296e69b19b14824ae72bafbcfadf594" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The DateTime of occurrence of the transaction</xsd:documentation>
 						</xsd:annotation>
@@ -137,7 +137,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 </xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="ItemInstance" id="oagis-id-a77a4856644f4cfc9d5e3a6c4f9681f1" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ItemInstance" id="oagis-id-6532276bf52f4c1f9f5d3e32b3df8be9" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

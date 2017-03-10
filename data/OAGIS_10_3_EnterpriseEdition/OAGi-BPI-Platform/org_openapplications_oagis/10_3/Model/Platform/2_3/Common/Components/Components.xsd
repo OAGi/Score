@@ -96,7 +96,7 @@
 			</xsd:element>
 			<xsd:element ref="LineIDSet" id="oagis-id-880bc0c044b6468eadfed3d4377f5607" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-eac640c618e848f68d8b9b2e8669da31"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-eac640c618e848f68d8b9b2e8669da31"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-8d126ae0d8c74926b742949a7d784529"/>
 	</xsd:complexType>
 	<xsd:complexType name="LineIdentificationType" id="oagis-id-9d3bd18371e84bbea58f35759c580238">
@@ -406,7 +406,7 @@ In software applications, this phrase is commonly split into two coded pieces, a
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-43407ad2112d4db09e3a4e3cc206edc4"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-43407ad2112d4db09e3a4e3cc206edc4"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-e69efa39a6fc412e8b50cbcb03142dc3"/>
 	</xsd:complexType>
 	<xsd:complexType name="FinancialAccountType" abstract="false" id="oagis-id-10bd758770a34aa08412410c504a40b5" mixed="false">
@@ -1786,7 +1786,7 @@ Kit</xsd:documentation>
 			<xsd:element ref="VariationID" id="oagis-id-8e384436ef2543f595a1d12aa2c70ec8" minOccurs="0"/>
 			<xsd:element ref="ItemIDSet" id="oagis-id-6adca4be96c14feb8a4a1e8220bbfded" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-325b34cc48c94d2cae5a5d7c5d72c633"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-325b34cc48c94d2cae5a5d7c5d72c633"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-900de0a394fa4f0b890b236c50d569aa"/>
 	</xsd:complexType>
 	<xsd:complexType name="ItemIdentificationType" id="oagis-id-e3dc25b35e5e4ec4a5c4d10e3f056604">
@@ -2098,7 +2098,7 @@ Kit</xsd:documentation>
 					<xsd:group ref="ItemInstanceIDsGroup" id="oagis-id-cd786d5b38314a6a85b2f5f341e5645d"/>
 					<xsd:element ref="ItemInstance" id="oagis-id-2c8fc58c0f9e428cabae1ce8fe00cf16" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-3d1989fe1d434dbd81731d5082023b8d"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-3d1989fe1d434dbd81731d5082023b8d"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-5a85f48e00cf47ccabc903108c55904e"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -3338,7 +3338,7 @@ HazardousMaterialType as defined in the Reusable Aggregate Business Information 
 					</xsd:element>
 					<xsd:element ref="LineIDSet" id="oagis-id-49f7c6f5706146cebb0bbbecf2c664c1" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-e1c2af70d995425eb1aa93b032fd94e3"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-e1c2af70d995425eb1aa93b032fd94e3"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-0630e20feb4c4198873e1596782bfba2"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -4103,7 +4103,7 @@ For the supplier schedule to respond to the original demand schedule, the Respon
 			</xsd:element>
 			<xsd:element ref="CCRID" id="oagis-id-817edb23ba3a40af88c1ec119962133d" minOccurs="0"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-07e947edb86f4110b02700ac45b79fb7"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-07e947edb86f4110b02700ac45b79fb7"/>
 		<xsd:attribute name="role" type="PartyRoleCodeContentType" use="optional" id="oagis-id-42c1530589ad4a608cb3c7668952f97b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-4e8b35f5993e4e218ea5e5ce58b89a6a"/>
 	</xsd:complexType>
@@ -8229,7 +8229,7 @@ Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
 					<xsd:element ref="GuarenteeDate" id="oagis-id-8d39303ce7ce42edaff0b17b227ed41c" minOccurs="0"/>
 					<xsd:element ref="GuarnteeAmount" id="oagis-id-2087af1b8087410eb0175fb018c36ca0" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" id="oagis-id-ae0502b7cc464b7497b2b7df8a4538f0"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-ae0502b7cc464b7497b2b7df8a4538f0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -10584,7 +10584,7 @@ Possible values:
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-4550c325d31f4dc7b4a7407fedb10c2d"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-4550c325d31f4dc7b4a7407fedb10c2d"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-36ce5ee856e3412a81691469fed9e804"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -10719,7 +10719,7 @@ The following are a couple of examples: Setup, Tear-down, Run</xsd:documentation
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-2ada2265fa9d432a8ba09b1a3718ad13"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2ada2265fa9d432a8ba09b1a3718ad13"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-e72a1c2287da4dc4bd201362fff590b6"/>
 				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-c591acc5b0614dfab5fa528033b7551f">
 					<xsd:annotation>
@@ -14116,7 +14116,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:element ref="UpperLimit" id="oagis-id-c52cd84b942a49ef89d0078ac79498cd" minOccurs="0"/>
 			<xsd:element ref="LowerLimit" id="oagis-id-9590f69cc0ed450cad020ffeada240ff" minOccurs="0"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-5ee2f83a9ff84459972a827524b92991">
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-5ee2f83a9ff84459972a827524b92991">
 			<xsd:annotation>
 				<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the type of the information being passed in the NameValue.</xsd:documentation>
 			</xsd:annotation>

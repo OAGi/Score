@@ -459,7 +459,7 @@ Values are:
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ending production sequence number, name, or identifier given to a manufactured or assembled item for use in sequenced part requirements and shipments for a given day's requirements</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EngineeringWorkRequestCode" type="EngineeringWorkRequestCodeContentType" nillable="true" id="oagis-id-b431bc4e5a684aed8933e069f5adf52e">
+	<xsd:element name="EngineeringWorkRequestCodeType" type="EngineeringWorkRequestCodeContentType" nillable="true" id="oagis-id-b431bc4e5a684aed8933e069f5adf52e">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Code type specifing the type of Engineering Work Request.</xsd:documentation>
 		</xsd:annotation>

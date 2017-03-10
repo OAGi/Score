@@ -738,7 +738,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="TextType_0F0ZX1">
-				<xsd:attribute name="expressionLanguage" type="TextType_0F0ZX1" use="optional" id="oagis-id-99f7c6c49493417191e281586fbe9223"/>
+				<xsd:attribute name="expressionLanguage" type="xsd:token" use="optional" id="oagis-id-99f7c6c49493417191e281586fbe9223"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -757,7 +757,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 		<xsd:simpleContent>
 			<xsd:extension base="TextType_0F0ZX1">
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" use="required" id="oagis-id-c05ff56ed80d42d59fdeabddb5891126"/>
-				<xsd:attribute name="expressionLanguage" type="TextType_0F0ZX1" use="optional" id="oagis-id-314bd79fb54147c993bafd54d37101aa"/>
+				<xsd:attribute name="expressionLanguage" type="xsd:token" use="optional" id="oagis-id-314bd79fb54147c993bafd54d37101aa"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -792,7 +792,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 		<xsd:simpleContent>
 			<xsd:extension base="TextType_0F0ZX1">
 				<xsd:attribute name="actionCode" type="ResponseActionCodeContentType" use="required" id="oagis-id-1c020ca70a2440a0b490fabaed6100a5"/>
-				<xsd:attribute name="expressionLanguage" type="TextType_0F0ZX1" use="optional" id="oagis-id-d3f9ec6ec1974ffd93168e4d39262ed1"/>
+				<xsd:attribute name="expressionLanguage" type="xsd:token" use="optional" id="oagis-id-d3f9ec6ec1974ffd93168e4d39262ed1"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>

@@ -26,7 +26,9 @@
 	<!-- ====================================================================== -->
 	<!-- =====  Root Element Declaration				      ===== -->
 	<!-- ====================================================================== -->
+	<!--
 	<xsd:element name="clm63055D16B_AgencyIdentification" type="clm63055D16B_AgencyIdentificationContentType" id="oagis-id-c7d666c08d564a5eb04880589f288834"/>
+	-->
 	<!-- ====================================================================== -->
 	<!-- =====  Type Definitions					      ===== -->
 	<!-- ====================================================================== -->
@@ -37,8 +39,6 @@
 	</xsd:simpleType>
 	<xsd:simpleType name="clm63055D16B_AgencyIdentificationContentEnumerationType" id="oagis-id-67f13ff79c7d4fe4b5c927f933e5acfb">
 		<xsd:restriction base="xsd:token">
-			<xsd:minLength value="1"/>
-			<xsd:maxLength value="3"/>
 			<xsd:enumeration value="1">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10">

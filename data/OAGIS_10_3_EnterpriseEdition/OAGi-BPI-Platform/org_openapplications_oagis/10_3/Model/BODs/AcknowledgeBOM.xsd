@@ -46,7 +46,7 @@ There are many possible business applications in several environments that may u
 	</xsd:complexType>
 	<xsd:complexType name="AcknowledgeBOMDataAreaType" id="oagis-id-ad1161582d0d4e0aa2ac44358a9d9a2c">
 		<xsd:sequence>
-			<xsd:element ref="Acknowledge" id="oagis-id-f8b4f55ad21d471dbbe204a156e520f7"/>
+			<xsd:element ref="Acknowledge" id="oagis-id-0cae17be94694b80836d1f0c2faf547c"/>
 			<xsd:element ref="BOM" id="oagis-id-0cdae06e26314915b44fd03bc405582e" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
