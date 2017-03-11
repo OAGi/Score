@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
@@ -191,6 +192,7 @@ public class P_1_6_PopulateDTFromMeta {
             Element attrElement = (Element) attributeList.item(i);
             String attribute_name = attrElement.getAttribute("name");
             String attribute_id = attrElement.getAttribute("id");
+            String attribute_type = attrElement.getAttribute("type");
 
             DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
             vo.setOwnerDtId(dt.getDtId());
@@ -231,14 +233,10 @@ public class P_1_6_PopulateDTFromMeta {
             vo.setDefinition(definition);
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-            dtScRepository.saveAndFlush(vo);
+            vo = dtScRepository.saveAndFlush(vo);
 
-            DataTypeSupplementaryComponent insertedSC = dtScRepository.findOneByGuid(vo.getGuid());
-
-            populateCDTSCAwdPri(insertedSC);
-
-            populateBDTSCPrimitiveRestriction(insertedSC);
-
+            populateCDTSCAwdPri(vo, attribute_type);
+            populateBDTSCPrimitiveRestriction(vo, attribute_type);
         }
 
         //For LanguageCode SC
@@ -253,60 +251,56 @@ public class P_1_6_PopulateDTFromMeta {
         vo.setOwnerDtId(dt.getDtId());
         vo.setPropertyTerm(languageCodeSC.getPropertyTerm());
         vo.setRepresentationTerm(languageCodeSC.getRepresentationTerm());
-        dtScRepository.saveAndFlush(vo);
+        vo = dtScRepository.saveAndFlush(vo);
 
-        DataTypeSupplementaryComponent insertedSC = dtScRepository.findOneByGuid(vo.getGuid());
-
-        populateBDTSCPrimitiveRestriction(insertedSC);
-
+        populateBDTSCPrimitiveRestriction(vo, null);
     }
 
-    public void populateCDTSCAwdPri(DataTypeSupplementaryComponent dtsc){
-        long cdtSCAPId = -1L;
+    public void populateCDTSCAwdPri(DataTypeSupplementaryComponent dtSc, String type) {
+        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAP_normalizedString
+                = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
+        cdtSCAP_normalizedString.setCdtScId(dtSc.getDtScId());
+        cdtSCAP_normalizedString.setCdtPriId(NormalizedStringCDTPrimitiveId);
 
-        //For NormalizedString Primitive
-        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAP = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
+        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAP_string
+                = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
+        cdtSCAP_string.setCdtScId(dtSc.getDtScId());
+        cdtSCAP_string.setCdtPriId(StringCDTPrimitiveId);
 
-        cdtSCAP.setCdtScId(dtsc.getDtScId());
-        cdtSCAP.setCdtPriId(NormalizedStringCDTPrimitiveId);
-        if(dtsc.getPropertyTerm().equals("Expression Language")){
-            cdtSCAP.setDefault(true);
+        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAP_token
+                = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
+        cdtSCAP_token.setCdtScId(dtSc.getDtScId());
+        cdtSCAP_token.setCdtPriId(TokenCDTPrimitiveId);
+
+        if (type.equals("xsd:normalizedString")) {
+            cdtSCAP_normalizedString.setDefault(true);
+        } else if (type.equals("xsd:string")) {
+            cdtSCAP_string.setDefault(true);
+        } else if (type.equals("xsd:token") || dtSc.getPropertyTerm().equals("Action")) {
+            cdtSCAP_token.setDefault(true);
+        } else {
+            throw new IllegalArgumentException("Not allowed 'type': " + type + " in " + dtSc);
         }
-        else {
-            cdtSCAP.setDefault(false);
-        }
-        cdtScAwdPriRepository.saveAndFlush(cdtSCAP);
-        cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), NormalizedStringCDTPrimitiveId).getCdtScAwdPriId();
+
+        long cdtSCAPId;
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAPXTypeMap;
+
+        cdtSCAP_normalizedString = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_normalizedString);
+        cdtSCAPId = cdtSCAP_normalizedString.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(NormalizedStringXBTId);
         cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtSCAPXTypeMap);
 
-        //For String Primitive
-        cdtSCAP = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
-        cdtSCAP.setCdtScId(dtsc.getDtScId());
-        cdtSCAP.setCdtPriId(StringCDTPrimitiveId);
-        cdtSCAP.setDefault(false);
-        cdtScAwdPriRepository.saveAndFlush(cdtSCAP);
-        cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), StringCDTPrimitiveId).getCdtScAwdPriId();
+        cdtSCAP_string = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_string);
+        cdtSCAPId = cdtSCAP_string.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(StringXBTId);
         cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtSCAPXTypeMap);
 
-        //For Token Primitive
-        cdtSCAP = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
-        cdtSCAP.setCdtScId(dtsc.getDtScId());
-        cdtSCAP.setCdtPriId(TokenCDTPrimitiveId);
-        if(dtsc.getPropertyTerm().equals("Action")){
-            cdtSCAP.setDefault(true);
-        }
-        else {
-            cdtSCAP.setDefault(false);
-        }
-        cdtScAwdPriRepository.saveAndFlush(cdtSCAP);
-        cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), TokenCDTPrimitiveId).getCdtScAwdPriId();
+        cdtSCAP_token = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_token);
+        cdtSCAPId = cdtSCAP_token.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(TokenXBTId);
@@ -314,53 +308,55 @@ public class P_1_6_PopulateDTFromMeta {
     }
 
 
-    public void populateBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtsc){
-        long dtscId = dtsc.getDtScId();
+    public void populateBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtSc, String type) {
+        long dtScId = dtSc.getDtScId();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
 
-        if(dtsc.getPropertyTerm().equals("Language")){
+        if (dtSc.getPropertyTerm().equals("Language")) {
 
             CodeList cdl = codeListRepository.findOneByName("clm56392A20081107_LanguageCode");
             bdtSCPri.setCodeListId(cdl.getCodeListId());
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(0);
             bdtSCPri.setDefault(false);
-            bdtSCPri.setBdtScId(dtscId);
+            bdtSCPri.setBdtScId(dtScId);
             bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
-            inheritLanguageCode(dtsc);
+            inheritLanguageCode(dtSc);
 
+        } else if (dtSc.getPropertyTerm().equals("Expression Language")) {
 
-        }
-        else if (dtsc.getPropertyTerm().equals("Expression Language")){
+            if ("xsd:normalizedString".equals(type)) {
+                populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), NormalizedStringCDTPrimitiveId);
+            } else if ("xsd:normalizedString".equals(type)) {
+                populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), StringCDTPrimitiveId);
+            } else if ("xsd:token".equals(type)) {
+                populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), TokenCDTPrimitiveId);
+            } else {
+                throw new IllegalArgumentException("Not allowed 'type': " + type + " in " + dtSc);
+            }
 
-            populateBDTSCPrimitiveFromCDTSC(dtsc.getDtScId(), NormalizedStringCDTPrimitiveId);
+        } else if (dtSc.getPropertyTerm().equals("Action")) {
 
-        }
-        else if(dtsc.getPropertyTerm().equals("Action")){
-
-
-            DataType baseDT = dataTypeRepository.findOne(dtsc.getOwnerDtId());
+            DataType baseDT = dataTypeRepository.findOne(dtSc.getOwnerDtId());
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
 
-            if(baseDT.getDen().equals("Action Expression. Type")){
+            if (baseDT.getDen().equals("Action Expression. Type")) {
                 CodeList actionCode = codeListRepository.findOneByName("oacl_ActionCode");
                 bdtSCPri.setCodeListId(actionCode.getCodeListId());
                 bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
-            }
-            else if (baseDT.getDen().equals("Response Expression. Type")){
+            } else if (baseDT.getDen().equals("Response Expression. Type")) {
                 CodeList responseActionCode = codeListRepository.findOneByName("oacl_ResponseActionCode");
                 bdtSCPri.setCodeListId(responseActionCode.getCodeListId());
                 bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
             }
 
-            populateBDTSCPrimitiveFromCDTSC(dtsc.getDtScId(), TokenCDTPrimitiveId);
+            populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), TokenCDTPrimitiveId);
 
 
-        }
-        else {
+        } else {
             System.out.println("************************************************************ERROR***********************************");
             System.out.println("************************************************************ERROR***********************************");
             System.out.println("************************************************************ERROR***********************************");
@@ -369,29 +365,29 @@ public class P_1_6_PopulateDTFromMeta {
         }
     }
 
-    public void populateBDTSCPrimitiveFromCDTSC(long dtscId, long defaultCDTPriIndex){
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPriList = cdtScAwdPriRepository.findByCdtScId(dtscId);
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+    public void populateBDTSCPrimitiveFromCDTSC(long dtScId, long defaultCDTPriIndex) {
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPriList = cdtScAwdPriRepository.findByCdtScId(dtScId);
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri;
 
-        for(int i=0; i<cdtSCAwdPriList.size(); i++){
+        for (int i = 0; i < cdtSCAwdPriList.size(); i++) {
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtscId);
+            bdtSCPri.setBdtScId(dtScId);
 
-            if(cdtSCAwdPriList.get(i).getCdtPriId()==defaultCDTPriIndex){
+            CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri = cdtSCAwdPriList.get(i);
+            long cdtPriId = cdtSCAwdPri.getCdtPriId();
+
+            if (cdtPriId == defaultCDTPriIndex) {
                 bdtSCPri.setDefault(true);
-            }
-            else {
+            } else {
                 bdtSCPri.setDefault(false);
             }
 
             long xbtId = -1L;
-            if(cdtSCAwdPriList.get(i).getCdtPriId()==NormalizedStringCDTPrimitiveId){
+            if (cdtPriId == NormalizedStringCDTPrimitiveId) {
                 xbtId = NormalizedStringXBTId;
-            }
-            else if (cdtSCAwdPriList.get(i).getCdtPriId()==StringCDTPrimitiveId){
+            } else if (cdtPriId == StringCDTPrimitiveId) {
                 xbtId = StringXBTId;
-            }
-            else if (cdtSCAwdPriList.get(i).getCdtPriId()==TokenCDTPrimitiveId){
+            } else if (cdtPriId == TokenCDTPrimitiveId) {
                 xbtId = TokenXBTId;
             }
 
