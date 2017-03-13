@@ -15,6 +15,7 @@ public class CodeListCreateWithoutBaseBean extends CodeListBaseBean {
 
     @PostConstruct
     public void init() {
+        super.init();
         setAllUsedIndicator(false);
     }
 }
