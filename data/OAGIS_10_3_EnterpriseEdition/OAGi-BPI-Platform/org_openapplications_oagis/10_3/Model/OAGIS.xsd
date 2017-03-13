@@ -69,9 +69,6 @@
 	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveAction.xsd"/>
 	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveActionPlan.xsd"/>
 	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveActionRequest.xsd"/>
-	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveAction.xsd"/>
-	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveActionPlan.xsd"/>
-	<xsd:include schemaLocation="BODs/AcknowledgeCorrectiveActionRequest.xsd"/>	
 	<xsd:include schemaLocation="BODs/AcknowledgeCredit.xsd"/>
 	<xsd:include schemaLocation="BODs/AcknowledgeCreditStatus.xsd"/>
 	<xsd:include schemaLocation="BODs/AcknowledgeCreditTransfer.xsd"/>
@@ -1177,6 +1174,40 @@
 	<xsd:element name="OAGIS10BODs" type="OAGIS10BODsType" id="oagis-id-f3ed8e216f6e4df7a4143f6a8babc42b"/>
 	<xsd:complexType name="OAGIS10BODsType" id="oagis-id-1a0c82a0401a47ce85f9503125aba09c">
 		<xsd:sequence>
+			<xsd:element ref="AcknowledgeField" id="oagis-id-6dbbb91542e9324bb55f031241e57357" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeTable" id="oagis-id-499e7b2126e93e0c912ed4e145cd7446" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeUOMGroup" id="oagis-id-f98d3af6d32133cba521d110df44d381" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeField" id="oagis-id-1fee74f05e1d3d768328ca33320adda6" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeTable" id="oagis-id-8cbbf2c96da73f7fac0935e42172d35c" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeUOMGroup" id="oagis-id-bfb37b9a5bd23b33a29bcad46ba648f3" minOccurs="0"/>
+			<xsd:element ref="CancelField" id="oagis-id-82d60b3cb4e63940b45e260fcfee3796" minOccurs="0"/>
+			<xsd:element ref="CancelTable" id="oagis-id-285e63e47af43e6db0bcb1d4af3f24f3" minOccurs="0"/>
+			<xsd:element ref="CancelUOMGroup" id="oagis-id-58dc6c4b803b36ba93f3fb393b1792ea" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeField" id="oagis-id-88f8b342d2483d58ba56ca76fa478735" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeTable" id="oagis-id-5332628b36e73eadad54338f5cf1dc51" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeUOMGroup" id="oagis-id-2a8e83caabe732658efc75e0e87ecb6f" minOccurs="0"/>
+			<xsd:element ref="ChangeField" id="oagis-id-53e1bdd461e23b618b8dcbb33aefb18b" minOccurs="0"/>
+			<xsd:element ref="ChangeTable" id="oagis-id-c6b1d5a0b77130498017c5f67d2a7873" minOccurs="0"/>
+			<xsd:element ref="ChangeUOMGroup" id="oagis-id-4bea9c1a9c1f3c5eb68c7039560a9402" minOccurs="0"/>
+			<xsd:element ref="ConfirmBOD" id="oagis-id-742b9050b172337daf0783ab7ea585cd" minOccurs="0"/>
+			<xsd:element ref="GetField" id="oagis-id-a431ce9722b13a3385629e75551a66cd" minOccurs="0"/>
+			<xsd:element ref="GetTable" id="oagis-id-5a83d16efd553ad9b1bf149be4681cab" minOccurs="0"/>
+			<xsd:element ref="GetUOMGroup" id="oagis-id-1f936a2a10ba37f197a77636bcf223d3" minOccurs="0"/>
+			<xsd:element ref="NotifyField" id="oagis-id-331582bd14ac31d4b4ada1c66f32b016" minOccurs="0"/>
+			<xsd:element ref="NotifyTable" id="oagis-id-0774987f704a3fd893d70bbf26f7aa59" minOccurs="0"/>
+			<xsd:element ref="NotifyUOMGroup" id="oagis-id-5f03717f15a8373aaf9237246ca5fed6" minOccurs="0"/>
+			<xsd:element ref="ProcessField" id="oagis-id-195fc682b76138418545855b643bea7d" minOccurs="0"/>
+			<xsd:element ref="ProcessTable" id="oagis-id-30f119d98cee3af08d33abda5a387f8d" minOccurs="0"/>
+			<xsd:element ref="ProcessUOMGroup" id="oagis-id-f52e97578eee3d6da0564c6c4dc59ab3" minOccurs="0"/>
+			<xsd:element ref="ShowField" id="oagis-id-6981fb81a69032b89233dd4fe261ab38" minOccurs="0"/>
+			<xsd:element ref="ShowTable" id="oagis-id-cba8365204c334e7926bd05e4add2fd0" minOccurs="0"/>
+			<xsd:element ref="ShowUOMGroup" id="oagis-id-9b0bd511525934eea9d93be01da128da" minOccurs="0"/>
+			<xsd:element ref="SyncField" id="oagis-id-868a839cccdc351f8f5907f8e2823c9d" minOccurs="0"/>
+			<xsd:element ref="SyncResponseField" id="oagis-id-826f2f7c8937358f8e450184c177c366" minOccurs="0"/>
+			<xsd:element ref="SyncResponseTable" id="oagis-id-77d9fb39fd503ff18866e69f5e1e1272" minOccurs="0"/>
+			<xsd:element ref="SyncResponseUOMGroup" id="oagis-id-510e695db2bb33d894a3caa71c65b13f" minOccurs="0"/>
+			<xsd:element ref="SyncTable" id="oagis-id-269c113ba20b312cb0be2a442cef6b1a" minOccurs="0"/>
+			<xsd:element ref="SyncUOMGroup" id="oagis-id-d6908991280c3ad9a100ab3fe3213a2b" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeAllocateResource" id="oagis-id-a91df375d73c4148ac3f9383e240cad5" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeBatchCertificateOfAnalysis" id="oagis-id-83fe2fe7324045188f9c41ff3f908d81" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeBOM" id="oagis-id-ba247915c5764dbd84ed6944bb31851e" minOccurs="0"/>

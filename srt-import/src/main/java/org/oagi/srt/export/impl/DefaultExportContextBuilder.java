@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -43,7 +44,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
 
-        List<Module> moduleList = moduleRepository.findAll();
+        List<Module> moduleList = moduleRepository.findAll(new Sort(Sort.Direction.ASC, "moduleId"));
         Map<Long, SchemaModule> moduleMap = moduleList.stream()
                 .collect(Collectors.toMap(Module::getModuleId, module -> new SchemaModule(module)));
 
@@ -65,7 +66,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             context.addSchemaModule(schemaModule);
         }
 
-        for (ModuleDep moduleDep : moduleDepRepository.findAll()) {
+        for (ModuleDep moduleDep : moduleDepRepository.findAll(new Sort(Sort.Direction.ASC, "moduleDepId"))) {
             Module dependingModule = moduleDep.getDependingModule();
             Module dependedModule = moduleDep.getDependedModule();
 
@@ -217,7 +218,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     }
 
     private void createBlobContents(Map<Long, SchemaModule> moduleMap) {
-        for (BlobContent blobContent : blobContentRepository.findAll()) {
+        for (BlobContent blobContent : blobContentRepository.findAll(new Sort(Sort.Direction.ASC, "blobContentId"))) {
 
             SchemaModule schemaModule = moduleMap.get(blobContent.getModule().getModuleId());
             schemaModule.setContent(blobContent.getContent());

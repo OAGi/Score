@@ -35,10 +35,10 @@
 	<xsd:include schemaLocation="Nouns/CommercialInvoice.xsd"/>
 	<xsd:include schemaLocation="Nouns/Configuration.xsd"/>
 	<xsd:include schemaLocation="Nouns/ConfirmWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/CostingActivity.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveAction.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveActionPlan.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveActionRequest.xsd"/>
-	<xsd:include schemaLocation="Nouns/CostingActivity.xsd"/>
 	<xsd:include schemaLocation="Nouns/Credit.xsd"/>
 	<xsd:include schemaLocation="Nouns/CreditStatus.xsd"/>
 	<xsd:include schemaLocation="Nouns/CreditTransfer.xsd"/>
