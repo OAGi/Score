@@ -67,6 +67,7 @@
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column headerText="#{editProfileBODBean.getModule(editProfileBODBean.topLevelNode.asccp.moduleId)}">
                                     <h:selectBooleanCheckbox rendered="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
+                                                             disabled="#{editProfileBODBean.topLevelNode.type.abie.state ne 'Editing'}"
                                                              value="${node.used}" style="margin-right: 5px;">
                                         <p:ajax listener="#{editProfileBODBean.onChangeData(node)}"
                                                 update=":form:treeTable, :form:editingPanel, :form:btnGroup"/>
