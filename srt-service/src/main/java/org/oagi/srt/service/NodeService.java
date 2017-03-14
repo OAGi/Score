@@ -265,7 +265,11 @@ public class NodeService {
     }
 
     private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc) {
-        List<CoreComponentRelation> associationsWithoutRecursive = getAssociationsWithoutRecursive(acc);
+        return getAssociations(acc, null);
+    }
+
+    private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc, CoreComponentState state) {
+        List<CoreComponentRelation> associationsWithoutRecursive = getAssociationsWithoutRecursive(acc, state);
         List<CoreComponentRelation> associations = new ArrayList();
 
         for (int i = 0, len = associationsWithoutRecursive.size(); i < len; ++i) {
@@ -274,7 +278,7 @@ public class NodeService {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
                 AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc);
                 if (isGroup(roleOfAcc)) {
-                    associations.addAll(getAssociations(roleOfAcc));
+                    associations.addAll(getAssociations(roleOfAcc, state));
                 } else {
                     associations.add(ascc);
                 }
@@ -286,19 +290,31 @@ public class NodeService {
         return associations;
     }
 
-    private List<CoreComponentRelation> getAssociationsWithoutRecursive(AggregateCoreComponent acc) {
+    private List<CoreComponentRelation> getAssociationsWithoutRecursive(AggregateCoreComponent acc, CoreComponentState state) {
         long accId = acc.getAccId();
 
         List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-        List<AssociationCoreComponent> asccList =
-                asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-        coreComponentRelations.addAll(asccList);
-        List<BasicCoreComponent> bccList =
-                bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-        coreComponentRelations.addAll(bccList);
-        Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
+        if (state != null) {
+            List<AssociationCoreComponent> asccList =
+                    asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            coreComponentRelations.addAll(asccList);
+            List<BasicCoreComponent> bccList =
+                    bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            coreComponentRelations.addAll(bccList);
+            Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
 
-        return coreComponentRelations;
+            return coreComponentRelations;
+        } else {
+            List<AssociationCoreComponent> asccList =
+                    asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            coreComponentRelations.addAll(asccList);
+            List<BasicCoreComponent> bccList =
+                    bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            coreComponentRelations.addAll(bccList);
+            Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
+
+            return coreComponentRelations;
+        }
     }
 
     private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent associationCoreComponent) {
@@ -769,7 +785,7 @@ public class NodeService {
                 while (!accList.isEmpty()) {
                     acc = accList.pollLast();
 
-                    List<CoreComponentRelation> associations = getAssociations(acc);
+                    List<CoreComponentRelation> associations = getAssociations(acc, CoreComponentState.Published);
                     for (CoreComponentRelation relation : associations) {
                         if (relation instanceof AssociationCoreComponent) {
                             AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
