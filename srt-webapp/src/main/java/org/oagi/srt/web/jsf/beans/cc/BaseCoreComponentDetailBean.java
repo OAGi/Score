@@ -73,7 +73,7 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
         String type = treeNodeTypeNameResolver.getType();
         TreeNode treeNode = new DefaultTreeNode(type, node, parent);
-        if (node.hasChild()) {
+        if (node.hasChild() || ((node instanceof ACCNode) && ((ACCNode) node).getAcc() != null)) {
             new DefaultTreeNode(null, treeNode); // append a dummy child
         }
         return treeNode;

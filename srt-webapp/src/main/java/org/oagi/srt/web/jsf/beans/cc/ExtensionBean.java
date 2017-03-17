@@ -8,7 +8,6 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
-import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -33,8 +32,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
-import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
-import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -165,17 +162,32 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        CCNode coreComponentTreeNode = (CCNode) treeNode.getData();
-        Boolean expanded = (Boolean) coreComponentTreeNode.getAttribute("expanded");
+        CCNode ccNode = (CCNode) treeNode.getData();
+        Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
         if (expanded == null || expanded == false) {
-            if (coreComponentTreeNode.hasChild()) {
-                treeNode.setChildren(new ArrayList()); // clear children
+            if (ccNode.hasChild() || ((ccNode instanceof ACCNode) && ((ACCNode) ccNode).getAcc() != null)) {
+                clearChildren(treeNode);
+            }
 
-                for (CCNode child : coreComponentTreeNode.getChildren()) {
+            if (ccNode instanceof ACCNode) {
+                ACCNode accNode = (ACCNode) ccNode;
+                ACCNode baseAccNode = accNode.getBase();
+                if (baseAccNode != null) {
+                    toTreeNode(baseAccNode, treeNode);
+                }
+            }
+            if (ccNode.hasChild()) {
+                for (CCNode child : ccNode.getChildren()) {
                     toTreeNode(child, treeNode);
                 }
             }
-            coreComponentTreeNode.setAttribute("expanded", true);
+            ccNode.setAttribute("expanded", true);
+        }
+    }
+
+    private void clearChildren(DefaultTreeNode treeNode) {
+        if (!treeNode.getChildren().isEmpty()) {
+            treeNode.setChildren(new ArrayList());
         }
     }
 
@@ -551,9 +563,16 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
             if (compareTo != 0) {
                 return compareTo;
             } else {
-                return getCreationTimestamp(a).compareTo(getCreationTimestamp(b));
+                if (a instanceof BDTSCNode || b instanceof BDTSCNode) {
+                    return 0;
+                } else {
+                    Date aTs = getCreationTimestamp(a);
+                    Date bTs = getCreationTimestamp(b);
+                    return aTs.compareTo(bTs);
+                }
             }
         });
+
         /*
          * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
          * to clarify children's order for node selection
