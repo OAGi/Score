@@ -40,7 +40,10 @@
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
                               sortBy="#{profileBOD.bizCtxName}">
-                        <h:outputText value="#{profileBOD.bizCtxName}"/>
+                        <h:link value="#{profileBOD.bizCtxName}"
+                                outcome="/views/business_context/details.xhtml">
+                            <f:param name="bizCtxId" value="#{profileBOD.bizCtxId}"/>
+                        </h:link>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.ownerName}">
