@@ -1279,6 +1279,7 @@ public class NodeService {
 //                bbie.setCodeListId(codeListId);
 //            }
             bbie.setSeqKey(seqKey);
+            bbie.setDefinition(bcc.getDefinition());
             bbie.afterLoaded();
             return bbie;
         }
