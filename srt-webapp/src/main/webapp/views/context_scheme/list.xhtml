@@ -30,7 +30,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
-                    <p:column style="width: 40%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
+                    <p:column style="width: 30%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
                         <h:link value="#{contextScheme.schemeName}" outcome="/views/context_scheme/details.xhtml">
                             <f:param name="ctxSchemeId" value="#{contextScheme.ctxSchemeId}"/>
                         </h:link>
@@ -40,6 +40,11 @@
                                 <f:param name="ctxSchemeId" value="#{contextScheme.ctxSchemeId}"/>
                             </h:link>
                         </div>
+                    </p:column>
+                    <p:column styleClass="ellipsis" headerText="Context Category" sortBy="#{contextScheme.contextCategory.name}">
+                        <h:link value="#{contextScheme.contextCategory.name}" outcome="/views/context_category/details.xhtml">
+                            <f:param name="ctxCategoryId" value="#{contextScheme.contextCategory.ctxCategoryId}"/>
+                        </h:link>
                     </p:column>
                     <p:column headerText="Scheme ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeId}">
                         <h:outputText value="#{contextScheme.schemeId}"/>
