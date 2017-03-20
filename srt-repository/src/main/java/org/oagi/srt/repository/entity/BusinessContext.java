@@ -28,7 +28,7 @@ public class BusinessContext implements TimestampAware, Serializable {
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(length = 100)
+    @Column(length = 255)
     private String name;
 
     @Column(nullable = false, updatable = false)

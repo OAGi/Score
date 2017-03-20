@@ -27,7 +27,7 @@ public class ContextCategory implements Serializable {
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(length = 45)
+    @Column(length = 255)
     private String name;
 
     @Lob

@@ -829,6 +829,7 @@ h6 {
 .BBIE-Attribute, .ui-state-hover.BBIE-Attribute, .ui-state-highlight.BBIE-Attribute,
 .BCCP-Attribute, .ui-state-hover.BCCP-Attribute, .ui-state-highlight.BCCP-Attribute {
     color: #666 !important;
+    font-style: italic !important;
 }
 
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC,
@@ -836,6 +837,11 @@ h6 {
 .ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
 .ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target {
     color: #bd2c00 !important;
+}
+
+.ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
+.ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target {
+    font-weight: bold !important;
 }
 
 .loading-block {
@@ -914,6 +920,7 @@ h6 {
 
 .itemtip tr {
     border: 0 !important;
+    max-width: 50% !important;
 }
 
 .itemtip tr td {
@@ -998,4 +1005,8 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 .CC-nav-forward {
     float: right;
     color: #333 !important;
+}
+
+.ui-autocomplete-panel {
+    max-width: 50% !important;
 }
