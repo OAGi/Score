@@ -98,6 +98,23 @@
                                 </li>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-haspopup="true" aria-expanded="false">CC Management <span
+                                            class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                        <li><h:link
+                                                outcome="/views/namespace/list.jsf">Namespace</h:link>
+                                        </li>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
+                                        <li><h:link
+                                                outcome="/views/core_component/list.jsf">Core Component</h:link>
+                                        </li>
+                                        </h:panelGroup>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Code List <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><h:link outcome="/views/code_list/list.jsf">View Code List</h:link></li>
