@@ -160,37 +160,6 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         }
     }
 
-    public void expand(NodeExpandEvent expandEvent) {
-        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        CCNode ccNode = (CCNode) treeNode.getData();
-        Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
-        if (expanded == null || expanded == false) {
-            if (ccNode.hasChild() || ((ccNode instanceof ACCNode) && ((ACCNode) ccNode).getAcc() != null)) {
-                clearChildren(treeNode);
-            }
-
-            if (ccNode instanceof ACCNode) {
-                ACCNode accNode = (ACCNode) ccNode;
-                ACCNode baseAccNode = accNode.getBase();
-                if (baseAccNode != null) {
-                    toTreeNode(baseAccNode, treeNode);
-                }
-            }
-            if (ccNode.hasChild()) {
-                for (CCNode child : ccNode.getChildren()) {
-                    toTreeNode(child, treeNode);
-                }
-            }
-            ccNode.setAttribute("expanded", true);
-        }
-    }
-
-    private void clearChildren(DefaultTreeNode treeNode) {
-        if (!treeNode.getChildren().isEmpty()) {
-            treeNode.setChildren(new ArrayList());
-        }
-    }
-
     private boolean preparedAppend;
 
     public boolean isPreparedAppend() {

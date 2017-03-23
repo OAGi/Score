@@ -578,7 +578,7 @@ public class CoreComponentService {
                             AggregateCoreComponent ueAcc,
                             CoreComponentState state,
                             User requester) {
-        if (ueAcc.getCreatedBy() != requester.getAppUserId()) {
+        if (ueAcc.getOwnerUserId() != requester.getAppUserId()) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }

@@ -73,7 +73,7 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         TreeNodeTypeNameResolver treeNodeTypeNameResolver = getTreeNodeTypeNameResolver(node);
         String type = treeNodeTypeNameResolver.getType();
         TreeNode treeNode = new DefaultTreeNode(type, node, parent);
-        if (node.hasChild() || ((node instanceof ACCNode) && ((ACCNode) node).getAcc() != null)) {
+        if (node.hasChild() || ((node instanceof ACCNode) && ((ACCNode) node).getBase() != null)) {
             new DefaultTreeNode(null, treeNode); // append a dummy child
         }
         return treeNode;
@@ -203,17 +203,32 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
 
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        CCNode coreComponentTreeNode = (CCNode) treeNode.getData();
-        Boolean expanded = (Boolean) coreComponentTreeNode.getAttribute("expanded");
+        CCNode ccNode = (CCNode) treeNode.getData();
+        Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
         if (expanded == null || expanded == false) {
-            if (coreComponentTreeNode.hasChild()) {
-                treeNode.setChildren(new ArrayList()); // clear children
+            if (ccNode.hasChild() || ((ccNode instanceof ACCNode) && ((ACCNode) ccNode).getBase() != null)) {
+                clearChildren(treeNode);
+            }
 
-                for (CCNode child : coreComponentTreeNode.getChildren()) {
+            if (ccNode instanceof ACCNode) {
+                ACCNode accNode = (ACCNode) ccNode;
+                ACCNode baseAccNode = accNode.getBase();
+                if (baseAccNode != null) {
+                    toTreeNode(baseAccNode, treeNode);
+                }
+            }
+            if (ccNode.hasChild()) {
+                for (CCNode child : ccNode.getChildren()) {
                     toTreeNode(child, treeNode);
                 }
             }
-            coreComponentTreeNode.setAttribute("expanded", true);
+            ccNode.setAttribute("expanded", true);
+        }
+    }
+
+    private void clearChildren(DefaultTreeNode treeNode) {
+        if (!treeNode.getChildren().isEmpty()) {
+            treeNode.setChildren(new ArrayList());
         }
     }
 

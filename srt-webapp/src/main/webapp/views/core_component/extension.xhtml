@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{extensionBean.currentUser.appUserId eq extensionBean.userExtensionAcc.createdBy ? '' : '(Review)'} #{extensionBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : extensionBean.targetAcc.objectClassTerm}</h2>
+                <h2 class="subhead-heading">#{extensionBean.userExtensionAcc.state eq 'Candidate' and extensionBean.currentUser.appUserId ne extensionBean.userExtensionAcc.ownerUserId ? '(Review)' : ''} #{extensionBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : extensionBean.targetAcc.objectClassTerm}</h2>
             </div>
         </div>
         <h:form id="form">
@@ -656,7 +656,7 @@
             </p:panel>
 
             <p:panel id="btnGroup"
-                     rendered="#{(extensionBean.currentUser.appUserId eq extensionBean.userExtensionAcc.createdBy) and
+                     rendered="#{(extensionBean.currentUser.appUserId eq extensionBean.userExtensionAcc.ownerUserId) and
                                  (extensionBean.preparedAppend eq false)}">
                 <p:commandButton rendered="#{extensionBean.userExtensionAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"

@@ -222,7 +222,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             CoreComponentState ueAccState = ueAcc.getState();
 
             boolean isSameBetweenRequesterAndOwner = user.getAppUserId() == ueAcc.getOwnerUserId();
-            if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Published) {
+            if (ueAccState == CoreComponentState.Editing) {
                 if (!isSameBetweenRequesterAndOwner) {
                     User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
                     FacesContext.getCurrentInstance().addMessage(null,

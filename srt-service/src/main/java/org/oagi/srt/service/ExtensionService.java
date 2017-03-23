@@ -53,15 +53,7 @@ public class ExtensionService {
         }
 
         if (ueAcc != null) {
-            long ownerId = ueAcc.getCreatedBy();
-            long requesterId = user.getAppUserId();
-            if (ownerId != requesterId) {
-                User owner = userRepository.findOne(ownerId);
-                throw new PermissionDeniedDataAccessException(
-                        "The component is currently edited by another user - " + owner.getName(), new IllegalStateException());
-            } else {
-                updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, user);
-            }
+            updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, user);
         } else {
             createNewUserExtensionGroupACC(eAcc, user);
         }
@@ -138,14 +130,15 @@ public class ExtensionService {
                 .max().getAsInt();
         createACCHistoryForExtension(ueAcc, latestRevisionTrackingNum + 1);
 
-        AssociationCoreComponentProperty ueAsccp = getASCCPForExtension(ueAcc);
-        List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(ueAsccp.getAsccpId());
+        AssociationCoreComponentProperty ueAsccp = updateASCCPForExtension(ueAcc, currentLoginUser);
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList =
+                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(ueAsccp.getAsccpId());
         latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().getAsInt();
         createASCCPHistoryForExtension(ueAsccp, latestRevisionTrackingNum + 1);
 
-        AssociationCoreComponent ueAscc = getASCCForException(eAcc, ueAsccp);
+        AssociationCoreComponent ueAscc = updateASCCForException(eAcc, ueAsccp, currentLoginUser);
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(ueAscc.getAsccId());
         latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -175,6 +168,7 @@ public class ExtensionService {
     private AggregateCoreComponent updateStateACCForException(AggregateCoreComponent ueAcc, User currentLoginUser) {
         ueAcc.setState(Editing);
         ueAcc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
+        ueAcc.setOwnerUserId(currentLoginUser.getAppUserId());
         accRepository.save(ueAcc);
         return ueAcc;
     }
@@ -209,9 +203,12 @@ public class ExtensionService {
         return asccpRepository.saveAndFlush(ueAsccp);
     }
 
-    private AssociationCoreComponentProperty getASCCPForExtension(AggregateCoreComponent ueAcc) {
+    private AssociationCoreComponentProperty updateASCCPForExtension(AggregateCoreComponent ueAcc, User currentLoginUser) {
         long roleOfAccId = ueAcc.getAccId();
-        return asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        asccp.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
+        asccp.setOwnerUserId(currentLoginUser.getAppUserId());
+        return asccpRepository.save(asccp);
     }
 
     private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum) {
@@ -230,11 +227,16 @@ public class ExtensionService {
         return asccRepository.saveAndFlush(ueAscc);
     }
 
-    private AssociationCoreComponent getASCCForException(AggregateCoreComponent eAcc,
-                                                         AssociationCoreComponentProperty ueAsccp) {
+    private AssociationCoreComponent updateASCCForException(AggregateCoreComponent eAcc,
+                                                            AssociationCoreComponentProperty ueAsccp,
+                                                            User currentLoginUser) {
         long fromAccId = eAcc.getAccId();
         long toAsccpId = ueAsccp.getAsccpId();
-        return asccRepository.findByFromAccIdAndToAsccpIdAndRevisionNumAndState(fromAccId, toAsccpId, 0, Published);
+        AssociationCoreComponent ascc = asccRepository.findByFromAccIdAndToAsccpIdAndRevisionNumAndState(
+                fromAccId, toAsccpId, 0, Published);
+        ascc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
+        ascc.setOwnerUserId(currentLoginUser.getAppUserId());
+        return asccRepository.save(ascc);
     }
 
     private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum) {
