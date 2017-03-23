@@ -12,6 +12,8 @@ import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -279,6 +281,16 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
 
         for (TreeNode child : treeNode.getChildren()) {
             updateState(child, state, requester);
+        }
+    }
+
+    public void validate(CCNode ccNode) {
+        try {
+            ccNode.validate();
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
         }
     }
 }

@@ -291,25 +291,27 @@
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <p:selectOneMenu
+                                                <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMin}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
-                                                    <f:ajax render="asccPanel"/>
-                                                </p:selectOneMenu>
+                                                    <f:ajax listener="#{extensionBean.validate(extensionBean.selectedTreeNode.data)}"
+                                                            render="asccPanel"/>
+                                                </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <p:selectOneMenu editable="true"
+                                                <h:inputText editable="true"
                                                                  value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMax}"
                                                                  styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                                  disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                     <f:converter binding="#{cardinalityMaxConverter}"/>
                                                     <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                    <f:ajax render="asccPanel"/>
-                                                </p:selectOneMenu>
+                                                    <f:ajax listener="#{extensionBean.validate(extensionBean.selectedTreeNode.data)}"
+                                                            render="asccPanel"/>
+                                                </h:inputText>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox
@@ -427,25 +429,27 @@
                                                 </p:selectOneMenu>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <p:selectOneMenu
+                                                <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMin}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
-                                                    <f:ajax render="bccPanel"/>
-                                                </p:selectOneMenu>
+                                                    <f:ajax listener="#{extensionBean.validate(extensionBean.selectedTreeNode.data)}"
+                                                            render="bccPanel"/>
+                                                </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <p:selectOneMenu editable="true"
+                                                <h:inputText editable="true"
                                                                  value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMax}"
                                                                  styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                                  disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                     <f:converter binding="#{cardinalityMaxConverter}"/>
                                                     <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                    <f:ajax render="bccPanel"/>
-                                                </p:selectOneMenu>
+                                                    <f:ajax listener="#{extensionBean.validate(extensionBean.selectedTreeNode.data)}"
+                                                            render="bccPanel"/>
+                                                </h:inputText>
 
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox
@@ -619,23 +623,23 @@
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <p:selectOneMenu
+                                                <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bdtSc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
-                                                </p:selectOneMenu>
+                                                </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <p:selectOneMenu editable="true"
+                                                <h:inputText editable="true"
                                                                  value="#{extensionBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                     <f:converter binding="#{cardinalityMaxConverter}"/>
                                                     <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                </p:selectOneMenu>
+                                                </h:inputText>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea

@@ -220,6 +220,10 @@ public class NodeService {
             }
         }
 
+        @Override
+        public void validate() {
+        }
+
         private List<CoreComponentRelation> associations() {
             if (associations == null) {
                 associations = getAssociations(acc);
@@ -406,6 +410,10 @@ public class NodeService {
         }
 
         @Override
+        public void validate() {
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
                 long roleOfAccId = getRoleOfAccId();
@@ -524,6 +532,10 @@ public class NodeService {
         }
 
         @Override
+        public void validate() {
+        }
+
+        @Override
         public boolean hasChild() {
             if (hasChild == null) {
                 long bdtId = getBdt().getDtId();
@@ -609,6 +621,9 @@ public class NodeService {
             }
         }
 
+        @Override
+        public void validate() {
+        }
 
         @Override
         public boolean hasChild() {
