@@ -803,4 +803,16 @@ public class CoreComponentService {
         DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
         return dtSc.getCardinalityMax();
     }
+
+    public void transferOwner(AggregateCoreComponent acc, User newOwner) {
+        long oldOwnerId = acc.getOwnerUserId();
+        long newOwnerId = newOwner.getAppUserId();
+
+        if (oldOwnerId == newOwnerId) {
+            return;
+        }
+
+        acc.setOwnerUserId(newOwnerId);
+        accRepository.save(acc);
+    }
 }

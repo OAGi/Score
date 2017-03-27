@@ -67,6 +67,9 @@
                     </h:panelGroup>
                 </f:facet>
 
+                <!--
+                    ACC
+                -->
                 <p:dataTable id="tblAcc" var="acc" value="#{coreComponentBean.accList}" rendered="#{coreComponentBean.type == 'ACC'}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
@@ -97,6 +100,15 @@
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{coreComponentBean.getUserName(acc.ownerUserId)}">
                         <h:outputText value="#{coreComponentBean.getUserName(acc.ownerUserId)}"/>
+
+                        <h:link rendered="#{coreComponentBean.currentUser.appUserId eq acc.ownerUserId and acc.state eq 'Editing'}"
+                                outcome="/views/core_component/transfer_acc_ownership.xhtml">
+                            <f:param name="accId" value="#{acc.accId}"/>
+                            <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                            </h:panelGroup>
+                        </h:link>
+                        <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
 
                     <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{acc.state}">
@@ -124,6 +136,9 @@
                     </p:column>
                 </p:dataTable>
 
+                <!--
+                    ASCC
+                -->
                 <p:dataTable id="tblAscc" var="ascc" value="#{coreComponentBean.asccList}" rendered="#{coreComponentBean.type == 'ASCC'}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
@@ -170,6 +185,9 @@
                     </p:column>
                 </p:dataTable>
 
+                <!--
+                    ASCCP
+                -->
                 <p:dataTable id="tblAsccp" var="asccp" value="#{coreComponentBean.asccpList}" rendered="#{coreComponentBean.type == 'ASCCP'}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
@@ -216,6 +234,9 @@
                     </p:column>
                 </p:dataTable>
 
+                <!--
+                    BCC
+                -->
                 <p:dataTable id="tblBcc" var="bcc" value="#{coreComponentBean.bccList}" rendered="#{coreComponentBean.type == 'BCC'}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
@@ -262,6 +283,9 @@
                     </p:column>
                 </p:dataTable>
 
+                <!--
+                    BCCP
+                -->
                 <p:dataTable id="tblBccp" var="bccp" value="#{coreComponentBean.bccpList}" rendered="#{coreComponentBean.type == 'BCCP'}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
