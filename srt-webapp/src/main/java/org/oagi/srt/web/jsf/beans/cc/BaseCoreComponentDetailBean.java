@@ -14,9 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
@@ -292,5 +290,61 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
+
+    public void reorderTreeNode(TreeNode treeNode) {
+        List<TreeNode> children = treeNode.getChildren();
+        Collections.sort(children, (a, b) -> {
+            int s1 = getSeqKey(a);
+            int s2 = getSeqKey(b);
+            int compareTo = s1 - s2;
+            if (compareTo != 0) {
+                return compareTo;
+            } else {
+                if (a.getData() instanceof BDTSCNode || b.getData() instanceof BDTSCNode) {
+                    return 0;
+                } else {
+                    Date aTs = getCreationTimestamp(a);
+                    Date bTs = getCreationTimestamp(b);
+                    return aTs.compareTo(bTs);
+                }
+            }
+        });
+
+        /*
+         * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
+         * to clarify children's order for node selection
+         */
+        for (int i = 0, len = children.size(); i < len; ++i) {
+            TreeNode child = children.get(i);
+            String childRowKey = (treeNode.getParent() == null) ? String.valueOf(i) : treeNode.getRowKey() + "_" + i;
+            child.setRowKey(childRowKey);
+        }
+
+        for (TreeNode child : children) {
+            reorderTreeNode(child);
+        }
+    }
+
+    private int getSeqKey(TreeNode treeNode) {
+        Object data = treeNode.getData();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAscc().getSeqKey();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBcc().getSeqKey();
+        }
+        return -1;
+    }
+
+    private Date getCreationTimestamp(TreeNode treeNode) {
+        Object data = treeNode.getData();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAsccp().getCreationTimestamp();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBccp().getCreationTimestamp();
+        } else if (data instanceof ACCNode) {
+            return ((ACCNode) data).getAcc().getCreationTimestamp();
+        }
+        return null;
     }
 }
