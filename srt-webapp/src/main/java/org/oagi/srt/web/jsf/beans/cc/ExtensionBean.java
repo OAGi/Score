@@ -57,8 +57,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     private AggregateCoreComponent targetAcc;
     private AggregateCoreComponent userExtensionAcc;
 
-    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
-    private int treeNodeLinkedListIndex = -1;
+    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     private DataType selectedBdt;
@@ -96,40 +95,15 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     }
 
     public TreeNode getTreeNode() {
-        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
+        return treeNode;
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
-            treeNodeLinkedList.removeLast();
-        }
-        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
-
-    }
-
-    public boolean canBack() {
-        return (treeNodeLinkedListIndex > 0);
-    }
-
-    public boolean canForward() {
-        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
-    }
-
-    public void navigateBack() {
-        treeNodeLinkedListIndex--;
-    }
-
-    public void navigateForward() {
-        treeNodeLinkedListIndex++;
-    }
-
-    public void navigateForward(AggregateCoreComponent acc) {
-        TreeNode treeNode = createTreeNode(acc);
-        setTreeNode(treeNode);
+        this.treeNode = treeNode;
     }
 
     public TreeNode getRootNode() {
-        return treeNodeLinkedList.get(0).getChildren().get(0);
+        return (treeNode.getChildCount() > 0) ? treeNode.getChildren().get(0) : null;
     }
 
     public TreeNode getSelectedTreeNode() {

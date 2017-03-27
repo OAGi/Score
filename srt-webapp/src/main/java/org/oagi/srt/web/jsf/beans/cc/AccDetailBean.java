@@ -1,9 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.ACCNode;
-import org.oagi.srt.model.node.ASCCPNode;
-import org.oagi.srt.model.node.BCCPNode;
-import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
@@ -67,8 +64,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private AggregateCoreComponent targetAcc;
     private AggregateCoreComponent userExtensionAcc;
 
-    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
-    private int treeNodeLinkedListIndex = -1;
+    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     private DataType selectedBdt;
@@ -107,6 +103,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public boolean isDirty(TreeNode treeNode) {
+        if (treeNode == null) {
+            return false;
+        }
+
         Object data = treeNode.getData();
         if (data instanceof ACCNode) {
             ACCNode accNode = (ACCNode) data;
@@ -146,40 +146,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public TreeNode getTreeNode() {
-        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
+        return treeNode;
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
-            treeNodeLinkedList.removeLast();
-        }
-        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
-
-    }
-
-    public boolean canBack() {
-        return (treeNodeLinkedListIndex > 0);
-    }
-
-    public boolean canForward() {
-        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
-    }
-
-    public void navigateBack() {
-        treeNodeLinkedListIndex--;
-    }
-
-    public void navigateForward() {
-        treeNodeLinkedListIndex++;
-    }
-
-    public void navigateForward(AggregateCoreComponent acc) {
-        TreeNode treeNode = createTreeNode(acc);
-        setTreeNode(treeNode);
+        this.treeNode = treeNode;
     }
 
     public TreeNode getRootNode() {
-        return treeNodeLinkedList.get(0).getChildren().get(0);
+        return (treeNode.getChildCount() > 0) ? treeNode.getChildren().get(0) : null;
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -307,8 +282,14 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void discardAcc(TreeNode treeNode) {
+    public String discardAcc(TreeNode treeNode) {
         ACCNode accNode = (ACCNode) treeNode.getData();
+        if (!accNode.getChildren().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Not allowed discard the ACC which has children"));
+            return null;
+        }
+
         AggregateCoreComponent acc = accNode.getAcc();
         User requester = getCurrentUser();
 
@@ -327,7 +308,13 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         children.remove(treeNode);
 
         TreeNode root = getTreeNode();
-        reorderTreeNode(root);
+        if (root.getChildCount() == 0) {
+            return "/views/core_component/list.jsf?faces-redirect=true";
+        } else {
+            reorderTreeNode(root);
+        }
+
+        return null;
     }
 
     public void onChangeObjectClassTerm(ACCNode accNode) {
@@ -710,9 +697,16 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             if (compareTo != 0) {
                 return compareTo;
             } else {
-                return getCreationTimestamp(a).compareTo(getCreationTimestamp(b));
+                if (a instanceof BDTSCNode || b instanceof BDTSCNode) {
+                    return 0;
+                } else {
+                    Date aTs = getCreationTimestamp(a);
+                    Date bTs = getCreationTimestamp(b);
+                    return aTs.compareTo(bTs);
+                }
             }
         });
+
         /*
          * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
          * to clarify children's order for node selection

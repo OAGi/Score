@@ -1,9 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.ACCNode;
-import org.oagi.srt.model.node.ASCCPNode;
-import org.oagi.srt.model.node.BCCPNode;
-import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
@@ -50,8 +47,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
 
     private AssociationCoreComponentProperty targetAsccp;
 
-    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
-    private int treeNodeLinkedListIndex = -1;
+    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     @PostConstruct
@@ -89,39 +85,15 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public TreeNode getTreeNode() {
-        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
+        return treeNode;
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
-            treeNodeLinkedList.removeLast();
-        }
-        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
-    }
-
-    public boolean canBack() {
-        return (treeNodeLinkedListIndex > 0);
-    }
-
-    public boolean canForward() {
-        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
-    }
-
-    public void navigateBack() {
-        treeNodeLinkedListIndex--;
-    }
-
-    public void navigateForward() {
-        treeNodeLinkedListIndex++;
-    }
-
-    public void navigateForward(AggregateCoreComponent acc) {
-        TreeNode treeNode = createTreeNode(acc);
-        setTreeNode(treeNode);
+        this.treeNode = treeNode;
     }
 
     public TreeNode getRootNode() {
-        return treeNodeLinkedList.get(0).getChildren().get(0);
+        return (treeNode.getChildCount() > 0) ? treeNode.getChildren().get(0) : null;
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -176,9 +148,16 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
             if (compareTo != 0) {
                 return compareTo;
             } else {
-                return getCreationTimestamp(a).compareTo(getCreationTimestamp(b));
+                if (a instanceof BDTSCNode || b instanceof BDTSCNode) {
+                    return 0;
+                } else {
+                    Date aTs = getCreationTimestamp(a);
+                    Date bTs = getCreationTimestamp(b);
+                    return aTs.compareTo(bTs);
+                }
             }
         });
+
         /*
          * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
          * to clarify children's order for node selection

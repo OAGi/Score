@@ -36,32 +36,9 @@
                                     <p:ajax event="select" update=":form:details"/>
                                     <p:column>
                                         <f:facet name="header">
-                                            <p:commandLink disabled="#{bccpDetailBean.canBack() eq false}"
-                                                           styleClass="CC-nav-back"
-                                                           actionListener="#{bccpDetailBean.navigateBack()}"
-                                                           update=":form:treeTable">
-                                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
-                                            </p:commandLink>
-
                                             <h:outputText value="#{bccpDetailBean.targetBccp.propertyTerm}"/>
-
-                                            <p:commandLink disabled="#{bccpDetailBean.canForward() eq false}"
-                                                           styleClass="CC-nav-forward"
-                                                           actionListener="#{bccpDetailBean.navigateForward()}"
-                                                           update=":form:treeTable">
-                                                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                                            </p:commandLink>
                                         </f:facet>
                                         <h:outputText value="#{ node.getAttribute('name') }"/>
-
-                                        <p:commandLink rendered="#{ fn:startsWith(node['class'].simpleName, 'AggregateCoreComponent')
-                                                                and node.base != null }"
-                                                       styleClass="ACC-base-link"
-                                                       actionListener="#{bccpDetailBean.navigateForward(node.base.acc)}"
-                                                       update=":form:treeTable" id="baseLink">
-                                            <i class="fa fa-level-up" aria-hidden="true"></i>
-                                        </p:commandLink>
-                                        <p:tooltip id="toolTipBaseLink" for="baseLink" value="Click to show the base type." position="bottom"/>
                                     </p:column>
                                 </p:treeTable>
                             </p:panel>
