@@ -468,7 +468,6 @@ public class NodeService {
         private final BasicCoreComponentProperty bccp;
         private DataType dataType;
 
-        private Boolean hasChild = null;
         private Collection<BDTSCNode> children = null;
 
         private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc) {
@@ -537,25 +536,23 @@ public class NodeService {
 
         @Override
         public boolean hasChild() {
-            if (hasChild == null) {
-                long bdtId = getBdt().getDtId();
-                hasChild = dtScRepository.countByOwnerDtId(bdtId) > 0;
-            }
-            return hasChild;
+            return !getChildren().isEmpty();
         }
 
         @Override
         public Collection<? extends CCNode> getChildren() {
             if (children == null) {
                 long bdtId = getBdt().getDtId();
-                List<DataTypeSupplementaryComponent> bdtScList = dtScRepository.findByOwnerDtId(bdtId);
+                List<DataTypeSupplementaryComponent> bdtScList = dtScRepository.findByOwnerDtId(bdtId).stream()
+                        .filter(e -> e.getCardinalityMin() != 0 || e.getCardinalityMax() != 0)
+                        .collect(Collectors.toList());
+
                 if (bdtScList.isEmpty()) {
                     children = Collections.emptyList();
                 } else {
                     children = new ArrayList();
                     for (DataTypeSupplementaryComponent bdtSc : bdtScList) {
-                        BDTSCNode child =
-                                new BusinessDataTypeSupplementaryComponentNodeImpl(this, bdtSc);
+                        BDTSCNode child = new BusinessDataTypeSupplementaryComponentNodeImpl(this, bdtSc);
                         children.add(child);
                     }
                 }
@@ -576,7 +573,6 @@ public class NodeService {
         @Override
         public void reload() {
             parent = null;
-            hasChild = null;
             children = null;
         }
     }

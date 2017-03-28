@@ -505,7 +505,7 @@
             </p:panel>
 
             <p:panel id="btnGroup"
-                     rendered="#{(asccpDetailBean.currentUser.appUserId eq asccpDetailBean.targetAsccp.createdBy)}">
+                     rendered="#{(asccpDetailBean.currentUser.appUserId eq asccpDetailBean.targetAsccp.ownerUserId)}">
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{asccpDetailBean.updateState('Candidate')}"

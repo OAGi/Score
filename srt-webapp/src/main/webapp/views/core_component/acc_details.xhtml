@@ -688,7 +688,7 @@
             </p:panel>
 
             <p:panel id="btnGroup"
-                     rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.createdBy) and
+                     rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.ownerUserId) and
                                  (accDetailBean.preparedAppend eq false)}">
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
