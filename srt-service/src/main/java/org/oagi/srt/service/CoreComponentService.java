@@ -200,7 +200,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = acc.getCreatedBy();
+        long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -240,7 +240,7 @@ public class CoreComponentService {
     public void updateState(AggregateCoreComponent acc,
                             CoreComponentState state,
                             User requester) {
-        if (acc.getCreatedBy() != requester.getAppUserId()) {
+        if (acc.getOwnerUserId() != requester.getAppUserId()) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
@@ -253,7 +253,7 @@ public class CoreComponentService {
     public void updateState(AssociationCoreComponentProperty asccp,
                             CoreComponentState state,
                             User requester) {
-        if (asccp.getCreatedBy() != requester.getAppUserId()) {
+        if (asccp.getOwnerUserId() != requester.getAppUserId()) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
@@ -265,7 +265,7 @@ public class CoreComponentService {
     public void updateState(BasicCoreComponentProperty bccp,
                             CoreComponentState state,
                             User requester) {
-        if (bccp.getCreatedBy() != requester.getAppUserId()) {
+        if (bccp.getOwnerUserId() != requester.getAppUserId()) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
@@ -276,7 +276,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = acc.getCreatedBy();
+        long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -295,7 +295,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(AssociationCoreComponent ascc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = ascc.getCreatedBy();
+        long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -334,7 +334,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AssociationCoreComponent ascc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = ascc.getCreatedBy();
+        long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -357,7 +357,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(BasicCoreComponent bcc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bcc.getCreatedBy();
+        long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -414,7 +414,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(BasicCoreComponent bcc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bcc.getCreatedBy();
+        long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -439,7 +439,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(AssociationCoreComponentProperty asccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = asccp.getCreatedBy();
+        long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -479,7 +479,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AssociationCoreComponentProperty asccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = asccp.getCreatedBy();
+        long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -499,7 +499,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(BasicCoreComponentProperty bccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bccp.getCreatedBy();
+        long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
@@ -539,7 +539,7 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(BasicCoreComponentProperty bccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bccp.getCreatedBy();
+        long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());

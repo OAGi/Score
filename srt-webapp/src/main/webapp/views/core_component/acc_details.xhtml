@@ -43,6 +43,10 @@
                                 </p:treeTable>
 
                                 <p:contextMenu for="treeTable" nodeType="ACC-Target" rendered="#{accDetailBean.targetAcc.state == 'Editing'}">
+                                    <p:menuitem value="Set based ACC" style="width: 100%;"
+                                                actionListener="#{accDetailBean.prepareSetBasedAcc}"
+                                                onclick="PF('leftBlockUI').show()"
+                                                update=":form"/>
                                     <p:menuitem value="Append ASCC" style="width: 100%;"
                                                 actionListener="#{accDetailBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
@@ -60,6 +64,83 @@
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
                                     <!--
+                                        To set based ACC
+                                    -->
+                                    <h:panelGroup rendered="#{accDetailBean.preparedSetBasedAcc}">
+                                        <p:panel>
+                                            <f:facet name="header">
+                                                <p:autoComplete id="accObjectClassTerm" widgetVar="accObjectClassTerm"
+                                                                value="#{accDetailBean.selectedAccObjectClassTerm}"
+                                                                completeMethod="#{accDetailBean.completeInputAcc}"
+                                                                style="width: 440px; margin-right: 20px;">
+                                                    <p:ajax event="itemSelect"
+                                                            listener="#{accDetailBean.onSelectAccObjectClassTerm}"/>
+                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                </p:autoComplete>
+                                                <p:commandButton value="Search" ajax="true"
+                                                                 actionListener="#{accDetailBean.searchAcc}"
+                                                                 update=":form:details" icon="ui-icon-search"/>
+                                            </f:facet>
+
+                                            <p:dataTable id="tblAcc" var="acc" value="#{accDetailBean.accList}"
+                                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                                         paginator="true" paginatorPosition="bottom" rows="5"
+                                                         style="width: 100%; margin-bottom:20px"
+                                                         rowKey="#{acc.accId}"
+                                                         selection="#{accDetailBean.selectedAcc}"
+                                                         selectionMode="single">
+                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onAccRowSelect}"/>
+                                                <p:ajax event="rowUnselect"
+                                                        listener="#{accDetailBean.onAccRowUnselect}"/>
+                                                <p:column headerText="ACC Object Class Term" sortBy="#{acc.objectClassTerm}">
+                                                    <h:outputText value="#{acc.objectClassTerm}"/>
+                                                    <div>
+                                                        <h:outputText value="GUID: #{acc.guid}"
+                                                                      style="font-size: 12px !important; color: #767676 !important;"/>
+                                                    </div>
+                                                </p:column>
+                                                <p:column style="width: 150px; text-align: center;" headerText="Type" sortBy="#{acc.oagisComponentType}">
+                                                    <span class="label label-info">#{acc.oagisComponentType}</span>
+                                                </p:column>
+                                                <p:column headerText="Definition" sortBy="#{acc.definition}">
+                                                    <h:outputText value="#{acc.definition}"/>
+                                                </p:column>
+                                                <p:column style="width: 100px; text-align: center;" headerText="Abstract" sortBy="#{acc.isAbstract()}">
+                                                    <h:panelGroup rendered="#{acc.isAbstract()}">
+                                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{!acc.isAbstract()}">
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                    </h:panelGroup>
+                                                </p:column>
+                                                <p:column style="width: 100px; text-align: center;" headerText="State"
+                                                          sortBy="#{acc.state}">
+                                                    <h:panelGroup rendered="#{acc.state == 'Editing'}">
+                                                        <span class="label label-primary">Editing</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{acc.state == 'Candidate'}">
+                                                        <span class="label label-warning">Candidate</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{acc.state == 'Published'}">
+                                                        <span class="label label-default">Published</span>
+                                                    </h:panelGroup>
+                                                </p:column>
+                                            </p:dataTable>
+
+                                            <p:commandButton value="Apply"
+                                                             actionListener="#{accDetailBean.setPreparedSetBasedAcc(false)}"
+                                                             action="#{accDetailBean.setAcc()}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form"/>
+                                            <p:commandButton value="Discard"
+                                                             styleClass="danger"
+                                                             actionListener="#{accDetailBean.setPreparedSetBasedAcc(false)}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form"/>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
                                         To append ASCC
                                     -->
                                     <h:panelGroup rendered="#{accDetailBean.preparedAppendAscc}">
@@ -70,7 +151,7 @@
                                                                 completeMethod="#{accDetailBean.completeInputAsccp}"
                                                                 style="width: 440px; margin-right: 20px;">
                                                     <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectAsccpPropertyTerm}"/>
+                                                            listener="#{accDetailBean.onSelectAsccpPrprepareSetBasedACCopertyTerm}"/>
                                                     <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                                                 </p:autoComplete>
                                                 <p:commandButton value="Search" ajax="true"

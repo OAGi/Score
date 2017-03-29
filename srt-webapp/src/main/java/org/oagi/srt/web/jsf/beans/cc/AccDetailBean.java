@@ -1,6 +1,9 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.*;
+import org.oagi.srt.model.node.ACCNode;
+import org.oagi.srt.model.node.ASCCPNode;
+import org.oagi.srt.model.node.BCCPNode;
+import org.oagi.srt.model.node.CCNode;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
@@ -13,6 +16,7 @@ import org.oagi.srt.service.NodeService;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -286,7 +291,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         ACCNode accNode = (ACCNode) treeNode.getData();
         if (!accNode.getChildren().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Not allowed discard the ACC which has children"));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Not allowed to discard the ACC which has children"));
             return null;
         }
 
@@ -336,6 +341,121 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         setNodeName(accNode);
     }
+
+    /*
+     * Begin Set Based ACC
+     */
+
+    private boolean preparedSetBasedAcc;
+    private List<AggregateCoreComponent> allAccList;
+    private List<AggregateCoreComponent> accList;
+    private String selectedAccObjectClassTerm;
+    private AggregateCoreComponent selectedAcc;
+
+    public boolean isPreparedSetBasedAcc() {
+        return preparedSetBasedAcc;
+    }
+
+    public void setPreparedSetBasedAcc(boolean preparedSetBasedAcc) {
+        this.preparedSetBasedAcc = preparedSetBasedAcc;
+        setPreparedAppend(preparedSetBasedAcc);
+    }
+
+    public List<AggregateCoreComponent> getAccList() {
+        return accList;
+    }
+
+    public void setAccList(List<AggregateCoreComponent> accList) {
+        this.accList = accList;
+    }
+
+    public String getSelectedAccObjectClassTerm() {
+        return selectedAccObjectClassTerm;
+    }
+
+    public void setSelectedAccObjectClassTerm(String selectedAccObjectClassTerm) {
+        this.selectedAccObjectClassTerm = selectedAccObjectClassTerm;
+    }
+
+    public AggregateCoreComponent getSelectedAcc() {
+        return selectedAcc;
+    }
+
+    public void setSelectedAcc(AggregateCoreComponent selectedAcc) {
+        this.selectedAcc = selectedAcc;
+    }
+
+    public void onAccRowSelect(SelectEvent event) {
+        setSelectedAcc((AggregateCoreComponent) event.getObject());
+    }
+
+    public void onAccRowUnselect(UnselectEvent event) {
+        setSelectedAcc(null);
+    }
+
+    public void prepareSetBasedAcc() {
+        allAccList = accRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+                .filter(e -> getTargetAcc().isAbstract() ? e.isAbstract() : true)
+                .filter(e -> e.getAccId() != getTargetAcc().getAccId())
+                .collect(Collectors.toList());
+
+        setAccList(allAccList.stream()
+                .sorted(Comparator.comparing(AggregateCoreComponent::getObjectClassTerm))
+                .collect(Collectors.toList())
+        );
+        setPreparedSetBasedAcc(true);
+    }
+
+    public List<String> completeInputAcc(String query) {
+        return allAccList.stream()
+                .map(e -> e.getObjectClassTerm())
+                .distinct()
+                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void onSelectAccObjectClassTerm(SelectEvent event) {
+        setSelectedAccObjectClassTerm(event.getObject().toString());
+    }
+
+    public void searchAcc() {
+        String selectedObjectClassTerm = StringUtils.trimWhitespace(getSelectedAccObjectClassTerm());
+        if (StringUtils.isEmpty(selectedObjectClassTerm)) {
+            setAccList(allAccList.stream()
+                    .sorted(Comparator.comparing(AggregateCoreComponent::getObjectClassTerm))
+                    .collect(Collectors.toList()));
+        } else {
+            setAccList(
+                    allAccList.stream()
+                            .filter(e -> e.getObjectClassTerm().toLowerCase().contains(selectedObjectClassTerm.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
+        setPreparedSetBasedAcc(true);
+    }
+
+    @Transactional
+    public void setAcc() {
+        AggregateCoreComponent selectedAcc = getSelectedAcc();
+        AggregateCoreComponent targetAcc = getTargetAcc();
+
+        long previousBasedAccId = targetAcc.getBasedAccId();
+        targetAcc.setBasedAccId(selectedAcc.getAccId());
+
+        TreeNode root = getRootNode();
+        ((CCNode) root.getData()).reload();
+        List<TreeNode> children = root.getChildren();
+        if (!children.isEmpty()) {
+            ACCNode accNode = nodeService.createCoreComponentTreeNode(selectedAcc);
+            if (previousBasedAccId > 0L) {
+                children.remove(0);
+            }
+            
+            children.add(0, toTreeNode(accNode, root));
+            reorderTreeNode(root);
+        }
+    }
+
 
     /*
      * Begin Append ASCC
@@ -397,7 +517,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 .collect(Collectors.toList());
         setAsccpList(
                 allAsccpList.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
                         .collect(Collectors.toList())
         );
         setPreparedAppendAscc(true);
