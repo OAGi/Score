@@ -327,7 +327,7 @@ public class P_1_6_PopulateDTFromMeta {
 
             if ("xsd:normalizedString".equals(type)) {
                 populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), NormalizedStringCDTPrimitiveId);
-            } else if ("xsd:normalizedString".equals(type)) {
+            } else if ("xsd:string".equals(type)) {
                 populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), StringCDTPrimitiveId);
             } else if ("xsd:token".equals(type)) {
                 populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), TokenCDTPrimitiveId);

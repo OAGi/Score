@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
 
 
@@ -23,7 +25,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/BudgetLedger.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
 	<xsd:element name="BudgetLedger" type="BudgetLedgerType" id="oagis-id-b4199c3058614e9985cdc667305aceb0">
 		<xsd:annotation>
@@ -45,7 +48,7 @@
 			</xsd:element>
 			<xsd:element ref="BudgetLedgerLine" id="oagis-id-4b065f800b684b9c9ada3d182fa8540a" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-2b1dce8320464809bb5858e3f2f80616"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2b1dce8320464809bb5858e3f2f80616"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-a5c276a52cf14a2495a62f61da0a4213"/>
 	</xsd:complexType>
 	<xsd:complexType name="BudgetLedgerHeaderBaseType" id="oagis-id-3e4a75af9e4f48cda3a208d867218559">
@@ -92,7 +95,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the user of a given system.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="Party" id="oagis-id-c595941886fcb4ffabdf415d9c28ce84" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Party" id="oagis-id-21e47457126b4209b8abad487a8c13a8" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

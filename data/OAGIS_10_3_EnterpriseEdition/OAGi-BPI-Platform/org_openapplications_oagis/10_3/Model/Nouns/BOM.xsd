@@ -74,7 +74,7 @@ An example of an option class would be memory for a laptop.  The options could t
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-157a71949cbf4c4f97982a4175000a69"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-157a71949cbf4c4f97982a4175000a69"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-028a9b60993b4a27a1faaf759516ee6b"/>
 	</xsd:complexType>
 	<xsd:complexType name="BOMHeaderBaseType" id="oagis-id-5e01cd552c6246acad317864101aa535">

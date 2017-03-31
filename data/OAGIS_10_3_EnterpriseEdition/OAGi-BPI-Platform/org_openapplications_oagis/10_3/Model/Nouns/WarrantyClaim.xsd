@@ -33,7 +33,7 @@
 			<xsd:element ref="WarrantyClaimHeader" id="oagis-id-1204ac4e91594ee88c07e72d496e0375" minOccurs="0"/>
 			<xsd:element ref="WarrantyClaimLine" id="oagis-id-7cb4b3e0986b4aeead1a7008d1f379e4" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-00c1e38fe05e425380b56adad434178a"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-00c1e38fe05e425380b56adad434178a"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-40b71f12e73c45c885912431d9303f06"/>
 	</xsd:complexType>
 	<xsd:complexType name="WarrantyClaimHeaderBaseType" id="oagis-id-9130475c51f943288a941e96f0ee128a">

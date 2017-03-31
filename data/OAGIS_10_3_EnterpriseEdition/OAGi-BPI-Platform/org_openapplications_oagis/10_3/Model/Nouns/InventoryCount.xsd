@@ -37,7 +37,7 @@
 			<xsd:element ref="InventoryCountHeader" id="oagis-id-d3af1572a659434bbd0504bc6f3acfd3" minOccurs="0"/>
 			<xsd:element ref="InventoryCountLine" id="oagis-id-d6cd845b7fff41c58a3c81f66cac81da" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-66659b2ab8c949e383cf1aea63c8e879"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-66659b2ab8c949e383cf1aea63c8e879"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f0d7b2a51e804690a68c0cfa620b3ae5"/>
 	</xsd:complexType>
 	<xsd:complexType name="InventoryCountHeaderBaseType" id="oagis-id-8f6bbf818e084d53b38be24e5a04c3db">

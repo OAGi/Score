@@ -46,7 +46,7 @@
 			</xsd:element>
 			<xsd:element ref="MaintenanceOrderLine" id="oagis-id-a71c67971d1c48f5bacdfb924c3e9408" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-a90880b22e8c45a1a6bf497a0116c5d2"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-a90880b22e8c45a1a6bf497a0116c5d2"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-1079921ec01f46e9bd94256c79426134"/>
 	</xsd:complexType>
 	<xsd:complexType name="MaintenanceOrderHeaderBaseType" id="oagis-id-711ad11873004712921f58c08eb7a5de">

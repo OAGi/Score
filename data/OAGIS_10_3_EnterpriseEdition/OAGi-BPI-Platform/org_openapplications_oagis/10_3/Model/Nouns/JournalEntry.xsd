@@ -36,7 +36,7 @@
 			<xsd:element ref="JournalEntryHeader" id="oagis-id-67d7b94329114d1a82d9478d948e982c" minOccurs="0"/>
 			<xsd:element ref="JournalEntryLine" id="oagis-id-f46a6bcec3544b13b3031d7fa2a77e59" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-6aa0fdb2d95e4d2ba825b74ab8423080"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-6aa0fdb2d95e4d2ba825b74ab8423080"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3dcd6e3ba4a14355809ac10990cd9541"/>
 	</xsd:complexType>
 	<xsd:complexType name="JournalEntryHeaderType" id="oagis-id-4cde579018004f748f25c1e3f4b27358">

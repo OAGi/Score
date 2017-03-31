@@ -37,7 +37,7 @@
 			<xsd:element ref="MoveWIPHeader" id="oagis-id-62ca305d33d84edbac981896b2303770" minOccurs="0"/>
 			<xsd:element ref="MoveWIPLine" id="oagis-id-4dabc3ccb43f44e3842edab560ae1b55" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-2650158f5e4c475c8193e6f2775b7ab6"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2650158f5e4c475c8193e6f2775b7ab6"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-69725768bae3434798c6e9a46b5f9901"/>
 	</xsd:complexType>
 	<xsd:complexType name="MoveWIPLineBaseType" id="oagis-id-953a0b7c21864b68b253aca0721a70ea">

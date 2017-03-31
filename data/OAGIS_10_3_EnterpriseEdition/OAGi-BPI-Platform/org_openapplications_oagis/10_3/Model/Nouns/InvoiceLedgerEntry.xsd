@@ -78,7 +78,7 @@ The Tax element contains any tax information such as the taxable amounts and the
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-50a20614c2d547559f860bfc29cc78af"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-50a20614c2d547559f860bfc29cc78af"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-a60d29afd04d4161990f168510920253"/>
 	</xsd:complexType>
 	<xsd:complexType name="InvoiceLedgerEntryHeaderBaseType" id="oagis-id-1ec829575f7a4850976d3cd56ddc45f9">

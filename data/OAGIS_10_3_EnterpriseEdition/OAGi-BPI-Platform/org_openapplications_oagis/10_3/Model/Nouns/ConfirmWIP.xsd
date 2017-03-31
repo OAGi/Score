@@ -60,7 +60,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-707d3c84fb28429186064c9c21879c45"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-707d3c84fb28429186064c9c21879c45"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f03f301c8aeb46108c0d2eb9e3ba76cc"/>
 	</xsd:complexType>
 	<xsd:complexType name="ConfirmWIPHeaderBaseType" id="oagis-id-7862f9e34ed6489385645eb60f259093">

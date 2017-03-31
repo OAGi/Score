@@ -41,7 +41,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-eb1f6df2c8c64d55a0314cf8777f60bf"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-eb1f6df2c8c64d55a0314cf8777f60bf"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-b6a659c286a14d7984e095e9b2175a31"/>
 	</xsd:complexType>
 	<xsd:complexType name="DebitTransferHeaderBaseType" id="oagis-id-00c80dcb454f48c7808f5787c5073976">

@@ -45,7 +45,7 @@ Business Rule: This component may be present if payment method is TRF. It must n
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-f79bdb0eeedf41fd99c167adbcca43aa"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f79bdb0eeedf41fd99c167adbcca43aa"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-27561ac5f6bc4e6c9b8e34dbadb927b1"/>
 	</xsd:complexType>
 	<xsd:complexType name="CreditTransferHeaderBaseType" id="oagis-id-ad1297549c6348bfa05aea802337e6b3">

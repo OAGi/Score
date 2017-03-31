@@ -35,7 +35,7 @@
 			<xsd:element ref="WarehouseShippingAdviceHeader" id="oagis-id-680ccea188cc424186bd09c9042e9926" minOccurs="0"/>
 			<xsd:element ref="WarehouseShippingAdviceLine" id="oagis-id-8f496cd1f02548018a50df987812139a" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-7a866bd7591a48bab2264d3b6a5d089b"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7a866bd7591a48bab2264d3b6a5d089b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-5bb2841dd9b048b093a05715b6f3fc00"/>
 	</xsd:complexType>
 	<xsd:complexType name="WarehouseShippingAdviceHeaderBaseType" id="oagis-id-fb17edd8de834c33aca3ea9caf3abb2d">

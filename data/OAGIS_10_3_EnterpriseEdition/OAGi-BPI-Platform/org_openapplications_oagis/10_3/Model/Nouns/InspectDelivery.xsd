@@ -117,7 +117,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-12669af8a3494804921ef36af7cbfdb4"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-12669af8a3494804921ef36af7cbfdb4"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-b73ced2acc414f2a995992dd9716c686"/>
 			</xsd:extension>
 		</xsd:complexContent>

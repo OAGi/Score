@@ -63,7 +63,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-41a6be466d8245d8bbe29a778bf9ef5c"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-41a6be466d8245d8bbe29a778bf9ef5c"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f09fa16b91cb44889169bf20fa1549a0"/>
 	</xsd:complexType>
 	<xsd:complexType name="SplitWIPSourceBaseType" id="oagis-id-7a1dc31e91d748739649c9e616751506">

@@ -161,7 +161,7 @@ Each instance of the RouteStop pertains to a single physical destination shippin
 					</xsd:element>
 					<xsd:element ref="Quantity" id="oagis-id-596a2b60a3fc4d10a09c810126bf64c7" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-53e8aa11d9f14ab6b39468b132700e1b"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-53e8aa11d9f14ab6b39468b132700e1b"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-fd33f01144cd4c4697614d113cf987b3"/>
 			</xsd:extension>
 		</xsd:complexContent>

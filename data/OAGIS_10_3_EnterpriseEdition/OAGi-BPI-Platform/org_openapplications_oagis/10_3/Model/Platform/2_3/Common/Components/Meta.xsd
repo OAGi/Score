@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_3 Platform 2_2 
@@ -18,7 +20,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Platform/2_3/Common/Components/Meta.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="Fields.xsd"/>
 	<xsd:include schemaLocation="../../Extension/Extensions.xsd"/>
 	<xsd:complexType name="BusinessObjectDocumentType" id="oagis-id-2783857358f145e799471461f5192fa7">
@@ -82,8 +85,8 @@ This element supports any digital signature specification that is available toda
 This allows the user to carry a digital signature in the xml instance of a BOD. The choice of which digital signature to use is left up to the user and their integration needs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="ScenarioID" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd3" minOccurs="0"/>
-			<xsd:element ref="CorrelationID" id="oagis-id-8608944406234866817301e39693fd91" minOccurs="0"/>
+			<xsd:element ref="ScenarioID" id="oagis-id-a24d9477fddd44ddb386ff43aaee02cc" minOccurs="0"/>
+			<xsd:element ref="CorrelationID" id="oagis-id-0419c743140b4046bec481903fe6719f" minOccurs="0"/>
 			<xsd:element ref="BODID" id="oagis-id-afa1894b0cd449b68f65ec602f2e9c96" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The BODId provides a place to carry a Globally Unique Identifier (GUID) that will make each Business Object Document instance uniquely identifiable.
@@ -173,7 +176,7 @@ The Open Applications Group has not constructed the list of valid Component name
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-737bf0f79ee9499dbf1934bc0578300e"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-737bf0f79ee9499dbf1934bc0578300e"/>
 		<xsd:attribute name="partyRoleCode" type="CodeType_1E7368" id="oagis-id-ced78b3239dd4175bcd2aad7d8204064"/>
 	</xsd:complexType>
 	<xsd:complexType name="IntermediaryType" id="oagis-id-c49c28f22f7142a79b00b69686660376">
@@ -210,7 +213,7 @@ The Open Applications Group has not constructed the list of valid Component name
 			<xsd:element ref="ReceivedDateTime" id="oagis-id-283add1a257b4b138a791f8995c99b04" minOccurs="0"/>
 			<xsd:element ref="SentDateTime" id="oagis-id-852605e24dd94216adb72de48df43690" minOccurs="0"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-548010f95bde4302876807d244d8f35c"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-548010f95bde4302876807d244d8f35c"/>
 		<xsd:attribute name="partyRoleCode" type="CodeType_1E7368" id="oagis-id-dd9ee4dc0a6c43a99e557e5d241ecc50"/>
 		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-4cd9d762a08145478b6ffd966f1bb923"/>
 	</xsd:complexType>
@@ -246,7 +249,7 @@ The Open Applications Group has not constructed the list of valid Component name
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-48e40844c75443c3a546d04a86e9f302"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-48e40844c75443c3a546d04a86e9f302"/>
 		<xsd:attribute name="partyRoleCode" type="CodeType_1E7368" id="oagis-id-6ba8e7b0137149fda62faba545e4a693"/>
 		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-dcd2b9fd07b4410a8c8b5a22d978340f"/>
 	</xsd:complexType>
@@ -286,7 +289,7 @@ This allows the user to carry a digital signature in the xml instance of a BOD. 
 </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="BODID" type="IDType" id="oagis-id-2b5d49b69f3f4c4a93bf29954f0ec940">
+	<xsd:element name="BODID" type="IDType" nillable="true" id="oagis-id-2b5d49b69f3f4c4a93bf29954f0ec940">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The BODId provides a place to carry a Globally Unique Identifier (GUID) that will make each Business Object Document instance uniquely identifiable.
 
@@ -300,7 +303,7 @@ This is a critical success factor to enable software developers to use the Globa
 7. Security.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="LogicalID" type="IDType" id="oagis-id-3511de121288430686c5bd8abf75be33">
+	<xsd:element name="LogicalID" type="IDType" nillable="true" id="oagis-id-3511de121288430686c5bd8abf75be33">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the logical location of the server and applications from which the Business Object Document originated. It can be used to establish a logical to physical mapping, however its use is optional.
 
@@ -313,24 +316,24 @@ This logical to physical mapping may be done at execution time by the applicatio
 This provides for a simple but effective directory access capability while maintaining application independence from the physical location of those resources on the network</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ComponentID" type="IDType" id="oagis-id-112b29683a0c47d9ab22d884878a98ca">
+	<xsd:element name="ComponentID" type="IDType" nillable="true" id="oagis-id-112b29683a0c47d9ab22d884878a98ca">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides a finer level of control than Logical Identifier and represents the business application that issued the Business Object Document.  Its use is optional.
 
 The Open Applications Group has not constructed the list of valid Component names.  A suggestion for naming is to use the application component names used in the scenario diagrams in section two of OAGIS. Example Components may be Inventory, or Payroll.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="TaskID" type="IDType" id="oagis-id-6d71aa175f294032908cfbda3a4c672d">
+	<xsd:element name="TaskID" type="IDType" nillable="true" id="oagis-id-6d71aa175f294032908cfbda3a4c672d">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Describes the business event that initiated the need for the Business Object Document to be created. Its use is optional. Although the Task may differ depending on the specific implementation, it is important to enable drill back capability. Example Tasks may be Receipt or Adjustment.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ReferenceID" type="IDType" id="oagis-id-1ed5333e39bb4346b3e6c7617ef79fdf">
+	<xsd:element name="ReferenceID" type="IDType" nillable="true" id="oagis-id-1ed5333e39bb4346b3e6c7617ef79fdf">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Enables the sending application to indicate the instance identifier of the event or task that caused the BOD to be created. This allows drill back from the BOD message into the sending application. The may be required in environments where an audit trail must be maintained for all transactions.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ConfirmationCode" type="ConfirmationCodeType" id="oagis-id-ad6d6d146f7d41fca39537a3609ab601">
+	<xsd:element name="ConfirmationCode" type="ConfirmationCodeType" nillable="true" id="oagis-id-ad6d6d146f7d41fca39537a3609ab601">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is an option controlled by the Sender business application.  It is a request to the receiving application to send back a confirmation BOD to the sender. The confirmation Business Object Document may indicate the successful processing of the original Business Object Document or return error conditions if the original Business Object Document was unsuccessful.
 
@@ -343,6 +346,8 @@ OnError - OnError send back a confirmation Business Object Document only if an e
 Always - Always send a confirmation Business Object Document regardless</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+	<xsd:element name="ScenarioID" type="IDType" nillable="true" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2"/>
+	<xsd:element name="CorrelationID" type="IDType" nillable="true" id="oagis-id-8608944406234866817301e39693fd90"/>
 	<!---->
 	<xsd:complexType name="IDSetType" id="oagis-id-8537e396814a488087b71496eaec6563">
 		<xsd:annotation>
@@ -404,7 +409,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-afc9f30b19ed407bacae65fd76cb0f7f"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-afc9f30b19ed407bacae65fd76cb0f7f"/>
 	</xsd:complexType>
 	<xsd:element name="IDSet" type="IDSetType" id="oagis-id-ba9ab2e816094f5da6db3fd07733cded"/>
 	<!---->
@@ -418,7 +423,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-637f9b9ed71d49cebd12b0a11c9974f7"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-637f9b9ed71d49cebd12b0a11c9974f7"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-4ec5c09c043c45c787fd4d057c14c31d"/>
 	</xsd:complexType>
 	<!---->
@@ -796,19 +801,19 @@ The expressionLanguage indicates the expression language being used. In order fo
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:element name="ActionExpression" type="ActionExpressionType" id="oagis-id-661d02b3b0ac4bd093e42e6dd419ab5f"/>
+	<xsd:element name="ActionExpression" type="ActionExpressionType" nillable="true" id="oagis-id-661d02b3b0ac4bd093e42e6dd419ab5f"/>
 	<xsd:element name="ActionCriteria" type="ActionCriteriaType" id="oagis-id-e1575519d6b940cfafed787e229604b8">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies with the ActionExpression the level by carrying a value of the expressionLanguage (this is typically XPath) within the BOD that the actionCode is to be performed. The ChangeStatus communicates just that the Change Status. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Expression" type="ExpressionType" id="oagis-id-d0b7619703a743f2872cffe7b9f08a8a"/>
-	<xsd:element name="ResponseExpression" type="ResponseExpressionType" id="oagis-id-2484c1631df948a2b100f7c0f5fcfe25">
+	<xsd:element name="ResponseExpression" type="ResponseExpressionType" nillable="true" id="oagis-id-2484c1631df948a2b100f7c0f5fcfe25">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">ResponseExpression identifies a pointer to the Component being provided as a response to a request. This point is provided using an appropriate value of the given expressionLanguage indicated. The actionCode is intended to indicate what has occured with the given component and/or instance of the given component.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="SourceLocationExpression" type="ExpressionType" id="oagis-id-65a656c5a711422ebb733eac6f788c73"/>
+	<xsd:element name="SourceLocationExpression" type="ExpressionType" nillable="true" id="oagis-id-65a656c5a711422ebb733eac6f788c73"/>
 	<xsd:element name="ResponseCriteria" type="ResponseActionCriteriaType" id="oagis-id-0c7f17ab099d4cffa0819ceec2b421b7">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">ResponseCriteria identifies the content that is to be returned, given query success. In essence, the expression here has the effect of filtering the part(s) of the found element(s) that are to be returned.
@@ -1153,7 +1158,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 			</xsd:element>
 			<xsd:element ref="EndTime" id="oagis-id-fad0948994214f7a90359b0aed1fd099" minOccurs="0"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-23a84acfe7c147d6b66ea2114b582091"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-23a84acfe7c147d6b66ea2114b582091"/>
 	</xsd:complexType>
 	<xsd:complexType name="TimePeriodType" abstract="false" id="oagis-id-5418a6fed21c4716bef1f95989ebeeb4" mixed="false">
 		<xsd:annotation>
@@ -1202,8 +1207,6 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 			<xsd:element ref="BusinessObjectDocument" id="oagis-id-997a1b1b329942448f88ca5b515b0556"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ScenarioID" type="IDType" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2"/>
-	<xsd:element name="CorrelationID" type="IDType" id="oagis-id-8608944406234866817301e39693fd90"/>
 	<xsd:element name="BusinessObjectDocument" type="BusinessObjectDocumentType" id="oagis-id-31e578bda6d249818dfc52181497de86"/>
 	<!---->
 </xsd:schema>

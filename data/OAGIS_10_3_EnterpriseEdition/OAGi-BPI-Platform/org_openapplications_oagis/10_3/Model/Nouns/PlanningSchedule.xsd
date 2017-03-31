@@ -74,7 +74,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-636d9e8315f24dc3b2ac95299aa855f0"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-636d9e8315f24dc3b2ac95299aa855f0"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-647eca09eabc4248bca64129d1889a81"/>
 	</xsd:complexType>
 	<xsd:complexType name="PlanningScheduleHeaderBaseType" id="oagis-id-f52044986a5649d0984889557871362f">

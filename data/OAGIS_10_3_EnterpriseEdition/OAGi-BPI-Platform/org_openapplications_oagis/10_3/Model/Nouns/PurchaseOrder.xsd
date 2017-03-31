@@ -71,7 +71,7 @@ At least one occurrence of this Component is required for each occurrence of the
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-ec34c7efb6024d19907c0522b9503917"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-ec34c7efb6024d19907c0522b9503917"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-56bc8a05c2064710ab5ce812661ac3f7"/>
 	</xsd:complexType>
 	<xsd:complexType name="PurchaseOrderHeaderBaseType" id="oagis-id-e6c48757028646a48fdff33269f93284">

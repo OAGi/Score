@@ -55,7 +55,7 @@
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-5e531522ca4145f194849dde35d19a84"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-5e531522ca4145f194849dde35d19a84"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-d8f8521dab5846b582d8f792ffc9b598"/>
 			</xsd:extension>
 		</xsd:complexContent>

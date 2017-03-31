@@ -53,7 +53,7 @@ The status field on the OnlineOrder header is used in third party buying scenari
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-0e803f3f12db4eb097b346b48bbff03b"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-0e803f3f12db4eb097b346b48bbff03b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-d6f6892f04ab466a8e9da8bf3c683769"/>
 	</xsd:complexType>
 	<xsd:complexType name="OnlineOrderHeaderBaseType" id="oagis-id-05bc9dc72b974ac09272f74ddd46e05a">

@@ -56,7 +56,7 @@
 					<xsd:element ref="TestingProcedure" id="oagis-id-12402e7797694c429c35c54fbcb5bdd6" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Party" id="oagis-id-162044279f1f40e1a8bb0ba0a9e62b3e" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-db2a4f387f424ba0bde0aaa796d70497"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-db2a4f387f424ba0bde0aaa796d70497"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3a4b2618c85744c3ba77645fd13c0d9f"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -86,7 +86,7 @@
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-734c64eee2244f939d95e715145263cc"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-734c64eee2244f939d95e715145263cc"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-194a3e61ca994214b8c6d9fa8f3d68e7"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -222,7 +222,7 @@ Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
 					<xsd:element ref="TestingProcedureStep" id="oagis-id-d04044537bf54a7f9cfd00bf2b23ea18" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="TestedControlIDs" id="oagis-id-7ba8a56a5f6c4bae94454f582d99e531" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-fb320eee82424ef58b0343edb16a5782"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fb320eee82424ef58b0343edb16a5782"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-952811ee92a84a449c842d81ef14e1c2"/>
 			</xsd:extension>
 		</xsd:complexContent>

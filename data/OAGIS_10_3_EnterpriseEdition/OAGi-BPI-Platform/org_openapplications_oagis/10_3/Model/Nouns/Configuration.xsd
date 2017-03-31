@@ -48,7 +48,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-fc050a840f0c4565a90062192e2442dd"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fc050a840f0c4565a90062192e2442dd"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-ac54d234db9541f6a7cfe4c68c792962"/>
 	</xsd:complexType>
 	<xsd:complexType name="ConfigurationHeaderBaseType" id="oagis-id-838a9d73486d4fe9932627bde4fec74c">

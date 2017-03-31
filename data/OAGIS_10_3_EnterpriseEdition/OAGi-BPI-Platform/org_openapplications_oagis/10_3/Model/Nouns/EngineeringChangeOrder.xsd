@@ -91,7 +91,7 @@
 			</xsd:element>
 			<xsd:element ref="EngineeringChangeDetail" id="oagis-id-937e5a45c0f540f7a58f21eae6ea7102" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-f115509e816a454f91a7c420b1efa379"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f115509e816a454f91a7c420b1efa379"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-e7195a425b7c41bfb0febd7dbafab6f6"/>
 	</xsd:complexType>
 	<xsd:complexType name="EngineeringChangeHeaderBaseType" id="oagis-id-385aaef799de4689bd3a12ee2f58ac19">

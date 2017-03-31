@@ -56,7 +56,7 @@ SalesLead -&gt; Opportunity -&gt; Opportunity -&gt; Quote -&gt; PurchaseOrder -&
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-7afd7b8093cc4852b44b12fa5cc593dc"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7afd7b8093cc4852b44b12fa5cc593dc"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3d0d2615eb5645c4a0adf032d94da903"/>
 	</xsd:complexType>
 	<xsd:complexType name="OpportunityHeaderBaseType" id="oagis-id-7958409c287f4ff98f12de8b9cdf5590">

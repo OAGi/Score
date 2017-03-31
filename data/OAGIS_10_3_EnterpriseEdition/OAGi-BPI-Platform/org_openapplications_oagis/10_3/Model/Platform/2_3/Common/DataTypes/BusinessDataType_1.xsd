@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!-- ====================================================================== --><!-- =====  OAGI - Business Data Type XML Schema File                                               ===== --><!-- ====================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!-- ====================================================================== -->
+<!-- =====  OAGI - Business Data Type XML Schema File                                               ===== -->
+<!-- ====================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:  OAGIS 10_3 Platform 2_2 
@@ -18,7 +23,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Platform/2_3/DataTypes/BusinessDataType_1.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<!-- =================================================================== -->
 	<!-- ===== Imports                                                 															   ===== -->
 	<!-- =================================================================== -->
@@ -73,7 +79,7 @@
 						</ccts_ContentComponentValueDomain>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:attribute name="currencyCode" type="clm542173A20090305_ISO3AlphaCurrencyCodeContentType" use="optional" id="oagis-id-0dd62519460d4a91bfdbc1f7778befac">
+				<xsd:attribute name="currencyCode" type="oacl_CurrencyCodeContentType" use="optional" id="oagis-id-0dd62519460d4a91bfdbc1f7778befac">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>

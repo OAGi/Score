@@ -57,7 +57,7 @@ A Commercial Invoice document represents the extent and content of "transportati
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-f64141dca33a4d918f760503a4baadf2"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f64141dca33a4d918f760503a4baadf2"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-efbd12944da94f84a256b62184d78a37"/>
 	</xsd:complexType>
 	<xsd:complexType name="CommercialInvoiceHeaderType" id="oagis-id-7102fa1e5dbc4470966e54674fe2d693">

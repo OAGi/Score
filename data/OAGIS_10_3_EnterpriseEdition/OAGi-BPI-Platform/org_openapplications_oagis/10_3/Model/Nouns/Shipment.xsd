@@ -64,7 +64,7 @@ The ShipmentUnit complements the line-item oriented summary information provided
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-0ed1b7f77e9542a8b5c3236c169f6437"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-0ed1b7f77e9542a8b5c3236c169f6437"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-81fb7263f1c147ef8d1e2e776df44f64"/>
 	</xsd:complexType>
 	<xsd:complexType name="ShipmentType" id="oagis-id-ca83310c8ef8459a8df3820f201c474d">

@@ -62,7 +62,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-4f533fce1e8d408e860aa938b327903a"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-4f533fce1e8d408e860aa938b327903a"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-4ec437302ffe425689f93754c8220d43"/>
 	</xsd:complexType>
 	<xsd:complexType name="PriceListHeaderBaseType" id="oagis-id-0df5ec0f320d4657b2489bef62b8a07c">

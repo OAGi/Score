@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
 
 
@@ -23,7 +25,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/InventoryBalance.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
 	<xsd:element name="InventoryBalance" type="InventoryBalanceType" id="oagis-id-cb3821c1e186420db1dcb48912a380ba">
 		<xsd:annotation>
@@ -39,7 +42,7 @@ All Quantity information will be updated as replacing the entire field, not incr
 		<xsd:complexContent>
 			<xsd:extension base="ItemInstanceBaseType">
 				<xsd:sequence>
-					<xsd:element ref="GLEntityID" id="oagis-id-95e7d287fbad4f40aaf6f0b493d8363d" minOccurs="0">
+					<xsd:element ref="GLEntityID" id="oagis-id-00189d05b38e432993e5b8106a2b82d6" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
 
@@ -48,17 +51,17 @@ It is normally the primary balancing segment of the GL Account structure.  Typic
 Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="Status" id="oagis-id-ca506eca8a2048f5aa0646cdbf94d77e" minOccurs="0">
+					<xsd:element ref="Status" id="oagis-id-2cf7aeed8008408c9d1de2083f50e217" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="ReasonCode" id="oagis-id-cb2f0f3086414f33a44306187a3f64d0" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="ReasonCode" id="oagis-id-c1b5a674db304bf38493e4acd6cc656b" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="TransactionDateTime" id="oagis-id-4296e69b19b14824ae72bafbcfadf594" minOccurs="0">
+					<xsd:element ref="TransactionDateTime" id="oagis-id-1b42b48ec40f4a1683772682b8338818" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The DateTime of occurrence of the transaction</xsd:documentation>
 						</xsd:annotation>
@@ -137,7 +140,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 </xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="ItemInstance" id="oagis-id-6532276bf52f4c1f9f5d3e32b3df8be9" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ItemInstance" id="oagis-id-544cfdf778cb4e1a8bf2c16a4c5684aa" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

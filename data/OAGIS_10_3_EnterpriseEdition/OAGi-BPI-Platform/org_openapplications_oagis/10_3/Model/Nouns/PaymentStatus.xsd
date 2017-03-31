@@ -33,7 +33,7 @@
 			<xsd:element ref="PaymentStatusHeader" id="oagis-id-a5183a9cb60b4a40af440e8d30e7ca3b" minOccurs="0"/>
 			<xsd:element ref="PaymentStatusPayment" id="oagis-id-1ad4a2f2f25c4e4b816b67fa8f49e9ac" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-056a4ed3eb5646079ebb2a70fc606543"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-056a4ed3eb5646079ebb2a70fc606543"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-0c894bac217147ee9f8fb00aab42dc6f"/>
 	</xsd:complexType>
 	<xsd:complexType name="PaymentStatusHeaderBaseType" id="oagis-id-82431b9e9d6e492baa8d3030d2dfdf94">

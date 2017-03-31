@@ -36,7 +36,7 @@
 				<xsd:sequence>
 					<xsd:group ref="CommonTimeReporting" id="oagis-id-910e47b8e2134a16b8ffb945dc30c75a"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-b121285115f44c99a178456d3ddfd301"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b121285115f44c99a178456d3ddfd301"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-bc9587b517b14b2eba10f7d48c4c7f39"/>
 			</xsd:extension>
 		</xsd:complexContent>

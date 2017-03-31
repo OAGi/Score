@@ -65,7 +65,7 @@
 			</xsd:element>
 			<xsd:element ref="ReceiveDeliveryUnit" id="oagis-id-bcb85141aacc43829d8337a8a90d6f7b" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-ea166de2e72d43d780aa17a29ce00b81"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-ea166de2e72d43d780aa17a29ce00b81"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-c0f3da0267934485a0da7ec0ed147b51"/>
 	</xsd:complexType>
 	<xsd:complexType name="ReceiveDeliveryHeaderBaseType" id="oagis-id-df581b0ad3794e05aeb5b09f97a3f467">

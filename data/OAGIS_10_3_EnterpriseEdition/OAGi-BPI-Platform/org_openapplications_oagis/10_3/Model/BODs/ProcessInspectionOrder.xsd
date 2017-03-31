@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
 
 
@@ -23,9 +25,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessInspectionOrder.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/InspectionOrder.xsd"/>
-	<xsd:element name="ProcessInspectionOrder" type="ProcessInspectionOrderType" id="oagis-id-cd69bf5b105c4426ad1b4ccb5c3a2ab7">
+	<xsd:element name="ProcessInspectionOrder" type="ProcessInspectionOrderType" id="oagis-id-2bb9f3e946cc40e69a36a636ad0652ae">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynInspectionOrder is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 

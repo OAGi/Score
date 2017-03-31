@@ -79,6 +79,9 @@ public class Context {
         xsomParser.parse(file);
 
         xsSchemaSet = xsomParser.getResult();
+        if (xsSchemaSet == null) {
+            throw new IllegalStateException();
+        }
 
         this.file = file;
         this.moduleRepository = moduleRepository;

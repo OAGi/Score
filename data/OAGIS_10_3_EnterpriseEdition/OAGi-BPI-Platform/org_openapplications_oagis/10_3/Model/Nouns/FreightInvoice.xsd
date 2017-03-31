@@ -66,7 +66,7 @@ The summary amounts in the Header include the Line level amounts and Header leve
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-875a40da9bd644a7821ef15a3c8eac27"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-875a40da9bd644a7821ef15a3c8eac27"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-7b1a3065bfcb4cdab9d087341eb8454c"/>
 	</xsd:complexType>
 	<xsd:complexType name="FreightInvoiceHeaderBaseType" id="oagis-id-b5e61611fc064c7d969a087053dcbcdc">

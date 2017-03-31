@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
    Schema agency: 	Open Applications Group 
 
    OAGIS® Revision:    OAGIS 10_3  
@@ -18,7 +20,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/OAGIS-Nouns.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="Platform/2_3/OAGi-Platform.xsd"/>
 	<xsd:include schemaLocation="Platform/2_3/Nouns/BOD.xsd"/>
 	<xsd:include schemaLocation="Platform/2_3/Nouns/Field.xsd"/>
@@ -35,10 +38,10 @@
 	<xsd:include schemaLocation="Nouns/CommercialInvoice.xsd"/>
 	<xsd:include schemaLocation="Nouns/Configuration.xsd"/>
 	<xsd:include schemaLocation="Nouns/ConfirmWIP.xsd"/>
-	<xsd:include schemaLocation="Nouns/CostingActivity.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveAction.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveActionPlan.xsd"/>
 	<xsd:include schemaLocation="Nouns/CorrectiveActionRequest.xsd"/>
+	<xsd:include schemaLocation="Nouns/CostingActivity.xsd"/>
 	<xsd:include schemaLocation="Nouns/Credit.xsd"/>
 	<xsd:include schemaLocation="Nouns/CreditStatus.xsd"/>
 	<xsd:include schemaLocation="Nouns/CreditTransfer.xsd"/>
@@ -143,10 +146,10 @@
 			<xsd:element ref="CommercialInvoice" id="oagis-id-1f285b863c40452282b95736d9deabfa" minOccurs="0"/>
 			<xsd:element ref="Configuration" id="oagis-id-b2a70af62d5e4e5d9b8c4774559074f4" minOccurs="0"/>
 			<xsd:element ref="ConfirmWIP" id="oagis-id-8b075345556e452ea224b590999145cb" minOccurs="0"/>
+			<xsd:element ref="CorrectiveAction" id="oagis-id-4a96cbac81a74cd6bc6ffad34fa014a1" minOccurs="0"/>
+			<xsd:element ref="CorrectiveActionPlan" id="oagis-id-cee83eb4f2d844028f5963ab9bcd31fc" minOccurs="0"/>
+			<xsd:element ref="CorrectiveActionRequest" id="oagis-id-2548ef25b16b48658588be80a59ecb65" minOccurs="0"/>
 			<xsd:element ref="CostingActivity" id="oagis-id-3a82c24f96674870a54918c2b2764dbb" minOccurs="0"/>
-			<xsd:element ref="CorrectiveAction" minOccurs="0" id="oagis-id-4a96cbac81a74cd6bc6ffad34fa014a1"/>
-			<xsd:element ref="CorrectiveActionPlan" minOccurs="0" id="oagis-id-cee83eb4f2d844028f5963ab9bcd31fc"/>
-			<xsd:element ref="CorrectiveActionRequest" minOccurs="0" id="oagis-id-2548ef25b16b48658588be80a59ecb65"/>
 			<xsd:element ref="Credit" id="oagis-id-dd5e9c50fb07444ca59fcc039affb11c" minOccurs="0"/>
 			<xsd:element ref="CreditStatus" id="oagis-id-a678f336414848a8a16297fd30443cea" minOccurs="0"/>
 			<xsd:element ref="CreditTransfer" id="oagis-id-36114b04fd994a5bbd1056668d6cfc99" minOccurs="0"/>
@@ -232,7 +235,7 @@
 			<xsd:element ref="WarehouseShippingOrder" id="oagis-id-5c42cf7ad2c34896b77afbc225df5cff" minOccurs="0"/>
 			<xsd:element ref="WarrantyClaim" id="oagis-id-dba1544c0a404e48a1817418161ea18a" minOccurs="0"/>
 			<xsd:element ref="WIPStatus" id="oagis-id-9beff5f290984ad2988e296410646463" minOccurs="0"/>
-			<xsd:element ref="WorkOrder" minOccurs="0" id="oagis-id-8f5ce50866684007ab7b4d58ab6a6857"/>
+			<xsd:element ref="WorkOrder" id="oagis-id-8f5ce50866684007ab7b4d58ab6a6857" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

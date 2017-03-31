@@ -53,7 +53,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-c827323c621a4721b2f9af9874cc415b"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c827323c621a4721b2f9af9874cc415b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-7d17b78add89469fbcb5505c868870db"/>
 	</xsd:complexType>
 	<xsd:complexType name="MatchDocumentHeaderBaseType" id="oagis-id-19eb502b550e43d7bd70dce9c3f83f36">
@@ -150,7 +150,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-9ff1743f07e74d678f931530137eb845"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-9ff1743f07e74d678f931530137eb845"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-63f6c2142c7a4978a1bd3a008c3bde9e"/>
 			</xsd:extension>
 		</xsd:complexContent>

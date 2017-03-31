@@ -42,7 +42,7 @@
 			<xsd:element ref="DispatchListHeader" id="oagis-id-b7dd391cad5b4e2aad3f7fc8ebe7c498" minOccurs="0"/>
 			<xsd:element ref="DispatchListLine" id="oagis-id-c393d2b16f51475e99513022c5fc2dae" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-7fa130a6fa8345198bf2a3303a9c4439"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7fa130a6fa8345198bf2a3303a9c4439"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-d4acea4a54f645c6835b104d531fd5e0"/>
 	</xsd:complexType>
 	<xsd:complexType name="DispatchListHeaderBaseType" id="oagis-id-5da0cb4ac2724f2ab78f4c3a3a5e44b8">

@@ -67,7 +67,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-abceb2de1fde4cb1b624ac4c08593e88"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-abceb2de1fde4cb1b624ac4c08593e88"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-caf6f37a325a4009b9521bbc241f8d82"/>
 	</xsd:complexType>
 	<xsd:complexType name="MergeWIPDestinationBaseType" id="oagis-id-9af9599c38d641f89e1a78c6aa48032f">

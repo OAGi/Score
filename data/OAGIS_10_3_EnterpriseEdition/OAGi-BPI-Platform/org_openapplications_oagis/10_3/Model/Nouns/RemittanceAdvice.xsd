@@ -57,7 +57,7 @@ At least one occurrence of this Component is required for each occurrence of the
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-8773b725e7534b2e869d80e8063fd7ef"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-8773b725e7534b2e869d80e8063fd7ef"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-cd7085babea04ca6b2ac51283709fc7f"/>
 	</xsd:complexType>
 	<xsd:complexType name="RemittanceAdviceHeaderBaseType" id="oagis-id-f09f6e05e0cc42d19d9138f928e713d8">

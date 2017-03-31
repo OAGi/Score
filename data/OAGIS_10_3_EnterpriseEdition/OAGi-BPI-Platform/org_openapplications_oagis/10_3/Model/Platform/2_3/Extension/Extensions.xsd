@@ -52,7 +52,7 @@
 			<xsd:element ref="Time" minOccurs="0" maxOccurs="unbounded" id="oagis-id-4edcb3d7e4e547e8aa31322083cd668e"/>
 			<xsd:element ref="ValueText" minOccurs="0" maxOccurs="unbounded" id="oagis-id-229bea6c7e2d4b428bd8b10a3003c1a5"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" id="oagis-id-c97f9c47388f4a64bb50cd091862a8dc"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-c97f9c47388f4a64bb50cd091862a8dc"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-098f947a98b342cbab79e3d92246b697"/>
 		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-29453736b5e54561af4f8a0894052248">
 			<xsd:annotation>

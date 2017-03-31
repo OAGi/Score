@@ -261,7 +261,7 @@ Information used to communicate the individual items on the pre-determined Bill 
 			<xsd:element ref="Operation" id="oagis-id-078e5fd8c25d4e1d8ab0fb5d6faf6eb6" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element name="Extension" type="ProductionOrderExtensionType" id="oagis-id-2c2acdb4bdac41d89d51d4a9c3a1869d" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-003d30b80dcf46a38930f8a682dedd3b"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-003d30b80dcf46a38930f8a682dedd3b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-dd75418a769441c5a3f2946d255c3c70"/>
 	</xsd:complexType>
 	<xsd:complexType name="ProductionOrderLineBaseType" id="oagis-id-5c2094938fa54c07a0a67211610495d2">
