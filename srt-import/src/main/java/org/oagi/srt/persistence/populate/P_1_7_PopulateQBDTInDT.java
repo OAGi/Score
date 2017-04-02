@@ -342,15 +342,16 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO) throws Exception {
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtScPriRestriRepository.findByBdtScId(dtscVO.getBasedDtScId());
-        if (bdtscs.isEmpty()) {
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestiList =
+                bdtScPriRestriRepository.findByBdtScId(dtscVO.getBasedDtScId());
+        if (bdtScPriRestiList.isEmpty()) {
             if (dtscVO.getBasedDtScId() == 0) {
                 return Collections.emptyList();
             }
             DataTypeSupplementaryComponent vo = dtScRepository.findOne(dtscVO.getBasedDtScId());
-            bdtscs = getBDTSCPrimitiveRestriction(vo);
+            bdtScPriRestiList = getBDTSCPrimitiveRestriction(vo);
         }
-        return bdtscs;
+        return bdtScPriRestiList;
     }
 
     private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO,
@@ -377,6 +378,9 @@ public class P_1_7_PopulateQBDTInDT {
         }
 
         if (!bdtScPriRestriListForSaving.isEmpty()) {
+            if (bdtScPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+                throw new IllegalStateException("BDT_SC_ID['" + dtscVO.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
+            }
             bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
         }
     }
@@ -503,6 +507,9 @@ public class P_1_7_PopulateQBDTInDT {
         }
 
         if (!bdtPriRestriListForSaving.isEmpty()) {
+            if (bdtPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+                throw new IllegalStateException("BDT_ID['" + dataType.getDtId() + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
+            }
             bdtPriRestriRepository.save(bdtPriRestriListForSaving);
         }
     }
@@ -601,13 +608,19 @@ public class P_1_7_PopulateQBDTInDT {
                     representation_term = "Name";
                 } else {
                     String attrType = attrElement.getAttribute("type");
-                    if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
-                        representation_term = "Text";
-                    else if (attrType.equals("xbt_BooleanType"))
+                    if (attrName.equals("preferred") || attrName.equals("preferredIndicator")) {
                         representation_term = "Indicator";
-                    else if (attrName.equals("preferred") || attrName.equals("preferredIndicator")) {
-                        representation_term = "Indicator";
+                    } else {
+                        attrType = populateDefaultAndUnqualifiedBDT.findPrimitiveTypeName(attrType);
+                        if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
+                            representation_term = "Text";
+                        else if (attrType.equals("xbt_BooleanType"))
+                            representation_term = "Indicator";
                     }
+                }
+
+                if (StringUtils.isEmpty(representation_term)) {
+                    throw new IllegalStateException("Not defined REPRESENTATION_TERM.");
                 }
 
                 Node documentationNode = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");

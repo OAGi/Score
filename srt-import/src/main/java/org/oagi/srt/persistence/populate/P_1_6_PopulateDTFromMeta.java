@@ -19,7 +19,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
@@ -86,9 +85,9 @@ public class P_1_6_PopulateDTFromMeta {
         StringCDTPrimitiveId = cdtPriRepository.findOneByName("String").getCdtPriId();
         TokenCDTPrimitiveId = cdtPriRepository.findOneByName("Token").getCdtPriId();
 
-        NormalizedStringXBTId= xbtRepository.findOneByBuiltInType("xsd:normalizedString").getXbtId();
-        StringXBTId= xbtRepository.findOneByBuiltInType("xsd:string").getXbtId();
-        TokenXBTId= xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
+        NormalizedStringXBTId = xbtRepository.findOneByBuiltInType("xsd:normalizedString").getXbtId();
+        StringXBTId = xbtRepository.findOneByBuiltInType("xsd:string").getXbtId();
+        TokenXBTId = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
         meta_xsd = new XPathHandler(ImportConstants.META_XSD_FILE_PATH);
 
         importAdditionalBDT();
@@ -366,14 +365,15 @@ public class P_1_6_PopulateDTFromMeta {
     }
 
     public void populateBDTSCPrimitiveFromCDTSC(long dtScId, long defaultCDTPriIndex) {
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPriList = cdtScAwdPriRepository.findByCdtScId(dtScId);
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri;
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList = cdtScAwdPriRepository.findByCdtScId(dtScId);
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestiList = new ArrayList();
 
-        for (int i = 0; i < cdtSCAwdPriList.size(); i++) {
-            bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+        for (int i = 0; i < cdtScAwdPriList.size(); i++) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri =
+                    new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtScId);
 
-            CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri = cdtSCAwdPriList.get(i);
+            CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri = cdtScAwdPriList.get(i);
             long cdtPriId = cdtSCAwdPri.getCdtPriId();
 
             if (cdtPriId == defaultCDTPriIndex) {
@@ -391,33 +391,45 @@ public class P_1_6_PopulateDTFromMeta {
                 xbtId = TokenXBTId;
             }
 
-            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAwdPriXpsTypeMap = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAwdPriList.get(i).getCdtScAwdPriId(), xbtId);
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAwdPriXpsTypeMap = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtScAwdPriList.get(i).getCdtScAwdPriId(), xbtId);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(cdtSCAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId());
-            bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+
+            bdtScPriRestiList.add(bdtSCPri);
         }
 
+        if (bdtScPriRestiList.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+            throw new IllegalStateException("BDT_SC_ID['" + dtScId + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
+        }
     }
 
-    public void inheritLanguageCode(DataTypeSupplementaryComponent dtsc){
+    public void inheritLanguageCode(DataTypeSupplementaryComponent dtSc) {
 
-        DataType baseBDT = dataTypeRepository.findOne(dtsc.getOwnerDtId());
+        DataType baseBDT = dataTypeRepository.findOne(dtSc.getOwnerDtId());
         DataType baseDefaultTextBDT = dataTypeRepository.findOne(baseBDT.getBasedDtId());
 
         DataTypeSupplementaryComponent languageCodeSC = dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(baseDefaultTextBDT.getDtId(), "Language", "Code");
 
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> languageBDTSCPriList = bdtScPriRestriRepository.findByBdtScId(languageCodeSC.getDtScId());
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> languageBDTSCPriList =
+                bdtScPriRestriRepository.findByBdtScId(languageCodeSC.getDtScId());
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestiList = new ArrayList();
 
-        for(int i=0; i<languageBDTSCPriList.size(); i++){
+        for (int i = 0, len = languageBDTSCPriList.size(); i < len; i++) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction fromBdtSCPri = languageBDTSCPriList.get(i);
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri =
+                    new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
 
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(fromBdtSCPri.isDefault());
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(fromBdtSCPri.getCdtScAwdPriXpsTypeMapId());
-            bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+
+            bdtScPriRestiList.add(bdtSCPri);
         }
 
-
+        if (bdtScPriRestiList.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+            throw new IllegalStateException("BDT_SC_ID['" + dtSc.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
+        }
     }
 
     public static void main(String args[]) throws Exception {
