@@ -172,10 +172,8 @@ public class AggregateCoreComponent
         return (basedAccId == null) ? 0L : basedAccId;
     }
 
-    public void setBasedAccId(long basedAccId) {
-        if (basedAccId > 0) {
-            this.basedAccId = basedAccId;
-        }
+    public void setBasedAccId(Long basedAccId) {
+        this.basedAccId = basedAccId;
     }
 
     public String getObjectClassQualifier() {

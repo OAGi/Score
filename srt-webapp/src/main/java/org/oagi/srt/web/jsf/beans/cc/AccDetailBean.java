@@ -263,16 +263,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     public void updateAcc(TreeNode treeNode) {
         ACCNode accNode = (ACCNode) treeNode.getData();
         AggregateCoreComponent acc = accNode.getAcc();
-        User requester = getCurrentUser();
-
-        try {
-            coreComponentService.update(acc, requester);
-            acc.afterLoaded();
-        } catch (Throwable t) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
-            throw t;
-        }
+        updateAcc(acc);
 
         for (TreeNode child : treeNode.getChildren()) {
             if (isDirty(child)) {
@@ -283,6 +274,19 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                     updateBcc(child);
                 }
             }
+        }
+    }
+
+    private void updateAcc(AggregateCoreComponent acc) {
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.update(acc, requester);
+            acc.afterLoaded();
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
         }
     }
 
@@ -435,25 +439,43 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional
-    public void setAcc() {
+    public void setBasedAcc() {
         AggregateCoreComponent selectedAcc = getSelectedAcc();
         AggregateCoreComponent targetAcc = getTargetAcc();
 
         long previousBasedAccId = targetAcc.getBasedAccId();
         targetAcc.setBasedAccId(selectedAcc.getAccId());
 
+        updateAcc(targetAcc);
+
         TreeNode root = getRootNode();
         ((CCNode) root.getData()).reload();
         List<TreeNode> children = root.getChildren();
+        ACCNode accNode = nodeService.createCoreComponentTreeNode(selectedAcc);
         if (!children.isEmpty()) {
-            ACCNode accNode = nodeService.createCoreComponentTreeNode(selectedAcc);
             if (previousBasedAccId > 0L) {
                 children.remove(0);
             }
-            
-            children.add(0, toTreeNode(accNode, root));
-            reorderTreeNode(root);
         }
+        children.add(0, toTreeNode(accNode, root));
+        reorderTreeNode(root);
+    }
+
+    @Transactional
+    public void discardBasedAcc() {
+        AggregateCoreComponent targetAcc = getTargetAcc();
+        long previousBasedAccId = targetAcc.getBasedAccId();
+        targetAcc.setBasedAccId(null);
+
+        updateAcc(targetAcc);
+
+        TreeNode root = getRootNode();
+        ((CCNode) root.getData()).reload();
+        List<TreeNode> children = root.getChildren();
+        if (previousBasedAccId > 0L) {
+            children.remove(0);
+        }
+        reorderTreeNode(root);
     }
 
 

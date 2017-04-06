@@ -47,6 +47,9 @@
                                                 actionListener="#{accDetailBean.prepareSetBasedAcc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
+                                    <p:menuitem value="Discard based ACC" style="width: 100%;" rendered="#{accDetailBean.targetAcc.basedAccId gt 0}"
+                                                actionListener="#{accDetailBean.discardBasedAcc}"
+                                                update=":form"/>
                                     <p:menuitem value="Append ASCC" style="width: 100%;"
                                                 actionListener="#{accDetailBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
@@ -129,7 +132,7 @@
 
                                             <p:commandButton value="Apply"
                                                              actionListener="#{accDetailBean.setPreparedSetBasedAcc(false)}"
-                                                             action="#{accDetailBean.setAcc()}"
+                                                             action="#{accDetailBean.setBasedAcc()}"
                                                              onclick="PF('leftBlockUI').hide()"
                                                              update=":form"/>
                                             <p:commandButton value="Discard"

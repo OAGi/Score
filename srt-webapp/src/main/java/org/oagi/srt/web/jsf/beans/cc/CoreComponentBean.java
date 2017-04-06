@@ -12,17 +12,18 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 @Controller
-@Scope(SCOPE_SESSION)
+@Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public class CoreComponentBean extends AbstractCoreComponentBean {
 
@@ -41,14 +42,35 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @Autowired
     private CoreComponentService coreComponentService;
 
-    private String type = "ACC";
+    private String type;
     private List<CoreComponentState> selectedStates;
 
     private String searchText;
 
     @PostConstruct
     public void init() {
-        selectedStates = Arrays.asList(CoreComponentState.Editing);
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+
+        String type = requestParameterMap.get("type");
+        if (!StringUtils.isEmpty(type)) {
+            setType(type);
+        } else {
+            setType("ACC");
+        }
+
+        String states = requestParameterMap.get("states");
+        if (!StringUtils.isEmpty(states)) {
+            StringTokenizer tokenizer = new StringTokenizer(states);
+            selectedStates = new ArrayList();
+            while (tokenizer.hasMoreTokens()) {
+                String token = tokenizer.nextToken();
+                CoreComponentState state = CoreComponentState.valueOf(token);
+                selectedStates.add(state);
+            }
+        } else {
+            selectedStates = Arrays.asList(CoreComponentState.Editing);
+        }
     }
 
     public String getType() {
