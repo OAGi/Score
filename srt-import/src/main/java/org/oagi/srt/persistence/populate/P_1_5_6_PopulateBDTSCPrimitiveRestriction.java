@@ -380,7 +380,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     public boolean isBDTSC(long id) throws Exception {
         DataType tmp = dataTypeRepository.findOne(id);
 
-        if (tmp != null && tmp.getType() == 1)
+        if (tmp != null && tmp.getType() == DataTypeType.BusinessDataType)
             return true;
         return false;
     }

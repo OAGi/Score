@@ -13,7 +13,7 @@
         <h:form id="form">
             <p:panel>
                 <f:facet name="header">
-                    <p:autoComplete id="dataTypeTermQualifier" value="#{selectBDTBean.dataTypeTermQualifier}"
+                    <p:autoComplete id="qualifierDataTypeTerm" value="#{selectBDTBean.qualifierDataTypeTerm}"
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
                                     completeMethod="#{selectBDTBean.completeInput}">
@@ -34,12 +34,16 @@
                     <p:ajax event="rowUnselect" update=":form:btnGroup"
                             listener="#{selectBDTBean.onBDTUnselect}"/>
 
+                    <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
+                        <h:outputText value="#{bdt.qualifier}"/>
+                    </p:column>
+
                     <p:column headerText="Data Type Term" sortBy="#{bdt.dataTypeTerm}">
                         <h:outputText value="#{bdt.dataTypeTerm}"/>
                     </p:column>
 
-                    <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
-                        <h:outputText value="#{bdt.qualifier}"/>
+                    <p:column headerText="DEN" sortBy="#{bdt.den}">
+                        <h:outputText value="#{bdt.den}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"

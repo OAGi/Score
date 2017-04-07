@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 
 /**
  * Created by tnk11 on 6/24/2016.
@@ -233,7 +234,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO = new DataType();
 
             dtVO.setGuid(id);
-            dtVO.setType(1);
+            dtVO.setType(BusinessDataType);
             dtVO.setVersionNum("1.0");
             //dtVO.setRevisionType(0);
             dtVO.setDataTypeTerm(dataTypeTerm);
@@ -310,7 +311,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO = new DataType();
 
             dtVO.setGuid(id);
-            dtVO.setType(1);
+            dtVO.setType(BusinessDataType);
             dtVO.setVersionNum("1.0");
             //dtVO.setRevisionType(0);
             dtVO.setDataTypeTerm(dataTypeTerm);

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 
 @Controller
 @Scope("view")
@@ -35,7 +36,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     private CoreComponentService coreComponentService;
 
     private List<DataType> bdtList;
-    private String dataTypeTermQualifier;
+    private String qualifierDataTypeTerm;
     private DataType selectedBDT;
 
     @PostConstruct
@@ -45,6 +46,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
     private List<DataType> allBDTs() {
         return dataTypeRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
+                .filter(e -> BusinessDataType == e.getType())
                 .filter(e -> Published == e.getState())
                 .collect(Collectors.toList());
     }
@@ -57,12 +59,12 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
         this.bdtList = bdtList;
     }
 
-    public String getDataTypeTermQualifier() {
-        return dataTypeTermQualifier;
+    public String getQualifierDataTypeTerm() {
+        return qualifierDataTypeTerm;
     }
 
-    public void setDataTypeTermQualifier(String dataTypeTermQualifier) {
-        this.dataTypeTermQualifier = dataTypeTermQualifier;
+    public void setQualifierDataTypeTerm(String qualifierDataTypeTerm) {
+        this.qualifierDataTypeTerm = qualifierDataTypeTerm;
     }
 
     public DataType getSelectedBDT() {
@@ -86,13 +88,13 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
         if (StringUtils.isEmpty(q)) {
             return allBDTs().stream()
-                    .map(e -> e.getDataTypeTerm() + " " + e.getQualifier())
+                    .map(e -> e.getQualifier() + " " + e.getDataTypeTerm())
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
             return allBDTs().stream()
-                    .map(e -> e.getDataTypeTerm() + " " + e.getQualifier())
+                    .map(e -> e.getQualifier() + " " + e.getDataTypeTerm())
                     .distinct()
                     .filter(e -> {
                         e = e.toLowerCase();
@@ -108,13 +110,13 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     }
 
     public void search() {
-        String dataTypeTermQualifier = getDataTypeTermQualifier();
-        if (StringUtils.isEmpty(dataTypeTermQualifier)) {
+        String qualifierDataTypeTerm = getQualifierDataTypeTerm();
+        if (StringUtils.isEmpty(qualifierDataTypeTerm)) {
             setBdtList(allBDTs());
         } else {
             setBdtList(
                     allBDTs().stream()
-                            .filter(e -> (e.getDataTypeTerm() + " " + e.getQualifier()).toLowerCase().contains(dataTypeTermQualifier.toLowerCase()))
+                            .filter(e -> (e.getQualifier() + " " + e.getDataTypeTerm()).toLowerCase().contains(qualifierDataTypeTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
         }

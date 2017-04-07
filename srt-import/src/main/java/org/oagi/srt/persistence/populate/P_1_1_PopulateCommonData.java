@@ -329,7 +329,7 @@ public class P_1_1_PopulateCommonData {
         public CDTBuilder(User user, Release release) {
             cdt = new DataType();
             cdt.setGuid(Utility.generateGUID());
-            cdt.setType(0);
+            cdt.setType(DataTypeType.CoreDataType);
             cdt.setVersionNum("1.0");
             cdt.setState(CoreComponentState.Published);
             cdt.setOwnerUserId(user.getAppUserId());

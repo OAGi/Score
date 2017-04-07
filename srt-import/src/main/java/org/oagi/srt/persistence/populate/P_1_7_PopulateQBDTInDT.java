@@ -40,6 +40,7 @@ import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 
 /**
  * @author Yunsu Lee
@@ -394,7 +395,7 @@ public class P_1_7_PopulateQBDTInDT {
         DataType dataType = new DataType();
         String guid = dataTypeInfoHolder.getGuid();
         dataType.setGuid(guid);
-        dataType.setType(1);
+        dataType.setType(BusinessDataType);
         dataType.setVersionNum("1.0");
 
         DataType baseDataType;
@@ -857,7 +858,7 @@ public class P_1_7_PopulateQBDTInDT {
         DataType dataType = new DataType();
         String guid = dataTypeInfoHolder.getGuid();
         dataType.setGuid(guid);
-        dataType.setType(1);
+        dataType.setType(BusinessDataType);
         dataType.setVersionNum("1.0");
 
         String base = dataTypeInfoHolder.getBaseTypeName();

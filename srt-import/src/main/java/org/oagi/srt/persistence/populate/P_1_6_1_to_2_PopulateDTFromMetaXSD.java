@@ -7,10 +7,7 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
 import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.ModuleRepository;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
-import org.oagi.srt.repository.entity.CoreComponentState;
-import org.oagi.srt.repository.entity.DataType;
-import org.oagi.srt.repository.entity.Module;
+import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +60,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
             DataType dataType = new DataType();
             dataType.setGuid(ele.getAttribute("id"));
-            dataType.setType(1);
+            dataType.setType(DataTypeType.BusinessDataType);
             dataType.setVersionNum("1.0");
 
             Node extension = xh.getNode("//xsd:complexType[@name = '" + name + "']/xsd:simpleContent/xsd:extension");

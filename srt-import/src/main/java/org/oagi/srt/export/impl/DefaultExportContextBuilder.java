@@ -133,7 +133,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
     private void createBDT(BdtsBlob bdtsBlob, Map<Long, SchemaModule> moduleMap) {
         List<DataType> bdtList = importedDataProvider.findDT().stream()
-                .filter(e -> e.getType() == 1).collect(Collectors.toList());
+                .filter(e -> e.getType() == DataTypeType.BusinessDataType).collect(Collectors.toList());
         for (DataType bdt : bdtList) {
             if (bdtsBlob.exists(bdt.getGuid())) {
                 continue;

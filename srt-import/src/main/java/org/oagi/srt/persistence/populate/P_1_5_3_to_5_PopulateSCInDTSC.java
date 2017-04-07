@@ -61,7 +61,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
             // default BDT
-            if (dt2.getType() == 0) {
+            if (dt2.getType() == DataTypeType.CoreDataType) {
                 logger.debug("Popuating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
                 List<DataTypeSupplementaryComponent> cdtSCList = dtScRepository.findByOwnerDtId(dt2.getDtId());
 
@@ -200,7 +200,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
             // default BDT
-            if (dt2.getType() == 0) {
+            if (dt2.getType() == DataTypeType.CoreDataType) {
                 logger.debug("Validating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
                 //Inherit from based CDT
                 ArrayList<String> fromXSDwAttrs = new ArrayList<String>();
@@ -377,7 +377,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
             // unqualified BDT
-            if (dt2.getType() != 0) {
+            if (dt2.getType() != DataTypeType.CoreDataType) {
                 //inheritance
                 String denType = Utility.denToName(dt.getDen());
                 logger.debug("Popuating SCs for unqualified bdt with type = " + denType);
@@ -581,7 +581,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
             // unqualified BDT
-            if (dt2.getType() != 0) {
+            if (dt2.getType() != DataTypeType.CoreDataType) {
                 String denType = Utility.denToName(dt.getDen());
                 logger.debug("Validating SCs for unqualified bdt with type = " + denType);
                 Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");

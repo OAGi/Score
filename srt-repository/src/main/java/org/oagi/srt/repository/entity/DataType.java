@@ -2,6 +2,7 @@ package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.DataTypeTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +33,8 @@ public class DataType implements TimestampAware, Serializable {
     private String guid;
 
     @Column(nullable = false)
-    private int type;
+    @Convert(attributeName = "type", converter = DataTypeTypeConverter.class)
+    private DataTypeType type;
 
     @Column(nullable = false, length = 45)
     private String versionNum;
@@ -146,11 +148,11 @@ public class DataType implements TimestampAware, Serializable {
         this.guid = guid;
     }
 
-    public int getType() {
+    public DataTypeType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(DataTypeType type) {
         this.type = type;
     }
 
@@ -360,7 +362,7 @@ public class DataType implements TimestampAware, Serializable {
     public int hashCode() {
         int result = (int) (dtId ^ (dtId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + type;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
         result = 31 * result + (previousVersionDtId != null ? previousVersionDtId.hashCode() : 0);
         result = 31 * result + (dataTypeTerm != null ? dataTypeTerm.hashCode() : 0);

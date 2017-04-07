@@ -107,7 +107,7 @@ public class P_1_6_PopulateDTFromMeta {
 
             DataType dataType = new DataType();
             dataType.setGuid(ele.getAttribute("id"));
-            dataType.setType(1);
+            dataType.setType(DataTypeType.BusinessDataType);
             dataType.setVersionNum("1.0");
 
             Node extension = meta_xsd.getNode("//xsd:complexType[@name = '" + name + "']/xsd:simpleContent/xsd:extension");

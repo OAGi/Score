@@ -203,7 +203,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO = new DataType();
 
             dtVO.setGuid(id);
-            dtVO.setType(1);
+            dtVO.setType(DataTypeType.BusinessDataType);
             dtVO.setVersionNum("1.0");
             //dtVO.setRevisionType(0);
             dtVO.setDataTypeTerm(dataTypeTerm);
@@ -281,7 +281,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO = new DataType();
 
             dtVO.setGuid(id);
-            dtVO.setType(1);
+            dtVO.setType(DataTypeType.BusinessDataType);
             dtVO.setVersionNum("1.0");
             //dtVO.setRevisionType(0);
             dtVO.setDataTypeTerm(dataTypeTerm);
