@@ -17,7 +17,10 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -41,6 +44,11 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
     @PostConstruct
     public void init() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+        type = requestParameterMap.get("type");
+        states = requestParameterMap.get("states");
+
         setBdtList(allBDTs());
     }
 
@@ -133,13 +141,21 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
         return sb.toString();
     }
 
+    // To support 'back' button to go back 'list' page.
+    private String type;
+    private String states;
+
+    public String back() {
+        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+    }
+
     @Transactional
     public String createBCCP() {
         User requester = getCurrentUser();
         DataType bdt = getSelectedBDT();
         BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
 
-        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&faces-redirect=true";
+        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&type=" + type + "&states= " + states + "&faces-redirect=true";
     }
 
 }

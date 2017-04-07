@@ -504,6 +504,9 @@
 
             <p:panel id="btnGroup"
                      rendered="#{(bccpDetailBean.currentUser.appUserId eq bccpDetailBean.targetBccp.ownerUserId)}">
+                <p:commandButton id="btnBack" widgetVar="btnBack" value="Back"
+                                 rendered="#{bccpDetailBean.hasRequestParameters()}"
+                                 action="#{bccpDetailBean.back}"/>
                 <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{bccpDetailBean.updateState('Candidate')}"

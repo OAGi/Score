@@ -794,6 +794,9 @@
             <p:panel id="btnGroup"
                      rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.ownerUserId) and
                                  (accDetailBean.preparedAppend eq false)}">
+                <p:commandButton id="btnBack" widgetVar="btnBack" value="Back"
+                                 rendered="#{accDetailBean.hasRequestParameters()}"
+                                 action="#{accDetailBean.back}"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{accDetailBean.updateState('Candidate')}"

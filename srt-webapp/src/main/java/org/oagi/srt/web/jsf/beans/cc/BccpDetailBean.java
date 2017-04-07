@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -79,6 +80,9 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode treeNode = createTreeNode(targetBccp);
         setTreeNode(treeNode);
+
+        type = requestParameterMap.get("type");
+        states = requestParameterMap.get("states");
     }
 
     public BasicCoreComponentProperty getTargetBccp() {
@@ -193,7 +197,19 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
             throw t;
         }
 
-        return "/views/core_component/list.xhtml?faces-redirect=true";
+        return back();
+    }
+
+    // To support 'back' button to go back 'list' page.
+    private String type;
+    private String states;
+
+    public boolean hasRequestParameters() {
+        return (!StringUtils.isEmpty(type));
+    }
+
+    public String back() {
+        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
     }
 }
 

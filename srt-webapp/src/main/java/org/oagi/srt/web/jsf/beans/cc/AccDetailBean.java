@@ -94,6 +94,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode treeNode = createTreeNode(targetAcc);
         setTreeNode(treeNode);
+
+        type = requestParameterMap.get("type");
+        states = requestParameterMap.get("states");
     }
 
     public AggregateCoreComponent getTargetAcc() {
@@ -849,6 +852,18 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
+
+    // To support 'back' button to go back 'list' page.
+    private String type;
+    private String states;
+
+    public boolean hasRequestParameters() {
+        return (!StringUtils.isEmpty(type));
+    }
+
+    public String back() {
+        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
     }
 }
 

@@ -66,6 +66,8 @@
             </p:panel>
 
             <p:panel id="btnGroup">
+                <p:commandButton id="btnBack" widgetVar="btnBack" value="Back"
+                                 action="#{selectBDTBean.back}"/>
                 <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
                                  disabled="#{selectBDTBean.selectedBDT eq null}"
                                  action="#{selectBDTBean.createBCCP()}"/>

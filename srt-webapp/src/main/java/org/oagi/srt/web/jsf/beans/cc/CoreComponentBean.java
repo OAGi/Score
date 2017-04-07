@@ -50,6 +50,10 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String type = requestParameterMap.get("type");
+        if ("null".equals(type)) {
+            type = null;
+        }
+
         if (!StringUtils.isEmpty(type)) {
             setType(type);
         } else {
@@ -57,8 +61,12 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         }
 
         String states = requestParameterMap.get("states");
+        if ("null".equals(states)) {
+            states = null;
+        }
+
         if (!StringUtils.isEmpty(states)) {
-            StringTokenizer tokenizer = new StringTokenizer(states);
+            StringTokenizer tokenizer = new StringTokenizer(states, ",");
             selectedStates = new ArrayList();
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
@@ -102,6 +110,11 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 this.selectedStates.add(CoreComponentState.valueOf(selectedState));
             }
         }
+    }
+
+    public String toStringSelectedStates() {
+        String[] selectedStates = getSelectedStates();
+        return (selectedStates != null) ? String.join(",", selectedStates) : "";
     }
 
     public void onStateChange() {
@@ -320,7 +333,17 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     public String createACC() {
         User requester = getCurrentUser();
         AggregateCoreComponent acc = coreComponentService.newAggregateCoreComponent(requester);
+        String states = toStringSelectedStates();
+        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&type=ACC&states=" + states + "&faces-redirect=true";
+    }
 
-        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&faces-redirect=true";
+    public String createASCCP() {
+        String states = toStringSelectedStates();
+        return "/views/core_component/select_acc.jsf?type=ASCCP&states=" + states + "&faces-redirect=true";
+    }
+
+    public String createBCCP() {
+        String states = toStringSelectedStates();
+        return "/views/core_component/select_bdt.jsf?type=BCCP&states=" + states + "&faces-redirect=true";
     }
 }

@@ -59,10 +59,10 @@
                                          action="#{coreComponentBean.createACC}"
                                          style="float: right; padding: 3px 0 3px 0;"/>
                         <p:commandButton value="Create ASCCP" rendered="#{coreComponentBean.type == 'ASCCP'}"
-                                         action="/views/core_component/select_acc.xhtml?faces-redirect=true"
+                                         action="#{coreComponentBean.createASCCP}"
                                          style="float: right; padding: 3px 0 3px 0;"/>
                         <p:commandButton value="Create BCCP" rendered="#{coreComponentBean.type == 'BCCP'}"
-                                         action="/views/core_component/select_bdt.xhtml?faces-redirect=true"
+                                         action="#{coreComponentBean.createBCCP}"
                                          style="float: right; padding: 3px 0 3px 0;"/>
                     </h:panelGroup>
                 </f:facet>

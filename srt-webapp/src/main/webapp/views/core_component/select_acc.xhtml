@@ -66,6 +66,8 @@
             </p:panel>
 
             <p:panel id="btnGroup">
+                <p:commandButton id="btnBack" widgetVar="btnBack" value="Back"
+                                 action="#{selectACCBean.back}"/>
                 <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
                                  disabled="#{selectACCBean.selectedACC eq null}"
                                  action="#{selectACCBean.createASCCP()}"/>

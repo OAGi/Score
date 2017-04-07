@@ -16,8 +16,11 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -40,6 +43,11 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     @PostConstruct
     public void init() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+        type = requestParameterMap.get("type");
+        states = requestParameterMap.get("states");
+
         setAccList(allACCs());
     }
 
@@ -120,12 +128,20 @@ public class SelectACCBean extends AbstractCoreComponentBean {
         }
     }
 
+    // To support 'back' button to go back 'list' page.
+    private String type;
+    private String states;
+
+    public String back() {
+        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+    }
+
     @Transactional
     public String createASCCP() {
         User requester = getCurrentUser();
         AggregateCoreComponent roleOfAcc = getSelectedACC();
         AssociationCoreComponentProperty asccp = coreComponentService.newAssociationCoreComponentProperty(requester, roleOfAcc);
 
-        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&faces-redirect=true";
+        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&type=" + type + "&states= " + states + "&faces-redirect=true";
     }
 }
