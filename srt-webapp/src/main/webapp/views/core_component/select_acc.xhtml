@@ -35,7 +35,10 @@
                             listener="#{selectACCBean.onACCUnselect}"/>
 
                     <p:column headerText="Object Class Term" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
-                        <h:outputText value="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}"/>
+                        <h:link value="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}"
+                                outcome="/views/core_component/acc_details.jsf">
+                            <f:param name="accId" value="${acc.accId}"/>
+                        </h:link>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" headerText="Type"
