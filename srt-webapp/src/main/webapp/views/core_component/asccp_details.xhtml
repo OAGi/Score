@@ -506,7 +506,7 @@
 
             <p:panel id="btnGroup"
                      rendered="#{(asccpDetailBean.currentUser.appUserId eq asccpDetailBean.targetAsccp.ownerUserId)}">
-                <p:commandButton id="btnBack" widgetVar="btnBack" value="Back"
+                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Back to list" styleClass="danger"
                                  rendered="#{asccpDetailBean.hasRequestParameters()}"
                                  action="#{asccpDetailBean.back}"/>
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Editing'}"

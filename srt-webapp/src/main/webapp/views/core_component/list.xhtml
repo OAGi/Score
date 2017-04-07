@@ -87,6 +87,8 @@
                                           ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
                                 outcome="/views/core_component/acc_details.jsf">
                             <f:param name="accId" value="#{acc.accId}"/>
+                            <f:param name="type" value="#{coreComponentBean.type}"/>
+                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
                         </h:link>
 
                         <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
