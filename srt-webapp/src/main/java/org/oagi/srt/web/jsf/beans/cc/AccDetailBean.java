@@ -537,7 +537,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpRepository.findAll().stream()
+        allAsccpList = asccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
@@ -669,12 +669,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendBcc() {
-        allBccpList = bccpRepository.findAll().stream()
+        allBccpList = bccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
                 .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
         setBccpList(
                 allBccpList.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .sorted(Comparator.comparing(BasicCoreComponentProperty::getPropertyTerm))
                         .collect(Collectors.toList())
         );
         setPreparedAppendBcc(true);
