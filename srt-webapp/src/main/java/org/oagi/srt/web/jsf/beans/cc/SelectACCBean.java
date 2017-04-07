@@ -9,14 +9,14 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public class SelectACCBean extends AbstractCoreComponentBean {
 
@@ -44,8 +44,8 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     }
 
     private List<AggregateCoreComponent> allACCs() {
-        return accRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
-                .filter(e -> Published == e.getState())
+        return accRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+                .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
     }
 

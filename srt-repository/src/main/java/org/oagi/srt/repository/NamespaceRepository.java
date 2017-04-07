@@ -10,7 +10,7 @@ public interface NamespaceRepository extends JpaRepository<Namespace, Long> {
     public Namespace findByUri(String uri);
 
     @Query("select n.namespaceId from Namespace n where n.uri = ?1")
-    public int findNamespaceIdByUri(String uri);
+    public Long findNamespaceIdByUri(String uri);
 
     @Query("select case when count(n) > 0 then true else false end from Namespace n where n.uri = ?1 and n.namespaceId <> ?2")
     public boolean existsByUriExceptNamespaceId(String uri, long namespaceId);

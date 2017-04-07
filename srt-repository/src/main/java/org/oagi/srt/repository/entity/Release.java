@@ -32,7 +32,7 @@ public class Release implements NamespaceAware, Serializable {
     private String releaseNote;
 
     @Column(nullable = false)
-    private long namespaceId;
+    private Long namespaceId;
 
     public long getReleaseId() {
         return releaseId;
@@ -59,10 +59,10 @@ public class Release implements NamespaceAware, Serializable {
     }
 
     public long getNamespaceId() {
-        return namespaceId;
+        return (namespaceId != null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
+    public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -82,7 +82,7 @@ public class Release implements NamespaceAware, Serializable {
         int result = (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (releaseNum != null ? releaseNum.hashCode() : 0);
         result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0);
-        result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
+        result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         return result;
     }
 

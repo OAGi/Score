@@ -145,7 +145,10 @@ public class CoreComponentService {
         asccp.setRoleOfAccId(roleOfAcc.getAccId());
         asccp.setState(CoreComponentState.Editing);
         asccp.setOwnerUserId(requesterId);
-        asccp.setNamespaceId(roleOfAcc.getNamespaceId());
+        long namespaceId = roleOfAcc.getNamespaceId();
+        if (namespaceId > 0L) {
+            asccp.setNamespaceId(namespaceId);
+        }
 
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         asccp.addPersistEventListener(eventListener);

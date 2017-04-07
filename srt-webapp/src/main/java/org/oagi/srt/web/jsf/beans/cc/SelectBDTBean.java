@@ -16,7 +16,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public class SelectBDTBean extends AbstractCoreComponentBean {
 

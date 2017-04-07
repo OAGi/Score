@@ -9,17 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
-
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public abstract class AbstractCoreComponentBean extends UIHandler {
 

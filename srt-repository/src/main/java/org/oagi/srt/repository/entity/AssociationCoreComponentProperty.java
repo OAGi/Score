@@ -75,8 +75,8 @@ public class AssociationCoreComponentProperty
     @Column
     private Long moduleId;
 
-    @Column(nullable = false)
-    private long namespaceId;
+    @Column
+    private Long namespaceId;
 
     @Column(nullable = false)
     private boolean reusableIndicator;
@@ -249,10 +249,10 @@ public class AssociationCoreComponentProperty
     }
 
     public long getNamespaceId() {
-        return namespaceId;
+        return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
+    public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -385,7 +385,7 @@ public class AssociationCoreComponentProperty
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
-        result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
+        result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (reusableIndicator ? 1 : 0);
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + revisionNum;

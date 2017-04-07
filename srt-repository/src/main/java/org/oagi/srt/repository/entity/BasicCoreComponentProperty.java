@@ -230,7 +230,7 @@ public class BasicCoreComponentProperty
         return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
+    public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
     }
 

@@ -11,14 +11,11 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 @Controller
 @Scope("view")
