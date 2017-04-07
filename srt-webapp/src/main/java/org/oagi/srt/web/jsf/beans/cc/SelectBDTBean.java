@@ -88,13 +88,13 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
         if (StringUtils.isEmpty(q)) {
             return allBDTs().stream()
-                    .map(e -> e.getQualifier() + " " + e.getDataTypeTerm())
+                    .map(e -> toCompleteInputString(e))
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
             return allBDTs().stream()
-                    .map(e -> e.getQualifier() + " " + e.getDataTypeTerm())
+                    .map(e -> toCompleteInputString(e))
                     .distinct()
                     .filter(e -> {
                         e = e.toLowerCase();
@@ -116,10 +116,21 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
         } else {
             setBdtList(
                     allBDTs().stream()
-                            .filter(e -> (e.getQualifier() + " " + e.getDataTypeTerm()).toLowerCase().contains(qualifierDataTypeTerm.toLowerCase()))
+                            .filter(e -> (toCompleteInputString(e)).toLowerCase().contains(qualifierDataTypeTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
         }
+    }
+
+    private String toCompleteInputString(DataType dataType) {
+        StringBuilder sb = new StringBuilder();
+        String qualifier = dataType.getQualifier();
+        if (!StringUtils.isEmpty(qualifier)) {
+            sb.append(qualifier).append(" ");
+        }
+        String dataTypeTerm = dataType.getDataTypeTerm();
+        sb.append(dataTypeTerm);
+        return sb.toString();
     }
 
     @Transactional
@@ -130,4 +141,5 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
         return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&faces-redirect=true";
     }
+
 }
