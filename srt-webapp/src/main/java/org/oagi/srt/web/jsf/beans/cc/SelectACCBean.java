@@ -52,7 +52,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     }
 
     private List<AggregateCoreComponent> allACCs() {
-        return accRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+        return accRepository.findAllByRevisionNum(0).stream()
                 .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
     }
