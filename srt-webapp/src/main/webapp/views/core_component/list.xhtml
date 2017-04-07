@@ -200,6 +200,8 @@
                                 rendered="#{(coreComponentBean.getCurrentUser().appUserId eq asccp.ownerUserId) or asccp.state ne 'Editing'}"
                                 outcome="/views/core_component/asccp_details.jsf">
                             <f:param name="asccpId" value="#{asccp.asccpId}"/>
+                            <f:param name="type" value="#{coreComponentBean.type}"/>
+                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
                         </h:link>
 
                         <h:outputText value="#{asccp.propertyTerm}"
@@ -293,7 +295,16 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{bccp.guid}">
                     <p:column headerText="Property Term" sortBy="#{bccp.propertyTerm}">
-                        <h:outputText value="#{bccp.propertyTerm}"/>
+                        <h:link value="#{bccp.propertyTerm}"
+                                rendered="#{(coreComponentBean.getCurrentUser().appUserId eq bccp.ownerUserId) or bccp.state ne 'Editing'}"
+                                outcome="/views/core_component/bccp_details.jsf">
+                            <f:param name="bccpId" value="#{bccp.bccpId}"/>
+                            <f:param name="type" value="#{coreComponentBean.type}"/>
+                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
+                        </h:link>
+
+                        <h:outputText value="#{bccp.propertyTerm}"
+                                      rendered="#{(coreComponentBean.getCurrentUser().appUserId ne bccp.ownerUserId) and bccp.state eq 'Editing'}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
