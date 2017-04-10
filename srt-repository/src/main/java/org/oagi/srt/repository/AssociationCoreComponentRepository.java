@@ -64,6 +64,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.fromAccId in ?1")
     public List<AssociationCoreComponent> findByFromAccId(Collection<Long> fromAccId);
 
+    @Query("select a from AssociationCoreComponent a where a.toAsccpId = ?1")
+    public List<AssociationCoreComponent> findAllByToAsccpId(Long fromAccId);
+
     @Modifying
     @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +
             "where a.fromAccId = ?1 and a.seqKey > ?2 and a.revisionNum = 0")

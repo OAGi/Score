@@ -455,6 +455,11 @@ public class CoreComponentService {
         }
 
         asccpRepository.save(asccp);
+        asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, asccp);
+            asccRepository.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -515,6 +520,11 @@ public class CoreComponentService {
         }
 
         bccpRepository.save(bccp);
+        bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, bccp);
+            bccRepository.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
