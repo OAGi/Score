@@ -76,12 +76,58 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
     public void deleteByCurrentBccId(long currentBccId);
 
-    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 order by b.creationTimestamp desc")
-    public List<BasicCoreComponent> findAllByRevisionNum(int revisionNum);
-
-    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 and b.state in ?2 order by b.creationTimestamp desc")
-    public List<BasicCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
-
     @Query("select b from BasicCoreComponent b where b.toBccpId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByToBccpIdAndRevisionNum(long toBccpId, int revisionNum);
+
+    /*
+     * For searching in a web application.
+     */
+    @Query("select CONCAT(acc.objectClassTerm, ' ', bccp.propertyTerm) " +
+            "from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 order by b.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndBccpPropertyTermByRevisionNum(int revisionNum);
+
+    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 order by b.lastUpdateTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNum(int revisionNum);
+
+    @Query("select CONCAT(acc.objectClassTerm, ' ', bccp.propertyTerm) " +
+            "from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 and b.state in ?2 order by b.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 and b.state in ?2 order by b.lastUpdateTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select CONCAT(acc.objectClassTerm, ' ', bccp.propertyTerm) " +
+            "from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 and " +
+            "      (LOWER(acc.objectClassTerm) like %?2% or LOWER(bccp.propertyTerm) like %?2%) " +
+            "order by b.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(int revisionNum, String searchText);
+
+    @Query("select b from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 and " +
+            "      (LOWER(acc.objectClassTerm) like %?2% or LOWER(bccp.propertyTerm) like %?2%) " +
+            "      order by b.lastUpdateTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(int revisionNum, String searchText);
+
+    @Query("select CONCAT(acc.objectClassTerm, ' ', bccp.propertyTerm) " +
+            "from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 and b.state in ?2 and " +
+            "      (LOWER(acc.objectClassTerm) like %?3% or LOWER(bccp.propertyTerm) like %?3%) " +
+            "      order by b.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(int revisionNum, Collection<CoreComponentState> states, String searchText);
+
+    @Query("select b from BasicCoreComponent b, AggregateCoreComponent acc, BasicCoreComponentProperty bccp " +
+            "where b.fromAccId = acc.accId and b.toBccpId = bccp.bccpId and " +
+            "      b.revisionNum = ?1 and b.state in ?2 and " +
+            "      (LOWER(acc.objectClassTerm) like %?3% or LOWER(bccp.propertyTerm) like %?3%) " +
+            "      order by b.lastUpdateTimestamp desc")
+    public List<BasicCoreComponent> findAllByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(int revisionNum, Collection<CoreComponentState> states, String searchText);
+
 }

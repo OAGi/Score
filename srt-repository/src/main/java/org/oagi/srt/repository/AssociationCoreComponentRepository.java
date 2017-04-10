@@ -81,9 +81,56 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("delete from AssociationCoreComponent a where a.currentAsccId = ?1")
     public void deleteByCurrentAsccId(long currentAsccId);
 
-    @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 order by a.creationTimestamp desc")
+
+    /*
+     * For searching in a web application.
+     */
+    @Query("select CONCAT(acc.objectClassTerm, ' ', asccp.propertyTerm) " +
+            "from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and " +
+            "      a.revisionNum = ?1 order by a.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndAsccpPropertyTermByRevisionNum(int revisionNum);
+
+    @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 order by a.lastUpdateTimestamp desc")
     public List<AssociationCoreComponent> findAllByRevisionNum(int revisionNum);
 
-    @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
+    @Query("select CONCAT(acc.objectClassTerm, ' ', asccp.propertyTerm) " +
+            "from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and " +
+            "      a.revisionNum = ?1 and a.state in ?2 order by a.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 and a.state in ?2 order by a.lastUpdateTimestamp desc")
     public List<AssociationCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select CONCAT(acc.objectClassTerm, ' ', asccp.propertyTerm) " +
+            "from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and a.revisionNum = ?1 and " +
+            "      (LOWER(acc.objectClassTerm) like %?2% or LOWER(asccp.propertyTerm) like %?2%) " +
+            "      order by a.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(
+            int revisionNum, String searchText);
+
+    @Query("select a from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and a.revisionNum = ?1 and " +
+            "      (LOWER(acc.objectClassTerm) like %?2% or LOWER(asccp.propertyTerm) like %?2%) " +
+            "      order by a.lastUpdateTimestamp desc")
+    public List<AssociationCoreComponent> findAllByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(
+            int revisionNum, String searchText);
+
+    @Query("select CONCAT(acc.objectClassTerm, ' ', asccp.propertyTerm) " +
+            "from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and a.revisionNum = ?1 and a.state in ?2 and " +
+            "      (LOWER(acc.objectClassTerm) like %?3% or LOWER(asccp.propertyTerm) like %?3%) " +
+            "      order by a.lastUpdateTimestamp desc")
+    public List<String> findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(
+            int revisionNum, Collection<CoreComponentState> states, String searchText);
+
+    @Query("select a from AssociationCoreComponent a, AggregateCoreComponent acc, AssociationCoreComponentProperty asccp " +
+            "where a.fromAccId = acc.accId and a.toAsccpId = asccp.asccpId and a.revisionNum = ?1 and a.state in ?2 and " +
+            "      (LOWER(acc.objectClassTerm) like %?3% or LOWER(asccp.propertyTerm) like %?3%) " +
+            "      order by a.lastUpdateTimestamp desc")
+    public List<AssociationCoreComponent> findAllByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(
+            int revisionNum, Collection<CoreComponentState> states, String searchText);
+
 }

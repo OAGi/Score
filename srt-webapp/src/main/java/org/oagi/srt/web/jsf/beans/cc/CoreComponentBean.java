@@ -141,18 +141,37 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     public List<AssociationCoreComponent> getAsccList() {
         List<AssociationCoreComponent> asccList;
         if (selectedStates == null || selectedStates.isEmpty()) {
-            asccList = asccRepository.findAllByRevisionNum(0);
+            if (searchText != null) {
+                asccList = asccRepository.findAllByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(0, searchText.toLowerCase());
+            } else {
+                asccList = asccRepository.findAllByRevisionNum(0);
+            }
         } else {
-            asccList = asccRepository.findAllByRevisionNumAndStates(0, selectedStates);
+            if (searchText != null) {
+                asccList = asccRepository.findAllByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(0, selectedStates, searchText.toLowerCase());
+            } else {
+                asccList = asccRepository.findAllByRevisionNumAndStates(0, selectedStates);
+            }
         }
+        return asccList;
+    }
 
-        if (searchText != null) {
-            return asccList.stream()
-                    .filter(e -> e.getDen().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
+    private List<String> getAccObjectClassTermAndAsccpPropertyTermList(String q) {
+        List<String> accObjectClassTermAndAsccpPropertyTermList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            if (!StringUtils.isEmpty(q)) {
+                accObjectClassTermAndAsccpPropertyTermList = asccRepository.findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(0, q.toLowerCase());
+            } else {
+                accObjectClassTermAndAsccpPropertyTermList = asccRepository.findAccObjectClassTermAndAsccpPropertyTermByRevisionNum(0);
+            }
         } else {
-            return asccList;
+            if (!StringUtils.isEmpty(q)) {
+                accObjectClassTermAndAsccpPropertyTermList = asccRepository.findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToAsccpPropertyTermLikeIgnoreCase(0, selectedStates, q.toLowerCase());
+            } else {
+                accObjectClassTermAndAsccpPropertyTermList = asccRepository.findAccObjectClassTermAndAsccpPropertyTermByRevisionNumAndStates(0, selectedStates);
+            }
         }
+        return accObjectClassTermAndAsccpPropertyTermList;
     }
 
     public List<AssociationCoreComponentProperty> getAsccpList() {
@@ -175,18 +194,37 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     public List<BasicCoreComponent> getBccList() {
         List<BasicCoreComponent> bccList;
         if (selectedStates == null || selectedStates.isEmpty()) {
-            bccList = bccRepository.findAllByRevisionNum(0);
+            if (searchText != null) {
+                bccList = bccRepository.findAllByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(0, searchText.toLowerCase());
+            } else {
+                bccList = bccRepository.findAllByRevisionNum(0);
+            }
         } else {
-            bccList = bccRepository.findAllByRevisionNumAndStates(0, selectedStates);
+            if (searchText != null) {
+                bccList = bccRepository.findAllByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(0, selectedStates, searchText.toLowerCase());
+            } else {
+                bccList = bccRepository.findAllByRevisionNumAndStates(0, selectedStates);
+            }
         }
+        return bccList;
+    }
 
-        if (searchText != null) {
-            return bccList.stream()
-                    .filter(e -> e.getDen().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
+    private List<String> getAccObjectClassTermAndBccpPropertyTermList(String q) {
+        List<String> accObjectClassTermAndBccpPropertyTermList;
+        if (selectedStates == null || selectedStates.isEmpty()) {
+            if (!StringUtils.isEmpty(q)) {
+                accObjectClassTermAndBccpPropertyTermList = bccRepository.findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(0, q.toLowerCase());
+            } else {
+                accObjectClassTermAndBccpPropertyTermList = bccRepository.findAccObjectClassTermAndBccpPropertyTermByRevisionNum(0);
+            }
         } else {
-            return bccList;
+            if (!StringUtils.isEmpty(q)) {
+                accObjectClassTermAndBccpPropertyTermList = bccRepository.findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndStatesAndFromAccObjectClassTermLikeIgnoreCaseOrToBccpPropertyTermLikeIgnoreCase(0, selectedStates, q.toLowerCase());
+            } else {
+                accObjectClassTermAndBccpPropertyTermList = bccRepository.findAccObjectClassTermAndBccpPropertyTermByRevisionNumAndStates(0, selectedStates);
+            }
         }
+        return accObjectClassTermAndBccpPropertyTermList;
     }
 
     public List<BasicCoreComponentProperty> getBccpList() {
@@ -224,17 +262,15 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                             .map(e -> e.getObjectClassTerm())
                             .collect(Collectors.toList());
                 case "ASCC":
-                    return getAsccList().stream()
-                            .map(e -> e.getDen())
-                            .collect(Collectors.toList());
+                    return getAccObjectClassTermAndAsccpPropertyTermList(q);
+
                 case "ASCCP":
                     return getAsccpList().stream()
                             .map(e -> e.getPropertyTerm())
                             .collect(Collectors.toList());
                 case "BCC":
-                    return getBccList().stream()
-                            .map(e -> e.getDen())
-                            .collect(Collectors.toList());
+                    return getAccObjectClassTermAndBccpPropertyTermList(q);
+
                 case "BCCP":
                     return getBccpList().stream()
                             .map(e -> e.getPropertyTerm())
@@ -261,8 +297,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                             })
                             .collect(Collectors.toList());
                 case "ASCC":
-                    return getAsccList().stream()
-                            .map(e -> e.getDen())
+                    return getAccObjectClassTermAndAsccpPropertyTermList(q).stream()
                             .distinct()
                             .filter(e -> {
                                 e = e.toLowerCase();
@@ -289,8 +324,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                             })
                             .collect(Collectors.toList());
                 case "BCC":
-                    return getBccList().stream()
-                            .map(e -> e.getDen())
+                    return getAccObjectClassTermAndBccpPropertyTermList(q).stream()
                             .distinct()
                             .filter(e -> {
                                 e = e.toLowerCase();
