@@ -487,6 +487,12 @@
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
+                                                <h:outputText value="Reusable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${accDetailBean.selectedTreeNode.data.asccp.reusableIndicator}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox
                                                         value="${accDetailBean.selectedTreeNode.data.asccp.deprecated}"
