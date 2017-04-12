@@ -1103,9 +1103,25 @@
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{editProfileBODBean.updateState('Published')}"
-                                 update=":form:btnGroup"/>
+                                 onclick="PF('confirmPublish').show();"/>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    Do you really want to move this to the Published state?<br/>
+                    Once in the Published state the entity can no longer be changed or discarded.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                     oncomplete="PF('loadingBlock').hide();"
+                                     action="#{editProfileBODBean.updateState('Published')}"
+                                     update=":form:btnGroup" ajax="true"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmPublish').hide()"/>
+                </div>
+            </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>

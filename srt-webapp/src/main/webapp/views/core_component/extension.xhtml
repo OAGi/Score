@@ -679,9 +679,26 @@
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{extensionBean.userExtensionAcc.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{extensionBean.updateState('Published')}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 onclick="PF('confirmPublish').show();"/>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    Do you really want to move this to the Published state?<br/>
+                    Once in the Published state the entity can no longer be changed or discarded.<br/>
+                    A new revision would have to be created.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                     oncomplete="PF('loadingBlock').hide();"
+                                     actionListener="#{extensionBean.updateState('Published')}"
+                                     update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmPublish').hide()"/>
+                </div>
+            </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
