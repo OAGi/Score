@@ -74,15 +74,15 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{acc.guid}">
-                    <p:column headerText="Object Class Term" sortBy="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}">
-                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                    <p:column headerText="Object Class Term" sortBy="#{acc.objectClassTerm}">
+                        <h:link value="#{acc.objectClassTerm}"
                                 rendered="#{acc.oagisComponentType eq 'UserExtensionGroup' and
                                           ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
                                 outcome="/views/core_component/extension.jsf">
                             <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(acc.accId)}"/>
                         </h:link>
 
-                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                        <h:link value="#{acc.objectClassTerm}"
                                 rendered="#{acc.oagisComponentType ne 'UserExtensionGroup' and
                                           ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
                                 outcome="/views/core_component/acc_details.jsf">
@@ -91,7 +91,7 @@
                             <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
                         </h:link>
 
-                        <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
+                        <h:outputText value="#{acc.objectClassTerm}"
                                       rendered="#{coreComponentBean.getCurrentUser().appUserId ne acc.ownerUserId and acc.state eq 'Editing'}"/>
                     </p:column>
 
