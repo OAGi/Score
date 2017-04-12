@@ -537,7 +537,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+        allAsccpList = asccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
