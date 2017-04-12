@@ -755,30 +755,32 @@ public class CoreComponentService {
         long basedAccId = abie.getBasedAccId();
         long eAccId = eAcc.getAccId();
 
-        AssociationCoreComponentProperty asccp = findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(basedAccId, eAccId);
-        return (asccp != null) ? true : false;
+        return existsASCCPRecursivelyByRoleOfAccId(basedAccId, eAccId);
     }
 
-    private AssociationCoreComponentProperty findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
+    private boolean existsASCCPRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
         Collection<Long> fromAccIds = Arrays.asList(basedAccId);
 
         while (true) {
-            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccIds);
-            List<AssociationCoreComponentProperty> asccpList =
-                    !asccList.isEmpty()
-                            ? asccpRepository.findByAsccpId(asccList.stream().map(AssociationCoreComponent::getToAsccpId).collect(Collectors.toList()))
-                            : Collections.emptyList();
-            if (asccpList.isEmpty()) {
-                return null;
+            List<Long> toAsccpId = asccRepository.findToAsccpIdByFromAccId(fromAccIds);
+            List<Long> roleOfAccIdList =
+                    !toAsccpId.isEmpty() ? asccpRepository.findRoleOfAccIdByAsccpId(toAsccpId) : Collections.emptyList();
+            if (roleOfAccIdList.isEmpty()) {
+                return false;
             }
 
-            for (AssociationCoreComponentProperty asccp : asccpList) {
-                if (asccp.getRoleOfAccId() == eAccId) {
-                    return asccp;
+            if (roleOfAccIdList.contains(eAccId)) {
+                return true;
+            }
+
+            List<Long> tempAccIds = new ArrayList();
+            roleOfAccIdList.forEach(accId -> {
+                while (accId != null && accId > 0L) {
+                    tempAccIds.add(accId);
+                    accId = accRepository.findBasedAccIdByAccId(accId);
                 }
-            }
-
-            fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
+            });
+            fromAccIds = tempAccIds;
         }
     }
 

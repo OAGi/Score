@@ -43,6 +43,9 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
             "select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId)")
     public List<AggregateCoreComponent> findAllWithLatestRevisionNumByCurrentAccId(long currentAccId);
 
+    @Query("select a.basedAccId from AggregateCoreComponent a where a.accId = ?1")
+    public Long findBasedAccIdByAccId(long accId);
+
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1")
     public void deleteByCurrentAccId(long currentAccId);

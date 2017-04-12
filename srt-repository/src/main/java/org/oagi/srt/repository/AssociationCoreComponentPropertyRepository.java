@@ -59,6 +59,9 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.asccpId in ?1")
     public List<AssociationCoreComponentProperty> findByAsccpId(Collection<Long> asccpId);
 
+    @Query("select a.roleOfAccId from AssociationCoreComponentProperty a where a.asccpId in ?1")
+    public List<Long> findRoleOfAccIdByAsccpId(Collection<Long> asccpId);
+
     @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = ?1 order by a.creationTimestamp desc")
     public List<AssociationCoreComponentProperty> findAllByRevisionNum(int revisionNum);
 
