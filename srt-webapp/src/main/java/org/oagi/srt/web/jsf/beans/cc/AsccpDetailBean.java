@@ -73,7 +73,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
 
         setTargetAsccp(targetAsccp);
 
-        TreeNode treeNode = createTreeNode(targetAsccp);
+        TreeNode treeNode = createTreeNode(targetAsccp, true);
         setTreeNode(treeNode);
 
         type = requestParameterMap.get("type");

@@ -46,22 +46,22 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         return availableOagisComponentTypes;
     }
 
-    public TreeNode createTreeNode(AggregateCoreComponent acc) {
-        ACCNode accNode = nodeService.createCoreComponentTreeNode(acc);
+    public TreeNode createTreeNode(AggregateCoreComponent acc, boolean enableShowingGroup) {
+        ACCNode accNode = nodeService.createCoreComponentTreeNode(acc, enableShowingGroup);
         TreeNode root = new DefaultTreeNode();
         toTreeNode(accNode, root);
         return root;
     }
 
-    public TreeNode createTreeNode(AssociationCoreComponentProperty asccp) {
-        ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(asccp);
+    public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, boolean enableShowingGroup) {
+        ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(asccp, enableShowingGroup);
         TreeNode root = new DefaultTreeNode();
         toTreeNode(asccpNode, root);
         return root;
     }
 
-    public TreeNode createTreeNode(BasicCoreComponentProperty bccp) {
-        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(bccp);
+    public TreeNode createTreeNode(BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
+        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(bccp, enableShowingGroup);
         TreeNode root = new DefaultTreeNode();
         toTreeNode(bccpNode, root);
         return root;
@@ -120,7 +120,8 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
             if (targetAcc != null && targetAcc.equals(acc)) {
                 type = "ACC-Target";
             } else {
-                type = "ACC";
+                boolean isGroup = nodeService.isGroup(acc);
+                type = "ACC" + (isGroup ? "-Group" : "");
             }
             return type;
         }
@@ -142,7 +143,8 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
 
         @Override
         public String getType() {
-            return "ASCCP";
+            boolean isGroup = nodeService.isGroup(node.getType().getAcc());
+            return "ASCCP" + (isGroup ? "-Group" : "");
         }
 
         @Override

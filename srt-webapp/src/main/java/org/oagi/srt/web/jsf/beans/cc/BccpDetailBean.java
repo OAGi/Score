@@ -78,7 +78,7 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
 
         setTargetBccp(targetBccp);
 
-        TreeNode treeNode = createTreeNode(targetBccp);
+        TreeNode treeNode = createTreeNode(targetBccp, true);
         setTreeNode(treeNode);
 
         type = requestParameterMap.get("type");

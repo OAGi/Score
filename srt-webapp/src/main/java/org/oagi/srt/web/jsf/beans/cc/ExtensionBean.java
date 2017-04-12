@@ -71,7 +71,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
         setTargetAcc(targetAcc);
 
-        TreeNode treeNode = createTreeNode(targetAcc);
+        TreeNode treeNode = createTreeNode(targetAcc, false);
         setTreeNode(treeNode);
 
         setUserExtensionAcc(extensionService.findUserExtensionAcc(targetAcc));
@@ -265,7 +265,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ((CCNode) rootNode.getData()).reload();
 
         ASCCPNode asccpNode =
-                nodeService.createCoreComponentTreeNode(result.getAscc());
+                nodeService.createCoreComponentTreeNode(result.getAscc(), true);
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -397,7 +397,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ((CCNode) rootNode.getData()).reload();
 
         BCCPNode bccpNode =
-                nodeService.createCoreComponentTreeNode(result.getBcc());
+                nodeService.createCoreComponentTreeNode(result.getBcc(), false);
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);

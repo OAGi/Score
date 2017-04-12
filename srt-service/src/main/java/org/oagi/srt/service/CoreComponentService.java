@@ -144,6 +144,7 @@ public class CoreComponentService {
         asccp.setPropertyTerm("A new ASCCP property");
         asccp.setRoleOfAccId(roleOfAcc.getAccId());
         asccp.setState(CoreComponentState.Editing);
+        asccp.setReusableIndicator(true); // Default value should be true.
         asccp.setOwnerUserId(requesterId);
         long namespaceId = roleOfAcc.getNamespaceId();
         if (namespaceId > 0L) {

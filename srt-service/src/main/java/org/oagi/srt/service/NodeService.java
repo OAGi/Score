@@ -80,79 +80,79 @@ public class NodeService {
     private BusinessContextRepository businessContextRepository;
 
     public ACCNode createCoreComponentTreeNode(
-            AggregateCoreComponent aggregateCoreComponent) {
+            AggregateCoreComponent aggregateCoreComponent, boolean enableShowingGroup) {
         if (aggregateCoreComponent == null) {
             throw new IllegalArgumentException("'aggregateCoreComponent' argument must not be null.");
         }
-        return new AggregateCoreComponentNodeImpl(aggregateCoreComponent);
+        return new AggregateCoreComponentNodeImpl(aggregateCoreComponent, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             ACCNode parent,
-            BasicCoreComponent basicCoreComponent) {
+            BasicCoreComponent basicCoreComponent, boolean enableShowingGroup) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponent);
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponent, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
-            BasicCoreComponent basicCoreComponent) {
+            BasicCoreComponent basicCoreComponent, boolean enableShowingGroup) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponent);
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponent, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
-            AssociationCoreComponent associationCoreComponent) {
+            AssociationCoreComponent associationCoreComponent, boolean enableShowingGroup) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponent);
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponent, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             ACCNode parent,
-            AssociationCoreComponent associationCoreComponent) {
+            AssociationCoreComponent associationCoreComponent, boolean enableShowingGroup) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent);
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
-            AssociationCoreComponentProperty associationCoreComponentProperty) {
+            AssociationCoreComponentProperty associationCoreComponentProperty, boolean enableShowingGroup) {
         if (associationCoreComponentProperty == null) {
             throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponentProperty);
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponentProperty, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             ACCNode parent,
-            AssociationCoreComponentProperty associationCoreComponentProperty) {
+            AssociationCoreComponentProperty associationCoreComponentProperty, boolean enableShowingGroup) {
         if (associationCoreComponentProperty == null) {
             throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty);
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
-            BasicCoreComponentProperty basicCoreComponentProperty) {
+            BasicCoreComponentProperty basicCoreComponentProperty, boolean enableShowingGroup) {
         if (basicCoreComponentProperty == null) {
             throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponentProperty);
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponentProperty, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             ACCNode parent,
-            BasicCoreComponentProperty basicCoreComponentProperty) {
+            BasicCoreComponentProperty basicCoreComponentProperty, boolean enableShowingGroup) {
         if (basicCoreComponentProperty == null) {
             throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponentProperty);
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponentProperty, enableShowingGroup);
     }
 
     private abstract class AbstractSRTNode implements SRTNode {
@@ -175,13 +175,15 @@ public class NodeService {
             implements ACCNode {
 
         private final AggregateCoreComponent acc;
+        private boolean enableShowingGroup;
         private ACCNode base;
 
         private List<CoreComponentRelation> associations = null;
         private Collection<CCNode> children = null;
 
-        private AggregateCoreComponentNodeImpl(AggregateCoreComponent aggregateCoreComponent) {
+        private AggregateCoreComponentNodeImpl(AggregateCoreComponent aggregateCoreComponent, boolean enableShowingGroup) {
             this.acc = aggregateCoreComponent;
+            this.enableShowingGroup = enableShowingGroup;
         }
 
         @Override
@@ -196,7 +198,7 @@ public class NodeService {
                 long basedAccId = acc.getBasedAccId();
                 if (basedAccId > 0L) {
                     AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
-                    base = new AggregateCoreComponentNodeImpl(basedAcc);
+                    base = new AggregateCoreComponentNodeImpl(basedAcc, enableShowingGroup);
                 }
             }
             return base;
@@ -226,7 +228,7 @@ public class NodeService {
 
         private List<CoreComponentRelation> associations() {
             if (associations == null) {
-                associations = getAssociations(acc);
+                associations = getAssociations(acc, enableShowingGroup);
             }
             return associations;
         }
@@ -247,11 +249,11 @@ public class NodeService {
                     for (CoreComponentRelation association : associations()) {
                         if (association instanceof AssociationCoreComponent) {
                             ASCCPNode asccpNode =
-                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) association);
+                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) association, enableShowingGroup);
                             children.add(asccpNode);
                         } else if (association instanceof BasicCoreComponent) {
                             BCCPNode bccpNode =
-                                    createCoreComponentTreeNode(this, (BasicCoreComponent) association);
+                                    createCoreComponentTreeNode(this, (BasicCoreComponent) association, enableShowingGroup);
                             children.add(bccpNode);
                         }
                     }
@@ -268,11 +270,15 @@ public class NodeService {
         }
     }
 
-    private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc) {
-        return getAssociations(acc, null);
+    private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc, boolean enableShowingGroup) {
+        return getAssociations(acc, null, enableShowingGroup);
     }
 
     private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc, CoreComponentState state) {
+        return getAssociations(acc, state, false);
+    }
+
+    private List<CoreComponentRelation> getAssociations(AggregateCoreComponent acc, CoreComponentState state, boolean enableShowingGroup) {
         List<CoreComponentRelation> associationsWithoutRecursive = getAssociationsWithoutRecursive(acc, state);
         List<CoreComponentRelation> associations = new ArrayList();
 
@@ -282,7 +288,11 @@ public class NodeService {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
                 AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc);
                 if (isGroup(roleOfAcc)) {
-                    associations.addAll(getAssociations(roleOfAcc, state));
+                    if (enableShowingGroup) {
+                        associations.add(ascc);
+                    } else {
+                        associations.addAll(getAssociations(roleOfAcc, state));
+                    }
                 } else {
                     associations.add(ascc);
                 }
@@ -329,7 +339,7 @@ public class NodeService {
         return acc;
     }
 
-    private boolean isGroup(AggregateCoreComponent acc) {
+    public boolean isGroup(AggregateCoreComponent acc) {
         OagisComponentType oagisComponentType = acc.getOagisComponentType();
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
@@ -340,33 +350,39 @@ public class NodeService {
 
         private ACCNode parent = null;
         private AssociationCoreComponent ascc;
+        private boolean enableShowingGroup;
+
         private final AssociationCoreComponentProperty asccp;
         private ACCNode type;
 
         private Boolean hasChild = null;
         private Collection<CCNode> children = null;
 
-        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponent ascc) {
-            this(null, ascc);
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponent ascc, boolean enableShowingGroup) {
+            this(null, ascc, enableShowingGroup);
         }
 
-        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponentProperty asccp) {
-            this(null, asccp);
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponentProperty asccp, boolean enableShowingGroup) {
+            this(null, asccp, enableShowingGroup);
         }
 
         private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                         AssociationCoreComponent ascc) {
+                                                         AssociationCoreComponent ascc,
+                                                         boolean enableShowingGroup) {
             this.parent = parent;
             this.ascc = ascc;
+            this.enableShowingGroup = enableShowingGroup;
 
             long asccpId = ascc.getToAsccpId();
             this.asccp = asccpRepository.findOne(asccpId);
         }
 
         private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                         AssociationCoreComponentProperty asccp) {
+                                                         AssociationCoreComponentProperty asccp,
+                                                         boolean enableShowingGroup) {
             this.parent = parent;
             this.asccp = asccp;
+            this.enableShowingGroup = enableShowingGroup;
         }
 
         @Override
@@ -385,7 +401,7 @@ public class NodeService {
                 long roleOfAccId = getRoleOfAccId();
                 if (roleOfAccId > 0L) {
                     AggregateCoreComponent roleOfAcc = accRepository.findOne(roleOfAccId);
-                    type = new AggregateCoreComponentNodeImpl(roleOfAcc);
+                    type = new AggregateCoreComponentNodeImpl(roleOfAcc, enableShowingGroup);
                 }
             }
             return type;
@@ -446,7 +462,7 @@ public class NodeService {
             if (parent == null) {
                 long fromAccId = getAscc().getFromAccId();
                 AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
-                parent = new AggregateCoreComponentNodeImpl(fromAcc);
+                parent = new AggregateCoreComponentNodeImpl(fromAcc, enableShowingGroup);
             }
             return parent;
         }
@@ -465,32 +481,36 @@ public class NodeService {
 
         private ACCNode parent = null;
         private BasicCoreComponent bcc;
+        private boolean enableShowingGroup;
+
         private final BasicCoreComponentProperty bccp;
         private DataType dataType;
 
         private Collection<BDTSCNode> children = null;
 
-        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc) {
-            this(null, bcc);
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc, boolean enableShowingGroup) {
+            this(null, bcc, enableShowingGroup);
         }
 
-        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponentProperty bccp) {
-            this(null, bccp);
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
+            this(null, bccp, enableShowingGroup);
         }
 
         private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                   BasicCoreComponent bcc) {
+                                                   BasicCoreComponent bcc, boolean enableShowingGroup) {
             this.parent = parent;
             this.bcc = bcc;
+            this.enableShowingGroup = enableShowingGroup;
 
             long bccpId = bcc.getToBccpId();
             this.bccp = bccpRepository.findOne(bccpId);
         }
 
         private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                   BasicCoreComponentProperty bccp) {
+                                                   BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
             this.parent = parent;
             this.bccp = bccp;
+            this.enableShowingGroup = enableShowingGroup;
         }
 
         @Override
@@ -565,7 +585,7 @@ public class NodeService {
             if (parent == null) {
                 long fromAccId = getBcc().getFromAccId();
                 AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
-                parent = new AggregateCoreComponentNodeImpl(fromAcc);
+                parent = new AggregateCoreComponentNodeImpl(fromAcc, enableShowingGroup);
             }
             return parent;
         }

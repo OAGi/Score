@@ -68,7 +68,7 @@ public class CoreComponentTreeNodeTests {
         assertThat(dataAreaAsccp).isNotNull();
 
         ACCNode accTreeNode =
-                treeNodeService.createCoreComponentTreeNode(acknowledgeBOMAcc);
+                treeNodeService.createCoreComponentTreeNode(acknowledgeBOMAcc, false);
         assertThat(accTreeNode).isNotNull();
         assertThat(accTreeNode.getAcc()).isEqualTo(acknowledgeBOMAcc);
 
@@ -109,7 +109,7 @@ public class CoreComponentTreeNodeTests {
         // First ASCC, 'Acknowledge'
         AssociationCoreComponent acknowledgeAscc = asccList.get(0);
         ASCCPNode acknowledgeAsccTreeNode =
-                treeNodeService.createCoreComponentTreeNode(acknowledgeAscc);
+                treeNodeService.createCoreComponentTreeNode(acknowledgeAscc, false);
         assertThat(acknowledgeAsccTreeNode).isNotNull();
         assertThat(acknowledgeAsccTreeNode.getParent().getAcc()).isEqualTo(acknowledgeBOMDataAreaTypeAcc);
 
@@ -119,7 +119,7 @@ public class CoreComponentTreeNodeTests {
 
         // Second ASCC, 'BOM'
         AssociationCoreComponent bomAscc = asccList.get(1);
-        ASCCPNode bomAsccTreeNode = treeNodeService.createCoreComponentTreeNode(bomAscc);
+        ASCCPNode bomAsccTreeNode = treeNodeService.createCoreComponentTreeNode(bomAscc, false);
         assertThat(bomAsccTreeNode).isNotNull();
 
         String bomAsccpGuid = "oagis-id-465ed46fd9a4422186327a77ed3b4fbf";
@@ -151,7 +151,7 @@ public class CoreComponentTreeNodeTests {
         Collections.sort(bccList, treeNodeService.comparingCoreComponentRelation());
 
         ACCNode businessObjectDocumentTreeNode =
-                treeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc);
+                treeNodeService.createCoreComponentTreeNode(businessObjectDocumentTypeAcc, false);
         assertThat(businessObjectDocumentTreeNode).isNotNull();
 
         Collection<? extends CCNode> bccpTreeNodeChildren =
@@ -219,7 +219,7 @@ public class CoreComponentTreeNodeTests {
         assertThat(stateChangeBaseTypeAcc).isNotNull();
 
         ACCNode stateChangeBaseTypeTreeNode =
-                treeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc);
+                treeNodeService.createCoreComponentTreeNode(stateChangeBaseTypeAcc, false);
         assertThat(stateChangeBaseTypeTreeNode).isNotNull();
 
         Collection<? extends CCNode> children = stateChangeBaseTypeTreeNode.getChildren();
@@ -262,7 +262,7 @@ public class CoreComponentTreeNodeTests {
         assertThat(moveInventoryLineBaseTypeAcc).isNotNull();
 
         ACCNode moveInventoryLineBaseTypeTreeNode =
-                treeNodeService.createCoreComponentTreeNode(moveInventoryLineBaseTypeAcc);
+                treeNodeService.createCoreComponentTreeNode(moveInventoryLineBaseTypeAcc, false);
         assertThat(moveInventoryLineBaseTypeTreeNode).isNotNull();
 
         Collection<? extends CCNode> children = moveInventoryLineBaseTypeTreeNode.getChildren();
