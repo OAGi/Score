@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeCarrierRoute.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CarrierRoute.xsd"/>
+	<xsd:element name="ChangeAcknowledgeCarrierRoute" type="ChangeAcknowledgeCarrierRouteType" id="oagis-id-e327915dcf0e4b29b737c3f0503de819">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeCarrierRoute is to enable an application to provide  Carrier Route information from another business application module.  The ChangeAcknowledgeCarrierRoute is typiically provided in a publish/subscribe or broadcast environment. Where the sending system is the master application of the information being provided, where the information is sent to other business applications that need to know the information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeCarrierRouteType" id="oagis-id-14797ae03e8f4c5f9c9beff967d17dd9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeCarrierRouteDataAreaType" id="oagis-id-1fc786cecfa94f778451e136dfb88b73">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeCarrierRoute. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (CarrierRoute).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeCarrierRouteDataAreaType" id="oagis-id-e58d9d969112450d92d21133a226d961">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-042c0e8c4b374b8eb0a5c0ecd5945c37"/>
+			<xsd:element ref="CarrierRoute" maxOccurs="unbounded" id="oagis-id-f863af4da465458d9d4ca81642201afb"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowInventoryConsumption.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryConsumption.xsd"/>
+        <xsd:element name="ShowInventoryConsumption" type="ShowInventoryConsumptionType" id="oagis-id-8f304fc4545a4b5a854e528a693e736c">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The most common use of the ShowInventoryConsumption is to share a buyer's usage information about an item or product with the supplier of such item or product.  This BOD will not create or update either buyer's or supplier's inventory records.   The receiver of the request is responsible to make effective use of this information.
+
+The BOD can be used in the following ways: 
+(1)  for a buyer of goods to inform the supplier that goods have been consumed, and replenishment will likely be required; 
+(2)  for a retailer to inform the vendor that retail sales of goods have been made; and 
+(3)  for plant data collection systems and warehouse management systems to inform inventory systems that goods have been consumed and inventory records should be adjusted accordingly.
+
+This is an outline of the business flow that this BOD supports:
+(1)  Overall purchase, replenishment or vendor managed inventory agreement is in place.
+(2)  Message is sent to supplier, distributor or third party logistics provider, that material has been consumed.  This is done in response to events such as these, depending on implementation context:
+  ·  Material is replenished to line side at manufacturing facitliy.
+  ·  Material is assembled into final product.
+  ·  Material is purchased and removed from facility by customer.
+(3)  Supplier, distributor, third party logistics provider replenishes material, using information provided in the ShowInventoryConsumption message, the demand and shipment forecasts, and the terms of the overall purchase or vendor managed inventory agreement.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowInventoryConsumptionType" id="oagis-id-98918dd94bec4be186432ad1301a0954">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowInventoryConsumptionDataAreaType" id="oagis-id-0c9e8f07ab6d464b99c5ce01f7f742a7">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInventoryConsumption. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InventoryConsumption).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowInventoryConsumptionDataAreaType" id="oagis-id-95e1cf87b838463bac97fde65cfce603">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-a7de2437bce14f3fa8e439837511454e"/>
+                        <xsd:element ref="InventoryConsumption" maxOccurs="unbounded" id="oagis-id-bf2fe922a9af427984653c4f8c6fba86"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

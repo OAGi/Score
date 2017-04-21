@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeChartOfAccounts.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ChartOfAccounts.xsd"/>
+	<xsd:element name="ChangeAcknowledgeChartOfAccounts" type="ChangeAcknowledgeChartOfAccountsType" id="oagis-id-08e71683c8974e438eb124726e6e3f25">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeChartOfAccounts is to supply ChartOfAccounts information to another business application module. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeChartOfAccountsType" id="oagis-id-74a4e69917044af58fc554f2d4c3d023">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeChartOfAccountsDataAreaType" id="oagis-id-a835d113378645658a17f292cb0f8108">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeChartOfAccounts. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (ChartOfAccounts).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeChartOfAccountsDataAreaType" id="oagis-id-4e65232659574fe494763626dca8ef78">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-425bf4b44d3d4f54829db52f34141ce8"/>
+			<xsd:element ref="ChartOfAccounts" maxOccurs="unbounded" id="oagis-id-0d21235b6c1f483487f4d52c03dfe42a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

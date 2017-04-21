@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/GetBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+        <xsd:element name="GetBatchCertificateOfAnalysis" type="GetBatchCertificateOfAnalysisType" id="oagis-id-cb532ba979e34cac860b617ec7066b44">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Get BatchCertificateOfAnalysis is to enable a business application module to request information concerning a specific purchase order from another business application.  The reply to this BOD is the Show BatchCertificateOfAnalysis.
+
+There are several environments that may use this capability. For example, an MRP application may use this BOD to ask for information from a Order Management application, or a Plant Data Collection application may also use this BOD to request information from a Order Management application. This may als happen across business parties.
+
+This BOD does not usually cause updates to occur.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetBatchCertificateOfAnalysisType" id="oagis-id-04bb04c2510d4683a83a0d4755f03fbd">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetBatchCertificateOfAnalysisDataAreaType" id="oagis-id-d4b7fab202874d3d827159d46c3c71c4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetBatchCertificateOfAnalysisDataAreaType" id="oagis-id-19295b47bb4b46b29a34c6046954ec6f">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-b84d9a27b66f43ae8d8ecc02f0206da1"/>
+                        <xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-817f9a403f9d4aa7884cf4ed7348fcce"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

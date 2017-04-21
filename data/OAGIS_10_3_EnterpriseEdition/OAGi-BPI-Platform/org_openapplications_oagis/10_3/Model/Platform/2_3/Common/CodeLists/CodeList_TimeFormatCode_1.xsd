@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--====================================================================== --><!-- ===== OAGi Time Format Code - Code List XML Schema File                              ===== --><!-- ====================================================================== --><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_3 Platform 2_2 
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the 
+	Time Format Code List from UN/CEFACT Time Format Code.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_TimeFormatCode_1.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xsd:simpleType name="clm6TimeFormatCode1_TimeFormatCodeContentType" id="oagis-id-98f48609a5154608bd5673aea57784da">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="hh:mm:ss">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Local Time</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mm:ss with optional fraction of second allowed (hh:mm:ss,ss)</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh:mm:ss+hh:mm">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Time with UTC Offset</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mm:ss+hh:mm with optional fraction of second allowed (hh:mm:ss,ss+hh:mm)</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh:mm:ssZ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTC Time</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mm:ssZ with optional fraction of second allowed (hh:mm:ss,ssZ)</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh:mm">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Local Hour and Minute</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mm</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh:mmZ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTC Hour and Minute</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mmZ</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh:mm+hh:mm">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Hour and Minute with UTC offset</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh:mm+hh:mm</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Local Hour</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hhZ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTC Hour</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hhZ</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hh+hh:mm">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Hour with UTC offset</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: hh+hh:mm</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="-mm:ss">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Minute and Second</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: -mm:ss</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="-mm">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Minute</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: -mm</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="--ss">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Second</ccts_Name>
+						<ccts_Description>ISO 8601 Time extended format: --ss</ccts_Description>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

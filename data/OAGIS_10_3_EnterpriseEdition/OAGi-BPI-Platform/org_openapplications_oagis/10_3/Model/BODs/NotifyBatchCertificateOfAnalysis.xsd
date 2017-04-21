@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+        <xsd:element name="NotifyBatchCertificateOfAnalysis" type="NotifyBatchCertificateOfAnalysisType" id="oagis-id-7c6564e3b7ac4698b1141f635702de15">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Notify BatchCertificateOfAnalysis is to facilitate keeping purchase order information synchronized on separate data bases throughout an enterprise.  The Notify BatchCertificateOfAnalysis allows the adding of new purchase orders and the modification of previously established purchase orders.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyBatchCertificateOfAnalysisType" id="oagis-id-570ca6b917904ba098e32c034597c239">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyBatchCertificateOfAnalysisDataAreaType" id="oagis-id-521a9b910f244f3b9d51eb1fe6683bb7">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyBatchCertificateOfAnalysisDataAreaType" id="oagis-id-1a29bf6b17ac4bbca878ea8e55cf8ef3">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-1aa0e6535f9342d1a115a152f5f3be1e"/>
+                        <xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-d8d91c5e997a4df2acb03946bbd027c2"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/GetConfirmWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ConfirmWIP.xsd"/>
+        <xsd:element name="GetConfirmWIP" type="GetConfirmWIPType" id="oagis-id-de1da1d8629144c2b08c1ec21b72e564">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetConfirmWIP is to enable the requesting of data necessary to perform a confirmation of the movement of WIP (Work in Progress).</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetConfirmWIPType" id="oagis-id-e54c6f45582c49a19d3019f82d58a205">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetConfirmWIPDataAreaType" id="oagis-id-d62c76dbce3e4b36b4f16a42436d0bb9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetConfirmWIP. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ConfirmWIP).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetConfirmWIPDataAreaType" id="oagis-id-30633cc692144d67895d0d2bc3bac9b2">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-9ccc5426c72c49a7ae0fed4ab9d4ed83"/>
+                        <xsd:element ref="ConfirmWIP" maxOccurs="unbounded" id="oagis-id-88aa1289c8704205ba2449207d6880a7"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyField.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Field.xsd"/>
+        <xsd:element name="NotifyField" type="NotifyFieldType" id="oagis-id-027affba2796452886929aa500a2762d">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyField is to enable the validation of data that exists on separate application's data bases.  This BOD can cause on-line validation to occur or may be a single tool for synchronizing data.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyFieldType" id="oagis-id-f2e12aafb9ac400c9616f9cc6ce0aba3">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyFieldDataAreaType" id="oagis-id-683049295ca1465b8f5adb401f550ffd">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyField. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (Field).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyFieldDataAreaType" id="oagis-id-b7e7d22d77e74f13a0bc1c1926e89ea3">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-4ac7618d46234096b991a9f4bd3fb2d0"/>
+                        <xsd:element ref="Field" maxOccurs="unbounded" id="oagis-id-0893e17c968a4eada7365a99e7b66feb"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

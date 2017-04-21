@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessProjectMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProjectMaster.xsd"/>
+	<xsd:element name="ProcessProjectMaster" type="ProcessProjectMasterType" id="oagis-id-456fad27c9b741f0b1de87ec21eed867">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessProjectMaster is to enable all relevant sub-systems that submit transactions to the project accounting application to maintain valid values for the key project fields.  The target applications for this update would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessProjectMasterType" id="oagis-id-fb2b53c300b54e70944bff3180c68140">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessProjectMasterDataAreaType" id="oagis-id-7b19caed485f4e80a1e2b0245475b3c7">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessProjectMaster. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ProjectMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessProjectMasterDataAreaType" id="oagis-id-f344a01005ad40fb82ff44b19b74666f">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-2b95a9d539b34c828f7fcc99da64a7af"/>
+			<xsd:element ref="ProjectMaster" maxOccurs="unbounded" id="oagis-id-f897f7bf9a8143749f00931806411c8b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

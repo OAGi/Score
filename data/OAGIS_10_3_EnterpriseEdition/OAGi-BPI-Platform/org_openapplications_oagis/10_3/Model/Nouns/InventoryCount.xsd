@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/InventoryCount.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="InventoryCount" type="InventoryCountType" id="oagis-id-9227894b8a3a44a28936064fd24b8f09">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">InventoryCount represents the results of a physical inventory or cycle count of the actual on-hand quantities of each item in each location.  Compare to the noun InventoryBalance, which represents system-maintained on-hand quantities.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="InventoryCountHeader" type="InventoryCountHeaderType" id="oagis-id-fef1bcaff5b449e499c7a45e2c52d963"/>
+	<xsd:element name="InventoryCountLine" type="InventoryCountLineType" id="oagis-id-48f82301bb814c49ac74239945e77b67"/>
+	<xsd:complexType name="InventoryCountType" id="oagis-id-7def7af966c2423c81ad037c6410820d">
+		<xsd:sequence>
+			<xsd:element ref="InventoryCountHeader" id="oagis-id-d3af1572a659434bbd0504bc6f3acfd3" minOccurs="0"/>
+			<xsd:element ref="InventoryCountLine" id="oagis-id-d6cd845b7fff41c58a3c81f66cac81da" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-66659b2ab8c949e383cf1aea63c8e879"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-f0d7b2a51e804690a68c0cfa620b3ae5"/>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryCountHeaderBaseType" id="oagis-id-8f6bbf818e084d53b38be24e5a04c3db">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="WarehouseParty" id="oagis-id-525499495f0740709f9a79c2452d5223" minOccurs="0"/>
+					<xsd:element ref="CarrierParty" id="oagis-id-347852d079b64d7da6c8cbe1ab265138" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Idenitfies the party that serves as the carrier of the goods or services for the transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-dc221c64a9814454a7c70cec44daf0ea" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-218d9e280312498eaeee097a4afc2a25" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryCountHeaderType" id="oagis-id-b69eea393c8748719e03b862649d1e70">
+		<xsd:complexContent>
+			<xsd:extension base="InventoryCountHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InventoryCountHeaderExtensionType" id="oagis-id-7fd44158a92a417f9db14a1fd30d7164" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryCountLineBaseType" id="oagis-id-5057535f5f8648ce98ca0a241b629fc1">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c7fcdb20ebc042c3bbbe24212d02e371"/>
+					<xsd:element ref="Quantity" id="oagis-id-d2568cb323d74458936cf0da899c1b03" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-8e14e53c378344ba88b0072b7cec011a"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryCountLineType" id="oagis-id-35ce5ae96d2e467b8cbf3cc1d0757958">
+		<xsd:complexContent>
+			<xsd:extension base="InventoryCountLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InventoryCountLineExtensionType" id="oagis-id-634f619efc9b4c4ebb5414a542677ebd" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

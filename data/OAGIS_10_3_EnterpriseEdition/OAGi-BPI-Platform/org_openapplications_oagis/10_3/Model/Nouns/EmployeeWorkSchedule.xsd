@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/EmployeeWorkSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="EmployeeWorkSchedule" type="EmployeeWorkScheduleType" id="oagis-id-e99ca4ab8dac4e2d9f054c5ad1b2556a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Represents data related to the planned work hours for an employee. A work schedule typically includes relatively static employee information, such as employee ID and name.  It will also include schedule-specific information such as dates and amount of time to be worked.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EmployeeWorkScheduleBaseType" id="oagis-id-1dbef6a868ed4ab485d0be937d9552b5">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:group ref="CommonTimeReporting" id="oagis-id-910e47b8e2134a16b8ffb945dc30c75a"/>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b121285115f44c99a178456d3ddfd301"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-bc9587b517b14b2eba10f7d48c4c7f39"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EmployeeWorkScheduleType" id="oagis-id-d6131503a8da4613ab007a6ae7f582c5">
+		<xsd:complexContent>
+			<xsd:extension base="EmployeeWorkScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EmployeeWorkScheduleExtensionType" id="oagis-id-946f5111f46743b0adf0b63bf5e6476c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

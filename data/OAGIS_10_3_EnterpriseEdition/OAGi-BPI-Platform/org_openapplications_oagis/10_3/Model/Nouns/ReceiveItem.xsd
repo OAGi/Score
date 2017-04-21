@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/ReceiveItem.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="ReceiveItem" type="ReceiveItemType" id="oagis-id-c1d37b05590248f2b30b59ecd91143ac">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Receive Item is intended for use in Unplanned Receipt Scenarios.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceiveItemHeader" type="ReceiveItemHeaderType" id="oagis-id-c47c9c74d6fd4fcab89cdeaef6d77c78"/>
+	<xsd:element name="ReceiveItemLine" type="ReceiveItemLineType" id="oagis-id-9baaf409b6db435b9394dbf8cc7fda58">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies the item being received, and the location to which the receipt is being done</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ReceiveItemType" id="oagis-id-46029cd17c2d4ca3897d1ca947a0f997">
+		<xsd:sequence>
+			<xsd:element ref="ReceiveItemHeader" id="oagis-id-d99092e8bc474239b7c41ca9a53f9b82" minOccurs="0"/>
+			<xsd:element ref="ReceiveItemLine" id="oagis-id-8b9b14cc8acd4344ba7943176fbba520" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies the item being received, and the location to which the receipt is being done</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-8727e8f9d9cf448088f6a60ddf662f19"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-9946955180514f7db6f54914cf4c7d37"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveItemHeaderType" id="oagis-id-6adcbb54fdfa4e1f97a03c8face3dcbe">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveItemHeaderExtensionType" id="oagis-id-a110dd2795874afe955acffcf0bff760" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveItemLineBaseType" id="oagis-id-8287b61a7a354fb68458d117b60ac36b">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-670c8fd5c57945cbab0b896e621d0682"/>
+					<xsd:element ref="Quantity" minOccurs="0" maxOccurs="unbounded" id="oagis-id-fc75d66ec3f8436c8c9f1d27e630ce89"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-ac5a0f07aaf6458ab61330fdc5566aa2"/>
+					<xsd:element ref="UnitValue" id="oagis-id-77ff0c24abae4e8b8830fdc2dbd3ad1e" minOccurs="0"/>
+					<xsd:element ref="TotalValueAmount" id="oagis-id-3bfdbdeeefe94d0b87a4cabc6b45bdb1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the total value of the associated object.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveItemLineType" id="oagis-id-bfe197f69a2246b7bebdbc794f87f8af">
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveItemLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveItemLineExtensionType" id="oagis-id-302c73e274954274af4bd7a007195c6c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

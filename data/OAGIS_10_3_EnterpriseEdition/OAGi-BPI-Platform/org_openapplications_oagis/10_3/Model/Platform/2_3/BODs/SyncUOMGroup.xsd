@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncUOMGroup.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/UOMGroup.xsd"/>
+	<xsd:element name="SyncUOMGroup" type="SyncUOMGroupType" id="oagis-id-f68551e82f7d4f1a8ede0a4d79e748a5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncUOMGroup is to supply a set of Unit-Of-Measure relationships to another business application module.
+
+This BOD addresses the need for applications to exchange item-independent alternative UOM information beyond the stocking UOM. See the Item UOM Integration Scenario for more detailed information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncUOMGroupType" id="oagis-id-1a0d6cb865b04b2eb6a5e306e5863f2f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncUOMGroupDataAreaType" id="oagis-id-0d5e41ec7cd94cfbbe0b2f8a2f2f3fa2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncUOMGroup. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (UOMGroup).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncUOMGroupDataAreaType" id="oagis-id-0c1eef9bab154a6c93e242f3450ff37d">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-c999a96882484c2d8c7648dc13a4a5ce"/>
+			<xsd:element ref="UOMGroup" maxOccurs="unbounded" id="oagis-id-af3714ba42d5469f84c1be01b29cac90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

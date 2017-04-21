@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncDispatchList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/DispatchList.xsd"/>
+        <xsd:element name="SyncDispatchList" type="SyncDispatchListType" id="oagis-id-98741df5643e4234a115d2ff747376a5">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncDispatchList is to synchronize dispatch list (finite schedule) information.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncDispatchListType" id="oagis-id-b18cc7eb6d1f474e87da5dea2c4aaf0a">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncDispatchListDataAreaType" id="oagis-id-bf18b5c272264b9f86e15aa7d7631b0d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncDispatchList. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (DispatchList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncDispatchListDataAreaType" id="oagis-id-35c68ca170384dbc915e3507835cf260">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-bf5ca903d8cf47da899b9a293857002d"/>
+                        <xsd:element ref="DispatchList" maxOccurs="unbounded" id="oagis-id-681eaf5fca6d4e079959f0b0c1068825"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

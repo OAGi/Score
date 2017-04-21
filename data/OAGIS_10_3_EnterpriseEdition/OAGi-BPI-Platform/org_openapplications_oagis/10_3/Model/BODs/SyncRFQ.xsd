@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncRFQ.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RFQ.xsd"/>
+        <xsd:element name="SyncRFQ" type="SyncRFQType" id="oagis-id-89247df4805643529a66cb812349ecf6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncRFQ is to ensure that all business software components in a specific integration instance have the current Request for Quote information. This BOD is commonly used to publish the need to create or update a Request for Quote in a publish and subscribe integration environment.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncRFQType" id="oagis-id-f2829f1d51b94083830e40b451c4483a">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncRFQDataAreaType" id="oagis-id-d572363e0a7a4a3aa4a951605f17f34d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncRFQ. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (RFQ).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncRFQDataAreaType" id="oagis-id-cbafe70f98a740daa2c9bd68c4fce126">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-9708c549e0ed400f9e4998f09baa6bd9"/>
+                        <xsd:element ref="RFQ" maxOccurs="unbounded" id="oagis-id-8b625fc78c7c4996b523ea767f0223d1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

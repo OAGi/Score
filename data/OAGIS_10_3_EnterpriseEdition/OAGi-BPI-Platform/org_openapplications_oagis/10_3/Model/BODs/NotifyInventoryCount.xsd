@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyInventoryCount.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryCount.xsd"/>
+        <xsd:element name="NotifyInventoryCount" type="NotifyInventoryCountType" id="oagis-id-ef9204326cbd4c5d892397bce70749bf">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyInventoryCount is to transmit an inventory count to ERP from the actual physical inventory location. This count may be a cycle count or a physical count.  This BOD may also apply to planned or unplanned inventory counts.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyInventoryCountType" id="oagis-id-30ad52d74ea74f9c8cbc53511922dcce">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyInventoryCountDataAreaType" id="oagis-id-c67eb54b81184df8b287444d996ffad6">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyInventoryCount. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (InventoryCount).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyInventoryCountDataAreaType" id="oagis-id-c2ffd82dca13447cb2f1c1dafb9f39ce">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-81acc94d17e64514aa313a8a15ae40b5"/>
+                        <xsd:element ref="InventoryCount" maxOccurs="unbounded" id="oagis-id-5f6ded81f8bb47219219b34d1587e020"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

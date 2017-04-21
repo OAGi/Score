@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseWorkOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WorkOrder.xsd"/>
+	<xsd:element name="SyncResponseWorkOrder" type="SyncResponseWorkOrderType" id="oagis-id-337afee342ed4900957ce6f5fe3d41eb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseWorkOrder is to communicate to a business application module or system the need to initiate the creation of a WorkOrder structure.
+			
+A SyncResponse is the response to a Sync. In this case a SyncResponseWorkOrder is in response to SyncWorkOrder. The SyncResponse reports the results of the Sync.
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseWorkOrderType" id="oagis-id-8273f6d9da514fc29667033c1eaa6d10">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseWorkOrderDataAreaType" id="oagis-id-cd4dcfb38a464dbd8b0cd00ae3155aba">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseWorkOrder. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (WorkOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseWorkOrderDataAreaType" id="oagis-id-162fd3e9b90b4b0d8b07bf80de6569f4">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-6c5f3a78f7b54036a5109cbc9e22d9ac"/>
+			<xsd:element ref="WorkOrder" id="oagis-id-034699c581f7430f83922be90d8c8863"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgeOnlineOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/OnlineOrder.xsd"/>
+	<xsd:element name="CancelAcknowledgeOnlineOrder" type="CancelAcknowledgeOnlineOrderType" id="oagis-id-597b44ad466b42e88684b74a3e570366">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeOnlineOrder is to enable an application to provide online shopping OnlineOrders from another business application module.  The CancelAcknowledgeOnlineOrder is provided in response to the ProcessOnlineOrder in order to request a CancelAcknowledge to process the OnlineOrder. The Chagne is directed from the owner of the information (the receiver of the Process) the originator of the Process.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeOnlineOrderType" id="oagis-id-39bd1860d4bd4a068d2fe169b2b30616">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeOnlineOrderDataAreaType" id="oagis-id-6d3f43a686b04cddb5fa50a179d9d005">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeOnlineOrder. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (OnlineOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeOnlineOrderDataAreaType" id="oagis-id-69f1ffa2931a4bcea02526eaa93147eb">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-89e556c3024c41a0bc1aab15dfd731fc"/>
+			<xsd:element ref="OnlineOrder" maxOccurs="unbounded" id="oagis-id-750af5367f44472d913ab5c21b15b138"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

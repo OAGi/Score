@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncShipmentUnit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ShipmentUnit.xsd"/>
+        <xsd:element name="SyncShipmentUnit" type="SyncShipmentUnitType" id="oagis-id-f14f4a48a87245a7ba1c9f6e0bd046f1">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncShipmentUnit is to enable an application to provide a ShipmentUnit information from another business application module.
+
+The SyncShipmentUnit is typically published from the business application that is the master or owner of the ShipmentUnit information to other systems needing to know about the changes to the ShipmentUnit information.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncShipmentUnitType" id="oagis-id-a8e9c5663163478e924a657dad9fa2a2">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncShipmentUnitDataAreaType" id="oagis-id-8dab22ff93ca45b084d7488d2f71c5f4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncShipmentUnit. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ShipmentUnit).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncShipmentUnitDataAreaType" id="oagis-id-5957a6a109004181aa4c68bc6c197992">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-87223eb0afc84c45a35cfab935d412a2"/>
+                        <xsd:element ref="ShipmentUnit" maxOccurs="unbounded" id="oagis-id-d09a4b5bdad747bb880ccf77e2274312"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

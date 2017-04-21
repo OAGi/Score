@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelShipmentUnit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShipmentUnit.xsd"/>
+	<xsd:element name="CancelShipmentUnit" type="CancelShipmentUnitType" id="oagis-id-9104621229c94ef0984c6b92db4ac291">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelShipmentUnit is to enable an application to provide a ShipmentUnit information from another business application module in order for that module to perform the task at hand..
+
+The CancelShipmentUnit is typically published from the business application that is is requesting that the master or owner of the ShipmentUnit information to Cancel the contained update. This may also occur across enterprises.
+
+The respons to the CancelShipmentUnit is the AcknowledgeShipmentUnit to indicate success or failure. If the receiving system needs to make Cancels to the ShipmentUnit then the CancelShipmentUnit can be used a coresponding RespondShipmentUnit accepts the Cancels or indicates additional Cancels.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelShipmentUnitType" id="oagis-id-54dcf5ecd65448c0ae73eeab51ae0dcd">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelShipmentUnitDataAreaType" id="oagis-id-3eb371ade9724b5da5ea18c0bc6f2922">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelShipmentUnit. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (ShipmentUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelShipmentUnitDataAreaType" id="oagis-id-60d2e707452a4f00b30e598350ed00a7">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-e5ded6b5c2184b1f87f35dba3fb99d73"/>
+			<xsd:element ref="ShipmentUnit" maxOccurs="unbounded" id="oagis-id-11abab853db74f2a865ccdd45256847f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

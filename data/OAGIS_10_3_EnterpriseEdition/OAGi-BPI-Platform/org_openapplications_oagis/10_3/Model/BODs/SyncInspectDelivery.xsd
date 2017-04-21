@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncInspectDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InspectDelivery.xsd"/>
+        <xsd:element name="SyncInspectDelivery" type="SyncInspectDeliveryType" id="oagis-id-d6e19de2e44143c8be1fcd975105b7a8">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncInspectDelivery is to supply InspectDelivery information for goods or services to another business application module.  This BOD may is initiated by the sending system upon some event occurring.  There are many possible business applications in several environments that may use this capability.
+
+For example;
+1.  A PurchaseOrder application could use this to send information to a Plant Data Collection application, or vice versa. 
+2.  An MRP, Inventory, Purchasing or Manufacturing business application could use this to communicate InspectDelivery information.
+3.  A Laboratory Information System could send quality information to an Inventory application,
+4.  A Quality Control application could send information to an MRP, Inventory, or Purchasing application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncInspectDeliveryType" id="oagis-id-b90e36c0b9f94734929482e0f874a877">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncInspectDeliveryDataAreaType" id="oagis-id-e401a7ad757d476e90f0b2a169f2aed8">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncInspectDelivery. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (InspectDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncInspectDeliveryDataAreaType" id="oagis-id-6f8a9195bf9e4844b29b5173899b926a">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-a7e46e6b3d1a4d7bbc5040d227f9042c"/>
+                        <xsd:element ref="InspectDelivery" maxOccurs="unbounded" id="oagis-id-2fe50138074c4d41ace332b03bc06b39"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

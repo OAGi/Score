@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeUOMGroup.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/UOMGroup.xsd"/>
+	<xsd:element name="ChangeUOMGroup" type="ChangeUOMGroupType" id="oagis-id-46315e94b1674b70960aba3f52ebf5f9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeUOMGroup is to supply a set of Unit-Of-Measure relationships to another business application module.
+
+This BOD addresses the need for applications to exchange item-independent alternative UOM information beyond the stocking UOM. See the Item UOM Integration Scenario for more detailed information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeUOMGroupType" id="oagis-id-b792903daa9c47b59a0ca4e14f9cc331">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeUOMGroupDataAreaType" id="oagis-id-f7bde262b29d4beabd59d585fd2fa490">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeUOMGroup. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (UOMGroup).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeUOMGroupDataAreaType" id="oagis-id-71972dc351c2477a818616fd828af031">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-07b73786035e4a1d9d2fb2a48bcf0645"/>
+			<xsd:element ref="UOMGroup" maxOccurs="unbounded" id="oagis-id-a76c696156af4cf39736affb74e5f4f1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

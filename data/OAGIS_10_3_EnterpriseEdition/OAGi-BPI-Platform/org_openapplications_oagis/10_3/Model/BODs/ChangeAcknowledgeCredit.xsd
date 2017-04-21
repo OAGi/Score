@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeCredit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Credit.xsd"/>
+	<xsd:element name="ChangeAcknowledgeCredit" type="ChangeAcknowledgeCreditType" id="oagis-id-d97471e2f5ef446ab38d68cbe75a16d9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeCredit is to ChangeAcknowledge the Credit Management functionality within the customer order management or the accounts receivable application.  The ChangeAcknowledgeCredit will also transmit changes in the accounts receivable open item balances to the credit management function of the customer order management application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeCreditType" id="oagis-id-f92e33c2ef9b48e0a919cbe4782edf93">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeCreditDataAreaType" id="oagis-id-1452cef18b8d44bfb5b4fda36ca69e98">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeCredit. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (Credit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeCreditDataAreaType" id="oagis-id-41735b0472e24b92aa0cb3baba0de024">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-3805fad303d940d992c7c7a2645299b7"/>
+			<xsd:element ref="Credit" maxOccurs="unbounded" id="oagis-id-f5241f9d86604a74a5f711d9ee3a56ff"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

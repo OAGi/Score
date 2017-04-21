@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+   Schema agency: 	Cisco 
+   OAGIS® Revision:    
+   Date:               06 Mar 2017 
+
+
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/1_2_1/Common/OAGi/Components/Components.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<!---->
+	<xsd:element name="Configuration" type="ConfigurationType" id="oagis-id-3bf957c4586d4dcf9760d0cab578173a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A specific instance of a configurable product line that might consisit of items, software, services and other "bundles" combined in such a way as to represent a unique grouping of selections from a large and sometimes infinite listing of possible combinations of possible options. This differs from a catalog item in that a catalog item can sometimes itself be a specific offered configuration but in this case, the configuration is custom developed to meet specific, non-catalog requirements and/or buyer needs.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ConfigurationHeader" type="ConfigurationHeaderType" id="oagis-id-29ae6b4cb3bc4f3aa63280e7fb2001cd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Common iInformation about the elements of this unique grouping or "configuration" that would apply to all the configuration's elements within this specifi grouping</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ConfigurationLine" type="ConfigurationLineType" id="oagis-id-843da3e960084c8f8e7f3078c7abe700">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Common element used to define all the required characteristics and other meta data that would identify a specific element of the identified configuration</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ConfiguredItem" type="ConfiguredItemType" id="oagis-id-69a76609d4bb461f8e779f98f2f24aeb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Common element to accuratly identify one constituient component within a configuration</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ConfigurationType" id="oagis-id-966a8367c2fc4c46894c0f2bc369f865">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for a configuration instance known as a  "configuration" - generally these "configurations" are created through some form of rules based selection engine known as a "configurator."</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ConfigurationHeader" id="oagis-id-18933cfea3674a1bbe11671a69329c60" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Common iInformation about the elements of this unique grouping or "configuration" that would apply to all the configuration's elements within this specifi grouping</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ConfigurationLine" id="oagis-id-1a171a7097d248ceb8dd0b45b6b62f41" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Common element used to define all the required characteristics and other meta data that would identify a specific element of the identified configuration</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fc050a840f0c4565a90062192e2442dd"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-ac54d234db9541f6a7cfe4c68c792962"/>
+	</xsd:complexType>
+	<xsd:complexType name="ConfigurationHeaderBaseType" id="oagis-id-838a9d73486d4fe9932627bde4fec74c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for the common information concerning a specific grouping or a configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ConfiguratorPath" id="oagis-id-473dd6db29044ddd86b905dfd15dd9dc" minOccurs="0"/>
+					<xsd:element ref="ConfigurationReference" id="oagis-id-70d204811e6b4ecea492a881ec5b1b18" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Message" id="oagis-id-aa74d99ea6db46cd85ad3643468d77e0" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ContractReference" id="oagis-id-a32288ef43384b51af73aea8d25e5889" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CatalogReference" id="oagis-id-634000f57292432e937a97f03e42786f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a catalogue.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-21c2aa79f318456c8c9aa2a149d481b2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductLeadTimeStatus" id="oagis-id-9c8b46725ef74973b4299a567ef7e832" minOccurs="0"/>
+					<xsd:element ref="ProductLeadTimeEffectivity" id="oagis-id-c1f24bd7b53b47f3914f26cf3dfe7215" minOccurs="0"/>
+					<xsd:element ref="Property" id="oagis-id-5e6e9130837a4273b5b92901e0f0307d" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AssociatedBundleItem" id="oagis-id-fd325164cc104cae85fc6aafd80acde4" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedItem" id="oagis-id-085df0d1b39e40919a4c415683563162" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedSoftware" id="oagis-id-f64309b8e930413f97608cafc979db68" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedServices" id="oagis-id-25ed20c21c70408cb9ed9db666aff553" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="LicenseIndicator" id="oagis-id-27e40891cea54413b2b40f0bfc7d4147" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates what type of licenses are required and indicates which are required.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DiscountAllowancePricing" id="oagis-id-f03d32188a64433e9ab206c407514bd3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Tax" id="oagis-id-17b5325c87af43c7b4a66869d97efe37" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the tax for the object associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Charge" id="oagis-id-b43c33dd60444e43b8f27aa89bb9e30a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the different Charges that may be applied to the associated document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalCostAmount" id="oagis-id-4d0e6a8caf8a41918e53429f12baac26" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The total cost of this project, as either an entered amount (no activity costing) or calculated as the sum of the activity costs.
+
+This field is updated by the LoadProjectAccounting BOD.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EndUserParty" id="oagis-id-fd5cec74499d46d1a7545cdad4fdb859" minOccurs="0"/>
+					<xsd:element ref="DistributorParty" id="oagis-id-8c963c9f6acb4c9fb3bc9987ab276295" minOccurs="0"/>
+					<xsd:element ref="ConfigurationEndUserParty" id="oagis-id-68a4730ab9be44bdb666d31699d29271" minOccurs="0"/>
+					<xsd:element ref="RequesterParty" id="oagis-id-cf55312ed03045a2b129e1c0a7ef5443" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BillToParty" id="oagis-id-31b85145878644928ae1308950e33e3f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the bill or invoice is to be sent. In most cases this is the same as the CustomerParty however there are many cases where the CustomerParty and the BillToParty will be different.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-8d1616b36a484bc4865709674158d16a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the ShipToParty for the document or the line. In a lot of cases, this is the same as the CustomerParty. In multi-organization purchasing, the CustomerParty may be different from the BuyerParty</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-7f788c386a454b3783d640c5b3f7c180" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConfigurationHeaderType" id="oagis-id-12e9609ca3244e27bcfca6a07cf30c0e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for the message header that would include all the common information for a specific grouping or a configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConfigurationHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ConfigurationHeaderExtensionType" id="oagis-id-8e472c6fd97d4b01aa534901c80709c7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConfigurationLineBaseType" id="oagis-id-4c888395a64e44359dd9379ee0866aaa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for the individual elements that would constitute a specific configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ConfiguredItem" id="oagis-id-65883164b31346659bcb38b0f19e0bfb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Common element to accuratly identify one constituient component within a configuration</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConfigurationLineType" id="oagis-id-1e8f24acb3da48929101a3d9874ca64e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for the characteristics and other meta data that would identify a specific element of the identified configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConfigurationLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ConfigurationLineExtensionType" id="oagis-id-270fcec2a125467d85fe82ef393f9988" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConfiguredItemBaseType" id="oagis-id-3bee0f13668047ec9c41f6fe579bffa8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for a constituient component within a configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemClassIdentification" id="oagis-id-c28726673dcd4de08db115513aac2616" minOccurs="0"/>
+					<xsd:element ref="Item" id="oagis-id-ff1c75323d8041539efdd22097082d31" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentReference" id="oagis-id-1d45f80d6b684527b10afd5cdf87795a" minOccurs="0"/>
+					<xsd:element ref="ChildItem" id="oagis-id-8c3803f162094172b218539e88c0e2ca" minOccurs="0"/>
+					<xsd:element ref="ConfiguredQuantity" id="oagis-id-008922e9c9054c819f873415d22e51ff" minOccurs="0"/>
+					<xsd:element ref="ProductLeadTimeStatus" id="oagis-id-a74c1cb8bc614864b0044ce114f68956" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DiscountAllowancePricing" id="oagis-id-aae50b52c227468f9b77ebfe08e51cb1" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="InstallUseLocation" id="oagis-id-8953657884ed4347a0a5ce230c2a6499" minOccurs="0"/>
+					<xsd:element ref="Status" id="oagis-id-87e19c722f6142b29f556970029bf2db" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AssociatedBundleItem" id="oagis-id-a2b54e955c16419a83601721282a5f09" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AssociatedItem" id="oagis-id-38572343e09145b0aa1858d786f34680" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceBundleItem" id="oagis-id-e5f470c58d974d7ead04111d6af4cf39" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceItem" id="oagis-id-d61da3ef5a2348338ff102231b81410b" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedItem" id="oagis-id-6cb8730534ac4ff7aeb23f91adeae815" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedServices" id="oagis-id-8dc104a5397c45b695c5722f134831ba" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="AttachedSoftware" id="oagis-id-8aa6ca8e88ef4f20a30372fba55e18a8" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Message" id="oagis-id-c19d8a8966ea4fba8ddda00f103576a7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ConfiguratorPath" id="oagis-id-5f34b25e859f449c81d80888dd84fd48" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConfiguredItemType" id="oagis-id-ad07206ad7ac41f2ae47bbabb910bc6f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Base type for a constituient component within a configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConfiguredItemBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ConfiguredItemExtensionType" id="oagis-id-2839e88211564bcd8e49d7ab3bc497b0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

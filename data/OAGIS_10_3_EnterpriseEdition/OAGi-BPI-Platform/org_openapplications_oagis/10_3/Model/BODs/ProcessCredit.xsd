@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessCredit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Credit.xsd"/>
+        <xsd:element name="ProcessCredit" type="ProcessCreditType" id="oagis-id-be7f9178b7404cc0b439cfb40fbb8dee">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessCredit is for the order management application to request credit data for a trading partner from the credit management function.  The ProcessCredit does not imply any update, it is only an inquiry function.  The ShowCredit discussed in the next chapter will be the response back to the order management application.
+
+Discussed in a later chapter is the UpdateCredit.  The UpdateCredit may be used in both directions between the order management and the accounts receivable application.  Its purpose is to keep order, shipment and open item amounts current.  Finally, the ChangeCreditStatus is used to update the order management application with any changes in business status for a particular trading partner.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessCreditType" id="oagis-id-00055fd2535a4718962575496ef8e126">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessCreditDataAreaType" id="oagis-id-08ce9378aa384f05af8ce6ae596f6605">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessCredit. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Credit).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessCreditDataAreaType" id="oagis-id-644a96d72ef74751afd5c0ba65f0ff83">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-f152d435c86d42909c12b29ce1f16e20"/>
+                        <xsd:element ref="Credit" maxOccurs="unbounded" id="oagis-id-eae6a9a8d2b44d7695ee06ce72cd4501"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

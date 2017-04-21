@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseShipmentUnit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShipmentUnit.xsd"/>
+	<xsd:element name="SyncResponseShipmentUnit" type="SyncResponseShipmentUnitType" id="oagis-id-6e02cb97831947398a0045f1a0333452">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseShipmentUnit is to enable an application to provide a ShipmentUnit information from another business application module.
+
+The SyncResponseShipmentUnit is typically published from the business application that is the master or owner of the ShipmentUnit information to other systems needing to know about the changes to the ShipmentUnit information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseShipmentUnitType" id="oagis-id-0bb28efc4baf4d1f8cba478c29a6873d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseShipmentUnitDataAreaType" id="oagis-id-e65eda53063c4ee5a2f145d6e18f9784">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseShipmentUnit. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ShipmentUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseShipmentUnitDataAreaType" id="oagis-id-c343c44355104975a92067c46852160c">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-12ea621b0eeb4469a16aa0fc950f2a3f"/>
+			<xsd:element ref="ShipmentUnit" maxOccurs="unbounded" id="oagis-id-492ede4d48e24c3fa24dd9067a0fe483"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

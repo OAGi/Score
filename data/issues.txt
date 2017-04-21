@@ -1,0 +1,159 @@
+[Model\Platform\2_3\Common\CodeLists\CodeList_CharacterSetCode_IANA_20131220.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_ConditionTypeCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_ConstraintTypeCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_CurrencyCode_ISO_7_04.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_DateFormatCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_DateTimeFormatCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_LanguageCode_ISO_7_04.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_MIMEMediaTypeCode_IANA_7_04.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_TimeFormatCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_TimeZoneCode_1.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\CodeLists\CodeList_UnitCode_UNECE_7_04.xsd]
+#Issue: The 'xsd:schema' element has unmatched number of child elements except xsd:annotation.
+
+[Model\Platform\2_3\Common\ISO20022\pain.001.001.04.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'InstdAmt EqvtAmt'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+
+[Model\Platform\2_3\Common\ISO20022\pain.001.001.05.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'InstdAmt EqvtAmt'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+
+[Model\Platform\2_3\Common\ISO20022\pain.002.001.04.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'InstdAmt EqvtAmt'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+
+[Model\Platform\2_3\Common\ISO20022\pain.002.001.05.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'InstdAmt EqvtAmt'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+
+[Model\Platform\2_3\Common\ISO20022\pain.008.001.03.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+
+[Model\Platform\2_3\Common\ISO20022\pain.008.001.04.xsd]
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'IBAN Othr'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Checking for the attribute 'Ccy' declaration. The required attribute declaration does not exist or has duplicate. Maybe the value of the 'type', 'use',
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'OrgId PrvtId'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+#Issue: Issue with an xsd:choice at position 1 does not have the required or has too many element name 'Cd Prtry'.
+

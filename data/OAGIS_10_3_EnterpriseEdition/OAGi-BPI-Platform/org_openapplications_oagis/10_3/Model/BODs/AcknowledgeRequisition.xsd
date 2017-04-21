@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/AcknowledgeRequisition.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Requisition.xsd"/>
+        <xsd:element name="AcknowledgeRequisition" type="AcknowledgeRequisitionType" id="oagis-id-4d7be488d2044de886cda772b0fe7cb0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeRequisition Business Object Document is to acknowledge receipt of the Requisition</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeRequisitionType" id="oagis-id-99e1e2437f71448dba4b238798e5af3a">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeRequisitionDataAreaType" id="oagis-id-36e94124138e43bcbe49aca484278ac1">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeRequisition. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (Requisition).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeRequisitionDataAreaType" id="oagis-id-36c87864d41748dfb95015e83f1d2fe1">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-8d4d1ecbbae2444b8c3e3c297341cb7f"/>
+                        <xsd:element ref="Requisition" maxOccurs="unbounded" id="oagis-id-6676475a767b4b9da7a94070d7004398"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

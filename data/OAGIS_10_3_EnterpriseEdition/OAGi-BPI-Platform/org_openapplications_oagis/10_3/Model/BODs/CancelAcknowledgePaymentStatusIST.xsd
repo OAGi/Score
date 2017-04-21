@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgePaymentStatusIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.002.001.05" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PaymentStatusIST.xsd"/>
+	<xsd:element name="CancelAcknowledgePaymentStatusIST" type="CancelAcknowledgePaymentStatusISTType" id="oagis-id-70f6c8be79a94ddd8649f34affc7b04d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgePaymentStatusIST is to provide the results of an application to process specific PaymentStatusIST information by the ProcessPaymentStatusIST.
+
+This typically a transaction that occurs between a company and a Bank in order to remit payment to company that has provided goods or services.  
+
+This is the response to the ProcessPaymentStatusIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgePaymentStatusISTType" id="oagis-id-c7997d1268e7454c9c0fb99f5992b91b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgePaymentStatusISTDataAreaType" id="oagis-id-f388e3f41b9240818745faa4faef98f1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgePaymentStatusIST. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (PaymentStatusIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgePaymentStatusISTDataAreaType" id="oagis-id-1d5b5676813843a7bc5bbd7732e9d774">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-f0b51da52eec4662879112657ef134e8"/>
+			<xsd:element ref="PaymentStatusIST" maxOccurs="unbounded" id="oagis-id-dbd63fea3df0411a90b6ab7150a74301"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

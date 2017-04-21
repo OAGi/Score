@@ -56,7 +56,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
-        List<DataType> srtObjects = dataTypeRepository.findByType(1);
+        List<DataType> srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
@@ -195,7 +195,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     private void validatePopulateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
-        List<DataType> srtObjects = dataTypeRepository.findByType(1);
+        List<DataType> srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
@@ -366,11 +366,11 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     public void populateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
-            srtObjects = dataTypeRepository.findByType(1);
+            srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         } else {
             String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
             for (int k = 0; k < metalist.length; k++) {
-                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
+                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(DataTypeType.BusinessDataType, Utility.typeToDen(metalist[k])));
             }
         }
 
@@ -570,11 +570,11 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
-            srtObjects = dataTypeRepository.findByType(1);
+            srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         } else {
             String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
             for (int k = 0; k < metalist.length; k++) {
-                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
+                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(DataTypeType.BusinessDataType, Utility.typeToDen(metalist[k])));
             }
         }
 

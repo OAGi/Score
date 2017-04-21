@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeAcknowledgeRecoverWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RecoverWIP.xsd"/>
+	<xsd:element name="ChangeAcknowledgeRecoverWIP" type="ChangeAcknowledgeRecoverWIPType" id="oagis-id-53e8e8dbb46a419cae6128f6cdf15f2c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeRecoverWIP is to notify a Manufacturing Application of the creation of usable production materials from material previously considered to be unsuitable for production use. This is most often likely to represent a return to production of scrap material. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what is being recovered, the quantity being recovered, and the processing step at which the recovered material is to re-enter the production process, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeRecoverWIPType" id="oagis-id-0d389dd4d3f14e28b6c48eedb5aa79ec">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeRecoverWIPDataAreaType" id="oagis-id-9723abffcca74af5abf499ca30214b53">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessRecoverWIP. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (RecoverWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeRecoverWIPDataAreaType" id="oagis-id-91ac4fa6929847cda3404193e6060741">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-57aee463e20341d2a6eba00485dea2a7"/>
+			<xsd:element ref="RecoverWIP" maxOccurs="unbounded" id="oagis-id-f0eea6be80b3426b80872c8138bbe4f3"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyMatchDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MatchDocument.xsd"/>
+	<xsd:element name="NotifyMatchDocument" type="NotifyMatchDocumentType" id="oagis-id-2f41c31feb3f4b358056e07d7f58e0ea">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyMatchDocument is to enable the communication of a Notify in the MatchDocument data  concerning invoice matching  from another business application.
+
+
+The invoice matching process may include several document types, including the following:
+
+Two way match - Purchase Order and the Invoice 
+
+ Three way match - Purchase Order, Invoice, and the Receipt 
+
+Four way match - Purchase Order, Invoice, Receipt, and Inspection results 
+
+Note:  For the four way match, it is assumed that inspection results have been updated on the Purchase Order for visibility in matching.
+
+When matching takes place in the purchasing application, the purchasing application may have to request the accounts payable application to provide the supplier invoice to which purchasing transactions (purchase orders, goods receiving notes and inspection tickets) are to be matched.  This is the generally the situation when the invoice is initially entered into the accounts payable application.
+
+Note that in some situations, accounts payable will send invoices to the purchasing application unsolicited. In others, invoices are entered directly into the purchase order application or are created by the purchase order application when using evaluated receipt settlement (ERS) and in this instance, it is not necessary to perform the separate integration described in these chapters.
+
+When matching takes place in the accounts payable application, the purchasing application must inform the accounts payable application of the purchasing transactions (purchase orders, goods receiving notes and inspection tickets) to which the invoice (in accounts payable) is to be matched. Alternatively, the accounts payable application can request the information.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyMatchDocumentType" id="oagis-id-0ad4c88afd01401e92d2633a9ec167d5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyMatchDocumentDataAreaType" id="oagis-id-f06ead3f2d264d0f853fcb09ef6edcdf">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyMatchDocument. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (MatchDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyMatchDocumentDataAreaType" id="oagis-id-5077a892e2484d9e9f791e28773c2c5c">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-4de3e459e3d640189dec8bc84dba7380"/>
+			<xsd:element ref="MatchDocument" maxOccurs="unbounded" id="oagis-id-b6ab91e03aae4fa3a087f1b4fbf86052"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

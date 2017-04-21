@@ -758,8 +758,8 @@ public class P_1_7_PopulateQBDTInDT {
         return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
-    public long getDtId(String DataTypeTerm) throws Exception {
-        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
+    public long getDtId(String dataTypeTerm) throws Exception {
+        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType);
         long id = dtVO.getDtId();
         return id;
     }
@@ -808,11 +808,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType getDataTypeWithDen(String den) throws Exception {
-        return dataTypeRepository.findOneByTypeAndDen(1, den);
+        return dataTypeRepository.findOneByTypeAndDen(DataTypeType.BusinessDataType, den);
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) throws Exception {
-        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
+        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, DataTypeType.CoreDataType);
     }
 
     private DataType getDataTypeWithGUID(String guid) throws Exception {

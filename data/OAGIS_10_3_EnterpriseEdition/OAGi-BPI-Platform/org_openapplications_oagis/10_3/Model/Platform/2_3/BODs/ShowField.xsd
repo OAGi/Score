@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowField.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Field.xsd"/>
+        <xsd:element name="ShowField" type="ShowFieldType" id="oagis-id-b995a96140d14743a88b0a6850173079">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowField is to supply Field information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowFieldType" id="oagis-id-f80d19970acc4f63b54744c3980eb10c">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowFieldDataAreaType" id="oagis-id-e813bb9a320b4521a387ada28bc90808">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowField. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Field).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowFieldDataAreaType" id="oagis-id-c4ca3b9629d54f39b05dc553354cbc88">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-38bf363f923d4a2eafa8205452e05651"/>
+                        <xsd:element ref="Field" maxOccurs="unbounded" id="oagis-id-13c7b1737d614f66a2d619b56b6079ae"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

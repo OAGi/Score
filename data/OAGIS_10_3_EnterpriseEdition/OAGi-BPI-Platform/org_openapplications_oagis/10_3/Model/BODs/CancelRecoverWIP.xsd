@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelRecoverWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RecoverWIP.xsd"/>
+	<xsd:element name="CancelRecoverWIP" type="CancelRecoverWIPType" id="oagis-id-d8f5569c13514e73ab4721bd6759665c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelRecoverWIP is to Cancel a Manufacturing Application of the creation of usable production materials from material previously considered to be unsuitable for production use. This is most often likely to represent a return to production of scrap material. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what is being recovered, the quantity being recovered, and the Canceling step at which the recovered material is to re-enter the production Cancel, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelRecoverWIPType" id="oagis-id-02591d51949c4bcd92b4c647ed5b9449">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelRecoverWIPDataAreaType" id="oagis-id-afad5c69dd3d4433b5a2553821225896">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelRecoverWIP. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (RecoverWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelRecoverWIPDataAreaType" id="oagis-id-80e50e7555a648c29d2e69e0bd558e1e">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-530d69c702a64c818e82a59dc3a033f0"/>
+			<xsd:element ref="RecoverWIP" maxOccurs="unbounded" id="oagis-id-b2fb8aedca024dea9c33d0244a11afcf"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

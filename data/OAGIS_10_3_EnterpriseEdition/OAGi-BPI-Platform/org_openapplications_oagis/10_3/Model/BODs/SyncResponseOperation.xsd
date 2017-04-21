@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+	<xsd:element name="SyncResponseOperation" type="SyncResponseOperationType" id="oagis-id-803b2105fc0649beadcb48b83e264884">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseOperation is to enable an application to provide online shopping Operations from another business application module.  The SyncResponseOperation is provided in a a publishe/subscribe or broadcast buiness exchange wher the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseOperationType" id="oagis-id-240d37a913d844148a24b14bef3bb165">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseOperationDataAreaType" id="oagis-id-1036f6aaab56478797ec67fc6c5492b0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseOperation. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseOperationDataAreaType" id="oagis-id-d23d84eea50147a193e8aaed2528988e">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-5b4d8f4391b14053b7eb8be08cbc5d3f"/>
+			<xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-f208cd95055e462397de3e65ef597b80"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
