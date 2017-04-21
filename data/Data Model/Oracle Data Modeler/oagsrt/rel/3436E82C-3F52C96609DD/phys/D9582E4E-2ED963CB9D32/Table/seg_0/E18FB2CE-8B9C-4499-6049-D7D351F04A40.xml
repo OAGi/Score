@@ -175,18 +175,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-<uniqueKeys>
-<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="BCCP_UK1" id="A9375DB8-2D62-D106-8A13-267CA0D31F7E">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:19:18 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexSort>SORTED</indexSort>
-</UniqueKey>
-<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="BCCP_UK2" id="B44931AD-543F-BCE3-EA23-3054E7B1804B">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:19:18 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexSort>SORTED</indexSort>
-</UniqueKey>
-</uniqueKeys>
 </TableProxyOraclev10g>

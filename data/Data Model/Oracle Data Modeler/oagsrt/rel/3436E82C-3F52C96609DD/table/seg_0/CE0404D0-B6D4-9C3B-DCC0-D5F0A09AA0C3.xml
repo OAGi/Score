@@ -299,18 +299,6 @@
 <colUsage columnID="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="309A8EDF-80A7-BBB3-ACDA-8E322FEC5F17" name="ASCC_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:56:02 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="657C8250-0F04-E6F0-B213-AD1AA6F51AF8"/>
-<colUsage columnID="16D7FECE-BF51-6D74-013D-7EAFC0637A1E"/>
-<colUsage columnID="40863F32-E864-4957-35F6-9B1E8694181B"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="3F79586A-E0E0-4361-E506-0961B74FEB85" name="ASCC_FROM_ACC_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:55:51 UTC</createdTime>

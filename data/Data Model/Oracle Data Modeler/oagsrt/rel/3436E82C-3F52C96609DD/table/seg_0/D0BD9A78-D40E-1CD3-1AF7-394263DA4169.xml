@@ -43,7 +43,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="49162712-D9B3-2293-6816-2DA1DECC0D45" referredColumn="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42"/>
@@ -58,7 +58,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="16A8238A-4676-9CBB-A658-7E7A7279ED15" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
@@ -111,7 +111,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="D28CA392-0B06-8395-4C17-E7CDBBD8DBE3" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -126,7 +126,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="CF1CB979-FA5B-5F1A-98AB-DABFC3BFE3A5" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -165,7 +165,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="05CDF7C0-D496-230C-4BAA-B31A01664483" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
@@ -182,16 +182,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="DED39440-6579-847B-FCCE-72A73CB3A55D"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="B04EE478-69C7-76DA-D6FB-6D586BC665CC" name="ASBIEP_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:51:41 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="10B1D067-4D07-FC2D-00A0-0B20E4889929"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="3FE60FD0-64D6-F765-CA81-FB99DEB6D7E8" name="ASBIEP_OWNER_TLVL_ABIE_ID_IDX">

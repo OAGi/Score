@@ -338,18 +338,6 @@
 <colUsage columnID="6E215D1D-333A-D2D4-4E12-57C38E41DD9B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="081FE96D-5C09-553D-D5F8-D49897F748C0" name="BCC_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:30:53 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="F91DC696-55CB-B99B-AE5E-BBA72FD7A23F"/>
-<colUsage columnID="02205EB9-8D83-BC01-91C9-32F2501E615D"/>
-<colUsage columnID="67C1B6DF-FB43-10CA-8F8C-A18EC3A2FED7"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="C4364018-B460-789E-B222-03833A956086" name="BCC_TO_BCCP_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:29:40 UTC</createdTime>

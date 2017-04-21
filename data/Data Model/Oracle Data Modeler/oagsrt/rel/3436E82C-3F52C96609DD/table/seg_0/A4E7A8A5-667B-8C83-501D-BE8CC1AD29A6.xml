@@ -247,18 +247,6 @@
 <colUsage columnID="C31F2E9E-8473-96BF-90D0-F96ACC1CE325"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="EACE1F42-C057-9C03-BC2B-4F96EB6FE825" name="ASBIE_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:59:52 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="44C03230-EB50-7DAD-EE44-8ABBB75D5825"/>
-<colUsage columnID="E550759B-72EC-9CF0-28F1-E73EC0AFF917"/>
-<colUsage columnID="6B6C766F-015C-0463-63BD-9B407C3BF833"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="701E42CE-8AEC-F09F-8450-98E068396272" name="ASBIE_OWNER_TLVL_ABIE_ID_IDX">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 19:09:13 UTC</createdTime>
