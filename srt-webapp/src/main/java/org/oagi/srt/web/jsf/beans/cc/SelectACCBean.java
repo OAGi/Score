@@ -45,7 +45,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     public void init() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
-        type = requestParameterMap.get("type");
+        types = requestParameterMap.get("types");
         states = requestParameterMap.get("states");
 
         setAccList(allACCs());
@@ -129,11 +129,11 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     }
 
     // To support 'back' button to go back 'list' page.
-    private String type;
+    private String types;
     private String states;
 
     public String back() {
-        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 
     @Transactional
@@ -142,6 +142,6 @@ public class SelectACCBean extends AbstractCoreComponentBean {
         AggregateCoreComponent roleOfAcc = getSelectedACC();
         AssociationCoreComponentProperty asccp = coreComponentService.newAssociationCoreComponentProperty(requester, roleOfAcc);
 
-        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 }

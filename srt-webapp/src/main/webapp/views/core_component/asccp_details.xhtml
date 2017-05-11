@@ -533,6 +533,13 @@
                                  disabled="#{asccpDetailBean.targetAsccp.dirty}"/>
             </p:panel>
 
+            <p:panel id="btnGroup2"
+                     rendered="#{(asccpDetailBean.currentUser.appUserId ne asccpDetailBean.targetAsccp.ownerUserId)}">
+                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
+                                 rendered="#{asccpDetailBean.hasRequestParameters()}"
+                                 action="#{asccpDetailBean.back}"/>
+            </p:panel>
+
             <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">

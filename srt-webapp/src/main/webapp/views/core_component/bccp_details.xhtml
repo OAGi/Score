@@ -529,6 +529,13 @@
                                  disabled="#{bccpDetailBean.targetBccp.dirty}"/>
             </p:panel>
 
+            <p:panel id="btnGroup2"
+                     rendered="#{(bccpDetailBean.currentUser.appUserId ne bccpDetailBean.targetBccp.ownerUserId)}">
+                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
+                                 rendered="#{bccpDetailBean.hasRequestParameters()}"
+                                 action="#{bccpDetailBean.back}"/>
+            </p:panel>
+
             <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">

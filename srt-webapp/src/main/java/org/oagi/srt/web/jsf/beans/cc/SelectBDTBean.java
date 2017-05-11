@@ -46,7 +46,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     public void init() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
-        type = requestParameterMap.get("type");
+        types = requestParameterMap.get("types");
         states = requestParameterMap.get("states");
 
         setBdtList(allBDTs());
@@ -142,11 +142,11 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     }
 
     // To support 'back' button to go back 'list' page.
-    private String type;
+    private String types;
     private String states;
 
     public String back() {
-        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 
     @Transactional
@@ -155,7 +155,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
         DataType bdt = getSelectedBDT();
         BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
 
-        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 
 }

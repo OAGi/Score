@@ -76,7 +76,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         TreeNode treeNode = createTreeNode(targetAsccp, true);
         setTreeNode(treeNode);
 
-        type = requestParameterMap.get("type");
+        types = requestParameterMap.get("types");
         states = requestParameterMap.get("states");
     }
 
@@ -196,15 +196,15 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     // To support 'back' button to go back 'list' page.
-    private String type;
+    private String types;
     private String states;
 
     public boolean hasRequestParameters() {
-        return (!StringUtils.isEmpty(type));
+        return (!StringUtils.isEmpty(types));
     }
 
     public String back() {
-        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 }
 

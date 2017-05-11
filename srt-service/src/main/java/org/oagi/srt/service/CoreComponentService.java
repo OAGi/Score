@@ -7,6 +7,7 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,14 @@ public class CoreComponentService {
 
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
+
+    @Autowired
+    private CoreComponentsRepository coreComponentsRepository;
+
+    public List<CoreComponents> getCoreComponents(
+            List<String> types, List<CoreComponentState> states, Sort.Order order) {
+        return coreComponentsRepository.findAll(types, states, order);
+    }
 
     public List<CoreComponentRelation> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {

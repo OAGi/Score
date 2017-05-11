@@ -819,6 +819,14 @@
                                  disabled="#{accDetailBean.dirty}"/>
             </p:panel>
 
+            <p:panel id="btnGroup2"
+                     rendered="#{(accDetailBean.currentUser.appUserId ne accDetailBean.targetAcc.ownerUserId) or
+                                 (accDetailBean.preparedAppend eq true)}">
+                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
+                                 rendered="#{accDetailBean.hasRequestParameters()}"
+                                 action="#{accDetailBean.back}"/>
+            </p:panel>
+
             <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
