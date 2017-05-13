@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgeProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+	<xsd:element name="CancelAcknowledgeProductAvailability" type="CancelAcknowledgeProductAvailabilityType" id="oagis-id-6a826bf1a7ad402db6b1d22ff53337b3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The CancelAcknowledgeProductAvailability may be used to obtain limited information CancelAcknowledgeing about documents that match certain selection criteria in a GetCancelAcknowledgeProductAvailability.
+
+Additional information about a specific ProductAvailability may be obtained through ShowProductAvailability by using the CancelAcknowledgeing information to populate a GetProductAvailability request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeProductAvailabilityType" id="oagis-id-24e31022d9b44656b43d5c13edab2e2b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeProductAvailabilityDataAreaType" id="oagis-id-d46c8e0bc7564116997d647bb94157f8">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeProductAvailability. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ProductAvailability).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeProductAvailabilityDataAreaType" id="oagis-id-41155f28ad8743838f531bf70d2cbcbe">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-bf3af37ce65642339639f21157a1bb07"/>
+			<xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-b82f4166348a4908b9cb089e95a5af51"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

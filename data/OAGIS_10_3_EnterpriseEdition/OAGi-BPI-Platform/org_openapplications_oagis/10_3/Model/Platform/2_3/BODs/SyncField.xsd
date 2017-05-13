@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncField.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Field.xsd"/>
+	<xsd:element name="SyncField" type="SyncFieldType" id="oagis-id-e035220562e04df78793ee7aa7c42d6a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncField is to enable the validation of data that exists on separate application's data bases.  This BOD can cause on-line validation to occur or may be a single tool for synchronizing data.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncFieldType" id="oagis-id-ad87dd86f27f4bd291cbf8d10290a843">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncFieldDataAreaType" id="oagis-id-7e233113c4e74cdc870f84fdc22f31cd">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncField. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (Field).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncFieldDataAreaType" id="oagis-id-2f0e68da45154345ae812b85b25a2661">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-1a100d5ecffd4048a352a08d82b487ec"/>
+			<xsd:element ref="Field" maxOccurs="unbounded" id="oagis-id-17a843b2223a4f24af4e84ef8f69fac1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

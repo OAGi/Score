@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessLocation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Location.xsd"/>
+	<xsd:element name="ProcessLocation" type="ProcessLocationType" id="oagis-id-8de0fc74db2c4425a3fa875c580f7303">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Process Location is to enable a mechanism to ensure that the physical location identifiers are Processhronized between the business applications that require this to communicate clearly.  This is particularly critical when only the codes that identify locations are used.  Without the meaning of the codes clearly communicated, the integration is not effective.  This BOD enables the Location codes to be Processhronized among business applications.
+
+This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate Location information.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessLocationType" id="oagis-id-0a895bef2c244de891f7bf9adfe56d61">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessLocationDataAreaType" id="oagis-id-4ba944ce35534e79b94a0f6d4f689f82">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessLocation. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Location).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessLocationDataAreaType" id="oagis-id-60572b3dbb40409a95472a593c15ed17">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-08f2f07bf7284af6bc70806e72055659"/>
+			<xsd:element ref="Location" maxOccurs="unbounded" id="oagis-id-9859c7ac6a904db086d472ddc263df33"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

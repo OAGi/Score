@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyCurrencyExchangeRate.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CurrencyExchangeRate.xsd"/>
+        <xsd:element name="NotifyCurrencyExchangeRate" type="NotifyCurrencyExchangeRateType" id="oagis-id-abedc49cc432481fb5d9d88db2a0f994">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyCurrencyExchangeRate is to enable the passing of updates of currency exchange rates to other applications that have exchange rate tables.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyCurrencyExchangeRateType" id="oagis-id-71cccfc6bc444bb2bb1cbd160716f9ec">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyCurrencyExchangeRateDataAreaType" id="oagis-id-b45881fd25984020a2aa5ad8dffb9051">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyCurrencyExchangeRate. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (CurrencyExchangeRate).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyCurrencyExchangeRateDataAreaType" id="oagis-id-9e66acffecc34858ac34c23f4acf4986">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-bd841b434b7540d398cdf0766e8b4961"/>
+                        <xsd:element ref="CurrencyExchangeRate" maxOccurs="unbounded" id="oagis-id-60f3530e3bba4cb9b9f15f5184a3c580"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

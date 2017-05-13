@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/GetMoveProductForecast.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MoveProductForecast.xsd"/>
+        <xsd:element name="GetMoveProductForecast" type="GetMoveProductForecastType" id="oagis-id-af49a512947748f58e05e557b9ede6bc">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Get MoveProductForecast is to enable a business application module to request information concerning a specific purchase order from another business application.  The reply to this BOD is the Show MoveProductForecast.
+
+There are several environments that may use this capability. For example, an MRP application may use this BOD to ask for information from a Order Management application, or a Plant Data Collection application may also use this BOD to request information from a Order Management application. This may als happen across business parties.
+
+This BOD does not usually cause updates to occur.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetMoveProductForecastType" id="oagis-id-65e1099b96974f8392f42ac9557cef72">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetMoveProductForecastDataAreaType" id="oagis-id-327a78b8f889461dbf686eb05728c305">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetMoveProductForecast. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (MoveProductForecast).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetMoveProductForecastDataAreaType" id="oagis-id-5f5db1f842984c3ab8520849a26e1378">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-e357b2477cba40a881299e00249f383e"/>
+                        <xsd:element ref="MoveProductForecast" maxOccurs="unbounded" id="oagis-id-9878a5a5ee32455282e9f1ea950a4fa1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

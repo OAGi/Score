@@ -58,26 +58,31 @@
                                             </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.acc.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Object Class Term" styleClass="section-label"/>
-                                                <h:inputText required="true"
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="term"
+                                                        required="true"
                                                              requiredMessage="Please fill out 'Object Class Term' field."
                                                              value="#{asccpDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true"/>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.acc.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Component Type" styleClass="section-label"/>
-                                                <p:selectOneMenu
+                                                <!--suppress XmlDuplicatedId -->
+                                                <p:selectOneMenu id="type"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.acc.oagisComponentType}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -86,7 +91,7 @@
                                                 </p:selectOneMenu>
 
                                                 <h:outputText value="Abstract" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <h:selectBooleanCheckbox id="abstractCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.acc.abstractComponent}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -94,7 +99,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="deprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.acc.deprecated}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -102,7 +108,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.acc.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.acc.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
@@ -127,19 +134,22 @@
 
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.ascc.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId, XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.ascc.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="min"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.ascc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -149,7 +159,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText editable="true"
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="max" editable="true"
                                                                  value="#{asccpDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
@@ -160,7 +171,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="deprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.ascc.deprecated}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -168,7 +180,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.ascc.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.ascc.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
@@ -184,13 +197,13 @@
                                             <f:facet name="header">
                                                 <h:outputText value="ASCCP"/>
                                                 <span style="float: right;">
-                                                    <p:commandButton
+                                                    <p:commandButton id="updateBtn"
                                                             rendered="#{asccpDetailBean.selectedTreeNode.data.asccp.state == 'Editing'}"
                                                             value="Update" ajax="true"
                                                             action="#{asccpDetailBean.updateAsccp(asccpDetailBean.selectedTreeNode)}"
                                                             disabled="#{!asccpDetailBean.selectedTreeNode.data.asccp.dirty}"
                                                             update=":form:details, :form:btnGroup"/>
-                                                    <p:commandButton
+                                                    <p:commandButton id="discardBtn"
                                                             rendered="#{asccpDetailBean.selectedTreeNode.data.asccp.state == 'Editing'}"
                                                             value="Discard" ajax="true" styleClass="danger"
                                                             action="#{asccpDetailBean.discardAsccp(asccpDetailBean.selectedTreeNode)}"/>
@@ -198,13 +211,15 @@
                                             </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="term"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
                                                         styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
@@ -213,13 +228,23 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
+                                                <h:outputText value="Reusable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="reusableCB"
+                                                        value="${asccpDetailBean.selectedTreeNode.data.asccp.reusableIndicator}"
+                                                        styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                    <p:ajax update="asccpPanel, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="deprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.asccp.deprecated}"
                                                         styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
@@ -227,7 +252,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
@@ -255,19 +281,22 @@
 
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Entity Type" styleClass="section-label"/>
-                                                <p:selectOneMenu
+                                                <!--suppress XmlDuplicatedId -->
+                                                <p:selectOneMenu id="type"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.entityType}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -277,7 +306,8 @@
                                                 </p:selectOneMenu>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="min"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -287,7 +317,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText editable="true"
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="max" editable="true"
                                                                  value="#{asccpDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
@@ -298,7 +329,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="nillableCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.bcc.nillable}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -306,7 +338,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="deprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.bcc.deprecated}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -314,7 +347,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Default Value" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="default"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.defaultValue}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
@@ -325,7 +359,8 @@
                                                 </h:inputTextarea>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bcc.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
@@ -341,25 +376,29 @@
                                         <p:panel id="bccpPanel" header="BCCP">
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bccp.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="term"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bccp.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="nillableCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.bccp.nillable}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -367,7 +406,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:selectBooleanCheckbox id="deprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.bccp.deprecated}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -375,7 +415,8 @@
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Default Value" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="default"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bccp.defaultValue}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
@@ -386,7 +427,8 @@
                                                 </h:inputTextarea>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bccp.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
                                                                 asccpDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
@@ -399,34 +441,38 @@
                                             </h:panelGrid>
                                         </p:panel>
 
-                                        <p:panel header="Data Type">
+                                        <p:panel id="dataTypePanel" header="Data Type">
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdt.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Data Type Term" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="term"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdt.dataTypeTerm}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Qualifier" styleClass="section-label"/>
-                                                <h:inputText
+                                                <h:inputText id="qualifier"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdt.qualifier}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="den"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdt.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdt.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}"
                                                         autoResize="false"
@@ -450,25 +496,27 @@
 
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="guid"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.guid}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText
+                                                <h:inputText id="propertyTerm"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.propertyTerm}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Representation Term" styleClass="section-label"/>
-                                                <h:inputText
+                                                <h:inputText id="representationTerm"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.representationTerm}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="min"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
@@ -477,7 +525,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText editable="true"
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputText id="max" editable="true"
                                                                  value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
@@ -487,7 +536,8 @@
                                                 </h:inputText>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea
+                                                <!--suppress XmlDuplicatedId -->
+                                                <h:inputTextarea id="definition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.definition}"
                                                         rows="#{asccpDetailBean.selectedTreeNode.data.bdtSc.definition == null ? '2' : '6'}"
                                                         autoResize="false"
@@ -521,10 +571,34 @@
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{asccpDetailBean.updateState('Published')}"
-                                 disabled="#{asccpDetailBean.targetAsccp.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 onclick="PF('confirmPublish').show();"
+                                 disabled="#{asccpDetailBean.targetAsccp.dirty}"/>
             </p:panel>
+
+            <p:panel id="btnGroup2"
+                     rendered="#{(asccpDetailBean.currentUser.appUserId ne asccpDetailBean.targetAsccp.ownerUserId)}">
+                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
+                                 rendered="#{asccpDetailBean.hasRequestParameters()}"
+                                 action="#{asccpDetailBean.back}"/>
+            </p:panel>
+
+            <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    Do you really want to move this to the Published state?<br/>
+                    Once in the Published state the entity can no longer be changed or discarded.<br/>
+                    A new revision would have to be created.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                                     onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                     oncomplete="PF('loadingBlock').hide();"
+                                     actionListener="#{asccpDetailBean.updateState('Published')}"
+                                     update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmPublish').hide()"/>
+                </div>
+            </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>

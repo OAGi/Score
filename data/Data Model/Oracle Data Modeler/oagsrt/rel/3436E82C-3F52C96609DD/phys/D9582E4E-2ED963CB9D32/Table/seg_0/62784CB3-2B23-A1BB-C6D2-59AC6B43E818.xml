@@ -137,12 +137,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-<uniqueKeys>
-<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="ABIE_UK1" id="BF346AF2-893A-36A9-2244-86656FC16BED">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:16:56 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexSort>SORTED</indexSort>
-</UniqueKey>
-</uniqueKeys>
 </TableProxyOraclev10g>

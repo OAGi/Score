@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessCatalog.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Catalog.xsd"/>
+	<xsd:element name="ProcessCatalog" type="ProcessCatalogType" id="oagis-id-226da88de5d64ae593939690e9d8d726">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ProcessCatalog is used to Process catalog information across systems. The Process indicates that the send of the ProcessCatalog is the owner of the information being passed, additionally it is understood that the receiver of the ProcessCatalog is a sub-system that must accept the data as provided by the owne of the information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessCatalogType" id="oagis-id-7dc7f738e58c44eba90e1ba82aef6cd6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessCatalogDataAreaType" id="oagis-id-f13353e14a674a84a04f95510ce7ab10">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessCatalog. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Catalog).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessCatalogDataAreaType" id="oagis-id-5affddc761cf4c8c9fa887cecc9cfdd3">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-4b8771cd3635462681926caf42133ef7"/>
+			<xsd:element ref="Catalog" maxOccurs="unbounded" id="oagis-id-312cc33faa51450f802b21ea347e8df0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

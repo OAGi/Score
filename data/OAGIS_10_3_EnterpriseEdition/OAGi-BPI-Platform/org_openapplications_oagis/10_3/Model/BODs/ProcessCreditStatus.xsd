@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessCreditStatus.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CreditStatus.xsd"/>
+        <xsd:element name="ProcessCreditStatus" type="ProcessCreditStatusType" id="oagis-id-48d4bb3408974f0fa39600ba822771a8">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessCreditStatus provides the ability to request an application/ system to create a CreditStatus</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessCreditStatusType" id="oagis-id-bdc3f50e1be945b6b245343285280f18">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessCreditStatusDataAreaType" id="oagis-id-d4c8be8b1c34498795af750de44556da">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessCreditStatus. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (CreditStatus).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessCreditStatusDataAreaType" id="oagis-id-0a2f8f5e3b234fd5897b8103b1e963ea">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-0d5cdd8867ee4b66a6da9f73fd8ae66a"/>
+                        <xsd:element ref="CreditStatus" maxOccurs="unbounded" id="oagis-id-a79f61944bc54ee78358418271fb38cc"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

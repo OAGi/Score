@@ -22,7 +22,7 @@
                     </p:autoComplete>
                     <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
                                      icon="ui-icon-search"/>
-                    <p:button id="createCLwBaseBtn" value="Create Code List without Base" style="float: right; padding: 3px 0 3px 0;"
+                    <p:button id="createCLwithoutBaseBtn" value="Create Code List without Base" style="float: right; padding: 3px 0 3px 0;"
                               outcome="/views/code_list/create_wo_base.xhtml"/>
                 </f:facet>
                 <p:dataTable id="tbl" var="cVO"

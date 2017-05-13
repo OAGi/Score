@@ -19,7 +19,7 @@
                                     completeMethod="#{selectACCBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true"
                                      actionListener="#{selectACCBean.search}"
                                      update="tblACC"
                                      icon="ui-icon-search"/>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/CorrectiveAction.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="CorrectiveAction" type="CorrectiveActionType" id="oagis-id-bcb098b010034e709e233789e9244913">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CorrectiveAction OAGIS element. Information about what was done to correct a recurring problem.  Describes the corrective action or actions, and provides evidence to support its effectiveness in addressing the problem.  
+
+Note that a single corrective action may apply to multiple facilities or locations.  In these cases, verification information will be needed for each place where the action applies.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CorrectiveActionType" id="oagis-id-d4aba3c5f08a41eba958927ada65a9cb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CorrectiveAction OAGIS complexType. Information about what was done to correct a recurring problem.  Describes the corrective action or actions, and provides evidence to support its effectiveness in addressing the problem.  
+
+Note that a single corrective action may apply to multiple facilities or locations.  In these cases, verification information will be needed for each place where the action applies.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CorrectiveActionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CorrectiveActionExtensionType" id="oagis-id-8768a4e3ffbf49848ec8b26f01fa4b97" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CorrectiveActionBaseType" id="oagis-id-6a81a88523e7450e8635c57b0f9b94e6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CorrectiveAction OAGIS complexType. Information about what was done to correct a recurring problem.  Describes the corrective action or actions, and provides evidence to support its effectiveness in addressing the problem.  
+
+Note that a single corrective action may apply to multiple facilities or locations.  In these cases, verification information will be needed for each place where the action applies.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PlannedCorrectiveActionBaseType">
+				<xsd:sequence>
+					<xsd:element ref="CorrectiveActionPlanReference" id="oagis-id-4c3f2c79267f4220a54488baa1e17e62" minOccurs="0"/>
+					<xsd:element ref="PlannedCorrectiveActionReference" id="oagis-id-92d4af57721d478ab51f7b864aa5707b" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ActualTimePeriod" id="oagis-id-827546fa60b2464d804170048432b411" minOccurs="0"/>
+					<xsd:element ref="ImplementationVerification" id="oagis-id-d4db75ce84a34271aa085ba266636be5" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="EffectivenessVerification" id="oagis-id-8f99eec91e404663919880bc4a2b702f" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RelatedActionAssociation" id="oagis-id-40067c8530b7471db049913ea09c3db9" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

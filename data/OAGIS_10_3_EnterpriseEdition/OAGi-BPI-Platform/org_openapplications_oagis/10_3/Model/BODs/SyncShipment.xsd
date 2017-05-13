@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncShipment.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Shipment.xsd"/>
+        <xsd:element name="SyncShipment" type="SyncShipmentType" id="oagis-id-5325f742695d4a2184a12e161aabb49f">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">SyncShipment is used to synchronize Shipment information with other applications</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncShipmentType" id="oagis-id-03c3f17d45b849778149633c026bc038">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncShipmentDataAreaType" id="oagis-id-04f806414bd34293bafc1733b941f21e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncShipment. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (Shipment).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncShipmentDataAreaType" id="oagis-id-b12692aea14144b7949d941a601dd837">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-793418ee33eb414fbd790c32fc37474a"/>
+                        <xsd:element ref="Shipment" maxOccurs="unbounded" id="oagis-id-c71c6d23c7b148d2811f29a8522bfe35"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

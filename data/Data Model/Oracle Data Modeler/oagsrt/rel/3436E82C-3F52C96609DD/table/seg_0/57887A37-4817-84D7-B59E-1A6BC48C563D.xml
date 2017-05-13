@@ -321,16 +321,6 @@
 <colUsage columnID="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="9678B309-16C2-3066-486E-684F8DCB4485" name="ASCCP_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:46:57 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="309DF4D5-AC90-9E51-17C1-311ADCE08C42"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="A48268A1-E44E-FBC4-4E07-98E6E6DAEFD7" name="ASCCP_ROLE_OF_ACC_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:45:12 UTC</createdTime>

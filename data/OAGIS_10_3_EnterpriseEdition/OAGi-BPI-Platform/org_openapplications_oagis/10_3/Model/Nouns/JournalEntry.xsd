@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/JournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="JournalEntry" type="JournalEntryType" id="oagis-id-a84dd378fa2842739999a40db0229d94"/>
+	<xsd:element name="JournalEntryHeader" type="JournalEntryHeaderType" id="oagis-id-7883cf92089b4f9a8dd1a24ac246843c"/>
+	<xsd:element name="JournalEntryLine" type="JournalEntryLineType" id="oagis-id-729bec234fc54f34a30bb9b57e9b6802"/>
+	<xsd:complexType name="JournalEntryType" id="oagis-id-2f30429934904701b1a6406d005dd6c2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A journal represents a change in the balances of a business's financial accounts.  Many tasks or transactions throughout an enterprise will result in the creation of a journal.  Some examples are creating a customer invoice, paying a vendor, transferring inventory, or paying employees.  A journal consists of a header with general information, and two or more lines specifying what accounts will be affected.  A journal typically includes balanced debit and credit lines.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JournalEntryHeader" id="oagis-id-67d7b94329114d1a82d9478d948e982c" minOccurs="0"/>
+			<xsd:element ref="JournalEntryLine" id="oagis-id-f46a6bcec3544b13b3031d7fa2a77e59" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-6aa0fdb2d95e4d2ba825b74ab8423080"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3dcd6e3ba4a14355809ac10990cd9541"/>
+	</xsd:complexType>
+	<xsd:complexType name="JournalEntryHeaderType" id="oagis-id-4cde579018004f748f25c1e3f4b27358">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In the Header, DocumentReferences is the link that ties back to a sub ledger transaction entry ID.  It is the identifier of an original transaction or document.  For example, it could be the receipt or the summarized inventory activity.  This is the element that refers to an audit record.  Together with the Sender information, the DocumentReferences is part of the referencing system, which will enable drill back audit trail functionality.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="JournalEntryHeaderExtensionType" id="oagis-id-2c3ebd4f881242e8a96f7e1110d9b993" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="JournalEntryLineType" id="oagis-id-0571451a53664853b590ac3acae1c917">
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="JournalEntryLineExtensionType" id="oagis-id-f5ff96e5f7834fbaa1409f88e014cd1f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

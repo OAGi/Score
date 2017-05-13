@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessCommercialInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CommercialInvoice.xsd"/>
+	<xsd:element name="ProcessCommercialInvoice" type="ProcessCommercialInvoiceType" id="oagis-id-3515cfce40164553aeee1c14fbd33c5a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessCommercialInvoice is to transmit an CommercialInvoice from a supplier to a customer. Indicating that the receiver of the CommercialInvoice is to Process the CommercialInvoice for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessCommercialInvoiceType" id="oagis-id-f6c9372a9c1b4e278061ffb0fc106b6d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessCommercialInvoiceDataAreaType" id="oagis-id-be1f70f0d347493d82742332fda2c450">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessCommercialInvoice. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (CommercialInvoice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessCommercialInvoiceDataAreaType" id="oagis-id-77d8881fbb6949b2bb415bfaaba09d1e">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-3fbcfe06aa8e4badb3c1c69a38a42580"/>
+			<xsd:element ref="CommercialInvoice" maxOccurs="unbounded" id="oagis-id-1cd7f0970a78498d9962518fcc8b3cd9"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

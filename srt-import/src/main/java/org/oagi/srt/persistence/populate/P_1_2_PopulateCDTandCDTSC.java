@@ -131,7 +131,7 @@ public class P_1_2_PopulateCDTandCDTSC {
     private CoreDataTypeAllowedPrimitive cdtAwdPri(String cdtTerm, String cdtPriName, boolean isDefault) {
         CoreDataTypeAllowedPrimitive cdtAwdPri = new CoreDataTypeAllowedPrimitive();
 
-        cdtAwdPri.setCdtId(dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId());
+        cdtAwdPri.setCdtId(dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId());
         cdtAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtAwdPri.setDefault(isDefault);
 
@@ -257,7 +257,7 @@ public class P_1_2_PopulateCDTandCDTSC {
 
         cdtAwdPriXpsTypeMap.setCdtAwdPriId(
                 cdtAwdPriRepository.findOneByCdtIdAndCdtPriId(
-                        dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId(),
+                        dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId(),
                         cdtPriRepository.findOneByName(cdtPriName).getCdtPriId()).getCdtAwdPriId()
         );
         cdtAwdPriXpsTypeMap.setXbtId(
@@ -319,7 +319,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         dtSc.setCardinalityMin(0);
         dtSc.setCardinalityMax(1);
         dtSc.setOwnerDtId(
-                dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId()
+                dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId()
         );
 
         return dtScRepository.saveAndFlush(dtSc);

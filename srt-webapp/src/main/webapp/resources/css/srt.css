@@ -817,9 +817,14 @@ h6 {
 .ABIE, .ui-state-hover.ABIE, .ui-state-highlight.ABIE,
 .ASBIE, .ui-state-hover.ASBIE, .ui-state-highlight.ASBIE,
 .ASBIE-Extension, .ui-state-hover.ASBIE-Extension, .ui-state-highlight.ASBIE-Extension,
-.ASCCP, .ui-state-hover.ASCCP, .ui-state-highlight.ASCCP {
+.ASCCP, .ui-state-hover.ASCCP, .ui-state-highlight.ASCCP,
+.ASCCP-Group, .ui-state-hover.ASCCP-Group, .ui-state-highlight.ASCCP-Group {
     color: #4078c0 !important;
     font-weight: bold !important;
+}
+
+.ASCCP-Group, .ui-state-hover.ASCCP-Group, .ui-state-highlight.ASCCP-Group {
+    font-style: italic;
 }
 
 .BBIE, .ui-state-hover.BBIE, .ui-state-highlight.BBIE,
@@ -836,13 +841,19 @@ h6 {
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC,
 .BDTSC, .ui-state-hover.BDTSC, .ui-state-highlight.BDTSC,
 .ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
-.ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target {
+.ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target,
+.ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
     color: #bd2c00 !important;
 }
 
 .ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
-.ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target {
+.ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target,
+.ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
     font-weight: bold !important;
+}
+
+.ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
+    font-style: italic;
 }
 
 .loading-block {

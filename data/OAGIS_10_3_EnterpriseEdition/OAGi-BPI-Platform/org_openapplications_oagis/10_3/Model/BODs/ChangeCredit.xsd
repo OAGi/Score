@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ChangeCredit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Credit.xsd"/>
+	<xsd:element name="ChangeCredit" type="ChangeCreditType" id="oagis-id-ff491e7ced0640a9bfab63570670fb50">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeCredit is to Change the Credit Management functionality within the customer order management or the accounts receivable application.  The ChangeCredit will also transmit changes in the accounts receivable open item balances to the Credit management function of the customer order management application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeCreditType" id="oagis-id-c2576565fc214bca9817eab99314f65b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeCreditDataAreaType" id="oagis-id-428ef72bae9444f081bc47c6e6cf283d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeCredit. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (Credit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeCreditDataAreaType" id="oagis-id-afc05d0ccfd8478b89c3a26bf96d2a23">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-5a22c121870e48d99beb6c079c4479b5"/>
+			<xsd:element ref="Credit" maxOccurs="unbounded" id="oagis-id-23917df6f2b84f2db9f0ea84abcc2fc4"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

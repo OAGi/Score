@@ -239,16 +239,6 @@
 <colUsage columnID="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="BF346AF2-893A-36A9-2244-86656FC16BED" name="ABIE_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:16:56 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="5DD0AC13-AEEE-7F22-8057-82D6914DF9E5"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="F5959EAE-1050-D39E-7303-1FFC1ABEC099" name="ABIE_OWNER_TOP_LVL_ABIE_ID_IDX">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 19:06:01 UTC</createdTime>

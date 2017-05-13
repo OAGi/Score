@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseRequisition.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Requisition.xsd"/>
+	<xsd:element name="SyncResponseRequisition" type="SyncResponseRequisitionType" id="oagis-id-4d0d1dad9462453f9e3644ecf28afdf6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseRequisition is to communicate the response to a Requisition message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseRequisitionType" id="oagis-id-60668075466446d5afa31decf11d21c0">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseRequisitionDataAreaType" id="oagis-id-51e38d4e3e5f43148046e41ae36afcc3">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseRequisition. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (Requisition).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseRequisitionDataAreaType" id="oagis-id-9f52330b923447f1af16e2e4e581d8a4">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-17b6c3b72eb74b908f970ac6683387a6"/>
+			<xsd:element ref="Requisition" maxOccurs="unbounded" id="oagis-id-514a692ca2f840a5992f678895cf288a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

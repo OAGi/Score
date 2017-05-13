@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncOnlineSession.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/OnlineSession.xsd"/>
+	<xsd:element name="SyncOnlineSession" type="SyncOnlineSessionType" id="oagis-id-0efdd20e572748feb10c1a6c04921fd0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncOnlineSession is to enable an application to request specific online OnlineSession from another business application module.  The response to the SyncOnlineSession is the ShowOnlineSession.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncOnlineSessionType" id="oagis-id-97df9127340b4a4688a1be3b9e14ef82">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncOnlineSessionDataAreaType" id="oagis-id-01a4b216ac6541359bfbfac1a0b84554">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncOnlineSession. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (OnlineSession).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncOnlineSessionDataAreaType" id="oagis-id-bbdbdd014ba847d2b38201a18b77cc0b">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-a9e1f0e142c24907857bb0f8b63b13d9"/>
+			<xsd:element ref="OnlineSession" maxOccurs="unbounded" id="oagis-id-dbfcbccbf4144a9686d999f1c9b3ba09"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

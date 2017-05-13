@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/NotifyQuote.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Quote.xsd"/>
+        <xsd:element name="NotifyQuote" type="NotifyQuoteType" id="oagis-id-05f3cd4074d14a59b893f1ec5c3283a5">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyQuote is to ensure that all business software components in a specific integration instance have the current Quote information. This BOD is commonly used to publish the need to create or update a Quote in a publish and subscribe integration environment.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyQuoteType" id="oagis-id-02089f71ef644100a2a3c34909d77517">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyQuoteDataAreaType" id="oagis-id-dee56e6b871045eeb3a807c21072e94a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyQuote. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (Quote).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyQuoteDataAreaType" id="oagis-id-800a714e9000429888900c0d41d26124">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-c9f5dc1c93bc4672aa5b7a2000b6ad9d"/>
+                        <xsd:element ref="Quote" maxOccurs="unbounded" id="oagis-id-4e68f2204ca54f9cb2f49b0f905f0860"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

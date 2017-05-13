@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -71,7 +72,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
         setTargetAcc(targetAcc);
 
-        TreeNode treeNode = createTreeNode(targetAcc);
+        TreeNode treeNode = createTreeNode(targetAcc, false);
         setTreeNode(treeNode);
 
         setUserExtensionAcc(extensionService.findUserExtensionAcc(targetAcc));
@@ -198,13 +199,13 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpRepository.findAll().stream()
+        allAsccpList = asccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
         setAsccpList(
                 allAsccpList.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
                         .collect(Collectors.toList())
         );
         setPreparedAppendAscc(true);
@@ -226,7 +227,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedAsccpPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setAsccpList(allAsccpList.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
                     .collect(Collectors.toList()));
         } else {
             setAsccpList(
@@ -265,7 +266,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ((CCNode) rootNode.getData()).reload();
 
         ASCCPNode asccpNode =
-                nodeService.createCoreComponentTreeNode(result.getAscc());
+                nodeService.createCoreComponentTreeNode(result.getAscc(), true);
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -331,7 +332,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendBcc() {
-        allBccpList = bccpRepository.findAll().stream()
+        allBccpList = bccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
                 .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
         setBccpList(
@@ -397,7 +398,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         ((CCNode) rootNode.getData()).reload();
 
         BCCPNode bccpNode =
-                nodeService.createCoreComponentTreeNode(result.getBcc());
+                nodeService.createCoreComponentTreeNode(result.getBcc(), false);
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);

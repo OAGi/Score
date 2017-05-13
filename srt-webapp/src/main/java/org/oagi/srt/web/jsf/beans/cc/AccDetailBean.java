@@ -92,10 +92,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         setTargetAcc(targetAcc);
 
-        TreeNode treeNode = createTreeNode(targetAcc);
+        TreeNode treeNode = createTreeNode(targetAcc, true);
         setTreeNode(treeNode);
 
-        type = requestParameterMap.get("type");
+        types = requestParameterMap.get("types");
         states = requestParameterMap.get("states");
     }
 
@@ -455,7 +455,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         TreeNode root = getRootNode();
         ((CCNode) root.getData()).reload();
         List<TreeNode> children = root.getChildren();
-        ACCNode accNode = nodeService.createCoreComponentTreeNode(selectedAcc);
+        ACCNode accNode = nodeService.createCoreComponentTreeNode(selectedAcc, true);
         if (!children.isEmpty()) {
             if (previousBasedAccId > 0L) {
                 children.remove(0);
@@ -537,7 +537,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+        allAsccpList = asccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
@@ -603,7 +603,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
-        ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(result.getAscc());
+        ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(result.getAscc(), true);
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -734,7 +734,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
-        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(result.getBcc());
+        BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(result.getBcc(), true);
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -855,15 +855,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     // To support 'back' button to go back 'list' page.
-    private String type;
+    private String types;
     private String states;
 
     public boolean hasRequestParameters() {
-        return (!StringUtils.isEmpty(type));
+        return (!StringUtils.isEmpty(types));
     }
 
     public String back() {
-        return "/views/core_component/list.jsf?type=" + type + "&states= " + states + "&faces-redirect=true";
+        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
 }
 

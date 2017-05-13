@@ -113,6 +113,7 @@
                                             <p:panel id="topLevelBiePanelForEditing" header="Top-Level BIE Info">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Version" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="version"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.version}"
                                                             styleClass="section-content input-section">
@@ -121,6 +122,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Status" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="status"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.status}"
                                                             styleClass="section-content input-section">
@@ -129,6 +131,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Business Term" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="term"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                             styleClass="section-content input-section">
@@ -137,6 +140,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="remark"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                             styleClass="section-content input-section">
@@ -145,6 +149,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Definition" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputTextarea id="definition"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                             rows="6" autoResize="false"
@@ -170,6 +175,7 @@
                                                             styleClass="section-content"/>
 
                                                     <h:outputText value="Used" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:selectBooleanCheckbox id="usedCB"
                                                             value="${editProfileBODBean.selectedTreeNode.data.used}"
                                                             styleClass="section-content">
@@ -181,6 +187,7 @@
                                             <p:panel id="asbiePanelForEditing" header="ASBIE">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Min" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="min" value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -191,6 +198,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="max" value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -202,6 +210,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:selectBooleanCheckbox id="nillableCB"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -363,6 +372,7 @@
                                                     </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="fixedValue"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -454,6 +464,7 @@
                                                              rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Primitive'}">
                                                     <h:outputText value="Primitive" styleClass="section-label"/>
 
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <p:autoComplete id="primitiveAuto" value="#{editProfileBODBean.bbieXbtName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieXbt}"
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -468,6 +479,7 @@
                                                              rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Code'}">
                                                     <h:outputText value="Code List" styleClass="section-label"/>
 
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <p:autoComplete id="codeListAuto" value="#{editProfileBODBean.bbieCodeListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieCodeList}"
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -482,6 +494,7 @@
                                                              rendered="#{editProfileBODBean.selectedTreeNode.data.bbie.restrictionType eq 'Agency'}">
                                                     <h:outputText value="Agency ID List" styleClass="section-label"/>
 
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <p:autoComplete id="agencyAuto" value="#{editProfileBODBean.bbieAgencyIdListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieAgencyIdList}"
                                                                     dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -551,6 +564,7 @@
                                                     </h:inputText>
 
                                                     <h:outputText value="Default" styleClass="section-label"/>
+                                                    <!--suppress XmlDuplicatedId -->
                                                     <h:inputText id="default"
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
                                                             styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -1171,9 +1185,25 @@
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{editProfileBODBean.updateState('Published')}"
-                                 update=":form:btnGroup"/>
+                                 onclick="PF('confirmPublish').show();"/>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmPublish" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    Do you really want to move this to the Published state?<br/>
+                    Once in the Published state the entity can no longer be changed or discarded.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                     oncomplete="PF('loadingBlock').hide();"
+                                     action="#{editProfileBODBean.updateState('Published')}"
+                                     update=":form:btnGroup" ajax="true"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmPublish').hide()"/>
+                </div>
+            </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>

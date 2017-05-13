@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowMoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MoveInventory.xsd"/>
+        <xsd:element name="ShowMoveInventory" type="ShowMoveInventoryType" id="oagis-id-5af98e0952fa490395700c6aba055c14">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowMoveInventory is to enable an application or component to request an MoveInventory document from another business application or component.
+
+The response to the ShowMoveInventory is is the ListMoveInventory. The ShowMoveInventory also enables the retrieval of information across several documents by using selection fields.    This type of functionality is limited to the capabilities of the responding application and needs to be determined during the implementation project.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowMoveInventoryType" id="oagis-id-b0addcf86b384f2b8ec7220b3e4de723">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowMoveInventoryDataAreaType" id="oagis-id-86829753fcc74359a3f2d881b5a9bf7c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowLocation. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (MoveInventory).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowMoveInventoryDataAreaType" id="oagis-id-b694e18eb12742e1a7c683210f8268cc">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-0e9276a5b0034037bb05f8bff65b2aa3"/>
+                        <xsd:element ref="MoveInventory" maxOccurs="unbounded" id="oagis-id-f3892fe660a2464b920bd7895e3d3ae7"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

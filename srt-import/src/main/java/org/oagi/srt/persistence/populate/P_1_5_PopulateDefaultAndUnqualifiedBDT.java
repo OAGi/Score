@@ -222,7 +222,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition,
                                                String ccDefinition, String id, Module module) throws Exception {
-        DataType basedDT = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0);
+        DataType basedDT = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType);
         if (basedDT == null) {
             throw new IllegalStateException("Can't find based CDT by '" + dataTypeTerm + "'");
         }

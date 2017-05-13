@@ -1362,7 +1362,7 @@ public class DataTypeTest {
     }
 
     public long getDtId(String DataTypeTerm) {
-        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
+        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, DataTypeType.CoreDataType);
         long id = dtVO.getDtId();
         return id;
     }
@@ -1407,11 +1407,11 @@ public class DataTypeTest {
         else if (den.equalsIgnoreCase("Description. Type"))
             den = "Description_ Text. Type";
 
-        return dataTypeRepository.findOneByTypeAndDen(1, den);
+        return dataTypeRepository.findOneByTypeAndDen(DataTypeType.BusinessDataType, den);
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) {
-        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
+        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, DataTypeType.CoreDataType);
     }
 
     private DataType getDataType(long dtid) {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelAcknowledgeEngineeringChangeOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/EngineeringChangeOrder.xsd"/>
+	<xsd:element name="CancelAcknowledgeEngineeringChangeOrder" type="CancelAcknowledgeEngineeringChangeOrderType" id="oagis-id-ef6e2f69864746c397de51b7463125cb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeEngineeringChangeOrder to communicate to a business application module or system that the synchronization of a specified engineering change document has been completed successfully.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may use this capability. For example, a PDM, MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Synchronize a Engineering Change Document.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeEngineeringChangeOrderType" id="oagis-id-8b7af030eaff498792cee59c2f9d52f5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeEngineeringChangeOrderDataAreaType" id="oagis-id-d927cc1633e447c6a90a0fcf84de8687">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeEngineeringChangeOrder. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (EngineeringChangeOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeEngineeringChangeOrderDataAreaType" id="oagis-id-b65c384883a649d09a8e289e39d74b36">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-8b952ff0dcdd484bb2091e6438c0f505"/>
+			<xsd:element ref="EngineeringChangeOrder" maxOccurs="unbounded" id="oagis-id-26d97cec93ef4f9283f4a566b8c2a89a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponseWarehouseShippingOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarehouseShippingOrder.xsd"/>
+	<xsd:element name="SyncResponseWarehouseShippingOrder" type="SyncResponseWarehouseShippingOrderType" id="oagis-id-93fa8890a9eb4e9e8c4e2ce0b237328d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SyncResponseWarehouseShippingOrder may be used to SyncResponse the result of a ProcesWarehouseShippingOrder.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseWarehouseShippingOrderType" id="oagis-id-ab81385bb73f4d5795cf72776632c6cb">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseWarehouseShippingOrderDataAreaType" id="oagis-id-571bae3726934c5ea6d0a9f278541a97">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseWarehouseShippingOrder. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (WarehouseShippingOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseWarehouseShippingOrderDataAreaType" id="oagis-id-07a6aacf31c44571b3045f3738e80ca4">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-bc70587404414026bd56bd2ffd23e410"/>
+			<xsd:element ref="WarehouseShippingOrder" maxOccurs="unbounded" id="oagis-id-75657f59cd304d14b27723c9d5386490"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

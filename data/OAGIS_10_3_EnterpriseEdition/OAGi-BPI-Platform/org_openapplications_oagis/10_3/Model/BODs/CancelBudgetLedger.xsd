@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downCancel package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/CancelBudgetLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/BudgetLedger.xsd"/>
+	<xsd:element name="CancelBudgetLedger" type="CancelBudgetLedgerType" id="oagis-id-1034efd3250e40ae91790b22cff426e7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelBudgetLedger is to transmit budget amounts from all possible source applications throughout an enterprise to a general ledger or budget application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelBudgetLedgerType" id="oagis-id-f57a1243d71a4928888c8b636a1f6393">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelBudgetLedgerDataAreaType" id="oagis-id-e984defbfc5e4885b69a9d57c13ec8ed">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelBudgetLedger. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (BudgetLedger).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelBudgetLedgerDataAreaType" id="oagis-id-b605e67ed0a44ac6b60ec893cb08410f">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-b796124684ee41ecaecb37a919108535"/>
+			<xsd:element ref="BudgetLedger" maxOccurs="unbounded" id="oagis-id-899a733a46954a0eb37df9c75bf294d2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

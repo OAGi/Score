@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/SyncResponsePersonnel.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Personnel.xsd"/>
+	<xsd:element name="SyncResponsePersonnel" type="SyncResponsePersonnelType" id="oagis-id-f318002eb5d4480fadc3dc9c5f490654">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponsePersonnel is to enable the SyncResponsehronization of employee data that exists on separate data bases between manufacturing and human resource applications.  The SyncResponsePersonnel allows the adding of new employees and their relevant data as well as the modification of previously established employees.
+
+The SyncResponsePersonnel is used to facilitate the maintenance of human resource data in a manufacturing work force planning module.  This enables the workforce planning module to use current personnel information when creating finite production schedules.  The SyncResponsePersonnel can also be used by a project accounting application or a work order management application to assign qualified personnel or to perform resource planning.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponsePersonnelType" id="oagis-id-e62b91d51ae64c9aa6ee34e19009a2de">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponsePersonnelDataAreaType" id="oagis-id-f277f3c5200c45e8a822ba586b3c1374">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponsePersonnel. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (Personnel).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponsePersonnelDataAreaType" id="oagis-id-1d01a60c803d4451a03cb6d99ab6f343">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-e360d33c01224b62a5eb747096ecb066"/>
+			<xsd:element ref="Personnel" maxOccurs="unbounded" id="oagis-id-a3e9ec4562a14c908ea3fdda29b8ef64"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

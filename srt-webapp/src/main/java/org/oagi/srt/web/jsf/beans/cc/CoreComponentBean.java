@@ -3,8 +3,12 @@ package org.oagi.srt.web.jsf.beans.cc;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.primefaces.component.api.UIColumn;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,22 +29,14 @@ import java.util.stream.Collectors;
 public class CoreComponentBean extends AbstractCoreComponentBean {
 
     @Autowired
-    private AggregateCoreComponentRepository accRepository;
-    @Autowired
-    private AssociationCoreComponentRepository asccRepository;
-    @Autowired
-    private AssociationCoreComponentPropertyRepository asccpRepository;
-    @Autowired
-    private BasicCoreComponentRepository bccRepository;
-    @Autowired
-    private BasicCoreComponentPropertyRepository bccpRepository;
-    @Autowired
-    private DataTypeRepository dataTypeRepository;
-    @Autowired
     private CoreComponentService coreComponentService;
 
-    private String type;
+    private List<CoreComponents> coreComponents;
+    private List<String> selectedTypes;
     private List<CoreComponentState> selectedStates;
+
+    private String sortColumnHeaderText = "";
+    private boolean isSortColumnAscending = false;
 
     private String searchText;
 
@@ -49,15 +45,22 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
-        String type = requestParameterMap.get("type");
-        if ("null".equals(type)) {
-            type = null;
+        String types = requestParameterMap.get("types");
+        if ("null".equals(types)) {
+            types = null;
         }
 
-        if (!StringUtils.isEmpty(type)) {
-            setType(type);
+        if (!StringUtils.isEmpty(types)) {
+            StringTokenizer tokenizer = new StringTokenizer(types, ",");
+            selectedTypes = new ArrayList();
+            while (tokenizer.hasMoreTokens()) {
+                String type = tokenizer.nextToken();
+                selectedTypes.add(type);
+            }
         } else {
-            setType("ACC");
+            selectedTypes = Arrays.asList(
+                    "ACC", "ASCC", "ASCCP", "BCC", "BCCP"
+            );
         }
 
         String states = requestParameterMap.get("states");
@@ -74,20 +77,37 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 selectedStates.add(state);
             }
         } else {
-            selectedStates = Arrays.asList(CoreComponentState.Editing);
+            selectedStates = Arrays.asList(
+                    CoreComponentState.Editing,
+                    CoreComponentState.Candidate,
+                    CoreComponentState.Published);
         }
     }
 
-    public String getType() {
-        return type;
+    public String[] getSelectedTypes() {
+        if (selectedTypes == null || selectedTypes.isEmpty()) {
+            return new String[0];
+        }
+
+        return selectedTypes.toArray(new String[selectedTypes.size()]);
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setSelectedTypes(String[] selectedTypes) {
+        if (selectedTypes != null && selectedTypes.length > 0) {
+            this.selectedTypes = new ArrayList();
+            for (String selectedType : selectedTypes) {
+                this.selectedTypes.add(selectedType);
+            }
+        }
+    }
+
+    public String toStringSelectedTypes() {
+        String[] selectedTypes = getSelectedTypes();
+        return (selectedTypes != null) ? String.join(",", selectedTypes) : "";
     }
 
     public void onTypeChange() {
-
+        reset();
     }
 
     public String[] getSelectedStates() {
@@ -121,89 +141,53 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         reset();
     }
 
-    public List<AggregateCoreComponent> getAccList() {
-        List<AggregateCoreComponent> accList;
-        if (selectedStates == null || selectedStates.isEmpty()) {
-            accList = accRepository.findAllByRevisionNum(0);
-        } else {
-            accList = accRepository.findAllByRevisionNumAndStates(0, selectedStates);
+    public List<CoreComponents> getCoreComponents() {
+        if (coreComponents == null) {
+            String sortProperty;
+            switch (sortColumnHeaderText) {
+                case "Type":
+                    sortProperty = "type";
+                    break;
+                case "DEN":
+                    sortProperty = "den";
+                    break;
+                case "Owner":
+                    sortProperty = "owner";
+                    break;
+                case "State":
+                    sortProperty = "state";
+                    break;
+                case "Last Updated By":
+                    sortProperty = "last_updated_user";
+                    break;
+                case "Last Updated Timestamp":
+                default:
+                    sortProperty = "last_update_timestamp";
+                    break;
+            }
+
+            coreComponents = coreComponentService.getCoreComponents(selectedTypes, selectedStates,
+                    new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
+
+            coreComponents = coreComponents.stream()
+                    .filter(e -> {
+                        String q = getSearchText();
+                        if (StringUtils.isEmpty(q)) {
+                            return true;
+                        }
+
+                        String den = e.getDen().toLowerCase();
+                        String[] split = q.split(" ");
+                        for (String s : split) {
+                            if (!den.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }).collect(Collectors.toList());
         }
 
-        if (searchText != null) {
-            return accList.stream()
-                    .filter(e -> e.getObjectClassTerm().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else {
-            return accList;
-        }
-    }
-
-    public List<AssociationCoreComponent> getAsccList() {
-        List<AssociationCoreComponent> asccList;
-        if (selectedStates == null || selectedStates.isEmpty()) {
-            asccList = asccRepository.findAllByRevisionNum(0);
-        } else {
-            asccList = asccRepository.findAllByRevisionNumAndStates(0, selectedStates);
-        }
-
-        if (searchText != null) {
-            return asccList.stream()
-                    .filter(e -> e.getDen().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else {
-            return asccList;
-        }
-    }
-
-    public List<AssociationCoreComponentProperty> getAsccpList() {
-        List<AssociationCoreComponentProperty> asccpList;
-        if (selectedStates == null || selectedStates.isEmpty()) {
-            asccpList = asccpRepository.findAllByRevisionNum(0);
-        } else {
-            asccpList = asccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
-        }
-
-        if (searchText != null) {
-            return asccpList.stream()
-                    .filter(e -> e.getPropertyTerm().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else {
-            return asccpList;
-        }
-    }
-
-    public List<BasicCoreComponent> getBccList() {
-        List<BasicCoreComponent> bccList;
-        if (selectedStates == null || selectedStates.isEmpty()) {
-            bccList = bccRepository.findAllByRevisionNum(0);
-        } else {
-            bccList = bccRepository.findAllByRevisionNumAndStates(0, selectedStates);
-        }
-
-        if (searchText != null) {
-            return bccList.stream()
-                    .filter(e -> e.getDen().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else {
-            return bccList;
-        }
-    }
-
-    public List<BasicCoreComponentProperty> getBccpList() {
-        List<BasicCoreComponentProperty> bccpList;
-        if (selectedStates == null || selectedStates.isEmpty()) {
-            bccpList = bccpRepository.findAllByRevisionNum(0);
-        } else {
-            bccpList = bccpRepository.findAllByRevisionNumAndStates(0, selectedStates);
-        }
-
-        if (searchText != null) {
-            return bccpList.stream()
-                    .filter(e -> e.getPropertyTerm().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-        } else {
-            return bccpList;
-        }
+        return coreComponents;
     }
 
     public String getSearchText() {
@@ -218,108 +202,31 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         String q = (query != null) ? query.trim() : null;
 
         if (StringUtils.isEmpty(q)) {
-            switch (getType()) {
-                case "ACC":
-                    return getAccList().stream()
-                            .map(e -> e.getObjectClassTerm())
-                            .collect(Collectors.toList());
-                case "ASCC":
-                    return getAsccList().stream()
-                            .map(e -> e.getDen())
-                            .collect(Collectors.toList());
-                case "ASCCP":
-                    return getAsccpList().stream()
-                            .map(e -> e.getPropertyTerm())
-                            .collect(Collectors.toList());
-                case "BCC":
-                    return getBccList().stream()
-                            .map(e -> e.getDen())
-                            .collect(Collectors.toList());
-                case "BCCP":
-                    return getBccpList().stream()
-                            .map(e -> e.getPropertyTerm())
-                            .collect(Collectors.toList());
-                default:
-                    throw new IllegalStateException();
-            }
+            return getCoreComponents().stream()
+                    .map(e -> e.getDen())
+                    .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
-            switch (getType()) {
-                case "ACC":
-                    return getAccList().stream()
-                            .map(e -> e.getObjectClassTerm())
-                            .distinct()
-                            .filter(e -> {
-                                e = e.toLowerCase();
-                                for (String s : split) {
-                                    if (!e.contains(s.toLowerCase())) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .collect(Collectors.toList());
-                case "ASCC":
-                    return getAsccList().stream()
-                            .map(e -> e.getDen())
-                            .distinct()
-                            .filter(e -> {
-                                e = e.toLowerCase();
-                                for (String s : split) {
-                                    if (!e.contains(s.toLowerCase())) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .collect(Collectors.toList());
-                case "ASCCP":
-                    return getAsccpList().stream()
-                            .map(e -> e.getPropertyTerm())
-                            .distinct()
-                            .filter(e -> {
-                                e = e.toLowerCase();
-                                for (String s : split) {
-                                    if (!e.contains(s.toLowerCase())) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .collect(Collectors.toList());
-                case "BCC":
-                    return getBccList().stream()
-                            .map(e -> e.getDen())
-                            .distinct()
-                            .filter(e -> {
-                                e = e.toLowerCase();
-                                for (String s : split) {
-                                    if (!e.contains(s.toLowerCase())) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .collect(Collectors.toList());
-                case "BCCP":
-                    return getBccpList().stream()
-                            .map(e -> e.getPropertyTerm())
-                            .distinct()
-                            .filter(e -> {
-                                e = e.toLowerCase();
-                                for (String s : split) {
-                                    if (!e.contains(s.toLowerCase())) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .collect(Collectors.toList());
-                default:
-                    throw new IllegalStateException();
-            }
+            return getCoreComponents().stream()
+                    .map(e -> e.getDen())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
         }
+    }
+
+    public void onSortEvent(SortEvent sortEvent) {
+        sortColumnHeaderText = sortEvent.getSortColumn().getHeaderText();
+        isSortColumnAscending = sortEvent.isAscending();
     }
 
     public void search() {
@@ -327,23 +234,27 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     private void reset() {
+        coreComponents = null;
     }
 
     @Transactional
     public String createACC() {
         User requester = getCurrentUser();
         AggregateCoreComponent acc = coreComponentService.newAggregateCoreComponent(requester);
+        String types = toStringSelectedTypes();
         String states = toStringSelectedStates();
-        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&type=ACC&states=" + states + "&faces-redirect=true";
+        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
     }
 
     public String createASCCP() {
+        String types = toStringSelectedTypes();
         String states = toStringSelectedStates();
-        return "/views/core_component/select_acc.jsf?type=ASCCP&states=" + states + "&faces-redirect=true";
+        return "/views/core_component/select_acc.jsf?types=" + types + "&states=" + states + "&faces-redirect=true";
     }
 
     public String createBCCP() {
+        String types = toStringSelectedTypes();
         String states = toStringSelectedStates();
-        return "/views/core_component/select_bdt.jsf?type=BCCP&states=" + states + "&faces-redirect=true";
+        return "/views/core_component/select_bdt.jsf?types=" + types + "&states=" + states + "&faces-redirect=true";
     }
 }

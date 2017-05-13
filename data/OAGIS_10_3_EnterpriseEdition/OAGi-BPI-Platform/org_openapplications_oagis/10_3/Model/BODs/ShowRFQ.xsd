@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ShowRFQ.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RFQ.xsd"/>
+        <xsd:element name="ShowRFQ" type="ShowRFQType" id="oagis-id-f4d2addc3f97441d8b8da9b8f42104ad">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowRFQ is to communicate to a business application module or system the sending systems representation of Request for Quote information.  This request may be used as a response to a GetRFQ request.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowRFQType" id="oagis-id-2e60aa48f3f14eaa950735de66135175">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowRFQDataAreaType" id="oagis-id-8ff72401875f48bd8f31d519488bd960">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowRFQ. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (RFQ).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowRFQDataAreaType" id="oagis-id-7002f7a145014fcd837ff479d486fd5b">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-21ce75183d384dc0848dec65ad9518b9"/>
+                        <xsd:element ref="RFQ" maxOccurs="unbounded" id="oagis-id-c5d73b7f57e546c8a0c03bad5d5dc448"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

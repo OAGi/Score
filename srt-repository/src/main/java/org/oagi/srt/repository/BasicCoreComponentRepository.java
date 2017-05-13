@@ -54,6 +54,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select count(a) from BasicCoreComponent a where a.fromAccId = ?1")
     public int countByFromAccId(long fromAccId);
 
+    @Query("select a from BasicCoreComponent a where a.toBccpId = ?1")
+    public List<BasicCoreComponent> findAllByToBccpId(Long bccpId);
+
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionNum = (" +
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId)")
     public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccId(long currentBccId);

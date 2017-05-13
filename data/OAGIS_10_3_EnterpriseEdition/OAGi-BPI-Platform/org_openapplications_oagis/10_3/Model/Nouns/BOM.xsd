@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/BOM.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="BOM" type="BOMType" id="oagis-id-465ed46fd9a4422186327a77ed3b4fbf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">When included in a hierarchy, the Components are position dependent for their meaning and applicability to the Bill of Material.
+
+The Bill of Material structure is broken down into three classifications or ways to represent the Item.  An Item may be included by itself as in the first sub-grouping, or an Item may be represented as part of a set of options or as an option within a class of options.
+
+An example of an option would be CD-ROM for a laptop computer.  Then each of the types of CD-ROM's for the option would be a separate Item.
+
+An example of an option class would be memory for a laptop.  The options could then be 128, 256, or 512 megabytes of RAM.  Each of these options would then have separate Item identifiers for memory modules that makes up the appropriate amount of memory.  For 256 megabytes of RAM, this could be two 128 megabyte memory modules or one 256 megabyte.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BOMHeader" type="BOMHeaderType" id="oagis-id-b21b8e3b061845ad8cb2509c69b29986">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the Bill of Material Structure and its contents.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BOMItemData" type="BOMItemDataType" id="oagis-id-6137dc9ee7f64e5ba9423d812381c3fe">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The BOM view of an Item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BOMOption" type="BOMOptionType" id="oagis-id-26ab6bbeb03f46f995de6fddbc6a7b71">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the attributes of a specific Option within a classification.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BOMOptionClass" type="BOMOptionClassType" id="oagis-id-84124d4c21ab4bd28f6594bb849632c8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the class of Option for a particular Product or Item</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BOMType" id="oagis-id-9cb8d20ac841454f8c1222c509bdd0e9">
+		<xsd:sequence>
+			<xsd:element ref="BOMHeader" id="oagis-id-df9ecf690b5f444fa62e75116b210111" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the Bill of Material Structure and its contents.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BOMItemData" id="oagis-id-e5c67e1c7d7a47e8a5b08d0370676c34" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The BOM view of an Item.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BOMOption" id="oagis-id-284a91df073e4ab792e25a01727ad0b3" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the attributes of a specific Option within a classification.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BOMOptionClass" id="oagis-id-e728415420b94599925d73e01f7334f4" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the class of Option for a particular Product or Item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-157a71949cbf4c4f97982a4175000a69"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-028a9b60993b4a27a1faaf759516ee6b"/>
+	</xsd:complexType>
+	<xsd:complexType name="BOMHeaderBaseType" id="oagis-id-5e01cd552c6246acad317864101aa535">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="AlternateBOMReference" id="oagis-id-41a5b47d1b814924a56f66c6b06c0156" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies an alternate BOM that maybe used in place of the one being referenced in this particular instance.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentBOMReference" id="oagis-id-f9747654de414badb3433f67e18afebc" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to the parent BOM of the current BOM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ChildBOMReference" id="oagis-id-91041f37ad6346abb8fd661e35b810f6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to a child BOM of the current BOM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RouteReference" id="oagis-id-d382a5a93bec4e228501edd9032e5711" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to a Routing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Name" id="oagis-id-de8bc5e84e7c4e768ad6f878cdcc89cb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UsageDescription" id="oagis-id-9b0cadc81ff74e6490ce659015332992" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Describes how an ITEM or product is consumed during the manufacturing process.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-74eb269ede6144dc8868efef066d8da3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-ee6c9577b8c84fa883b655640e4a4c94" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Location" id="oagis-id-a95edb04d882486f890b6e160e8c4ebe" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The location of a thing, as captured by an address (or addresses), GPS Coordinates, and/or in relation to other locations.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TrackingIndicator" id="oagis-id-4428953180b54848a4bd169adccdf61a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the related object is to be tracked</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BatchSizeQuantity" id="oagis-id-beebce527479427a9a95dc338aa7dc0c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the number of items that can be produced in each run of the BOM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-67bcca5849434c0c924800f84c1e6b6b" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ManufacturingParty" id="oagis-id-886f0fd363144196b76646ac60f5a0be" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMHeaderType" id="oagis-id-c64efc91aea7403981998b204721e918">
+		<xsd:complexContent>
+			<xsd:extension base="BOMHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BOMHeaderExtensionType" id="oagis-id-a382f3e1061443b8b09cbb5253205cd0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMItemDataBaseType" id="oagis-id-48ab0176b87145d0bd89f243a8d8b11f">
+		<xsd:complexContent>
+			<xsd:extension base="ManufacturingItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-2b54f17436054456bc24ca6029028a71" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationReference" id="oagis-id-17ce96254b1642199e5dfe952449c73e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RouteReference" id="oagis-id-0526078317144fd3a547ef843ad145ad" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to a Routing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentItemInstanceIdentification" id="oagis-id-5f4ef60242ad447f9b52edfef623803f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the parent item identifier for the current  item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ChildItemInstanceIdentification" id="oagis-id-6d32ceb5ab184cd1825b5188c049f254" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies one of the child item identifier for the current item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMItemDataType" id="oagis-id-c11c7f62efc04550a8b433aec532d058">
+		<xsd:complexContent>
+			<xsd:extension base="BOMItemDataBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BOMItemDataExtensionType" id="oagis-id-689f6ae4818a4ebd9fcc137e4ac52b7f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMOptionBaseType" id="oagis-id-616fda0b4e0b4005892bfcada9869cc3">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-9008cf47036843dd9a4f4255682afc05" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-9c564016e598437ba68e5db4526c2872"/>
+					<xsd:element ref="DefaultIndicator" id="oagis-id-4cae8ab402984f3595ce9267af0edeec" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a default option on a Bill-Of-Material.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExclusiveIndicator" id="oagis-id-5a4c53abf7c042b299a42abe21c61ef0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies within a Bill of Material structure if an OptionClass or Option conflicts with another part of the Bill of Material structure and therefore if chosen, must not be combined with any other OptionClass or Option within that branch of the Bill of Material.
+
+In other words if a given Option is choosen another Option out of the same OptionClass can not be selected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BOMItemData" id="oagis-id-b13794e7332047eda10e414754aca361" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The BOM view of an Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-3b0994d26b7442d7a04495212ab037bc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMOptionType" id="oagis-id-18d0835669784d2187bee74d6c98e60e">
+		<xsd:complexContent>
+			<xsd:extension base="BOMOptionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BOMOptionExtensionType" id="oagis-id-6c519f9dc332442b9584ffb971660ac6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMOptionClassBaseType" id="oagis-id-a6759f31b1a547f881be16a852fdfcf9">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-b9599c91f0c84708970297a682a4100d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExclusiveIndicator" id="oagis-id-8815c5a12dfc43929cf4a4e0aaa317cb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies within a Bill of Material structure if an OptionClass or Option conflicts with another part of the Bill of Material structure and therefore if chosen, must not be combined with any other OptionClass or Option within that branch of the Bill of Material.
+
+In other words if a given Option is choosen another Option out of the same OptionClass can not be selected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MandatoryIndicator" id="oagis-id-e06062869d0e478988fadb75cfe758bb" minOccurs="0"/>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-a3b35cb5f21d47979b438bf2a15de155"/>
+					<xsd:element ref="BOMOption" id="oagis-id-6a36667877f2470e950e51db543d8310" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the attributes of a specific Option within a classification.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-f3d8d8d6d03f444ab7f84cdd8f3c9666" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BOMOptionClassType" id="oagis-id-f1f3d1d8650b40e09d974f2a73432684">
+		<xsd:complexContent>
+			<xsd:extension base="BOMOptionClassBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BOMOptionClassExtensionType" id="oagis-id-6f1aa1a83c354e2fb17a716b203037c8" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

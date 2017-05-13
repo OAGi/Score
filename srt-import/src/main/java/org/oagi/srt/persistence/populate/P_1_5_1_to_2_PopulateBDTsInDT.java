@@ -195,7 +195,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition,
                                                String ccDefinition, String id, Module module) throws Exception {
-        long basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
+        long basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType).getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
             logger.debug("Inserting default bdt whose name is " + typeName);

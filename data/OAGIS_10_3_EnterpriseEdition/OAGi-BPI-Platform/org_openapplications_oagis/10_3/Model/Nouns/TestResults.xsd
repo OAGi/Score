@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+Reviewed with group... Outside of the commented out RelativeLocation is good to go forward
+
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               		 06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/TestResults.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
+	<xsd:element name="TestResults" type="TestResultsType" id="oagis-id-c9c4dcb3507f4e69a42020145fba39c8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">TestResults represents raw measurements performed on a set of samples by lab.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TestResultsType" id="oagis-id-a883208edd204246820f3cf8a07245a5">
+		<xsd:annotation>
+			<xsd:documentation>TestResults represents raw measurements performed on a set of samples by lab.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TestResultsHeader" id="oagis-id-e55ed6e00c0e444fb416c4cfc2afebcf" minOccurs="0"/>
+			<xsd:element ref="TestResultsLine" id="oagis-id-9ddc572071174298b1853502a23fb185" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-77a22763780f4a58aee8d3391551e910"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-c40cd601f0f54d678b2926ca8b559e48"/>
+	</xsd:complexType>
+	<xsd:complexType name="TestResultsHeaderBaseType" id="oagis-id-f0cc78da3b7a4f09862af2b98c8ca48b">
+		<xsd:annotation>
+			<xsd:documentation>Test Results header communicates the status and the related parties interested in the raw test results</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PriorityCode" id="oagis-id-a128cda3b4594bb1a53793fd5f3dbc17" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectionOrderID" id="oagis-id-d61b35247d5d4fc2905b61eb6ac33f02" minOccurs="0"/>
+					<xsd:element ref="LotBatchID" id="oagis-id-0f95bcd3e2d547be945aaf37d5ed77b4" minOccurs="0"/>
+					<xsd:element ref="ManufactureDateTime" id="oagis-id-c5c1607cf74d40008890513d65f4cc2c" minOccurs="0"/>
+					<xsd:element ref="Item" id="oagis-id-fdc19944622844dd88fbebbdaf699ebc" minOccurs="0"/>
+					<xsd:element ref="TestSpecificationDocumentReference" id="oagis-id-ac89d93bd8e6495f9a434104ae600353" minOccurs="0"/>
+					<xsd:element ref="Quantity" id="oagis-id-d78770df3aa34f59b78708c91151a5c7" minOccurs="0"/>
+					<xsd:element ref="CustomerParty" id="oagis-id-f0d736bcf781461c9ea4faedb5c243bb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the customer that purchased the goods or services.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipFromParty" id="oagis-id-1e2316f970e14f7da46e72a5889f2967" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party and location from which samples are shipped from.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-33489a2e5ebc40ccb4701b5efdaa6769" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party and location from which samples are shipped to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BillToParty" id="oagis-id-11a58791ef9f4a02bb813277d2e0f455" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party which the invoice for the services performed should be sent to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-23f33cb775ea44cebaa60981d52c75e9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemitToParty" id="oagis-id-bd5a0b67d6c84759aa3075d46acee777" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that will receive the payment, an agent of the Party that performed the inspection and qualification of the resources to perform the tests</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectionParty" id="oagis-id-e5343b530912409fa4234ebf35b5af2a" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-dc79789f60074760947a8b784991cd0e" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestResultsHeaderType" id="oagis-id-51dc1d54e10548f2b1937c9d9b4d2b0f">
+		<xsd:annotation>
+			<xsd:documentation>Test Results header communicates the status and the related parties interested in the raw test results</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TestResultsHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestResultsHeaderExtensionType" id="oagis-id-a915e45c9e274757b3ca100b019bdd4b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestResultsLineBaseType" id="oagis-id-43b7b54fe8cc4baeb1d270a3d98cadf5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The type that represents raw Test Results for a given sample.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Classification" id="oagis-id-1210abb44de4423894f604603011436e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the classification of an entity. An entity may be classified into multiple groups for different reasons. Examples of Classification include Commodity Codes, Freight Classifications, Product Line classifications and so on. Suggested Values are COMMODITY, FREIGHT, PRODUCT-LINE</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentSampleID" id="oagis-id-c89b9de238454a66a0f99536a82e0f74" minOccurs="0"/>
+					<xsd:element ref="ParentSampleLocation" id="oagis-id-274f58197d4242d48d275ad8bdbf7c9e" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SampledDateTime" id="oagis-id-a917ae894673444d9486a69c89b1dd04" minOccurs="0"/>
+					<xsd:element ref="SamplingEnvironmentCondition" id="oagis-id-7536a4fa6f904be7bec595476770f850" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestResultsDetail" id="oagis-id-f0765b54a27e4fff85a3dc352de35aa8" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestResultsLineType" id="oagis-id-ac80b09159d74268bcffa23973cc0f4a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The type that represents information used to communicate the test results for a sample sent to a lab for testing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TestResultsLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestResultsLineExtensionType" id="oagis-id-a85cfa33fc0c4ca5a9ce9de1206dbaca" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- new in 10.3 -->
+	<xsd:complexType name="TestResultsDetailBaseType" id="oagis-id-32ea61d2386e4d7aa5605c0bb026e777">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The type that represents the detailed test results for a given subsample.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Classification" id="oagis-id-c7e5da8560dd4df0a7e52d3122c085f6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the classification of an entity. An entity may be classified into multiple groups for different reasons. Examples of Classification include Commodity Codes, Freight Classifications, Product Line classifications and so on. Suggested Values are COMMODITY, FREIGHT, PRODUCT-LINE</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" id="oagis-id-38441d1ea929480d8954cbb736e6bfdc" minOccurs="0"/>
+					<xsd:element ref="InspectionParty" id="oagis-id-dfa79ba8e09143dd9dcd1390815fc4c6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that inspected a sample provided in an InspectionOrder.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-db2afaea983f4ccba6e7dd1d2c95d16c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SampleID" id="oagis-id-d66dcfaa83d64bb8a5c056e026cee466" minOccurs="0"/>
+					<xsd:element ref="SampledDateTime" id="oagis-id-6f8369ebe229468d9b09f234db5bd00e" minOccurs="0"/>
+					<xsd:element ref="TestDateTime" id="oagis-id-1bb4b11e1a88492c9bd33c464c7d115b" minOccurs="0"/>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-f85c221615c545dd9792dd86360e327d" minOccurs="0"/>
+					<xsd:element ref="StandardDocumentReference" id="oagis-id-a36294955d214fecaae68382678f2bfa" minOccurs="0"/>
+					<xsd:element ref="MethodDocumentReference" id="oagis-id-37036206da6b40c7b3f2fd49b5042e8f" minOccurs="0"/>
+					<xsd:element ref="TestEnvironmentCondition" id="oagis-id-b8bde97287fe4d6d871d5220188ee448" minOccurs="0" maxOccurs="unbounded"/>
+					<!-- new in 10.3 -->
+					<xsd:element ref="TestEquipmentClass" id="oagis-id-c0040e86d76c43ceba5e33d55d6b5bfe" minOccurs="0" maxOccurs="unbounded"/>
+					<!-- end 10.3 -->
+					<xsd:element ref="TestQuantitativeMeasurement" id="oagis-id-572ab4a4ba934f27930ed10f345432b0" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestQualitativeMeasurement" id="oagis-id-e9eb86259aaf4515a1ae6bc842204613" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-95b62d76372342f2997295150b85c259"/>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-c13c952028104e16833f2381c9b51935"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- end 10.3 -->
+	<xsd:complexType name="TestResultsDetailType" id="oagis-id-c58244b68e6841179955d1afced6d529">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The type that represents a minimal raw Test Results, which may come directly off test equipment.  Whereas a CoA represents reportable Test Results.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TestResultsDetailBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestResultsDetailExtensionType" id="oagis-id-30da1f6463d34bb79314c6bb672c6789" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TestResultsDetail" type="TestResultsDetailType" id="oagis-id-15674f6063ce4b6a906b5aaad0deb513">
+		<xsd:annotation>
+			<xsd:documentation>Test result detail relates to the specific tests performed on the identified at the line level.  There can be multiple tests performed, from which subsamples are created.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TestResultsLine" type="TestResultsLineBaseType" id="oagis-id-bf5b9481441449f183bd0e3f29cfd2c0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information used to communicate the test results for a sample sent to a lab for testing</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TestResultsHeader" type="TestResultsHeaderType" id="oagis-id-b215e1210d2f4c3b90540b285d4da895">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The test results header will communicate party information, status and reference identifiers such as lot number, InspectionOrderID, po number, etc.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

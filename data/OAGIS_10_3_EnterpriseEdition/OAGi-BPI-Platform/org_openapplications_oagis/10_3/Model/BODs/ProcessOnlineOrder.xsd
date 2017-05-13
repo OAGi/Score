@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessOnlineOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/OnlineOrder.xsd"/>
+        <xsd:element name="ProcessOnlineOrder" type="ProcessOnlineOrderType" id="oagis-id-9f382eb1ba9f426eb879b6dad9b93b6d">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessOnlineOrder is to enable an application to provide online shopping OnlineOrders from another business application module.  The ProcessOnlineOrder is provided in a a publishe/subscribe or broadcast buiness exchange where an application other than the owner or the master of the given information provides it to the business applications that owns the data in order to have it process or perform a function with the information.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessOnlineOrderType" id="oagis-id-47d231007ead4fddaee2398645188263">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessOnlineOrderDataAreaType" id="oagis-id-520f6f242dc04a65aa5e1beff9a856a9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessOnlineOrder. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (OnlineOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessOnlineOrderDataAreaType" id="oagis-id-fa8c8a439f3a417492fd2effb0b2763c">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-7773ba72bde94fb4b650b8cbf74d6465"/>
+                        <xsd:element ref="OnlineOrder" maxOccurs="unbounded" id="oagis-id-a6379349b02e4fe788c325f4f8c080a4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

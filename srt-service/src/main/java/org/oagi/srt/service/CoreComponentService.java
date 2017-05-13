@@ -7,6 +7,7 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,14 @@ public class CoreComponentService {
 
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
+
+    @Autowired
+    private CoreComponentsRepository coreComponentsRepository;
+
+    public List<CoreComponents> getCoreComponents(
+            List<String> types, List<CoreComponentState> states, Sort.Order order) {
+        return coreComponentsRepository.findAll(types, states, order);
+    }
 
     public List<CoreComponentRelation> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
@@ -144,6 +153,7 @@ public class CoreComponentService {
         asccp.setPropertyTerm("A new ASCCP property");
         asccp.setRoleOfAccId(roleOfAcc.getAccId());
         asccp.setState(CoreComponentState.Editing);
+        asccp.setReusableIndicator(true); // Default value should be true.
         asccp.setOwnerUserId(requesterId);
         long namespaceId = roleOfAcc.getNamespaceId();
         if (namespaceId > 0L) {
@@ -455,6 +465,11 @@ public class CoreComponentService {
         }
 
         asccpRepository.save(asccp);
+        asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, asccp);
+            asccRepository.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -515,6 +530,11 @@ public class CoreComponentService {
         }
 
         bccpRepository.save(bccp);
+        bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, bccp);
+            bccRepository.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -744,30 +764,32 @@ public class CoreComponentService {
         long basedAccId = abie.getBasedAccId();
         long eAccId = eAcc.getAccId();
 
-        AssociationCoreComponentProperty asccp = findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(basedAccId, eAccId);
-        return (asccp != null) ? true : false;
+        return existsASCCPRecursivelyByRoleOfAccId(basedAccId, eAccId);
     }
 
-    private AssociationCoreComponentProperty findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
+    private boolean existsASCCPRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
         Collection<Long> fromAccIds = Arrays.asList(basedAccId);
 
         while (true) {
-            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccIds);
-            List<AssociationCoreComponentProperty> asccpList =
-                    !asccList.isEmpty()
-                            ? asccpRepository.findByAsccpId(asccList.stream().map(AssociationCoreComponent::getToAsccpId).collect(Collectors.toList()))
-                            : Collections.emptyList();
-            if (asccpList.isEmpty()) {
-                return null;
+            List<Long> toAsccpId = asccRepository.findToAsccpIdByFromAccId(fromAccIds);
+            List<Long> roleOfAccIdList =
+                    !toAsccpId.isEmpty() ? asccpRepository.findRoleOfAccIdByAsccpId(toAsccpId) : Collections.emptyList();
+            if (roleOfAccIdList.isEmpty()) {
+                return false;
             }
 
-            for (AssociationCoreComponentProperty asccp : asccpList) {
-                if (asccp.getRoleOfAccId() == eAccId) {
-                    return asccp;
+            if (roleOfAccIdList.contains(eAccId)) {
+                return true;
+            }
+
+            List<Long> tempAccIds = new ArrayList();
+            roleOfAccIdList.forEach(accId -> {
+                while (accId != null && accId > 0L) {
+                    tempAccIds.add(accId);
+                    accId = accRepository.findBasedAccIdByAccId(accId);
                 }
-            }
-
-            fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
+            });
+            fromAccIds = tempAccIds;
         }
     }
 

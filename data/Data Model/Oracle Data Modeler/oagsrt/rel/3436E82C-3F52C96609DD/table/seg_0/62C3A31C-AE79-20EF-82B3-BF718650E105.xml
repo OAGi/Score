@@ -43,7 +43,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="6D651516-3EF9-EDA5-5105-145EF1B75214" referredColumn="2820686A-A020-3DC6-EF01-78792C666327"/>
@@ -96,7 +96,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="4232FC8A-F042-EE24-CDBA-7D0BA5E2B0E7" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -111,7 +111,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="266165BF-6FF9-F6C0-482B-B33B7581FCC5" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -150,7 +150,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="C3522358-43CC-5220-AB7B-EE61550A50BF" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
@@ -167,16 +167,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="41CF0414-D5DF-91F3-717A-4B119F9BC9F4"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="A2999F6D-2AC8-529B-C0B8-4055ACE50EA3" name="BBIEP_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:19:22 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="6A3DFE19-D947-37C5-2DEF-376CB5251A90"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="1E83622F-DFEF-2ADF-D00D-E561A357FABD" name="BBIEP_OWNER_TLVL_ABIE_ID_IDX">

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_3  
+   Date:               06 Mar 2017
+   Copyright 1997-2017, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2017). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/ProcessSalesOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/SalesOrder.xsd"/>
+        <xsd:element name="ProcessSalesOrder" type="ProcessSalesOrderType" id="oagis-id-1cda5b661dc4494fb05ab2a8e4e7c5ce">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessSalesOrder provides the ability to request an application/ system to create a SalesOrder</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessSalesOrderType" id="oagis-id-858cf22ae200460083e2a9e51e4f1846">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessSalesOrderDataAreaType" id="oagis-id-1624714fa184468f8fd1e3095ef1b32b">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessSalesOrder. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (SalesOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessSalesOrderDataAreaType" id="oagis-id-3b31e62688464d31951652d36257e6b7">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-843fb09d37c9483bb61a7d8d5d6139a8"/>
+                        <xsd:element ref="SalesOrder" maxOccurs="unbounded" id="oagis-id-eed1f6d1129b49cea4b4711f9a23dfe0"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

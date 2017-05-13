@@ -18,7 +18,7 @@
                                     style="width: 440px; margin-right: 20px;">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true"
                                      actionListener="#{transferAccOwnershipBean.search}"
                                      update="tbl" icon="ui-icon-search"/>
                 </f:facet>
