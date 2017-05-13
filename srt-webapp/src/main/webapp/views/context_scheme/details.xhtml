@@ -34,7 +34,7 @@
 
                     <h:outputText value="GUID" styleClass="section-label"
                                   rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"/>
-                    <h:inputText value="#{contextSchemeDetailBean.contextScheme.guid}"
+                    <h:inputText id="guid" value="#{contextSchemeDetailBean.contextScheme.guid}"
                                  rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
                                  styleClass="section-content input-section disabled" disabled="true"/>
 
@@ -71,7 +71,7 @@
                     </h:inputText>
 
                     <h:outputText value="Description" styleClass="section-label"/>
-                    <h:inputTextarea value="#{contextSchemeDetailBean.contextScheme.description}"
+                    <h:inputTextarea id="description" value="#{contextSchemeDetailBean.contextScheme.description}"
                                      rows="6" a:placeholder="Leave a description"
                                      styleClass="section-content input-section"/>
                 </h:panelGrid>
@@ -79,7 +79,7 @@
                 <p:panel>
                     <f:facet name="header">
                         <h:outputText value="Context Scheme Values"/>
-                        <p:commandButton value="Add" style="float: right;"
+                        <p:commandButton id="addBtn" value="Add" style="float: right;"
                                          actionListener="#{contextSchemeDetailBean.addContextSchemeValue}"
                                          update=":form:tbl"/>
                     </f:facet>
@@ -126,20 +126,20 @@
                 </p:panel>
             </p:panel>
 
-            <p:commandButton ajax="true" value="Create"
+            <p:commandButton id="createBtn" ajax="true" value="Create"
                              rendered="#{contextSchemeDetailBean.contextScheme.guid == null}"
                              action="#{contextSchemeDetailBean.update()}"/>
 
-            <p:commandButton ajax="true" value="Update"
+            <p:commandButton id="updateBtn" ajax="true" value="Update"
                              rendered="#{contextSchemeDetailBean.contextScheme.guid != null}"
                              action="#{contextSchemeDetailBean.update()}"/>
 
-            <p:commandButton ajax="true" value="Discard"
+            <p:commandButton id="discardBtn" ajax="true" value="Discard"
                              rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
                              styleClass="danger"
                              onclick="PF('confirmDiscard').show()"/>
 
-            <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+            <p:confirmDialog id="confirmDifferentNameButSameIdentityDlg" widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     You are about to create a context classification scheme with the different name but same identity
@@ -147,14 +147,16 @@
                     (i.e., same ID and Agency ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
-            <p:confirmDialog widgetVar="confirmDifferentSchemeIdButSameIdentity" showEffect="fade"
+            <p:confirmDialog id="confirmDifferentSchemeIdButSameIdentityDlg" widgetVar="confirmDifferentSchemeIdButSameIdentity" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     You are about to create a context classification scheme with an existing name but different identity
@@ -162,23 +164,27 @@
                     (i.e., same Agency ID but different Scheme ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
-            <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     The context scheme will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                      action="#{contextSchemeDetailBean.delete()}"
                                      oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <!--suppress XmlDuplicatedId -->
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>

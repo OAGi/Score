@@ -23,7 +23,7 @@
                                                 style="width: 440px; margin-right: 20px;">
                                     <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                                 </p:autoComplete>
-                                <p:commandButton value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
+                                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
                                                  update="tbl" icon="ui-icon-search"/>
                             </f:facet>
                             <p:dataTable id="tbl" var="profileBOD" value="#{profileBODGenerationBean.profileBODs}"
@@ -79,14 +79,14 @@
                         <p:panel id="bieDocumentationOption" header="BIE Documentation Options">
                             <h:panelGrid columns="2" styleClass="option-panel">
                                 <h:panelGroup styleClass="option-left">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="definitionCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="BIE Definition"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="remarkStatusCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.remarkAndStatus}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -95,7 +95,7 @@
 
                                 <h:panelGroup styleClass="option-left"
                                               style="left: 20px; #{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5); color: rgba(102, 102, 102, 0.5);' : ''}">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="inheritCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.inheritIfEmpty}"
                                                              disabled="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
                                         <f:ajax render="bieDocumentationOption"/>
@@ -103,7 +103,7 @@
                                     <h:outputText value="Inherit if empty"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="versionCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.bieVersion}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -111,14 +111,14 @@
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.bieGuid}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="BIE GUID"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="termCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.businessTerm}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -126,14 +126,14 @@
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.businessContext}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="Business Context"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="othersCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.others}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -146,14 +146,14 @@
                         <p:panel id="ccDocumentationOption" header="CC Documentations Options">
                             <h:panelGrid columns="2" styleClass="option-panel">
                                 <h:panelGroup styleClass="option-left">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="ccDefinitionCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.ccDocumentationOption.ccDefinition}">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="CC Definition"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="ccVersionCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.ccDocumentationOption.ccVersion}">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -161,14 +161,14 @@
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="ccguidCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.ccDocumentationOption.ccGuid}">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
                                     <h:outputText value="CC GUID"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
-                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                    <h:selectBooleanCheckbox id="ccOthersCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.ccDocumentationOption.others}">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
@@ -186,7 +186,7 @@
                         <h:outputText value="Select Expressions" styleClass="option-header"/>
                         <h:panelGrid id="schemaExpressionOption"
                                      columns="1" styleClass="option-panel" style="margin-top: 15px;">
-                            <h:selectOneRadio styleClass="option-radio"
+                            <h:selectOneRadio id="expressionRadio" styleClass="option-radio"
                                               value="#{profileBODGenerationBean.option.schemaExpression}">
                                 <f:selectItem itemValue="XML" itemLabel="XML Schema"/>
                                 <f:selectItem itemValue="JSON" itemLabel="JSON Schema" itemDisabled="true"/>
@@ -198,7 +198,7 @@
                         <h:outputText value="Schema Package Option" styleClass="option-header"/>
                         <h:panelGrid id="schemaPackageOption"
                                      columns="1" styleClass="option-panel" style="margin-top: 15px;">
-                            <h:selectOneRadio styleClass="option-radio"
+                            <h:selectOneRadio id="packageRadio" styleClass="option-radio"
                                               value="#{profileBODGenerationBean.option.schemaPackage}">
                                 <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
                                 <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"

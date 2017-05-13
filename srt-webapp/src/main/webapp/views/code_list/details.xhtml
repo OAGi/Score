@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="ui-widget-header">
-                <p:button value="Create Code List based on this"
+                <p:button id="createCLbasedBtn" value="Create Code List based on this"
                           style="float: right; margin-top: -2px; padding: 3px 0 3px 0;"
                           outcome="/views/code_list/create_from_another.xhtml"
                           rendered="#{codeListDetailBean.codeList.state == 'Published' and codeListDetailBean.codeList.extensibleIndicator}">
@@ -72,7 +72,7 @@
                             </h:panelGroup>
 
                             <h:outputText value="Extensible" styleClass="section-label"/>
-                            <h:selectBooleanCheckbox value="#{codeListDetailBean.codeList.extensibleIndicator}"
+                            <h:selectBooleanCheckbox id="extensibleCB" value="#{codeListDetailBean.codeList.extensibleIndicator}"
                                                      styleClass="section-content disabled" disabled="true"
                                                      style="text-align: left;"/>
                         </h:panelGrid>
@@ -195,8 +195,8 @@
                                 <span class="label label-danger section-content" style="color: #fff !important;">Deleted</span>
                             </h:panelGroup>
 
-                            <h:outputText for="name" value="Extensible" styleClass="section-label"/>
-                            <h:selectBooleanCheckbox
+                            <h:outputText for="extensibleCBox" value="Extensible" styleClass="section-label"/>
+                            <h:selectBooleanCheckbox id="extensibleCBox"
                                     value="#{codeListDetailBean.codeList.extensibleIndicator}"
                                     styleClass="section-content input-section" style="text-align: left;">
                                 <p:ajax update="form"/>
@@ -206,7 +206,7 @@
                     <p:panel>
                         <f:facet name="header">
                             <h:outputText value="Code List Values"/>
-                            <p:commandButton value="Add" style="float: right;"
+                            <p:commandButton id="addBtn" value="Add" style="float: right;"
                                              action="#{codeListDetailBean.addCodeListValue}"
                                              update="tbl"/>
                         </f:facet>
@@ -306,22 +306,22 @@
 
                         <p:separator/>
 
-                        <p:commandButton ajax="true" value="Update"
+                        <p:commandButton id="updateBtn" ajax="true" value="Update"
                                          actionListener="#{codeListDetailBean.setState('Editing')}"
                                          action="#{codeListDetailBean.update()}"/>
 
-                        <p:commandButton ajax="true" value="Publish"
+                        <p:commandButton id="publishBtn" ajax="true" value="Publish"
                                          actionListener="#{codeListDetailBean.setState('Published')}"
                                          action="#{codeListDetailBean.update()}"/>
 
-                        <p:commandButton ajax="true" value="Discard"
+                        <p:commandButton id="discardBtn" ajax="true" value="Discard"
                                          rendered="#{codeListDetailBean.codeList.state == 'Editing'}"
                                          styleClass="danger"
                                          actionListener="#{codeListDetailBean.setState('Discarded')}"
                                          action="#{codeListDetailBean.forceUpdate()}"/>
                     </p:panel>
 
-                    <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                    <p:confirmDialog id="confirmDifferentNameButSameIdentityDlg" widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
                                      hideEffect="fade" closable="false" header="Warning">
                         <f:facet name="message">
                             You are about to create a code list with the different name but same identity
@@ -329,14 +329,16 @@
                             (i.e., same Agency ID and List ID but different name).
                         </f:facet>
                         <div style="text-align: center;">
-                            <p:commandButton value="Accept" icon="ui-icon-check"
+                            <!--suppress XmlDuplicatedId -->
+                            <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                              actionListener="#{codeListDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
                                              action="#{codeListDetailBean.update()}"/>
-                            <p:commandButton value="Cancel" icon="ui-icon-close"
+                            <!--suppress XmlDuplicatedId -->
+                            <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                              onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                         </div>
                     </p:confirmDialog>
-                    <p:confirmDialog widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
+                    <p:confirmDialog id="confirmDifferentListIdButSameIdentityDlg" widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
                                      hideEffect="fade" closable="false" header="Warning">
                         <f:facet name="message">
                             You are about to create a code list with the same List ID but different name and Agency ID
@@ -344,10 +346,12 @@
                             (i.e., same name and Agency ID but different List ID).
                         </f:facet>
                         <div style="text-align: center;">
-                            <p:commandButton value="Accept" icon="ui-icon-check"
+                            <!--suppress XmlDuplicatedId -->
+                            <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                              actionListener="#{codeListDetailBean.setConfirmSameListIdButDifferentIdentity(true)}"
                                              action="#{codeListDetailBean.update()}"/>
-                            <p:commandButton value="Cancel" icon="ui-icon-close"
+                            <!--suppress XmlDuplicatedId -->
+                            <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                              onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
                         </div>
                     </p:confirmDialog>

@@ -19,10 +19,10 @@
                                     completeMethod="#{namespaceBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true" actionListener="#{namespaceBean.search}"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{namespaceBean.search}"
                                      update="tbl"
                                      icon="ui-icon-search"/>
-                    <p:button value="Create Namespace"
+                    <p:button id="createBtn" value="Create Namespace"
                               style="float: right; padding: 3px 0 3px 0;"
                               outcome="/views/namespace/details.jsf"/>
                 </f:facet>

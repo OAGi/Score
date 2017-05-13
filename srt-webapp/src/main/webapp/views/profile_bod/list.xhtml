@@ -18,7 +18,7 @@
                                     style="width: 440px; margin-right: 20px;">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true" actionListener="#{profileBODBean.search}"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODBean.search}"
                                      update="tbl" icon="ui-icon-search"/>
                 </f:facet>
 
@@ -86,7 +86,7 @@
 
                     <p:column style="text-align: center; width: 65px;"
                               rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
-                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton id="deleteBtn" icon="ui-icon-cancel" styleClass="delete"
                                          disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId or profileBOD.state eq 'Published'}"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
