@@ -220,12 +220,10 @@
                     (i.e., same name and Agency ID but different List ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="ui-icon-check"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmSameListIdButDifferentIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>

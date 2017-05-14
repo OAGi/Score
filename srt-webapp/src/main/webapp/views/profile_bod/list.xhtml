@@ -96,18 +96,18 @@
                 </p:dataTable>
             </p:panel>
 
-            <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     The profile BOD will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                      onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
                                      oncomplete="PF('loadingBlock').hide();"
                                      actionListener="#{profileBODBean.deleteProfileBOD()}"
                                      update="tbl" ajax="true"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>

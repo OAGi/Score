@@ -164,12 +164,10 @@
                     (i.e., same Agency ID but different Scheme ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -179,12 +177,10 @@
                     The context scheme will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn3" value="Accept" icon="ui-icon-check"
                                      action="#{contextSchemeDetailBean.delete()}"
                                      oncomplete="PF('confirmDiscard').hide()"/>
-                    <!--suppress XmlDuplicatedId -->
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn3" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>
