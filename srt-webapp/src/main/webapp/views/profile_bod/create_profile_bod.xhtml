@@ -30,9 +30,9 @@
                             <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
                                             completeMethod="#{createProfileBODBean.completeInput}"
                                             style="width: 440px; margin-right: 20px;">
-                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                <p:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
-                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
+                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{createProfileBODBean.search}"
                                              update="tbl1" icon="ui-icon-search"/>
                         </f:facet>
                         <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
@@ -174,7 +174,7 @@
 
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
                                                         <h:inputText id="abieterm"
-                                                                value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
+                                                                value="#{createProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
