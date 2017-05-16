@@ -135,6 +135,11 @@
 			<version>${org.ow2.asm.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>3.4.0</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
