@@ -38,7 +38,9 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     private String sortColumnHeaderText = "";
     private boolean isSortColumnAscending = false;
 
-    private String searchText;
+    private String searchTextForDen;
+    private String searchTextForDefinition;
+    private String searchTextForModule;
 
     @PostConstruct
     public void init() {
@@ -171,7 +173,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
             coreComponents = coreComponents.stream()
                     .filter(e -> {
-                        String q = getSearchText();
+                        String q = getSearchTextForDen();
                         if (StringUtils.isEmpty(q)) {
                             return true;
                         }
@@ -184,37 +186,40 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                             }
                         }
                         return true;
-                    }).collect(Collectors.toList());
-        }
-
-        return coreComponents;
-    }
-
-    public String getSearchText() {
-        return searchText;
-    }
-
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
-    }
-
-    public List<String> completeInput(String query) {
-        String q = (query != null) ? query.trim() : null;
-
-        if (StringUtils.isEmpty(q)) {
-            return getCoreComponents().stream()
-                    .map(e -> e.getDen())
-                    .collect(Collectors.toList());
-        } else {
-            String[] split = q.split(" ");
-
-            return getCoreComponents().stream()
-                    .map(e -> e.getDen())
-                    .distinct()
+                    })
                     .filter(e -> {
-                        e = e.toLowerCase();
+                        String q = getSearchTextForDefinition();
+                        if (StringUtils.isEmpty(q)) {
+                            return true;
+                        }
+
+                        String definition = e.getDefinition();
+                        if (StringUtils.isEmpty(definition)) {
+                            return false;
+                        }
+                        definition = definition.toLowerCase();
+                        String[] split = q.split(" ");
                         for (String s : split) {
-                            if (!e.contains(s.toLowerCase())) {
+                            if (!definition.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .filter(e -> {
+                        String q = getSearchTextForModule();
+                        if (StringUtils.isEmpty(q)) {
+                            return true;
+                        }
+
+                        String module = e.getModule();
+                        if (StringUtils.isEmpty(module)) {
+                            return false;
+                        }
+                        module = module.toLowerCase();
+                        String[] split = q.split(" ");
+                        for (String s : split) {
+                            if (!module.contains(s.toLowerCase())) {
                                 return false;
                             }
                         }
@@ -222,6 +227,32 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                     })
                     .collect(Collectors.toList());
         }
+
+        return coreComponents;
+    }
+
+    public String getSearchTextForDen() {
+        return searchTextForDen;
+    }
+
+    public void setSearchTextForDen(String searchTextForDen) {
+        this.searchTextForDen = searchTextForDen;
+    }
+
+    public String getSearchTextForDefinition() {
+        return searchTextForDefinition;
+    }
+
+    public void setSearchTextForDefinition(String searchTextForDefinition) {
+        this.searchTextForDefinition = searchTextForDefinition;
+    }
+
+    public String getSearchTextForModule() {
+        return searchTextForModule;
+    }
+
+    public void setSearchTextForModule(String searchTextForModule) {
+        this.searchTextForModule = searchTextForModule;
     }
 
     public void onSortEvent(SortEvent sortEvent) {

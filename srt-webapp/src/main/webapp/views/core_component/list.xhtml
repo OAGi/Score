@@ -45,25 +45,43 @@
                     </div>
 
                     <h:panelGroup>
-                        <p:autoComplete id="searchText" value="#{coreComponentBean.searchText}"
-                                        style="min-width: 440px; margin-right: 20px;"
-                                        maxResults="10"
-                                        completeMethod="#{coreComponentBean.completeInput}">
-                            <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                        </p:autoComplete>
-                        <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
-                                         update="pPanel"
-                                         icon="ui-icon-search"/>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
+                                         style="min-width: 440px; margin-right: 20px;">
+                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                            </p:inputText>
+                            <p:commandButton id="createACCBtn" value="Create ACC"
+                                             action="#{coreComponentBean.createACC}"
+                                             style="float: right; padding: 3px 0 3px 0; width: 105px;"/>
+                        </div>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
+                                         style="min-width: 440px; margin-right: 20px;">
+                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                            </p:inputText>
+                            <p:commandButton id="createASCCPBtn" value="Create ASCCP"
+                                             action="#{coreComponentBean.createASCCP}"
+                                             style="float: right; padding: 3px 0 3px 0; width: 105px;"/>
+                        </div>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
+                                         style="min-width: 440px; margin-right: 20px;">
+                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                            </p:inputText>
+                            <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                             actionListener="#{coreComponentBean.search}"
+                                             update="pPanel"
+                                             icon="ui-icon-search"/>
 
-                        <p:commandButton id="createBCCPBtn" value="Create BCCP"
-                                         action="#{coreComponentBean.createBCCP}"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
-                        <p:commandButton id="createASCCPBtn" value="Create ASCCP"
-                                         action="#{coreComponentBean.createASCCP}"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
-                        <p:commandButton id="createACCBtn" value="Create ACC"
-                                         action="#{coreComponentBean.createACC}"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
+                            <p:commandButton id="createBCCPBtn" value="Create BCCP"
+                                             action="#{coreComponentBean.createBCCP}"
+                                             style="float: right; padding: 3px 0 3px 0; width: 105px;"/>
+                        </div>
+
+                        <p:defaultCommand target="searchBtn"/>
                     </h:panelGroup>
                 </f:facet>
 
