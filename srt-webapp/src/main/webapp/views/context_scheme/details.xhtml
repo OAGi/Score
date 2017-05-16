@@ -147,11 +147,9 @@
                     (i.e., same ID and Agency ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <!--suppress XmlDuplicatedId -->
                     <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <!--suppress XmlDuplicatedId -->
                     <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
