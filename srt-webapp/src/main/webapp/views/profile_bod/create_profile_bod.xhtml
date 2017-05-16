@@ -173,24 +173,21 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="term"
+                                                        <h:inputText id="abieterm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="abieRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="abiedefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -214,8 +211,7 @@
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:selectBooleanCheckbox id="usedCB"
+                                                        <h:selectBooleanCheckbox id="asbieusedCB"
                                                                 value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <p:ajax update=":form:treeTable, :form:details"/>
@@ -225,8 +221,7 @@
                                                 <p:panel id="asbiePanel" header="ASBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="min" value="#{createProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                        <h:inputText id="asbieMin" value="#{createProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -236,8 +231,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="max" value="#{createProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                        <h:inputText id="asbieMax" value="#{createProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -247,8 +241,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:selectBooleanCheckbox id="nillableCB"
+                                                        <h:selectBooleanCheckbox id="asbieNillableCB"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -256,8 +249,7 @@
                                                         </h:selectBooleanCheckbox>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="asbieRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbie.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -265,8 +257,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="asbieDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -279,8 +270,7 @@
                                                 <p:panel id="asbiepPanel" header="ASBIEP">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="term"
+                                                        <h:inputText id="asbieterm"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -288,8 +278,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="asbiepRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbiep.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -297,8 +286,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="asbiepDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbiep.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -311,8 +299,7 @@
                                                 <p:panel id="abiePanel" header="Target ABIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="term"
+                                                        <h:inputText id="asbiepTerm"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -320,8 +307,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="targetABIERemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -329,8 +315,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="targetABIEDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -366,7 +351,7 @@
                                                 <p:panel id="bbiePanel" header="BBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:inputText value="#{createProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                        <h:inputText id="bbieMin" value="#{createProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -376,7 +361,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText value="#{createProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                        <h:inputText id="bbieMax" value="#{createProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -386,7 +371,6 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
                                                         <h:selectBooleanCheckbox id="nillableCB"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -395,8 +379,7 @@
                                                         </h:selectBooleanCheckbox>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="fixedValue"
+                                                        <h:inputText id="bbieFixedValue"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -404,8 +387,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="bbieRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbie.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -413,7 +395,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="bbieDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbie.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -426,8 +408,7 @@
                                                 <p:panel id="bbiepPanel" header="BBIEP">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="term"
+                                                        <h:inputText id="bbiepTerm"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -435,8 +416,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="bbiepRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbiep.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -444,8 +424,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="bbiepDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbiep.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -479,8 +458,7 @@
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <p:autoComplete id="primitiveAuto" value="#{createProfileBODBean.bbieXbtName}"
+                                                        <p:autoComplete id="bdtPriRestriPrimitiveAuto" value="#{createProfileBODBean.bbieXbtName}"
                                                                         completeMethod="#{createProfileBODBean.completeInputForBbieXbt}"
                                                                         dropdown="true" disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                         style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
@@ -494,8 +472,7 @@
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <p:autoComplete id="codeListAuto" value="#{createProfileBODBean.bbieCodeListName}"
+                                                        <p:autoComplete id="bdtPriRestriCodeListAuto" value="#{createProfileBODBean.bbieCodeListName}"
                                                                         completeMethod="#{createProfileBODBean.completeInputForBbieCodeList}"
                                                                         dropdown="true" disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                         style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
@@ -510,8 +487,7 @@
                                                         <h:outputText value="Agency ID List"
                                                                       styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <p:autoComplete id="agencyAuto"
+                                                        <p:autoComplete id="bdtPriRestriAgencyAuto"
                                                                 value="#{createProfileBODBean.bbieAgencyIdListName}"
                                                                 completeMethod="#{createProfileBODBean.completeInputForBbieAgencyIdList}"
                                                                 dropdown="true" disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -537,8 +513,7 @@
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:selectBooleanCheckbox id="usedCB"
+                                                        <h:selectBooleanCheckbox id="bbieScUsedCB"
                                                                 value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <p:ajax update=":form:treeTable, :form:details"/>
@@ -548,8 +523,7 @@
                                                 <p:panel id="bbieScPanel" header="BBIE SC">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="min" value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                        <h:inputText id="bbieScMin" value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -559,8 +533,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="max" value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                        <h:inputText id="bbieScMax" value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
                                                                      styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -570,8 +543,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="fixedValue"
+                                                        <h:inputText id="bbieScFixedValue"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -579,7 +551,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Default" styleClass="section-label"/>
-                                                        <h:inputText id="default"
+                                                        <h:inputText id="bbieScDefault"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -587,8 +559,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="term"
+                                                        <h:inputText id="bbieScTerm"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.bizTerm}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -596,8 +567,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputText id="remark"
+                                                        <h:inputText id="bbieScRemark"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.remark}"
                                                                 styleClass="section-content input-section ${createProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -605,8 +575,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <!--suppress XmlDuplicatedId -->
-                                                        <h:inputTextarea id="definition"
+                                                        <h:inputTextarea id="bbieScDefinition"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
                                                                 rows="6" autoResize="false"
                                                                 a:placeholder="Leave a definition"
@@ -640,7 +609,6 @@
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
                                                         <p:autoComplete id="primitiveAuto" value="#{createProfileBODBean.bbieScXbtName}"
                                                                         completeMethod="#{createProfileBODBean.completeInputForBbieScXbt}"
                                                                         dropdown="true" disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -655,7 +623,6 @@
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
                                                         <p:autoComplete id="codeListAuto"
                                                                 value="#{createProfileBODBean.bbieScCodeListName}"
                                                                 completeMethod="#{createProfileBODBean.completeInputForBbieScCodeList}"
@@ -672,7 +639,6 @@
                                                         <h:outputText value="Agency ID List"
                                                                       styleClass="section-label"/>
 
-                                                        <!--suppress XmlDuplicatedId -->
                                                         <p:autoComplete id="agencyAuto"
                                                                 value="#{createProfileBODBean.bbieScAgencyIdListName}"
                                                                 completeMethod="#{createProfileBODBean.completeInputForBbieScAgencyIdList}"
