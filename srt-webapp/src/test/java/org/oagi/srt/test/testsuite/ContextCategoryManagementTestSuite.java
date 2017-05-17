@@ -7,16 +7,16 @@ import org.oagi.srt.test.testcase.*;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class UserManagementTestSuite {
+public class ContextCategoryManagementTestSuite {
 
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(CreateUserTestCase.class);
-        suite.addTestSuite(UserLogInAndOutTestCase.class);
-        suite.addTestSuite(InvalidUserLogInTestCase.class);
-        suite.addTestSuite(CreateDuplicateUserTestCase.class);
-        suite.addTestSuite(CreateUserWithTooShortPasswordTestCase.class);
-        suite.addTestSuite(CreateUserWithUnmatchedPasswordsTestCase.class);
+        suite.addTestSuite(UserLogInTestCase.class);
+        suite.addTestSuite(CreateContextCategoryTestCase.class);
+        suite.addTestSuite(CreateDuplicateContextCategoryTestCase.class);
+        suite.addTestSuite(CreateContextCategoryNoNameTestCase.class);
+        suite.addTestSuite(UpdateContextCategoryTestCase.class);
+        suite.addTestSuite(DiscardContextCategoryTestCase.class);
         return suite;
     }
 

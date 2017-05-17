@@ -6,7 +6,7 @@ import org.openqa.selenium.By;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class CreateUserWithTooShortPasswordTestCase extends BasicTestCase {
+public class CreateUserWithTooShortPasswordTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateARegularUserWithTooShortPassword() throws Exception {

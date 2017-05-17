@@ -6,7 +6,7 @@ import org.openqa.selenium.By;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class CreateDuplicateUserTestCase extends BasicTestCase {
+public class CreateDuplicateUserTestCase extends BaseTestCase {
     
     @Test
     public void testCaseDuplicateAccountCreation() throws Exception {

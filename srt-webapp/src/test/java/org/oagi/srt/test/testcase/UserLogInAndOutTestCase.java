@@ -6,7 +6,7 @@ import org.openqa.selenium.By;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class UserLogInAndOutTestCase extends BasicTestCase {
+public class UserLogInAndOutTestCase extends BaseTestCase {
 
     @Test
     public void testCaseValidRegularUserLoginAndOut() throws Exception {

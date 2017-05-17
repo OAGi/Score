@@ -6,7 +6,7 @@ import org.openqa.selenium.By;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class CreateUserWithUnmatchedPasswordsTestCase extends BasicTestCase {
+public class CreateUserWithUnmatchedPasswordsTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateARegularUserWithUnmatchedPasswords() throws Exception {

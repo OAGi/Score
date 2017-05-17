@@ -6,7 +6,7 @@ import org.openqa.selenium.By;
 /**
  * Created by Miroslav Ljubicic on 5/16/2017.
  */
-public class InvalidUserLogInTestCase extends BasicTestCase {
+public class InvalidUserLogInTestCase extends BaseTestCase {
 
     @Test
     public void testCaseInvalidRegularUserLogin() throws Exception {
