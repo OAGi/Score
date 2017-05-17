@@ -8,7 +8,7 @@ import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.TopLevelAbie;
-import org.oagi.srt.standalone.StandaloneXMLSchema;
+import org.oagi.srt.service.ProfileBODGenerateService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -55,7 +55,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private TopLevelAbieRepository topLevelAbieRepository;
 
 	@Autowired
-	private StandaloneXMLSchema standaloneXMLSchema;
+	private ProfileBODGenerateService profileBODGenerateService;
 
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();
@@ -195,33 +195,21 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}
 
-		filePath = standaloneXMLSchema.generateXMLSchema(al, true);
-		System.out.println("### " + filePath);
+		generateSchemaFile = profileBODGenerateService.generateXMLSchema(al, null);
+		System.out.println("### " + generateSchemaFile);
 	}
 	
 	private StreamedContent file;
-	private String filePath;
-    
-    public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
+	private File generateSchemaFile;
 
 	public void setFile(StreamedContent file) {
 		this.file = file;
 	}
 
-	public StreamedContent getFile() {
-    	InputStream stream;
-		try {
-			stream = new FileInputStream(new File(filePath));
-			file = new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-        return file;
-    }
+	public StreamedContent getFile() throws IOException {
+		InputStream stream = new FileInputStream(generateSchemaFile);
+		String filePath = generateSchemaFile.getCanonicalPath();
+		file = new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
+		return file;
+	}
 }

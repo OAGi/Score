@@ -286,7 +286,7 @@ public class AssociationCoreComponent
     @Override
     public AssociationCoreComponent clone() {
         AssociationCoreComponent clone = new AssociationCoreComponent();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
         clone.setCardinalityMax(this.cardinalityMax);
         clone.setSeqKey(this.seqKey);
@@ -311,6 +311,7 @@ public class AssociationCoreComponent
         if (this.currentAsccId != null) {
             clone.setCurrentAsccId(this.currentAsccId);
         }
+        clone.afterLoaded();
         return clone;
     }
 

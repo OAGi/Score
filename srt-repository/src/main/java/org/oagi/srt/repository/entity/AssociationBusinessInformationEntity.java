@@ -416,7 +416,7 @@ public class AssociationBusinessInformationEntity
     @Override
     public AssociationBusinessInformationEntity clone() {
         AssociationBusinessInformationEntity clone = new AssociationBusinessInformationEntity();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.fromAbieId = this.fromAbieId;
         clone.toAsbiepId = this.toAsbiepId;
         clone.basedAsccId = this.basedAsccId;
@@ -427,6 +427,7 @@ public class AssociationBusinessInformationEntity
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }

@@ -328,7 +328,7 @@ public class BasicCoreComponent
     @Override
     public BasicCoreComponent clone() {
         BasicCoreComponent clone = new BasicCoreComponent();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
         clone.setCardinalityMax(this.cardinalityMax);
         clone.setFromAccId(this.fromAccId);

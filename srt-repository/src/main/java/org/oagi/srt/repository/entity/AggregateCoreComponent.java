@@ -338,7 +338,7 @@ public class AggregateCoreComponent
     @Override
     public AggregateCoreComponent clone() {
         AggregateCoreComponent clone = new AggregateCoreComponent();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setObjectClassTerm(this.objectClassTerm);
         clone.setDen(this.den);
         clone.setDefinition(this.definition);
@@ -371,6 +371,7 @@ public class AggregateCoreComponent
         }
         clone.setDeprecated(this.deprecated);
         clone.setAbstract(this.isAbstract);
+        clone.afterLoaded();
         return clone;
     }
 

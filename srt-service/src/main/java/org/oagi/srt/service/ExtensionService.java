@@ -125,25 +125,25 @@ public class ExtensionService {
             AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc, User currentLoginUser) {
         updateStateACCForException(ueAcc, currentLoginUser);
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(ueAcc.getAccId());
-        int latestRevisionTrackingNum = latestHistoryAccList.stream()
-                .mapToInt(e -> e.getRevisionTrackingNum())
+        int latestRevisionNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
                 .max().getAsInt();
-        createACCHistoryForExtension(ueAcc, latestRevisionTrackingNum + 1);
+        createACCHistoryForExtension(ueAcc, latestRevisionNum + 1);
 
         AssociationCoreComponentProperty ueAsccp = updateASCCPForExtension(ueAcc, currentLoginUser);
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
                 asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(ueAsccp.getAsccpId());
-        latestRevisionTrackingNum = latestHistoryAsccpList.stream()
-                .mapToInt(e -> e.getRevisionTrackingNum())
+        latestRevisionNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionNum())
                 .max().getAsInt();
-        createASCCPHistoryForExtension(ueAsccp, latestRevisionTrackingNum + 1);
+        createASCCPHistoryForExtension(ueAsccp, latestRevisionNum + 1);
 
         AssociationCoreComponent ueAscc = updateASCCForException(eAcc, ueAsccp, currentLoginUser);
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(ueAscc.getAsccId());
-        latestRevisionTrackingNum = latestHistoryAsccList.stream()
-                .mapToInt(e -> e.getRevisionTrackingNum())
+        latestRevisionNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
                 .max().getAsInt();
-        createASCCHistoryForExtension(ueAscc, latestRevisionTrackingNum + 1);
+        createASCCHistoryForExtension(ueAscc, latestRevisionNum + 1);
 
         return ueAcc;
     }
@@ -174,21 +174,10 @@ public class ExtensionService {
     }
 
     private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum) {
-        AggregateCoreComponent accHistory = new AggregateCoreComponent();
-        accHistory.setGuid(Utility.generateGUID());
-        accHistory.setObjectClassTerm(ueAcc.getObjectClassTerm());
-        accHistory.setDen(ueAcc.getDen());
-        accHistory.setDefinition(ueAcc.getDefinition());
-        accHistory.setOagisComponentType(ueAcc.getOagisComponentType());
-        accHistory.setCreatedBy(ueAcc.getCreatedBy());
-        accHistory.setLastUpdatedBy(ueAcc.getLastUpdatedBy());
-        accHistory.setOwnerUserId(ueAcc.getOwnerUserId());
-        accHistory.setState(ueAcc.getState());
+        AggregateCoreComponent accHistory = ueAcc.clone();
         accHistory.setRevisionNum(revisionNum);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(Insert);
-        accHistory.setCurrentAccId(ueAcc.getAccId());
-        accHistory.setNamespaceId(ueAcc.getNamespaceId());
         accRepository.saveAndFlush(accHistory);
     }
 
@@ -196,8 +185,7 @@ public class ExtensionService {
                                                                      User currentLoginUser,
                                                                      AggregateCoreComponent ueAcc) {
         AssociationCoreComponentProperty ueAsccp = createASCCP(ueAcc, currentLoginUser);
-        ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
-        ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
+        ueAsccp.setPropertyTerm(ueAsccp.getPropertyTerm(), ueAcc);
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAsccp.setState(Published);
         return asccpRepository.saveAndFlush(ueAsccp);

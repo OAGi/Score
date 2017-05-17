@@ -349,7 +349,7 @@ public class BasicCoreComponentProperty
     @Override
     public BasicCoreComponentProperty clone() {
         BasicCoreComponentProperty clone = new BasicCoreComponentProperty();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
         clone.setRepresentationTerm(this.representationTerm);
         clone.setBdtId(this.bdtId);
@@ -380,6 +380,7 @@ public class BasicCoreComponentProperty
         }
         clone.setNillable(this.nillable);
         clone.setDefaultValue(this.defaultValue);
+        clone.afterLoaded();
         return clone;
     }
 

@@ -74,6 +74,12 @@ public class CreateContextSchemeTestCase extends BaseTestCase {
         }
 
         try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
             assertEquals("Context Scheme", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
         } catch (Error e) {
             getVerificationErrors().append(e.toString());

@@ -26,6 +26,12 @@ public class DiscardContextCategoryTestCase extends BaseTestCase {
                 Thread.sleep(1000);
             }
 
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             assertEquals("Context Category", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
         } catch (Error e) {
             getVerificationErrors().append(e.toString());

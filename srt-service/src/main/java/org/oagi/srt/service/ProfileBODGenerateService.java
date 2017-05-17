@@ -1,11 +1,13 @@
-package org.oagi.srt.standalone;
+package org.oagi.srt.service;
 
+import org.apache.commons.io.FileUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
+import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 import static org.oagi.srt.common.SRTConstants.OAGI_NS;
 
 @Component
-public class StandaloneXMLSchema {
+public class ProfileBODGenerateService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -93,16 +95,22 @@ public class StandaloneXMLSchema {
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
-    public String writeXSDFile(Document doc, String filename) throws IOException {
-        File file = File.createTempFile(filename, ".xsd");
+    public File writeXSDFile(Document doc, String filename) throws IOException {
+        File file = File.createTempFile("oagis-", null);
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             outputter.output(doc, outputStream);
             outputStream.flush();
         }
 
-        System.out.println(file + " is generated");
-        return file.getCanonicalPath();
+        File renamedFile = new File(file.getParentFile(), filename + ".xsd");
+        if (file.renameTo(renamedFile)) {
+            FileUtils.deleteQuietly(file);
+            file = renamedFile;
+        }
+
+        logger.info(file + " is generated");
+        return file;
     }
 
     public Element generateSchema(Document doc) {
@@ -1411,34 +1419,59 @@ public class StandaloneXMLSchema {
         }
     }
 
-    public String generateXMLSchema(List<Long> topLevelAbieIds, boolean schema_package_flag) throws Exception {
-        String filepath = null;
+    public File generateXMLSchema(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
+        if (topLevelAbieIds == null || topLevelAbieIds.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        if (option == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (option.getSchemaPackage()) {
+            case All:
+                return generateXMLSchemaForAll(topLevelAbieIds, option);
+
+            case Each:
+                return generateXMLSchemaForEach(topLevelAbieIds, option);
+
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    private File generateXMLSchemaForAll(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
+        Document doc = new Document();
+        Element schemaNode = generateSchema(doc);
+
+        for (long topLevelAbieId : topLevelAbieIds) {
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            GenerationContext generationContext = new GenerationContext(topLevelAbie);
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+
+            AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
+            logger.debug("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
+            doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
+        }
+
+        return writeXSDFile(doc, Utility.generateGUID() + "_standalone");
+    }
+
+    private File generateXMLSchemaForEach(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
+        List<File> targetFiles = new ArrayList();
         for (long topLevelAbieId : topLevelAbieIds) {
             TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
             GenerationContext generationContext = new GenerationContext(topLevelAbie);
             AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
 
             Document doc = new Document();
-
             Element schemaNode = generateSchema(doc);
-            String filename = null;
-            if (schema_package_flag == true) {
-                AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
-                System.out.println("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
-                doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
-                AssociationCoreComponentProperty asccpvo = generationContext.findASCCP(asbiep.getBasedAsccpId());
-                filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
-                filepath = writeXSDFile(doc, filename + "_standalone");
-            } else {
-                AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
-                doc = new Document();
-                schemaNode = generateSchema(doc);
-                doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
-                writeXSDFile(doc, "Package/" + abie.getGuid());
-                filepath = Zip.compression(Utility.generateGUID());
-            }
+
+            AssociationBusinessInformationEntityProperty asbiep;
+            asbiep = generationContext.receiveASBIEP(abie.getAbieId());
+            doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
+            targetFiles.add(writeXSDFile(doc, abie.getGuid()));
         }
 
-        return filepath;
+        return Zip.compression(targetFiles, Utility.generateGUID());
     }
 }

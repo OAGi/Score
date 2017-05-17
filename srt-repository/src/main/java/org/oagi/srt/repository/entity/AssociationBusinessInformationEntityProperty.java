@@ -332,7 +332,7 @@ public class AssociationBusinessInformationEntityProperty
     @Override
     public AssociationBusinessInformationEntityProperty clone() {
         AssociationBusinessInformationEntityProperty clone = new AssociationBusinessInformationEntityProperty();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedAsccpId = this.basedAsccpId;
         clone.roleOfAbieId = this.roleOfAbieId;
         clone.definition = this.definition;

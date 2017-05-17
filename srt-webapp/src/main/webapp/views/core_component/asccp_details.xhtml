@@ -531,7 +531,13 @@
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
                                  onclick="PF('confirmPublish').show();"
-                                 disabled="#{asccpDetailBean.targetAsccp.dirty}"/>
+                                 disabled="#{asccpDetailBean.targetAsccp.dirty}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Published' and asccpDetailBean.hasPreviousRevision(asccpDetailBean.targetAsccp)}"
+                                 id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
+                                 action="#{asccpDetailBean.createNewRevision(asccpDetailBean.targetAsccp)}"
+                                 disabled="#{asccpDetailBean.targetAsccp.dirty}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
             <p:panel id="btnGroup2"
