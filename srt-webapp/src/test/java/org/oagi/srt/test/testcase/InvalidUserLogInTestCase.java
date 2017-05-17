@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
- * Created by Miroslav Ljubicic on 5/16/2017.
+ * Created by Miroslav Ljubicic.
  */
 public class InvalidUserLogInTestCase extends BaseTestCase {
 

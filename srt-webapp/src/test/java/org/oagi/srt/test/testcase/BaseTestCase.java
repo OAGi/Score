@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 //import org.openqa.selenium.support.ui.Select;
 
 /**
- * Created by Miroslav Ljubicic on 5/16/2017.
+ * Created by Miroslav Ljubicic.
  */
 public abstract class BaseTestCase extends TestCase {
     private static WebDriver driver;

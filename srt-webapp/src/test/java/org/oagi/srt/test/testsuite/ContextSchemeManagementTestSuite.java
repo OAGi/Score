@@ -7,15 +7,17 @@ import org.oagi.srt.test.testcase.*;
 /**
  * Created by Miroslav Ljubicic.
  */
-public class ContextCategoryManagementTestSuite {
+public class ContextSchemeManagementTestSuite {
 
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(UserLogInTestCase.class);
         suite.addTestSuite(CreateContextCategoryTestCase.class);
-        suite.addTestSuite(CreateDuplicateContextCategoryTestCase.class);
-        suite.addTestSuite(CreateContextCategoryNoNameTestCase.class);
-        suite.addTestSuite(UpdateContextCategoryTestCase.class);
+        suite.addTestSuite(CreateContextSchemeTestCase.class);
+        suite.addTestSuite(CreateDuplicateContextSchemeTestCase.class);
+        suite.addTestSuite(CreateInvalidContextSchemeTestCase.class);
+        suite.addTestSuite(UpdateContextSchemeTestCase.class);
+        suite.addTestSuite(DiscardContextSchemeTestCase.class);
         suite.addTestSuite(DiscardContextCategoryTestCase.class);
         return suite;
     }

@@ -5,7 +5,7 @@ import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.oagi.srt.test.testcase.*;
 
 /**
- * Created by Miroslav Ljubicic on 5/16/2017.
+ * Created by Miroslav Ljubicic.
  */
 public class UserManagementTestSuite {
 

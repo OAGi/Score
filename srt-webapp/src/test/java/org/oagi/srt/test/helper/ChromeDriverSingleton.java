@@ -4,7 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 /**
- * Created by Miroslav Ljubicic on 5/17/2017.
+ * Created by Miroslav Ljubicic.
  */
 public class ChromeDriverSingleton {
     private static WebDriver instance;
