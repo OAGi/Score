@@ -22,7 +22,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 
-		<org.joinfaces.version>2.2.7</org.joinfaces.version>
+		<org.joinfaces.version>2.3.9</org.joinfaces.version>
 	</properties>
 
 	<dependencies>
@@ -53,6 +53,11 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 
 		<dependency>

@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.component;
 
+import org.primefaces.component.api.Pageable;
 import org.primefaces.component.api.UIData;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.datatable.DataTableRenderer;
@@ -88,13 +89,13 @@ public class SRTDataTableRenderer extends DataTableRenderer {
     }
 
     @Override
-    public void encodePaginatorMarkup(FacesContext context, UIData uidata, String position) throws IOException {
-        dataRenderer.encodePaginatorMarkup(context, uidata, position);
+    public void encodePaginatorMarkup(FacesContext context, Pageable pageable, String position) throws IOException {
+        dataRenderer.encodePaginatorMarkup(context, pageable, position);
     }
 
     @Override
-    public void encodePaginatorConfig(FacesContext context, UIData uidata, WidgetBuilder wb) throws IOException {
-        dataRenderer.encodePaginatorConfig(context, uidata, wb);
+    public void encodePaginatorConfig(FacesContext context, Pageable pageable, WidgetBuilder wb) throws IOException {
+        dataRenderer.encodePaginatorConfig(context, pageable, wb);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.oagi.srt.web.jsf.component;
 
-import org.primefaces.component.api.UIData;
+import org.primefaces.component.api.Pageable;
 
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class PageLinkRenderer {
 
-    public void render(FacesContext context, UIData uidata, String linkClass, String iconClass, boolean disabled, String ariaLabel, String text) throws IOException {
+    public void render(FacesContext context, Pageable pageable, String linkClass, String iconClass, boolean disabled, String ariaLabel, String text) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
         String styleClass = disabled ? linkClass + " ui-state-disabled" : linkClass;
 

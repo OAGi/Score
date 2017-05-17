@@ -33,8 +33,8 @@ jsf:
   datetimeconverter-default-timezone-is-system-timezone: true
 
   primefaces:
-    theme: home
-    uploader: common
+    theme: omega
+    uploader: commons
     client-side-validation: true
     public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu
     private-captcha-key: 6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR

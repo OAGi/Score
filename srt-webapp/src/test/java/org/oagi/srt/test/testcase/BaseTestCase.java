@@ -4,8 +4,14 @@ import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.openqa.selenium.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.net.URL;
 import java.util.Locale;
@@ -14,7 +20,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Miroslav Ljubicic.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
 public abstract class BaseTestCase extends TestCase {
+
+    @Autowired
+    private WebApplicationContext context;
+
     private static WebDriver driver;
     private String baseUrl;
     private boolean acceptNextAlert = true;
