@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.openqa.selenium.*;
 
+import java.net.URL;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -39,8 +40,7 @@ public abstract class BaseTestCase extends TestCase {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
+    private String getWebdriverPath() {
         String webdriver;
         switch (getOperatingSystem()) {
             case Windows:
@@ -53,7 +53,20 @@ public abstract class BaseTestCase extends TestCase {
                 throw new UnsupportedOperationException("Unsupported Operating System: " + (System.getProperty("os.name")));
         }
 
-        System.setProperty("webdriver.chrome.driver", "./srt-webapp/src/test/resources/" + webdriver);
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL webdriverResource = classLoader.getResource(webdriver);
+        String webdriverPath = (webdriverResource != null) ? webdriverResource.getFile() : null;
+        if (StringUtils.isEmpty(webdriverPath)) {
+            throw new IllegalStateException("Can't find webdriver from resources.");
+        }
+        return webdriverPath;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        String webdriverPath = getWebdriverPath();
+
+        System.setProperty("webdriver.chrome.driver", webdriverPath);
         driver = ChromeDriverSingleton.getInstance();
         baseUrl = "http://localhost:8080"; // http://129.6.33.174:8080
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -61,7 +74,8 @@ public abstract class BaseTestCase extends TestCase {
 
     @After
     public void tearDown() throws Exception {
-//        driver.quit();
+        ChromeDriverSingleton.quitDriver();
+
         String verificationErrorString = verificationErrors.toString();
         if (!StringUtils.isEmpty(verificationErrorString)) {
             fail(verificationErrorString);

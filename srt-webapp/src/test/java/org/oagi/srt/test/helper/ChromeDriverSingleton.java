@@ -12,14 +12,17 @@ public class ChromeDriverSingleton {
     private ChromeDriverSingleton() {
     }
 
-    public static WebDriver getInstance() {
-        if(instance == null){
+    public static synchronized WebDriver getInstance() {
+        if (instance == null) {
             instance = new ChromeDriver();
         }
         return instance;
     }
 
-    public static void quitDriver(){
-        instance.quit();
+    public static synchronized void quitDriver() {
+        if (instance != null) {
+            instance.quit();
+            instance = null;
+        }
     }
 }
