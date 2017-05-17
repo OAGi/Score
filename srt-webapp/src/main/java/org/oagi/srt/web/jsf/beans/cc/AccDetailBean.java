@@ -865,5 +865,23 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     public String back() {
         return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
+
+    /*
+     * Create New Revision
+     */
+    public boolean hasPreviousRevision(AggregateCoreComponent acc) {
+        Long accId = acc.getAccId();
+        List<AggregateCoreComponent> latestRevisionNumAccs =
+                accRepository.findAllWithLatestRevisionNumByCurrentAccId(accId);
+        return !latestRevisionNumAccs.isEmpty();
+    }
+
+    @Transactional
+    public String createNewRevision(AggregateCoreComponent acc) {
+        User requester = getCurrentUser();
+        acc = coreComponentService.newAggregateCoreComponentRevision(requester, acc);
+        setTargetAcc(acc);
+        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+    }
 }
 

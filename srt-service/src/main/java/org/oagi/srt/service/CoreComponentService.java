@@ -145,6 +145,40 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent newAggregateCoreComponentRevision(User user, AggregateCoreComponent acc) {
+        long requesterId = user.getAppUserId();
+        if (acc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        acc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        acc.addPersistEventListener(eventListener);
+
+        acc = accRepository.saveAndFlush(acc);
+
+        AggregateCoreComponent accHistory = acc.clone();
+        Long currentAccId = acc.getAccId();
+        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        if (latestHistoryAccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().getAsInt();
+        accHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        accHistory.setRevisionTrackingNum(revisionTrackingNum);
+        accHistory.setRevisionAction(Insert);
+        accHistory.setCurrentAccId(acc.getAccId());
+
+        accRepository.save(accHistory);
+
+        return acc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public AssociationCoreComponentProperty newAssociationCoreComponentProperty(User user, AggregateCoreComponent roleOfAcc) {
         long requesterId = user.getAppUserId();
 
@@ -179,6 +213,40 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponentProperty newAssociationCoreComponentPropertyRevision(User user, AssociationCoreComponentProperty asccp) {
+        long requesterId = user.getAppUserId();
+        if (asccp.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        asccp.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        asccp.addPersistEventListener(eventListener);
+
+        asccp = asccpRepository.saveAndFlush(asccp);
+
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        Long currentAsccpId = asccp.getAsccpId();
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        if (latestHistoryAsccpList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().getAsInt();
+        asccpHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        asccpHistory.setRevisionAction(Insert);
+        asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+
+        asccpRepository.save(asccpHistory);
+
+        return asccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public BasicCoreComponentProperty newBasicCoreComponentProperty(User user, DataType bdt) {
         long requesterId = user.getAppUserId();
 
@@ -200,6 +268,40 @@ public class CoreComponentService {
         BasicCoreComponentProperty bccpHistory = bccp.clone();
         int revisionNum = 1;
         bccpHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setCurrentBccpId(bccp.getBccpId());
+
+        bccpRepository.save(bccpHistory);
+
+        return bccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponentProperty newBasicCoreComponentPropertyRevision(User user, BasicCoreComponentProperty bccp) {
+        long requesterId = user.getAppUserId();
+        if (bccp.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        bccp.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        bccp.addPersistEventListener(eventListener);
+
+        bccp = bccpRepository.saveAndFlush(bccp);
+
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        Long currentBccpId = bccp.getBccpId();
+        List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        if (latestHistoryBccpList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryBccpList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().getAsInt();
+        bccpHistory.setRevisionNum(latestRevisionNum + 1);
         int revisionTrackingNum = 1;
         bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
         bccpHistory.setRevisionAction(Insert);

@@ -206,5 +206,23 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     public String back() {
         return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
+
+    /*
+     * Create New Revision
+     */
+    public boolean hasPreviousRevision(AssociationCoreComponentProperty asccp) {
+        Long asccpId = asccp.getAsccpId();
+        List<AssociationCoreComponentProperty> latestRevisionNumAsccps =
+                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(asccpId);
+        return !latestRevisionNumAsccps.isEmpty();
+    }
+
+    @Transactional
+    public String createNewRevision(AssociationCoreComponentProperty asccp) {
+        User requester = getCurrentUser();
+        asccp = coreComponentService.newAssociationCoreComponentPropertyRevision(requester, asccp);
+        setTargetAsccp(asccp);
+        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+    }
 }
 

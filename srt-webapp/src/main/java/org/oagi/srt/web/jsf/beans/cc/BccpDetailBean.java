@@ -211,5 +211,23 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
     public String back() {
         return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
     }
+
+    /*
+     * Create New Revision
+     */
+    public boolean hasPreviousRevision(BasicCoreComponentProperty bccp) {
+        Long bccpId = bccp.getBccpId();
+        List<BasicCoreComponentProperty> latestRevisionNumBccps =
+                bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(bccpId);
+        return !latestRevisionNumBccps.isEmpty();
+    }
+
+    @Transactional
+    public String createNewRevision(BasicCoreComponentProperty bccp) {
+        User requester = getCurrentUser();
+        bccp = coreComponentService.newBasicCoreComponentPropertyRevision(requester, bccp);
+        setTargetBccp(bccp);
+        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+    }
 }
 
