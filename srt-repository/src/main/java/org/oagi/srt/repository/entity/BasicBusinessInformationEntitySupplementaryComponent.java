@@ -536,7 +536,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     public BasicBusinessInformationEntitySupplementaryComponent clone() {
         BasicBusinessInformationEntitySupplementaryComponent clone =
                 new BasicBusinessInformationEntitySupplementaryComponent();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.bbieId = this.bbieId;
         clone.dtScId = this.dtScId;
         clone.dtScPriRestriId = this.dtScPriRestriId;

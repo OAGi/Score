@@ -440,7 +440,7 @@ public class AggregateBusinessInformationEntity
     @Override
     public AggregateBusinessInformationEntity clone() {
         AggregateBusinessInformationEntity clone = new AggregateBusinessInformationEntity();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedAccId = this.basedAccId;
         clone.bizCtxId = this.bizCtxId;
         clone.definition = this.definition;

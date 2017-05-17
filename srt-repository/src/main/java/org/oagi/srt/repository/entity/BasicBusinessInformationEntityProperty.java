@@ -338,7 +338,7 @@ public class BasicBusinessInformationEntityProperty
     @Override
     public BasicBusinessInformationEntityProperty clone() {
         BasicBusinessInformationEntityProperty clone = new BasicBusinessInformationEntityProperty();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedBccpId = this.basedBccpId;
         clone.definition = this.definition;
         clone.remark = this.remark;

@@ -323,7 +323,7 @@ public class AssociationCoreComponentProperty
     @Override
     public AssociationCoreComponentProperty clone() {
         AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
         clone.setDefinition(this.definition);
         clone.setRoleOfAccId(this.roleOfAccId);

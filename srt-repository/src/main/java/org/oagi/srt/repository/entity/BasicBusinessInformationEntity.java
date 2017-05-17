@@ -642,7 +642,7 @@ public class BasicBusinessInformationEntity
     @Override
     public BasicBusinessInformationEntity clone() {
         BasicBusinessInformationEntity clone = new BasicBusinessInformationEntity();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedBccId = this.basedBccId;
         clone.fromAbieId = this.fromAbieId;
         clone.toBbiepId = this.toBbiepId;

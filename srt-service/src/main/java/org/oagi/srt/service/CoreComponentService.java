@@ -184,8 +184,7 @@ public class CoreComponentService {
 
         AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
         asccp.setGuid(Utility.generateGUID());
-        asccp.setPropertyTerm("A new ASCCP property");
-        asccp.setRoleOfAccId(roleOfAcc.getAccId());
+        asccp.setPropertyTerm("A new ASCCP property", roleOfAcc);
         asccp.setState(CoreComponentState.Editing);
         asccp.setReusableIndicator(true); // Default value should be true.
         asccp.setOwnerUserId(requesterId);
