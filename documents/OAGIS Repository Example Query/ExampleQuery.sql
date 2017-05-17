@@ -98,7 +98,7 @@ select * from CODE_LIST where NAME like '%Action%';
 /* view code list values */
 select CODE_LIST.NAME as CODE_LIST_NAME, CODE_LIST_VALUE.VALUE AS CODE, CODE_LIST_VALUE.DEFINITION AS DEFINITION from CODE_LIST_VALUE inner join CODE_LIST on CODE_LIST.CODE_LIST_ID = CODE_LIST_VALUE.CODE_LIST_ID where CODE_LIST.CODE_LIST_ID = 1;
 
-/* domain value restriction of a DT */
+/* domain value restriction of a DT. Replace the 3 BDT_PRI_RESTRI.BDT_ID with the DT_ID you want to query the value domain for. */
 select XBT.NAME as VALUE_DOMAIN from 
 (
    BDT_PRI_RESTRI 
@@ -115,18 +115,33 @@ select XBT.NAME as VALUE_DOMAIN from
    on
    BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID = CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID
 )
-where BDT_PRI_RESTRI.BDT_ID = 95
+where BDT_PRI_RESTRI.BDT_ID = 210
 union
 select CODE_LIST.NAME as VALUE_DOMAIN from 
   BDT_PRI_RESTRI inner join CODE_LIST on BDT_PRI_RESTRI.CODE_LIST_ID = CODE_LIST.CODE_LIST_ID
-  where BDT_PRI_RESTRI.BDT_ID = 95
+  where BDT_PRI_RESTRI.BDT_ID = 210
 union
 select AGENCY_ID_LIST.NAME as VALUE_DOMAIN from 
   BDT_PRI_RESTRI inner join AGENCY_ID_LIST on BDT_PRI_RESTRI.AGENCY_ID_LIST_ID = AGENCY_ID_LIST.AGENCY_ID_LIST_ID
-  where BDT_PRI_RESTRI.BDT_ID = 95;
+  where BDT_PRI_RESTRI.BDT_ID = 210;
   
 /* get supplementary components of a DT */
 select * from DT_SC where DT_SC.OWNER_DT_ID = 1 and DT_SC.CARDINALITY_MAX > 0;
+
+
+/* Searching for something with the word 'profile' or 'ship' in it. We were trying to map the ShippingProfile component
+from Oracle EBO to OAGIS. */
+select den from ACC where LOWER(definition) like '%profile%' or LOWER(definition) like '%ship%' or LOWER(den) like '%profile%' or LOWER(den) like '%ship%'; 
+
+
+select den from ASCCP where LOWER(definition) like '%profile%' or LOWER(definition) like '%ship%' or LOWER(den) like '%profile%' or LOWER(den) like '%ship%'; 
+select den from BCCP where LOWER(definition) like '%profile%' or LOWER(definition) like '%ship%' or LOWER(den) like '%profile%' or LOWER(den) like '%ship%';
+
+/*get the Nouns via ACC */
+select SUBSTR(ACC.DEN, 1, INSTR(ACC.DEN, '.', 1)-1) , DEFINITION from ACC inner join (select SUBSTR(MODULE, INSTR(MODULE, '\', -1, 1)+1, LENGTH(MODULE)) as NOUNS from MODULE where MODULE.MODULE like '%Nouns%') on REPLACE(SUBSTR(ACC.DEN, 1, INSTR(ACC.DEN, '.', 1)-1), ' ', '') = NOUNS ORDER BY DEN;
+
+/*get the Nouns via ASCCP */
+select SUBSTR(ASCCP.DEN, 1, INSTR(ASCCP.DEN, '.', 1)-1) , DEFINITION from ASCCP inner join (select SUBSTR(MODULE, INSTR(MODULE, '\', -1, 1)+1, LENGTH(MODULE)) as NOUNS from MODULE where MODULE.MODULE like '%Nouns%') on REPLACE(SUBSTR(ASCCP.DEN, 1, INSTR(ASCCP.DEN, '.', 1)-1), ' ', '') = NOUNS ORDER BY DEN;
 
 
 
