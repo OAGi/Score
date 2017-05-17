@@ -80,64 +80,71 @@
                             <h:panelGrid columns="2" styleClass="option-panel">
                                 <h:panelGroup styleClass="option-left">
                                     <h:selectBooleanCheckbox id="definitionCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="BIE Definition"/>
+                                    <h:outputText value="BIE Definition" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="remarkStatusCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.remarkAndStatus}">
-                                        <f:ajax render="bieDocumentationOption"/>
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.remarkAndStatus}"
+                                                             disabled="true">
+                                        <f:ajax render="bieDocumentationOption" styleClass="outputtext-disabled"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Remark &amp; Status"/>
+                                    <h:outputText value="Remark &amp; Status" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left"
-                                              style="left: 20px; #{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5); color: rgba(102, 102, 102, 0.5);' : ''}">
+                                              style="left: 20px;">
                                     <h:selectBooleanCheckbox id="inheritCB" styleClass="boolean-checkbox"
                                                              value="#{profileBODGenerationBean.option.bieDocumentationOption.inheritIfEmpty}"
                                                              disabled="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Inherit if empty"/>
+                                    <h:outputText value="Inherit if empty" styleClass="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'outputtext-disabled' : ''}"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="versionCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieVersion}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieVersion}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="BIE Version"/>
+                                    <h:outputText value="BIE Version" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
                                     <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieGuid}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieGuid}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="BIE GUID"/>
+                                    <h:outputText value="BIE GUID" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="termCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessTerm}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessTerm}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Business Term"/>
+                                    <h:outputText value="Business Term" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
                                     <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessContext}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessContext}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Business Context"/>
+                                    <h:outputText value="Business Context" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="othersCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.others}">
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.others}"
+                                                             disabled="true">
                                         <f:ajax render="bieDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Others (DEN, etc.)"/>
+                                    <h:outputText value="Others (DEN, etc.)" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                             </h:panelGrid>
                         </p:panel>
@@ -147,32 +154,36 @@
                             <h:panelGrid columns="2" styleClass="option-panel">
                                 <h:panelGroup styleClass="option-left">
                                     <h:selectBooleanCheckbox id="ccDefinitionCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccDefinition}">
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccDefinition}"
+                                                             disabled="true">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="CC Definition"/>
+                                    <h:outputText value="CC Definition" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="ccVersionCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccVersion}">
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccVersion}"
+                                                             disabled="true">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="CC Version"/>
+                                    <h:outputText value="CC Version" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup styleClass="option-left">
                                     <h:selectBooleanCheckbox id="ccguidCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccGuid}">
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccGuid}"
+                                                             disabled="true">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="CC GUID"/>
+                                    <h:outputText value="CC GUID" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                                 <h:panelGroup styleClass="option-right">
                                     <h:selectBooleanCheckbox id="ccOthersCB" styleClass="boolean-checkbox"
-                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.others}">
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.others}"
+                                                             disabled="true">
                                         <f:ajax render="ccDocumentationOption"/>
                                     </h:selectBooleanCheckbox>
-                                    <h:outputText value="Others (DEN, etc.)"/>
+                                    <h:outputText value="Others (DEN, etc.)" styleClass="outputtext-disabled"/>
                                 </h:panelGroup>
                             </h:panelGrid>
                         </p:panel>
@@ -201,8 +212,7 @@
                             <h:selectOneRadio id="packageRadio" styleClass="option-radio"
                                               value="#{profileBODGenerationBean.option.schemaPackage}">
                                 <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
-                                <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"
-                                              itemDisabled="true"/>
+                                <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"/>
                                 <f:ajax render="schemaPackageOption"/>
                             </h:selectOneRadio>
                         </h:panelGrid>

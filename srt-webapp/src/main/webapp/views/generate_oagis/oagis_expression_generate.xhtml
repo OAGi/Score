@@ -30,7 +30,7 @@
                 <h:panelGrid id="grid" cellpadding="5">
                     <p:row>
                         <p:column>
-                            <h:outputLabel for="desc" value="Select top-level ABIEs: "
+                            <h:outputLabel value="Select top-level ABIEs: "
                                            style="font-weight:bold; color: #bd2c00"/>
                         </p:column>
                         <p:column>
@@ -73,25 +73,25 @@
             </p:panel>
             <p:panel header="Select annotation to generate">
                 <h:panelGrid id="grid2" columns="8" cellpadding="5">
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="CC GUID"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="CC Definition"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="Business Term"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="Business Context"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="Remark"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="BIE GUID"/>
 
-                    <h:selectBooleanCheckbox value="1"/>
+                    <h:selectBooleanCheckbox value="false" disabled="true"/>
                     <h:outputText value="BIE Definition"/>
                 </h:panelGrid>
             </p:panel>
@@ -105,11 +105,11 @@
                     <f:selectItem itemLabel="Each" itemValue="Each"/>
                 </p:selectOneRadio>
                 <h:panelGrid id="grid3" cellpadding="5" columns="5" styleClass="companyHeaderGrid">
-                    <h:outputLabel for="desc" value="#1 " style="font-weight:bold; color: green"/> <h:outputLabel
-                        for="desc" value="Select expression" style="font-weight:bold; color: #4078c0"/>
+                    <h:outputLabel value="#1 " style="font-weight:bold; color: green"/>
+                    <h:outputLabel value="Select expression" style="font-weight:bold; color: #4078c0"/>
                     <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray"/>
-                    <h:outputLabel for="desc" value="#2 " style="font-weight:bold; color: green"/> <h:outputLabel
-                        for="desc" value="Schema package option" style="font-weight:bold; color: #4078c0"/>
+                    <h:outputLabel value="#2 " style="font-weight:bold; color: green"/>
+                    <h:outputLabel value="Schema package option" style="font-weight:bold; color: #4078c0"/>
 
                     <p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true"/>
                     <h:outputLabel rows="10" value="XML Schema" style="font-weight:bold"/>
