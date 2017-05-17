@@ -450,6 +450,7 @@ public class AggregateBusinessInformationEntity
         clone.status = this.status;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
+        clone.afterLoaded();
         return clone;
     }
 }

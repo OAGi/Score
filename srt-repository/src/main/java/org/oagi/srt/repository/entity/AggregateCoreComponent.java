@@ -371,6 +371,7 @@ public class AggregateCoreComponent
         }
         clone.setDeprecated(this.deprecated);
         clone.setAbstract(this.isAbstract);
+        clone.afterLoaded();
         return clone;
     }
 

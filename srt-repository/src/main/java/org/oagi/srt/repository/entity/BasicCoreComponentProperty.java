@@ -380,6 +380,7 @@ public class BasicCoreComponentProperty
         }
         clone.setNillable(this.nillable);
         clone.setDefaultValue(this.defaultValue);
+        clone.afterLoaded();
         return clone;
     }
 

@@ -311,6 +311,7 @@ public class AssociationCoreComponent
         if (this.currentAsccId != null) {
             clone.setCurrentAsccId(this.currentAsccId);
         }
+        clone.afterLoaded();
         return clone;
     }
 

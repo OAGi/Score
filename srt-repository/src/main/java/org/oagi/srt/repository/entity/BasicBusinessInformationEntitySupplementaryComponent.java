@@ -550,6 +550,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }

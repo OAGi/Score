@@ -351,6 +351,7 @@ public class AssociationCoreComponentProperty
             clone.setCurrentAsccpId(this.currentAsccpId);
         }
         clone.setNillable(this.nillable);
+        clone.afterLoaded();
         return clone;
     }
 

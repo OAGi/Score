@@ -343,6 +343,7 @@ public class BasicBusinessInformationEntityProperty
         clone.definition = this.definition;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
+        clone.afterLoaded();
         return clone;
     }
 }

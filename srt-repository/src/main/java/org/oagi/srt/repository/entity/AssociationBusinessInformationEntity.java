@@ -427,6 +427,7 @@ public class AssociationBusinessInformationEntity
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }
