@@ -1,15 +1,14 @@
 package org.oagi.srt.test.testcase;
 
 import junit.framework.TestCase;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-//import org.openqa.selenium.support.ui.Select;
 
 /**
  * Created by Miroslav Ljubicic.
@@ -20,9 +19,41 @@ public abstract class BaseTestCase extends TestCase {
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
+    private enum OperatingSystem {
+        Windows,
+        MacOSX,
+        Linux,
+        Other
+    }
+
+    private OperatingSystem getOperatingSystem() {
+        String osName = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+        if (osName.indexOf("mac") >= 0 || osName.indexOf("darwin") >= 0) {
+            return OperatingSystem.MacOSX;
+        } else if (osName.indexOf("win") >= 0) {
+            return OperatingSystem.Windows;
+        } else if (osName.indexOf("nux") >= 0) {
+            return OperatingSystem.Linux;
+        } else {
+            return OperatingSystem.Other;
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
-        System.setProperty("webdriver.chrome.driver", "./srt-webapp/src/test/resources/chromedriver.exe");
+        String webdriver;
+        switch (getOperatingSystem()) {
+            case Windows:
+                webdriver = "chromedriver.exe";
+                break;
+            case MacOSX:
+                webdriver = "chromedriver";
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported Operating System: " + (System.getProperty("os.name")));
+        }
+
+        System.setProperty("webdriver.chrome.driver", "./srt-webapp/src/test/resources/" + webdriver);
         driver = ChromeDriverSingleton.getInstance();
         baseUrl = "http://localhost:8080"; // http://129.6.33.174:8080
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -32,7 +63,7 @@ public abstract class BaseTestCase extends TestCase {
     public void tearDown() throws Exception {
 //        driver.quit();
         String verificationErrorString = verificationErrors.toString();
-        if (!"".equals(verificationErrorString)) {
+        if (!StringUtils.isEmpty(verificationErrorString)) {
             fail(verificationErrorString);
         }
     }
