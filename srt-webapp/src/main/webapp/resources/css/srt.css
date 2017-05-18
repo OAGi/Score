@@ -285,6 +285,7 @@ tr {
     filter: progid:DXImageTransform.Microsoft.gradient(enabled=false) !important;
     background-repeat: repeat-x !important;
     border-color: #245580 !important;
+    font-weight: normal !important;
 
     text-shadow: 0 -1px 0 rgba(0, 0, 0, .2) !important;
     -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 1px rgba(0, 0, 0, .075) !important;
@@ -303,6 +304,7 @@ tr {
     margin-top: 20px !important;
     display: inline-block;
     width: 100%;
+    background: #fff !important;
 }
 
 .ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-pages, .ui-paginator .ui-paginator-next, .ui-paginator .ui-paginator-last, .ui-paginator .ui-paginator-first, .ui-paginator .ui-paginator-prev, .ui-paginator .ui-paginator-current {
@@ -708,7 +710,7 @@ input[type="checkbox"].section-content {
 
 .ui-widget-header span.ui-button-text {
     font-size: 12px;
-    font-weight: 300;
+    font-weight: 300 !important;
     line-height: 10px !important;
 }
 
