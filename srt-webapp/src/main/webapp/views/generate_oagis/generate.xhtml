@@ -24,7 +24,7 @@
                                     <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                                 </p:autoComplete>
                                 <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
-                                                 update="tbl" icon="ui-icon-search"/>
+                                                 update="tbl" icon="fa fa-white fa-search"/>
                             </f:facet>
                             <p:dataTable id="tbl" var="profileBOD" value="#{profileBODGenerationBean.profileBODs}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -221,7 +221,7 @@
             </p:panel>
 
             <h:panelGroup id="btnPanel" style="display: inline-block; margin-top: 20px;">
-                <p:commandButton id="btnGenerate" ajax="false" value="Generate" icon="ui-icon-extlink"
+                <p:commandButton id="btnGenerate" ajax="false" value="Generate" icon="fa fa-white fa-external-link"
                                  onclick="PrimeFaces.monitorDownload(function() { PF('loadingBlock').show(); }, function() { PF('loadingBlock').hide(); })"
                                  actionListener="#{profileBODGenerationBean.generate}"
                                  disabled="#{profileBODGenerationBean.selectedProfileBODs.isEmpty() == true}">

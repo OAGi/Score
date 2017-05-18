@@ -19,7 +19,7 @@
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODBean.search}"
-                                     update="tbl" icon="ui-icon-search"/>
+                                     update="tbl" icon="fa fa-white fa-search"/>
                 </f:facet>
 
                 <p:dataTable id="tbl" var="profileBOD" value="#{profileBODBean.profileBODs}"
@@ -86,7 +86,7 @@
 
                     <p:column style="text-align: center; width: 65px;"
                               rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
-                        <p:commandButton id="deleteBtn" icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
                                          disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId or profileBOD.state eq 'Published'}"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
@@ -102,12 +102,12 @@
                     The profile BOD will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
                                      oncomplete="PF('loadingBlock').hide();"
                                      actionListener="#{profileBODBean.deleteProfileBOD()}"
                                      update="tbl" ajax="true"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>

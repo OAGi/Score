@@ -26,7 +26,7 @@
                     <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                 </p:autoComplete>
                 <p:commandButton value="Search" ajax="true" actionListener="#{profileBODHandler.search}" update="tbl"
-                                 icon="ui-icon-search"/>
+                                 icon="fa fa-white fa-search"/>
             </h:panelGrid>
             <p:dataTable id="tbl" var="abieView"
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -56,7 +56,7 @@
                     <h:outputText value="#{abieView.abie.creationTimestamp}"/>
                 </p:column>
             </p:dataTable>
-            <p:commandButton ajax="true" icon="ui-icon-search" value="Select"
+            <p:commandButton ajax="true" icon="fa fa-white fa-search" value="Select"
                              actionListener="#{profileBODHandler.closeDialog}"/>
         </p:panel>
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

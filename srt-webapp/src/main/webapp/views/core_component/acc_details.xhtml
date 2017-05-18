@@ -84,7 +84,7 @@
                                                 </p:autoComplete>
                                                 <p:commandButton id="setBasedACCSearchBtn" value="Search" ajax="true"
                                                                  actionListener="#{accDetailBean.searchAcc}"
-                                                                 update=":form:details" icon="ui-icon-search"/>
+                                                                 update=":form:details" icon="fa fa-white fa-search"/>
                                             </f:facet>
 
                                             <p:dataTable id="tblAcc" var="acc" value="#{accDetailBean.accList}"
@@ -173,7 +173,7 @@
                                                 </p:autoComplete>
                                                 <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
                                                                  action="#{accDetailBean.searchAsccp}"
-                                                                 update=":form:details" icon="ui-icon-search"/>
+                                                                 update=":form:details" icon="fa fa-white fa-search"/>
                                             </f:facet>
 
                                             <p:dataTable id="tblAsccp" var="asccp" value="#{accDetailBean.asccpList}"
@@ -249,7 +249,7 @@
                                                 </p:autoComplete>
                                                 <p:commandButton id="searchBtn" value="Search" ajax="true"
                                                                  actionListener="#{accDetailBean.searchBccp}"
-                                                                 update=":form:details" icon="ui-icon-search"/>
+                                                                 update=":form:details" icon="fa fa-white fa-search"/>
                                             </f:facet>
 
                                             <p:dataTable id="tblBccp" var="bccp" value="#{accDetailBean.bccpList}"
@@ -842,8 +842,8 @@
             </p:panel>
 
             <p:panel id="btnGroup2"
-                     rendered="#{(accDetailBean.currentUser.appUserId ne accDetailBean.targetAcc.ownerUserId) or
-                                 (accDetailBean.preparedAppend eq true)}">
+                     rendered="#{(accDetailBean.currentUser.appUserId ne accDetailBean.targetAcc.ownerUserId) and
+                                 (accDetailBean.preparedAppend eq false)}">
                 <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
                                  rendered="#{accDetailBean.hasRequestParameters()}"
                                  action="#{accDetailBean.back}"/>
@@ -857,12 +857,12 @@
                     A new revision would have to be created.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
                                      oncomplete="PF('loadingBlock').hide();"
                                      actionListener="#{accDetailBean.updateState('Published')}"
                                      update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
-                    <p:commandButton id="cacnelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cacnelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmPublish').hide()"/>
                 </div>
             </p:confirmDialog>

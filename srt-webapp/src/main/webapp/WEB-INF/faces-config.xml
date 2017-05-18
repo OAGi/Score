@@ -41,4 +41,10 @@
         </renderer>
     </render-kit>
 
+    <managed-bean>
+        <managed-bean-name>startup</managed-bean-name>
+        <managed-bean-class>java.util.Date</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+    </managed-bean>
+
 </faces-config>

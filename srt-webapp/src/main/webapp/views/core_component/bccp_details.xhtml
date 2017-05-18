@@ -550,12 +550,12 @@
                     A new revision would have to be created.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
                                      oncomplete="PF('loadingBlock').hide();"
                                      actionListener="#{bccpDetailBean.updateState('Published')}"
                                      update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmPublish').hide()"/>
                 </div>
             </p:confirmDialog>

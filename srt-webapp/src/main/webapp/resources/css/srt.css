@@ -374,6 +374,7 @@ tr {
     border: 1px solid #e5e5e5 !important;
     border-radius: 0;
     box-shadow: none;
+    font-weight: normal !important;
 }
 
 .ui-paginator a:first-child {
@@ -404,6 +405,7 @@ tr {
     background: #f2f8fa !important;
     color: #333 !important;
     box-shadow: none !important;
+    text-shadow: inherit !important;
 }
 
 .ui-inputfield {
@@ -464,14 +466,6 @@ input.ui-state-focus {
     color: #333 !important;
 }
 
-.ui-sortable-column .ui-sortable-column-icon {
-    filter: invert(100%);
-}
-
-.ui-treetable-data .ui-state-hover .ui-icon {
-    filter: invert(100%);
-}
-
 .ui-wizard-step-titles {
     border-bottom: solid 1px #ddd !important;
 }
@@ -484,6 +478,7 @@ input.ui-state-focus {
     color: #767676 !important;
     vertical-align: middle !important;
     border-radius: 0;
+    font-weight: normal;
 }
 
 .ui-wizard-step-titles > .ui-state-highlight {
@@ -495,7 +490,6 @@ input.ui-state-focus {
 }
 
 .ui-chkbox-icon.ui-icon {
-    filter: invert(100%);
     border: 1px solid #666;
     border-radius: 3px;
 }
@@ -823,21 +817,25 @@ h6 {
 .ASCCP-Group, .ui-state-hover.ASCCP-Group, .ui-state-highlight.ASCCP-Group {
     color: #4078c0 !important;
     font-weight: bold !important;
+    text-shadow: inherit !important;
 }
 
 .ASCCP-Group, .ui-state-hover.ASCCP-Group, .ui-state-highlight.ASCCP-Group {
     font-style: italic;
+    text-shadow: inherit !important;
 }
 
 .BBIE, .ui-state-hover.BBIE, .ui-state-highlight.BBIE,
 .BCCP, .ui-state-hover.BCCP, .ui-state-highlight.BCCP {
     color: #006400 !important;
+    text-shadow: inherit !important;
 }
 
 .BBIE-Attribute, .ui-state-hover.BBIE-Attribute, .ui-state-highlight.BBIE-Attribute,
 .BCCP-Attribute, .ui-state-hover.BCCP-Attribute, .ui-state-highlight.BCCP-Attribute {
     color: #666 !important;
     font-style: italic !important;
+    text-shadow: inherit !important;
 }
 
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC,
@@ -846,16 +844,19 @@ h6 {
 .ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target,
 .ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
     color: #bd2c00 !important;
+    text-shadow: inherit !important;
 }
 
 .ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
 .ACC-Target, .ui-state-hover.ACC-Target, .ui-state-highlight.ACC-Target,
 .ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
     font-weight: bold !important;
+    text-shadow: inherit !important;
 }
 
 .ACC-Group, .ui-state-hover.ACC-Group, .ui-state-highlight.ACC-Group {
     font-style: italic;
+    text-shadow: inherit !important;
 }
 
 .loading-block {
@@ -983,10 +984,6 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
     padding: 0px !important;
 }
 
-.ui-selectonemenu .ui-selectonemenu-trigger .ui-icon {
-    filter: invert(100%);
-}
-
 .ui-selectonemenu.ui-state-hover, .ui-selectonemenu-trigger.ui-state-hover {
     -webkit-box-shadow: none !important;
     box-shadow: none !important;
@@ -1027,4 +1024,8 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 
 .outputtext-disabled {
     text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5); color: rgba(102, 102, 102, 0.5);
+}
+
+.fa.fa-white {
+    color: #ffffff;
 }

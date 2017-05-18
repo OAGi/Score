@@ -33,7 +33,6 @@ jsf:
   datetimeconverter-default-timezone-is-system-timezone: true
 
   primefaces:
-    theme: omega
     uploader: commons
     client-side-validation: true
     public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu

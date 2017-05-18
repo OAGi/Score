@@ -177,7 +177,7 @@
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
-                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{codeListCreateFromAnotherBean.deleteCodeListValue}"
                                          update="tbl" rendered="#{codeListValue.color == 'Green'}">
                             <f:setPropertyActionListener value="#{codeListValue}"
@@ -205,10 +205,10 @@
                     (i.e., same Agency ID and List ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -220,10 +220,10 @@
                     (i.e., same name and Agency ID but different List ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn2" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmSameListIdButDifferentIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton id="cancelBtn2" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>

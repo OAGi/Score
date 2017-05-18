@@ -33,7 +33,7 @@
                                 <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
                             <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
-                                             update="tbl1" icon="ui-icon-search"/>
+                                             update="tbl1" icon="fa fa-white fa-search"/>
                         </f:facet>
                         <p:dataTable id="tbl1" var="profileBOD" value="#{copyProfileBODBean.profileBODs}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -674,11 +674,11 @@
 
             <p:panel id="btnGroup" style="margin-top: 40px;">
                 <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
-                                 value="Back" icon="ui-icon-arrowthick-1-w" oncomplete="PF('wizard').back();"/>
+                                 value="Back" icon="fa fa-white fa-arrow-left" oncomplete="PF('wizard').back();"/>
                 <p:commandButton id="btnNext" widgetVar="btnNext" style=""
-                                 value="Next" icon="ui-icon-arrowthick-1-e" oncomplete="PF('wizard').next();"/>
+                                 value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
                 <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
-                                 value="Copy" icon="ui-icon-check" action="#{copyProfileBODBean.copy()}"/>
+                                 value="Copy" icon="fa fa-white fa-check" action="#{copyProfileBODBean.copy()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

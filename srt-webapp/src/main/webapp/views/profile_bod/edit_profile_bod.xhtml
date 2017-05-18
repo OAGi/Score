@@ -28,10 +28,10 @@
                     </div>
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="okBtn" value="Okay" icon="ui-icon-check"
+                    <p:commandButton id="okBtn" value="Okay" icon="fa fa-white fa-check"
                                      action="#{editProfileBODBean.discard(editProfileBODBean.bieUserExtRevisionList)}"
                                      onclick="PF('notifyExtensionChange').hide();"/>
-                    <p:commandButton id="laterBtn" value="Remind me later" icon="ui-icon-close"
+                    <p:commandButton id="laterBtn" value="Remind me later" icon="fa fa-white fa-times"
                                      onclick="PF('notifyExtensionChange').hide();"/>
                 </div>
             </p:confirmDialog>
@@ -44,11 +44,11 @@
                     Would you like to accept it?
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      action="#{editProfileBODBean.uptakeExtensionsWithChangingState(editProfileBODBean.bieUserExtRevisionList, 'Editing')}"
                                      update=":form:panel, :form:btnGroup"
                                      onclick="PF('confirmChangeStateToEditing').hide(); PF('loadingBlock').show();"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmChangeStateToEditing').hide(); PF('confirmKeepNotification').show();"/>
                 </div>
             </p:confirmDialog>
@@ -1115,12 +1115,12 @@
                     Once in the Published state the entity can no longer be changed or discarded.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn2" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
                                      onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
                                      oncomplete="PF('loadingBlock').hide();"
                                      action="#{editProfileBODBean.updateState('Published')}"
                                      update=":form:btnGroup" ajax="true"/>
-                    <p:commandButton id="cancelBtn2" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmPublish').hide()"/>
                 </div>
             </p:confirmDialog>

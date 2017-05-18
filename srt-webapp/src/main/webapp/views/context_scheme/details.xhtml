@@ -115,7 +115,7 @@
                         </p:column>
 
                         <p:column style="text-align: center; width: 65px;">
-                            <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                            <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
                                              action="#{contextSchemeDetailBean.deleteContextSchemeValue}"
                                              update="tbl">
                                 <f:setPropertyActionListener value="#{contextSchemeValue}"
@@ -147,10 +147,10 @@
                     (i.e., same ID and Agency ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -162,10 +162,10 @@
                     (i.e., same Agency ID but different Scheme ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn2" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton id="cancelBtn2" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -175,10 +175,10 @@
                     The context scheme will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn3" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn3" value="Accept" icon="fa fa-white fa-check"
                                      action="#{contextSchemeDetailBean.delete()}"
                                      oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton id="cancelBtn3" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn3" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>

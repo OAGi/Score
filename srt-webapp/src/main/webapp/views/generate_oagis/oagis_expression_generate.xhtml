@@ -9,8 +9,8 @@
             <p:growl id="messages" showDetail="false"/>
             <p:menu>
                 <p:submenu style="width: 180px !important;" label="Context Category">
-                    <p:menuitem value="Create" url="business_context_create.jsf" icon="ui-icon-create"/>
-                    <p:menuitem value="List" url="business_context_list.jsf" icon="ui-icon-search"/>
+                    <p:menuitem value="Create" url="business_context_create.jsf" icon="fa fa-white fa-check"/>
+                    <p:menuitem value="List" url="business_context_list.jsf" icon="fa fa-white fa-search"/>
                 </p:submenu>
             </p:menu>
         </h:form>
@@ -34,7 +34,7 @@
                                            style="font-weight:bold; color: #bd2c00"/>
                         </p:column>
                         <p:column>
-                            <p:commandButton value="Add" icon="ui-icon-extlink"
+                            <p:commandButton value="Add" icon="fa fa-white fa-external-link"
                                              actionListener="#{profileBODHandler.chooseABIE}">
                                 <p:ajax event="dialogReturn" listener="#{profileBODHandler.onABIEChosen}"
                                         update=":form:tbl"/>
@@ -127,11 +127,11 @@
                 </h:panelGrid>
                 <p:separator/>
                 <h:panelGrid id="grid44" cellpadding="5" columns="2" styleClass="companyHeaderGrid">
-                    <p:commandButton value="Generate" update="downloadButton" icon="ui-icon-extlink"
+                    <p:commandButton value="Generate" update="downloadButton" icon="fa fa-white fa-external-link"
                                      actionListener="#{profileBODHandler.generate}"/>
                     <p:commandButton id="downloadButton" value="Download"
                                      disabled="#{profileBODHandler.filePath eq null ? true : false}" ajax="false"
-                                     icon="ui-icon-arrowthick-1-s">
+                                     icon="fa fa-white fa-arrow-down">
                         <p:fileDownload value="#{profileBODHandler.file}"/>
                     </p:commandButton>
                 </h:panelGrid>

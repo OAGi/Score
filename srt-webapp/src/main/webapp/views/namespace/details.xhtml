@@ -64,10 +64,10 @@
                     The namespace will be permanently removed.
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      action="#{namespaceDetailBean.delete()}"
                                      oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>

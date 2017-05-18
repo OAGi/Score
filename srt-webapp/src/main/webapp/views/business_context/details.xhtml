@@ -132,7 +132,7 @@
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
-                        <p:commandButton id="deleteBtn" icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{businessContextDetailBean.deleteBusinessContextValue}"
                                          update="tbl">
                             <f:setPropertyActionListener value="#{businessContextValue}"
@@ -162,10 +162,10 @@
                         The business context will be permanently removed.
                     </f:facet>
                     <div style="text-align: center;">
-                        <p:commandButton id="acceptBtn" value="Accept" icon="ui-icon-check"
+                        <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                          action="#{businessContextDetailBean.delete()}"
                                          oncomplete="PF('confirmDiscard').hide()"/>
-                        <p:commandButton id="cancelBtn" value="Cancel" icon="ui-icon-close"
+                        <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                          onclick="PF('confirmDiscard').hide()"/>
                     </div>
                 </p:confirmDialog>
