@@ -28,7 +28,6 @@ public class BusinessContextManagementTestSuite {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
-        ChromeDriverSingleton.quitDriver();
     }
 }
 

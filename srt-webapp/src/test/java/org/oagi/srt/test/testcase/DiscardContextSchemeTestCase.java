@@ -10,30 +10,26 @@ public class DiscardContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseDiscardContextScheme() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
+        open("/index.jsf");
+
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
         // Select Business Process Context Scheme.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Context Scheme")).click();
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
+        click(By.linkText("Context Management"));
+        click(By.linkText("Context Scheme"));
+        click(By.linkText("Business Process Context Scheme"));
+
         // Discard Business Process Context Scheme.
-        getDriver().findElement(By.id("form:discardBtn")).click();
-        getDriver().findElement(By.id("form:acceptBtn3")).click();
+        click(By.id("form:discardBtn"));
+        click(By.id("form:acceptBtn3"));
+
         // Verify that Business Process Context Scheme is deleted.
-        try {
-            assertTrue(isElementPresent(By.cssSelector("h2.subhead-heading")));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Context Scheme", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("No records found.", getDriver().findElement(By.cssSelector("td")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        assertElementPresent(By.cssSelector("h2.subhead-heading"));
+        pause(1000);
+        assertTextEqual(By.cssSelector("h2.subhead-heading"), "Context Scheme");
+        assertTextEqual(By.cssSelector("td"), "No records found.");
     }
 
 }

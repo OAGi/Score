@@ -10,13 +10,11 @@ public class InvalidUserLogInTestCase extends BaseTestCase {
 
     @Test
     public void testCaseInvalidRegularUserLogin() throws Exception {
-        getDriver().get(getBaseUrl() + "/views/user/login.xhtml");
+        open("/views/user/login.xhtml");
+
         // Invalid login.
-        getDriver().findElement(By.id("username")).clear();
-        getDriver().findElement(By.id("username")).sendKeys("testuser");
-        getDriver().findElement(By.id("password")).clear();
-        getDriver().findElement(By.id("password")).sendKeys("testuser");
-        getDriver().findElement(By.id("signInBtn")).click();
+        login("testuser", "testuser");
+
         // Warning: verifyTextPresent may require manual changes
         try {
             assertTrue(getDriver().findElement(By.cssSelector("BODY")).getText().matches("^[\\s\\S]*Invalid username or password[\\s\\S]*$"));

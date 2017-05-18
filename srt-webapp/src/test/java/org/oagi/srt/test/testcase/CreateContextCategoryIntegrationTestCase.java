@@ -10,42 +10,27 @@ public class CreateContextCategoryIntegrationTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateContextCategoryIntegration() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
-        // Create Integration Context Category.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Context Category")).click();
-        getDriver().findElement(By.id("listForm:createBtn")).click();
-        getDriver().findElement(By.id("form:name")).clear();
-        getDriver().findElement(By.id("form:name")).sendKeys("Integration Context Category");
-        getDriver().findElement(By.id("form:description")).clear();
-        getDriver().findElement(By.id("form:description")).sendKeys("Use integration context category to indidate that a context classification scheme is about various types of integrations.");
-        getDriver().findElement(By.id("form:createBtn")).click();
-        // Verify that context category is created.
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("h2.subhead-heading"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        open("/index.jsf");
 
-        try {
-            assertEquals("Context Category", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Integration Context Category", getDriver().findElement(By.linkText("Integration Context Category")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        getDriver().findElement(By.linkText("Integration Context Category")).click();
-        try {
-            assertEquals("Use integration context category to indidate that a context classification scheme is about various types of integrations.", getDriver().findElement(By.id("form:description")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
+        // Create Integration Context Category.
+        click(By.linkText("Context Management"));
+        click(By.linkText("Context Category"));
+        click(By.id("listForm:createBtn"));
+        type(By.id("form:name"), "Integration Context Category");
+        type(By.id("form:description"), "Use integration context category to indidate that a context classification scheme is about various types of integrations.");
+        click(By.id("form:createBtn"));
+
+        // Verify that context category is created.
+        waitForElementPresent(By.cssSelector("h2.subhead-heading"));
+        pause(1000);
+        assertTextEqual(By.cssSelector("h2.subhead-heading"), "Context Category");
+        assertTextEqual(By.linkText("Integration Context Category"), "Integration Context Category");
+        click(By.linkText("Integration Context Category"));
+        assertTextEqual(By.id("form:description"), "Use integration context category to indidate that a context classification scheme is about various types of integrations.");
     }
 
 }

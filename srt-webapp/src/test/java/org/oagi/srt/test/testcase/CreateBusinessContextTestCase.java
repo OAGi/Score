@@ -11,230 +11,77 @@ public class CreateBusinessContextTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateBusinessContextB2BProcessPO() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
+        open("/index.jsf");
+
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
         // Create Business Context.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Business Context")).click();
-        getDriver().findElement(By.id("listForm:createBtn")).click();
-        getDriver().findElement(By.id("form:name")).clear();
-        getDriver().findElement(By.id("form:name")).sendKeys("B2B Process PO");
+        click(By.linkText("Context Management"));
+        click(By.linkText("Business Context"));
+        click(By.id("listForm:createBtn"));
+        type(By.id("form:name"), "B2B Process PO");
+
         // Add Business Context Values.
-        getDriver().findElement(By.id("form:addBtn")).click();
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        click(By.id("form:addBtn"));
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"), "Business Process Context Category");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"), Keys.TAB);
 
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).click();
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).sendKeys("Business Process Context Category");
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).sendKeys(Keys.TAB);
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).click();
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]"));
         getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).sendKeys("Business Process Context Scheme");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]"), Keys.TAB);
 
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).sendKeys(Keys.TAB);
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).click();
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]"));
         getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).sendKeys("ProcessPO");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]"), Keys.TAB);
 
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).sendKeys(Keys.TAB);
+        click(By.id("form:addBtn"));
 
-        getDriver().findElement(By.id("form:addBtn")).click();
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).click();
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"));
         getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).sendKeys("Integration Context Category");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"), Keys.TAB);
 
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).sendKeys(Keys.TAB);
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).click();
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]"));
         getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).sendKeys("Integration Context Scheme");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]"), Keys.TAB);
 
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).sendKeys(Keys.TAB);
-
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/button"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).click();
+        waitForElementPresent(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/button"));
+        pause(1000);
+        click(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]"));
         getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).sendKeys("B2B");
+        waitForElementPresent(By.cssSelector("span.ui-autocomplete-query"));
+        sendKeys(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]"), Keys.TAB);
 
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-autocomplete-query"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
-        getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).sendKeys(Keys.TAB);
+        click(By.id("form:createBtn"));
 
-        getDriver().findElement(By.id("form:createBtn")).click();
         // Verify that Business Context is created.
-        try {
-            assertEquals("B2B Process PO", getDriver().findElement(By.linkText("B2B Process PO")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        getDriver().findElement(By.linkText("B2B Process PO")).click();
-        try {
-            assertEquals("B2B Process PO", getDriver().findElement(By.id("form:name")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Business Process Context Category", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Business Process Context Scheme", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessPO", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Integration Context Category", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[2]/td[1]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Integration Context Scheme", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[2]/td[2]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("B2B", getDriver().findElement(By.xpath("//table[@role='grid']/tbody/tr[2]/td[3]/span/input[1]")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        assertTextEqual(By.linkText("B2B Process PO"), "B2B Process PO");
+        click(By.linkText("B2B Process PO"));
+        assertAttributeEquals(By.id("form:name"), "value", "B2B Process PO");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[1]/td[1]/span/input[1]"), "value", "Business Process Context Category");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[1]/td[2]/span/input[1]"), "value", "Business Process Context Scheme");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[1]/td[3]/span/input[1]"), "value", "ProcessPO");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[2]/td[1]/span/input[1]"), "value", "Integration Context Category");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[2]/td[2]/span/input[1]"), "value", "Integration Context Scheme");
+        assertAttributeEquals(By.xpath("//table[@role='grid']/tbody/tr[2]/td[3]/span/input[1]"), "value", "B2B");
     }
 
 }

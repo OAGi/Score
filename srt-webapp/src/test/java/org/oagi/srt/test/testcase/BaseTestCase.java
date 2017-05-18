@@ -31,6 +31,81 @@ public abstract class BaseTestCase extends TestCase {
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
+    protected void waitForElementPresent(By by) throws InterruptedException {
+        for (int second = 0; ; second++) {
+            if (second >= 60) fail("timeout");
+            try {
+                if (isElementPresent(by)) break;
+            } catch (Exception e) {
+            }
+            Thread.sleep(1000);
+        }
+    }
+
+    protected void createUser(String username, String pass) {
+        getDriver().findElement(By.id("newAccountLink")).click();
+        getDriver().findElement(By.id("sign_up_form:username")).clear();
+        getDriver().findElement(By.id("sign_up_form:username")).sendKeys(username);
+        getDriver().findElement(By.id("sign_up_form:user_password")).clear();
+        getDriver().findElement(By.id("sign_up_form:user_password")).sendKeys(pass);
+        getDriver().findElement(By.id("sign_up_form:user_confirm_password")).clear();
+        getDriver().findElement(By.id("sign_up_form:user_confirm_password")).sendKeys(pass);
+        getDriver().findElement(By.id("sign_up_form:create_account")).click();
+    }
+
+    protected void assertTextEqual(By by, String text) {
+        try {
+            assertEquals(text, getDriver().findElement(by).getText());
+        } catch (Error e) {
+            getVerificationErrors().append(e.toString());
+        }
+    }
+
+    protected void assertElementPresent(By by) {
+        try {
+            assertTrue(isElementPresent(by));
+        } catch (Error e) {
+            getVerificationErrors().append(e.toString());
+        }
+    }
+
+    protected void type(By by, CharSequence text) {
+        getDriver().findElement(by).clear();
+        getDriver().findElement(by).sendKeys(text);
+    }
+
+    protected void click(By by) {
+        getDriver().findElement(by).click();
+    }
+
+    protected void open(String relativeURL) {
+        getDriver().get(getBaseUrl() + relativeURL);
+    }
+
+    protected void pause(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void assertAttributeEquals(By by, String attribute, String text) {
+        try {
+            assertEquals(text, getDriver().findElement(by).getAttribute(attribute));
+        } catch (Error e) {
+            getVerificationErrors().append(e.toString());
+        }
+    }
+
+    protected void sendKeys(By by, CharSequence keys) {
+        getDriver().findElement(by).sendKeys(keys);
+    }
+
+    protected void sendKeys(By by, Keys keys) {
+        getDriver().findElement(by).sendKeys(keys);
+    }
+
     private enum OperatingSystem {
         Windows,
         MacOSX,
@@ -141,4 +216,19 @@ public abstract class BaseTestCase extends TestCase {
             acceptNextAlert = true;
         }
     }
+
+    protected void logout(String user) {
+        getDriver().findElement(By.linkText(user)).click();
+        getDriver().findElement(By.linkText("Sign out")).click();
+    }
+
+    protected void login(String username, String password) {
+        getDriver().findElement(By.id("username")).clear();
+        getDriver().findElement(By.id("username")).sendKeys(username);
+        getDriver().findElement(By.id("password")).clear();
+        getDriver().findElement(By.id("password")).sendKeys(password);
+        getDriver().findElement(By.id("signInBtn")).click();
+    }
+
+
 }

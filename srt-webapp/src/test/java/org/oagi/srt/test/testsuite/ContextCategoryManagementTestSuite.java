@@ -22,7 +22,6 @@ public class ContextCategoryManagementTestSuite {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
-        ChromeDriverSingleton.quitDriver();
     }
 }
 

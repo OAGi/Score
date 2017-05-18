@@ -10,125 +10,61 @@ public class UpdateContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseUpdateContextScheme() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
-        // Select Business Process Context Scheme.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Context Scheme")).click();
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
-        // Update Business Process Conext Scheme (add values).
-        getDriver().findElement(By.id("form:addBtn")).click();
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td//input"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        open("/index.jsf");
 
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td//input")).sendKeys("EDM");
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]//input")).sendKeys("Engineering change management");
-        getDriver().findElement(By.id("form")).click();
-        getDriver().findElement(By.id("form:updateBtn")).click();
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
+        // Select Business Process Context Scheme.
+        click(By.linkText("Context Management"));
+        click(By.linkText("Context Scheme"));
+        click(By.linkText("Business Process Context Scheme"));
+
+        // Update Business Process Conext Scheme (add values).
+        click(By.id("form:addBtn"));
+        waitForElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td//input"));
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td//input"), "EDM");
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]//input"), "Engineering change management");
+        click(By.id("form"));
+        click(By.id("form:updateBtn"));
+
         // Verify added value.
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
-        try {
-            assertEquals("EDM", getDriver().findElement(By.cssSelector("div.ui-cell-editor-output")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Engineering change management", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessPO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Purchase order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessSO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[1]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Sales order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        click(By.linkText("Business Process Context Scheme"));
+        assertTextEqual(By.cssSelector("div.ui-cell-editor-output"), "EDM");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]"), "Engineering change management");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]"), "ProcessPO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]"), "Purchase order processing");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[1]"), "ProcessSO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]"), "Sales order processing");
+
         // Update value.
-        getDriver().findElement(By.cssSelector("div.ui-cell-editor-output")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input")).sendKeys("ECM");
-        getDriver().findElement(By.id("form")).click();
-        getDriver().findElement(By.id("form:updateBtn")).click();
+        click(By.cssSelector("div.ui-cell-editor-output"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input"), "ECM");
+        click(By.id("form"));
+        click(By.id("form:updateBtn"));
+
         // Verify updated value.
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
-        try {
-            assertEquals("ECM", getDriver().findElement(By.cssSelector("div.ui-cell-editor-output")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Engineering change management", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessPO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Purchase order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessSO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[1]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Sales order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        click(By.linkText("Business Process Context Scheme"));
+        assertTextEqual(By.cssSelector("div.ui-cell-editor-output"), "ECM");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]"), "Engineering change management");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]"), "ProcessPO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]"), "Purchase order processing");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[1]"), "ProcessSO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[3]/td[2]"), "Sales order processing");
+
         // Delete value.
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[3]/button")).click();
-        getDriver().findElement(By.id("form:updateBtn")).click();
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[3]/button"));
+        click(By.id("form:updateBtn"));
+
         // Verify deleted value.
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
-        try {
-            assertEquals("ProcessPO", getDriver().findElement(By.cssSelector("div.ui-cell-editor-output")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Purchase order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessSO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Sales order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        click(By.linkText("Business Process Context Scheme"));
+        assertTextEqual(By.cssSelector("div.ui-cell-editor-output"), "ProcessPO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]"), "Purchase order processing");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]"), "ProcessSO");
+        assertTextEqual(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]"), "Sales order processing");
     }
 
 }
