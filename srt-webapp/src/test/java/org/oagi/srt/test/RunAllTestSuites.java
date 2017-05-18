@@ -1,6 +1,5 @@
 package org.oagi.srt.test;
 
-import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.oagi.srt.test.testsuite.BusinessContextManagementTestSuite;
 import org.oagi.srt.test.testsuite.ContextCategoryManagementTestSuite;
 import org.oagi.srt.test.testsuite.ContextSchemeManagementTestSuite;

@@ -1,12 +1,10 @@
-package org.oagi.srt.test.testcase;
+package org.oagi.srt.test.testcase.businessContext;
 
 import org.junit.Test;
+import org.oagi.srt.test.testcase.BaseTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
-/**
- * Created by Miroslav Ljubicic.
- */
 public class CreateBusinessContextTestCase extends BaseTestCase {
 
     @Test

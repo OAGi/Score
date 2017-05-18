@@ -1,11 +1,8 @@
 package org.oagi.srt.test.testsuite;
 
 import junit.framework.TestSuite;
-import org.oagi.srt.test.testcase.*;
+import org.oagi.srt.test.testcase.user.*;
 
-/**
- * Created by Miroslav Ljubicic.
- */
 public class UserManagementTestSuite {
 
     public static TestSuite suite() {

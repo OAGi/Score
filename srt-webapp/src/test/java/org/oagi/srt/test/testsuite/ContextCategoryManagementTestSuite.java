@@ -1,12 +1,9 @@
 package org.oagi.srt.test.testsuite;
 
 import junit.framework.TestSuite;
-import org.oagi.srt.test.helper.ChromeDriverSingleton;
-import org.oagi.srt.test.testcase.*;
+import org.oagi.srt.test.testcase.contextCategory.*;
+import org.oagi.srt.test.testcase.user.UserLogInTestCase;
 
-/**
- * Created by Miroslav Ljubicic.
- */
 public class ContextCategoryManagementTestSuite {
 
     public static TestSuite suite() {

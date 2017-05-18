@@ -1,11 +1,9 @@
-package org.oagi.srt.test.testcase;
+package org.oagi.srt.test.testcase.contextCategory;
 
 import org.junit.Test;
+import org.oagi.srt.test.testcase.BaseTestCase;
 import org.openqa.selenium.By;
 
-/**
- * Created by Miroslav Ljubicic.
- */
 public class DiscardContextCategoryTestCase extends BaseTestCase {
 
     @Test

@@ -1,11 +1,11 @@
 package org.oagi.srt.test.testsuite;
 
 import junit.framework.TestSuite;
-import org.oagi.srt.test.testcase.*;
+import org.oagi.srt.test.testcase.contextCategory.CreateContextCategoryTestCase;
+import org.oagi.srt.test.testcase.contextCategory.DiscardContextCategoryTestCase;
+import org.oagi.srt.test.testcase.contextScheme.*;
+import org.oagi.srt.test.testcase.user.UserLogInTestCase;
 
-/**
- * Created by Miroslav Ljubicic.
- */
 public class ContextSchemeManagementTestSuite {
 
     public static TestSuite suite() {
