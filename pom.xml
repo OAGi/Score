@@ -31,7 +31,7 @@
 		<spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
 		<commons.logging.version>1.2</commons.logging.version>
 		<guava.version>19.0</guava.version>
-		<hibernate.version>5.2.10.Final</hibernate.version>
+		<hibernate.version>5.0.12.Final</hibernate.version>
 		<org.ow2.asm.version>5.0.4</org.ow2.asm.version>
 		<xml.apis.version>1.4.01</xml.apis.version>
 	</properties>
