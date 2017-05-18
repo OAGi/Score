@@ -172,7 +172,7 @@ public class P_1_1_PopulateCommonData {
         xbtName("positive integer").builtInType("xsd:positiveInteger").subTypeOfXbt(nonNegativeIntegerType).build();
         xbtName("double").builtInType("xsd:double").subTypeOfXbt(anySimpleType).build();
         xbtName("any uri").builtInType("xsd:anyURI").subTypeOfXbt(anySimpleType).build();
-        xbtName("xbt boolean true or false").builtInType("xbt_BooleanType").subTypeOfXbt(booleanType).build();
+        xbtName("xbt boolean").builtInType("xbt_BooleanType").subTypeOfXbt(booleanType).build();
     }
 
     public XBTBuilder xbtName(String name) {
