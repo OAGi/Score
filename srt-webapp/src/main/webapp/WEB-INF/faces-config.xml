@@ -39,6 +39,11 @@
             <renderer-type>org.primefaces.component.DataTableRenderer</renderer-type>
             <renderer-class>org.oagi.srt.web.jsf.component.SRTDataTableRenderer</renderer-class>
         </renderer>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.AutoCompleteRenderer</renderer-type>
+            <renderer-class>org.oagi.srt.web.jsf.component.SRTAutoCompleteRenderer</renderer-class>
+        </renderer>
     </render-kit>
 
     <managed-bean>
