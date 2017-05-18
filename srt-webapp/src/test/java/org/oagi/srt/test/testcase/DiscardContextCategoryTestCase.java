@@ -10,37 +10,26 @@ public class DiscardContextCategoryTestCase extends BaseTestCase {
 
     @Test
     public void testCaseDiscardContextCategory() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
+        open("/index.jsf");
+
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
         // Select Business Process Context Category.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Context Category")).click();
-        getDriver().findElement(By.linkText("Business Process Context Category")).click();
+        click(By.linkText("Context Management"));
+        click(By.linkText("Context Category"));
+        click(By.linkText("Business Process Context Category"));
+
         // Discard Business Process Context Category.
-        getDriver().findElement(By.id("form:discardBtn")).click();
-        getDriver().findElement(By.id("form:acceptBtn")).click();
+        click(By.id("form:discardBtn"));
+        click(By.id("form:acceptBtn"));
+
         // Verify Business Process Context Category is deleted.
-        try {
-            for (int second = 0;; second++) {
-                if (second >= 60) fail("timeout");
-                try { if (isElementPresent(By.cssSelector("h2.subhead-heading"))) break; } catch (Exception e) {}
-                Thread.sleep(1000);
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            assertEquals("Context Category", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("No records found.", getDriver().findElement(By.cssSelector("td")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        waitForElementPresent(By.cssSelector("h2.subhead-heading"));
+        pause(1000);
+        assertTextEqual(By.cssSelector("h2.subhead-heading"), "Context Category");
+        assertTextEqual(By.cssSelector("td"), "No records found.");
 
     }
 

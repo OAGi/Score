@@ -17,6 +17,5 @@ public class RunAllTestSuites {
         junit.textui.TestRunner.run(ContextSchemeManagementTestSuite.suite());
         junit.textui.TestRunner.run(BusinessContextManagementTestSuite.suite());
 
-        ChromeDriverSingleton.quitDriver();
     }
 }

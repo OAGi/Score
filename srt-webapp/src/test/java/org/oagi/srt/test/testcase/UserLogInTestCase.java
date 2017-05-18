@@ -10,25 +10,15 @@ public class UserLogInTestCase extends BaseTestCase {
 
     @Test
     public void testCaseValidRegularUserLogin() throws Exception {
-        getDriver().get(getBaseUrl() + "/views/user/login.jsf");
-        for (int second = 0;; second++) {
-            if (second >= 60) fail("timeout");
-            try { if (isElementPresent(By.id("username"))) break; } catch (Exception e) {}
-            Thread.sleep(1000);
-        }
+        open("/views/user/login.jsf");
+
+        waitForElementPresent(By.id("username"));
 
         // Login user testuser/testtest.
-        getDriver().findElement(By.id("username")).clear();
-        getDriver().findElement(By.id("username")).sendKeys("testuser");
-        getDriver().findElement(By.id("password")).clear();
-        getDriver().findElement(By.id("password")).sendKeys("testtest");
-        getDriver().findElement(By.id("signInBtn")).click();
+        login("testuser", "testtest");
+
         // Verify user is logged in.
-        try {
-            assertEquals("testuser", getDriver().findElement(By.linkText("testuser")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        assertTextEqual(By.linkText("testuser"), "testuser");
     }
 
 }

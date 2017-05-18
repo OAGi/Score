@@ -10,31 +10,18 @@ public class CreateUserWithUnmatchedPasswordsTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateARegularUserWithUnmatchedPasswords() throws Exception {
-        getDriver().get(getBaseUrl() + "/views/user/login.xhtml");
-        // Create new user.
-        getDriver().findElement(By.id("newAccountLink")).click();
-        getDriver().findElement(By.id("sign_up_form:username")).clear();
-        getDriver().findElement(By.id("sign_up_form:username")).sendKeys("jane");
-        getDriver().findElement(By.id("sign_up_form:user_password")).clear();
-        getDriver().findElement(By.id("sign_up_form:user_password")).sendKeys("janejane");
-        getDriver().findElement(By.id("sign_up_form:user_confirm_password")).clear();
-        getDriver().findElement(By.id("sign_up_form:user_confirm_password")).sendKeys("janeserm");
-        getDriver().findElement(By.id("sign_up_form:create_account")).click();
-        // Verify message.
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("span.ui-messages-error-detail"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        open("/views/user/login.xhtml");
 
-        try {
-            assertEquals("Passwords do not match.", getDriver().findElement(By.cssSelector("span.ui-messages-error-detail")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        // Create new user.
+        click(By.id("newAccountLink"));
+        type(By.id("sign_up_form:username"), "jane");
+        type(By.id("sign_up_form:user_password"), "janejane");
+        type(By.id("sign_up_form:user_confirm_password"), "janeserm");
+        click(By.id("sign_up_form:create_account"));
+
+        // Verify message.
+        waitForElementPresent(By.cssSelector("span.ui-messages-error-detail"));
+        assertTextEqual(By.cssSelector("span.ui-messages-error-detail"), "Passwords do not match.");
     }
 
 }

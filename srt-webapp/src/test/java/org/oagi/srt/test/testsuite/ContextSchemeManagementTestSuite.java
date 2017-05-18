@@ -1,7 +1,6 @@
 package org.oagi.srt.test.testsuite;
 
 import junit.framework.TestSuite;
-import org.oagi.srt.test.helper.ChromeDriverSingleton;
 import org.oagi.srt.test.testcase.*;
 
 /**
@@ -24,7 +23,6 @@ public class ContextSchemeManagementTestSuite {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
-        ChromeDriverSingleton.quitDriver();
     }
 }
 

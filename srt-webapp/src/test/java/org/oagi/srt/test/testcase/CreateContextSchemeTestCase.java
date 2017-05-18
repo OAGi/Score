@@ -10,136 +10,63 @@ public class CreateContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateContextScheme() throws Exception {
-        getDriver().get(getBaseUrl() + "/index.jsf");
+        open("/index.jsf");
+
+        // Login user testuser/testtest.
+        waitForElementPresent(By.id("username"));
+        login("testuser", "testtest");
+
         // Create Business Process Context Scheme.
-        getDriver().findElement(By.linkText("Context Management")).click();
-        getDriver().findElement(By.linkText("Context Scheme")).click();
-        getDriver().findElement(By.id("listForm:createBtn")).click();
-        getDriver().findElement(By.id("form:inputContextCategory_input")).clear();
-        getDriver().findElement(By.id("form:inputContextCategory_input")).sendKeys("Business Process Context Category");
-        getDriver().findElement(By.id("form:name")).clear();
-        getDriver().findElement(By.id("form:name")).sendKeys("Business Process Context Scheme");
-        getDriver().findElement(By.id("form:schemeId")).clear();
-        getDriver().findElement(By.id("form:schemeId")).sendKeys("Oracle BP Context Scheme");
-        getDriver().findElement(By.id("form:agencyId")).clear();
-        getDriver().findElement(By.id("form:agencyId")).sendKeys("Oracle");
-        getDriver().findElement(By.id("form:version")).clear();
-        getDriver().findElement(By.id("form:version")).sendKeys("1.0");
-        getDriver().findElement(By.id("form:description")).clear();
-        getDriver().findElement(By.id("form:description")).sendKeys("Classification scheme for business process context values.");
+        click(By.linkText("Context Management"));
+        click(By.linkText("Context Scheme"));
+        click(By.id("listForm:createBtn"));
+        type(By.id("form:inputContextCategory_input"), "Business Process Context Category");
+        type(By.id("form:name"), "Business Process Context Scheme");
+        type(By.id("form:schemeId"), "Oracle BP Context Scheme");
+        type(By.id("form:agencyId"), "Oracle");
+        type(By.id("form:version"), "1.0");
+        type(By.id("form:description"), "Classification scheme for business process context values.");
+
         // Add Context Scheme Values.
-        getDriver().findElement(By.id("form:addBtn")).click();
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        click(By.id("form:addBtn"));
+        waitForElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input"));
 
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input")).sendKeys("ProcessPO");
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr/td[2]")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr/td[2]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr/td[2]//input")).sendKeys("Purchase order processing");
-        getDriver().findElement(By.id("form")).click();
-        getDriver().findElement(By.id("form:addBtn")).click();
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input"), "ProcessPO");
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr/td[2]"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr/td[2]//input"), "Purchase order processing");
+        click(By.id("form"));
 
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input")).sendKeys("ProcessSO");
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]")).click();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]//input")).clear();
-        getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]//input")).sendKeys("Sales order processing");
-        getDriver().findElement(By.id("form")).click();
-        getDriver().findElement(By.id("form:createBtn")).click();
+        click(By.id("form:addBtn"));
+        waitForElementPresent(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input"));
+
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input"), "ProcessSO");
+        click(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]"));
+        type(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]//input"), "Sales order processing");
+        click(By.id("form"));
+
+        click(By.id("form:createBtn"));
+
         // Verify if Scheme is added.
-        for (int second = 0; ; second++) {
-            if (second >= 60) fail("timeout");
-            try {
-                if (isElementPresent(By.cssSelector("h2.subhead-heading"))) break;
-            } catch (Exception e) {
-            }
-            Thread.sleep(1000);
-        }
+        waitForElementPresent(By.cssSelector("h2.subhead-heading"));
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        pause(1000);
 
-        try {
-            assertEquals("Context Scheme", getDriver().findElement(By.cssSelector("h2.subhead-heading")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Business Process Context Scheme", getDriver().findElement(By.linkText("Business Process Context Scheme")).getText());
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        getDriver().findElement(By.linkText("Business Process Context Scheme")).click();
-        try {
-            assertEquals("Business Process Context Category", getDriver().findElement(By.id("form:inputContextCategory_input")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Business Process Context Scheme", getDriver().findElement(By.id("form:name")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Oracle BP Context Scheme", getDriver().findElement(By.id("form:schemeId")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Oracle", getDriver().findElement(By.id("form:agencyId")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("1.0", getDriver().findElement(By.id("form:version")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Classification scheme for business process context values.", getDriver().findElement(By.id("form:description")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessPO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Purchase order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]//input")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("ProcessSO", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
-        try {
-            assertEquals("Sales order processing", getDriver().findElement(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]//input")).getAttribute("value"));
-        } catch (Error e) {
-            getVerificationErrors().append(e.toString());
-        }
+        assertTextEqual(By.cssSelector("h2.subhead-heading"), "Context Scheme");
+        assertTextEqual(By.linkText("Business Process Context Scheme"), "Business Process Context Scheme");
+        click(By.linkText("Business Process Context Scheme"));
+
+        assertAttributeEquals(By.id("form:inputContextCategory_input"), "value", "Business Process Context Category");
+        assertAttributeEquals(By.id("form:name"), "value", "Business Process Context Scheme");
+        assertAttributeEquals(By.id("form:schemeId"), "value", "Oracle BP Context Scheme");
+        assertAttributeEquals(By.id("form:agencyId"), "value", "Oracle");
+        assertAttributeEquals(By.id("form:version"), "value", "1.0");
+        assertAttributeEquals(By.id("form:description"), "value", "Classification scheme for business process context values.");
+        assertAttributeEquals(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[1]//input"), "value", "ProcessPO");
+        assertAttributeEquals(By.xpath("//tbody[@id='form:tbl_data']/tr[1]/td[2]//input"), "value", "Purchase order processing");
+        assertAttributeEquals(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[1]//input"), "value", "ProcessSO");
+        assertAttributeEquals(By.xpath("//tbody[@id='form:tbl_data']/tr[2]/td[2]//input"), "value", "Sales order processing");
     }
 
 }
