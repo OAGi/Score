@@ -9,11 +9,8 @@ import java.util.Date;
 @Entity
 public class CoreComponents {
 
-    @Id
-    private long id;
-
-    @Column(nullable = false, length = 5)
-    private String type;
+    @EmbeddedId
+    private CoreComponentsId coreComponentsId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -46,20 +43,28 @@ public class CoreComponents {
     @Column(length = 10 * 1024)
     private String definition;
 
+    public CoreComponentsId getCoreComponentsId() {
+        return coreComponentsId;
+    }
+
+    public void setCoreComponentsId(CoreComponentsId coreComponentsId) {
+        this.coreComponentsId = coreComponentsId;
+    }
+
     public long getId() {
-        return id;
+        return coreComponentsId.getId();
     }
 
     public void setId(long id) {
-        this.id = id;
+        coreComponentsId.setId(id);
     }
 
     public String getType() {
-        return type;
+        return coreComponentsId.getType();
     }
 
     public void setType(String type) {
-        this.type = type;
+        coreComponentsId.setType(type);
     }
 
     public String getDen() {
@@ -132,5 +137,58 @@ public class CoreComponents {
 
     public void setDefinition(String definition) {
         this.definition = definition;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoreComponents that = (CoreComponents) o;
+
+        if (ownerUserId != that.ownerUserId) return false;
+        if (coreComponentsId != null ? !coreComponentsId.equals(that.coreComponentsId) : that.coreComponentsId != null)
+            return false;
+        if (den != null ? !den.equals(that.den) : that.den != null) return false;
+        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
+        if (state != that.state) return false;
+        if (oagisComponentType != that.oagisComponentType) return false;
+        if (lastUpdatedUser != null ? !lastUpdatedUser.equals(that.lastUpdatedUser) : that.lastUpdatedUser != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
+            return false;
+        if (module != null ? !module.equals(that.module) : that.module != null) return false;
+        return definition != null ? definition.equals(that.definition) : that.definition == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = coreComponentsId != null ? coreComponentsId.hashCode() : 0;
+        result = 31 * result + (den != null ? den.hashCode() : 0);
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
+        result = 31 * result + (lastUpdatedUser != null ? lastUpdatedUser.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CoreComponents{" +
+                "coreComponentsId=" + coreComponentsId +
+                ", den='" + den + '\'' +
+                ", ownerUserId=" + ownerUserId +
+                ", owner='" + owner + '\'' +
+                ", state=" + state +
+                ", oagisComponentType=" + oagisComponentType +
+                ", lastUpdatedUser='" + lastUpdatedUser + '\'' +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", module='" + module + '\'' +
+                ", definition='" + definition + '\'' +
+                '}';
     }
 }
