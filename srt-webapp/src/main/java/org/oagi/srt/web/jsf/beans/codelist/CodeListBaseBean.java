@@ -262,7 +262,7 @@ public class CodeListBaseBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "/views/code_list/list.xhtml?faces-redirect=true";
+        return "/views/code_list/list.jsf?faces-redirect=true";
     }
 
     private boolean validateCodeListValues() {

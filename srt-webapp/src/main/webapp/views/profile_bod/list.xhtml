@@ -27,12 +27,9 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
-                        <h:link rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId or profileBOD.state ne 'Editing'}"
-                                value="#{profileBOD.propertyTerm}"
-                                outcome="/views/profile_bod/edit_profile_bod.xhtml">
-                            <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
-                        </h:link>
-
+                        <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId or profileBOD.state ne 'Editing'}">
+                            <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
+                        </h:panelGroup>
                         <h:outputText rendered="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId and profileBOD.state eq 'Editing'}"
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
                         <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
@@ -40,22 +37,19 @@
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
                               sortBy="#{profileBOD.bizCtxName}">
-                        <h:link value="#{profileBOD.bizCtxName}"
-                                outcome="/views/business_context/details.xhtml">
-                            <f:param name="bizCtxId" value="#{profileBOD.bizCtxId}"/>
-                        </h:link>
+                        <a href="/context_management/business_context/#{profileBOD.bizCtxId}">#{profileBOD.bizCtxName}</a>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.ownerName}">
                         <h:outputText value="#{profileBOD.ownerName}"/>
 
-                        <h:link rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}"
-                                outcome="/views/profile_bod/transfer_profile_bod_ownership.xhtml">
-                            <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
-                            <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
-                                <i class="fa fa-exchange" aria-hidden="true"></i>
-                            </h:panelGroup>
-                        </h:link>
+                        <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}">
+                            <a href="/profile_bod/#{profileBOD.topLevelAbieId}/transfer_ownership">
+                                <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
+                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                </h:panelGroup>
+                            </a>
+                        </h:panelGroup>
                         <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
                     <p:column style="width: 120px; text-align: center;" styleClass="ellipsis" headerText="Version"

@@ -31,9 +31,7 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{namespace.namespaceId}">
                     <p:column style="width: 40%" headerText="URI" sortBy="#{namespace.uri}">
-                        <h:link value="#{namespace.uri}" outcome="/views/namespace/details.jsf">
-                            <f:param name="namespaceId" value="#{namespace.namespaceId}"/>
-                        </h:link>
+                        <a href="/namespace/#{namespace.namespaceId}">#{namespace.uri}</a>
                     </p:column>
                     <p:column style="width: 100px; text-align: center;" headerText="Prefix" sortBy="#{namespace.prefix}">
                         <h:outputText value="#{namespace.prefix}"/>

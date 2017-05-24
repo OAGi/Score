@@ -260,6 +260,8 @@ a:active, a:hover {
     background: #f5f5f5 !important;
     color: #333 !important;
     position: relative;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
 }
 
 tr {

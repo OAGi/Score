@@ -94,9 +94,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode treeNode = createTreeNode(targetAcc, true);
         setTreeNode(treeNode);
-
-        types = requestParameterMap.get("types");
-        states = requestParameterMap.get("states");
     }
 
     public AggregateCoreComponent getTargetAcc() {
@@ -295,12 +292,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String discardAcc(TreeNode treeNode) {
+    public void discardAcc(TreeNode treeNode) throws IOException {
         ACCNode accNode = (ACCNode) treeNode.getData();
         if (!accNode.getChildren().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "Not allowed to discard the ACC which has children"));
-            return null;
+            return;
         }
 
         AggregateCoreComponent acc = accNode.getAcc();
@@ -322,12 +319,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode root = getTreeNode();
         if (root.getChildCount() == 0) {
-            return "/views/core_component/list.jsf?faces-redirect=true";
+            back();
         } else {
             reorderTreeNode(root);
         }
-
-        return null;
     }
 
     public void onChangeObjectClassTerm(ACCNode accNode) {
@@ -854,16 +849,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
     }
 
-    // To support 'back' button to go back 'list' page.
-    private String types;
-    private String states;
-
-    public boolean hasRequestParameters() {
-        return (!StringUtils.isEmpty(types));
-    }
-
-    public String back() {
-        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
     }
 
     /*
@@ -877,11 +865,13 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional
-    public String createNewRevision(AggregateCoreComponent acc) {
+    public void createNewRevision(AggregateCoreComponent acc) throws IOException {
         User requester = getCurrentUser();
         acc = coreComponentService.newAggregateCoreComponentRevision(requester, acc);
         setTargetAcc(acc);
-        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/acc/" + acc.getAccId());
     }
 }
 

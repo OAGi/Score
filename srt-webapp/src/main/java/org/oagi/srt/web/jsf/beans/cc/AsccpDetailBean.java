@@ -24,6 +24,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.*;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
@@ -75,9 +76,6 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode treeNode = createTreeNode(targetAsccp, true);
         setTreeNode(treeNode);
-
-        types = requestParameterMap.get("types");
-        states = requestParameterMap.get("states");
     }
 
     public AssociationCoreComponentProperty getTargetAsccp() {
@@ -179,7 +177,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String discardAsccp(TreeNode treeNode) {
+    public void discardAsccp(TreeNode treeNode) throws IOException {
         ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
         User requester = getCurrentUser();
@@ -192,19 +190,12 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
             throw t;
         }
 
-        return back();
+        back();
     }
 
-    // To support 'back' button to go back 'list' page.
-    private String types;
-    private String states;
-
-    public boolean hasRequestParameters() {
-        return (!StringUtils.isEmpty(types));
-    }
-
-    public String back() {
-        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
     }
 
     /*
@@ -218,11 +209,13 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional
-    public String createNewRevision(AssociationCoreComponentProperty asccp) {
+    public void createNewRevision(AssociationCoreComponentProperty asccp) throws IOException {
         User requester = getCurrentUser();
         asccp = coreComponentService.newAssociationCoreComponentPropertyRevision(requester, asccp);
         setTargetAsccp(asccp);
-        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/asccp/" + asccp.getAsccpId());
     }
 }
 

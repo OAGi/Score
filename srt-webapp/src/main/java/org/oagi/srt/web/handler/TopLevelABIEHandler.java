@@ -1114,7 +1114,7 @@ public class TopLevelABIEHandler implements Serializable {
 //			selectedBod
 //			DefaultTreeNode node = new DefaultTreeNode(av1, root);
 //			context.setRequest(root);
-//			context.redirect(context.getRequestContextPath() + "/top_level_abie_edit.xhtml");
+//			context.redirect(context.getRequestContextPath() + "/top_level_abie_edit.jsf");
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}

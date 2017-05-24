@@ -156,6 +156,6 @@ public class TransferAccOwnershipBean extends UIHandler {
 
         coreComponentService.transferOwner(acc, selectedUser);
 
-        return "/views/core_component/list.xhtml?faces-redirect=true";
+        return "/views/core_component/list.jsf?faces-redirect=true";
     }
 }

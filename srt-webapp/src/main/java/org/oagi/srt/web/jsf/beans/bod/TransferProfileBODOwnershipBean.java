@@ -153,6 +153,6 @@ public class TransferProfileBODOwnershipBean extends UIHandler {
 
         bieService.transferOwner(topLevelAbie, selectedUser);
 
-        return "/views/profile_bod/list.xhtml?faces-redirect=true";
+        return "/views/profile_bod/list.jsf?faces-redirect=true";
     }
 }

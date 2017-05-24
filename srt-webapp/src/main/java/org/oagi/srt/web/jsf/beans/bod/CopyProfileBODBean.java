@@ -306,7 +306,7 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
             nodeService.validate(topLevelNode);
             nodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
 
-            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            return "/views/profile_bod/list.jsf?faces-redirect=true";
         } finally {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("PF('loadingBlock').hide()");

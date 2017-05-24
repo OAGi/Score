@@ -66,7 +66,7 @@ public class ContextCategoryDetailBean extends UIHandler {
 
         contextCategoryService.update(contextCategory);
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        return "/views/context_category/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -83,6 +83,6 @@ public class ContextCategoryDetailBean extends UIHandler {
 
         contextCategoryService.deleteById(ctxCategoryId);
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        return "/views/context_category/list.jsf?faces-redirect=true";
     }
 }

@@ -201,7 +201,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
             bieService.updateState(topLevelAbieId, state);
 
-            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            return "/views/profile_bod/list.jsf?faces-redirect=true";
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));

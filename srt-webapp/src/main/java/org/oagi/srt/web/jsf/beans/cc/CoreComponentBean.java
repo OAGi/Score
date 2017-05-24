@@ -1,10 +1,10 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.AggregateCoreComponent;
+import org.oagi.srt.repository.entity.CoreComponentState;
+import org.oagi.srt.repository.entity.CoreComponents;
+import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.CoreComponentService;
-import org.primefaces.component.api.UIColumn;
-import org.primefaces.component.datatable.DataTable;
 import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,7 +18,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,6 +31,12 @@ import java.util.stream.Collectors;
 @ViewScoped
 @Transactional(readOnly = true)
 public class CoreComponentBean extends AbstractCoreComponentBean {
+
+    private static final String SELECTED_TYPES_KEY = "_core_component/selected_types";
+    private static final String SELECTED_STATES_KEY = "_core_component/selected_states";
+    private static final String SEARCH_TEXT_DEN_KEY = "_core_component/search_text_den";
+    private static final String SEARCH_TEXT_DEFINITION_KEY = "_core_component/search_text_definition";
+    private static final String SEARCH_TEXT_MODULE_KEY = "_core_component/search_text_module";
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -45,45 +55,42 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @PostConstruct
     public void init() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+        
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
 
-        String types = requestParameterMap.get("types");
-        if ("null".equals(types)) {
-            types = null;
-        }
-
-        if (!StringUtils.isEmpty(types)) {
-            StringTokenizer tokenizer = new StringTokenizer(types, ",");
-            selectedTypes = new ArrayList();
-            while (tokenizer.hasMoreTokens()) {
-                String type = tokenizer.nextToken();
-                selectedTypes.add(type);
-            }
+        if (selectedTypes != null) {
+            this.selectedTypes = (List<String>) selectedTypes;
         } else {
-            selectedTypes = Arrays.asList(
+            this.selectedTypes = Arrays.asList(
                     "ACC", "ASCC", "ASCCP", "BCC", "BCCP"
             );
         }
 
-        String states = requestParameterMap.get("states");
-        if ("null".equals(states)) {
-            states = null;
-        }
-
-        if (!StringUtils.isEmpty(states)) {
-            StringTokenizer tokenizer = new StringTokenizer(states, ",");
-            selectedStates = new ArrayList();
-            while (tokenizer.hasMoreTokens()) {
-                String token = tokenizer.nextToken();
-                CoreComponentState state = CoreComponentState.valueOf(token);
-                selectedStates.add(state);
-            }
+        Object selectedStates = sessionMap.get(SELECTED_STATES_KEY);
+        if (selectedStates != null) {
+            this.selectedStates = (List<CoreComponentState>) selectedStates;
         } else {
-            selectedStates = Arrays.asList(
+            this.selectedStates = Arrays.asList(
                     CoreComponentState.Editing,
                     CoreComponentState.Candidate,
                     CoreComponentState.Published);
         }
+
+        searchTextForDen = (String) sessionMap.get(SEARCH_TEXT_DEN_KEY);
+        searchTextForDefinition = (String) sessionMap.get(SEARCH_TEXT_DEFINITION_KEY);
+        searchTextForModule = (String) sessionMap.get(SEARCH_TEXT_MODULE_KEY);
+    }
+
+    public void invalidate() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+
+        sessionMap.remove(SELECTED_TYPES_KEY);
+        sessionMap.remove(SELECTED_STATES_KEY);
+        sessionMap.remove(SEARCH_TEXT_DEN_KEY);
+        sessionMap.remove(SEARCH_TEXT_DEFINITION_KEY);
+        sessionMap.remove(SEARCH_TEXT_MODULE_KEY);
     }
 
     public String[] getSelectedTypes() {
@@ -103,12 +110,11 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         }
     }
 
-    public String toStringSelectedTypes() {
-        String[] selectedTypes = getSelectedTypes();
-        return (selectedTypes != null) ? String.join(",", selectedTypes) : "";
-    }
-
     public void onTypeChange() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        sessionMap.put(SELECTED_TYPES_KEY, selectedTypes);
+
         reset();
     }
 
@@ -134,12 +140,11 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         }
     }
 
-    public String toStringSelectedStates() {
-        String[] selectedStates = getSelectedStates();
-        return (selectedStates != null) ? String.join(",", selectedStates) : "";
-    }
-
     public void onStateChange() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        sessionMap.put(SELECTED_STATES_KEY, selectedStates);
+
         reset();
     }
 
@@ -236,7 +241,17 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public void setSearchTextForDen(String searchTextForDen) {
-        this.searchTextForDen = searchTextForDen;
+        if (StringUtils.isEmpty(searchTextForDen)) {
+            this.searchTextForDen = null;
+        } else {
+            this.searchTextForDen = StringUtils.trimWhitespace(searchTextForDen);
+        }
+    }
+
+    public void onSearchTextForDenChange() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        sessionMap.put(SEARCH_TEXT_DEN_KEY, this.searchTextForDen);
     }
 
     public String getSearchTextForDefinition() {
@@ -244,7 +259,17 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public void setSearchTextForDefinition(String searchTextForDefinition) {
-        this.searchTextForDefinition = searchTextForDefinition;
+        if (StringUtils.isEmpty(searchTextForDefinition)) {
+            this.searchTextForDefinition = null;
+        } else {
+            this.searchTextForDefinition = StringUtils.trimWhitespace(searchTextForDefinition);
+        }
+    }
+
+    public void onSearchTextForDefinitionChange() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        sessionMap.put(SEARCH_TEXT_DEFINITION_KEY, this.searchTextForDefinition);
     }
 
     public String getSearchTextForModule() {
@@ -252,7 +277,17 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public void setSearchTextForModule(String searchTextForModule) {
-        this.searchTextForModule = searchTextForModule;
+        if (StringUtils.isEmpty(searchTextForModule)) {
+            this.searchTextForModule = null;
+        } else {
+            this.searchTextForModule = StringUtils.trimWhitespace(searchTextForModule);
+        }
+    }
+
+    public void onSearchTextForModuleChange() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        sessionMap.put(SEARCH_TEXT_MODULE_KEY, this.searchTextForModule);
     }
 
     public void onSortEvent(SortEvent sortEvent) {
@@ -269,23 +304,21 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     @Transactional
-    public String createACC() {
+    public void createACC() throws IOException {
         User requester = getCurrentUser();
         AggregateCoreComponent acc = coreComponentService.newAggregateCoreComponent(requester);
-        String types = toStringSelectedTypes();
-        String states = toStringSelectedStates();
-        return "/views/core_component/acc_details.xhtml?accId=" + acc.getAccId() + "&types=" + types + "&states=" + states + "&faces-redirect=true";
+
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/acc/" + acc.getAccId());
     }
 
-    public String createASCCP() {
-        String types = toStringSelectedTypes();
-        String states = toStringSelectedStates();
-        return "/views/core_component/select_acc.jsf?types=" + types + "&states=" + states + "&faces-redirect=true";
+    public void createASCCP() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/asccp/create");
     }
 
-    public String createBCCP() {
-        String types = toStringSelectedTypes();
-        String states = toStringSelectedStates();
-        return "/views/core_component/select_bdt.jsf?types=" + types + "&states=" + states + "&faces-redirect=true";
+    public void createBCCP() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/bccp/create");
     }
 }

@@ -49,7 +49,7 @@
                             <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
                                          style="min-width: 440px; margin-right: 20px;" tabindex="1">
-                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForDenChange}"/>
                             </p:inputText>
                             <p:commandButton id="createACCBtn" value="Create ACC"
                                              action="#{coreComponentBean.createACC}" tabindex="5"
@@ -59,7 +59,7 @@
                             <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
                                          style="min-width: 440px; margin-right: 20px;" tabindex="2">
-                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForDefinitionChange}"/>
                             </p:inputText>
                             <p:commandButton id="createASCCPBtn" value="Create ASCCP"
                                              action="#{coreComponentBean.createASCCP}" tabindex="6"
@@ -69,7 +69,7 @@
                             <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
                                          style="min-width: 440px; margin-right: 20px;" tabindex="3">
-                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForModuleChange}"/>
                             </p:inputText>
                             <p:commandButton id="searchBtn" value="Search" ajax="true"
                                              actionListener="#{coreComponentBean.search}"
@@ -95,37 +95,27 @@
                     </p:column>
 
                     <p:column headerText="DEN" sortBy="#{cc.den}">
-                        <h:link value="#{cc.den}"
+                        <h:panelGroup
                                 rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and
-                                          ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}"
-                                outcome="/views/core_component/extension.jsf">
-                            <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(cc.id)}"/>
-                        </h:link>
+                                          ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
+                        </h:panelGroup>
 
-                        <h:link value="#{cc.den}"
+                        <h:panelGroup
                                 rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and
-                                          ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing') }"
-                                outcome="/views/core_component/acc_details.jsf">
-                            <f:param name="accId" value="#{cc.id}"/>
-                            <f:param name="types" value="#{coreComponentBean.toStringSelectedTypes()}"/>
-                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
-                        </h:link>
+                                ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing') }">
+                            <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
+                        </h:panelGroup>
 
-                        <h:link value="#{cc.den}"
-                                rendered="#{cc.type eq 'ASCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}"
-                                outcome="/views/core_component/asccp_details.jsf">
-                            <f:param name="asccpId" value="#{cc.id}"/>
-                            <f:param name="types" value="#{coreComponentBean.toStringSelectedTypes()}"/>
-                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
-                        </h:link>
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'ASCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
+                        </h:panelGroup>
 
-                        <h:link value="#{cc.den}"
-                                rendered="#{cc.type eq 'BCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}"
-                                outcome="/views/core_component/bccp_details.jsf">
-                            <f:param name="bccpId" value="#{cc.id}"/>
-                            <f:param name="types" value="#{coreComponentBean.toStringSelectedTypes()}"/>
-                            <f:param name="states" value="#{coreComponentBean.toStringSelectedStates()}"/>
-                        </h:link>
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'BCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
+                        </h:panelGroup>
 
                         <h:outputText value="${cc.den}"
                                       rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' or

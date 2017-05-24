@@ -19,6 +19,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -145,17 +146,19 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     private String types;
     private String states;
 
-    public String back() {
-        return "/views/core_component/list.jsf?types=" + types + "&states= " + states + "&faces-redirect=true";
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
     }
 
     @Transactional
-    public String createBCCP() {
+    public void createBCCP() throws IOException {
         User requester = getCurrentUser();
         DataType bdt = getSelectedBDT();
         BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
 
-        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&types=" + types + "&states= " + states + "&faces-redirect=true";
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/bccp/" + bccp.getBccpId());
     }
 
 }

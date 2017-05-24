@@ -281,7 +281,7 @@ public class BusinessContextDetailBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "/views/business_context/list.xhtml?faces-redirect=true";
+        return "/views/business_context/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -299,6 +299,6 @@ public class BusinessContextDetailBean extends UIHandler {
 
         businessContextService.deleteById(bizCtxId);
 
-        return "/views/business_context/list.xhtml?faces-redirect=true";
+        return "/views/business_context/list.jsf?faces-redirect=true";
     }
 }

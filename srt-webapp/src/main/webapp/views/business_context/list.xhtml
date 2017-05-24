@@ -31,14 +31,11 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
                     <p:column headerText="Name" sortBy="#{businessContext.name}">
-                        <h:link value="#{businessContext.name}" outcome="/views/business_context/details.xhtml">
-                            <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
-                        </h:link>
+                        <a href="/context_management/business_context/#{businessContext.bizCtxId}">#{businessContext.name}</a>
                         <div>
-                            <h:link value="GUID: #{businessContext.guid}" outcome="/views/business_context/details.xhtml"
-                                    style="font-size: 12px !important; color: #767676 !important;">
-                                <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
-                            </h:link>
+                            <a href="/context_management/business_context/#{businessContext.bizCtxId}">
+                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{businessContext.guid}</span>
+                            </a>
                         </div>
                     </p:column>
                 </p:dataTable>

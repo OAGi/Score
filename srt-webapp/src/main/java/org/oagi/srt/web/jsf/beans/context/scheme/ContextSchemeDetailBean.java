@@ -233,7 +233,7 @@ public class ContextSchemeDetailBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "/views/context_scheme/list.xhtml?faces-redirect=true";
+        return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 
     private boolean validateContextSchemeValues() {
@@ -323,6 +323,6 @@ public class ContextSchemeDetailBean extends UIHandler {
     public String delete() {
         contextSchemeService.delete(contextScheme);
 
-        return "/views/context_scheme/list.xhtml?faces-redirect=true";
+        return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 }

@@ -81,6 +81,6 @@ public class NamespaceDetailBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
-        return "/views/namespace/list.xhtml?faces-redirect=true";
+        return "/views/namespace/list.jsf?faces-redirect=true";
     }
 }

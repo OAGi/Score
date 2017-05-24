@@ -510,9 +510,6 @@
 
             <p:panel id="btnGroup"
                      rendered="#{(bccpDetailBean.currentUser.appUserId eq bccpDetailBean.targetBccp.ownerUserId)}">
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Back to list" styleClass="danger"
-                                 rendered="#{bccpDetailBean.hasRequestParameters()}"
-                                 action="#{bccpDetailBean.back}"/>
                 <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{bccpDetailBean.updateState('Candidate')}"
@@ -533,13 +530,6 @@
                                  action="#{bccpDetailBean.createNewRevision(bccpDetailBean.targetBccp)}"
                                  disabled="#{bccpDetailBean.targetBccp.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
-            </p:panel>
-
-            <p:panel id="btnGroup2"
-                     rendered="#{(bccpDetailBean.currentUser.appUserId ne bccpDetailBean.targetBccp.ownerUserId)}">
-                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
-                                 rendered="#{bccpDetailBean.hasRequestParameters()}"
-                                 action="#{bccpDetailBean.back}"/>
             </p:panel>
 
             <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"

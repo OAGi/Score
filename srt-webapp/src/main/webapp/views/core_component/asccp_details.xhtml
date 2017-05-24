@@ -515,9 +515,6 @@
 
             <p:panel id="btnGroup"
                      rendered="#{(asccpDetailBean.currentUser.appUserId eq asccpDetailBean.targetAsccp.ownerUserId)}">
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Back to list" styleClass="danger"
-                                 rendered="#{asccpDetailBean.hasRequestParameters()}"
-                                 action="#{asccpDetailBean.back}"/>
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{asccpDetailBean.updateState('Candidate')}"
@@ -538,13 +535,6 @@
                                  action="#{asccpDetailBean.createNewRevision(asccpDetailBean.targetAsccp)}"
                                  disabled="#{asccpDetailBean.targetAsccp.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
-            </p:panel>
-
-            <p:panel id="btnGroup2"
-                     rendered="#{(asccpDetailBean.currentUser.appUserId ne asccpDetailBean.targetAsccp.ownerUserId)}">
-                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
-                                 rendered="#{asccpDetailBean.hasRequestParameters()}"
-                                 action="#{asccpDetailBean.back}"/>
             </p:panel>
 
             <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"

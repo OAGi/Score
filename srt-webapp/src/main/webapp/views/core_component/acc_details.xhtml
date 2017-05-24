@@ -816,9 +816,6 @@
             <p:panel id="btnGroup"
                      rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.ownerUserId) and
                                  (accDetailBean.preparedAppend eq false)}">
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Back to list" styleClass="danger"
-                                 rendered="#{accDetailBean.hasRequestParameters()}"
-                                 action="#{accDetailBean.back}"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{accDetailBean.updateState('Candidate')}"
@@ -839,14 +836,6 @@
                                  action="#{accDetailBean.createNewRevision(accDetailBean.targetAcc)}"
                                  disabled="#{accDetailBean.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
-            </p:panel>
-
-            <p:panel id="btnGroup2"
-                     rendered="#{(accDetailBean.currentUser.appUserId ne accDetailBean.targetAcc.ownerUserId) and
-                                 (accDetailBean.preparedAppend eq false)}">
-                <p:commandButton id="btnDiscard2" widgetVar="btnDiscard2" value="Back to list" styleClass="danger"
-                                 rendered="#{accDetailBean.hasRequestParameters()}"
-                                 action="#{accDetailBean.back}"/>
             </p:panel>
 
             <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"

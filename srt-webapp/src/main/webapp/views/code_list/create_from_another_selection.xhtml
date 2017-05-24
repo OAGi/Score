@@ -30,9 +30,7 @@
                              style="width: 100%; margin-bottom: 20px;"
                              value="#{codeListCreateFromAnotherSelectionBean.codeLists}" rowKey="#{cVO.codeListId}">
                     <p:column headerText="Name" sortBy="#{cVO.name}">
-                        <h:link value="#{cVO.name}" outcome="/views/code_list/create_from_another.xhtml">
-                            <f:param name="codeListId" value="#{cVO.codeListId}"/>
-                        </h:link>
+                        <a href="/code_list/create/from_another/#{cVO.codeListId}">#{cVO.name}</a>
                     </p:column>
                     <p:column headerText="Based Code List" sortBy="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}">
                         <h:outputText value="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}"/>

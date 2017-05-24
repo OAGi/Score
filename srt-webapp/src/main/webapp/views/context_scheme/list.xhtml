@@ -31,14 +31,11 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
                     <p:column style="width: 30%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
-                        <h:link value="#{contextScheme.schemeName}" outcome="/views/context_scheme/details.xhtml">
-                            <f:param name="ctxSchemeId" value="#{contextScheme.ctxSchemeId}"/>
-                        </h:link>
+                        <a href="/context_management/context_scheme/#{contextScheme.ctxSchemeId}">#{contextScheme.schemeName}</a>
                         <div>
-                            <h:link value="GUID: #{contextScheme.guid}" outcome="/views/context_scheme/details.xhtml"
-                                    style="font-size: 12px !important; color: #767676 !important;">
-                                <f:param name="ctxSchemeId" value="#{contextScheme.ctxSchemeId}"/>
-                            </h:link>
+                            <a href="/context_management/context_scheme/#{contextScheme.ctxSchemeId}">
+                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextScheme.guid}</span>
+                            </a>
                         </div>
                     </p:column>
                     <p:column styleClass="ellipsis" headerText="Context Category" sortBy="#{contextScheme.contextCategory.name}">
