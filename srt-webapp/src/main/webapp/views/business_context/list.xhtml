@@ -31,9 +31,9 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
                     <p:column headerText="Name" sortBy="#{businessContext.name}">
-                        <a href="/context_management/business_context/#{businessContext.bizCtxId}">#{businessContext.name}</a>
+                        <a href="/context_management/business_context/#{businessContext.guid}">#{businessContext.name}</a>
                         <div>
-                            <a href="/context_management/business_context/#{businessContext.bizCtxId}">
+                            <a href="/context_management/business_context/#{businessContext.guid}">
                                 <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{businessContext.guid}</span>
                             </a>
                         </div>

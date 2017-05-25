@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Long> {
 
+    @Query("select c from ContextScheme c where c.guid = ?1")
+    public ContextScheme findOneByGuid(String guid);
+
     @Query("select c from ContextScheme c where c.contextCategory.ctxCategoryId = ?1 order by c.schemeName asc")
     public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId);
 

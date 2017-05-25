@@ -31,9 +31,9 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{contextCategory.guid}">
                     <p:column style="width: 40%" headerText="Name" sortBy="#{contextCategory.name}">
-                        <a href="/context_management/context_category/#{contextCategory.ctxCategoryId}">#{contextCategory.name}</a>
+                        <a href="/context_management/context_category/#{contextCategory.guid}">#{contextCategory.name}</a>
                         <div>
-                            <a href="/context_management/context_category/#{contextCategory.ctxCategoryId}">
+                            <a href="/context_management/context_category/#{contextCategory.guid}">
                                 <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextCategory.guid}</span>
                             </a>
                         </div>

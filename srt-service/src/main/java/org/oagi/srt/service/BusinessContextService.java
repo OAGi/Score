@@ -39,6 +39,10 @@ public class BusinessContextService {
         return businessContextRepository.findOne(bizCtxId);
     }
 
+    public BusinessContext findOneByGuid(String guid) {
+        return businessContextRepository.findOneByGuid(guid);
+    }
+
     public void update(BusinessContext businessContext, Collection<BusinessContextValue> businessContextValues) {
         businessContextRepository.saveAndFlush(businessContext);
         businessContextValues.stream()

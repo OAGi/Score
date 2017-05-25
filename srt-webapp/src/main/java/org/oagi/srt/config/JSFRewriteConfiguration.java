@@ -40,6 +40,8 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/context_category/list.jsf"))
                 .addRule(Join.path("/context_management/context_category/create")
                         .to("/views/context_category/details.jsf"))
+                .addRule(Join.path("/context_management/context_category/oagis-id-{context_category_guid}")
+                        .to("/views/context_category/details.jsf?ctxCategoryGuid=oagis-id-{context_category_guid}"))
                 .addRule(Join.path("/context_management/context_category/{context_category_id}")
                         .to("/views/context_category/details.jsf?ctxCategoryId={context_category_id}"))
 
@@ -47,6 +49,8 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/context_scheme/list.jsf"))
                 .addRule(Join.path("/context_management/context_scheme/create")
                         .to("/views/context_scheme/details.jsf"))
+                .addRule(Join.path("/context_management/context_scheme/oagis-id-{context_scheme_guid}")
+                        .to("/views/context_scheme/details.jsf?ctxSchemeGuid=oagis-id-{context_scheme_guid}"))
                 .addRule(Join.path("/context_management/context_scheme/{context_scheme_id}")
                         .to("/views/context_scheme/details.jsf?ctxSchemeId={context_scheme_id}"))
 
@@ -54,6 +58,8 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/business_context/list.jsf"))
                 .addRule(Join.path("/context_management/business_context/create")
                         .to("/views/business_context/details.jsf"))
+                .addRule(Join.path("/context_management/business_context/oagis-id-{business_context_guid}")
+                        .to("/views/business_context/details.jsf?bizCtxGuid=oagis-id-{business_context_guid}"))
                 .addRule(Join.path("/context_management/business_context/{business_context_id}")
                         .to("/views/business_context/details.jsf?bizCtxId={business_context_id}"))
 

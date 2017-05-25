@@ -31,9 +31,9 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
                     <p:column style="width: 30%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
-                        <a href="/context_management/context_scheme/#{contextScheme.ctxSchemeId}">#{contextScheme.schemeName}</a>
+                        <a href="/context_management/context_scheme/#{contextScheme.guid}">#{contextScheme.schemeName}</a>
                         <div>
-                            <a href="/context_management/context_scheme/#{contextScheme.ctxSchemeId}">
+                            <a href="/context_management/context_scheme/#{contextScheme.guid}">
                                 <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextScheme.guid}</span>
                             </a>
                         </div>
