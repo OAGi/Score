@@ -57,9 +57,13 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
     }
 
     public Long getParentAccIdOfUserExtensionGroupAcc(Long ueAccId) {
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(ueAccId);
+        List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(ueAccId);
+        if (asccpList.size() != 1) {
+            throw new IllegalStateException();
+        }
+        AssociationCoreComponentProperty asccp = asccpList.get(0);
         List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccp.getAsccpId(), 0);
-        if (asccList.isEmpty() || asccList.size() > 1) {
+        if (asccList.size() != 1) {
             throw new IllegalStateException();
         }
         AssociationCoreComponent ascc = asccList.get(0);

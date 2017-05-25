@@ -193,7 +193,11 @@ public class ExtensionService {
 
     private AssociationCoreComponentProperty updateASCCPForExtension(AggregateCoreComponent ueAcc, User currentLoginUser) {
         long roleOfAccId = ueAcc.getAccId();
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(roleOfAccId);
+        if (asccpList.size() != 1) {
+            throw new IllegalStateException();
+        }
+        AssociationCoreComponentProperty asccp = asccpList.get(0);
         asccp.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
         asccp.setOwnerUserId(currentLoginUser.getAppUserId());
         return asccpRepository.save(asccp);

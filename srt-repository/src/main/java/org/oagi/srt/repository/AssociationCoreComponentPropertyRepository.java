@@ -31,7 +31,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     public AssociationCoreComponentProperty findAsccpIdAndRoleOfAccIdAndDefinitionByAsccpIdAndRevisionNum(long asccpId, int revisionNum);
 
     @Query("select a from AssociationCoreComponentProperty a where a.roleOfAccId = ?1 and a.revisionNum = 0")
-    public AssociationCoreComponentProperty findOneByRoleOfAccId(long roleOfAccId);
+    public List<AssociationCoreComponentProperty> findByRoleOfAccId(long roleOfAccId);
 
     @Query("select a from AssociationCoreComponentProperty a where a.guid = ?1")
     public AssociationCoreComponentProperty findOneByGuid(String guid);

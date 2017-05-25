@@ -11,6 +11,9 @@
             </div>
         </div>
         <h:form id="listForm">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+
             <p:panel id="pPanel">
                 <f:facet name="header">
                     <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"

@@ -401,6 +401,13 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
+        if (!asccpRepository.findByRoleOfAccId(currentAccId).isEmpty()) {
+            throw new IllegalStateException("Not allowed to discard the ACC which has related with ASCCP");
+        }
+        if (!asccRepository.findByFromAccId(currentAccId).isEmpty()) {
+            throw new IllegalStateException("Not allowed to discard the ACC which has children");
+        }
+
         long accId = acc.getAccId();
         accRepository.deleteByCurrentAccId(accId); // To remove history
         accRepository.delete(acc);
@@ -679,6 +686,29 @@ public class CoreComponentService {
         bccpRepository.delete(bccp);
     }
 
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(CoreComponents coreComponents, User requester) {
+        switch(coreComponents.getType()) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                discard(acc, requester);
+                break;
+
+            case "ASCCP":
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                discard(asccp, requester);
+                break;
+
+            case "BCCP":
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                discard(bccp, requester);
+                break;
+
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
         long bccId = latestBcc.getBccId();
         List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(bccId);
@@ -774,8 +804,9 @@ public class CoreComponentService {
             accRepository.save(acc);
         }
 
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
-        updateAsccpState(asccp, state, requester);
+        for (AssociationCoreComponentProperty asccp : asccpRepository.findByRoleOfAccId(roleOfAccId)) {
+            updateAsccpState(asccp, state, requester);
+        }
     }
 
     private void updateAsccpState(AssociationCoreComponentProperty asccp,

@@ -483,8 +483,12 @@ public class TopLevelABIEHandler implements Serializable {
             TopLevelAbie selectedTopLevelAbie = topLevelAbieRepository.findByAbieId(selectedAbie.getAbieId());
             AggregateCoreComponent aggregateCoreComponent =
                     accRepository.findOne(selectedAbie.getBasedAccId());
-            AssociationCoreComponentProperty asccp =
-                    asccpRepository.findOneByRoleOfAccId(aggregateCoreComponent.getAccId());
+
+            List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(aggregateCoreComponent.getAccId());
+            if (asccpList.size() != 1) {
+                throw new IllegalStateException();
+            }
+            AssociationCoreComponentProperty asccp = asccpList.get(0);
 
             int userId = userRepository.findAppUserIdByLoginId("oagis");
             TopLevelAbie copiedBod = copyTopLevelAbie(selectedTopLevelAbie);

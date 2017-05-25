@@ -12,8 +12,10 @@
             </div>
         </div>
         <h:form id="listForm">
-            <p:panel id="pPanel">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
 
+            <p:panel id="pPanel">
                 <f:facet name="header">
                     <div class="row" style="margin-bottom: 15px;">
                         <div class="col-md-6 col-sm-6">
@@ -149,6 +151,12 @@
                         <h:outputText value="#{cc.lastUpdateTimestamp}">
                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                                         rendered="#{coreComponentBean.canBeDiscarded(cc)}"
+                                         action="#{coreComponentBean.discard(cc)}" update="tbl" ajax="true"/>
                     </p:column>
                 </p:dataTable>
             </p:panel>

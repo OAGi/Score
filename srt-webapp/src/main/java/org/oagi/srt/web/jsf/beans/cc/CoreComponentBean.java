@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
+import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.oagi.srt.repository.entity.CoreComponents;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
@@ -24,6 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Controller
 @Scope("view")
@@ -40,6 +44,9 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private AggregateCoreComponentRepository accRepository;
 
     private List<CoreComponents> coreComponents;
     private List<String> selectedTypes;
@@ -288,6 +295,50 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sessionMap = externalContext.getSessionMap();
         sessionMap.put(SEARCH_TEXT_MODULE_KEY, this.searchTextForModule);
+    }
+
+    public boolean canBeDiscarded(CoreComponents coreComponents) {
+        if (getCurrentUser().getAppUserId() != coreComponents.getOwnerUserId()) {
+            return false;
+        }
+        if (coreComponents.getState() == CoreComponentState.Published) {
+            return false;
+        }
+
+        switch (coreComponents.getType()) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                if (acc.getOagisComponentType() == UserExtensionGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            case "ASCC":
+                return false;
+            case "ASCCP":
+                return true;
+            case "BCC":
+                return false;
+            case "BCCP":
+                return true;
+        }
+
+        return false;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(CoreComponents coreComponents) {
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.discard(coreComponents, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+        reset();
     }
 
     public void onSortEvent(SortEvent sortEvent) {

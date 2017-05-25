@@ -20,7 +20,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
@@ -195,13 +197,11 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String updateState(AggregateBusinessInformationEntityState state) {
+    public void updateState(AggregateBusinessInformationEntityState state) {
         try {
             ASBIEPNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
             bieService.updateState(topLevelAbieId, state);
-
-            return "/views/profile_bod/list.jsf?faces-redirect=true";
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -210,7 +210,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String createABIEExtension(boolean isLocally) {
+    public void createABIEExtension(boolean isLocally) throws IOException {
         TreeNode treeNode = getSelectedTreeNode();
         ASBIEPNode asbieNode = (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
@@ -227,12 +227,13 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
                     User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
-                    return null;
+                    return;
                 }
             }
 
             if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Candidate) {
-                return redirectABIEExtension(isLocally, eAcc);
+                redirectABIEExtension(isLocally, eAcc);
+                return;
             }
         }
 
@@ -248,7 +249,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             throw t;
         }
 
-        return redirectABIEExtension(isLocally, eAcc);
+        redirectABIEExtension(isLocally, eAcc);
     }
 
     public CoreComponentState getABIEExtensionState(boolean isLocally) {
@@ -265,11 +266,11 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         return (ueAcc != null) ? ueAcc.getState() : null;
     }
 
-    public String redirectABIEExtension(boolean isLocally) {
-        return redirectABIEExtension(isLocally, null);
+    public void redirectABIEExtension(boolean isLocally) throws IOException {
+        redirectABIEExtension(isLocally, null);
     }
 
-    public String redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) {
+    public void redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) throws IOException {
         TreeNode treeNode = getSelectedTreeNode();
         ASBIEPNode asbieNode =
                 (ASBIEPNode) treeNode.getData();
@@ -279,6 +280,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             eAcc = extensionService.getExtensionAcc(asccp, isLocally);
         }
 
-        return "/views/core_component/extension.jsf?accId=" + eAcc.getAccId() + "&faces-redirect=true";
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/extension/" + eAcc.getAccId());
     }
 }
