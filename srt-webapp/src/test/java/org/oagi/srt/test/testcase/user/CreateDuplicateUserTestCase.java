@@ -8,7 +8,7 @@ public class CreateDuplicateUserTestCase extends BaseTestCase {
     
     @Test
     public void testCaseDuplicateAccountCreation() throws Exception {
-        open("/views/user/login.xhtml");
+        open("/signin");
 
         // Create new user (with existing username): testuser/miroslav1234.
         createUser("testuser", "miroslav1234");

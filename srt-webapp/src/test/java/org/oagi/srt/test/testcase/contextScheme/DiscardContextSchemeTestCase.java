@@ -8,7 +8,7 @@ public class DiscardContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseDiscardContextScheme() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

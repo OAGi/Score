@@ -8,7 +8,7 @@ public class CreateContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateContextScheme() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

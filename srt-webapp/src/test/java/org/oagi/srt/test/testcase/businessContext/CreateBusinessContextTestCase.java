@@ -9,7 +9,7 @@ public class CreateBusinessContextTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateBusinessContextB2BProcessPO() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

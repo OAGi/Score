@@ -8,7 +8,7 @@ public class InvalidUserLogInTestCase extends BaseTestCase {
 
     @Test
     public void testCaseInvalidRegularUserLogin() throws Exception {
-        open("/views/user/login.xhtml");
+        open("/signin");
 
         // Invalid login.
         login("testuser", "testuser");

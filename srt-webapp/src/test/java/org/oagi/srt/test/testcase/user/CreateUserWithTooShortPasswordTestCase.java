@@ -8,7 +8,7 @@ public class CreateUserWithTooShortPasswordTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateARegularUserWithTooShortPassword() throws Exception {
-        open("/views/user/login.xhtml");
+        open("/signin");
 
         // Create new user (with short password): jane/jane.
         createUser("jane", "jane");

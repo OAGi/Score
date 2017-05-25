@@ -8,7 +8,7 @@ public class UserLogInTestCase extends BaseTestCase {
 
     @Test
     public void testCaseValidRegularUserLogin() throws Exception {
-        open("/views/user/login.jsf");
+        open("/signup");
 
         waitForElementPresent(By.id("username"));
 

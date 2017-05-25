@@ -8,7 +8,7 @@ public class CreateContextCategoryIntegrationTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateContextCategoryIntegration() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

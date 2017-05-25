@@ -8,7 +8,7 @@ public class UpdateContextSchemeTestCase extends BaseTestCase {
 
     @Test
     public void testCaseUpdateContextScheme() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

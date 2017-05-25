@@ -8,7 +8,7 @@ public class UserLogInAndOutTestCase extends BaseTestCase {
 
     @Test
     public void testCaseValidRegularUserLoginAndOut() throws Exception {
-        open("/views/user/login.jsf");
+        open("/signup");
 
         // Login.
         login("testuser", "testtest");

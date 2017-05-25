@@ -8,7 +8,7 @@ public class CreateDuplicateContextCategoryTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateDuplicateContextCategory() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

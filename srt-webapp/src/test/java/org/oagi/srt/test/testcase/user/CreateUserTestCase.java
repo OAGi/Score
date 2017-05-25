@@ -8,7 +8,7 @@ public class CreateUserTestCase extends BaseTestCase {
     
     @Test
     public void testCaseCreateAccount() throws Exception {
-        open("/views/user/login.jsf");
+        open("/signup");
 
         // Create sample user: testuser/testtest.
         createUser("testuser", "testtest");

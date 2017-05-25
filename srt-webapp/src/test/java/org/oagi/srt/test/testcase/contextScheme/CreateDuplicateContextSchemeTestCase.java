@@ -8,7 +8,7 @@ public class CreateDuplicateContextSchemeTestCase extends BaseTestCase {
 
         @Test
         public void testCaseCreateDuplicateContextScheme() throws Exception {
-            open("/index.jsf");
+            open("/");
 
             // Login user testuser/testtest.
             waitForElementPresent(By.id("username"));

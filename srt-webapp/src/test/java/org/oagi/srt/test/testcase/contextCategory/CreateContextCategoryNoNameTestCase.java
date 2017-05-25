@@ -8,7 +8,7 @@ public class CreateContextCategoryNoNameTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateInvalidContextCategory() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

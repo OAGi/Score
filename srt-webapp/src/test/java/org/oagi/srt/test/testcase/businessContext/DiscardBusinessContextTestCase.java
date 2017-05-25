@@ -8,7 +8,7 @@ public class DiscardBusinessContextTestCase extends BaseTestCase {
     
     @Test
     public void testCaseDiscardBusinessContextA2AProcessPO() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

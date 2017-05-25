@@ -10,7 +10,7 @@ public class UpdateBusinessContextTestCase extends BaseTestCase {
 
     @Test
     public void testCaseUpdateBusinessContextB2BProcessPOToA2AProcessPO() throws Exception {
-        open("/index.jsf");
+        open("/");
 
         // Login user testuser/testtest.
         waitForElementPresent(By.id("username"));

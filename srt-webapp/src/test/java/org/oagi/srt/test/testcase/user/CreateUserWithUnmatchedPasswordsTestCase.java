@@ -8,7 +8,7 @@ public class CreateUserWithUnmatchedPasswordsTestCase extends BaseTestCase {
 
     @Test
     public void testCaseCreateARegularUserWithUnmatchedPasswords() throws Exception {
-        open("/views/user/login.xhtml");
+        open("/signin");
 
         // Create new user.
         click(By.id("newAccountLink"));
