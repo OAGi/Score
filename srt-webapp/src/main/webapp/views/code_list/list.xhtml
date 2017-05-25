@@ -33,9 +33,7 @@
                     <p:ajax event="rowSelect" listener="#{codeListBean.onRowSelect}"/>
                     <p:ajax event="rowUnselect" listener="#{codeListBean.onRowUnselect}"/>
                     <p:column headerText="Name" sortBy="#{cVO.name}">
-                        <h:link value="#{cVO.name}" outcome="/views/code_list/details.xhtml">
-                            <f:param name="codeListId" value="#{cVO.codeListId}"/>
-                        </h:link>
+                        <a href="/code_list/#{cVO.codeListId}">#{cVO.name}</a>
                     </p:column>
                     <p:column headerText="Based Code List" sortBy="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}">
                         <h:link value="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}" outcome="/views/code_list/details.xhtml">

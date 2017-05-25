@@ -90,6 +90,8 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                 // Code List Menu
                 .addRule(Join.path("/code_list")
                         .to("/views/code_list/list.jsf"))
+                .addRule(Join.path("/code_list/{code_list_id}")
+                        .to("/views/code_list/details.jsf?codeListId={code_list_id}"))
                 .addRule(Join.path("/code_list/create/without_base")
                         .to("/views/code_list/create_wo_base.jsf"))
                 .addRule(Join.path("/code_list/create/from_another")
