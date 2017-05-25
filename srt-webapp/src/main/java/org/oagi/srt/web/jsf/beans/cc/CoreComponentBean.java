@@ -55,7 +55,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @PostConstruct
     public void init() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        
+
         Map<String, Object> sessionMap = externalContext.getSessionMap();
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
 

@@ -10,15 +10,15 @@ tmp/*
 .settings/*
 .classpath
 .project
-docker-compose.yml
 /target/
 logs/*
 
 backup/*
 data/Model
-Dockerfile
-docker-compose.yaml
+Dockerfile*
+docker-compose*
 *.zip
 ~$*
 *.bak
-srt-webapp/src/main/resources/static/bower_components/**
+.dockerignore
+entrypoint.sh
