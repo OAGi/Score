@@ -26,6 +26,9 @@ public class CoreComponentService {
     private AggregateCoreComponentRepository accRepository;
 
     @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
+
+    @Autowired
     private AssociationCoreComponentRepository asccRepository;
 
     @Autowired
@@ -403,13 +406,16 @@ public class CoreComponentService {
         if (!asccpRepository.findByRoleOfAccId(currentAccId).isEmpty()) {
             throw new IllegalStateException("Not allowed to discard the ACC which has related with ASCCP");
         }
-        if (!asccRepository.findByFromAccId(currentAccId).isEmpty()) {
-            throw new IllegalStateException("Not allowed to discard the ACC which has children");
+        if (!abieRepository.findByBasedAccId(currentAccId).isEmpty()) {
+            throw new IllegalStateException("Not allowed to discard the ACC which has related with ABIE");
         }
 
         long accId = acc.getAccId();
         accRepository.deleteByCurrentAccId(accId); // To remove history
         accRepository.delete(acc);
+
+        asccRepository.deleteByFromAccId(accId);
+        bccRepository.deleteByFromAccId(accId);
     }
 
     @Transactional(rollbackFor = Throwable.class)

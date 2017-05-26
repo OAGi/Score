@@ -79,6 +79,10 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
     public void deleteByCurrentBccId(long currentBccId);
 
+    @Modifying
+    @Query("delete from BasicCoreComponent b where b.fromAccId = ?1")
+    public void deleteByFromAccId(long fromAccId);
+
     @Query("select b from BasicCoreComponent b where b.revisionNum = ?1 order by b.creationTimestamp desc")
     public List<BasicCoreComponent> findAllByRevisionNum(int revisionNum);
 

@@ -14,6 +14,9 @@ public interface AggregateBusinessInformationEntityRepository
     @Query("select a from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public List<AggregateBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 
+    @Query("select a from AggregateBusinessInformationEntity a where a.basedAccId = ?1")
+    public List<AggregateBusinessInformationEntity> findByBasedAccId(long basedAccId);
+
     @Query("select a from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1 and a.basedAccId = ?2")
     public List<AggregateBusinessInformationEntity> findByOwnerTopLevelAbieIdAndBasedAccId(long ownerTopLevelAbieId, long basedAccId);
 

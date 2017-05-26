@@ -87,6 +87,10 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("delete from AssociationCoreComponent a where a.currentAsccId = ?1")
     public void deleteByCurrentAsccId(long currentAsccId);
 
+    @Modifying
+    @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1")
+    public void deleteByFromAccId(long fromAccId);
+
     @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 order by a.creationTimestamp desc")
     public List<AssociationCoreComponent> findAllByRevisionNum(int revisionNum);
 
