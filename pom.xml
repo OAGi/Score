@@ -36,5 +36,6 @@
 		<hibernate.version>5.0.12.Final</hibernate.version>
 		<org.ow2.asm.version>5.0.4</org.ow2.asm.version>
 		<xml.apis.version>1.4.01</xml.apis.version>
+		<lucene.version>6.5.1</lucene.version>
 	</properties>
 </project>
