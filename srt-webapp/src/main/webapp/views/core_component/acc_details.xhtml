@@ -100,18 +100,11 @@
 
                                                 <p:column headerText="ACC Object Class Term"
                                                           sortBy="#{acc.objectClassTerm}">
-                                                    <h:link value="#{acc.objectClassTerm}"
-                                                            outcome="/views/core_component/acc_details.jsf"
-                                                            target="_new">
-                                                        <f:param name="accId" value="#{acc.accId}"/>
-                                                    </h:link>
+                                                    <a href="/core_component/acc/#{acc.accId}"
+                                                       target="_new">#{acc.objectClassTerm}</a>
                                                     <div>
-                                                        <h:link value="GUID: #{acc.guid}"
-                                                                outcome="/views/core_component/acc_details.jsf"
-                                                                target="_new"
-                                                                style="font-size: 12px !important; color: #767676 !important;">
-                                                            <f:param name="accId" value="#{acc.accId}"/>
-                                                        </h:link>
+                                                        <a href="/core_component/acc/#{acc.accId}" target="_new"
+                                                           style="font-size: 12px !important; color: #767676 !important;">GUID: #{acc.guid}</a>
                                                     </div>
                                                 </p:column>
                                                 <p:column style="width: 150px; text-align: center;" headerText="Type"
@@ -189,18 +182,11 @@
 
                                                 <p:column headerText="ASCCP Property Term"
                                                           sortBy="#{asccp.propertyTerm}">
-                                                    <h:link value="#{asccp.propertyTerm}"
-                                                            outcome="/views/core_component/asccp_details.jsf"
-                                                            target="_new">
-                                                        <f:param name="asccpId" value="#{asccp.asccpId}"/>
-                                                    </h:link>
+                                                    <a href="/core_component/asccp/#{asccp.asccpId}"
+                                                       target="_new">#{asccp.propertyTerm}</a>
                                                     <div>
-                                                        <h:link value="GUID: #{asccp.guid}"
-                                                                outcome="/views/core_component/asccp_details.jsf"
-                                                                target="_new"
-                                                                style="font-size: 12px !important; color: #767676 !important;">
-                                                            <f:param name="asccpId" value="#{asccp.asccpId}"/>
-                                                        </h:link>
+                                                        <a href="/core_component/asccp/#{asccp.asccpId}" target="_new"
+                                                           style="font-size: 12px !important; color: #767676 !important;">GUID: #{asccp.guid}</a>
                                                     </div>
                                                 </p:column>
                                                 <p:column headerText="Definition" sortBy="#{asccp.definition}">
@@ -264,18 +250,11 @@
                                                         listener="#{accDetailBean.onBccpRowUnselect}"/>
 
                                                 <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
-                                                    <h:link value="#{bccp.propertyTerm}"
-                                                            outcome="/views/core_component/bccp_details.jsf"
-                                                            target="_new">
-                                                        <f:param name="bccpId" value="#{bccp.bccpId}"/>
-                                                    </h:link>
+                                                    <a href="/core_component/bccp/#{bccp.bccpId}"
+                                                       target="_new">#{bccp.propertyTerm}</a>
                                                     <div>
-                                                        <h:link value="GUID: #{bccp.guid}"
-                                                                outcome="/views/core_component/bccp_details.jsf"
-                                                                target="_new"
-                                                                style="font-size: 12px !important; color: #767676 !important;">
-                                                            <f:param name="bccpId" value="#{bccp.bccpId}"/>
-                                                        </h:link>
+                                                        <a href="/core_component/bccp/#{bccp.bccpId}" target="_new"
+                                                           style="font-size: 12px !important; color: #767676 !important;">GUID: #{bccp.guid}</a>
                                                     </div>
                                                 </p:column>
                                                 <p:column headerText="Definition" sortBy="#{bccp.definition}">
