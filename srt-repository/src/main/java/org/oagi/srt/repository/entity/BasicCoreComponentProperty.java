@@ -1,12 +1,12 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -175,6 +175,14 @@ public class BasicCoreComponentProperty
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
+        if (bdt != null && !StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + bdt.getDataTypeTerm());
+        }
+    }
+
+    public void setPropertyTerm(String propertyTerm, DataType bdt) {
+        setPropertyTerm(propertyTerm);
+        setBdt(bdt);
     }
 
     public String getRepresentationTerm() {
@@ -197,6 +205,9 @@ public class BasicCoreComponentProperty
         this.bdt = bdt;
         if (bdt != null) {
             setRepresentationTerm(bdt.getDataTypeTerm());
+        }
+        if (!StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + bdt.getDataTypeTerm());
         }
     }
 

@@ -16,7 +16,6 @@ import org.oagi.srt.service.NodeService;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -758,6 +757,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     @Transactional(rollbackFor = Throwable.class)
     public void discardAscc(TreeNode treeNode) {
         ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        discardAscc(asccpNode);
+    }
+
+    private void discardAscc(ASCCPNode asccpNode) {
         AssociationCoreComponent ascc = asccpNode.getAscc();
         User requester = getCurrentUser();
 
@@ -771,9 +774,14 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         setSelectedTreeNode(null);
 
-        TreeNode parent = treeNode.getParent();
-        List<TreeNode> children = parent.getChildren();
-        children.remove(treeNode);
+        TreeNode rootNode = getRootNode();
+        List<TreeNode> children = rootNode.getChildren();
+        for (TreeNode child : rootNode.getChildren()) {
+            if (child.getData() == asccpNode) {
+                children.remove(child);
+                break;
+            }
+        }
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);
@@ -808,6 +816,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     @Transactional(rollbackFor = Throwable.class)
     public void discardBcc(TreeNode treeNode) {
         BCCPNode bccpNode = (BCCPNode) treeNode.getData();
+        discardBcc(bccpNode);
+    }
+
+    private void discardBcc(BCCPNode bccpNode) {
         BasicCoreComponent bcc = bccpNode.getBcc();
         User requester = getCurrentUser();
 
@@ -821,12 +833,53 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         setSelectedTreeNode(null);
 
-        TreeNode parent = treeNode.getParent();
-        List<TreeNode> children = parent.getChildren();
-        children.remove(treeNode);
+        TreeNode rootNode = getRootNode();
+        List<TreeNode> children = rootNode.getChildren();
+        for (TreeNode child : rootNode.getChildren()) {
+            if (child.getData() == bccpNode) {
+                children.remove(child);
+                break;
+            }
+        }
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);
+    }
+
+    public boolean canBeDiscard(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (Editing == ascc.getState()) {
+                return true;
+            }
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (Editing == bcc.getState()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            discardAscc(asccpNode);
+            selectedTreeNode = null;
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            discardBcc(bccpNode);
+            selectedTreeNode = null;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update() {
+        updateAcc(getRootNode());
     }
 
     @Transactional(rollbackFor = Throwable.class)

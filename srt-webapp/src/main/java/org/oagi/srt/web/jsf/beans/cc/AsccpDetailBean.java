@@ -161,8 +161,8 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateAsccp(TreeNode treeNode) {
-        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+    public void updateAsccp() {
+        ASCCPNode asccpNode = (ASCCPNode) getRootNode().getData();
         AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
         User requester = getCurrentUser();
 

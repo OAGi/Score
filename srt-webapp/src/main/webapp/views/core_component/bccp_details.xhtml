@@ -328,18 +328,6 @@
                                         <p:panel id="bccpPanel">
                                             <f:facet name="header">
                                                 <h:outputText value="BCCP"/>
-                                                <span style="float: right;">
-                                                    <p:commandButton id="updateBtn"
-                                                            rendered="#{bccpDetailBean.selectedTreeNode.data.bccp.state == 'Editing'}"
-                                                            value="Update" ajax="true"
-                                                            action="#{bccpDetailBean.updateBccp(bccpDetailBean.selectedTreeNode)}"
-                                                            disabled="#{!bccpDetailBean.selectedTreeNode.data.bccp.dirty}"
-                                                            update=":form:details, :form:btnGroup"/>
-                                                    <p:commandButton id="discardBtn"
-                                                            rendered="#{bccpDetailBean.selectedTreeNode.data.bccp.state == 'Editing'}"
-                                                            value="Discard" ajax="true" styleClass="danger"
-                                                            action="#{bccpDetailBean.discardBccp(bccpDetailBean.selectedTreeNode)}"/>
-                                                </span>
                                             </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
@@ -353,7 +341,8 @@
                                                         value="#{bccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
                                                         styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
-                                                    <p:ajax update="headerMessage, leftPanel, bccpPanel, :form:btnGroup"/>
+                                                    <p:ajax listener="#{bccpDetailBean.onChangePropertyTerm(bccpDetailBean.selectedTreeNode.data)}"
+                                                            update="headerMessage, leftPanel, bccpPanel, :form:btnGroup"/>
                                                 </h:inputText>
 
                                                 <h:outputText value="DEN" styleClass="section-label"/>
@@ -511,6 +500,12 @@
             <p:panel id="btnGroup"
                      rendered="#{(bccpDetailBean.currentUser.appUserId eq bccpDetailBean.targetBccp.ownerUserId)}">
                 <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
+                                 disabled="#{!bccpDetailBean.targetBccp.dirty}"
+                                 id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                                 action="#{bccpDetailBean.updateBccp()}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{bccpDetailBean.updateState('Candidate')}"
                                  disabled="#{bccpDetailBean.targetBccp.dirty}"
@@ -525,6 +520,7 @@
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{bccpDetailBean.targetBccp.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
+                
                 <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Published' and bccpDetailBean.hasPreviousRevision(bccpDetailBean.targetBccp)}"
                                  id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
                                  action="#{bccpDetailBean.createNewRevision(bccpDetailBean.targetBccp)}"

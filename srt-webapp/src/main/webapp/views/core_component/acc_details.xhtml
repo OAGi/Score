@@ -38,7 +38,13 @@
                                         <f:facet name="header">
                                             <h:outputText value="#{accDetailBean.targetAcc.objectClassTerm}"/>
                                         </f:facet>
-                                        <h:outputText value="#{ node.getAttribute('name') }"/>
+                                        <h:outputText value="#{node.getAttribute('name')}"/>
+                                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                                                         style="float: right; border-radius: 50%;"
+                                                         rendered="#{accDetailBean.canBeDiscard(node)}"
+                                                         action="#{accDetailBean.discard(node)}"
+                                                         update=":form">
+                                        </p:commandButton>
                                     </p:column>
                                 </p:treeTable>
 
@@ -296,19 +302,6 @@
                                         <p:panel id="accPanel">
                                             <f:facet name="header">
                                                 <h:outputText value="ACC"/>
-                                                <span style="float: right;">
-                                                        <p:commandButton id="accUpdateBtn"
-                                                                     rendered="#{accDetailBean.selectedTreeNode.data.acc.state == 'Editing'}"
-                                                                     value="Update" ajax="true"
-                                                                     action="#{accDetailBean.updateAcc(accDetailBean.selectedTreeNode)}"
-                                                                     disabled="#{accDetailBean.selectedTreeNode.data.acc.isDirty() eq false}"
-                                                                     update=":form:details, :form:btnGroup"/>
-                                                        <p:commandButton id="accDiscardBtn"
-                                                                     rendered="#{accDetailBean.selectedTreeNode.data.acc.state == 'Editing'}"
-                                                                     value="Discard" ajax="true" styleClass="danger"
-                                                                     action="#{accDetailBean.discardAcc(accDetailBean.selectedTreeNode)}"
-                                                                     update=":form:treeTable, :form:details, :form:btnGroup"/>
-                                                </span>
                                             </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
@@ -387,19 +380,6 @@
                                                  rendered="#{accDetailBean.selectedTreeNode.data.ascc != null}">
                                             <f:facet name="header">
                                                 <h:outputText value="ASCC"/>
-                                                <span style="float: right;">
-                                                        <p:commandButton id="asccUpdateBtn"
-                                                                     rendered="#{accDetailBean.selectedTreeNode.data.ascc.state == 'Editing'}"
-                                                                     value="Update" ajax="true"
-                                                                     action="#{accDetailBean.updateAscc(accDetailBean.selectedTreeNode)}"
-                                                                     disabled="#{accDetailBean.selectedTreeNode.data.ascc.isDirty() eq false}"
-                                                                     update=":form:details, :form:btnGroup"/>
-                                                        <p:commandButton id="asccDiscardBtn"
-                                                                     rendered="#{accDetailBean.selectedTreeNode.data.ascc.state == 'Editing'}"
-                                                                     value="Discard" ajax="true" styleClass="danger"
-                                                                     action="#{accDetailBean.discardAscc(accDetailBean.selectedTreeNode)}"
-                                                                     update=":form:treeTable, :form:details, :form:btnGroup"/>
-                                                </span>
                                             </f:facet>
 
                                             <h:panelGrid columns="2">
@@ -518,19 +498,6 @@
                                                  rendered="#{accDetailBean.selectedTreeNode.data.bcc != null}">
                                             <f:facet name="header">
                                                 <h:outputText value="BCC"/>
-                                                <span style="float: right;">
-                                                        <p:commandButton id="updateBtn"
-                                                            rendered="#{accDetailBean.selectedTreeNode.data.bcc.state == 'Editing'}"
-                                                            value="Update" ajax="true"
-                                                            action="#{accDetailBean.updateBcc(accDetailBean.selectedTreeNode)}"
-                                                            disabled="#{accDetailBean.selectedTreeNode.data.bcc.isDirty() eq false}"
-                                                            update=":form:treeTable, :form:details, :form:btnGroup"/>
-                                                        <p:commandButton id="discardBtn"
-                                                            rendered="#{accDetailBean.selectedTreeNode.data.bcc.state == 'Editing'}"
-                                                            value="Discard" ajax="true" styleClass="danger"
-                                                            action="#{accDetailBean.discardBcc(accDetailBean.selectedTreeNode)}"
-                                                            update=":form:treeTable, :form:details, :form:btnGroup"/>
-                                                </span>
                                             </f:facet>
 
                                             <h:panelGrid columns="2">
@@ -795,6 +762,12 @@
             <p:panel id="btnGroup"
                      rendered="#{(accDetailBean.currentUser.appUserId eq accDetailBean.targetAcc.ownerUserId) and
                                  (accDetailBean.preparedAppend eq false)}">
+                <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
+                                 disabled="#{!accDetailBean.dirty}"
+                                 id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                                 action="#{accDetailBean.update()}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{accDetailBean.updateState('Candidate')}"

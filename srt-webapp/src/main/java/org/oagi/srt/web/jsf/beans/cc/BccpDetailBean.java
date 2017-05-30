@@ -142,8 +142,8 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         }
     }
 
-    public void onChangePropertyTerm(ASCCPNode asccpNode) {
-        setNodeName(asccpNode);
+    public void onChangePropertyTerm(BCCPNode bccpNode) {
+        setNodeName(bccpNode);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -166,8 +166,8 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateBccp(TreeNode treeNode) {
-        BCCPNode bccpNode = (BCCPNode) treeNode.getData();
+    public void updateBccp() {
+        BCCPNode bccpNode = (BCCPNode) getRootNode().getData();
         BasicCoreComponentProperty bccp = bccpNode.getBccp();
         User requester = getCurrentUser();
 

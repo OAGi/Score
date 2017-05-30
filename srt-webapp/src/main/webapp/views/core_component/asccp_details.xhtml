@@ -184,18 +184,6 @@
                                         <p:panel id="asccpPanel">
                                             <f:facet name="header">
                                                 <h:outputText value="ASCCP"/>
-                                                <span style="float: right;">
-                                                    <p:commandButton id="updateBtn"
-                                                            rendered="#{asccpDetailBean.selectedTreeNode.data.asccp.state == 'Editing'}"
-                                                            value="Update" ajax="true"
-                                                            action="#{asccpDetailBean.updateAsccp(asccpDetailBean.selectedTreeNode)}"
-                                                            disabled="#{!asccpDetailBean.selectedTreeNode.data.asccp.dirty}"
-                                                            update=":form:details, :form:btnGroup"/>
-                                                    <p:commandButton id="discardBtn"
-                                                            rendered="#{asccpDetailBean.selectedTreeNode.data.asccp.state == 'Editing'}"
-                                                            value="Discard" ajax="true" styleClass="danger"
-                                                            action="#{asccpDetailBean.discardAsccp(asccpDetailBean.selectedTreeNode)}"/>
-                                                </span>
                                             </f:facet>
                                             <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
@@ -516,6 +504,12 @@
             <p:panel id="btnGroup"
                      rendered="#{(asccpDetailBean.currentUser.appUserId eq asccpDetailBean.targetAsccp.ownerUserId)}">
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Editing'}"
+                                 disabled="#{!asccpDetailBean.targetAsccp.dirty}"
+                                 id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                                 action="#{asccpDetailBean.updateAsccp()}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{asccpDetailBean.updateState('Candidate')}"
                                  disabled="#{asccpDetailBean.targetAsccp.dirty}"
@@ -530,6 +524,7 @@
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{asccpDetailBean.targetAsccp.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
+                
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Published' and asccpDetailBean.hasPreviousRevision(asccpDetailBean.targetAsccp)}"
                                  id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
                                  action="#{asccpDetailBean.createNewRevision(asccpDetailBean.targetAsccp)}"
