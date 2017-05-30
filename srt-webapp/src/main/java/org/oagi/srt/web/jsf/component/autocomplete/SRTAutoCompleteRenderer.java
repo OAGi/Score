@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.component;
+package org.oagi.srt.web.jsf.component.autocomplete;
 
 import org.primefaces.component.autocomplete.AutoComplete;
 import org.primefaces.component.autocomplete.AutoCompleteRenderer;

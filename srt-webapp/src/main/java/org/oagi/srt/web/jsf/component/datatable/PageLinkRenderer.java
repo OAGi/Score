@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.component;
+package org.oagi.srt.web.jsf.component.datatable;
 
 import org.primefaces.component.api.Pageable;
 

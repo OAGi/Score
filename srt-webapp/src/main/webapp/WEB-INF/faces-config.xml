@@ -14,6 +14,7 @@
         </locale-config>
         <el-resolver>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver</el-resolver>
         <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+        <resource-handler>org.oagi.srt.web.jsf.component.resource.SRTResourceHandler</resource-handler>
         <resource-bundle>
             <base-name>i18n.menu</base-name>
             <var>str</var>
@@ -37,19 +38,13 @@
         <renderer>
             <component-family>org.primefaces.component</component-family>
             <renderer-type>org.primefaces.component.DataTableRenderer</renderer-type>
-            <renderer-class>org.oagi.srt.web.jsf.component.SRTDataTableRenderer</renderer-class>
+            <renderer-class>org.oagi.srt.web.jsf.component.datatable.SRTDataTableRenderer</renderer-class>
         </renderer>
         <renderer>
             <component-family>org.primefaces.component</component-family>
             <renderer-type>org.primefaces.component.AutoCompleteRenderer</renderer-type>
-            <renderer-class>org.oagi.srt.web.jsf.component.SRTAutoCompleteRenderer</renderer-class>
+            <renderer-class>org.oagi.srt.web.jsf.component.autocomplete.SRTAutoCompleteRenderer</renderer-class>
         </renderer>
     </render-kit>
-
-    <managed-bean>
-        <managed-bean-name>startup</managed-bean-name>
-        <managed-bean-class>java.util.Date</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
 
 </faces-config>

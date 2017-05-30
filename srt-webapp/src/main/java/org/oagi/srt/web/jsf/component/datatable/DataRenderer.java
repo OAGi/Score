@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.component;
+package org.oagi.srt.web.jsf.component.datatable;
 
 import org.primefaces.component.api.Pageable;
 import org.primefaces.component.api.UIData;
@@ -24,11 +24,11 @@ public class DataRenderer extends CoreRenderer {
     static {
         PAGINATOR_ELEMENTS = new HashMap<String, PaginatorElementRenderer>();
         PAGINATOR_ELEMENTS.put("{CurrentPageReport}", new CurrentPageReportRenderer());
-        PAGINATOR_ELEMENTS.put("{FirstPageLink}", new org.oagi.srt.web.jsf.component.FirstPageLinkRenderer());
-        PAGINATOR_ELEMENTS.put("{PreviousPageLink}", new org.oagi.srt.web.jsf.component.PrevPageLinkRenderer());
-        PAGINATOR_ELEMENTS.put("{NextPageLink}", new org.oagi.srt.web.jsf.component.NextPageLinkRenderer());
-        PAGINATOR_ELEMENTS.put("{LastPageLink}", new org.oagi.srt.web.jsf.component.LastPageLinkRenderer());
-        PAGINATOR_ELEMENTS.put("{PageLinks}", new org.oagi.srt.web.jsf.component.PageLinksRenderer());
+        PAGINATOR_ELEMENTS.put("{FirstPageLink}", new FirstPageLinkRenderer());
+        PAGINATOR_ELEMENTS.put("{PreviousPageLink}", new PrevPageLinkRenderer());
+        PAGINATOR_ELEMENTS.put("{NextPageLink}", new NextPageLinkRenderer());
+        PAGINATOR_ELEMENTS.put("{LastPageLink}", new LastPageLinkRenderer());
+        PAGINATOR_ELEMENTS.put("{PageLinks}", new PageLinksRenderer());
         PAGINATOR_ELEMENTS.put("{RowsPerPageDropdown}", new RowsPerPageDropdownRenderer());
         PAGINATOR_ELEMENTS.put("{JumpToPageDropdown}", new JumpToPageDropdownRenderer());
     }
