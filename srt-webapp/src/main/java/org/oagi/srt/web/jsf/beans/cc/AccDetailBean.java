@@ -67,7 +67,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private ModuleRepository moduleRepository;
 
     private AggregateCoreComponent targetAcc;
-    private AggregateCoreComponent userExtensionAcc;
+    private int targetAccMaxSeqKey;
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
@@ -101,6 +101,11 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void setTargetAcc(AggregateCoreComponent targetAcc) {
         this.targetAcc = targetAcc;
+        onUpdateTargetAccChildCount();
+    }
+
+    public void onUpdateTargetAccChildCount() {
+        targetAccMaxSeqKey = coreComponentService.getMaxSeqKeyOfChildren(targetAcc);
     }
 
     public boolean isDirty() {
@@ -142,14 +147,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return false;
     }
 
-    public AggregateCoreComponent getUserExtensionAcc() {
-        return userExtensionAcc;
-    }
-
-    public void setUserExtensionAcc(AggregateCoreComponent userExtensionAcc) {
-        this.userExtensionAcc = userExtensionAcc;
-    }
-
     public TreeNode getTreeNode() {
         return treeNode;
     }
@@ -170,6 +167,129 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         this.selectedTreeNode = selectedTreeNode;
         setPreparedAppendAscc(false);
         setPreparedAppendBcc(false);
+    }
+
+    public boolean canMoveUp(TreeNode selectedTreeNode) {
+        if (selectedTreeNode == null) {
+            return false;
+        }
+
+        if (getRootNode() != selectedTreeNode.getParent()) {
+            return false;
+        }
+
+        Object data = selectedTreeNode.getData();
+        if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) data;
+            if (asccpNode.getAscc().getSeqKey() > 1) {
+                return true;
+            }
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) data;
+            if (bccpNode.getBcc().getSeqKey() > 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean canMoveDown(TreeNode selectedTreeNode) {
+        if (selectedTreeNode == null) {
+            return false;
+        }
+
+        TreeNode rootNode = getRootNode();
+        if (rootNode != selectedTreeNode.getParent()) {
+            return false;
+        }
+
+        int maxSeqKey = targetAccMaxSeqKey;
+
+        Object data = selectedTreeNode.getData();
+        if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) data;
+            int seqKey = asccpNode.getAscc().getSeqKey();
+            if (maxSeqKey > seqKey) {
+                return true;
+            }
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) data;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (Attribute == bcc.getEntityType()) {
+                return false;
+            }
+
+            int seqKey = bcc.getSeqKey();
+            if (maxSeqKey > seqKey) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void moveUp(TreeNode selectedTreeNode) {
+        TreeNode rootNode = getRootNode();
+        List<TreeNode> children = rootNode.getChildren();
+        int i = 0;
+        for (int len = children.size(); i < len; ++i) {
+            TreeNode child = children.get(i);
+
+            if (child == selectedTreeNode) {
+                TreeNode previousSibling = children.get(i - 1);
+                switchSeqKey(child, previousSibling);
+                reorderTreeNode(rootNode);
+                break;
+            }
+        }
+    }
+
+    public void moveDown(TreeNode selectedTreeNode) {
+        TreeNode rootNode = getRootNode();
+        List<TreeNode> children = rootNode.getChildren();
+        int i = 0;
+        for (int len = children.size(); i < len; ++i) {
+            TreeNode child = children.get(i);
+
+            if (child == selectedTreeNode) {
+                TreeNode nextSibling = children.get(i + 1);
+                switchSeqKey(child, nextSibling);
+                reorderTreeNode(rootNode);
+                break;
+            }
+        }
+    }
+
+    private void switchSeqKey(TreeNode node1, TreeNode node2) {
+        int seqKey1 = getSeqKey(node1);
+        int seqKey2 = getSeqKey(node2);
+
+        setSeqKey(node1, seqKey2);
+        setSeqKey(node2, seqKey1);
+    }
+
+    private int getSeqKey(TreeNode node) {
+        Object data = node.getData();
+        if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) data;
+            return asccpNode.getAscc().getSeqKey();
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) data;
+            return bccpNode.getBcc().getSeqKey();
+        }
+        throw new IllegalStateException();
+    }
+
+    private void setSeqKey(TreeNode node, int seqKey) {
+        Object data = node.getData();
+        if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) data;
+            asccpNode.getAscc().setSeqKey(seqKey);
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) data;
+            bccpNode.getBcc().setSeqKey(seqKey);
+        }
     }
 
     public AggregateCoreComponent getSelectedAggregateCoreComponent() {
@@ -263,9 +383,13 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     public void updateAcc(TreeNode treeNode) {
         ACCNode accNode = (ACCNode) treeNode.getData();
         AggregateCoreComponent acc = accNode.getAcc();
-        updateAcc(acc);
+        if (acc.isDirty()) {
+            updateAcc(acc);
+        }
 
-        for (TreeNode child : treeNode.getChildren()) {
+        List<TreeNode> children = treeNode.getChildren();
+        for (int i = 0, len = children.size(); i < len; ++i) {
+            TreeNode child = children.get(i);
             if (isDirty(child)) {
                 Object data = child.getData();
                 if (data instanceof ASCCPNode) {
@@ -603,6 +727,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         getSelectedTreeNode().setSelected(false);
         child.setSelected(true);
         setSelectedTreeNode(child);
+
+        onUpdateTargetAccChildCount();
     }
 
     // End Append ASCC
@@ -734,6 +860,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         getSelectedTreeNode().setSelected(false);
         child.setSelected(true);
         setSelectedTreeNode(child);
+
+        onUpdateTargetAccChildCount();
     }
 
     // End Append BCC
@@ -785,6 +913,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);
+
+        onUpdateTargetAccChildCount();
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -844,6 +974,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);
+
+        onUpdateTargetAccChildCount();
     }
 
     public boolean canBeDiscard(CCNode node) {

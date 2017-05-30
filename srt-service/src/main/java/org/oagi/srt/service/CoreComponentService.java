@@ -497,18 +497,25 @@ public class CoreComponentService {
         int seqKey;
         long fromAccId = bcc.getFromAccId();
 
+        // Only if EntityType property would be changed
         switch (bcc.getEntityType()) {
             case Element:
-                seqKey = findAppropriateSeqKey(bcc);
-                bcc.setSeqKey(seqKey);
+                if (bcc.getSeqKey() == 0) {
+                    seqKey = findAppropriateSeqKey(bcc);
+                    bcc.setSeqKey(seqKey);
 
-                increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
+                    increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
+                }
+
                 break;
             case Attribute:
-                seqKey = bcc.getSeqKey();
-                bcc.setSeqKey(0);
+                if (bcc.getSeqKey() > 0) {
+                    seqKey = bcc.getSeqKey();
+                    bcc.setSeqKey(0);
 
-                decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+                    decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+                }
+
                 break;
         }
 
@@ -880,6 +887,17 @@ public class CoreComponentService {
             });
             fromAccIds = tempAccIds;
         }
+    }
+
+    public int getMaxSeqKeyOfChildren(AggregateCoreComponent acc) {
+        long accId = acc.getAccId();
+
+        return Math.max(
+                asccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                        .mapToInt(e -> e.getSeqKey()).max().getAsInt(),
+                bccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                        .mapToInt(e -> e.getSeqKey()).max().getAsInt()
+        );
     }
 
     public int findOriginalCardinalityMin(AssociationBusinessInformationEntity asbie) {

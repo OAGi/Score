@@ -33,10 +33,19 @@
                                             update=":form:treeTable, :form:details"/>
                                     <p:ajax event="collapse"
                                             update=":form:treeTable, :form:details"/>
-                                    <p:ajax event="select" update=":form:details"/>
+                                    <p:ajax event="select" update=":form:treeTable, :form:details"/>
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="#{accDetailBean.targetAcc.objectClassTerm}"/>
+
+                                            <p:commandButton icon="fa fa-white fa-arrow-down" style="float: right;"
+                                                             disabled="#{!accDetailBean.canMoveDown(accDetailBean.selectedTreeNode)}"
+                                                             action="#{accDetailBean.moveDown(accDetailBean.selectedTreeNode)}"
+                                                             update=":form:treeTable, :form:btnGroup"/>
+                                            <p:commandButton icon="fa fa-white fa-arrow-up" style="float: right;"
+                                                             disabled="#{!accDetailBean.canMoveUp(accDetailBean.selectedTreeNode)}"
+                                                             action="#{accDetailBean.moveUp(accDetailBean.selectedTreeNode)}"
+                                                             update=":form:treeTable, :form:btnGroup"/>
                                         </f:facet>
                                         <h:outputText value="#{node.getAttribute('name')}"/>
                                         <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
