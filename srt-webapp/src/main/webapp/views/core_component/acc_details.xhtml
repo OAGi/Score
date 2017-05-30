@@ -326,7 +326,7 @@
                                                              value="#{accDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
                                                              styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
                                                              disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
-                                                    <p:ajax listener="#{accDetailBean.onChangeObjectClassTerm(accDetailBean.selectedTreeNode.data)}"
+                                                    <p:ajax listener="#{accDetailBean.onChangeObjectClassTerm(accDetailBean.selectedTreeNode)}"
                                                             update="headerMessage, leftPanel, accPanel, :form:btnGroup"/>
                                                 </h:inputText>
 
@@ -532,7 +532,8 @@
                                                                     accDetailBean.selectedTreeNode.children.isEmpty() ne true}">
                                                     <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
                                                     <f:selectItem itemLabel="Element" itemValue="Element"/>
-                                                    <p:ajax update="bccPanel, :form:btnGroup"/>
+                                                    <p:ajax listener="#{accDetailBean.onChangeBccEntityType(accDetailBean.selectedTreeNode)}"
+                                                            update="bccPanel, :form:btnGroup"/>
                                                 </p:selectOneMenu>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>

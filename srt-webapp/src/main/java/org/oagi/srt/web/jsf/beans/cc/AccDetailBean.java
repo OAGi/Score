@@ -305,6 +305,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return null;
     }
 
+    public void onChangeBccEntityType(TreeNode selectedTreeNode) {
+
+    }
+
     public void onSelectTreeNode(NodeSelectEvent selectEvent) {
         setSelectedTreeNode(selectEvent.getTreeNode());
     }
@@ -448,7 +452,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
     }
 
-    public void onChangeObjectClassTerm(ACCNode accNode) {
+    public void onChangeObjectClassTerm(TreeNode accTreeNode) {
+        ACCNode accNode = (ACCNode) accTreeNode.getData();
+        setNodeName(accNode);
+
         for (CCNode child : accNode.getChildren()) {
             if (child instanceof ASCCPNode) {
                 ASCCPNode asccpNode = (ASCCPNode) child;
@@ -456,16 +463,18 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 AssociationCoreComponent ascc = asccpNode.getAscc();
                 AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
                 ascc.setDen(acc, asccp);
+
+                setNodeName(asccpNode);
             } else if (child instanceof BCCPNode) {
                 BCCPNode bccpNode = (BCCPNode) child;
                 AggregateCoreComponent acc = accNode.getAcc();
                 BasicCoreComponent bcc = bccpNode.getBcc();
                 BasicCoreComponentProperty bccp = bccpNode.getBccp();
                 bcc.setDen(acc, bccp);
+
+                setNodeName(bccpNode);
             }
         }
-
-        setNodeName(accNode);
     }
 
     /*

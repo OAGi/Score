@@ -44,6 +44,9 @@ public class ExtensionService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CoreComponentService coreComponentService;
+
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
                                                       AssociationCoreComponentProperty asccp, User user)
@@ -557,18 +560,15 @@ public class ExtensionService {
     }
 
     private int nextSeqKey(AggregateCoreComponent acc) {
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
-        List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
-
-        int nextSeqKey = asccList.size() + bccList.size() + 1;
-        ensureNextSeqKey(nextSeqKey, asccList, bccList);
-
+        int nextSeqKey = coreComponentService.getMaxSeqKeyOfChildren(acc) + 1;
+        ensureNextSeqKey(nextSeqKey, acc);
         return nextSeqKey;
     }
 
-    private void ensureNextSeqKey(int nextSeqKey,
-                                  List<AssociationCoreComponent> asccList,
-                                  List<BasicCoreComponent> bccList) {
+    private void ensureNextSeqKey(int nextSeqKey, AggregateCoreComponent acc) {
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
+        List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
+
         int maxSeqKey = Math.max(asccList.stream().mapToInt(e -> e.getSeqKey()).max().orElse(0),
                 bccList.stream().mapToInt(e -> e.getSeqKey()).max().orElse(0));
         if (nextSeqKey != (maxSeqKey + 1)) {
