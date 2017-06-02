@@ -474,7 +474,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "NormalizedString", "normalized string");
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "String", "string");
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "Token", "token");
-        cdtScAwdPriXpsTypeMap("Date Time", "Daylight Saving", "Boolean", "xbt boolean true or false");
+        cdtScAwdPriXpsTypeMap("Date Time", "Daylight Saving", "Boolean", "xbt boolean");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "NormalizedString", "normalized string");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "String", "string");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "Token", "token");
