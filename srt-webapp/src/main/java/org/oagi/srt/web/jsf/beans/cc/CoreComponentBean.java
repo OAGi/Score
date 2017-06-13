@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
@@ -184,63 +185,84 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                     new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
 
             coreComponents = coreComponents.stream()
-                    .filter(e -> {
-                        String q = getSearchTextForDen();
-                        if (StringUtils.isEmpty(q)) {
-                            return true;
-                        }
-
-                        String den = e.getDen().toLowerCase();
-                        String[] split = q.split(" ");
-                        for (String s : split) {
-                            if (!den.contains(s.toLowerCase())) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
-                    .filter(e -> {
-                        String q = getSearchTextForDefinition();
-                        if (StringUtils.isEmpty(q)) {
-                            return true;
-                        }
-
-                        String definition = e.getDefinition();
-                        if (StringUtils.isEmpty(definition)) {
-                            return false;
-                        }
-                        definition = definition.toLowerCase();
-                        String[] split = q.split(" ");
-                        for (String s : split) {
-                            if (!definition.contains(s.toLowerCase())) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
-                    .filter(e -> {
-                        String q = getSearchTextForModule();
-                        if (StringUtils.isEmpty(q)) {
-                            return true;
-                        }
-
-                        String module = e.getModule();
-                        if (StringUtils.isEmpty(module)) {
-                            return false;
-                        }
-                        module = module.toLowerCase();
-                        String[] split = q.split(" ");
-                        for (String s : split) {
-                            if (!module.contains(s.toLowerCase())) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
+                    .filter(new DenSearchFilter())
+                    .filter(new DefinitionSearchFilter())
+                    .filter(new ModuleSearchFilter())
                     .collect(Collectors.toList());
         }
 
         return coreComponents;
+    }
+
+    private interface SearchFilter extends Predicate<CoreComponents> {
+    }
+
+    private class DenSearchFilter implements SearchFilter {
+
+        @Override
+        public boolean test(CoreComponents e) {
+            String q = getSearchTextForDen();
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            String den = e.getDen().toLowerCase();
+            String[] split = q.split(" ");
+            for (String s : split) {
+                if (!den.contains(s.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private class DefinitionSearchFilter implements SearchFilter {
+
+        @Override
+        public boolean test(CoreComponents e) {
+            String q = getSearchTextForDefinition();
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            String definition = e.getDefinition();
+            if (StringUtils.isEmpty(definition)) {
+                return false;
+            }
+            definition = definition.toLowerCase();
+            String[] split = q.split(" ");
+            for (String s : split) {
+                if (!definition.contains(s.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private class ModuleSearchFilter implements SearchFilter {
+
+        @Override
+        public boolean test(CoreComponents e) {
+            String q = getSearchTextForModule();
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            String module = e.getModule();
+            if (StringUtils.isEmpty(module)) {
+                return false;
+            }
+            module = module.toLowerCase();
+            String[] split = q.split(" ");
+            for (String s : split) {
+                if (!module.contains(s.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     public String getSearchTextForDen() {
