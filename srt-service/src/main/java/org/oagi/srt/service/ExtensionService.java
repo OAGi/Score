@@ -130,7 +130,7 @@ public class ExtensionService {
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(ueAcc.getAccId());
         int latestRevisionNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         createACCHistoryForExtension(ueAcc, latestRevisionNum + 1);
 
         AssociationCoreComponentProperty ueAsccp = updateASCCPForExtension(ueAcc, currentLoginUser);
@@ -138,14 +138,14 @@ public class ExtensionService {
                 asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(ueAsccp.getAsccpId());
         latestRevisionNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         createASCCPHistoryForExtension(ueAsccp, latestRevisionNum + 1);
 
         AssociationCoreComponent ueAscc = updateASCCForException(eAcc, ueAsccp, currentLoginUser);
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(ueAscc.getAsccId());
         latestRevisionNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         createASCCHistoryForExtension(ueAscc, latestRevisionNum + 1);
 
         return ueAcc;

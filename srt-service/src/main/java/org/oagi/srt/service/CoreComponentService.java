@@ -169,7 +169,7 @@ public class CoreComponentService {
 
         int latestRevisionNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         accHistory.setRevisionNum(latestRevisionNum + 1);
         int revisionTrackingNum = 1;
         accHistory.setRevisionTrackingNum(revisionTrackingNum);
@@ -236,7 +236,7 @@ public class CoreComponentService {
 
         int latestRevisionNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         asccpHistory.setRevisionNum(latestRevisionNum + 1);
         int revisionTrackingNum = 1;
         asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
@@ -302,7 +302,7 @@ public class CoreComponentService {
 
         int latestRevisionNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionNum())
-                .max().getAsInt();
+                .max().orElse(0);
         bccpHistory.setRevisionNum(latestRevisionNum + 1);
         int revisionTrackingNum = 1;
         bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
@@ -332,7 +332,7 @@ public class CoreComponentService {
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AggregateCoreComponent accHistory = acc.clone();
         accHistory.setRevisionNum(latestHistoryAccList.get(0).getRevisionNum());
@@ -347,7 +347,7 @@ public class CoreComponentService {
         latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
         int actualRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
         }
@@ -436,7 +436,7 @@ public class CoreComponentService {
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponent asccHistory = ascc.clone();
         asccHistory.setRevisionNum(latestHistoryAsccList.get(0).getRevisionNum());
@@ -451,7 +451,7 @@ public class CoreComponentService {
         latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
         int actualRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
         }
@@ -523,7 +523,7 @@ public class CoreComponentService {
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponent bccHistory = bcc.clone();
         bccHistory.setRevisionNum(latestHistoryBccList.get(0).getRevisionNum());
@@ -538,7 +538,7 @@ public class CoreComponentService {
         latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
         int actualRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
         }
@@ -593,7 +593,7 @@ public class CoreComponentService {
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponentProperty asccpHistory = asccp.clone();
         asccpHistory.setRevisionNum(latestHistoryAsccpList.get(0).getRevisionNum());
@@ -608,7 +608,7 @@ public class CoreComponentService {
         latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         int actualRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AssociationCoreComponentProperty was modified outside of this operation");
         }
@@ -658,7 +658,7 @@ public class CoreComponentService {
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponentProperty bccpHistory = bccp.clone();
         bccpHistory.setRevisionNum(latestHistoryBccpList.get(0).getRevisionNum());
@@ -673,7 +673,7 @@ public class CoreComponentService {
         latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         int actualRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponentProperty was modified outside of this operation");
         }
@@ -894,9 +894,9 @@ public class CoreComponentService {
 
         return Math.max(
                 asccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
-                        .mapToInt(e -> e.getSeqKey()).max().getAsInt(),
+                        .mapToInt(e -> e.getSeqKey()).max().orElse(0),
                 bccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
-                        .mapToInt(e -> e.getSeqKey()).max().getAsInt()
+                        .mapToInt(e -> e.getSeqKey()).max().orElse(0)
         );
     }
 
