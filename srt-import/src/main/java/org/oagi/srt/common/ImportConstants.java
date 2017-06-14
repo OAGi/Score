@@ -77,7 +77,8 @@ public class ImportConstants {
     public static final String META_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Meta.xsd";
     public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes/BusinessDataType_1.xsd";
     public static final String COMPONENTS_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Components.xsd";
-    public static final String XBT_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
+    public static final String DATA_TYPES_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes";
+    public static final String XBT_FILE_PATH = DATA_TYPES_PATH + "/XMLSchemaBuiltinType_1.xsd";
 
     public static String filepath(String list) {
         String prefix_filepath = MODEL_FOLDER_PATH;

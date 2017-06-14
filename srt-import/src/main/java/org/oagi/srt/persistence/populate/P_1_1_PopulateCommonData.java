@@ -1,7 +1,9 @@
 package org.oagi.srt.persistence.populate;
 
+import org.apache.commons.lang.StringUtils;
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
@@ -10,12 +12,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
+import static org.oagi.srt.common.ImportConstants.DATA_TYPES_PATH;
 import static org.oagi.srt.common.ImportConstants.OAGIS_RELEASE_NOTE;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
@@ -57,7 +70,10 @@ public class P_1_1_PopulateCommonData {
         User user = populateUser();
         Namespace namespace = populateNamespace(user);
         Release release = populateRelease(namespace);
-        populateXbt();
+        populateXbtFromXMLSchemaBuiltInTypes();
+        populateXbtFromOAGISDataTypes(
+                new File(DATA_TYPES_PATH, "XMLSchemaBuiltinType_1.xsd"),
+                new File(DATA_TYPES_PATH, "XMLSchemaBuiltinType_1_patterns.xsd"));
         populateCdtPri();
         populateCdt(user, release);
 
@@ -111,6 +127,9 @@ public class P_1_1_PopulateCommonData {
         private String builtInType;
         private XSDBuiltInType subTypeXbt;
 
+        private Element element;
+        private XSDBuiltInType xbt;
+
         public XBTBuilder name(String name) {
             this.name = name;
             return this;
@@ -126,24 +145,28 @@ public class P_1_1_PopulateCommonData {
             return this;
         }
 
+        public XBTBuilder element(Element element) {
+            this.element = element;
+            return this;
+        }
+
         public XSDBuiltInType build() {
-            XSDBuiltInType xbt = new XSDBuiltInType();
+            xbt = new XSDBuiltInType();
             xbt.setName(name);
             xbt.setBuiltInType(builtInType);
             if (subTypeXbt != null) {
                 xbt.setSubtypeOfXbtId(subTypeXbt.getXbtId());
             }
-            return xbtRepository.saveAndFlush(xbt);
+            xbt = xbtRepository.saveAndFlush(xbt);
+            return xbt;
         }
     }
 
-    private void populateXbt() {
+    private void populateXbtFromXMLSchemaBuiltInTypes() {
         printTitle("Populate XSD Built-In Types");
 
-        XSDBuiltInType anyType =
-                xbtName("any type").builtInType("xsd:anyType").build();
-        XSDBuiltInType anySimpleType =
-                xbtName("any simple type").builtInType("xsd:anySimpleType").subTypeOfXbt(anyType).build();
+        XSDBuiltInType anyType = xbtName("any type").builtInType("xsd:anyType").build();
+        XSDBuiltInType anySimpleType = xbtName("any simple type").builtInType("xsd:anySimpleType").subTypeOfXbt(anyType).build();
         xbtName("duration").builtInType("xsd:duration").subTypeOfXbt(anySimpleType).build();
         xbtName("date time").builtInType("xsd:dateTime").subTypeOfXbt(anySimpleType).build();
         xbtName("time").builtInType("xsd:time").subTypeOfXbt(anySimpleType).build();
@@ -153,32 +176,132 @@ public class P_1_1_PopulateCommonData {
         xbtName("gregorian month day").builtInType("xsd:gMonthDay").subTypeOfXbt(anySimpleType).build();
         xbtName("gregorian day").builtInType("xsd:gDay").subTypeOfXbt(anySimpleType).build();
         xbtName("gregorian month").builtInType("xsd:gMonth").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType stringType =
-                xbtName("string").builtInType("xsd:string").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType normalizedStringType =
-                xbtName("normalized string").builtInType("xsd:normalizedString").subTypeOfXbt(stringType).build();
+        XSDBuiltInType stringType = xbtName("string").builtInType("xsd:string").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType normalizedStringType = xbtName("normalized string").builtInType("xsd:normalizedString").subTypeOfXbt(stringType).build();
         xbtName("token").builtInType("xsd:token").subTypeOfXbt(normalizedStringType).build();
-        XSDBuiltInType booleanType =
-                xbtName("boolean").builtInType("xsd:boolean").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType booleanType = xbtName("boolean").builtInType("xsd:boolean").subTypeOfXbt(anySimpleType).build();
         xbtName("base64 binary").builtInType("xsd:base64Binary").subTypeOfXbt(anySimpleType).build();
         xbtName("hex binary").builtInType("xsd:hexBinary").subTypeOfXbt(anySimpleType).build();
         xbtName("float").builtInType("xsd:float").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType decimalType =
-                xbtName("decimal").builtInType("xsd:decimal").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType integerType =
-                xbtName("integer").builtInType("xsd:integer").subTypeOfXbt(decimalType).build();
-        XSDBuiltInType nonNegativeIntegerType =
-                xbtName("non negative integer").builtInType("xsd:nonNegativeInteger").subTypeOfXbt(integerType).build();
+        XSDBuiltInType decimalType = xbtName("decimal").builtInType("xsd:decimal").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType integerType = xbtName("integer").builtInType("xsd:integer").subTypeOfXbt(decimalType).build();
+        XSDBuiltInType nonNegativeIntegerType = xbtName("non negative integer").builtInType("xsd:nonNegativeInteger").subTypeOfXbt(integerType).build();
         xbtName("positive integer").builtInType("xsd:positiveInteger").subTypeOfXbt(nonNegativeIntegerType).build();
         xbtName("double").builtInType("xsd:double").subTypeOfXbt(anySimpleType).build();
         xbtName("any uri").builtInType("xsd:anyURI").subTypeOfXbt(anySimpleType).build();
-        xbtName("xbt boolean").builtInType("xbt_BooleanType").subTypeOfXbt(booleanType).build();
     }
 
     public XBTBuilder xbtName(String name) {
         XBTBuilder xbtBuilder = new XBTBuilder();
         xbtBuilder.name(name);
         return xbtBuilder;
+    }
+
+    private void populateXbtFromOAGISDataTypes(File ... typeFiles) {
+        Map<String, XBTBuilder> xbtMap = new HashMap();
+
+        for (File typeFile : typeFiles) {
+            printTitle("Populate XSD Built-In Types from '" + typeFile.getName() + "'");
+
+            Document document = Context.loadDocument(typeFile);
+            NodeList nodeList;
+            try {
+                nodeList = (NodeList) Context.xPath.evaluate("//xsd:simpleType", document, XPathConstants.NODESET);
+            } catch (XPathExpressionException e) {
+                throw new IllegalStateException(e);
+            }
+
+            for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
+                Element simpleTypeElement = (Element) nodeList.item(i);
+                String builtInType = simpleTypeElement.getAttribute("name");
+                if (xbtMap.containsKey(builtInType)) {
+                    continue;
+                }
+                String name = normalize(builtInType);
+
+                XBTBuilder xbtBuilder = xbtName(name).builtInType(builtInType).element(simpleTypeElement);
+                xbtMap.put(builtInType, xbtBuilder);
+                xbtBuilder.build();
+            }
+        }
+
+        for (Map.Entry<String, XBTBuilder> entry : xbtMap.entrySet()) {
+            XBTBuilder xbtBuilder = entry.getValue();
+
+            String base;
+            try {
+                base = (String) Context.xPath.evaluate(".//xsd:restriction/@base", xbtBuilder.element, XPathConstants.STRING);
+            } catch (XPathExpressionException e) {
+                throw new IllegalStateException(e);
+            }
+
+            XSDBuiltInType xbt = xbtBuilder.xbt;
+            xbt.afterLoaded();
+
+            if (!StringUtils.isEmpty(base)) {
+                if (base.equals("xsd:boolean") || base.equals("xsd:date") || base.equals("xsd:time") || base.equals("xsd:dateTime")) {
+                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType(base);
+                    if (baseXbt == null) {
+                        throw new IllegalStateException();
+                    }
+                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+                }
+            }
+
+            if (xbt.getSubtypeOfXbtId() == 0L) {
+                String builtinType = entry.getKey();
+                if (builtinType.contains("Duration")) {
+                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:duration");
+                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+                } else if (builtinType.contains("Hour") || builtinType.contains("Minute") || builtinType.contains("Second")) {
+                    if (builtinType.contains("Date") || builtinType.contains("Day")) {
+                        XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:time");
+                        xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+                    }
+                } else if (builtinType.contains("Hour") || builtinType.contains("Time")) {
+                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:dateTime");
+                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+                }
+            }
+
+            if (xbt.getSubtypeOfXbtId() == 0L) {
+                XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:date");
+                xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+            }
+
+            if (xbt.isDirty()) {
+                xbtRepository.save(xbt);
+            }
+        }
+    }
+
+    public String normalize(String xbtName) {
+        xbtName = StringUtils.trim(xbtName);
+        if (StringUtils.isEmpty(xbtName)) {
+            return null;
+        }
+
+        if (xbtName.endsWith("Type")) {
+            xbtName = xbtName.substring(0, xbtName.length() - "Type".length());
+        }
+
+        xbtName = xbtName.replaceAll("_", " ");
+        xbtName = xbtName.replaceAll("([A-Z]+)", " $1");
+        xbtName = xbtName.replaceAll("([A-Z][a-z])", " $1");
+
+        StringTokenizer tokenizer = new StringTokenizer(xbtName, " ");
+        StringBuilder sb = new StringBuilder();
+        while (tokenizer.hasMoreTokens()) {
+            String token = tokenizer.nextToken();
+            if (StringUtils.isAllUpperCase(token)) {
+                sb.append(token);
+            } else {
+                sb.append(token.toLowerCase());
+            }
+            sb.append(" ");
+        }
+
+        return StringUtils.trim(sb.toString());
     }
 
     public void populateCdtPri() {
