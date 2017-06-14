@@ -61,6 +61,9 @@ public class DataType implements TimestampAware, Serializable {
     @Column(length = 10 * 1024)
     private String definition;
 
+    @Column
+    private String definitionSource;
+
     @Lob
     @Column(length = 10 * 1024)
     private String contentComponentDefinition;
@@ -220,6 +223,14 @@ public class DataType implements TimestampAware, Serializable {
         this.definition = definition;
     }
 
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public String getContentComponentDefinition() {
         return contentComponentDefinition;
     }
@@ -371,6 +382,7 @@ public class DataType implements TimestampAware, Serializable {
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (contentComponentDen != null ? contentComponentDen.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
@@ -403,6 +415,7 @@ public class DataType implements TimestampAware, Serializable {
                 ", den='" + den + '\'' +
                 ", contentComponentDen='" + contentComponentDen + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
                 ", module=" + module +

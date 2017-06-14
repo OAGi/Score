@@ -84,6 +84,11 @@
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="87715221-C36F-DC2A-FFF1-8C2D9C25119B">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 20:58:57 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="REVISION_TRACKING_NUM" id="8838A18E-E4C8-1AB0-89CE-397E5E78CF13">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
