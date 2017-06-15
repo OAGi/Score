@@ -15,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,6 +50,7 @@ public class P_1_2_PopulateCDTandCDTSC {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
+    private Map<String, XSDBuiltInType> xbtMap;
     private Map<String, List<XSDBuiltInType>> cdtAwdPriXpsTypeMapppingMap = new HashMap();
 
     public static void main(String args[]) throws Exception {
@@ -78,8 +76,9 @@ public class P_1_2_PopulateCDTandCDTSC {
 
     public void init() {
         List<XSDBuiltInType> xbtList = xbtRepository.findAll();
-        Map<String, XSDBuiltInType> xbtMap =
-                xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getBuiltInType, Function.identity()));
+        Collections.sort(xbtList, Comparator.comparing(XSDBuiltInType::getXbtId));
+
+        xbtMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getBuiltInType, Function.identity()));
 
         cdtAwdPriXpsTypeMapppingMap.put("Binary",
                 Arrays.asList(xbtMap.get("xsd:base64Binary"), xbtMap.get("xsd:hexBinary")));
@@ -204,7 +203,11 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMap("Code", "NormalizedString");
         cdtAwdPriXpsTypeMap("Code", "String");
         cdtAwdPriXpsTypeMap("Code", "Token");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint");
+        cdtAwdPriXpsTypeMap("Date", "TimePoint",
+                cdtAwdPriXpsTypeMapppingMap.get("TimePoint").stream()
+                        .filter(e -> !"xsd:dateTime".equals(e.getBuiltInType()))
+                        .collect(Collectors.toList())
+        );
         cdtAwdPriXpsTypeMap("Date Time", "TimePoint");
         cdtAwdPriXpsTypeMap("Duration", "TimeDuration");
         cdtAwdPriXpsTypeMap("Graphic", "Binary");
@@ -246,7 +249,9 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMap("Text", "NormalizedString");
         cdtAwdPriXpsTypeMap("Text", "String");
         cdtAwdPriXpsTypeMap("Text", "Token");
-        cdtAwdPriXpsTypeMap("Time", "TimePoint");
+        cdtAwdPriXpsTypeMap("Time", "TimePoint",
+                Arrays.asList(xbtMap.get("xsd:token"), xbtMap.get("xsd:time"))
+        );
         cdtAwdPriXpsTypeMap("Value", "Decimal");
         cdtAwdPriXpsTypeMap("Value", "Double");
         cdtAwdPriXpsTypeMap("Value", "Float");
@@ -260,16 +265,22 @@ public class P_1_2_PopulateCDTandCDTSC {
     private void cdtAwdPriXpsTypeMap(
             String cdtTerm, String cdtPriName) {
         List<XSDBuiltInType> xsdBuiltInTypes = cdtAwdPriXpsTypeMapppingMap.get(cdtPriName);
-        for (XSDBuiltInType xbtBuiltInType : xsdBuiltInTypes) {
-            cdtAwdPriXpsTypeMap(cdtTerm, cdtPriName, xbtBuiltInType);
+        cdtAwdPriXpsTypeMap(cdtTerm, cdtPriName, xsdBuiltInTypes);
+    }
+
+    private void cdtAwdPriXpsTypeMap(
+            String cdtTerm, String cdtPriName, List<XSDBuiltInType> xbtBuiltInTypes) {
+        for (XSDBuiltInType xsdBuiltInType : xbtBuiltInTypes) {
+            cdtAwdPriXpsTypeMap(cdtTerm, cdtPriName, xsdBuiltInType);
         }
     }
 
     private CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap(
             String cdtTerm, String cdtPriName, XSDBuiltInType xbtBuiltInType) {
         if (xbtBuiltInType == null) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
+
         CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
                 new CoreDataTypeAllowedPrimitiveExpressionTypeMap();
 
