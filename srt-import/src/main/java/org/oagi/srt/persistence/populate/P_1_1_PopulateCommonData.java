@@ -70,6 +70,9 @@ public class P_1_1_PopulateCommonData {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private ImportUtil importUtil;
+
     private File baseDataDirectory;
     private User oagisUser;
     private Namespace namespace;
@@ -375,7 +378,7 @@ public class P_1_1_PopulateCommonData {
                     continue;
                 }
                 String name = normalize(builtInType);
-                String schemaDefinition = toString(simpleTypeElement.getChildNodes());
+                String schemaDefinition = importUtil.toString(simpleTypeElement.getChildNodes());
 
                 XBTBuilder xbtBuilder =
                         xbtName(name).builtInType(builtInType)
@@ -461,51 +464,6 @@ public class P_1_1_PopulateCommonData {
                 sb.append(token.toLowerCase());
             }
             sb.append(" ");
-        }
-
-        return StringUtils.trim(sb.toString());
-    }
-
-    private String toString(NodeList nodeList) {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = null;
-        try {
-            transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "no");
-        } catch (TransformerConfigurationException e) {
-            throw new IllegalStateException(e);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
-            Node node = nodeList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-            DOMSource domSource = new DOMSource(node);
-
-            StringWriter writer = new StringWriter();
-            StreamResult result = new StreamResult(writer);
-            try {
-                transformer.transform(domSource, result);
-            } catch (TransformerException e) {
-                throw new IllegalStateException(e);
-            }
-
-            writer.flush();
-
-            String str = StringUtils.trim(writer.toString());
-            // Eliminate definitions of the namespace
-            str = str.replaceAll("[\\W]+xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", "")
-                     .replaceAll("[\\W]+xmlns=\"http://www.openapplications.org/oagis/10\"", "")
-                     .replaceAll("([\t]+)", "\t")
-                     .replaceAll("[\t]</", "</");
-            sb.append(str);
-
-            if ((i + 1) != len) {
-                sb.append("\n");
-            }
         }
 
         return StringUtils.trim(sb.toString());

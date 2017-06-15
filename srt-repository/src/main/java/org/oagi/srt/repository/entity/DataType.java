@@ -418,7 +418,7 @@ public class DataType implements TimestampAware, Serializable {
                 ", definitionSource='" + definitionSource + '\'' +
                 ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
-                ", module=" + module +
+                ", module=" + ((module != null) ? module.getModuleId() : null) +
                 ", state=" + state +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +

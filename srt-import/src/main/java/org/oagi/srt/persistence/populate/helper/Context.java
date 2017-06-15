@@ -7,6 +7,8 @@ import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,8 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class Context {
+
+    private static final Logger logger = LoggerFactory.getLogger(Context.class);
 
     private static Map<String, Document> documentMap = new HashMap();
     public static XPath xPath;
