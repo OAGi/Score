@@ -2,6 +2,7 @@ package org.oagi.srt.persistence.populate;
 
 import org.apache.commons.lang.StringUtils;
 import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
@@ -20,19 +21,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.annotation.PostConstruct;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static org.oagi.srt.common.ImportConstants.DATA_TYPES_PATH;
 import static org.oagi.srt.common.ImportConstants.OAGIS_RELEASE_NOTE;
@@ -54,6 +56,12 @@ public class P_1_1_PopulateCommonData {
     private ReleaseRepository releaseRepository;
 
     @Autowired
+    private ModuleRepository moduleRepository;
+
+    @Autowired
+    private ModuleDepRepository moduleDepRepository;
+
+    @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
     @Autowired
@@ -62,7 +70,10 @@ public class P_1_1_PopulateCommonData {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    private File baseDataDirectory;
     private User oagisUser;
+    private Namespace namespace;
+    private Release release;
 
     public static void main(String args[]) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
@@ -71,19 +82,31 @@ public class P_1_1_PopulateCommonData {
         }
     }
 
+    @PostConstruct
+    public void init() throws IOException {
+        baseDataDirectory = new File(ImportConstants.BASE_DATA_PATH, "Model").getCanonicalFile();
+        if (!baseDataDirectory.exists()) {
+            throw new IllegalStateException("Couldn't find data directory: " + baseDataDirectory +
+                    ". Please check your environments.");
+        }
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.1 Start");
 
         oagisUser = populateUser();
-        Namespace namespace = populateNamespace();
-        Release release = populateRelease(namespace);
+        namespace = populateNamespace();
+        release = populateRelease(namespace);
+
+        populateModule();
         populateXbtFromXMLSchemaBuiltInTypes();
         populateXbtFromOAGISDataTypes(
                 new File(DATA_TYPES_PATH, "XMLSchemaBuiltinType_1_patterns.xsd"),
                 new File(DATA_TYPES_PATH, "XMLSchemaBuiltinType_1.xsd"));
+
         populateCdtPri();
-        populateCdt(release);
+        populateCdt();
 
         logger.info("### 1.1 End");
     }
@@ -130,10 +153,115 @@ public class P_1_1_PopulateCommonData {
         return releaseRepository.saveAndFlush(release);
     }
 
+    private void populateModule() throws Exception {
+        logger.info("### Module population Start");
+        printTitle("Schemas not considered for import and import them as blobs");
+
+        release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
+        namespace = namespaceRepository.findByUri("http://www.openapplications.org/oagis/10");
+
+        populateModule(baseDataDirectory);
+        populateModuleDep(baseDataDirectory);
+
+        logger.info("### Module population End");
+    }
+
+    private void populateModule(File file) {
+        if (file == null) {
+            return;
+        }
+
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                populateModule(child);
+            }
+        } else if (file.getName().endsWith(".xsd")) {
+            String moduleName = Utility.extractModuleName(file.getAbsolutePath());
+            if (!moduleRepository.existsByModule(moduleName)) {
+                Module module = new Module();
+                module.setModule(moduleName);
+                module.setRelease(release);
+                module.setNamespace(namespace);
+
+                String versionNum = getVersion(file);
+                module.setVersionNum(versionNum);
+
+                moduleRepository.saveAndFlush(module);
+            }
+        }
+    }
+
+    private String getVersion(File file) {
+        Document document = Context.loadDocument(file);
+        try {
+            String version = Context.xPath.evaluate("//xsd:schema/@version", document);
+            return org.springframework.util.StringUtils.isEmpty(version) ? null : version.trim();
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private void populateModuleDep(File file) throws Exception {
+        if (file == null) {
+            return;
+        }
+
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                populateModuleDep(child);
+            }
+        } else if (file.getName().endsWith(".xsd")) {
+            Module module = findModule(file);
+
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file);
+
+            NodeList includeNodeList = (NodeList) Context.xPath.evaluate("//xsd:include", document, XPathConstants.NODESET);
+            for (int i = 0, len = includeNodeList.getLength(); i < len; ++i) {
+                Element includeElement = (Element) includeNodeList.item(i);
+                Module includeModule = findModule(file, includeElement);
+
+                ModuleDep moduleDep = new ModuleDep();
+                moduleDep.setDependencyType(ModuleDep.DependencyType.INCLUDE);
+                moduleDep.setDependingModule(includeModule);
+                moduleDep.setDependedModule(module);
+
+                moduleDepRepository.saveAndFlush(moduleDep);
+            }
+
+            NodeList importNodeList = (NodeList) Context.xPath.evaluate("//xsd:import", document, XPathConstants.NODESET);
+            for (int i = 0, len = importNodeList.getLength(); i < len; ++i) {
+                Element importElement = (Element) importNodeList.item(i);
+                Module importModule = findModule(file, importElement);
+
+                ModuleDep moduleDep = new ModuleDep();
+                moduleDep.setDependencyType(ModuleDep.DependencyType.IMPORT);
+                moduleDep.setDependingModule(importModule);
+                moduleDep.setDependedModule(module);
+                moduleDepRepository.saveAndFlush(moduleDep);
+            }
+        }
+    }
+
+    private Module findModule(File file) throws IOException {
+        String path = file.getCanonicalPath();
+        String moduleName = Utility.extractModuleName(path);
+        return moduleRepository.findByModule(moduleName);
+    }
+
+    private Module findModule(File file, Element element) throws IOException {
+        String schemaLocation = element.getAttribute("schemaLocation");
+        File schemaLocationFile = new File(file.getParent(), schemaLocation);
+        return findModule(schemaLocationFile);
+    }
+
     private class XBTBuilder {
         private String name;
         private String builtInType;
         private String schemaDefinition;
+        private Module module;
         private XSDBuiltInType subTypeXbt;
 
         private Element element;
@@ -154,6 +282,11 @@ public class P_1_1_PopulateCommonData {
             return this;
         }
 
+        public XBTBuilder module(Module module) {
+            this.module = module;
+            return this;
+        }
+
         public XBTBuilder subTypeOfXbt(XSDBuiltInType subTypeXbt) {
             this.subTypeXbt = subTypeXbt;
             return this;
@@ -169,6 +302,7 @@ public class P_1_1_PopulateCommonData {
             xbt.setName(name);
             xbt.setBuiltInType(builtInType);
             xbt.setSchemaDefinition(schemaDefinition);
+            xbt.setModule(module);
             if (subTypeXbt != null) {
                 xbt.setSubtypeOfXbtId(subTypeXbt.getXbtId());
             }
@@ -218,6 +352,11 @@ public class P_1_1_PopulateCommonData {
     private void populateXbtFromOAGISDataTypes(File ... typeFiles) {
         printTitle("Populate XSD Built-In Types from '" + Arrays.stream(typeFiles).map(e -> e.getName()) + "'");
 
+        Module xbtModule = moduleRepository.findByModuleEndsWith("XMLSchemaBuiltinType_1");
+        if (xbtModule == null) {
+            throw new IllegalStateException();
+        }
+
         Map<String, XBTBuilder> xbtMap = new HashMap();
 
         for (File typeFile : typeFiles) {
@@ -241,6 +380,7 @@ public class P_1_1_PopulateCommonData {
                 XBTBuilder xbtBuilder =
                         xbtName(name).builtInType(builtInType)
                                 .schemaDefinition(schemaDefinition)
+                                .module(xbtModule)
                                 .element(simpleTypeElement);
                 xbtMap.put(builtInType, xbtBuilder);
                 xbtBuilder.build();
@@ -260,41 +400,41 @@ public class P_1_1_PopulateCommonData {
             XSDBuiltInType xbt = xbtBuilder.xbt;
             xbt.afterLoaded();
 
-            if (!StringUtils.isEmpty(base)) {
-                if (base.equals("xsd:boolean") || base.equals("xsd:date") || base.equals("xsd:time") || base.equals("xsd:dateTime")) {
-                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType(base);
-                    if (baseXbt == null) {
-                        throw new IllegalStateException();
-                    }
-                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-                }
-            }
-
-            if (xbt.getSubtypeOfXbtId() == 0L) {
+            XSDBuiltInType baseXbt = findBaseTypeByBaseAttribute(base);
+            if (baseXbt == null) {
                 String builtinType = entry.getKey();
-                if (builtinType.contains("Duration")) {
-                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:duration");
-                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-                } else if (builtinType.contains("Hour") || builtinType.contains("Minute") || builtinType.contains("Second")) {
-                    if (builtinType.contains("Date") || builtinType.contains("Day")) {
-                        XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:time");
-                        xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-                    }
-                } else if (builtinType.contains("Hour") || builtinType.contains("Time")) {
-                    XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:dateTime");
-                    xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-                }
+                baseXbt = findBaseTypeByName(builtinType);
             }
-
-            if (xbt.getSubtypeOfXbtId() == 0L) {
-                XSDBuiltInType baseXbt = xbtRepository.findOneByBuiltInType("xsd:date");
-                xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+            if (baseXbt == null) {
+                throw new IllegalStateException();
             }
-
-            if (xbt.isDirty()) {
-                xbtRepository.save(xbt);
-            }
+            xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
+            xbtRepository.save(xbt);
         }
+    }
+
+    public XSDBuiltInType findBaseTypeByBaseAttribute(String base) {
+        if (base.equals("xsd:boolean") || base.equals("xsd:date") || base.equals("xsd:time") || base.equals("xsd:dateTime")) {
+            return xbtRepository.findOneByBuiltInType(base);
+        }
+        return null;
+    }
+
+    public XSDBuiltInType findBaseTypeByName(String name) {
+        if (name.contains("Duration")) {
+            return xbtRepository.findOneByBuiltInType("xsd:duration");
+        }
+
+        boolean containsHMS = name.contains("Hour") || name.contains("Minute") || name.contains("Second");
+        if ((containsHMS ^ name.contains("Date")) && (containsHMS ^ name.contains("Day"))) {
+            return xbtRepository.findOneByBuiltInType("xsd:time");
+        }
+
+        if (name.contains("Hour") || name.contains("Time")) {
+            return xbtRepository.findOneByBuiltInType("xsd:dateTime");
+        }
+
+        return xbtRepository.findOneByBuiltInType("xsd:date");
     }
 
     public String normalize(String xbtName) {
@@ -393,7 +533,7 @@ public class P_1_1_PopulateCommonData {
         return cdtPri;
     }
 
-    public void populateCdt(Release release) {
+    public void populateCdt() {
         printTitle("Populate CDT");
 
         new CDTBuilder(oagisUser, release).dataTypeTerm("Amount").den("Amount. Type")

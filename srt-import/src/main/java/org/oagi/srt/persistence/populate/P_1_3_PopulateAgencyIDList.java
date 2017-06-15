@@ -61,7 +61,7 @@ public class P_1_3_PopulateAgencyIDList {
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
         String moduleName = IDENTIFIER_SCHEME_AGENCY_IDENTIFICATION_FILENAME;
-        Module module = moduleRepository.findByModuleContaining(moduleName);
+        Module module = moduleRepository.findByModuleEndsWith(moduleName);
         if (module == null) {
             throw new IllegalStateException("Can't find " + moduleName + " module. We need to import `module` first perfectly.");
         }

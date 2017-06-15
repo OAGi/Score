@@ -24,9 +24,6 @@ public class RunAll {
                 P_1_1_PopulateCommonData p1 = ctx.getBean(P_1_1_PopulateCommonData.class);
                 p1.run(ctx);
 
-                PopulateModules populateModules = ctx.getBean(PopulateModules.class);
-                populateModules.run(ctx);
-
                 PopulateBlobContents populateBlobContents = ctx.getBean(PopulateBlobContents.class);
                 populateBlobContents.run(ctx);
 
