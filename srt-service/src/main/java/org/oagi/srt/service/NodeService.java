@@ -80,7 +80,7 @@ public class NodeService {
     private BusinessContextRepository businessContextRepository;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private BusinessInformationEntityDAO bieDAO;
 
     public ACCNode createCoreComponentTreeNode(
             AggregateCoreComponent aggregateCoreComponent, boolean enableShowingGroup) {
@@ -1567,22 +1567,22 @@ public class NodeService {
             }
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(abieList);
+            bieDAO.saveAbieList(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbiepList);
+            bieDAO.saveBbiepList(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieList);
+            bieDAO.saveBbieList(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieScList);
+            bieDAO.saveBbieScList(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbiepList);
+            bieDAO.saveAsbiepList(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbieList);
+            bieDAO.saveAsbieList(asbieList);
 
             return topLevelAbie;
         }
@@ -1591,15 +1591,15 @@ public class NodeService {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
             topLevelAbie.setState(Editing);
-            topLevelAbie = jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
+            topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 
             AggregateBusinessInformationEntity abie = root.getType().getAbie();
             preset(abie, topLevelAbie);
-            abie = jpaRepositoryDefinitionHelper.saveAndFlush(abie);
+            abie = bieDAO.save(abie);
             abie.afterLoaded();
 
             topLevelAbie.setAbie(abie);
-            jpaRepositoryDefinitionHelper.save(topLevelAbie);
+            topLevelAbieRepository.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
             asbiepList.add(root.getAsbiep());
@@ -1844,22 +1844,22 @@ public class NodeService {
             root.accept(this);
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(abieList);
+            bieDAO.saveAbieList(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbiepList);
+            bieDAO.saveBbiepList(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieList);
+            bieDAO.saveBbieList(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieScList);
+            bieDAO.saveBbieScList(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbiepList);
+            bieDAO.saveAsbiepList(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbieList);
+            bieDAO.saveAsbieList(asbieList);
         }
 
         private TopLevelAbie prepareForTopLevelAbieEntity() {
@@ -2002,22 +2002,22 @@ public class NodeService {
             }
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(abieList);
+            bieDAO.saveAbieList(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbiepList);
+            bieDAO.saveBbiepList(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieList);
+            bieDAO.saveBbieList(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(bbieScList);
+            bieDAO.saveBbieScList(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbiepList);
+            bieDAO.saveAsbiepList(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            jpaRepositoryDefinitionHelper.save(asbieList);
+            bieDAO.saveAsbieList(asbieList);
 
             return topLevelAbie;
         }
@@ -2026,23 +2026,23 @@ public class NodeService {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
             topLevelAbie.setState(Editing);
-            topLevelAbie = jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
+            topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 
             AggregateBusinessInformationEntity abie = root.getType().getAbie();
             long abieId = abie.getAbieId();
-            abie = abie.clone();
+            abie = abie.clone(false);
             preset(abie, topLevelAbie);
 
             prevAbieIdMap.put(abieId, abie);
-            abie = jpaRepositoryDefinitionHelper.saveAndFlush(abie);
+            abie = bieDAO.save(abie);
 
             topLevelAbie.setAbie(abie);
-            jpaRepositoryDefinitionHelper.save(topLevelAbie);
+            topLevelAbieRepository.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
             AssociationBusinessInformationEntityProperty asbiep = root.getAsbiep();
             long asbiepId = asbiep.getAsbiepId();
-            asbiep = asbiep.clone();
+            asbiep = asbiep.clone(false);
             asbiep.setRoleOfAbie(abie);
             preset(asbiep, topLevelAbie);
 
@@ -2080,19 +2080,19 @@ public class NodeService {
 
                 AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
                 if (asbie != null && asbie.getAsbieId() > 0L) {
-                    prevAsbieIdMap.put(asbie.getAsbieId(), asbie.clone());
+                    prevAsbieIdMap.put(asbie.getAsbieId(), asbie.clone(false));
                 }
 
                 AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
                 if (asbiep != null && asbiep.getAsbiepId() > 0L) {
-                    prevAsbiepIdMap.put(asbiep.getAsbiepId(), asbiep.clone());
+                    prevAsbiepIdMap.put(asbiep.getAsbiepId(), asbiep.clone(false));
                 }
 
                 ABIENode abieNode = asbiepNode.getType();
                 AggregateBusinessInformationEntity abie =
                         abieNode.getAbie();
                 if (abie != null && abie.getAbieId() > 0L) {
-                    prevAbieIdMap.put(abie.getAbieId(), abie.clone());
+                    prevAbieIdMap.put(abie.getAbieId(), abie.clone(false));
                 }
 
                 if (abieNode instanceof ABIENodeImpl) {
@@ -2103,13 +2103,13 @@ public class NodeService {
 
                 BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
                 if (bbie != null && bbie.getBbieId() > 0L) {
-                    prevBbieIdMap.put(bbie.getBbieId(), bbie.clone());
+                    prevBbieIdMap.put(bbie.getBbieId(), bbie.clone(false));
                 }
 
                 BasicBusinessInformationEntityProperty bbiep =
                         bbiepNode.getBbiep();
                 if (bbiep != null && bbiep.getBbiepId() > 0L) {
-                    prevBbiepIdMap.put(bbiep.getBbiepId(), bbiep.clone());
+                    prevBbiepIdMap.put(bbiep.getBbiepId(), bbiep.clone(false));
                 }
 
                 if (bbiepNode instanceof BasicBIEPropertyNodeImpl) {
@@ -2120,7 +2120,7 @@ public class NodeService {
 
                 BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
                 if (bbieSc != null && bbieSc.getBbieScId() > 0L) {
-                    prevBbieScIdMap.put(bbieSc.getBbieScId(), bbieSc.clone());
+                    prevBbieScIdMap.put(bbieSc.getBbieScId(), bbieSc.clone(false));
                 }
             } else {
                 throw new IllegalStateException();

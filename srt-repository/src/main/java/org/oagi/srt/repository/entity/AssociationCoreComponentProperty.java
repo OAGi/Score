@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -16,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "asccp")
 public class AssociationCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
+        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
@@ -345,12 +344,17 @@ public class AssociationCoreComponentProperty
         this.nillable = nillable;
     }
 
-    @Override
-    public AssociationCoreComponentProperty clone() {
+    public AssociationCoreComponentProperty clone(boolean shallowCopy) {
         AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
         clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.setRoleOfAccId(this.roleOfAccId);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);

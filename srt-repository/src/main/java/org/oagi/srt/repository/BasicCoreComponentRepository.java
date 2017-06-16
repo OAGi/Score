@@ -74,6 +74,12 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
             "where b.fromAccId = ?1 and b.seqKey > ?2 and b.revisionNum = 0")
     public void decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(long fromAccId, int seqKey);
 
+    @Query("select distinct b.definitionId from BasicCoreComponent b where b.currentBccId = ?1")
+    public List<Long> findDefinitionIdByCurrentBccId(long currentBccId);
+
+    @Query("select distinct b.definitionId from BasicCoreComponent b where b.fromAccId = ?1")
+    public List<Long> findDefinitionIdByFromAccId(long fromAccId);
+
     @Modifying
     @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
     public void deleteByCurrentBccId(long currentBccId);

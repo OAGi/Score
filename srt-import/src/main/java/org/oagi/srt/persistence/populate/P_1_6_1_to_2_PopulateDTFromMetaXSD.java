@@ -6,9 +6,9 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
 import org.oagi.srt.repository.DataTypeRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     private ImportUtil importUtil;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private DataTypeDAO dtDAO;
 
     public void importAdditionalBDT(XPathHandler xh) throws Exception {
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
@@ -96,7 +96,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             dataType.setReleaseId(importUtil.getReleaseId());
             dataType.setModule(module);
             logger.debug("Populating additional BDTs from meta whose name is " + name);
-            jpaRepositoryDefinitionHelper.saveAndFlush(dataType);
+            dtDAO.save(dataType);
 
             // BDT_Primitive_Restriction
             bdtPriRestris.addAll(
@@ -104,7 +104,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             );
         }
 
-        jpaRepositoryDefinitionHelper.save(bdtPriRestris);
+        bdtPriRestriRepository.save(bdtPriRestris);
     }
 
     private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(

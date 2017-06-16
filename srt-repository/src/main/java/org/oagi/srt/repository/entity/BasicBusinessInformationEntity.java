@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -677,8 +676,7 @@ public class BasicBusinessInformationEntity
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
-    public BasicBusinessInformationEntity clone() {
+    public BasicBusinessInformationEntity clone(boolean shallowCopy) {
         BasicBusinessInformationEntity clone = new BasicBusinessInformationEntity();
         clone.guid = this.guid;
         clone.basedBccId = this.basedBccId;
@@ -693,7 +691,13 @@ public class BasicBusinessInformationEntity
         clone.nillable = this.nillable;
         clone.fixedValue = this.fixedValue;
         clone.nill = this.nill;
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;

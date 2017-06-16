@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -475,14 +474,19 @@ public class AssociationBusinessInformationEntity
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
-    public AssociationBusinessInformationEntity clone() {
+    public AssociationBusinessInformationEntity clone(boolean shallowCopy) {
         AssociationBusinessInformationEntity clone = new AssociationBusinessInformationEntity();
         clone.guid = this.guid;
         clone.fromAbieId = this.fromAbieId;
         clone.toAsbiepId = this.toAsbiepId;
         clone.basedAsccId = this.basedAsccId;
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.cardinalityMin = this.cardinalityMin;
         clone.cardinalityMax = this.cardinalityMax;
         clone.nillable = this.nillable;

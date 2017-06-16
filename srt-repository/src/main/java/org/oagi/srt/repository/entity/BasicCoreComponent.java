@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.BasicCoreComponentEntityTypeConverter;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
@@ -17,7 +16,7 @@ import java.util.*;
 @Entity
 @Table(name = "bcc")
 public class BasicCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable, Cloneable {
+        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 
@@ -361,8 +360,7 @@ public class BasicCoreComponent
         this.defaultValue = defaultValue;
     }
 
-    @Override
-    public BasicCoreComponent clone() {
+    public BasicCoreComponent clone(boolean shallowCopy) {
         BasicCoreComponent clone = new BasicCoreComponent();
         clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
@@ -372,7 +370,13 @@ public class BasicCoreComponent
         clone.setSeqKey(this.seqKey);
         clone.setEntityType(this.entityType);
         clone.setDen(this.den);
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
         clone.setOwnerUserId(this.ownerUserId);

@@ -6,6 +6,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class P_1_6_PopulateDTFromMeta {
     private ImportUtil importUtil;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private DataTypeDAO dtDAO;
 
     private long NormalizedStringCDTPrimitiveId;
     private long StringCDTPrimitiveId;
@@ -142,7 +143,7 @@ public class P_1_6_PopulateDTFromMeta {
             dataType.setReleaseId(importUtil.getReleaseId());
             dataType.setModule(module);
             logger.debug("Populating additional BDTs from meta whose name is " + name);
-            jpaRepositoryDefinitionHelper.saveAndFlush(dataType);
+            dtDAO.save(dataType);
 
             // BDT_Primitive_Restriction
             bdtPriRestris.addAll(
@@ -152,7 +153,7 @@ public class P_1_6_PopulateDTFromMeta {
             populateDTSC(dataType);
         }
 
-        jpaRepositoryDefinitionHelper.save(bdtPriRestris);
+        bdtPriRestriRepository.save(bdtPriRestris);
     }
 
     private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
@@ -235,7 +236,7 @@ public class P_1_6_PopulateDTFromMeta {
             vo.setDefinition(definition);
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-            vo = jpaRepositoryDefinitionHelper.saveAndFlush(vo);
+            vo = dtDAO.save(vo);
 
             populateCDTSCAwdPri(vo, attribute_type);
             populateBDTSCPrimitiveRestriction(vo, attribute_type);
@@ -253,7 +254,7 @@ public class P_1_6_PopulateDTFromMeta {
         vo.setOwnerDtId(dt.getDtId());
         vo.setPropertyTerm(languageCodeSC.getPropertyTerm());
         vo.setRepresentationTerm(languageCodeSC.getRepresentationTerm());
-        vo = jpaRepositoryDefinitionHelper.saveAndFlush(vo);
+        vo = dtDAO.save(vo);
 
         populateBDTSCPrimitiveRestriction(vo, null);
     }
@@ -287,26 +288,26 @@ public class P_1_6_PopulateDTFromMeta {
         long cdtSCAPId;
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAPXTypeMap;
 
-        cdtSCAP_normalizedString = jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAP_normalizedString);
+        cdtSCAP_normalizedString = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_normalizedString);
         cdtSCAPId = cdtSCAP_normalizedString.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(NormalizedStringXBTId);
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAPXTypeMap);
+        cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtSCAPXTypeMap);
 
-        cdtSCAP_string = jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAP_string);
+        cdtSCAP_string = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_string);
         cdtSCAPId = cdtSCAP_string.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(StringXBTId);
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAPXTypeMap);
+        cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtSCAPXTypeMap);
 
-        cdtSCAP_token = jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAP_token);
+        cdtSCAP_token = cdtScAwdPriRepository.saveAndFlush(cdtSCAP_token);
         cdtSCAPId = cdtSCAP_token.getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
         cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(TokenXBTId);
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAPXTypeMap);
+        cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtSCAPXTypeMap);
     }
 
 
@@ -321,7 +322,7 @@ public class P_1_6_PopulateDTFromMeta {
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(0);
             bdtSCPri.setDefault(false);
             bdtSCPri.setBdtScId(dtScId);
-            jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
+            bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
             inheritLanguageCode(dtSc);
 
@@ -347,12 +348,12 @@ public class P_1_6_PopulateDTFromMeta {
             if (baseDT.getDen().equals("Action Expression. Type")) {
                 CodeList actionCode = codeListRepository.findOneByName("oacl_ActionCode");
                 bdtSCPri.setCodeListId(actionCode.getCodeListId());
-                jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
+                bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
             } else if (baseDT.getDen().equals("Response Expression. Type")) {
                 CodeList responseActionCode = codeListRepository.findOneByName("oacl_ResponseActionCode");
                 bdtSCPri.setCodeListId(responseActionCode.getCodeListId());
-                jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
+                bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
             }
 
             populateBDTSCPrimitiveFromCDTSC(dtSc.getDtScId(), TokenCDTPrimitiveId);
@@ -396,7 +397,7 @@ public class P_1_6_PopulateDTFromMeta {
 
             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAwdPriXpsTypeMap = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtScAwdPriList.get(i).getCdtScAwdPriId(), xbtId);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(cdtSCAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId());
-            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
+            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
             bdtScPriRestiList.add(bdtSCPri);
         }
@@ -425,7 +426,7 @@ public class P_1_6_PopulateDTFromMeta {
             bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(fromBdtSCPri.isDefault());
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(fromBdtSCPri.getCdtScAwdPriXpsTypeMapId());
-            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
+            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
 
             bdtScPriRestiList.add(bdtSCPri);
         }

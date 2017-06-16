@@ -5,7 +5,6 @@ import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
@@ -48,9 +47,6 @@ public class P_1_3_PopulateAgencyIDList {
 
     @Autowired
     private ModuleRepository moduleRepository;
-
-    @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
@@ -99,7 +95,7 @@ public class P_1_3_PopulateAgencyIDList {
                 "Code list agency:   UNECE\n" +
                 "Code list version:  D13A");
 
-        jpaRepositoryDefinitionHelper.save(agencyIdList);
+        agencyIdListRepository.save(agencyIdList);
 
         return Arrays.asList(agencyIdList);
     }
@@ -132,14 +128,14 @@ public class P_1_3_PopulateAgencyIDList {
             }
         }
 
-        jpaRepositoryDefinitionHelper.save(agencyIdListValues);
+        agencyIdListValueRepository.save(agencyIdListValues);
     }
 
     private void updateAgencyIDList() throws Exception {
         AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOneByValue("6");
         agencyIdListRepository.findAll().forEach(e -> {
             e.setAgencyIdListValueId(agencyIdListValue.getAgencyIdListValueId());
-            jpaRepositoryDefinitionHelper.saveAndFlush(e);
+            agencyIdListRepository.saveAndFlush(e);
         });
     }
 

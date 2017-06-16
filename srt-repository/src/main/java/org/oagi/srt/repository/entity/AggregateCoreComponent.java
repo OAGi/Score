@@ -1,16 +1,12 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.ApplicationContextProvider;
-import org.oagi.srt.repository.DefinitionRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -20,7 +16,7 @@ import java.util.*;
 @Entity
 @Table(name = "acc")
 public class AggregateCoreComponent
-        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
+        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
@@ -370,13 +366,18 @@ public class AggregateCoreComponent
         return isExtension() && "All Extension".equals(getObjectClassTerm());
     }
 
-    @Override
-    public AggregateCoreComponent clone() {
+    public AggregateCoreComponent clone(boolean shallowCopy) {
         AggregateCoreComponent clone = new AggregateCoreComponent();
         clone.setGuid(this.guid);
         clone.setObjectClassTerm(this.objectClassTerm);
         clone.setDen(this.den);
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         if (this.basedAccId != null) {
             clone.setBasedAccId(this.basedAccId);
         }

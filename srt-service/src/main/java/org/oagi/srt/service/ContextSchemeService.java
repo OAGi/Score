@@ -2,7 +2,6 @@ package org.oagi.srt.service;
 
 import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.ContextSchemeValueRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.ContextScheme;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ public class ContextSchemeService {
 
     @Autowired
     private ContextSchemeValueRepository contextSchemeValueRepository;
-
-    @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     public List<ContextScheme> findAll() {
         return contextSchemeRepository.findAll();
@@ -67,9 +63,9 @@ public class ContextSchemeService {
 
     @Transactional(readOnly = false)
     public void update(ContextScheme contextScheme, List<ContextSchemeValue> contextSchemeValues) {
-        jpaRepositoryDefinitionHelper.saveAndFlush(contextScheme);
+        contextSchemeRepository.saveAndFlush(contextScheme);
         contextSchemeValues.stream().forEach(e -> e.setContextScheme(contextScheme));
-        jpaRepositoryDefinitionHelper.save(contextSchemeValues);
+        contextSchemeValueRepository.save(contextSchemeValues);
     }
 
     @Transactional(readOnly = false)

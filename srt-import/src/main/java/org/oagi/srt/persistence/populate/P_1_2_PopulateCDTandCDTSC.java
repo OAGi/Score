@@ -4,6 +4,7 @@ import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 
 import java.util.*;
 import java.util.function.Function;
@@ -51,7 +50,7 @@ public class P_1_2_PopulateCDTandCDTSC {
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private DataTypeDAO dtDAO;
 
     private Map<String, XSDBuiltInType> xbtMap;
     private Map<String, List<XSDBuiltInType>> cdtAwdPriXpsTypeMapppingMap = new HashMap();
@@ -192,7 +191,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtAwdPri.setDefault(isDefault);
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtAwdPri);
+        return cdtAwdPriRepository.saveAndFlush(cdtAwdPri);
     }
 
     public void populateCdtAwdPriXpsTypeMap() {
@@ -294,7 +293,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         );
         cdtAwdPriXpsTypeMap.setXbtId(xbtBuiltInType.getXbtId());
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtAwdPriXpsTypeMap);
+        return cdtAwdPriXpsTypeMapRepository.saveAndFlush(cdtAwdPriXpsTypeMap);
     }
 
     public void populateDtSc() {
@@ -352,7 +351,7 @@ public class P_1_2_PopulateCDTandCDTSC {
                 dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId()
         );
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(dtSc);
+        return dtDAO.save(dtSc);
     }
 
     public void populateCdtScAwdPri() {
@@ -474,7 +473,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtScAwdPri.setDefault(isDefault);
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPri);
+        return cdtScAwdPriRepository.save(cdtScAwdPri);
     }
 
     public void populateCdtScAwdPriXpsTypeMap() {
@@ -605,6 +604,6 @@ public class P_1_2_PopulateCDTandCDTSC {
                 xbtRepository.findOneByName(xbtName).getXbtId()
         );
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPriXpsTypeMap);
+        return cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtScAwdPriXpsTypeMap);
     }
 }

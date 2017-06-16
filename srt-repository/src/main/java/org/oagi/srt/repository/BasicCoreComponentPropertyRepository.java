@@ -39,6 +39,9 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
             "select MAX(b.revisionNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 group by b.currentBccpId)")
     public List<BasicCoreComponentProperty> findAllWithLatestRevisionNumByCurrentBccpId(long currentBccpId);
 
+    @Query("select distinct b.definitionId from BasicCoreComponentProperty b where b.currentBccpId = ?1")
+    public List<Long> findDefinitionIdByCurrentBccpId(long currentBccpId);
+
     @Modifying
     @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1")
     public void deleteByCurrentBccpId(long currentBccpId);

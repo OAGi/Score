@@ -56,9 +56,6 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
-    @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
-
     private long agencyIdListId;
 
     @Transactional(rollbackFor = Throwable.class)
@@ -164,7 +161,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                                 XSDBuiltInType xbtName = xbtRepository.findOne(CDTSCAPX.getXbtId());
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
-                                jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
+                                bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
                         }
                         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bLanguageVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -174,7 +171,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         bLanguageVO.setCodeListId(clVO.getCodeListId());
                         bLanguageVO.setDefault(false);
                         logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bLanguageVO.getCodeListId() + " is default = " + bLanguageVO.isDefault());
-                        jpaRepositoryDefinitionHelper.saveAndFlush(bLanguageVO);
+                        bdtScPriRestriRepository.saveAndFlush(bLanguageVO);
                     } else if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Action")) {
 
                         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPris = cdtScAwdPriRepository.findByCdtScId(aDataTypeSupplementaryComponent.getDtScId());
@@ -193,7 +190,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 }
                                 XSDBuiltInType xbtName = xbtRepository.findOne(cdtSCMaps.get(j).getXbtId());
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
-                                jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
+                                bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
 
                         }
@@ -212,7 +209,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                             bActionCodeVO.setCodeListId(clVO.getCodeListId());
                             bActionCodeVO.setDefault(false);
                             logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bActionCodeVO.getCodeListId() + " is default = " + bActionCodeVO.isDefault());
-                            jpaRepositoryDefinitionHelper.saveAndFlush(bActionCodeVO);
+                            bdtScPriRestriRepository.saveAndFlush(bActionCodeVO);
                         }
                     } else if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Expression Language")) {
                         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPris = cdtScAwdPriRepository.findByCdtScId(aDataTypeSupplementaryComponent.getDtScId());
@@ -231,7 +228,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 }
                                 XSDBuiltInType xbtName = xbtRepository.findOne(cdtSCMaps.get(j).getXbtId());
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
-                                jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
+                                bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
 
                         }
@@ -250,7 +247,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         logger.debug("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bVO.getCodeListId() + " is default = " + bVO.isDefault());
                     }
                     //logger.debug("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" code list id = "+bVO.getCodeListId()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.isDefault());
-                    jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
+                    bdtScPriRestriRepository.saveAndFlush(bVO);
 
                     long CDT_Primitive_id = cdtPriRepository.findOneByName("Token").getCdtPriId();
 
@@ -297,7 +294,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         aXBT = xbtRepository.findOne(aCDTSCPAX.getXbtId());
                     }
                     logger.debug("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO1.isDefault());
-                    jpaRepositoryDefinitionHelper.saveAndFlush(bVO1);
+                    bdtScPriRestriRepository.saveAndFlush(bVO1);
 
                 } else {
                     List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3;
@@ -364,7 +361,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                             }
                             //logger.debug("representation term = "+representationTerm+" xbt name = "+xdtName+" cdt primitive name = "+getCDTPrimitiveName(cdtPrimitiveId));
                             logger.debug("     ##### Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO.isDefault());
-                            jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
+                            bdtScPriRestriRepository.saveAndFlush(bVO);
                         }
                     }
                 }

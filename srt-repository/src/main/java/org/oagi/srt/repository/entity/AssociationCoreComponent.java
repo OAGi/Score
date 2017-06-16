@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -16,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "ascc")
 public class AssociationCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable, Cloneable {
+        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 
@@ -326,8 +325,7 @@ public class AssociationCoreComponent
         this.currentAsccId = currentAsccId;
     }
 
-    @Override
-    public AssociationCoreComponent clone() {
+    public AssociationCoreComponent clone(boolean shallowCopy) {
         AssociationCoreComponent clone = new AssociationCoreComponent();
         clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
@@ -336,7 +334,13 @@ public class AssociationCoreComponent
         clone.setFromAccId(this.fromAccId);
         clone.setToAsccpId(this.toAsccpId);
         clone.setDen(this.den);
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.setDeprecated(this.deprecated);
         clone.setCreatedBy(this.createdBy);
         clone.setOwnerUserId(this.ownerUserId);

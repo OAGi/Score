@@ -4,9 +4,7 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.BusinessInformationEntityService;
-import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.ExtensionService;
+import org.oagi.srt.service.*;
 import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
 import org.oagi.srt.web.jsf.beans.context.business.BusinessContextHandler;
 import org.primefaces.context.RequestContext;
@@ -132,7 +130,10 @@ public class TopLevelABIEHandler implements Serializable {
     private CoreComponentService coreComponentService;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private CoreComponentDAO ccDAO;
+
+    @Autowired
+    private BusinessInformationEntityDAO bieDAO;
 
     private int abieCount = 0;
     private int bbiescCount = 0;
@@ -577,12 +578,12 @@ public class TopLevelABIEHandler implements Serializable {
 
     private TopLevelAbie copyTopLevelAbie(TopLevelAbie source) {
         TopLevelAbie topLevelAbie = new TopLevelAbie();
-        return jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
+        return topLevelAbieRepository.saveAndFlush(topLevelAbie);
     }
 
     private void updateTopLevelAbie(TopLevelAbie topLevelAbie, AggregateBusinessInformationEntity abie) {
         topLevelAbie.setTopLevelAbieId(abie.getAbieId());
-        jpaRepositoryDefinitionHelper.save(topLevelAbie);
+        topLevelAbieRepository.save(topLevelAbie);
     }
 
     private void copyBIEs(
@@ -664,7 +665,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAbie.setState(Editing);
         cloneAbie.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(cloneAbie);
+        bieDAO.save(cloneAbie);
         abieCount++;
 
         return cloneAbie;
@@ -683,7 +684,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAsbiep.setDefinition(sourceAsbiep.getDefinition());
         cloneAsbiep.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(cloneAsbiep);
+        bieDAO.save(cloneAsbiep);
         asbiepCount++;
 
         return cloneAsbiep;
@@ -704,7 +705,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbieVO.setSeqKey(oasbieVO.getSeqKey());
         asbieVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(asbieVO);
+        bieDAO.save(asbieVO);
         asbieCount++;
 
         return asbieVO;
@@ -723,7 +724,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiepVO.setLastUpdatedBy(userId);
         nbbiepVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(nbbiepVO);
+        bieDAO.save(nbbiepVO);
         bbiepCount++;
 
         return nbbiepVO;
@@ -757,7 +758,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbieVO.setLastUpdatedBy(userId);
         nbbieVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(nbbieVO);
+        bieDAO.save(nbbieVO);
         bbieCount++;
 
         return nbbieVO;
@@ -781,7 +782,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiescVO.setBbieId(bbie);
         nbbiescVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(nbbiescVO);
+        bieDAO.save(nbbiescVO);
         bbiescCount++;
 
         DataTypeSupplementaryComponent dtscvo = dtScRepository.findOne(nbbiescVO.getDtScId());
@@ -847,8 +848,8 @@ public class TopLevelABIEHandler implements Serializable {
             ascc.setState(CoreComponentState.Editing);
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             asccp.setState(CoreComponentState.Editing);//Editing
-            jpaRepositoryDefinitionHelper.save(ascc);
-            jpaRepositoryDefinitionHelper.save(asccp);
+            ccDAO.save(ascc);
+            ccDAO.save(asccp);
         }
     }
 
@@ -1145,14 +1146,14 @@ public class TopLevelABIEHandler implements Serializable {
         bcVO.setName(bcH.getName());
         String guid = Utility.generateGUID();
         bcVO.setGuid(guid);
-        jpaRepositoryDefinitionHelper.saveAndFlush(bcVO);
+        businessContextRepository.saveAndFlush(bcVO);
 
         for (BusinessContextHandler.BusinessContextValues bcv : bcH.getBcValues()) {
             for (ContextSchemeValue cVO : bcv.getCsList()) {
                 BusinessContextValue bcvVO = new BusinessContextValue();
                 bcvVO.setBusinessContext(bcVO);
                 bcvVO.setContextSchemeValue(cVO);
-                jpaRepositoryDefinitionHelper.saveAndFlush(bcvVO);
+                businessContextValueRepository.saveAndFlush(bcvVO);
             }
         }
 
@@ -1276,8 +1277,8 @@ public class TopLevelABIEHandler implements Serializable {
             }
         }
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(bbieVO);
-        jpaRepositoryDefinitionHelper.saveAndFlush(bbiepVO);
+        bieDAO.save(bbieVO);
+        bieDAO.save(bbiepVO);
     }
 
     public void chooseCodeForTLBIE() {
@@ -1423,7 +1424,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private void saveBBIESCChanges(ABIEView aABIEView) {
         BasicBusinessInformationEntitySupplementaryComponent bbiescVO = aABIEView.getBbiesc();
-        jpaRepositoryDefinitionHelper.saveAndFlush(bbiescVO);
+        bieDAO.save(bbiescVO);
     }
 
     public void closeDialog() {
@@ -1435,14 +1436,14 @@ public class TopLevelABIEHandler implements Serializable {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         AssociationBusinessInformationEntityProperty asbiepVO = aABIEView.getAsbiep();
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(asbieVO);
-        jpaRepositoryDefinitionHelper.saveAndFlush(asbiepVO);
-        jpaRepositoryDefinitionHelper.saveAndFlush(abieVO);
+        bieDAO.save(asbieVO);
+        bieDAO.save(asbiepVO);
+        bieDAO.save(abieVO);
     }
 
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
-        jpaRepositoryDefinitionHelper.saveAndFlush(abieVO);
+        bieDAO.save(abieVO);
     }
 
     public void createABIEExtensionLocally() {

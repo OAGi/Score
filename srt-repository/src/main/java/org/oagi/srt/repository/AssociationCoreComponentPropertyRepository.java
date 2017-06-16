@@ -64,6 +64,9 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
             "select MAX(a.revisionNum) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 group by a.currentAsccpId)")
     public List<AssociationCoreComponentProperty> findAllWithLatestRevisionNumByCurrentAsccpId(long currentAsccpId);
 
+    @Query("select distinct a.definitionId from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
+    public List<Long> findDefinitionIdByCurrentAsccpId(long currentAsccpId);
+
     @Modifying
     @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
     public void deleteByCurrentAsccpId(long currentAsccpId);

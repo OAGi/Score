@@ -4,7 +4,6 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.ContextSchemeValueRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.ContextCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -27,9 +26,6 @@ public class ContextCategoryService {
 
     @Autowired
     private ContextSchemeValueRepository contextSchemeValueRepository;
-
-    @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     public List<ContextCategory> findAll(Sort.Direction direction, String property) {
         return contextCategoryRepository.findAll(new Sort(new Sort.Order(direction, property)));
@@ -72,7 +68,7 @@ public class ContextCategoryService {
         if (StringUtils.isEmpty(contextCategory.getGuid())) {
             contextCategory.setGuid(Utility.generateGUID());
         }
-        jpaRepositoryDefinitionHelper.save(contextCategory);
+        contextCategoryRepository.save(contextCategory);
     }
 
     @Transactional(readOnly = false)
@@ -111,7 +107,7 @@ public class ContextCategoryService {
             contextCategory.setName(this.name);
             contextCategory.setDescription(this.description);
             contextCategory.setGuid(Utility.generateGUID());
-            jpaRepositoryDefinitionHelper.saveAndFlush(contextCategory);
+            contextCategoryRepository.saveAndFlush(contextCategory);
 
             return contextCategory;
         }

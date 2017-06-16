@@ -52,9 +52,6 @@ public class P_1_4_PopulateCodeList {
     @Autowired
     private ModuleRepository moduleRepository;
 
-    @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
-
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.4 Start");
@@ -87,7 +84,7 @@ public class P_1_4_PopulateCodeList {
             String filename = fileName + ".xsd";
             codeLists.addAll(codeList(filename, agencyId));
         }
-        jpaRepositoryDefinitionHelper.save(codeLists);
+        codeListRepository.save(codeLists);
 
         for (int i = 0; i < tt.length; i++) {
             String fileName = tt[i][0];
@@ -237,7 +234,7 @@ public class P_1_4_PopulateCodeList {
 
                         if (baseCodelistVO != null && codelistVO != null) {
                             codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
-                            jpaRepositoryDefinitionHelper.saveAndFlush(codelistVO);
+                            codeListRepository.saveAndFlush(codelistVO);
                             logger.debug(" Update Based Code List ID: " + elementName.substring(0, elementName.lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
                         } else {
                             logger.warn(" Update Based Code List ID Is Failed! Check CodeListID: " + elementName);
@@ -293,7 +290,7 @@ public class P_1_4_PopulateCodeList {
                                 codeListValue.setUsedIndicator(true);
                                 codeListValue.setLockedIndicator(false);
                                 codeListValue.setExtensionIndicator(false);
-                                jpaRepositoryDefinitionHelper.saveAndFlush(codeListValue);
+                                codeListValueRepository.saveAndFlush(codeListValue);
                             }
                         }
                     } else {//if based code list is null
@@ -329,7 +326,7 @@ public class P_1_4_PopulateCodeList {
                             codeListValue.setDefinitionSource(definition.getAttribute("source"));
                         }
 
-                        jpaRepositoryDefinitionHelper.saveAndFlush(codeListValue);
+                        codeListValueRepository.saveAndFlush(codeListValue);
                         count++;
                     }
                     if (count > 0) {

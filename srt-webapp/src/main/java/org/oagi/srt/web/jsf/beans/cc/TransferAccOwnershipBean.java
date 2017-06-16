@@ -1,12 +1,9 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.TopLevelAbie;
 import org.oagi.srt.repository.entity.User;
-import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.SelectEvent;

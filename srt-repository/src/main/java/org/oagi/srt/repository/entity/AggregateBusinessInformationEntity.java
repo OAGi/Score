@@ -1,14 +1,10 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.ApplicationContextProvider;
-import org.oagi.srt.repository.DefinitionRepository;
-import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -478,13 +474,18 @@ public class AggregateBusinessInformationEntity
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
-    public AggregateBusinessInformationEntity clone() {
+    public AggregateBusinessInformationEntity clone(boolean shallowCopy) {
         AggregateBusinessInformationEntity clone = new AggregateBusinessInformationEntity();
         clone.guid = this.guid;
         clone.basedAccId = this.basedAccId;
         clone.bizCtxId = this.bizCtxId;
-        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
+
+        if (shallowCopy) {
+            clone.definitionId = this.definitionId;
+        } else {
+            clone.definition = (definition != null) ? definition.clone() : null;
+        }
+
         clone.state = this.state;
         clone.clientId = this.clientId;
         clone.version = this.version;

@@ -2,7 +2,9 @@ package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.BusinessInformationEntityUserExtensionRevisionRepository;
+import org.oagi.srt.repository.CoreComponentsRepository;
+import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,37 +25,22 @@ import static org.oagi.srt.repository.entity.RevisionAction.Update;
 public class CoreComponentService {
 
     @Autowired
-    private AggregateCoreComponentRepository accRepository;
-
-    @Autowired
-    private AggregateBusinessInformationEntityRepository abieRepository;
-
-    @Autowired
-    private AssociationCoreComponentRepository asccRepository;
-
-    @Autowired
-    private AssociationCoreComponentPropertyRepository asccpRepository;
-
-    @Autowired
-    private BasicCoreComponentRepository bccRepository;
-
-    @Autowired
-    private BasicCoreComponentPropertyRepository bccpRepository;
-
-    @Autowired
-    private DataTypeSupplementaryComponentRepository dtScRepository;
-
-    @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
 
     @Autowired
-    private CoreComponentsRepository coreComponentsRepository;
+    private CoreComponentDAO ccDAO;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private BusinessInformationEntityDAO bieDAO;
+
+    @Autowired
+    private DataTypeDAO dtDAO;
+
+    @Autowired
+    private CoreComponentsRepository coreComponentsRepository;
 
     public List<CoreComponents> getCoreComponents(
             List<String> types, List<CoreComponentState> states, Sort.Order order) {
@@ -135,9 +122,9 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         acc.addPersistEventListener(eventListener);
 
-        acc = jpaRepositoryDefinitionHelper.saveAndFlush(acc);
+        acc = ccDAO.save(acc);
 
-        AggregateCoreComponent accHistory = acc.clone();
+        AggregateCoreComponent accHistory = acc.clone(true);
         int revisionNum = 1;
         accHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -145,7 +132,7 @@ public class CoreComponentService {
         accHistory.setRevisionAction(Insert);
         accHistory.setCurrentAccId(acc.getAccId());
 
-        jpaRepositoryDefinitionHelper.save(accHistory);
+        ccDAO.save(accHistory);
 
         return acc;
     }
@@ -161,11 +148,11 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         acc.addPersistEventListener(eventListener);
 
-        acc = jpaRepositoryDefinitionHelper.saveAndFlush(acc);
+        acc = ccDAO.save(acc);
 
-        AggregateCoreComponent accHistory = acc.clone();
+        AggregateCoreComponent accHistory = acc.clone(true);
         Long currentAccId = acc.getAccId();
-        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        List<AggregateCoreComponent> latestHistoryAccList = ccDAO.findAccWithLatestRevisionNumByCurrentAccId(currentAccId);
         if (latestHistoryAccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
@@ -179,7 +166,7 @@ public class CoreComponentService {
         accHistory.setRevisionAction(Insert);
         accHistory.setCurrentAccId(acc.getAccId());
 
-        jpaRepositoryDefinitionHelper.save(accHistory);
+        ccDAO.save(accHistory);
 
         return acc;
     }
@@ -202,9 +189,9 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         asccp.addPersistEventListener(eventListener);
 
-        asccp = jpaRepositoryDefinitionHelper.saveAndFlush(asccp);
+        asccp = ccDAO.save(asccp);
 
-        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
         int revisionNum = 1;
         asccpHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -212,7 +199,7 @@ public class CoreComponentService {
         asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
 
-        jpaRepositoryDefinitionHelper.save(asccpHistory);
+        ccDAO.save(asccpHistory);
 
         return asccp;
     }
@@ -228,11 +215,11 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         asccp.addPersistEventListener(eventListener);
 
-        asccp = jpaRepositoryDefinitionHelper.saveAndFlush(asccp);
+        asccp = ccDAO.save(asccp);
 
-        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
         Long currentAsccpId = asccp.getAsccpId();
-        List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList = ccDAO.findAsccpWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         if (latestHistoryAsccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
@@ -246,7 +233,7 @@ public class CoreComponentService {
         asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
 
-        jpaRepositoryDefinitionHelper.save(asccpHistory);
+        ccDAO.save(asccpHistory);
 
         return asccp;
     }
@@ -268,9 +255,9 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         bccp.addPersistEventListener(eventListener);
 
-        bccp = jpaRepositoryDefinitionHelper.saveAndFlush(bccp);
+        bccp = ccDAO.save(bccp);
 
-        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
         int revisionNum = 1;
         bccpHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -278,7 +265,7 @@ public class CoreComponentService {
         bccpHistory.setRevisionAction(Insert);
         bccpHistory.setCurrentBccpId(bccp.getBccpId());
 
-        jpaRepositoryDefinitionHelper.save(bccpHistory);
+        ccDAO.save(bccpHistory);
 
         return bccp;
     }
@@ -294,11 +281,11 @@ public class CoreComponentService {
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         bccp.addPersistEventListener(eventListener);
 
-        bccp = jpaRepositoryDefinitionHelper.saveAndFlush(bccp);
+        bccp = ccDAO.save(bccp);
 
-        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
         Long currentBccpId = bccp.getBccpId();
-        List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        List<BasicCoreComponentProperty> latestHistoryBccpList = ccDAO.findBccpWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         if (latestHistoryBccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
@@ -312,7 +299,7 @@ public class CoreComponentService {
         bccpHistory.setRevisionAction(Insert);
         bccpHistory.setCurrentBccpId(bccp.getBccpId());
 
-        jpaRepositoryDefinitionHelper.save(bccpHistory);
+        ccDAO.save(bccpHistory);
 
         return bccp;
     }
@@ -326,28 +313,28 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAccId = acc.getAccId();
-        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        List<AggregateCoreComponent> latestHistoryAccList = ccDAO.findAccWithLatestRevisionNumByCurrentAccId(currentAccId);
         if (latestHistoryAccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        jpaRepositoryDefinitionHelper.save(acc);
+        ccDAO.save(acc);
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AggregateCoreComponent accHistory = acc.clone();
+        AggregateCoreComponent accHistory = acc.clone(true);
         accHistory.setRevisionNum(latestHistoryAccList.get(0).getRevisionNum());
         accHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         accHistory.setRevisionAction(Update);
         accHistory.setLastUpdatedBy(requesterId);
         accHistory.setCurrentAccId(currentAccId);
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(accHistory);
+        ccDAO.save(accHistory);
 
         // to check RevisionTrackingNum
-        latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        latestHistoryAccList = ccDAO.findAccWithLatestRevisionNumByCurrentAccId(currentAccId);
         int actualRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
@@ -401,24 +388,24 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAccId = acc.getAccId();
-        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        List<AggregateCoreComponent> latestHistoryAccList = ccDAO.findAccWithLatestRevisionNumByCurrentAccId(currentAccId);
         if (latestHistoryAccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        if (!asccpRepository.findByRoleOfAccId(currentAccId).isEmpty()) {
+        if (!ccDAO.findAsccpByRoleOfAccId(currentAccId).isEmpty()) {
             throw new IllegalStateException("Not allowed to discard the ACC which has related with ASCCP");
         }
-        if (!abieRepository.findByBasedAccId(currentAccId).isEmpty()) {
+        if (!bieDAO.findAbieByBasedAccId(currentAccId).isEmpty()) {
             throw new IllegalStateException("Not allowed to discard the ACC which has related with ABIE");
         }
 
         long accId = acc.getAccId();
-        accRepository.deleteByCurrentAccId(accId); // To remove history
-        accRepository.delete(acc);
+        ccDAO.deleteByCurrentAccId(accId); // To remove history
+        ccDAO.delete(acc);
 
-        asccRepository.deleteByFromAccId(accId);
-        bccRepository.deleteByFromAccId(accId);
+        ccDAO.deleteAsccByFromAccId(accId);
+        ccDAO.deleteBccByFromAccId(accId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -430,28 +417,28 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccId = ascc.getAsccId();
-        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        List<AssociationCoreComponent> latestHistoryAsccList = ccDAO.findAsccWithLatestRevisionNumByCurrentAsccId(currentAsccId);
         if (latestHistoryAsccList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        jpaRepositoryDefinitionHelper.save(ascc);
+        ccDAO.save(ascc);
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AssociationCoreComponent asccHistory = ascc.clone();
+        AssociationCoreComponent asccHistory = ascc.clone(true);
         asccHistory.setRevisionNum(latestHistoryAsccList.get(0).getRevisionNum());
         asccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(asccHistory);
+        ccDAO.save(asccHistory);
 
         // to check RevisionTrackingNum
-        latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        latestHistoryAsccList = ccDAO.findAsccWithLatestRevisionNumByCurrentAsccId(currentAsccId);
         int actualRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
@@ -469,18 +456,18 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccId = ascc.getAsccId();
-        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        List<AssociationCoreComponent> latestHistoryAsccList = ccDAO.findAsccWithLatestRevisionNumByCurrentAsccId(currentAsccId);
         if (latestHistoryAsccList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         long asccId = ascc.getAsccId();
-        asccRepository.deleteByCurrentAsccId(asccId); // To remove history
+        ccDAO.deleteByCurrentAsccId(asccId); // To remove history
         int seqKey = ascc.getSeqKey();
-        asccRepository.delete(ascc);
+        ccDAO.delete(ascc);
 
         long fromAccId = ascc.getFromAccId();
-        decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+        ccDAO.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -492,7 +479,7 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccId = bcc.getBccId();
-        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        List<BasicCoreComponent> latestHistoryBccList = ccDAO.findBccWithLatestRevisionNumByCurrentBccId(currentBccId);
         if (latestHistoryBccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
@@ -507,7 +494,7 @@ public class CoreComponentService {
                     seqKey = findAppropriateSeqKey(bcc);
                     bcc.setSeqKey(seqKey);
 
-                    increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
+                    ccDAO.increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey - 1);
                 }
 
                 break;
@@ -516,29 +503,29 @@ public class CoreComponentService {
                     seqKey = bcc.getSeqKey();
                     bcc.setSeqKey(0);
 
-                    decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+                    ccDAO.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
                 }
 
                 break;
         }
 
-        jpaRepositoryDefinitionHelper.save(bcc);
+        ccDAO.save(bcc);
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        BasicCoreComponent bccHistory = bcc.clone();
+        BasicCoreComponent bccHistory = bcc.clone(true);
         bccHistory.setRevisionNum(latestHistoryBccList.get(0).getRevisionNum());
         bccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(bccHistory);
+        ccDAO.save(bccHistory);
 
         // to check RevisionTrackingNum
-        latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        latestHistoryBccList = ccDAO.findBccWithLatestRevisionNumByCurrentBccId(currentBccId);
         int actualRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
@@ -556,19 +543,19 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccId = bcc.getBccId();
-        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        List<BasicCoreComponent> latestHistoryBccList = ccDAO.findBccWithLatestRevisionNumByCurrentBccId(currentBccId);
         if (latestHistoryBccList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         long bccId = bcc.getBccId();
-        bccRepository.deleteByCurrentBccId(bccId); // To remove history
+        ccDAO.deleteByCurrentBccId(bccId); // To remove history
         int seqKey = bcc.getSeqKey();
-        bccRepository.delete(bcc);
+        ccDAO.delete(bcc);
 
         if (seqKey > 0) {
             long fromAccId = bcc.getFromAccId();
-            decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+            ccDAO.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
         }
     }
 
@@ -582,33 +569,33 @@ public class CoreComponentService {
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
-                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+                ccDAO.findAsccpWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         if (latestHistoryAsccpList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        jpaRepositoryDefinitionHelper.save(asccp);
-        asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
-            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+        ccDAO.save(asccp);
+        ccDAO.findAsccByToAsccpId(asccp.getAsccpId()).forEach(e -> {
+            AggregateCoreComponent acc = ccDAO.findAcc(e.getFromAccId());
             e.setDen(acc, asccp);
-            jpaRepositoryDefinitionHelper.save(e);
+            ccDAO.save(e);
         });
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
         asccpHistory.setRevisionNum(latestHistoryAsccpList.get(0).getRevisionNum());
         asccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccpHistory.setRevisionAction(Update);
         asccpHistory.setLastUpdatedBy(requesterId);
         asccpHistory.setCurrentAsccpId(currentAsccpId);
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(asccpHistory);
+        ccDAO.save(asccpHistory);
 
         // to check RevisionTrackingNum
-        latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        latestHistoryAsccpList = ccDAO.findAsccpWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         int actualRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
@@ -627,14 +614,14 @@ public class CoreComponentService {
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
-                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+                ccDAO.findAsccpWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         if (latestHistoryAsccpList == null) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         long asccpId = asccp.getAsccpId();
-        asccpRepository.deleteByCurrentAsccpId(asccpId); // To remove history
-        asccpRepository.delete(asccp);
+        ccDAO.deleteByCurrentAsccpId(asccpId); // To remove history
+        ccDAO.delete(asccp);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -647,33 +634,33 @@ public class CoreComponentService {
         }
         long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList =
-                bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+                ccDAO.findBccpWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         if (latestHistoryBccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        jpaRepositoryDefinitionHelper.save(bccp);
-        bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
-            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+        ccDAO.save(bccp);
+        ccDAO.findBccByToBccpId(bccp.getBccpId()).forEach(e -> {
+            AggregateCoreComponent acc = ccDAO.findAcc(e.getFromAccId());
             e.setDen(acc, bccp);
-            jpaRepositoryDefinitionHelper.save(e);
+            ccDAO.save(e);
         });
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
         bccpHistory.setRevisionNum(latestHistoryBccpList.get(0).getRevisionNum());
         bccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccpHistory.setRevisionAction(Update);
         bccpHistory.setLastUpdatedBy(requesterId);
         bccpHistory.setCurrentBccpId(currentBccpId);
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(bccpHistory);
+        ccDAO.save(bccpHistory);
 
         // to check RevisionTrackingNum
-        latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        latestHistoryBccpList = ccDAO.findBccpWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         int actualRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
@@ -691,31 +678,31 @@ public class CoreComponentService {
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccpId = bccp.getBccpId();
-        List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        List<BasicCoreComponentProperty> latestHistoryBccpList = ccDAO.findBccpWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         if (latestHistoryBccpList.isEmpty()) {
             throw new IllegalStateException("There is no history for this element.");
         }
 
         long bccpId = bccp.getBccpId();
-        bccpRepository.deleteByCurrentBccpId(bccpId); // To remove history
-        bccpRepository.delete(bccp);
+        ccDAO.deleteByCurrentBccpId(bccpId); // To remove history
+        ccDAO.delete(bccp);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void discard(CoreComponents coreComponents, User requester) {
         switch(coreComponents.getType()) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                AggregateCoreComponent acc = ccDAO.findAcc(coreComponents.getId());
                 discard(acc, requester);
                 break;
 
             case "ASCCP":
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                AssociationCoreComponentProperty asccp = ccDAO.findAsccp(coreComponents.getId());
                 discard(asccp, requester);
                 break;
 
             case "BCCP":
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                BasicCoreComponentProperty bccp = ccDAO.findBccp(coreComponents.getId());
                 discard(bccp, requester);
                 break;
 
@@ -726,20 +713,10 @@ public class CoreComponentService {
 
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
         long bccId = latestBcc.getBccId();
-        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(bccId);
+        List<BasicCoreComponent> latestHistoryBccList = ccDAO.findBccWithLatestRevisionNumByCurrentBccId(bccId);
         return latestHistoryBccList.stream()
                 .mapToInt(e -> e.getSeqKey())
                 .max().orElseGet(() -> 0);
-    }
-
-    private void increaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
-        asccRepository.increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
-        bccRepository.increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
-    }
-
-    private void decreaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
-        asccRepository.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
-        bccRepository.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -765,24 +742,24 @@ public class CoreComponentService {
         long fromAccId = acc.getAccId();
         long lastUpdatedBy = requester.getAppUserId();
 
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
+        List<AssociationCoreComponent> asccList = ccDAO.findAsccByFromAccIdAndRevisionNumIsZero(fromAccId);
         for (AssociationCoreComponent ascc : asccList) {
             if (ascc.getState() != Published) {
                 ascc.setState(state);
                 ascc.setLastUpdatedBy(lastUpdatedBy);
             }
         }
-        jpaRepositoryDefinitionHelper.save(asccList.stream()
+        ccDAO.saveAsccList(asccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
 
-        List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
+        List<BasicCoreComponent> bccList = ccDAO.findBccByFromAccIdAndRevisionNumIsZero(fromAccId);
         for (BasicCoreComponent bcc : bccList) {
             if (bcc.getState() != Published) {
                 bcc.setState(state);
                 bcc.setLastUpdatedBy(lastUpdatedBy);
             }
         }
-        jpaRepositoryDefinitionHelper.save(bccList.stream()
+        ccDAO.saveBccList(bccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
     }
 
@@ -794,7 +771,7 @@ public class CoreComponentService {
         if (acc.getState() != Published) {
             acc.setState(state);
             acc.setLastUpdatedBy(lastUpdatedBy);
-            jpaRepositoryDefinitionHelper.save(acc);
+            ccDAO.save(acc);
         }
 
         updateChildrenState(acc, state, requester);
@@ -812,7 +789,7 @@ public class CoreComponentService {
         if (asccp.getState() != Published) {
             asccp.setState(state);
             asccp.setLastUpdatedBy(lastUpdatedBy);
-            jpaRepositoryDefinitionHelper.save(asccp);
+            ccDAO.save(asccp);
         }
     }
 
@@ -828,7 +805,7 @@ public class CoreComponentService {
         if (bccp.getState() != Published) {
             bccp.setState(state);
             bccp.setLastUpdatedBy(lastUpdatedBy);
-            jpaRepositoryDefinitionHelper.save(bccp);
+            ccDAO.save(bccp);
         }
     }
 
@@ -855,7 +832,7 @@ public class CoreComponentService {
             }
         }
 
-        jpaRepositoryDefinitionHelper.save(bieUserExtRevisionList);
+        bieUserExtRevisionRepository.save(bieUserExtRevisionList);
     }
 
     private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
@@ -870,9 +847,9 @@ public class CoreComponentService {
         Collection<Long> fromAccIds = Arrays.asList(basedAccId);
 
         while (true) {
-            List<Long> toAsccpId = asccRepository.findToAsccpIdByFromAccId(fromAccIds);
+            List<Long> toAsccpId = ccDAO.findAsccToAsccpIdByFromAccId(fromAccIds);
             List<Long> roleOfAccIdList =
-                    !toAsccpId.isEmpty() ? asccpRepository.findRoleOfAccIdByAsccpId(toAsccpId) : Collections.emptyList();
+                    !toAsccpId.isEmpty() ? ccDAO.findAsccpRoleOfAccIdByAsccpId(toAsccpId) : Collections.emptyList();
             if (roleOfAccIdList.isEmpty()) {
                 return false;
             }
@@ -885,7 +862,7 @@ public class CoreComponentService {
             roleOfAccIdList.forEach(accId -> {
                 while (accId != null && accId > 0L) {
                     tempAccIds.add(accId);
-                    accId = accRepository.findBasedAccIdByAccId(accId);
+                    accId = ccDAO.findAccBasedAccIdByAccId(accId);
                 }
             });
             fromAccIds = tempAccIds;
@@ -896,46 +873,46 @@ public class CoreComponentService {
         long accId = acc.getAccId();
 
         return Math.max(
-                asccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                ccDAO.findAsccByFromAccIdAndRevisionNumIsZero(accId).stream()
                         .mapToInt(e -> e.getSeqKey()).max().orElse(0),
-                bccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                ccDAO.findBccByFromAccIdAndRevisionNumIsZero(accId).stream()
                         .mapToInt(e -> e.getSeqKey()).max().orElse(0)
         );
     }
 
     public int findOriginalCardinalityMin(AssociationBusinessInformationEntity asbie) {
         long basedAsccId = asbie.getBasedAsccId();
-        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        AssociationCoreComponent ascc = ccDAO.findAscc(basedAsccId);
         return ascc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(AssociationBusinessInformationEntity asbie) {
         long basedAsccId = asbie.getBasedAsccId();
-        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        AssociationCoreComponent ascc = ccDAO.findAscc(basedAsccId);
         return ascc.getCardinalityMax();
     }
 
     public int findOriginalCardinalityMin(BasicBusinessInformationEntity bbie) {
         long basedBccId = bbie.getBasedBccId();
-        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        BasicCoreComponent bcc = ccDAO.findBcc(basedBccId);
         return bcc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(BasicBusinessInformationEntity bbie) {
         long basedBccId = bbie.getBasedBccId();
-        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        BasicCoreComponent bcc = ccDAO.findBcc(basedBccId);
         return bcc.getCardinalityMax();
     }
 
     public int findOriginalCardinalityMin(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
         long dtScId = bbieSc.getDtScId();
-        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        DataTypeSupplementaryComponent dtSc = dtDAO.findDtSc(dtScId);
         return dtSc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
         long dtScId = bbieSc.getDtScId();
-        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        DataTypeSupplementaryComponent dtSc = dtDAO.findDtSc(dtScId);
         return dtSc.getCardinalityMax();
     }
 
@@ -948,6 +925,6 @@ public class CoreComponentService {
         }
 
         acc.setOwnerUserId(newOwnerId);
-        jpaRepositoryDefinitionHelper.save(acc);
+        ccDAO.save(acc);
     }
 }

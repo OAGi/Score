@@ -16,6 +16,6 @@ public interface BusinessInformationEntity extends IDefinition, IGuidEntity {
 
     public void addUpdateEventListener(UpdateEventListener updateEventListener);
 
-    public BusinessInformationEntity clone();
+    public BusinessInformationEntity clone(boolean shallowCopy);
 
 }

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AssociationBusinessInformationEntityRepository
-        extends JpaRepository<AssociationBusinessInformationEntity, Integer> {
+        extends JpaRepository<AssociationBusinessInformationEntity, Long> {
 
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(long fromAbieId);

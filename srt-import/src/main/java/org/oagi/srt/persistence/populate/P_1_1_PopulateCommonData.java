@@ -8,6 +8,7 @@ import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +19,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import static org.oagi.srt.common.ImportConstants.DATA_TYPES_PATH;
 import static org.oagi.srt.common.ImportConstants.OAGIS_RELEASE_NOTE;
@@ -68,13 +67,10 @@ public class P_1_1_PopulateCommonData {
     private CoreDataTypePrimitiveRepository cdtPriRepository;
 
     @Autowired
-    private DataTypeRepository dataTypeRepository;
-
-    @Autowired
     private ImportUtil importUtil;
 
     @Autowired
-    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+    private DataTypeDAO dtDAO;
 
     private File baseDataDirectory;
     private User oagisUser;
@@ -127,7 +123,7 @@ public class P_1_1_PopulateCommonData {
         user.setOrganization("Open Applications Group");
         user.setOagisDeveloperIndicator(true);
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(user);
+        return userRepository.saveAndFlush(user);
     }
 
     private Namespace populateNamespace() throws ParseException {
@@ -145,7 +141,7 @@ public class P_1_1_PopulateCommonData {
         namespace.setCreationTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
         namespace.setLastUpdateTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(namespace);
+        return namespaceRepository.saveAndFlush(namespace);
     }
 
     private Release populateRelease(Namespace namespace) {
@@ -156,7 +152,7 @@ public class P_1_1_PopulateCommonData {
         release.setNamespaceId(namespace.getNamespaceId());
         release.setReleaseNote(OAGIS_RELEASE_NOTE);
 
-        return jpaRepositoryDefinitionHelper.saveAndFlush(release);
+        return releaseRepository.saveAndFlush(release);
     }
 
     private void populateModule() throws Exception {
@@ -192,7 +188,7 @@ public class P_1_1_PopulateCommonData {
                 String versionNum = getVersion(file);
                 module.setVersionNum(versionNum);
 
-                jpaRepositoryDefinitionHelper.saveAndFlush(module);
+                moduleRepository.saveAndFlush(module);
             }
         }
     }
@@ -234,7 +230,7 @@ public class P_1_1_PopulateCommonData {
                 moduleDep.setDependingModule(includeModule);
                 moduleDep.setDependedModule(module);
 
-                jpaRepositoryDefinitionHelper.saveAndFlush(moduleDep);
+                moduleDepRepository.saveAndFlush(moduleDep);
             }
 
             NodeList importNodeList = (NodeList) Context.xPath.evaluate("//xsd:import", document, XPathConstants.NODESET);
@@ -246,7 +242,7 @@ public class P_1_1_PopulateCommonData {
                 moduleDep.setDependencyType(ModuleDep.DependencyType.IMPORT);
                 moduleDep.setDependingModule(importModule);
                 moduleDep.setDependedModule(module);
-                jpaRepositoryDefinitionHelper.saveAndFlush(moduleDep);
+                moduleDepRepository.saveAndFlush(moduleDep);
             }
         }
     }
@@ -315,7 +311,7 @@ public class P_1_1_PopulateCommonData {
             xbt.setState(CoreComponentState.Published);
             xbt.addPersistEventListener(new CreatorModifierAwareEventListener(oagisUser));
             xbt.setOwnerUserId(oagisUser.getAppUserId());
-            xbt = jpaRepositoryDefinitionHelper.saveAndFlush(xbt);
+            xbt = xbtRepository.saveAndFlush(xbt);
             return xbt;
         }
     }
@@ -415,7 +411,7 @@ public class P_1_1_PopulateCommonData {
                 throw new IllegalStateException();
             }
             xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-            jpaRepositoryDefinitionHelper.save(xbt);
+            xbtRepository.save(xbt);
         }
     }
 
@@ -475,17 +471,17 @@ public class P_1_1_PopulateCommonData {
     public void populateCdtPri() {
         printTitle("Populate CDT Primitive");
 
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Binary"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Boolean"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Decimal"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Double"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Float"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Integer"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("NormalizedString"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("String"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("TimeDuration"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("TimePoint"));
-        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Token"));
+        cdtPriRepository.saveAndFlush(cdtPri("Binary"));
+        cdtPriRepository.saveAndFlush(cdtPri("Boolean"));
+        cdtPriRepository.saveAndFlush(cdtPri("Decimal"));
+        cdtPriRepository.saveAndFlush(cdtPri("Double"));
+        cdtPriRepository.saveAndFlush(cdtPri("Float"));
+        cdtPriRepository.saveAndFlush(cdtPri("Integer"));
+        cdtPriRepository.saveAndFlush(cdtPri("NormalizedString"));
+        cdtPriRepository.saveAndFlush(cdtPri("String"));
+        cdtPriRepository.saveAndFlush(cdtPri("TimeDuration"));
+        cdtPriRepository.saveAndFlush(cdtPri("TimePoint"));
+        cdtPriRepository.saveAndFlush(cdtPri("Token"));
     }
 
     private CoreDataTypePrimitive cdtPri(String name) {
@@ -658,7 +654,7 @@ public class P_1_1_PopulateCommonData {
         }
 
         public DataType build() {
-            return jpaRepositoryDefinitionHelper.saveAndFlush(cdt);
+            return dtDAO.save(cdt);
         }
     }
 }
