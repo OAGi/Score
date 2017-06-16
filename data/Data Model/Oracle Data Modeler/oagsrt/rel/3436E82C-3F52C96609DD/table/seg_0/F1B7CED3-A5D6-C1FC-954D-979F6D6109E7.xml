@@ -65,6 +65,17 @@
 <ownDataTypeParameters>50 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="LANGUAGE_CODE" id="DC2FA03F-D947-8EF6-6E29-0BA93860EBC0">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:30:11 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20 CHAR</dataTypeSize>
+<ownDataTypeParameters>20 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA" name="DEFINITION_PK">
@@ -87,6 +98,7 @@
 <indexColumnUsage>
 <colUsage columnID="03D39FB4-C137-7FB8-D644-9845741106BF"/>
 <colUsage columnID="1E8F2F3F-159D-B5D3-B451-D2CA582D253F"/>
+<colUsage columnID="DC2FA03F-D947-8EF6-6E29-0BA93860EBC0"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

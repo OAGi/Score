@@ -34,6 +34,11 @@
 <createdTime>2017-06-16 02:28:44 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="LANGUAGE_CODE" id="DC2FA03F-D947-8EF6-6E29-0BA93860EBC0">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:30:11 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 </columnProxies>
 <primaryKeys>
 <PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="DEFINITION_PK" id="9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA">
