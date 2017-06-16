@@ -1,0 +1,93 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F1B7CED3-A5D6-C1FC-954D-979F6D6109E7" name="DEFINITION">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:24:32 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_40</ordsAlias>
+<abbreviation>DEFINITION</abbreviation>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="DEFINITION_ID" id="0C8EBDE1-4473-B00E-49B4-4D21287E3338">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:25:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="6C224D78-FB3D-B9B3-0A45-CE422046B391">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:28:44 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="37527FA1-1EB7-8DC7-99EC-E75815A14802">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:32:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REF_ID" id="03D39FB4-C137-7FB8-D644-9845741106BF">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:29:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REF_TABLE_NAME" id="1E8F2F3F-159D-B5D3-B451-D2CA582D253F">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:32:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50 CHAR</dataTypeSize>
+<ownDataTypeParameters>50 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA" name="DEFINITION_PK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:25:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3D8C2F90-F319-55FE-6F6F-F5ABEEF60D70" name="DEFINITION_UK1">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:15:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="03D39FB4-C137-7FB8-D644-9845741106BF"/>
+<colUsage columnID="1E8F2F3F-159D-B5D3-B451-D2CA582D253F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

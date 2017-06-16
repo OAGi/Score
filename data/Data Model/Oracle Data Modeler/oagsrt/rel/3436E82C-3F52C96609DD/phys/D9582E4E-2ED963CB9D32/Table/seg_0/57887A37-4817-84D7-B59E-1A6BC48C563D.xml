@@ -59,7 +59,7 @@
 <createdTime>2016-08-08 20:42:26 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="DEFINITION" id="87052FD7-5922-A93A-260A-87F3200D9578">
+<ColumnProxy name="DEFINITION_ID" id="87052FD7-5922-A93A-260A-87F3200D9578">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:42:26 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -154,6 +154,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ASCCP_LAST_UPDATED_BY_FK" id="D4C8007E-ACD6-8E75-FF5D-2CEB0628D998">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:46:45 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ASCCP_DEFINITION_ID_FK" id="D8448C00-76AE-C49A-F5A1-F93C1A1AE5A7">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:11:59 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ASCCP_CREATED_BY_FK" id="EACCACE9-DE1F-86DD-DB7D-C141149D5298">

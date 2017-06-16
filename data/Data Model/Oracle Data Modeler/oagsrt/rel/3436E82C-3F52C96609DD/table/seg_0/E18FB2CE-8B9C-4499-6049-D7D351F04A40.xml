@@ -85,7 +85,7 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="EBA69A3E-28B0-529E-C3AD-14D7070CD757">
+<Column name="DEFINITION_ID" id="EBA69A3E-28B0-529E-C3AD-14D7070CD757">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:16:59 UTC</createdTime>
 <commentInRDBMS>Description of the BCCP.</commentInRDBMS>
@@ -93,9 +93,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="361D7216-62ED-1D83-4BD0-3EAB8529B8DE" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="MODULE_ID" id="327FBA50-3512-D695-7EC7-3A1026417607">
 <createdBy>hno2</createdBy>
@@ -407,6 +411,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="02EF7287-6C94-9093-8260-F1DBB86E6546"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="641A8782-A146-3643-41D9-DE122CBF0BC6" name="BCCP_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:14:07 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EBA69A3E-28B0-529E-C3AD-14D7070CD757"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

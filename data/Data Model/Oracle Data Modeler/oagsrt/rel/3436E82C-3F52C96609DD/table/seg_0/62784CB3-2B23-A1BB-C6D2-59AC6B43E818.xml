@@ -64,7 +64,7 @@
 <colAssociation fkAssociation="0D5D68CC-FD3C-9B9F-7C87-A65EDAB2DDDF" referredColumn="5925057B-29E1-5A22-3A22-6E5C72802C85"/>
 </associations>
 </Column>
-<Column name="DEFINITION" id="D2E5CB21-8E9A-3218-F416-B9D809542862">
+<Column name="DEFINITION_ID" id="D2E5CB21-8E9A-3218-F416-B9D809542862">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>Definition to override the ACC&apos;s definition. If NULL, it means that the definition should be inherited from the based CC.</commentInRDBMS>
@@ -72,9 +72,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9BA9B410-D1C6-F04E-C36D-BA08E47A6017" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="CREATED_BY" id="B87AA5AC-6CE3-FC75-E351-559BE67EDE5E">
 <createdBy>hno2</createdBy>
@@ -306,6 +310,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="32BC279F-7BC0-55C4-30D6-FEE4AF40FE20"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D15ACDA9-95E1-0FD7-419A-61A2BDA2187A" name="ABIE_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:06:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D2E5CB21-8E9A-3218-F416-B9D809542862"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

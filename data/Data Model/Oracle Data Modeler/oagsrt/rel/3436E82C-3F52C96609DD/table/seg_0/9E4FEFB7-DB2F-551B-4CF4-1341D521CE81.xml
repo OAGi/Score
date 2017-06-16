@@ -127,7 +127,7 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
+<Column name="DEFINITION_ID" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.</commentInRDBMS>
@@ -135,9 +135,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DA7ACE95-82C0-1FFB-C0C3-15E2502FE3C8" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="CREATED_BY" id="D8E04933-D95D-8CDC-D2A4-2AE87F0BEBAB">
 <createdBy>hno2</createdBy>
@@ -406,6 +410,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="3A8E6233-2866-D9A7-CD72-7DC338E66D33"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BB70B394-15F5-D6D2-305F-501D8C88276F" name="BCC_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:13:48 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2B2C2B10-BD8F-C752-B55C-411C59D2054D"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

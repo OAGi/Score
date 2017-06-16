@@ -64,7 +64,7 @@
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="DEFINITION" id="D2E5CB21-8E9A-3218-F416-B9D809542862">
+<ColumnProxy name="DEFINITION_ID" id="D2E5CB21-8E9A-3218-F416-B9D809542862">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -121,6 +121,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ABIE_BASED_ACC_ID_FK" id="D1357B45-70CB-E06C-BDD6-D3D22E3A7065">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:15:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ABIE_DEFINITION_ID_FK" id="D15ACDA9-95E1-0FD7-419A-61A2BDA2187A">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:06:09 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ABIE_TOP_LEVEL_ABIE_ID_FK" id="E82CFF3C-1132-859B-6EC0-4090F9166373">

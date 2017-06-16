@@ -79,7 +79,7 @@
 <colAssociation fkAssociation="5F218D46-3EEC-A969-1F49-AE309AD8908C" referredColumn="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
 </associations>
 </Column>
-<Column name="DEFINITION" id="8291D9E9-DE60-5FA0-3F7D-5D51AF6624B1">
+<Column name="DEFINITION_ID" id="8291D9E9-DE60-5FA0-3F7D-5D51AF6624B1">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:57:04 UTC</createdTime>
 <commentInRDBMS>Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC on the UI, expression generation, and any API.</commentInRDBMS>
@@ -87,9 +87,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D2583C66-6DC1-6C76-842B-34764ECA1400" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="CARDINALITY_MIN" id="5AC31830-F89D-29A8-6055-EBD2E04B40F1">
 <createdBy>hno2</createdBy>
@@ -314,6 +318,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="EED998B7-B8D5-6D15-C5BC-7D3F3DC7C68B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6A2C81CE-8486-25FC-EB5F-7FA94E392130" name="ASBIE_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:10:47 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8291D9E9-DE60-5FA0-3F7D-5D51AF6624B1"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

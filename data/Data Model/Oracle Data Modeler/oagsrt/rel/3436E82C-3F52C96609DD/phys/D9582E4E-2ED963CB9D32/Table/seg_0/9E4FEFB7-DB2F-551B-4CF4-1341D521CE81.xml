@@ -39,7 +39,7 @@
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="DEFINITION" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
+<ColumnProxy name="DEFINITION_ID" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -154,6 +154,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BCC_RELEASE_ID_FK" id="A30F0AEC-C129-EF84-0980-AAFB7B0E474D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BCC_DEFINITION_ID_FK" id="BB70B394-15F5-D6D2-305F-501D8C88276F">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:13:48 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BCC_FROM_ACC_ID_FK" id="BC56D5FC-E08A-7850-48AF-E2046A6DBACD">

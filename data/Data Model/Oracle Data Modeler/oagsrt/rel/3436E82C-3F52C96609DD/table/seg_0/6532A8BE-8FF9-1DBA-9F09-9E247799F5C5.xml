@@ -60,7 +60,7 @@
 <ownDataTypeParameters>20,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="52642323-5559-307A-8896-24F30DB2CC6D">
+<Column name="DEFINITION_ID" id="52642323-5559-307A-8896-24F30DB2CC6D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <commentInRDBMS>Description of the supplementary component.</commentInRDBMS>
@@ -68,9 +68,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="43A9E56D-BA89-DABF-87B2-14092A88280F" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="OWNER_DT_ID" id="03073B13-6419-111B-CD15-4E431C55F5A3">
 <createdBy>hno2</createdBy>
@@ -82,7 +86,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="A7FB6309-0AD1-F1E5-9BD3-306857E46B92" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
@@ -123,7 +127,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="735A75CB-AA8F-1B11-EC90-B983A681AE0A" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
@@ -170,6 +174,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="18123DEA-45AE-5B4C-388C-C3FD50AA1491"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="FF84FCCB-75DE-7D3F-8D67-BC9B657A781C" name="DT_SC_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:14:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="52642323-5559-307A-8896-24F30DB2CC6D"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

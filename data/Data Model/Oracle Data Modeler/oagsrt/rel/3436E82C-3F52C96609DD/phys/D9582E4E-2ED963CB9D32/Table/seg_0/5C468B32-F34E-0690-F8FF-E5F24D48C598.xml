@@ -94,7 +94,7 @@
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="DEFINITION" id="B7C1B4D0-F2EC-0B35-2C1A-523085C02281">
+<ColumnProxy name="DEFINITION_ID" id="B7C1B4D0-F2EC-0B35-2C1A-523085C02281">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -161,6 +161,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_BASED_BCC_ID_FK" id="9504BD20-9551-A281-65D1-4B59EAB7E79D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:36:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_DEFINITION_ID_FK" id="C495936C-5332-C532-7CF3-C24C408327C1">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:12:25 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIE_TO_BBIEP_ID_FK" id="C810B2CB-FC0C-79E6-76C0-B7DCD8D81833">

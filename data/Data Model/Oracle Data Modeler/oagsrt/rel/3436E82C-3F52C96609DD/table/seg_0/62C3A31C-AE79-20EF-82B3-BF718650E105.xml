@@ -49,7 +49,7 @@
 <colAssociation fkAssociation="6D651516-3EF9-EDA5-5105-145EF1B75214" referredColumn="2820686A-A020-3DC6-EF01-78792C666327"/>
 </associations>
 </Column>
-<Column name="DEFINITION" id="163577E4-C383-8A60-0D85-D231ADBF19F7">
+<Column name="DEFINITION_ID" id="163577E4-C383-8A60-0D85-D231ADBF19F7">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:18:39 UTC</createdTime>
 <commentInRDBMS>Definition to override the BCCP&apos;s Definition. If NULL, it means that the definition should be inherited from the based CC.</commentInRDBMS>
@@ -57,9 +57,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9E1DA02F-1D1F-7A86-220D-2E155FD4CB4E" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="REMARK" id="3AE6F5FB-8E96-3296-81A1-6EA7EF56ADAE">
 <createdBy>hno2</createdBy>
@@ -216,6 +220,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="9741C428-906E-457D-CD45-672EA372E68C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9B460928-7244-1123-F104-38DC6F2A1D40" name="BBIEP_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:12:50 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="163577E4-C383-8A60-0D85-D231ADBF19F7"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

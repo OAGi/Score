@@ -142,7 +142,7 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
+<Column name="DEFINITION_ID" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
 <commentInRDBMS>Description of the data type.</commentInRDBMS>
@@ -150,21 +150,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
-</Column>
-<Column name="DEFINITION_SOURCE" id="87715221-C36F-DC2A-FFF1-8C2D9C25119B">
-<createdBy>hno2</createdBy>
-<createdTime>2017-06-14 20:58:57 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>100 CHAR</dataTypeSize>
-<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="823D7BA6-4555-28A5-1E03-DCAEA54D59B5" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+</associations>
 </Column>
 <Column name="CONTENT_COMPONENT_DEFINITION" id="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6">
 <createdBy>hno2</createdBy>
@@ -470,6 +462,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="7F7A4D40-6035-59E9-73BA-D3C9E1FB116B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7D072AC6-471E-9A98-1FD1-BD871DDE2F21" name="DT_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:14:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

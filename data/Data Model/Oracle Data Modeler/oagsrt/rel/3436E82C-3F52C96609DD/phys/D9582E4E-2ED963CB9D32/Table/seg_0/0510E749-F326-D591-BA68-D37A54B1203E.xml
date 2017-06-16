@@ -34,7 +34,7 @@
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="DEFINITION" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
+<ColumnProxy name="DEFINITION_ID" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -82,11 +82,6 @@
 <ColumnProxy name="QUALIFIER" id="8018D781-A1D1-06F3-2AE7-4740D11C4829">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</ColumnProxy>
-<ColumnProxy name="DEFINITION_SOURCE" id="87715221-C36F-DC2A-FFF1-8C2D9C25119B">
-<createdBy>hno2</createdBy>
-<createdTime>2017-06-14 20:58:57 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REVISION_TRACKING_NUM" id="8838A18E-E4C8-1AB0-89CE-397E5E78CF13">
@@ -169,6 +164,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="DT_MODULE_ID_FK" id="7708CA82-B122-8D9B-A853-BDE4F70972CE">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:37:13 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="DT_DEFINITION_ID_FK" id="7D072AC6-471E-9A98-1FD1-BD871DDE2F21">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:14:25 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="DT_BASED_DT_ID_FK" id="8260CC80-549A-39BF-B235-CF7D7345F524">

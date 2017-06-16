@@ -1,0 +1,54 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableProxyOraclev10g" name="DEFINITION" directorySegmentName="seg_0" id="F1B7CED3-A5D6-C1FC-954D-979F6D6109E7">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:24:32 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="REF_ID" id="03D39FB4-C137-7FB8-D644-9845741106BF">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:29:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_ID" id="0C8EBDE1-4473-B00E-49B4-4D21287E3338">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:25:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REF_TABLE_NAME" id="1E8F2F3F-159D-B5D3-B451-D2CA582D253F">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:32:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="37527FA1-1EB7-8DC7-99EC-E75815A14802">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:32:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="6C224D78-FB3D-B9B3-0A45-CE422046B391">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:28:44 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="DEFINITION_PK" id="9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 02:25:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="DEFINITION_UK1" id="3D8C2F90-F319-55FE-6F6F-F5ABEEF60D70">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:15:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev10g>

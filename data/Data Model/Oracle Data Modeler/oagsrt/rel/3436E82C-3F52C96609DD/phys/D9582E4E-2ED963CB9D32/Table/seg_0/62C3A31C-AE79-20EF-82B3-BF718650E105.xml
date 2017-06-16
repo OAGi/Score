@@ -9,7 +9,7 @@
 <accessDriverType>oracle_loader</accessDriverType>
 <rejectLimit></rejectLimit>
 <columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
-<ColumnProxy name="DEFINITION" id="163577E4-C383-8A60-0D85-D231ADBF19F7">
+<ColumnProxy name="DEFINITION_ID" id="163577E4-C383-8A60-0D85-D231ADBF19F7">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:18:39 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -86,6 +86,11 @@
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIEP_TOP_LEVEL_ABIE_ID_FK" id="8040F603-2438-813B-1D12-B66634F175AA">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:09:33 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIEP_DEFINITION_ID_FK" id="9B460928-7244-1123-F104-38DC6F2A1D40">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-16 04:12:50 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BBIEP_BASED_BCCP_ID_FK" id="D7988645-FD76-FB48-4B94-4874D2FF30B9">
