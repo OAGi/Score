@@ -1,10 +1,11 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -78,9 +79,10 @@ public class BasicBusinessInformationEntity
     @Column(name = "is_null", nullable = false)
     private boolean nill;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -118,6 +120,11 @@ public class BasicBusinessInformationEntity
     @Override
     public void setId(long id) {
         setBbieId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BBIE";
     }
 
     public long getBbieId() {
@@ -301,12 +308,38 @@ public class BasicBusinessInformationEntity
         this.nill = nill;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public String getRemark() {
@@ -447,7 +480,7 @@ public class BasicBusinessInformationEntity
         result = 31 * result + (nillable ? 1 : 0);
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
         result = 31 * result + (nill ? 1 : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
@@ -477,7 +510,7 @@ public class BasicBusinessInformationEntity
                 ", nillable=" + nillable +
                 ", fixedValue='" + fixedValue + '\'' +
                 ", nill=" + nill +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", remark='" + remark + '\'' +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
@@ -518,6 +551,11 @@ public class BasicBusinessInformationEntity
             public void onPostPersist(Object object) {
                 BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
                 bbie.afterLoaded();
+
+                if (bbie.definition != null) {
+                    bbie.definition.setRefId(getId());
+                    bbie.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -655,7 +693,7 @@ public class BasicBusinessInformationEntity
         clone.nillable = this.nillable;
         clone.fixedValue = this.fixedValue;
         clone.nill = this.nill;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;

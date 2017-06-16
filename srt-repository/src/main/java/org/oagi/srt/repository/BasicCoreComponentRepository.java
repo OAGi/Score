@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,11 +1,15 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -47,9 +51,10 @@ public class AggregateBusinessInformationEntity
     @Transient
     private String bizCtxName;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -97,6 +102,11 @@ public class AggregateBusinessInformationEntity
     @Override
     public void setId(long id) {
         setAbieId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "ABIE";
     }
 
     public long getAbieId() {
@@ -147,12 +157,38 @@ public class AggregateBusinessInformationEntity
         this.bizCtxName = bizCtxName;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public long getCreatedBy() {
@@ -272,7 +308,7 @@ public class AggregateBusinessInformationEntity
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
@@ -298,7 +334,7 @@ public class AggregateBusinessInformationEntity
                 ", basedAccId=" + basedAccId +
                 ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +
@@ -353,6 +389,11 @@ public class AggregateBusinessInformationEntity
             public void onPostPersist(Object object) {
                 AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
                 abie.afterLoaded();
+
+                if ((abie.definitionId == null || abie.definitionId == 0L) && abie.definition != null) {
+                    abie.definition.setRefId(getId());
+                    abie.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -443,7 +484,7 @@ public class AggregateBusinessInformationEntity
         clone.guid = this.guid;
         clone.basedAccId = this.basedAccId;
         clone.bizCtxId = this.bizCtxId;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.state = this.state;
         clone.clientId = this.clientId;
         clone.version = this.version;

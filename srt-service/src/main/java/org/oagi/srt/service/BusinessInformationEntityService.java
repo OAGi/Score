@@ -104,6 +104,9 @@ public class BusinessInformationEntityService {
     @Autowired
     private CoreComponentService coreComponentService;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     public class CreateBIEsResult {
 
         private int abieCount = 0;
@@ -180,7 +183,7 @@ public class BusinessInformationEntityService {
 
     private TopLevelAbie createTopLevelAbie(BusinessContext bizCtx) {
         TopLevelAbie topLevelAbie = new TopLevelAbie();
-        return topLevelAbieRepository.saveAndFlush(topLevelAbie);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
     }
 
     private AggregateBusinessInformationEntity createABIE(long userId, AggregateCoreComponent acc,
@@ -198,7 +201,7 @@ public class BusinessInformationEntityService {
         abie.setState(Editing);
         abie.setOwnerTopLevelAbie(topLevelAbie);
 
-        abieRepository.saveAndFlush(abie);
+        jpaRepositoryDefinitionHelper.saveAndFlush(abie);
         createBIEsResult.abieCount++;
 
         return abie;
@@ -206,7 +209,7 @@ public class BusinessInformationEntityService {
 
     private void updateTopLevelAbie(TopLevelAbie topLevelAbie, AggregateBusinessInformationEntity abie) {
         topLevelAbie.setAbie(abie);
-        topLevelAbieRepository.save(topLevelAbie);
+        jpaRepositoryDefinitionHelper.save(topLevelAbie);
     }
 
     private AssociationBusinessInformationEntityProperty createASBIEP(long userId,
@@ -223,7 +226,7 @@ public class BusinessInformationEntityService {
         asbiep.setDefinition(asccp.getDefinition());
         asbiep.setOwnerTopLevelAbie(topLevelAbie);
 
-        asbiepRepository.saveAndFlush(asbiep);
+        jpaRepositoryDefinitionHelper.saveAndFlush(asbiep);
         createBIEsResult.asbiepCount++;
 
         return asbiep;
@@ -511,10 +514,10 @@ public class BusinessInformationEntityService {
             return abie;
         }
 
-        public void save(TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
+        public void  save(TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
             aggregateBusinessInformationEntitys.stream()
                     .forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            abieRepository.save(aggregateBusinessInformationEntitys);
+            jpaRepositoryDefinitionHelper.save(aggregateBusinessInformationEntitys);
             createBIEsResult.abieCount += aggregateBusinessInformationEntitys.size();
         }
 
@@ -533,7 +536,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getBbiep())
                             .collect(Collectors.toList());
             bbiepList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbiepRepository.save(bbiepList);
+            jpaRepositoryDefinitionHelper.save(bbiepList);
             createBIEsResult.bbiepCount += createBBIETreeTasks.size();
 
             List<BasicBusinessInformationEntity> bbieList =
@@ -541,7 +544,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getBbie())
                             .collect(Collectors.toList());
             bbieList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbieRepository.save(bbieList);
+            jpaRepositoryDefinitionHelper.save(bbieList);
             createBIEsResult.bbieCount += createBBIETreeTasks.size();
 
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new ArrayList();
@@ -550,7 +553,7 @@ public class BusinessInformationEntityService {
                         bbieScList.addAll(task.getBbieScList());
                     });
             bbieScList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbiescRepository.save(bbieScList);
+            jpaRepositoryDefinitionHelper.save(bbieScList);
             createBIEsResult.bbiescCount += bbieScList.size();
         }
     }
@@ -736,7 +739,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getAsbiep())
                             .collect(Collectors.toList());
             asbiepList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            asbiepRepository.save(asbiepList);
+            jpaRepositoryDefinitionHelper.save(asbiepList);
             createBIEsResult.asbiepCount += createASBIETreeTasks.size();
 
             List<AssociationBusinessInformationEntity> asbieList =
@@ -744,7 +747,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getAsbie())
                             .collect(Collectors.toList());
             asbieList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            asbieRepository.save(asbieList);
+            jpaRepositoryDefinitionHelper.save(asbieList);
             createBIEsResult.asbieCount += createASBIETreeTasks.size();
         }
     }
@@ -768,7 +771,6 @@ public class BusinessInformationEntityService {
         topLevelAbieRepository.updateState(toplevelAbieId, state);
         abieRepository.updateState(toplevelAbieId, state);
     }
-
 
     /*
      * for BBIE Primitive Restriction
@@ -1129,6 +1131,6 @@ public class BusinessInformationEntityService {
         }
 
         topLevelAbie.setOwnerUserId(newOwnerId);
-        topLevelAbieRepository.save(topLevelAbie);
+        jpaRepositoryDefinitionHelper.save(topLevelAbie);
     }
 }

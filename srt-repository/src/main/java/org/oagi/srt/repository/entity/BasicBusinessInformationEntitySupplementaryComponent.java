@@ -1,7 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -14,9 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Agency;
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Code;
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Primitive;
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.*;
 
 @Entity
 @Table(name = "bbie_sc")
@@ -73,9 +71,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     @Column
     private String fixedValue;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -99,6 +98,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     @Override
     public void setId(long id) {
         setBbieScId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BBIE_SC";
     }
 
     public long getBbieScId() {
@@ -233,8 +237,24 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         this.fixedValue = fixedValue;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
@@ -242,9 +262,13 @@ public class BasicBusinessInformationEntitySupplementaryComponent
             definition = definition.trim();
         }
         if (StringUtils.isEmpty(definition)) {
-            definition = null;
+            return;
         }
-        this.definition = definition;
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public String getRemark() {
@@ -348,7 +372,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (used ? 1 : 0);
@@ -370,7 +394,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
                 ", fixedValue='" + fixedValue + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
@@ -410,6 +434,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent
                 BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                         (BasicBusinessInformationEntitySupplementaryComponent) object;
                 bbieSc.afterLoaded();
+
+                if (bbieSc.definition != null) {
+                    bbieSc.definition.setRefId(getId());
+                    bbieSc.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -546,7 +575,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         clone.cardinalityMax = this.cardinalityMax;
         clone.defaultValue = this.defaultValue;
         clone.fixedValue = this.fixedValue;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.used = this.used;

@@ -99,6 +99,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private P_1_5_PopulateDefaultAndUnqualifiedBDT populateDefaultAndUnqualifiedBDT;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     private XPathHandler fields_xsd;
 
     private class DataTypeInfoHolder {
@@ -382,7 +385,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (bdtScPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_SC_ID['" + dtscVO.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
             }
-            bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
+            jpaRepositoryDefinitionHelper.save(bdtScPriRestriListForSaving);
         }
     }
 
@@ -452,7 +455,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
-        dataTypeRepository.saveAndFlush(dataType);
+        jpaRepositoryDefinitionHelper.saveAndFlush(dataType);
 
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(dataType, base);
@@ -511,7 +514,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (bdtPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_ID['" + dataType.getDtId() + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
             }
-            bdtPriRestriRepository.save(bdtPriRestriListForSaving);
+            jpaRepositoryDefinitionHelper.save(bdtPriRestriListForSaving);
         }
     }
 
@@ -540,7 +543,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());
-        bccpRepository.saveAndFlush(bccp);
+        jpaRepositoryDefinitionHelper.saveAndFlush(bccp);
     }
 
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
@@ -662,7 +665,7 @@ public class P_1_7_PopulateQBDTInDT {
                 }
 
                 if (isNew) {
-                    dtScRepository.saveAndFlush(dtSc);
+                    jpaRepositoryDefinitionHelper.saveAndFlush(dtSc);
 
                     // populate CDT_SC_Allowed_Primitives
                     String representationTerm = dtSc.getRepresentationTerm();
@@ -678,7 +681,7 @@ public class P_1_7_PopulateQBDTInDT {
                         cdtScAwdPri.setCdtScId(dtSc.getDtScId());
                         cdtScAwdPri.setCdtPriId(svo.getCdtPriId());
                         cdtScAwdPri.setDefault(svo.isDefault());
-                        cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPri);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
                         long cdtScAwdPriId =
@@ -693,13 +696,13 @@ public class P_1_7_PopulateQBDTInDT {
                             cdtScAwdPriXpsTypeMap.setCdtScAwdPriId(cdtScAwdPriId);
                             long xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             cdtScAwdPriXpsTypeMap.setXbtId(xdtBuiltTypeId);
-                            cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtScAwdPriXpsTypeMap);
+                            jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPriXpsTypeMap);
                         }
                     }
 
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 } else {
-                    dtScRepository.saveAndFlush(dtSc);
+                    jpaRepositoryDefinitionHelper.saveAndFlush(dtSc);
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 }
             }
@@ -720,7 +723,7 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedDtSc.setCardinalityMax(baseDtsc.getCardinalityMax());
                 inheritedDtSc.setBasedDtScId(baseDtsc.getDtScId());
 
-                dtScRepository.saveAndFlush(inheritedDtSc);
+                jpaRepositoryDefinitionHelper.saveAndFlush(inheritedDtSc);
 
                 insertBDTSCPrimitiveRestriction(inheritedDtSc, 1, "", "");
             }
@@ -896,7 +899,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
-        dataType = dataTypeRepository.saveAndFlush(dataType);
+        dataType = jpaRepositoryDefinitionHelper.saveAndFlush(dataType);
 
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(dataType, base);
@@ -921,7 +924,7 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setCardinalityMax(0);
             vo.setBasedDtScId(dtsc_vo.getDtScId());
 
-            dtScRepository.saveAndFlush(vo);
+            jpaRepositoryDefinitionHelper.saveAndFlush(vo);
 
             insertBDTSCPrimitiveRestriction(vo, 1, "", "");
         }

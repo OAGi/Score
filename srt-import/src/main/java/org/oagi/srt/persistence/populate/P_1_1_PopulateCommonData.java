@@ -73,6 +73,9 @@ public class P_1_1_PopulateCommonData {
     @Autowired
     private ImportUtil importUtil;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     private File baseDataDirectory;
     private User oagisUser;
     private Namespace namespace;
@@ -124,7 +127,7 @@ public class P_1_1_PopulateCommonData {
         user.setOrganization("Open Applications Group");
         user.setOagisDeveloperIndicator(true);
 
-        return userRepository.saveAndFlush(user);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(user);
     }
 
     private Namespace populateNamespace() throws ParseException {
@@ -142,7 +145,7 @@ public class P_1_1_PopulateCommonData {
         namespace.setCreationTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
         namespace.setLastUpdateTimestamp(simpleDateFormat.parse("2014-06-27 00:00:00 -05:00"));
 
-        return namespaceRepository.saveAndFlush(namespace);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(namespace);
     }
 
     private Release populateRelease(Namespace namespace) {
@@ -153,7 +156,7 @@ public class P_1_1_PopulateCommonData {
         release.setNamespaceId(namespace.getNamespaceId());
         release.setReleaseNote(OAGIS_RELEASE_NOTE);
 
-        return releaseRepository.saveAndFlush(release);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(release);
     }
 
     private void populateModule() throws Exception {
@@ -189,7 +192,7 @@ public class P_1_1_PopulateCommonData {
                 String versionNum = getVersion(file);
                 module.setVersionNum(versionNum);
 
-                moduleRepository.saveAndFlush(module);
+                jpaRepositoryDefinitionHelper.saveAndFlush(module);
             }
         }
     }
@@ -231,7 +234,7 @@ public class P_1_1_PopulateCommonData {
                 moduleDep.setDependingModule(includeModule);
                 moduleDep.setDependedModule(module);
 
-                moduleDepRepository.saveAndFlush(moduleDep);
+                jpaRepositoryDefinitionHelper.saveAndFlush(moduleDep);
             }
 
             NodeList importNodeList = (NodeList) Context.xPath.evaluate("//xsd:import", document, XPathConstants.NODESET);
@@ -243,7 +246,7 @@ public class P_1_1_PopulateCommonData {
                 moduleDep.setDependencyType(ModuleDep.DependencyType.IMPORT);
                 moduleDep.setDependingModule(importModule);
                 moduleDep.setDependedModule(module);
-                moduleDepRepository.saveAndFlush(moduleDep);
+                jpaRepositoryDefinitionHelper.saveAndFlush(moduleDep);
             }
         }
     }
@@ -312,7 +315,7 @@ public class P_1_1_PopulateCommonData {
             xbt.setState(CoreComponentState.Published);
             xbt.addPersistEventListener(new CreatorModifierAwareEventListener(oagisUser));
             xbt.setOwnerUserId(oagisUser.getAppUserId());
-            xbt = xbtRepository.saveAndFlush(xbt);
+            xbt = jpaRepositoryDefinitionHelper.saveAndFlush(xbt);
             return xbt;
         }
     }
@@ -412,7 +415,7 @@ public class P_1_1_PopulateCommonData {
                 throw new IllegalStateException();
             }
             xbt.setSubtypeOfXbtId(baseXbt.getXbtId());
-            xbtRepository.save(xbt);
+            jpaRepositoryDefinitionHelper.save(xbt);
         }
     }
 
@@ -472,17 +475,17 @@ public class P_1_1_PopulateCommonData {
     public void populateCdtPri() {
         printTitle("Populate CDT Primitive");
 
-        cdtPriRepository.saveAndFlush(cdtPri("Binary"));
-        cdtPriRepository.saveAndFlush(cdtPri("Boolean"));
-        cdtPriRepository.saveAndFlush(cdtPri("Decimal"));
-        cdtPriRepository.saveAndFlush(cdtPri("Double"));
-        cdtPriRepository.saveAndFlush(cdtPri("Float"));
-        cdtPriRepository.saveAndFlush(cdtPri("Integer"));
-        cdtPriRepository.saveAndFlush(cdtPri("NormalizedString"));
-        cdtPriRepository.saveAndFlush(cdtPri("String"));
-        cdtPriRepository.saveAndFlush(cdtPri("TimeDuration"));
-        cdtPriRepository.saveAndFlush(cdtPri("TimePoint"));
-        cdtPriRepository.saveAndFlush(cdtPri("Token"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Binary"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Boolean"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Decimal"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Double"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Float"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Integer"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("NormalizedString"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("String"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("TimeDuration"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("TimePoint"));
+        jpaRepositoryDefinitionHelper.saveAndFlush(cdtPri("Token"));
     }
 
     private CoreDataTypePrimitive cdtPri(String name) {
@@ -655,7 +658,7 @@ public class P_1_1_PopulateCommonData {
         }
 
         public DataType build() {
-            return dataTypeRepository.saveAndFlush(cdt);
+            return jpaRepositoryDefinitionHelper.saveAndFlush(cdt);
         }
     }
 }

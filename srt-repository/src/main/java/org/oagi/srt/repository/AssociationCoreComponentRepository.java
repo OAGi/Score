@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,9 +34,6 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.state = ?4")
     public AssociationCoreComponent findByFromAccIdAndToAsccpIdAndRevisionNumAndState(long fromAccId, long toAsccpId, int revisionNum, CoreComponentState state);
-
-    @Query("select a from AssociationCoreComponent a where a.definition = ?1")
-    public List<AssociationCoreComponent> findByDefinition(String definition);
 
     @Query("select a from AssociationCoreComponent a where a.den like ?1%")
     public List<AssociationCoreComponent> findByDenStartsWith(String den);

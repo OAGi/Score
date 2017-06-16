@@ -3,6 +3,7 @@ package org.oagi.srt.service;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
@@ -24,6 +25,9 @@ public class CodeListService {
 
     @Autowired
     private CodeListValueRepository codeListValueRepository;
+
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     public List<CodeList> findAll() {
         return codeListRepository.findAll();
@@ -82,7 +86,7 @@ public class CodeListService {
     }
 
     public void update(CodeList codeList) {
-        codeListRepository.save(codeList);
+        jpaRepositoryDefinitionHelper.save(codeList);
     }
 
     public void delete(Collection<CodeListValue> codeListValues) {
@@ -144,7 +148,7 @@ public class CodeListService {
             }
             codeList.setLastUpdatedBy(userId);
 
-            codeListRepository.save(codeList);
+            jpaRepositoryDefinitionHelper.save(codeList);
 
             return codeList;
         }
@@ -202,7 +206,7 @@ public class CodeListService {
                 codeListValue.setLockedIndicator(lockedIndicator);
             }
 
-            codeListValueRepository.save(codeListValue);
+            jpaRepositoryDefinitionHelper.save(codeListValue);
 
             return codeListValue;
         }

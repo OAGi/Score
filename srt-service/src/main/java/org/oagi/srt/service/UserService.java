@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     public User findByAuthentication(Authentication authentication) {
         return userRepository.findOneByLoginId(authentication.getName());
@@ -54,7 +58,7 @@ public class UserService {
     public void updatePassword(Authentication authentication, String newPassword) {
         User user = findByAuthentication(authentication);
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        jpaRepositoryDefinitionHelper.save(user);
     }
 
     @Transactional
@@ -65,7 +69,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(rawPassword));
         user.setOagisDeveloperIndicator(false);
         user.setOrganization(null);
-        user = userRepository.save(user);
+        user = jpaRepositoryDefinitionHelper.save(user);
         return user.getAppUserId();
     }
 }

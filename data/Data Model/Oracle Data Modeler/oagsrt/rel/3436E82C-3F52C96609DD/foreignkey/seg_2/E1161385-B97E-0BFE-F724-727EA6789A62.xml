@@ -3,7 +3,7 @@
 <createdBy>hakju</createdBy>
 <createdTime>2017-06-16 04:11:40 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
-<deleteRule>NO ACTION</deleteRule>
+<deleteRule>CASCADE</deleteRule>
 <referredTableID>F1B7CED3-A5D6-C1FC-954D-979F6D6109E7</referredTableID>
 <keyObject>9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA</keyObject>
 <referredKeyID>9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA</referredKeyID>

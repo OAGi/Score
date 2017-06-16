@@ -1,12 +1,13 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -53,9 +54,10 @@ public class AssociationCoreComponent
     @Column(nullable = false, length = 200)
     private String den;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
@@ -99,6 +101,21 @@ public class AssociationCoreComponent
 
     public AssociationCoreComponent() {
         init();
+    }
+
+    @Override
+    public long getId() {
+        return getAsccId();
+    }
+
+    @Override
+    public void setId(long id) {
+        setAsccId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "ASCC";
     }
 
     public long getAsccId() {
@@ -179,12 +196,38 @@ public class AssociationCoreComponent
         setDen(acc.getObjectClassTerm() + ". " + asccp.getDen());
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public boolean isDeprecated() {
@@ -293,7 +336,7 @@ public class AssociationCoreComponent
         clone.setFromAccId(this.fromAccId);
         clone.setToAsccpId(this.toAsccpId);
         clone.setDen(this.den);
-        clone.setDefinition(this.definition);
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.setDeprecated(this.deprecated);
         clone.setCreatedBy(this.createdBy);
         clone.setOwnerUserId(this.ownerUserId);
@@ -341,7 +384,7 @@ public class AssociationCoreComponent
         result = 31 * result + (int) (fromAccId ^ (fromAccId >>> 32));
         result = 31 * result + (int) (toAsccpId ^ (toAsccpId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
@@ -368,7 +411,7 @@ public class AssociationCoreComponent
                 ", fromAccId=" + fromAccId +
                 ", toAsccpId=" + toAsccpId +
                 ", den='" + den + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", deprecated=" + deprecated +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
@@ -393,6 +436,23 @@ public class AssociationCoreComponent
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) object;
+                ascc.afterLoaded();
+
+                if (ascc.definition != null) {
+                    ascc.definition.setRefId(getId());
+                    ascc.definition.setRefTableName(tableName());
+                }
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

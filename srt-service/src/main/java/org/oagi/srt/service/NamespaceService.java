@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.NamespaceRepository;
 import org.oagi.srt.repository.entity.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class NamespaceService {
     @Autowired
     private NamespaceRepository namespaceRepository;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     public List<Namespace> findAll(Sort.Direction direction, String property) {
         return namespaceRepository.findAll(new Sort(direction, property));
     }
@@ -30,7 +34,7 @@ public class NamespaceService {
 
     @Transactional
     public void update(Namespace namespace) {
-        namespaceRepository.saveAndFlush(namespace);
+        jpaRepositoryDefinitionHelper.saveAndFlush(namespace);
     }
 
     public boolean isExistsUri(String uri, long namespaceId) {

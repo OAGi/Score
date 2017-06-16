@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,10 +25,6 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2 and a.state = ?3")
     public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNumAndState(long asccpId, int revisionNum, CoreComponentState state);
 
-    @Query("select new AssociationCoreComponentProperty(a.asccpId, a.roleOfAccId, a.definition) " +
-            "from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")
-    public AssociationCoreComponentProperty findAsccpIdAndRoleOfAccIdAndDefinitionByAsccpIdAndRevisionNum(long asccpId, int revisionNum);
-
     @Query("select a from AssociationCoreComponentProperty a where a.roleOfAccId = ?1 and a.revisionNum = 0")
     public List<AssociationCoreComponentProperty> findByRoleOfAccId(long roleOfAccId);
 
@@ -38,9 +33,6 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select case when count(a) > 0 then true else false end from AssociationCoreComponentProperty a where a.guid = ?1")
     public boolean existsByGuid(String guid);
-
-    @Query("select new AssociationCoreComponentProperty(a.asccpId, a.den) from AssociationCoreComponentProperty a where a.guid = ?1")
-    public AssociationCoreComponentProperty findAsccpIdAndDenByGuid(String guid);
 
     @Query("select distinct asccp.propertyTerm from " +
             "AggregateBusinessInformationEntity abie, " +

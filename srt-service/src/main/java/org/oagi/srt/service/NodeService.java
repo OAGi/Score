@@ -79,6 +79,9 @@ public class NodeService {
     @Autowired
     private BusinessContextRepository businessContextRepository;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     public ACCNode createCoreComponentTreeNode(
             AggregateCoreComponent aggregateCoreComponent, boolean enableShowingGroup) {
         if (aggregateCoreComponent == null) {
@@ -1564,22 +1567,22 @@ public class NodeService {
             }
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            abieRepository.save(abieList);
+            jpaRepositoryDefinitionHelper.save(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbiepRepository.save(bbiepList);
+            jpaRepositoryDefinitionHelper.save(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieRepository.save(bbieList);
+            jpaRepositoryDefinitionHelper.save(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieScRepository.save(bbieScList);
+            jpaRepositoryDefinitionHelper.save(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbiepRepository.save(asbiepList);
+            jpaRepositoryDefinitionHelper.save(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbieRepository.save(asbieList);
+            jpaRepositoryDefinitionHelper.save(asbieList);
 
             return topLevelAbie;
         }
@@ -1588,15 +1591,15 @@ public class NodeService {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
             topLevelAbie.setState(Editing);
-            topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            topLevelAbie = jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
 
             AggregateBusinessInformationEntity abie = root.getType().getAbie();
             preset(abie, topLevelAbie);
-            abie = abieRepository.saveAndFlush(abie);
+            abie = jpaRepositoryDefinitionHelper.saveAndFlush(abie);
             abie.afterLoaded();
 
             topLevelAbie.setAbie(abie);
-            topLevelAbieRepository.save(topLevelAbie);
+            jpaRepositoryDefinitionHelper.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
             asbiepList.add(root.getAsbiep());
@@ -1841,22 +1844,22 @@ public class NodeService {
             root.accept(this);
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            abieRepository.save(abieList);
+            jpaRepositoryDefinitionHelper.save(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbiepRepository.save(bbiepList);
+            jpaRepositoryDefinitionHelper.save(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieRepository.save(bbieList);
+            jpaRepositoryDefinitionHelper.save(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieScRepository.save(bbieScList);
+            jpaRepositoryDefinitionHelper.save(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbiepRepository.save(asbiepList);
+            jpaRepositoryDefinitionHelper.save(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbieRepository.save(asbieList);
+            jpaRepositoryDefinitionHelper.save(asbieList);
         }
 
         private TopLevelAbie prepareForTopLevelAbieEntity() {
@@ -1999,22 +2002,22 @@ public class NodeService {
             }
 
             abieList.stream().forEach(e -> preset(e, topLevelAbie));
-            abieRepository.save(abieList);
+            jpaRepositoryDefinitionHelper.save(abieList);
 
             bbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbiepRepository.save(bbiepList);
+            jpaRepositoryDefinitionHelper.save(bbiepList);
 
             bbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieRepository.save(bbieList);
+            jpaRepositoryDefinitionHelper.save(bbieList);
 
             bbieScList.stream().forEach(e -> preset(e, topLevelAbie));
-            bbieScRepository.save(bbieScList);
+            jpaRepositoryDefinitionHelper.save(bbieScList);
 
             asbiepList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbiepRepository.save(asbiepList);
+            jpaRepositoryDefinitionHelper.save(asbiepList);
 
             asbieList.stream().forEach(e -> preset(e, topLevelAbie));
-            asbieRepository.save(asbieList);
+            jpaRepositoryDefinitionHelper.save(asbieList);
 
             return topLevelAbie;
         }
@@ -2023,7 +2026,7 @@ public class NodeService {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
             topLevelAbie.setState(Editing);
-            topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            topLevelAbie = jpaRepositoryDefinitionHelper.saveAndFlush(topLevelAbie);
 
             AggregateBusinessInformationEntity abie = root.getType().getAbie();
             long abieId = abie.getAbieId();
@@ -2031,10 +2034,10 @@ public class NodeService {
             preset(abie, topLevelAbie);
 
             prevAbieIdMap.put(abieId, abie);
-            abie = abieRepository.saveAndFlush(abie);
+            abie = jpaRepositoryDefinitionHelper.saveAndFlush(abie);
 
             topLevelAbie.setAbie(abie);
-            topLevelAbieRepository.save(topLevelAbie);
+            jpaRepositoryDefinitionHelper.save(topLevelAbie);
 
             // It has to be added whether it is dirty or not.
             AssociationBusinessInformationEntityProperty asbiep = root.getAsbiep();

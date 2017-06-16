@@ -50,6 +50,9 @@ public class P_1_2_PopulateCDTandCDTSC {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     private Map<String, XSDBuiltInType> xbtMap;
     private Map<String, List<XSDBuiltInType>> cdtAwdPriXpsTypeMapppingMap = new HashMap();
 
@@ -189,7 +192,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtAwdPri.setDefault(isDefault);
 
-        return cdtAwdPriRepository.saveAndFlush(cdtAwdPri);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtAwdPri);
     }
 
     public void populateCdtAwdPriXpsTypeMap() {
@@ -291,7 +294,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         );
         cdtAwdPriXpsTypeMap.setXbtId(xbtBuiltInType.getXbtId());
 
-        return cdtAwdPriXpsTypeMapRepository.saveAndFlush(cdtAwdPriXpsTypeMap);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtAwdPriXpsTypeMap);
     }
 
     public void populateDtSc() {
@@ -349,7 +352,7 @@ public class P_1_2_PopulateCDTandCDTSC {
                 dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId()
         );
 
-        return dtScRepository.saveAndFlush(dtSc);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(dtSc);
     }
 
     public void populateCdtScAwdPri() {
@@ -471,7 +474,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtScAwdPri.setDefault(isDefault);
 
-        return cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPri);
     }
 
     public void populateCdtScAwdPriXpsTypeMap() {
@@ -602,6 +605,6 @@ public class P_1_2_PopulateCDTandCDTSC {
                 xbtRepository.findOneByName(xbtName).getXbtId()
         );
 
-        return cdtScAwdPriXpsTypeMapRepository.saveAndFlush(cdtScAwdPriXpsTypeMap);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(cdtScAwdPriXpsTypeMap);
     }
 }

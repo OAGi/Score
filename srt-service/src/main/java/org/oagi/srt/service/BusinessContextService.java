@@ -3,6 +3,7 @@ package org.oagi.srt.service;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.BusinessContextValueRepository;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.BusinessContextValue;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
@@ -22,6 +23,9 @@ public class BusinessContextService {
 
     @Autowired
     private BusinessContextValueRepository businessContextValueRepository;
+
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     public List<BusinessContext> findAll(Sort.Direction direction, String property) {
         return businessContextRepository.findAll(new Sort(new Sort.Order(direction, property)));
@@ -44,10 +48,10 @@ public class BusinessContextService {
     }
 
     public void update(BusinessContext businessContext, Collection<BusinessContextValue> businessContextValues) {
-        businessContextRepository.saveAndFlush(businessContext);
+        jpaRepositoryDefinitionHelper.saveAndFlush(businessContext);
         businessContextValues.stream()
                 .forEach(e -> e.setBusinessContext(businessContext));
-        businessContextValueRepository.save(businessContextValues);
+        jpaRepositoryDefinitionHelper.save(businessContextValues);
     }
 
     public void delete(List<BusinessContextValue> businessContextValues) {
@@ -102,14 +106,14 @@ public class BusinessContextService {
             businessContext.setCreatedBy(userId);
             businessContext.setLastUpdatedBy(userId);
 
-            businessContext = businessContextRepository.saveAndFlush(businessContext);
+            businessContext = jpaRepositoryDefinitionHelper.saveAndFlush(businessContext);
 
             if (contextSchemeValues != null && !contextSchemeValues.isEmpty()) {
                 for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
                     BusinessContextValue businessContextValue = new BusinessContextValue();
                     businessContextValue.setBusinessContext(businessContext);
                     businessContextValue.setContextSchemeValue(contextSchemeValue);
-                    businessContextValueRepository.save(businessContextValue);
+                    jpaRepositoryDefinitionHelper.save(businessContextValue);
                 }
             }
 

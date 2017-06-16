@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -49,9 +50,10 @@ public class BasicCoreComponentProperty
     @Column(nullable = false, length = 200)
     private String den;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column
     private Long moduleId;
@@ -116,14 +118,6 @@ public class BasicCoreComponentProperty
         this.den = den;
     }
 
-    public BasicCoreComponentProperty(long bccpId, long bdtId, String definition) {
-        init();
-
-        this.bccpId = bccpId;
-        this.bdtId = bdtId;
-        this.definition = definition;
-    }
-
     /*
      * Copy constructor
      */
@@ -134,7 +128,11 @@ public class BasicCoreComponentProperty
         this.representationTerm = bccp.getRepresentationTerm();
         this.bdtId = bccp.getBdtId();
         this.den = bccp.getDen();
-        this.definition = bccp.getDefinition();
+        this.definitionId = bccp.getDefinitionId();
+        Definition definition = bccp.getRawDefinition();
+        if (definition != null) {
+            this.definition = definition.clone();
+        }
         this.moduleId = bccp.getModuleId();
         this.namespaceId = bccp.getNamespaceId();
         this.deprecated = bccp.isDeprecated();
@@ -151,6 +149,21 @@ public class BasicCoreComponentProperty
         this.currentBccpId = bccp.getCurrentBccpId();
         this.nillable = bccp.isNillable();
         this.defaultValue = bccp.getDefaultValue();
+    }
+
+    @Override
+    public long getId() {
+        return getBccpId();
+    }
+
+    @Override
+    public void setId(long id) {
+        setBccpId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BCCP";
     }
 
     public long getBccpId() {
@@ -219,12 +232,38 @@ public class BasicCoreComponentProperty
         this.den = den;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public long getModuleId() {
@@ -364,7 +403,7 @@ public class BasicCoreComponentProperty
         clone.setPropertyTerm(this.propertyTerm);
         clone.setRepresentationTerm(this.representationTerm);
         clone.setBdtId(this.bdtId);
-        clone.setDefinition(this.definition);
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
@@ -419,7 +458,7 @@ public class BasicCoreComponentProperty
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
@@ -448,7 +487,7 @@ public class BasicCoreComponentProperty
                 ", representationTerm='" + representationTerm + '\'' +
                 ", bdtId=" + bdtId +
                 ", den='" + den + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", deprecated=" + deprecated +
@@ -477,6 +516,22 @@ public class BasicCoreComponentProperty
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                BasicCoreComponentProperty bccp = (BasicCoreComponentProperty) object;
+                bccp.afterLoaded();
+
+                if (bccp.definition != null) {
+                    bccp.definition.setRefId(getId());
+                    bccp.definition.setRefTableName(tableName());
+                }
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

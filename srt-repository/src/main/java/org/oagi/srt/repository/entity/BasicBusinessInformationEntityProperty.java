@@ -1,10 +1,11 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,9 +39,10 @@ public class BasicBusinessInformationEntityProperty
     @Transient
     private BasicCoreComponentProperty basedBccp;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -77,6 +79,11 @@ public class BasicBusinessInformationEntityProperty
         setBbiepId(id);
     }
 
+    @Override
+    public String tableName() {
+        return "BBIEP";
+    }
+
     public long getBbiepId() {
         return bbiepId;
     }
@@ -105,12 +112,38 @@ public class BasicBusinessInformationEntityProperty
         this.basedBccp = basedBccp;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public String getRemark() {
@@ -195,7 +228,7 @@ public class BasicBusinessInformationEntityProperty
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedBccpId ^ (basedBccpId >>> 32));
         result = 31 * result + (basedBccp != null ? basedBccp.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -215,7 +248,7 @@ public class BasicBusinessInformationEntityProperty
                 "bbiepId=" + bbiepId +
                 ", guid='" + guid + '\'' +
                 ", basedBccpId=" + basedBccpId +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", createdBy=" + createdBy +
@@ -251,6 +284,11 @@ public class BasicBusinessInformationEntityProperty
             public void onPostPersist(Object object) {
                 BasicBusinessInformationEntityProperty bbiep = (BasicBusinessInformationEntityProperty) object;
                 bbiep.afterLoaded();
+
+                if (bbiep.definition != null) {
+                    bbiep.definition.setRefId(getId());
+                    bbiep.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -340,7 +378,7 @@ public class BasicBusinessInformationEntityProperty
         BasicBusinessInformationEntityProperty clone = new BasicBusinessInformationEntityProperty();
         clone.guid = this.guid;
         clone.basedBccpId = this.basedBccpId;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.afterLoaded();

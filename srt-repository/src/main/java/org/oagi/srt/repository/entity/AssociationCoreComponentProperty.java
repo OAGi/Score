@@ -1,7 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -39,9 +39,10 @@ public class AssociationCoreComponentProperty
     @Column(nullable = false)
     private String propertyTerm;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column
     private Long roleOfAccId;
@@ -107,19 +108,19 @@ public class AssociationCoreComponentProperty
         init();
     }
 
-    public AssociationCoreComponentProperty(long asccpId, String den) {
-        init();
-
-        this.asccpId = asccpId;
-        this.den = den;
+    @Override
+    public long getId() {
+        return getAsccpId();
     }
 
-    public AssociationCoreComponentProperty(long asccpId, long roleOfAccId, String definition) {
-        init();
+    @Override
+    public void setId(long id) {
+        setAsccpId(id);
+    }
 
-        this.asccpId = asccpId;
-        this.roleOfAccId = roleOfAccId;
-        this.definition = definition;
+    @Override
+    public String tableName() {
+        return "ASCCP";
     }
 
     public long getAsccpId() {
@@ -154,14 +155,38 @@ public class AssociationCoreComponentProperty
         setRoleOfAcc(roleOfAcc);
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        if (!StringUtils.isEmpty(definition)) {
-            this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
         }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public long getRoleOfAccId() {
@@ -325,7 +350,7 @@ public class AssociationCoreComponentProperty
         AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
         clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
-        clone.setDefinition(this.definition);
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.setRoleOfAccId(this.roleOfAccId);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
@@ -376,7 +401,7 @@ public class AssociationCoreComponentProperty
         int result = (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (int) (roleOfAccId ^ (roleOfAccId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -404,7 +429,7 @@ public class AssociationCoreComponentProperty
                 "asccpId=" + asccpId +
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", roleOfAccId=" + roleOfAccId +
                 ", den='" + den + '\'' +
                 ", createdBy=" + createdBy +
@@ -435,6 +460,23 @@ public class AssociationCoreComponentProperty
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) object;
+                asccp.afterLoaded();
+
+                if (asccp.definition != null) {
+                    asccp.definition.setRefId(getId());
+                    asccp.definition.setRefTableName(tableName());
+                }
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

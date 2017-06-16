@@ -1,10 +1,11 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -47,9 +48,10 @@ public class AssociationBusinessInformationEntity
     @Column(nullable = false, updatable = false)
     private long basedAsccId;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -97,6 +99,11 @@ public class AssociationBusinessInformationEntity
     @Override
     public void setId(long id) {
         setAsbieId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "ASBIE";
     }
 
     public long getAsbieId() {
@@ -155,12 +162,38 @@ public class AssociationBusinessInformationEntity
         this.basedAsccId = basedAsccId;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public int getCardinalityMin() {
@@ -286,7 +319,7 @@ public class AssociationBusinessInformationEntity
         result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
         result = 31 * result + (int) (toAsbiepId ^ (toAsbiepId >>> 32));
         result = 31 * result + (int) (basedAsccId ^ (basedAsccId >>> 32));
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (nillable ? 1 : 0);
@@ -300,6 +333,30 @@ public class AssociationBusinessInformationEntity
         result = 31 * result + (used ? 1 : 0);
         result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntity{" +
+                "asbieId=" + asbieId +
+                ", guid='" + guid + '\'' +
+                ", fromAbieId=" + fromAbieId +
+                ", toAsbiepId=" + toAsbiepId +
+                ", basedAsccId=" + basedAsccId +
+                ", definitionId=" + definitionId +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", nillable=" + nillable +
+                ", remark='" + remark + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", seqKey=" + seqKey +
+                ", used=" + used +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                '}';
     }
 
     @Transient
@@ -329,6 +386,11 @@ public class AssociationBusinessInformationEntity
             public void onPostPersist(Object object) {
                 AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) object;
                 asbie.afterLoaded();
+
+                if (asbie.definition != null) {
+                    asbie.definition.setRefId(getId());
+                    asbie.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -420,7 +482,7 @@ public class AssociationBusinessInformationEntity
         clone.fromAbieId = this.fromAbieId;
         clone.toAsbiepId = this.toAsbiepId;
         clone.basedAsccId = this.basedAsccId;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.cardinalityMin = this.cardinalityMin;
         clone.cardinalityMax = this.cardinalityMax;
         clone.nillable = this.nillable;

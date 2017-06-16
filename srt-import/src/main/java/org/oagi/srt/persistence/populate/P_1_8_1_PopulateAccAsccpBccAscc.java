@@ -66,6 +66,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     @Autowired
     private ImportUtil importUtil;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     private File f1 = new File(ImportConstants.BOD_FILE_PATH_01);
     private File f2 = new File(ImportConstants.BOD_FILE_PATH_02);
 
@@ -103,7 +106,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyACC.setLastUpdatedBy(importUtil.getUserId());
         anyACC.setReleaseId(importUtil.getReleaseId());
         anyACC.setNamespaceId(importUtil.getNamespaceId());
-        accRepository.saveAndFlush(anyACC);
+        jpaRepositoryDefinitionHelper.saveAndFlush(anyACC);
 
         AssociationCoreComponentProperty anyASCCP = new AssociationCoreComponentProperty();
         anyASCCP.setGuid(Utility.generateGUID());
@@ -117,7 +120,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyASCCP.setLastUpdatedBy(importUtil.getUserId());
         anyASCCP.setReleaseId(importUtil.getReleaseId());
         anyASCCP.setNamespaceId(importUtil.getNamespaceId());
-        asccpRepository.saveAndFlush(anyASCCP);
+        jpaRepositoryDefinitionHelper.saveAndFlush(anyASCCP);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -387,7 +390,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setReleaseId(importUtil.getReleaseId());
         asccp.setReusableIndicator(reusableIndicator);
         asccp.setNillable(declaration.isNillable());
-        return asccpRepository.saveAndFlush(asccp);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(asccp);
     }
 
     private AggregateCoreComponent createACC(Declaration declaration) {
@@ -487,7 +490,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
         acc.setNamespaceId(importUtil.getNamespaceId());
         acc.setReleaseId(importUtil.getReleaseId());
-        return accRepository.saveAndFlush(acc);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(acc);
     }
 
     private AggregateCoreComponent doCreateACC(Declaration declaration) {
@@ -550,7 +553,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         ascc.setCreatedBy(importUtil.getUserId());
         ascc.setLastUpdatedBy(importUtil.getUserId());
         ascc.setOwnerUserId(importUtil.getUserId());
-        return asccRepository.saveAndFlush(ascc);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(ascc);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
@@ -609,7 +612,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             defaultValue = toBccp.getDefaultValue();
         }
         bcc.setDefaultValue(defaultValue);
-        bccRepository.saveAndFlush(bcc);
+        jpaRepositoryDefinitionHelper.saveAndFlush(bcc);
 
         return true;
     }
@@ -670,7 +673,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setReleaseId(importUtil.getReleaseId());
             bccp.setNamespaceId(importUtil.getNamespaceId());
             bccp.setNillable(declaration.isNillable());
-            bccp = bccpRepository.saveAndFlush(bccp);
+            bccp = jpaRepositoryDefinitionHelper.saveAndFlush(bccp);
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }

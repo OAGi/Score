@@ -54,6 +54,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
 
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
@@ -141,7 +144,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     if (baseInd > -1) {
                         cdtSCList.remove(baseInd);
                         logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This sc has corresponding base!");
-                        dtScRepository.saveAndFlush(vo);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                     } else {
                         String propertyTerm = "";
                         String representationTerm = "";
@@ -165,7 +168,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setRepresentationTerm(representationTerm);
                         vo.setDefinition(definition);
                         logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by default BDT is new from Attribute!");
-                        dtScRepository.saveAndFlush(vo);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                     }
                 }
 
@@ -188,7 +191,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setCardinalityMax(0);
                     vo.setBasedDtScId(baseCDTSC.getDtScId());
                     logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
-                    dtScRepository.saveAndFlush(vo);
+                    jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                 }
             }
         }
@@ -454,7 +457,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     if (baseInd > -1) {
                         baseDefaultDTSCs.remove(baseInd);
                         logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT has corresponding base!");
-                        dtScRepository.saveAndFlush(vo);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                     } else {
 
                         String propertyTerm = "";
@@ -480,7 +483,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setDefinition(definition);
                         logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-                        dtScRepository.saveAndFlush(vo);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(vo);
 
                         //if it has new attribute extension,
                         //it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map
@@ -521,7 +524,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                         logger.debug("");
                                     }
 
-                                    cdtScAwdPriRepository.saveAndFlush(cdtSCAP);
+                                    jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAP);
 
                                     CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
                                             cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
@@ -533,7 +536,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                         tmp.setXbtId(thisAPXTmap.getXbtId());
                                         tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
-                                        cdtScAwdPriXpsTypeMapRepository.saveAndFlush(tmp);
+                                        jpaRepositoryDefinitionHelper.saveAndFlush(tmp);
                                     }
                                 }
                                 break;//if this is hit, that means dt sc is mapped to cdt sc
@@ -560,7 +563,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setCardinalityMax(baseDefaultBDTSC.getCardinalityMax());
                     vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
                     logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
-                    dtScRepository.saveAndFlush(vo);
+                    jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                 }
             }
         }

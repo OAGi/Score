@@ -47,6 +47,9 @@ public class ExtensionService {
     @Autowired
     private CoreComponentService coreComponentService;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
                                                       AssociationCoreComponentProperty asccp, User user)
@@ -165,14 +168,14 @@ public class ExtensionService {
         ueAcc.setRevisionNum(0);
         ueAcc.setRevisionTrackingNum(0);
         ueAcc.setNamespaceId(namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10"));
-        return accRepository.saveAndFlush(ueAcc);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(ueAcc);
     }
 
     private AggregateCoreComponent updateStateACCForException(AggregateCoreComponent ueAcc, User currentLoginUser) {
         ueAcc.setState(Editing);
         ueAcc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
         ueAcc.setOwnerUserId(currentLoginUser.getAppUserId());
-        accRepository.save(ueAcc);
+        jpaRepositoryDefinitionHelper.save(ueAcc);
         return ueAcc;
     }
 
@@ -181,7 +184,7 @@ public class ExtensionService {
         accHistory.setRevisionNum(revisionNum);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(Insert);
-        accRepository.saveAndFlush(accHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(accHistory);
     }
 
     private AssociationCoreComponentProperty createASCCPForExtension(AggregateCoreComponent eAcc,
@@ -191,7 +194,7 @@ public class ExtensionService {
         ueAsccp.setPropertyTerm(ueAsccp.getPropertyTerm(), ueAcc);
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAsccp.setState(Published);
-        return asccpRepository.saveAndFlush(ueAsccp);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(ueAsccp);
     }
 
     private AssociationCoreComponentProperty updateASCCPForExtension(AggregateCoreComponent ueAcc, User currentLoginUser) {
@@ -203,12 +206,12 @@ public class ExtensionService {
         AssociationCoreComponentProperty asccp = asccpList.get(0);
         asccp.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
         asccp.setOwnerUserId(currentLoginUser.getAppUserId());
-        return asccpRepository.save(asccp);
+        return jpaRepositoryDefinitionHelper.save(asccp);
     }
 
     private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum) {
         AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp, revisionNum);
-        asccpRepository.saveAndFlush(asccpHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(asccpHistory);
     }
 
     private AssociationCoreComponent createASCCForExtension(AggregateCoreComponent eAcc,
@@ -219,7 +222,7 @@ public class ExtensionService {
         ueAscc.setCardinalityMin(1);
         ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
         ueAscc.setState(Published);
-        return asccRepository.saveAndFlush(ueAscc);
+        return jpaRepositoryDefinitionHelper.saveAndFlush(ueAscc);
     }
 
     private AssociationCoreComponent updateASCCForException(AggregateCoreComponent eAcc,
@@ -231,12 +234,12 @@ public class ExtensionService {
                 fromAccId, toAsccpId, 0, Published);
         ascc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
         ascc.setOwnerUserId(currentLoginUser.getAppUserId());
-        return asccRepository.save(ascc);
+        return jpaRepositoryDefinitionHelper.save(ascc);
     }
 
     private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum) {
         AssociationCoreComponent asccHistory = createASCCHistory(ueAscc, revisionNum);
-        asccRepository.saveAndFlush(asccHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(asccHistory);
     }
 
     private AssociationCoreComponentProperty createASCCP(AggregateCoreComponent ueAcc, User owner) {
@@ -408,10 +411,10 @@ public class ExtensionService {
 
         int seqKey = nextSeqKey(pAcc);
         AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
-        asccRepository.saveAndFlush(tAscc);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAscc);
 
         AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc, tAscc.getRevisionNum() + 1);
-        asccRepository.saveAndFlush(tAsccHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAsccHistory);
 
         return new AppendAsccResult(tAscc, tAsccHistory);
     }
@@ -457,17 +460,17 @@ public class ExtensionService {
     @Transactional(rollbackFor = Throwable.class)
     public CreateAsccResult createAsccTo(AggregateCoreComponent pAcc, User user) {
         AssociationCoreComponentProperty tAsccp = createASCCP(pAcc, user);
-        asccpRepository.saveAndFlush(tAsccp);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAsccp);
 
         AssociationCoreComponentProperty tAsccpHistory = createASCCPHistory(tAsccp, tAsccp.getRevisionNum() + 1);
-        asccpRepository.saveAndFlush(tAsccpHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAsccpHistory);
 
         int seqKey = nextSeqKey(pAcc);
         AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
-        asccRepository.saveAndFlush(tAscc);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAscc);
 
         AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc, tAscc.getRevisionNum() + 1);
-        asccRepository.saveAndFlush(tAsccHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tAsccHistory);
 
         return new CreateAsccResult(tAsccp, tAsccpHistory, tAscc, tAsccHistory);
     }
@@ -499,10 +502,10 @@ public class ExtensionService {
                                        User user) {
         int seqKey = nextSeqKey(pAcc);
         BasicCoreComponent tBcc = createBCC(pAcc, tBccp, user, seqKey);
-        bccRepository.saveAndFlush(tBcc);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tBcc);
 
         BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
-        bccRepository.saveAndFlush(tBccHistory);
+        jpaRepositoryDefinitionHelper.saveAndFlush(tBccHistory);
 
         return new AppendBccResult(tBcc, tBccHistory);
     }
@@ -549,12 +552,12 @@ public class ExtensionService {
     public CreateBccResult createBccTo(AggregateCoreComponent pAcc, User user, DataType tBdt) {
         BasicCoreComponentProperty tBccp = createBCCP(pAcc, user, tBdt);
         BasicCoreComponentProperty tBccpHistory = createBCCPHistory(tBccp);
-        bccpRepository.save(Arrays.asList(tBccp, tBccpHistory));
+        jpaRepositoryDefinitionHelper.save(Arrays.asList(tBccp, tBccpHistory));
 
         int seqKey = nextSeqKey(pAcc);
         BasicCoreComponent tBcc = createBCC(pAcc, tBccp, user, seqKey);
         BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
-        bccRepository.save(Arrays.asList(tBcc, tBccHistory));
+        jpaRepositoryDefinitionHelper.save(Arrays.asList(tBcc, tBccHistory));
 
         return new CreateBccResult(tBccp, tBccpHistory, tBcc, tBccHistory);
     }

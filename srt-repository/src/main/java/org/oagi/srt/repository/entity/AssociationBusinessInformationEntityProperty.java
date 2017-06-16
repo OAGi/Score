@@ -1,7 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -44,9 +44,10 @@ public class AssociationBusinessInformationEntityProperty
     @Transient
     private AggregateBusinessInformationEntity roleOfAbie;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -81,6 +82,11 @@ public class AssociationBusinessInformationEntityProperty
     @Override
     public void setId(long id) {
         setAsbiepId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "ASBIEP";
     }
 
     public long getAsbiepId() {
@@ -127,8 +133,24 @@ public class AssociationBusinessInformationEntityProperty
         this.roleOfAbie = roleOfAbie;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
@@ -136,9 +158,13 @@ public class AssociationBusinessInformationEntityProperty
             definition = definition.trim();
         }
         if (StringUtils.isEmpty(definition)) {
-            definition = null;
+            return;
         }
-        this.definition = definition;
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public String getRemark() {
@@ -217,6 +243,43 @@ public class AssociationBusinessInformationEntityProperty
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        int result = (int) (asbiepId ^ (asbiepId >>> 32));
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
+        result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntityProperty{" +
+                "asbiepId=" + asbiepId +
+                ", guid='" + guid + '\'' +
+                ", basedAsccpId=" + basedAsccpId +
+                ", roleOfAbieId=" + roleOfAbieId +
+                ", definitionId=" + definitionId +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                '}';
+    }
+
     @Transient
     private transient List<PersistEventListener> persistEventListeners;
 
@@ -245,6 +308,11 @@ public class AssociationBusinessInformationEntityProperty
             public void onPostPersist(Object object) {
                 AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
                 asbiep.afterLoaded();
+
+                if (asbiep.definition != null) {
+                    asbiep.definition.setRefId(getId());
+                    asbiep.definition.setRefTableName(tableName());
+                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -335,7 +403,7 @@ public class AssociationBusinessInformationEntityProperty
         clone.guid = this.guid;
         clone.basedAsccpId = this.basedAsccpId;
         clone.roleOfAbieId = this.roleOfAbieId;
-        clone.definition = this.definition;
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         return clone;

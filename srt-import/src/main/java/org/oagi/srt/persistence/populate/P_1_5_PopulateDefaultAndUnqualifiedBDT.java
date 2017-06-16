@@ -76,6 +76,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
     @Autowired
     private ImportUtil importUtil;
 
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
+
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_5_PopulateDefaultAndUnqualifiedBDT populateBDTsInDT = ctx.getBean(P_1_5_PopulateDefaultAndUnqualifiedBDT.class);
@@ -254,7 +257,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO.setReleaseId(importUtil.getReleaseId());
             dtVO.setModule(module);
 
-            dtVO = dataTypeRepository.saveAndFlush(dtVO);
+            dtVO = jpaRepositoryDefinitionHelper.saveAndFlush(dtVO);
         }
 
         return dtVO;
@@ -281,7 +284,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                     aBDT_Primitive_RestrictionVO.setDefault(isDefault);
                     logger.debug("Inserting allowed primitive expression type map with XSD built-in type in DefaultBDT" +
                             getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = " + isDefault);
-                    bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
+                    jpaRepositoryDefinitionHelper.saveAndFlush(aBDT_Primitive_RestrictionVO);
                 }
             }
         } else {
@@ -292,7 +295,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
                 aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
                 logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
-                bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
+                jpaRepositoryDefinitionHelper.saveAndFlush(aBDT_Primitive_RestrictionVO);
             }
         }
 
@@ -328,7 +331,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO.setDeprecated(false);
             dtVO.setReleaseId(importUtil.getReleaseId());
             dtVO.setModule(module);
-            dtVO = dataTypeRepository.saveAndFlush(dtVO);
+            dtVO = jpaRepositoryDefinitionHelper.saveAndFlush(dtVO);
         }
 
         return dtVO;
@@ -585,7 +588,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                         aBDT_Primitive_RestrictionVO.setDefault(true);
                         logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
                                 getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
-                        bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(aBDT_Primitive_RestrictionVO);
                     }
 
                     if (isTimePoint && idOfXsdToken == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) {
@@ -595,7 +598,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                         aBDT_Primitive_RestrictionVO.setDefault(false);
                         logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
                                 getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = false");
-                        bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
+                        jpaRepositoryDefinitionHelper.saveAndFlush(aBDT_Primitive_RestrictionVO);
                     }
 
                     //TODO: logic for default BDTs which don't have base type and only have union
@@ -609,7 +612,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
                 aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
                 logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
-                bdtPriRestriRepository.saveAndFlush(aBDT_Primitive_RestrictionVO);
+                jpaRepositoryDefinitionHelper.saveAndFlush(aBDT_Primitive_RestrictionVO);
             }
         }
     }
@@ -790,7 +793,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             if (baseInd > -1) {
                 cdtSCList.remove(baseInd);
                 logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This sc has corresponding base!");
-                dtScRepository.saveAndFlush(vo);
+                jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                 populateBDTSCPrimitiveRestrictionWithAttribute(attrElement, vo);
             } else {
                 String propertyTerm = "";
@@ -815,7 +818,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 vo.setRepresentationTerm(representationTerm);
                 vo.setDefinition(definition);
                 logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by default BDT is new from Attribute!");
-                dtScRepository.saveAndFlush(vo);
+                jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                 populateBDTSCPrimitiveRestrictionWithAttribute(attrElement, vo);
             }
 
@@ -841,7 +844,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtSc.setCardinalityMax(0);
             dtSc.setBasedDtScId(baseCDTSC.getDtScId());
             logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
-            dtScRepository.saveAndFlush(dtSc);
+            jpaRepositoryDefinitionHelper.saveAndFlush(dtSc);
             inheritCDTSCAllowedPrimitiveRestriction(dtSc);
         }
     }
@@ -931,7 +934,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             if (baseInd > -1) {
                 baseDefaultDTSCs.remove(baseInd);
                 logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT has corresponding base!");
-                dtScRepository.saveAndFlush(vo);
+                jpaRepositoryDefinitionHelper.saveAndFlush(vo);
                 populateBDTSCPrimitiveRestrictionWithAttribute(attrElement, vo);
             } else {
 
@@ -956,7 +959,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 vo.setDefinition(definition);
                 logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-                dtScRepository.saveAndFlush(vo);
+                jpaRepositoryDefinitionHelper.saveAndFlush(vo);
 
 
                 //if it has new attribute extension,
@@ -985,7 +988,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                                 logger.debug("");
                             }
 
-                            cdtScAwdPriRepository.saveAndFlush(cdtSCAP);
+                            jpaRepositoryDefinitionHelper.saveAndFlush(cdtSCAP);
 
                             CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
                                     cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
@@ -997,7 +1000,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                                 CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                 tmp.setXbtId(thisAPXTmap.getXbtId());
                                 tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
-                                cdtScAwdPriXpsTypeMapRepository.saveAndFlush(tmp);
+                                jpaRepositoryDefinitionHelper.saveAndFlush(tmp);
                             }
                         }
                         break;//if this is hit, that means dt sc is mapped to cdt sc
@@ -1025,7 +1028,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             vo.setCardinalityMax(baseDefaultBDTSC.getCardinalityMax());
             vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
-            dtScRepository.saveAndFlush(vo);
+            jpaRepositoryDefinitionHelper.saveAndFlush(vo);
             inheritBDTSCPrimitiveRestriction(vo, xh, xh2);
         }
     }
@@ -1042,7 +1045,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
             bdtSCPri.setCodeListId(isCodeList.getCodeListId());
-            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
             bdtScPriRestiList.add(bdtSCPri);
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -1050,7 +1053,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             long mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
-            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
             bdtScPriRestiList.add(bdtSCPri);
 
         } else if (type.equals(AGENCY_IDENTIFICATION_NAME + "ContentType")) {
@@ -1060,7 +1063,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
             bdtSCPri.setAgencyIdListId(agencyIdList.getAgencyIdListId());
-            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
             bdtScPriRestiList.add(bdtSCPri);
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -1068,7 +1071,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             long mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
-            bdtSCPri = bdtScPriRestriRepository.saveAndFlush(bdtSCPri);
+            bdtSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(bdtSCPri);
             bdtScPriRestiList.add(bdtSCPri);
         } else {
             List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3 = cdtScAwdPriRepository.findByCdtScId(getCDTSCAncestor(dtSc));
@@ -1089,7 +1092,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                         bVO.setDefault(false);
                     }
 
-                    bVO = bdtScPriRestriRepository.saveAndFlush(bVO);
+                    bVO = jpaRepositoryDefinitionHelper.saveAndFlush(bVO);
                     bdtScPriRestiList.add(bVO);
                 }
             }
@@ -1174,7 +1177,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 } else {
                     inputBDTSCPri.setDefault(false);
                 }
-                inputBDTSCPri = bdtScPriRestriRepository.saveAndFlush(inputBDTSCPri);
+                inputBDTSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(inputBDTSCPri);
                 bdtScPriRestiList.add(inputBDTSCPri);
             }
         }
@@ -1199,7 +1202,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             inputBDTSCPri.setAgencyIdListId(baseBDTSCPri.getAgencyIdListId());
             inputBDTSCPri.setCodeListId(baseBDTSCPri.getCodeListId());
             inputBDTSCPri.setCdtScAwdPriXpsTypeMapId(baseBDTSCPri.getCdtScAwdPriXpsTypeMapId());
-            inputBDTSCPri = bdtScPriRestriRepository.saveAndFlush(inputBDTSCPri);
+            inputBDTSCPri = jpaRepositoryDefinitionHelper.saveAndFlush(inputBDTSCPri);
             bdtScPriRestiList.add(inputBDTSCPri);
         }
 

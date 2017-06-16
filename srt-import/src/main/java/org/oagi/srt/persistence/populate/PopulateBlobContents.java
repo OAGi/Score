@@ -3,6 +3,7 @@ package org.oagi.srt.persistence.populate;
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BlobContentRepository;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.BlobContent;
@@ -38,6 +39,9 @@ public class PopulateBlobContents {
     private ModuleRepository moduleRepository;
 
     private File baseDataDirectory;
+
+    @Autowired
+    private JpaRepositoryDefinitionHelper jpaRepositoryDefinitionHelper;
 
     @PostConstruct
     public void init() throws IOException {
@@ -85,7 +89,7 @@ public class PopulateBlobContents {
             Module module = moduleRepository.findByModule(moduleName);
             blobContent.setModule(module);
             blobContent.setReleaseId(release.getReleaseId());
-            blobContentRepository.saveAndFlush(blobContent);
+            jpaRepositoryDefinitionHelper.saveAndFlush(blobContent);
         }
     }
 

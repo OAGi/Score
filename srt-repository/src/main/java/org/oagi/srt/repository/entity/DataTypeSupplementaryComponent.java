@@ -1,13 +1,20 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "dt_sc")
-public class DataTypeSupplementaryComponent implements Serializable {
+public class DataTypeSupplementaryComponent implements IDefinition, Serializable {
 
     public static final String SEQUENCE_NAME = "DT_SC_ID_SEQ";
 
@@ -33,9 +40,10 @@ public class DataTypeSupplementaryComponent implements Serializable {
     @Column(length = 20)
     private String representationTerm;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column(nullable = false)
     private long ownerDtId;
@@ -48,6 +56,25 @@ public class DataTypeSupplementaryComponent implements Serializable {
 
     @Column
     private Long basedDtScId;
+
+    public DataTypeSupplementaryComponent() {
+        init();
+    }
+
+    @Override
+    public long getId() {
+        return getDtScId();
+    }
+
+    @Override
+    public void setId(long id) {
+        setDtScId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "DT_SC";
+    }
 
     public long getDtScId() {
         return dtScId;
@@ -81,12 +108,38 @@ public class DataTypeSupplementaryComponent implements Serializable {
         this.representationTerm = representationTerm;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public long getOwnerDtId() {
@@ -143,7 +196,7 @@ public class DataTypeSupplementaryComponent implements Serializable {
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (int) (ownerDtId ^ (ownerDtId >>> 32));
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -158,11 +211,104 @@ public class DataTypeSupplementaryComponent implements Serializable {
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", representationTerm='" + representationTerm + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", ownerDtId=" + ownerDtId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", basedDtScId=" + basedDtScId +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    private void init() {
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                DataTypeSupplementaryComponent dtSc = (DataTypeSupplementaryComponent) object;
+                dtSc.afterLoaded();
+
+                if (dtSc.definition != null) {
+                    dtSc.definition.setRefId(getId());
+                    dtSc.definition.setRefTableName(tableName());
+                }
+            }
+        });
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

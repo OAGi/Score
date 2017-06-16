@@ -1,13 +1,17 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
+import org.oagi.srt.repository.JpaRepositoryDefinitionHelper;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -42,9 +46,10 @@ public class AggregateCoreComponent
     @Column(nullable = false, length = 200)
     private String den;
 
-    @Lob
-    @Column(length = 10 * 1024)
-    private String definition;
+    @Column
+    private Long definitionId;
+    @Transient
+    private Definition definition;
 
     @Column
     private Long basedAccId;
@@ -116,15 +121,19 @@ public class AggregateCoreComponent
         this.den = den;
     }
 
-    public AggregateCoreComponent(long accId, Long basedAccId, String definition) {
-        init();
+    @Override
+    public long getId() {
+        return getAccId();
+    }
 
-        this.accId = accId;
-        if (basedAccId != null) {
+    @Override
+    public void setId(long id) {
+        setAccId(id);
+    }
 
-        }
-        this.basedAccId = basedAccId;
-        this.definition = definition;
+    @Override
+    public String tableName() {
+        return "ACC";
     }
 
     public long getAccId() {
@@ -160,12 +169,38 @@ public class AggregateCoreComponent
         this.den = den;
     }
 
+    public Long getDefinitionId() {
+        return definitionId;
+    }
+
+    public void setDefinitionId(Long definitionId) {
+        this.definitionId = definitionId;
+    }
+
     public String getDefinition() {
-        return definition;
+        return (this.definition != null) ? this.definition.getDefinition() : null;
+    }
+
+    public Definition getRawDefinition() {
+        return this.definition;
+    }
+
+    public void setRawDefinition(Definition definition) {
+        this.definition = definition;
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        if (this.definition == null) {
+            this.definition = new Definition();
+        }
+        this.definition.setDefinition(definition);
     }
 
     public long getBasedAccId() {
@@ -341,7 +376,7 @@ public class AggregateCoreComponent
         clone.setGuid(this.guid);
         clone.setObjectClassTerm(this.objectClassTerm);
         clone.setDen(this.den);
-        clone.setDefinition(this.definition);
+        clone.definition = JpaRepositoryDefinitionHelper.cloneDefinition(this);
         if (this.basedAccId != null) {
             clone.setBasedAccId(this.basedAccId);
         }
@@ -397,7 +432,7 @@ public class AggregateCoreComponent
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
@@ -426,7 +461,7 @@ public class AggregateCoreComponent
                 ", guid='" + guid + '\'' +
                 ", objectClassTerm='" + objectClassTerm + '\'' +
                 ", den='" + den + '\'' +
-                ", definition='" + definition + '\'' +
+                ", definitionId='" + definitionId + '\'' +
                 ", basedAccId=" + basedAccId +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
                 ", oagisComponentType=" + oagisComponentType +
@@ -457,6 +492,22 @@ public class AggregateCoreComponent
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                AggregateCoreComponent acc = (AggregateCoreComponent) object;
+                acc.afterLoaded();
+
+                if (acc.definition != null) {
+                    acc.definition.setRefId(getId());
+                    acc.definition.setRefTableName(tableName());
+                }
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

@@ -1,6 +1,6 @@
 package org.oagi.srt.repository.entity;
 
-public interface CoreComponent extends TimestampAware {
+public interface CoreComponent extends IDefinition, TimestampAware {
 
     public String getGuid();
 
