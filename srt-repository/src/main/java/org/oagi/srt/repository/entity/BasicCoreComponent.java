@@ -15,7 +15,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "bcc")
-public class BasicCoreComponent
+public class BasicCoreComponent extends DefinitionBase
         implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
@@ -57,11 +57,6 @@ public class BasicCoreComponent
 
     @Column(nullable = false)
     private String den;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -214,40 +209,6 @@ public class BasicCoreComponent
         setDen(acc.getObjectClassTerm() + ". " + bccp.getDen());
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public long getCreatedBy() {
         return createdBy;
     }
@@ -374,7 +335,7 @@ public class BasicCoreComponent
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.setCreatedBy(this.createdBy);
@@ -427,6 +388,7 @@ public class BasicCoreComponent
         result = 31 * result + (entityType != null ? entityType.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));

@@ -51,10 +51,19 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
     }
 
+    private Field getDeclaredField(Class<?> clazz, String propertyName) throws NoSuchFieldException {
+        try {
+            return clazz.getDeclaredField(propertyName);
+        } catch (NoSuchFieldException e) {
+            clazz = clazz.getSuperclass();
+            return clazz.getDeclaredField(propertyName);
+        }
+    }
+
     private String getPropertyName(Object entity, String propertyName) {
         Class<?> clazz = entity.getClass();
         try {
-            Field field = clazz.getDeclaredField(propertyName);
+            Field field = getDeclaredField(clazz, propertyName);
             Column column = field.getDeclaredAnnotation(Column.class);
             if (column == null) {
                 return propertyName;

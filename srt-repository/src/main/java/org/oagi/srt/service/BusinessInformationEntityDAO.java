@@ -31,6 +31,9 @@ public class BusinessInformationEntityDAO extends AbstractDefinitionDAO {
     @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
+    @Autowired
+    private TopLevelAbieRepository topLevelAbieRepository;
+
     @Transactional
     public AggregateBusinessInformationEntity save(AggregateBusinessInformationEntity abie) {
         return save(abie, abieRepository);
@@ -100,6 +103,38 @@ public class BusinessInformationEntityDAO extends AbstractDefinitionDAO {
     public List<AggregateBusinessInformationEntity> findAbieByBasedAccId(long basedAccId) {
         List<AggregateBusinessInformationEntity> results = abieRepository.findByBasedAccId(basedAccId);
         return loadDefinition(results);
+    }
+
+    @Transactional
+    public void deleteProfileBOD(long topLevelAbieId) {
+        List<Long> definitionIds;
+
+        definitionIds = asbieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        asbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        definitionIds = asbiepRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        asbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        definitionIds = bbieScRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        bbieScRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        definitionIds = bbieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        bbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        definitionIds = bbiepRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        bbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        topLevelAbieRepository.updateAbieToNull(topLevelAbieId);
+        definitionIds = abieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
+        deleteDefinitions(definitionIds);
+        abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        topLevelAbieRepository.delete(topLevelAbieId);
     }
 
 }

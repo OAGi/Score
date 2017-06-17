@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -13,7 +16,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "abie")
-public class AggregateBusinessInformationEntity
+public class AggregateBusinessInformationEntity extends DefinitionBase
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
@@ -46,11 +49,6 @@ public class AggregateBusinessInformationEntity
 
     @Transient
     private String bizCtxName;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -151,40 +149,6 @@ public class AggregateBusinessInformationEntity
 
     public void setBizCtxName(String bizCtxName) {
         this.bizCtxName = bizCtxName;
-    }
-
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
     }
 
     public long getCreatedBy() {
@@ -305,6 +269,7 @@ public class AggregateBusinessInformationEntity
         result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
@@ -483,7 +448,7 @@ public class AggregateBusinessInformationEntity
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.state = this.state;

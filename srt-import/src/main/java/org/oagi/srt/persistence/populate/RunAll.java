@@ -98,6 +98,7 @@ public class RunAll {
                 CodeListValue.class,
                 DataType.class,
                 DataTypeSupplementaryComponent.class,
+                Definition.class,
                 ModuleDep.class,
                 Module.class,
                 Namespace.class,

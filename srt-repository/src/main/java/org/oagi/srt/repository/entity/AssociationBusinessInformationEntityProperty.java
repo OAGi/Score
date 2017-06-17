@@ -12,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "asbiep")
-public class AssociationBusinessInformationEntityProperty
+public class AssociationBusinessInformationEntityProperty extends DefinitionBase
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASBIEP_ID_SEQ";
@@ -42,11 +42,6 @@ public class AssociationBusinessInformationEntityProperty
     private long roleOfAbieId;
     @Transient
     private AggregateBusinessInformationEntity roleOfAbie;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -132,40 +127,6 @@ public class AssociationBusinessInformationEntityProperty
         this.roleOfAbie = roleOfAbie;
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public String getRemark() {
         return remark;
     }
@@ -249,6 +210,7 @@ public class AssociationBusinessInformationEntityProperty
         result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
         result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -405,7 +367,7 @@ public class AssociationBusinessInformationEntityProperty
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.remark = this.remark;

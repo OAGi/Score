@@ -1,12 +1,15 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -15,7 +18,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent
+public class AggregateCoreComponent extends DefinitionBase
         implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
@@ -41,11 +44,6 @@ public class AggregateCoreComponent
 
     @Column(nullable = false, length = 200)
     private String den;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column
     private Long basedAccId;
@@ -163,40 +161,6 @@ public class AggregateCoreComponent
 
     public void setDen(String den) {
         this.den = den;
-    }
-
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
     }
 
     public long getBasedAccId() {
@@ -375,7 +339,7 @@ public class AggregateCoreComponent
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         if (this.basedAccId != null) {
@@ -434,6 +398,7 @@ public class AggregateCoreComponent
         result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);

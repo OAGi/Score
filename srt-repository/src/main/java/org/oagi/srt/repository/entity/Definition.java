@@ -116,10 +116,8 @@ public class Definition implements Serializable {
     @Override
     public int hashCode() {
         int result = definitionId != null ? definitionId.hashCode() : 0;
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
-        result = 31 * result + (refId != null ? refId.hashCode() : 0);
-        result = 31 * result + (refTableName != null ? refTableName.hashCode() : 0);
         result = 31 * result + (languageCode != null ? languageCode.hashCode() : 0);
         return result;
     }
@@ -141,14 +139,12 @@ public class Definition implements Serializable {
         Definition clone = new Definition();
         clone.definition = this.definition;
         clone.definitionSource = this.definitionSource;
-        clone.refId = refId;
-        clone.refTableName = refTableName;
         clone.languageCode = languageCode;
         return clone;
     }
 
     @Transient
-    private int hashCodeAfterLoaded;
+    private int hashCodeAfterLoaded = hashCode();
 
     @PostLoad
     public void afterLoaded() {
@@ -157,5 +153,15 @@ public class Definition implements Serializable {
 
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
+    }
+
+    public boolean isEmpty() {
+        if (!StringUtils.isEmpty(definition)) {
+            return false;
+        }
+        if (!StringUtils.isEmpty(definitionSource)) {
+            return false;
+        }
+        return true;
     }
 }

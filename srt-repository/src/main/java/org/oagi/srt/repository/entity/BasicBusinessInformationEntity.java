@@ -14,7 +14,7 @@ import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestr
 
 @Entity
 @Table(name = "bbie")
-public class BasicBusinessInformationEntity
+public class BasicBusinessInformationEntity extends DefinitionBase
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable, Serializable {
 
     public static final String SEQUENCE_NAME = "BBIE_ID_SEQ";
@@ -77,11 +77,6 @@ public class BasicBusinessInformationEntity
 
     @Column(name = "is_null", nullable = false)
     private boolean nill;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(length = 225)
     private String remark;
@@ -307,40 +302,6 @@ public class BasicBusinessInformationEntity
         this.nill = nill;
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public String getRemark() {
         return remark;
     }
@@ -480,6 +441,7 @@ public class BasicBusinessInformationEntity
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
         result = 31 * result + (nill ? 1 : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
@@ -695,7 +657,7 @@ public class BasicBusinessInformationEntity
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.remark = this.remark;

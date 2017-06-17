@@ -754,16 +754,7 @@ public class BusinessInformationEntityService {
 
     @Transactional(rollbackFor = Throwable.class)
     public void deleteProfileBOD(long topLevelAbieId) {
-        asbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        asbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbiescRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        topLevelAbieRepository.updateAbieToNull(topLevelAbieId);
-        abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        topLevelAbieRepository.delete(topLevelAbieId);
+        bieDAO.deleteProfileBOD(topLevelAbieId);
     }
 
     @Transactional(rollbackFor = Throwable.class)

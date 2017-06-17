@@ -738,7 +738,7 @@ public class NodeService {
             abie.setGuid(abieGuid);
             abie.setBasedAcc(acc);
             abie.setBizCtx(bizCtx);
-            abie.setDefinition(acc.getDefinition());
+            abie.setRawDefinition(acc.getRawDefinition().clone());
             abie.afterLoaded();
 
             return abie;
@@ -1041,7 +1041,7 @@ public class NodeService {
             asbie.setBasedAsccId(ascc.getAsccId());
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
-            asbie.setDefinition(ascc.getDefinition());
+            asbie.setRawDefinition(ascc.getRawDefinition().clone());
             asbie.setSeqKey(seqKey);
             asbie.afterLoaded();
             return asbie;
@@ -1053,7 +1053,7 @@ public class NodeService {
             asbiep.setGuid(Utility.generateGUID());
             asbiep.setBasedAsccp(asccp);
             asbiep.setRoleOfAbie(roleOfAbie);
-            asbiep.setDefinition(asccp.getDefinition());
+            asbiep.setRawDefinition(asccp.getRawDefinition().clone());
             asbiep.afterLoaded();
             return asbiep;
         }
@@ -1239,7 +1239,7 @@ public class NodeService {
 
                         bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
                         bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
-                        bbieSc.setDefinition(dtSc.getDefinition());
+                        bbieSc.setRawDefinition(dtSc.getRawDefinition().clone());
                         bbieSc.afterLoaded();
                     }
 
@@ -1289,7 +1289,7 @@ public class NodeService {
             BasicBusinessInformationEntityProperty bbiep = new BasicBusinessInformationEntityProperty();
             bbiep.setGuid(Utility.generateGUID());
             bbiep.setBasedBccp(bccp);
-            bbiep.setDefinition(bccp.getDefinition());
+            bbiep.setRawDefinition(bccp.getRawDefinition().clone());
             bbiep.afterLoaded();
             return bbiep;
         }
@@ -1313,7 +1313,7 @@ public class NodeService {
 //                bbie.setCodeListId(codeListId);
 //            }
             bbie.setSeqKey(seqKey);
-            bbie.setDefinition(bcc.getDefinition());
+            bbie.setRawDefinition(bcc.getRawDefinition().clone());
             bbie.afterLoaded();
             return bbie;
         }
@@ -1896,20 +1896,11 @@ public class NodeService {
             AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
             AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
 
-            if (asbie != null && asbie.getAsbieId() > 0L && asbie.isDirty()) {
+            if (asbie != null && (asbie.isDirty() || asbie.getAsbieId() == 0L)) {
                 asbieList.add(asbie);
-            } else if (asbiep != null && asbiep.getAsbiepId() > 0L && asbiep.isDirty()) {
+            }
+            if (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() == 0L)) {
                 asbiepList.add(asbiep);
-            } else {
-                if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() == 0L)) ||
-                    (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() == 0L))) {
-                    if (asbie != null) {
-                        asbieList.add(asbie);
-                    }
-                    if (asbiep != null) {
-                        asbiepList.add(asbiep);
-                    }
-                }
             }
         }
 
@@ -1918,18 +1909,11 @@ public class NodeService {
             BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
             BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBbiep();
 
-            if (bbie != null && bbie.getBbieId() > 0L && bbie.isDirty()) {
+            if (bbie != null && (bbie.isDirty() || bbie.getBbieId() == 0L)) {
                 bbieList.add(bbie);
-            } else if (bbiep != null && bbiep.getBbiepId() > 0L && bbiep.isDirty()) {
+            }
+            if (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() == 0L)) {
                 bbiepList.add(bbiep);
-            } else if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() == 0L)) ||
-                       (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() == 0L))) {
-                if (bbie != null) {
-                    bbieList.add(bbie);
-                }
-                if (bbiep != null) {
-                    bbiepList.add(bbiep);
-                }
             }
         }
 

@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -14,7 +17,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "asccp")
-public class AssociationCoreComponentProperty
+public class AssociationCoreComponentProperty extends DefinitionBase
         implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
@@ -37,11 +40,6 @@ public class AssociationCoreComponentProperty
 
     @Column(nullable = false)
     private String propertyTerm;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column
     private Long roleOfAccId;
@@ -152,40 +150,6 @@ public class AssociationCoreComponentProperty
     public void setPropertyTerm(String propertyTerm, AggregateCoreComponent roleOfAcc) {
         setPropertyTerm(propertyTerm);
         setRoleOfAcc(roleOfAcc);
-    }
-
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
     }
 
     public long getRoleOfAccId() {
@@ -352,7 +316,7 @@ public class AssociationCoreComponentProperty
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.setRoleOfAccId(this.roleOfAccId);
@@ -406,6 +370,7 @@ public class AssociationCoreComponentProperty
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (int) (roleOfAccId ^ (roleOfAccId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));

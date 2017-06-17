@@ -15,7 +15,8 @@ import java.util.*;
 
 @Entity
 @Table(name = "dt")
-public class DataType implements IDefinition, TimestampAware, Serializable {
+public class DataType  extends DefinitionBase
+        implements IDefinition, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 
@@ -59,11 +60,6 @@ public class DataType implements IDefinition, TimestampAware, Serializable {
 
     @Column(length = 200)
     private String contentComponentDen;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -223,40 +219,6 @@ public class DataType implements IDefinition, TimestampAware, Serializable {
         this.contentComponentDen = contentComponentDen;
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public String getContentComponentDefinition() {
         return contentComponentDefinition;
     }
@@ -408,6 +370,7 @@ public class DataType implements IDefinition, TimestampAware, Serializable {
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (contentComponentDen != null ? contentComponentDen.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);

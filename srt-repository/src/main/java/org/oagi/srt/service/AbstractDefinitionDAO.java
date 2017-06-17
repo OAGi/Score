@@ -71,39 +71,47 @@ public class AbstractDefinitionDAO {
 
     @Transactional
     public <T extends IDefinition> T save(T entity, JpaRepository<T, Long> jpaRepository) {
-        Definition definition = null;
+        Definition definition;
         Long id = entity.getId();
-
         if (id != null && id > 0L) { // update
+            definition = saveDefinition(entity);
             entity = jpaRepository.save(entity);
-            definition = entity.getRawDefinition();
         } else { // insert
             entity = jpaRepository.saveAndFlush(entity);
-            id = entity.getId();
-
-            Long definitionId = entity.getDefinitionId();
-            if (definitionId == null || definitionId == 0L) {
-                definition = entity.getRawDefinition();
-                if (definition != null) {
-                    definition.setRefId(id);
-                    definition.setRefTableName(entity.tableName());
-                }
-            }
+            definition = saveDefinition(entity);
         }
 
-        if (definition != null && definition.isDirty()) {
-            definition = definitionRepository.save(definition);
-            definition.afterLoaded();
-
+        if (definition != null) {
             entity.setRawDefinition(definition);
-            Long definitionId = definition.getDefinitionId();
-            if (!definitionId.equals(entity.getDefinitionId())) {
+            if (entity.getDefinitionId() == null) {
                 entity.setDefinitionId(definition.getDefinitionId());
                 entity = jpaRepository.save(entity);
+            }
+
+            Long definitionId = definition.getDefinitionId();
+            if (!definitionId.equals(entity.getDefinitionId())) {
+                throw new IllegalStateException();
             }
         }
 
         return entity;
+    }
+
+    private Definition saveDefinition(IDefinition entity) {
+        Definition definition = entity.getRawDefinition();
+        if (definition != null) {
+            if (definition.getRefId() == null) {
+                definition.setRefId(entity.getId());
+                definition.setRefTableName(entity.tableName());
+            }
+
+            if (definition.isDirty()) {
+                definition = definitionRepository.saveAndFlush(definition);
+                definition.afterLoaded();
+            }
+        }
+
+        return (definition.getDefinitionId() != null) ? definition : null;
     }
 
     @Transactional
@@ -117,6 +125,14 @@ public class AbstractDefinitionDAO {
 
     @Transactional
     public void deleteDefinitions(List<Long> definitionIds) {
+        if (definitionIds == null) {
+            return;
+        }
+        definitionIds = definitionIds.stream()
+                .filter(e -> e != null)
+                .distinct()
+                .collect(Collectors.toList());
+
         if (definitionIds.isEmpty()) {
             return;
         }

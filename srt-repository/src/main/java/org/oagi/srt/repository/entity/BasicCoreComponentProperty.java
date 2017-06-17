@@ -14,7 +14,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty
+public class BasicCoreComponentProperty extends DefinitionBase
         implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
@@ -48,11 +48,6 @@ public class BasicCoreComponentProperty
 
     @Column(nullable = false, length = 200)
     private String den;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column
     private Long moduleId;
@@ -231,40 +226,6 @@ public class BasicCoreComponentProperty
         this.den = den;
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public long getModuleId() {
         return (moduleId == null) ? 0L : moduleId;
     }
@@ -405,7 +366,7 @@ public class BasicCoreComponentProperty
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.setDen(this.den);
@@ -463,6 +424,7 @@ public class BasicCoreComponentProperty
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);

@@ -14,7 +14,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "dt_sc")
-public class DataTypeSupplementaryComponent implements IDefinition, Serializable {
+public class DataTypeSupplementaryComponent extends DefinitionBase
+        implements IDefinition, Serializable {
 
     public static final String SEQUENCE_NAME = "DT_SC_ID_SEQ";
 
@@ -39,11 +40,6 @@ public class DataTypeSupplementaryComponent implements IDefinition, Serializable
 
     @Column(length = 20)
     private String representationTerm;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(nullable = false)
     private long ownerDtId;
@@ -108,40 +104,6 @@ public class DataTypeSupplementaryComponent implements IDefinition, Serializable
         this.representationTerm = representationTerm;
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public long getOwnerDtId() {
         return ownerDtId;
     }
@@ -197,6 +159,7 @@ public class DataTypeSupplementaryComponent implements IDefinition, Serializable
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (int) (ownerDtId ^ (ownerDtId >>> 32));
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;

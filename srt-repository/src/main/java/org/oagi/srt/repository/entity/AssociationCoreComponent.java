@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -14,7 +17,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "ascc")
-public class AssociationCoreComponent
+public class AssociationCoreComponent extends DefinitionBase
         implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
@@ -52,11 +55,6 @@ public class AssociationCoreComponent
 
     @Column(nullable = false, length = 200)
     private String den;
-
-    @Column
-    private Long definitionId;
-    @Transient
-    private Definition definition;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
@@ -195,40 +193,6 @@ public class AssociationCoreComponent
         setDen(acc.getObjectClassTerm() + ". " + asccp.getDen());
     }
 
-    public Long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(Long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    public String getDefinition() {
-        return (this.definition != null) ? this.definition.getDefinition() : null;
-    }
-
-    public Definition getRawDefinition() {
-        return this.definition;
-    }
-
-    public void setRawDefinition(Definition definition) {
-        this.definition = definition;
-    }
-
-    public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            return;
-        }
-
-        if (this.definition == null) {
-            this.definition = new Definition();
-        }
-        this.definition.setDefinition(definition);
-    }
-
     public boolean isDeprecated() {
         return deprecated;
     }
@@ -338,7 +302,7 @@ public class AssociationCoreComponent
         if (shallowCopy) {
             clone.definitionId = this.definitionId;
         } else {
-            clone.definition = (definition != null) ? definition.clone() : null;
+            clone.definition = getRawDefinition().clone();
         }
 
         clone.setDeprecated(this.deprecated);
@@ -389,6 +353,7 @@ public class AssociationCoreComponent
         result = 31 * result + (int) (toAsccpId ^ (toAsccpId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
+        result = 31 * result + (getRawDefinition().hashCode());
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
