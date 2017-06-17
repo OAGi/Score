@@ -8,7 +8,7 @@
 <keyObject>9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA</keyObject>
 <referredKeyID>9CB818B0-D0E1-7FA2-DB7F-8B9233283EFA</referredKeyID>
 <mandatory>false</mandatory>
-<transferable>false</transferable>
+<transferable>true</transferable>
 <rely>false</rely>
 <columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
 </FKIndexAssociation>
