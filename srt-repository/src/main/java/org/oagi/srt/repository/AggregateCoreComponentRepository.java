@@ -45,4 +45,8 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1")
     public void deleteByCurrentAccId(long currentAccId);
+
+    @Modifying
+    @Query("delete from AggregateCoreComponent a where a.accId = ?1")
+    public void deleteByAccId(long accId);
 }

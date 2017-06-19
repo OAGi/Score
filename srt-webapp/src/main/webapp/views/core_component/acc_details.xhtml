@@ -374,7 +374,9 @@
                                                                  autoResize="false"
                                                                  a:placeholder="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                                  styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}"/>
+                                                                 disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                    <p:ajax update="accPanel, :form:btnGroup"/>
+                                                </h:inputTextarea>
                                             </h:panelGrid>
                                         </p:panel>
                                     </h:panelGroup>

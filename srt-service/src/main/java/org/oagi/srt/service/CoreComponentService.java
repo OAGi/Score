@@ -52,6 +52,9 @@ public class CoreComponentService {
     @Autowired
     private CoreComponentsRepository coreComponentsRepository;
 
+    @Autowired
+    private CoreComponentDAO coreComponentDAO;
+
     public List<CoreComponents> getCoreComponents(
             List<String> types, List<CoreComponentState> states, Sort.Order order) {
         return coreComponentsRepository.findAll(types, states, order);
@@ -328,7 +331,7 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        accRepository.save(acc);
+        acc = coreComponentDAO.save(acc);
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -410,12 +413,7 @@ public class CoreComponentService {
             throw new IllegalStateException("Not allowed to discard the ACC which has related with ABIE");
         }
 
-        long accId = acc.getAccId();
-        accRepository.deleteByCurrentAccId(accId); // To remove history
-        accRepository.delete(acc);
-
-        asccRepository.deleteByFromAccId(accId);
-        bccRepository.deleteByFromAccId(accId);
+        coreComponentDAO.delete(acc);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -432,7 +430,7 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        asccRepository.save(ascc);
+        ascc = coreComponentDAO.save(ascc);
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -472,9 +470,9 @@ public class CoreComponentService {
         }
 
         long asccId = ascc.getAsccId();
-        asccRepository.deleteByCurrentAsccId(asccId); // To remove history
+        coreComponentDAO.deleteByCurrentAsccId(asccId); // To remove history
         int seqKey = ascc.getSeqKey();
-        asccRepository.delete(ascc);
+        coreComponentDAO.delete(ascc);
 
         long fromAccId = ascc.getFromAccId();
         decreaseSeqKeyGreaterThan(fromAccId, seqKey);
@@ -519,7 +517,7 @@ public class CoreComponentService {
                 break;
         }
 
-        bccRepository.save(bcc);
+        bcc = coreComponentDAO.save(bcc);
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -559,9 +557,9 @@ public class CoreComponentService {
         }
 
         long bccId = bcc.getBccId();
-        bccRepository.deleteByCurrentBccId(bccId); // To remove history
+        coreComponentDAO.deleteByCurrentBccId(bccId); // To remove history
         int seqKey = bcc.getSeqKey();
-        bccRepository.delete(bcc);
+        coreComponentDAO.delete(bcc);
 
         if (seqKey > 0) {
             long fromAccId = bcc.getFromAccId();
@@ -584,11 +582,11 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        asccpRepository.save(asccp);
+        coreComponentDAO.save(asccp);
         asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
             AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
             e.setDen(acc, asccp);
-            asccRepository.save(e);
+            coreComponentDAO.save(e);
         });
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
@@ -630,8 +628,8 @@ public class CoreComponentService {
         }
 
         long asccpId = asccp.getAsccpId();
-        asccpRepository.deleteByCurrentAsccpId(asccpId); // To remove history
-        asccpRepository.delete(asccp);
+        coreComponentDAO.deleteByCurrentAsccpId(asccpId); // To remove history
+        coreComponentDAO.delete(asccp);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -649,11 +647,11 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        bccpRepository.save(bccp);
+        coreComponentDAO.save(bccp);
         bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
             AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
             e.setDen(acc, bccp);
-            bccRepository.save(e);
+            coreComponentDAO.save(e);
         });
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
@@ -694,8 +692,8 @@ public class CoreComponentService {
         }
 
         long bccpId = bccp.getBccpId();
-        bccpRepository.deleteByCurrentBccpId(bccpId); // To remove history
-        bccpRepository.delete(bccp);
+        coreComponentDAO.deleteByCurrentBccpId(bccpId); // To remove history
+        coreComponentDAO.delete(bccp);
     }
 
     @Transactional(rollbackFor = Throwable.class)

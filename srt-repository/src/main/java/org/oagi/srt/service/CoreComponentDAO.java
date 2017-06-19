@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -79,25 +80,31 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
     }
 
     @Transactional
-    public void deleteByCurrentAccId(Long currentAccId) {
-        List<Long> definitionIds = accRepository.findDefinitionIdByCurrentAccId(currentAccId);
-        deleteDefinitions(definitionIds);
-        accRepository.deleteByCurrentAccId(currentAccId);
-    }
-
-    @Transactional
     public void delete(AggregateCoreComponent acc) {
         if (acc == null) {
             return;
         }
-        deleteDefinition(acc.getDefinitionId());
-        accRepository.delete(acc);
+
+        long accId = acc.getAccId();
+        if (accId == 0L) {
+            return;
+        }
+
+        List<Long> definitionIds = new ArrayList();
+        definitionIds.addAll(accRepository.findDefinitionIdByCurrentAccId(accId));
+        definitionIds.addAll(asccRepository.findDefinitionIdByFromAccId(accId));
+        definitionIds.addAll(bccRepository.findDefinitionIdByFromAccId(accId));
+        definitionIds.add(acc.getDefinitionId());
+
+        accRepository.deleteByCurrentAccId(accId); // To remove history
+        asccRepository.deleteByFromAccId(accId);
+        bccRepository.deleteByFromAccId(accId);
+        accRepository.deleteByAccId(accId);
+        deleteDefinitions(definitionIds);
     }
 
     @Transactional
     public void deleteByCurrentAsccId(Long currentAsccId) {
-        List<Long> definitionIds = asccRepository.findDefinitionIdByCurrentAsccId(currentAsccId);
-        deleteDefinitions(definitionIds);
         asccRepository.deleteByCurrentAsccId(currentAsccId);
     }
 
@@ -111,20 +118,7 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
     }
 
     @Transactional
-    public void deleteAsccByFromAccId(Long accId) {
-        if (accId == null || accId == 0L) {
-            return;
-        }
-
-        List<Long> definitionIds = asccRepository.findDefinitionIdByFromAccId(accId);
-        deleteDefinitions(definitionIds);
-        asccRepository.deleteByFromAccId(accId);
-    }
-
-    @Transactional
     public void deleteByCurrentAsccpId(Long currentAsccpId) {
-        List<Long> definitionIds = asccpRepository.findDefinitionIdByCurrentAsccpId(currentAsccpId);
-        deleteDefinitions(definitionIds);
         asccpRepository.deleteByCurrentAsccpId(currentAsccpId);
     }
 
@@ -139,8 +133,6 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
 
     @Transactional
     public void deleteByCurrentBccId(Long currentBccId) {
-        List<Long> definitionIds = bccRepository.findDefinitionIdByCurrentBccId(currentBccId);
-        deleteDefinitions(definitionIds);
         bccRepository.deleteByCurrentBccId(currentBccId);
     }
 
@@ -154,20 +146,7 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
     }
 
     @Transactional
-    public void deleteBccByFromAccId(Long accId) {
-        if (accId == null || accId == 0L) {
-            return;
-        }
-
-        List<Long> definitionIds = bccRepository.findDefinitionIdByFromAccId(accId);
-        deleteDefinitions(definitionIds);
-        bccRepository.deleteByFromAccId(accId);
-    }
-
-    @Transactional
     public void deleteByCurrentBccpId(Long currentBccpId) {
-        List<Long> definitionIds = bccpRepository.findDefinitionIdByCurrentBccpId(currentBccpId);
-        deleteDefinitions(definitionIds);
         bccpRepository.deleteByCurrentBccpId(currentBccpId);
     }
 
