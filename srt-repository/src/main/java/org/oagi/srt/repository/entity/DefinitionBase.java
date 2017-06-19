@@ -31,7 +31,7 @@ abstract class DefinitionBase implements IDefinition, Serializable {
     }
 
     public Definition getRawDefinition() {
-        if (this.definitionId != null) {
+        if (this.definitionId != null && !this.definitionId.equals(this.definition.getDefinitionId())) {
             ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
             DefinitionRepository definitionRepository = applicationContext.getBean(DefinitionRepository.class);
             this.definition = definitionRepository.findOne(this.definitionId);
