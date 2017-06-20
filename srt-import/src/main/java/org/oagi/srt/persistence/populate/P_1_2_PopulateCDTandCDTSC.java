@@ -52,7 +52,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     @Autowired
     private DataTypeDAO dtDAO;
 
-    private Map<String, XSDBuiltInType> xbtMap;
+    private Map<String, XSDBuiltInType> xbtBuiltInTypeMap;
+    private Map<Long, XSDBuiltInType> xbtIdMap;
     private Map<String, List<XSDBuiltInType>> cdtAwdPriXpsTypeMapppingMap = new HashMap();
 
     public static void main(String args[]) throws Exception {
@@ -80,26 +81,27 @@ public class P_1_2_PopulateCDTandCDTSC {
         List<XSDBuiltInType> xbtList = xbtRepository.findAll();
         Collections.sort(xbtList, Comparator.comparing(XSDBuiltInType::getXbtId));
 
-        xbtMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getBuiltInType, Function.identity()));
+        xbtBuiltInTypeMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getBuiltInType, Function.identity()));
+        xbtIdMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getXbtId, Function.identity()));
 
         cdtAwdPriXpsTypeMapppingMap.put("Binary",
-                Arrays.asList(xbtMap.get("xsd:base64Binary"), xbtMap.get("xsd:hexBinary")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:base64Binary"), xbtBuiltInTypeMap.get("xsd:hexBinary")));
         cdtAwdPriXpsTypeMapppingMap.put("Boolean",
-                Arrays.asList(xbtMap.get("xbt_BooleanType")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xbt_BooleanType")));
         cdtAwdPriXpsTypeMapppingMap.put("Decimal",
-                Arrays.asList(xbtMap.get("xsd:decimal")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:decimal")));
         cdtAwdPriXpsTypeMapppingMap.put("Double",
-                Arrays.asList(xbtMap.get("xsd:double"), xbtMap.get("xsd:float")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:double"), xbtBuiltInTypeMap.get("xsd:float")));
         cdtAwdPriXpsTypeMapppingMap.put("Float",
-                Arrays.asList(xbtMap.get("xsd:float")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:float")));
         cdtAwdPriXpsTypeMapppingMap.put("Integer",
-                Arrays.asList(xbtMap.get("xsd:integer"), xbtMap.get("xsd:positiveInteger"), xbtMap.get("xsd:nonNegativeInteger")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:integer"), xbtBuiltInTypeMap.get("xsd:positiveInteger"), xbtBuiltInTypeMap.get("xsd:nonNegativeInteger")));
         cdtAwdPriXpsTypeMapppingMap.put("NormalizedString",
-                Arrays.asList(xbtMap.get("xsd:normalizedString")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString")));
         cdtAwdPriXpsTypeMapppingMap.put("String",
-                Arrays.asList(xbtMap.get("xsd:string")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:string")));
         cdtAwdPriXpsTypeMapppingMap.put("TimeDuration",
-                Arrays.asList(xbtMap.get("xsd:token"), xbtMap.get("xsd:duration"), xbtMap.get("xbt_WeekDurationType")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token"), xbtBuiltInTypeMap.get("xsd:duration"), xbtBuiltInTypeMap.get("xbt_WeekDurationType")));
         cdtAwdPriXpsTypeMapppingMap.put("TimePoint",
                 xbtList.stream().filter(e -> {
                     String builtInType = e.getBuiltInType();
@@ -117,7 +119,7 @@ public class P_1_2_PopulateCDTandCDTSC {
                     return false;
                 }).collect(Collectors.toList()));
         cdtAwdPriXpsTypeMapppingMap.put("Token",
-                Arrays.asList(xbtMap.get("xsd:token")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token")));
     }
 
     public void populateCdtAwdPri() {
@@ -207,7 +209,22 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMap("Code", "Token");
         cdtAwdPriXpsTypeMap("Date", "TimePoint",
                 cdtAwdPriXpsTypeMapppingMap.get("TimePoint").stream()
-                        .filter(e -> !"xsd:dateTime".equals(e.getBuiltInType()))
+                        .filter(e -> {
+                            String builtInType = e.getBuiltInType();
+                            if ("xsd:dateTime".equals(builtInType) || "xsd:time".equals(builtInType)) {
+                                return false;
+                            }
+
+                            long subTypeOfXbtId = e.getSubtypeOfXbtId();
+                            if (subTypeOfXbtId > 0L) {
+                                builtInType = xbtIdMap.get(subTypeOfXbtId).getBuiltInType();
+                                if ("xsd:dateTime".equals(builtInType) || "xsd:time".equals(builtInType)) {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        })
                         .collect(Collectors.toList())
         );
         cdtAwdPriXpsTypeMap("Date Time", "TimePoint");
@@ -251,9 +268,29 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMap("Text", "NormalizedString");
         cdtAwdPriXpsTypeMap("Text", "String");
         cdtAwdPriXpsTypeMap("Text", "Token");
-        cdtAwdPriXpsTypeMap("Time", "TimePoint",
-                Arrays.asList(xbtMap.get("xsd:token"), xbtMap.get("xsd:time"))
-        );
+
+        List<XSDBuiltInType> xsdBuiltInTypesForTime =
+                cdtAwdPriXpsTypeMapppingMap.get("TimePoint").stream()
+                        .filter(e -> {
+                            String builtInType = e.getBuiltInType();
+                            if ("xsd:time".equals(builtInType)) {
+                                return true;
+                            }
+
+                            long subTypeOfXbtId = e.getSubtypeOfXbtId();
+                            if (subTypeOfXbtId > 0L) {
+                                builtInType = xbtIdMap.get(subTypeOfXbtId).getBuiltInType();
+                                if ("xsd:time".equals(builtInType)) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+        xsdBuiltInTypesForTime.add(xbtBuiltInTypeMap.get("xsd:token"));
+        cdtAwdPriXpsTypeMap("Time", "TimePoint", xsdBuiltInTypesForTime);
+
         cdtAwdPriXpsTypeMap("Value", "Decimal");
         cdtAwdPriXpsTypeMap("Value", "Double");
         cdtAwdPriXpsTypeMap("Value", "Float");
