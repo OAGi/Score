@@ -2914,7 +2914,7 @@
 				<ccts_DataTypeTermName>Date</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="DateType_30CB24 DateType_FX0L23 DateType_37D62E DateType_D46DBA DateType_DB95C8 DateType_5B057B DateType_0C267D DateType_2841F8 DateType_4A071E DateType_B950EA DateType_BBCC14 DateType_57D5E1 DateType_3B6616 DateType_1A9053">
+		<xsd:union memberTypes="xbt_CenturyType xbt_DateType xbt_DayOfWeekType xbt_DayOfYearType xbt_DayType xbt_MonthDayType xbt_MonthType xbt_WeekType xbt_WeekDayType xbt_YearDayType xbt_YearMonthType xbt_YearType xbt_YearWeekType xbt_YearWeekDayType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -3719,7 +3719,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="DateTimeType_13E100 DateTimeType_F40B55 DateTimeType_P09C22 DateTimeType_A26E13 DateTimeType_F0DD24 DateTimeType_3EF065 DateTimeType_0C3D5B DateTimeType_A4C365 DateTimeType_71A250 DateTimeType_E5A3D3 DateTimeType_61DE1D DateTimeType_8166DF DateTimeType_EE9A81 DateTimeType_55D975 DateTimeType_4D2186 DateTimeType_AD67C6 DateTimeType_C359E2 DateTimeType_E28DCF DateTimeType_B0204D DateTimeType_16E098 DateTimeType_F718AE DateTimeType_DF7198 DateTimeType_0C33FF DateTimeType_57C215 DateTimeType_BCAD3F DateTimeType_208D79 DateTimeType_5B0534 DateTimeType_163787 DateTimeType_F8C699 DateTimeType_E15090 DateTimeType_57F849 DateTimeType_6CAEB4">
+		<xsd:union memberTypes="xbt_DateHourMinuteType xbt_DateHourType xbt_DateTimeType xbt_DayHourMinuteType xbt_DayHourType xbt_DayOfWeekHourMinuteType xbt_DayOfWeekHourType xbt_DayOfWeekTimeType xbt_DayOfYearHourMinuteType xbt_DayOfYearHourType xbt_DayOfYearTimeType xbt_DayTimeType xbt_MonthDayHourMinuteType xbt_MonthDayHourType xbt_MonthDayTimeType xbt_WeekDayHourMinuteType xbt_WeekDayHourType xbt_WeekDayTimeType xbt_YearDayHourMinuteType xbt_YearDayHourType xbt_YearDayTimeType xbt_YearWeekDayHourMinuteType xbt_YearWeekDayHourType xbt_YearWeekDayTimeType xbt_DateType xbt_DayOfWeekType xbt_DayOfYearType xbt_DayType xbt_MonthDayType xbt_WeekDayType xbt_YearDayType xbt_YearWeekDayType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -7005,7 +7005,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="DateTimeType_841A21 DateTimeType_ED643A DateTimeType_4F9B0B DateTimeType_CDE131 DateTimeType_C50C4F DateTimeType_B29849 DateTimeType_14C0F1 DateTimeType_A5C9E3 DateTimeType_4FFA8A DateTimeType_6D6D1E DateTimeType_D651A3 DateTimeType_3AEFEB DateTimeType_B056E2 DateTimeType_DEDA1F DateTimeType_9D3967 DateTimeType_F2D0AF DateTimeType_EBD045 DateTimeType_81894F DateTimeType_3E6CBB DateTimeType_675620 DateTimeType_961C07 DateTimeType_ABD5D2 DateTimeType_452E5A DateTimeType_6436B7">
+		<xsd:union memberTypes="xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9669,7 +9669,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="DateTimeType_AF0447 DateTimeType_13479C DateTimeType_4AA771 DateTimeType_3521A1 DateTimeType_471796 DateTimeType_287CD6 DateTimeType_6FCD54 DateTimeType_4234CC DateTimeType_CF4A65 DateTimeType_A865AF DateTimeType_FEF8E4 DateTimeType_10E4D6 DateTimeType_833BBA DateTimeType_E34B76 DateTimeType_BC4936 DateTimeType_300776 DateTimeType_4169E6 DateTimeType_E86C74 DateTimeType_1A064A DateTimeType_10E935 DateTimeType_35B3D1 DateTimeType_5A0F2B DateTimeType_FE3915 DateTimeType_AB7B13">
+		<xsd:union memberTypes="xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9776,7 +9776,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="DateTimeType_13E100 DateTimeType_F40B55 DateTimeType_P09C22 DateTimeType_A26E13 DateTimeType_F0DD24 DateTimeType_3EF065 DateTimeType_0C3D5B DateTimeType_A4C365 DateTimeType_71A250 DateTimeType_E5A3D3 DateTimeType_61DE1D DateTimeType_8166DF DateTimeType_EE9A81 DateTimeType_55D975 DateTimeType_4D2186 DateTimeType_AD67C6 DateTimeType_C359E2 DateTimeType_E28DCF DateTimeType_B0204D DateTimeType_16E098 DateTimeType_F718AE DateTimeType_DF7198 DateTimeType_0C33FF DateTimeType_57C215 DateTimeType_BCAD3F DateTimeType_208D79 DateTimeType_5B0534 DateTimeType_163787 DateTimeType_F8C699 DateTimeType_E15090 DateTimeType_57F849 DateTimeType_6CAEB4 DateTimeType_841A21 DateTimeType_ED643A DateTimeType_4F9B0B DateTimeType_CDE131 DateTimeType_C50C4F DateTimeType_B29849 DateTimeType_14C0F1 DateTimeType_A5C9E3 DateTimeType_4FFA8A DateTimeType_6D6D1E DateTimeType_D651A3 DateTimeType_3AEFEB DateTimeType_B056E2 DateTimeType_DEDA1F DateTimeType_9D3967 DateTimeType_F2D0AF DateTimeType_EBD045 DateTimeType_81894F DateTimeType_3E6CBB DateTimeType_675620 DateTimeType_961C07 DateTimeType_ABD5D2 DateTimeType_452E5A DateTimeType_6436B7 DateTimeType_AF0447 DateTimeType_13479C DateTimeType_4AA771 DateTimeType_3521A1 DateTimeType_471796 DateTimeType_287CD6 DateTimeType_6FCD54 DateTimeType_4234CC DateTimeType_CF4A65 DateTimeType_A865AF DateTimeType_FEF8E4 DateTimeType_10E4D6 DateTimeType_833BBA DateTimeType_E34B76 DateTimeType_BC4936 DateTimeType_300776 DateTimeType_4169E6 DateTimeType_E86C74 DateTimeType_1A064A DateTimeType_10E935 DateTimeType_35B3D1 DateTimeType_5A0F2B DateTimeType_FE3915 DateTimeType_AB7B13">
+		<xsd:union memberTypes="xbt_DateHourMinuteType xbt_DateHourType xbt_DateTimeType xbt_DayHourMinuteType xbt_DayHourType xbt_DayOfWeekHourMinuteType xbt_DayOfWeekHourType xbt_DayOfWeekTimeType xbt_DayOfYearHourMinuteType xbt_DayOfYearHourType xbt_DayOfYearTimeType xbt_DayTimeType xbt_MonthDayHourMinuteType xbt_MonthDayHourType xbt_MonthDayTimeType xbt_WeekDayHourMinuteType xbt_WeekDayHourType xbt_WeekDayTimeType xbt_YearDayHourMinuteType xbt_YearDayHourType xbt_YearDayTimeType xbt_YearWeekDayHourMinuteType xbt_YearWeekDayHourType xbt_YearWeekDayTimeType xbt_DateType xbt_DayOfWeekType xbt_DayOfYearType xbt_DayType xbt_MonthDayType xbt_WeekDayType xbt_YearDayType xbt_YearWeekDayType xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9899,7 +9899,7 @@
 	<!-- ===== 											Duration. Type    						  						       ===== -->
 	<!-- ===== 						Use this xsd:union type if Weeks are included or possible       ===== -->
 	<!-- =================================================================== -->
-	<xsd:simpleType name="DurationType_JJ5401" id="oagis-id-f16cdbda66d2441cac9e99615c99e70e">
+	<xsd:simpleType name="DurationType_JJ5401" id="oagis-id-f16cdbda66d2441cac9e99615c99e70e" final="union">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID>JJ5401</ccts_UniqueID>
@@ -22857,7 +22857,7 @@
 	<!-- =====   precision at run time. The specific base="xbtType" will reflect the defaulted design time     ===== -->
 	<!-- =====   time  format code.	        																														===== -->
 	<!-- ================================================================================ -->
-	<xsd:simpleType name="TimeType_100DCA" id="oagis-id-6659e405ac8d43268d2a10d451eea261">
+	<xsd:simpleType name="TimeType_100DCA" id="oagis-id-6659e405ac8d43268d2a10d451eea261" final="union">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID>100DCA</ccts_UniqueID>
@@ -22867,7 +22867,7 @@
 				<ccts_DataTypeTermName>Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="TimeType_C8E18D TimeType_B3DF2A TimeType_15F9D3 TimeType_2B3EE4 TimeType_05B074 TimeType_33720E TimeType_14AA35 TimeType_7936D9 TimeType_D030D9 TimeType_VD2387 TimeType_4DF8D8 TimeType_28F44E">
+		<xsd:union memberTypes="xbt_HourMinuteType xbt_HourMinuteUTCType xbt_HourMinuteUTCOffsetType xbt_HourType xbt_HourUTCType xbt_HourUTCOffsetType xbt_MinuteType xbt_MinuteSecondType xbt_SecondType xbt_TimeType xbt_TimeUTCType xbt_TimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
