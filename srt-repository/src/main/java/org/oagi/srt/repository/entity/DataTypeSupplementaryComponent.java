@@ -274,4 +274,17 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
     public boolean isDirty() {
         return hashCodeAfterLoaded != hashCode();
     }
+
+    public DataTypeSupplementaryComponent clone() {
+        DataTypeSupplementaryComponent clone = new DataTypeSupplementaryComponent();
+
+        clone.propertyTerm = this.propertyTerm;
+        clone.representationTerm = this.representationTerm;
+        clone.ownerDtId = this.ownerDtId;
+        clone.cardinalityMin = this.cardinalityMin;
+        clone.cardinalityMax = this.cardinalityMax;
+        clone.basedDtScId = this.dtScId;
+
+        return clone;
+    }
 }

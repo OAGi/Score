@@ -14,6 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMapppingMap.put("Integer",
                 Arrays.asList(xbtBuiltInTypeMap.get("xsd:integer"), xbtBuiltInTypeMap.get("xsd:positiveInteger"), xbtBuiltInTypeMap.get("xsd:nonNegativeInteger")));
         cdtAwdPriXpsTypeMapppingMap.put("NormalizedString",
-                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString"), xbtBuiltInTypeMap.get("xsd:anyURI")));
         cdtAwdPriXpsTypeMapppingMap.put("String",
                 Arrays.asList(xbtBuiltInTypeMap.get("xsd:string")));
         cdtAwdPriXpsTypeMapppingMap.put("TimeDuration",
@@ -119,7 +120,20 @@ public class P_1_2_PopulateCDTandCDTSC {
                     return false;
                 }).collect(Collectors.toList()));
         cdtAwdPriXpsTypeMapppingMap.put("Token",
-                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token"), xbtBuiltInTypeMap.get("xsd:language")));
+    }
+
+    public List<XSDBuiltInType> findXSDBuiltInTypesByCdtPri(CoreDataTypePrimitive cdtPri) {
+        return findXSDBuiltInTypesByCdtPriName(cdtPri.getName());
+    }
+
+    public List<XSDBuiltInType> findXSDBuiltInTypesByCdtPriName(String cdtPriName) {
+        List<XSDBuiltInType> xbtList = cdtAwdPriXpsTypeMapppingMap.get(cdtPriName);
+        if (xbtList != null) {
+            Collections.sort(xbtList, Comparator.comparingLong(XSDBuiltInType::getXbtId));
+            return xbtList;
+        }
+        return Collections.emptyList();
     }
 
     public void populateCdtAwdPri() {

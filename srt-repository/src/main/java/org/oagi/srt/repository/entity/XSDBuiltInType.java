@@ -279,7 +279,6 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentXbtId != null ? currentXbtId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
-        result = 31 * result + hashCodeAfterLoaded;
         return result;
     }
 
@@ -292,7 +291,7 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
                 ", subtypeOfXbtId=" + subtypeOfXbtId +
                 ", schemaDefinition='" + schemaDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
-                ", module=" + module +
+                ", moduleId=" + ((module != null) ? module.getModuleId() : null) +
                 ", state=" + state +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
@@ -305,7 +304,6 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
                 ", releaseId=" + releaseId +
                 ", currentXbtId=" + currentXbtId +
                 ", deprecated=" + deprecated +
-                ", hashCodeAfterLoaded=" + hashCodeAfterLoaded +
                 '}';
     }
 

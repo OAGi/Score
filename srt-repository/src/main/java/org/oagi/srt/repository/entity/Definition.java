@@ -70,6 +70,12 @@ public class Definition implements Serializable {
     }
 
     public void setDefinitionSource(String definitionSource) {
+        if (definitionSource != null) {
+            definitionSource = definitionSource.trim();
+        }
+        if (StringUtils.isEmpty(definitionSource)) {
+            definitionSource = null;
+        }
         this.definitionSource = definitionSource;
     }
 

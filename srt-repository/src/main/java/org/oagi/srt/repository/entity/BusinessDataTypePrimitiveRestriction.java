@@ -1,6 +1,10 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.common.util.ApplicationContextProvider;
+import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+import org.oagi.srt.repository.XSDBuiltInTypeRepository;
+import org.springframework.context.ApplicationContext;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -124,13 +128,29 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
     @Override
     public String toString() {
+        ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
+                applicationContext.getBean(CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository.class);
+        XSDBuiltInTypeRepository xbtRepository = applicationContext.getBean(XSDBuiltInTypeRepository.class);
+
         return "BusinessDataTypePrimitiveRestriction{" +
                 "bdtPriRestriId=" + bdtPriRestriId +
                 ", bdtId=" + bdtId +
-                ", cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +
+                ", cdtAwdPriXpsTypeMapId=" + xbtRepository.findOne(cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId).getXbtId()) +
                 ", codeListId=" + codeListId +
                 ", agencyIdListId=" + agencyIdListId +
                 ", isDefault=" + isDefault +
                 '}';
+    }
+
+    public BusinessDataTypePrimitiveRestriction clone() {
+        BusinessDataTypePrimitiveRestriction clone = new BusinessDataTypePrimitiveRestriction();
+
+        clone.cdtAwdPriXpsTypeMapId = this.cdtAwdPriXpsTypeMapId;
+        clone.codeListId = this.codeListId;
+        clone.agencyIdListId = this.agencyIdListId;
+        clone.isDefault = this.isDefault;
+
+        return clone;
     }
 }

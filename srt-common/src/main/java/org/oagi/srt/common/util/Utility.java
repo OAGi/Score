@@ -155,7 +155,8 @@ public class Utility {
         String result = sb.toString();
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).replaceAll(" ", "").concat(" Code Type");
-        return result.substring(result.lastIndexOf(" ") + 1);
+        result = result.substring(result.lastIndexOf(" ") + 1);
+        return IDtoIdentifier(result);
     }
 
     public static final String allowed_Representation_Term_List[] = {
@@ -222,6 +223,9 @@ public class Utility {
     public static String spaceSeparator(String str) {//Assume that we only take into account TypeName
         if (str.equals("mimeCode")) {
             return "MIME Code";
+        }
+        if (str.equals("uri")) {
+            return "URI";
         }
 
         String result = sparcing(str);

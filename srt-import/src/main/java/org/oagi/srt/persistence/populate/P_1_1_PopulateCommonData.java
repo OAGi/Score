@@ -332,7 +332,8 @@ public class P_1_1_PopulateCommonData {
         xbtName("gregorian month").builtInType("xsd:gMonth").subTypeOfXbt(anySimpleType).build();
         XSDBuiltInType stringType = xbtName("string").builtInType("xsd:string").subTypeOfXbt(anySimpleType).build();
         XSDBuiltInType normalizedStringType = xbtName("normalized string").builtInType("xsd:normalizedString").subTypeOfXbt(stringType).build();
-        xbtName("token").builtInType("xsd:token").subTypeOfXbt(normalizedStringType).build();
+        XSDBuiltInType tokenType = xbtName("token").builtInType("xsd:token").subTypeOfXbt(normalizedStringType).build();
+        xbtName("language").builtInType("xsd:language").subTypeOfXbt(tokenType).build();
         XSDBuiltInType booleanType = xbtName("boolean").builtInType("xsd:boolean").subTypeOfXbt(anySimpleType).build();
         xbtName("base64 binary").builtInType("xsd:base64Binary").subTypeOfXbt(anySimpleType).build();
         xbtName("hex binary").builtInType("xsd:hexBinary").subTypeOfXbt(anySimpleType).build();

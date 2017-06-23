@@ -126,4 +126,16 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
                 ", isDefault=" + isDefault +
                 '}';
     }
+
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction clone() {
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction clone =
+                new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+
+        clone.cdtScAwdPriXpsTypeMapId = this.cdtScAwdPriXpsTypeMapId;
+        clone.codeListId = this.codeListId;
+        clone.agencyIdListId = this.agencyIdListId;
+        clone.isDefault = this.isDefault;
+
+        return clone;
+    }
 }
