@@ -266,9 +266,9 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTwithoutElement() throws Exception {
-        NodeList complexTypesFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:complexType");
-        for (int i = 0; i < complexTypesFromFieldsXSD.getLength(); i++) {
-            Node typeNode = complexTypesFromFieldsXSD.item(i);
+        NodeList elementList = fields_xsd.getNodeList("/xsd:schema/xsd:complexType | /xsd:schema/xsd:simpleType");
+        for (int i = 0; i < elementList.getLength(); i++) {
+            Node typeNode = elementList.item(i);
 
             String type = ((Element) typeNode).getAttribute("name");
             DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(type);
@@ -319,7 +319,8 @@ public class P_1_7_PopulateQBDTInDT {
                     throw new IllegalStateException("Unknown QBDT: " + typeName);
                 }
 
-                DataType dataType = dataTypeRepository.findOneByGuid(dataTypeInfoHolder.getGuid());
+                String dtGuid = dataTypeInfoHolder.getGuid();
+                DataType dataType = dataTypeRepository.findOneByGuid(dtGuid);
                 if (dataType == null) {
                     /*
                      * @TODO
@@ -406,17 +407,8 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setType(BusinessDataType);
         dataType.setVersionNum("1.0");
 
-        DataType baseDataType;
-
-        if (xHandler != null) {
-            Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='" + type + "']/xsd:simpleContent");
-            if (simpleContentNode == null) {
-                return null;
-            }
-        }
-
         String baseDen = Utility.typeToDen(base);
-        baseDataType = getDataTypeWithDen(baseDen);
+        DataType baseDataType = getDataTypeWithDen(baseDen);
 
         if (baseDataType == null) {
             DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
@@ -440,7 +432,7 @@ public class P_1_7_PopulateQBDTInDT {
 
         String qualifier = Utility.qualifier(type, baseDataType.getDen(), baseDataType.getDataTypeTerm());
         if (StringUtils.isEmpty(qualifier)) {
-            throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den:" + baseDataType.getDen());
+            logger.warn("The based data type[" + baseDataType.getDen() + "] of '" + type + "' has no qualifier.");
         }
 
         dataType.setQualifier(qualifier);
@@ -877,6 +869,10 @@ public class P_1_7_PopulateQBDTInDT {
         } else {
             dVO = getDataTypeWithDen("Identifier Content. Type");
             base = "IDContentType";
+        }
+
+        if (dVO == null) {
+            throw new IllegalStateException();
         }
 
         dataType.setBasedDtId(dVO.getDtId());

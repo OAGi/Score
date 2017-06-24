@@ -86,6 +86,9 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
     @Autowired
     private P_1_2_PopulateCDTandCDTSC populateCDTandCDTSC;
 
+    @Autowired
+    private P_1_5_PopulateDefaultAndUnqualifiedBDT populateDefaultAndUnqualifiedBDT;
+
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_5_1_PopulateDefaultAndUnqualifiedBDT populateBDTsInDT = ctx.getBean(P_1_5_1_PopulateDefaultAndUnqualifiedBDT.class);
@@ -107,6 +110,12 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
         private List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList = new ArrayList();
         private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtScAwdPriXpsTypeMapList = new ArrayList();
         private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = new ArrayList();
+
+        public BDTContext(DataType dataType) {
+            this.dataType = dataType;
+            this.bdtPriRestriList = bdtPriRestriRepository.findByBdtId(dataType.getDtId());
+            this.dtScList = dtScRepository.findByOwnerDtId(dataType.getDtId());
+        }
 
         public BDTContext(Document document, Element element, Module module, Long userId, Long releaseId, int seq) {
             this.document = document;
@@ -733,40 +742,10 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
         importDefaultBDTs();
         importUnqualifiedBDTs();
 
+        populateDefaultAndUnqualifiedBDT.importCodeContentType();
+        populateDefaultAndUnqualifiedBDT.importIDContentType();
+
         logger.info("### 1.5 End");
-    }
-
-    private void importUnqualifiedBDTs() throws Exception {
-        File unqualifiedBDTFile = new File(ImportConstants.FIELDS_XSD_FILE_PATH).getCanonicalFile();
-        String moduleName = unqualifiedBDTFile.getName();
-        moduleName = moduleName.substring(0, moduleName.indexOf(".xsd"));
-        Module module = moduleRepository.findByModuleEndsWith(moduleName);
-        Long userId = importUtil.getUserId();
-        Long releaseId = importUtil.getReleaseId();
-
-        Document fieldsXsd = Context.loadDocument(unqualifiedBDTFile);
-        int seq = 0;
-        for (String cctsDataType : Types.dataTypeList) {
-            Element unqualifiedBDTElement = (Element) Context.xPath.evaluate(
-                    "//xsd:complexType[@name='" + cctsDataType + "'] | //xsd:simpleType[@name='" + cctsDataType + "']", fieldsXsd, XPathConstants.NODE);
-            if (unqualifiedBDTElement == null) {
-                throw new IllegalStateException();
-            }
-
-            BDTContext bdtContext = new BDTContext(fieldsXsd, unqualifiedBDTElement, module, userId, releaseId, ++seq);
-            String base;
-            if (bdtContext.isComplexType()) {
-                base = bdtContext.evaluate(".//xsd:simpleContent/xsd:extension").getAttribute("base");
-            } else {
-                base = bdtContext.evaluate(".//xsd:restriction").getAttribute("base");
-            }
-
-            String basedDataTypeTerm = bdtContext.toDataTypeTerm(base);
-            DataType basedDataType = dataTypeRepository.findOneByDataTypeTermAndType(basedDataTypeTerm, DataTypeType.BusinessDataType);
-            if (basedDataType == null) {
-                throw new IllegalStateException();
-            }
-        }
     }
 
     private void importDefaultBDTs() throws Exception {
@@ -829,9 +808,47 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
             bdtContext.buildBdtPriRestriList(basedBDTContext);
             bdtContext.buildDtScList(basedBDTContext);
         }
+    }
 
-        for (BDTContext bdtContext : bdtContexts) {
-            System.out.println(bdtContext);
+    private void importUnqualifiedBDTs() throws Exception {
+        File unqualifiedBDTFile = new File(ImportConstants.FIELDS_XSD_FILE_PATH).getCanonicalFile();
+        String moduleName = unqualifiedBDTFile.getName();
+        moduleName = moduleName.substring(0, moduleName.indexOf(".xsd"));
+        Module module = moduleRepository.findByModuleEndsWith(moduleName);
+        Long userId = importUtil.getUserId();
+        Long releaseId = importUtil.getReleaseId();
+
+        Document fieldsXsd = Context.loadDocument(unqualifiedBDTFile);
+
+        List<BDTContext> bdtContexts = new ArrayList();
+        int seq = 0;
+        for (String cctsDataType : Types.dataTypeList) {
+            Element unqualifiedBDTElement = (Element) Context.xPath.evaluate(
+                    "//xsd:complexType[@name='" + cctsDataType + "'] | //xsd:simpleType[@name='" + cctsDataType + "']", fieldsXsd, XPathConstants.NODE);
+            if (unqualifiedBDTElement == null) {
+                throw new IllegalStateException();
+            }
+
+            BDTContext bdtContext = new BDTContext(fieldsXsd, unqualifiedBDTElement, module, userId, releaseId, ++seq);
+            String base;
+            if (bdtContext.isComplexType()) {
+                base = bdtContext.evaluate(".//xsd:simpleContent/xsd:extension").getAttribute("base");
+            } else {
+                base = bdtContext.evaluate(".//xsd:restriction").getAttribute("base");
+            }
+
+            String den = Utility.typeToDen(base);
+            List<DataType> basedDataType = dataTypeRepository.findByDen(den);
+            if (basedDataType.size() != 1) {
+                throw new IllegalStateException();
+            }
+
+            BDTContext basedBDTContext = new BDTContext(basedDataType.get(0));
+            bdtContext.buildDataType(basedBDTContext);
+            bdtContext.buildBdtPriRestriList(basedBDTContext);
+            bdtContext.buildDtScList(basedBDTContext);
+
+            bdtContexts.add(bdtContext);
         }
     }
 

@@ -342,6 +342,17 @@ public class Utility {
     }
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
+        /*
+         * [exception in Fields.xsd at line 4081]
+         *
+         * <xsd:simpleType name="DurationMeasureType" id="oagis-id-10ef9f34e0504a71880c967c82ac039f">
+         *     <xsd:restriction base="DurationType_JJ5401"/>
+         * </xsd:simpleType>
+         */
+        if ("DurationMeasureType".equals(type)) {
+            return "Measure";
+        }
+
         String qualifier = "";
         if (dataTypeTerm.equals("Text")) {
             if (type.contains("Text")) {
@@ -552,9 +563,10 @@ public class Utility {
     }
 
     public static void main(String args[]) {
-        String name = "OAGIS10BODs";
-        int idx = name.lastIndexOf("Type");
-        String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
-        System.out.println(objectClassTerm);
+
+        String qualifier =
+                Utility.qualifier("DurationMeasureType", "Duration_JJ5401. Type", "Duration");
+
+        System.out.println(qualifier);
     }
 }

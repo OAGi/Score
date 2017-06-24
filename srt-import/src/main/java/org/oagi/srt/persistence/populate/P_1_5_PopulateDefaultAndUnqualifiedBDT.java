@@ -622,7 +622,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         }
     }
 
-    private void importCodeContentType() throws Exception {
+    public void importCodeContentType() throws Exception {
         String dataType = "CodeContentType";
 
         String typeName;
@@ -680,7 +680,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         populateDTSCforUnqualifiedBDT(dVO2, fields_xsd, businessDataType_xsd);
     }
 
-    private void importIDContentType() throws Exception {
+    public void importIDContentType() throws Exception {
 
         String dataType = "IDContentType";
 
