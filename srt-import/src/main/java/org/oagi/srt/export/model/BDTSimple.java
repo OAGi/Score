@@ -4,6 +4,8 @@ public interface BDTSimple {
 
     public long getBdtId();
 
+    public boolean isDefaultBDT();
+
     public String getName();
 
     public String getGuid();

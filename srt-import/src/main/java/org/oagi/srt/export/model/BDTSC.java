@@ -22,7 +22,7 @@ public class BDTSC implements Component {
 
     public String getName() {
         String propertyTerm = dtSc.getPropertyTerm();
-        if ("MIME".equals(propertyTerm)) {
+        if ("MIME".equals(propertyTerm) || "URI".equals(propertyTerm)) {
             propertyTerm = propertyTerm.toLowerCase();
         }
         String representationTerm = dtSc.getRepresentationTerm();

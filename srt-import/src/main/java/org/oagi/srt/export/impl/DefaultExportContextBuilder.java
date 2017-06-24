@@ -51,8 +51,8 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         createSchemaModules(context, moduleMap);
         createAgencyIdList(moduleMap);
         createCodeLists(moduleMap);
-        BdtsBlob bdtsBlob = loadBtdsBlob();
-        createBDT(bdtsBlob, moduleMap);
+        createXBTs(moduleMap);
+        createBDT(moduleMap);
         createBCCP(moduleMap);
         createACC(moduleMap);
         createASCCP(moduleMap);
@@ -122,39 +122,52 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private BdtsBlob loadBtdsBlob() {
-        BlobContent blobContent = blobContentRepository.findByModuleEndsWith("BusinessDataType_1");
-        if (blobContent == null) {
-            throw new IllegalStateException();
+    private void createXBTs(Map<Long, SchemaModule> moduleMap) {
+        List<XSDBuiltInType> xbtList = importedDataProvider.findXbt().stream()
+                .filter(e -> e.getBuiltInType().startsWith("xbt"))
+                .collect(Collectors.toList());
+        for (XSDBuiltInType xbt : xbtList) {
+            SchemaModule schemaModule = moduleMap.get(xbt.getModule().getModuleId());
+            schemaModule.addXBTSimpleType(new XBTSimpleType(xbt, importedDataProvider.findXbt(xbt.getSubtypeOfXbtId())));
         }
-
-        return new BdtsBlob(blobContent.getContent());
     }
 
-    private void createBDT(BdtsBlob bdtsBlob, Map<Long, SchemaModule> moduleMap) {
+    private void createBDT(Map<Long, SchemaModule> moduleMap) {
         List<DataType> bdtList = importedDataProvider.findDT().stream()
                 .filter(e -> e.getType() == DataTypeType.BusinessDataType).collect(Collectors.toList());
         for (DataType bdt : bdtList) {
-            if (bdtsBlob.exists(bdt.getGuid())) {
-                continue;
-            }
-
             if (bdt.getBasedDtId() == 0) {
                 throw new IllegalStateException();
             }
             DataType baseDataType = importedDataProvider.findDT(bdt.getBasedDtId());
-
             SchemaModule schemaModule = moduleMap.get(bdt.getModule().getModuleId());
             List<DataTypeSupplementaryComponent> dtScList =
                     importedDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
                             .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
 
+            boolean isDefaultBDT = schemaModule.getPath().contains("BusinessDataType_1");
             BDTSimple bdtSimple;
             if (dtScList.isEmpty()) {
-                bdtSimple = new BDTSimpleType(bdt, baseDataType);
+                long bdtId = bdt.getDtId();
+                List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                        importedDataProvider.findBdtPriRestriListByDtId(bdtId);
+                List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAwdPriXpsTypeMapList =
+                        importedDataProvider.findCdtAwdPriXpsTypeMapListByDtId(bdtId);
+                if (!cdtAwdPriXpsTypeMapList.isEmpty()) {
+                    List<XSDBuiltInType> xbtList = cdtAwdPriXpsTypeMapList.stream()
+                            .map(e -> importedDataProvider.findXbt(e.getXbtId()))
+                            .collect(Collectors.toList());
+                    bdtSimple = new BDTSimpleType(
+                            bdt, baseDataType, isDefaultBDT,
+                            bdtPriRestriList, xbtList, importedDataProvider);
+                } else {
+                    bdtSimple = new BDTSimpleType(
+                            bdt, baseDataType, isDefaultBDT, importedDataProvider);
+                }
             } else {
-                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList, importedDataProvider);
+                bdtSimple = new BDTSimpleContent(bdt, baseDataType, isDefaultBDT, dtScList, importedDataProvider);
             }
+
             schemaModule.addBDTSimple(bdtSimple);
         }
     }

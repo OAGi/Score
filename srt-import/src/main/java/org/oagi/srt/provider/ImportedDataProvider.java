@@ -26,9 +26,15 @@ public interface ImportedDataProvider {
 
     public List<BusinessDataTypePrimitiveRestriction> findBdtPriRestriListByDtId(long dtId);
 
+    public CoreDataTypeAllowedPrimitiveExpressionTypeMap findCdtAwdPriXpsTypeMapById(long cdtAwdPriXpsTypeMapId);
+
+    public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findCdtAwdPriXpsTypeMapListByDtId(long dtId);
+
     public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriListByDtScId(long dtScId);
 
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(long cdtScAwdPriXpsTypeMapId);
+
+    public List<XSDBuiltInType> findXbt();
 
     public XSDBuiltInType findXbt(long xbtId);
 

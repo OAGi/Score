@@ -12,6 +12,8 @@ public interface SchemaModuleVisitor {
 
     public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception;
 
+    public void visitXBTSimpleType(XBTSimpleType xbtSimpleType) throws Exception;
+
     public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception;
 
     public void visitBDTSimpleContent(BDTSimpleContent bdtSimpleContent) throws Exception;

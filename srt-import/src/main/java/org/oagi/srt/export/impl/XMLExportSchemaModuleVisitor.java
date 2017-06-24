@@ -224,27 +224,58 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     }
 
     @Override
+    public void visitXBTSimpleType(XBTSimpleType xbtSimpleType) throws Exception {
+        Element simpleTypeElement = new Element("simpleType", XSD_NS);
+        String name = xbtSimpleType.getName();
+        simpleTypeElement.setAttribute("name", name);
+        simpleTypeElement.setAttribute("id", xbtSimpleType.getGuid());
+
+        Element restrictionElement = new Element("restriction", XSD_NS);
+        simpleTypeElement.addContent(restrictionElement);
+        restrictionElement.setAttribute("base", xbtSimpleType.getBaseName());
+
+        rootElement.addContent(simpleTypeElement);
+    }
+
+    @Override
     public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception {
         Element simpleTypeElement = new Element("simpleType", XSD_NS);
         String name = bdtSimpleType.getName();
         simpleTypeElement.setAttribute("name", name);
         simpleTypeElement.setAttribute("id", bdtSimpleType.getGuid());
 
-        Element restrictionElement = new Element("restriction", XSD_NS);
-        simpleTypeElement.addContent(restrictionElement);
+        if (bdtSimpleType.isTimepointCDT() && bdtSimpleType.isBaseDT_CDT() && bdtSimpleType.countBDT_PRI_RESTRI() > 1) {
+            Element unionElement = new Element("union", XSD_NS);
+            simpleTypeElement.addContent(unionElement);
 
-        if ( (name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
-             (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
-            String baseName;
-            if (name.endsWith("CodeContentType")) {
-                baseName = getCodeListName(bdtSimpleType);
-            } else {
-                baseName = getAgencyIdName(bdtSimpleType);
-            }
-
-            restrictionElement.setAttribute("base", baseName + "ContentType");
+            String memberTypes = String.join(" ",
+                    bdtSimpleType.getXbtBuiltInTypes().stream()
+                            .filter(e -> !"xsd:token".equals(e))
+                            .collect(Collectors.toList())
+            );
+            unionElement.setAttribute("memberTypes", memberTypes);
+            unionElement.setAttribute("final", "union");
         } else {
-            restrictionElement.setAttribute("base", bdtSimpleType.getBaseDTName());
+            Element restrictionElement = new Element("restriction", XSD_NS);
+            simpleTypeElement.addContent(restrictionElement);
+
+            if ( (name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
+                    (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
+                String baseName;
+                if (name.endsWith("CodeContentType")) {
+                    baseName = getCodeListName(bdtSimpleType);
+                } else {
+                    baseName = getAgencyIdName(bdtSimpleType);
+                }
+
+                restrictionElement.setAttribute("base", baseName + "ContentType");
+            } else {
+                if (bdtSimpleType.isDefaultBDT()) {
+                    restrictionElement.setAttribute("base", bdtSimpleType.getXbtName());
+                } else {
+                    restrictionElement.setAttribute("base", bdtSimpleType.getBaseDTName());
+                }
+            }
         }
 
         rootElement.addContent(simpleTypeElement);
@@ -286,7 +317,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         String baseName = bdtSimpleContent.getBaseDTName();
         String name = bdtSimpleContent.getName();
-        extensionElement.setAttribute("base", baseName);
+        if (bdtSimpleContent.isDefaultBDT()) {
+            String xbtName = bdtSimpleContent.getXbtName();
+            extensionElement.setAttribute("base", xbtName);
+        } else {
+            extensionElement.setAttribute("base", baseName);
+        }
+
 
         List<BDTSC> dtScList;
         if (baseName.endsWith("CodeContentType")) {
@@ -294,7 +331,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         } else {
             dtScList = new ArrayList();
             for (BDTSC dtSc : bdtSimpleContent.getDtScList()) {
-                if (!dtSc.hasBasedBDTSC()) {
+                if (bdtSimpleContent.isDefaultBDT() || !dtSc.hasBasedBDTSC()) {
                     dtScList.add(dtSc);
                 }
             }
