@@ -53,7 +53,6 @@ public class PopulateBlobContents {
         Release release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
 
         Collection<File> files = Arrays.asList(
-                new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/Common/DataTypes"),
                 new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/Common/ISO20022"),
                 new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/OAGi-Platform.xsd"));
 
