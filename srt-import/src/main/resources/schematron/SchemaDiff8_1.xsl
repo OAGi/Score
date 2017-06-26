@@ -456,6 +456,23 @@
 		</xsl:element>
 		<xsl:apply-templates/>
 	</xsl:template>
+	<xsl:template name="globalSimpleType" match="xsd:schema/xsd:simpleType">
+		<xsl:element name="pattern">
+			<xsl:attribute name="name">Investigating content of the global xsd:simpleType '<xsl:value-of select="@name"/>'</xsl:attribute>
+			<xsl:element name="rule">
+				<xsl:attribute name="context">xsd:schema/xsd:simpleType[@name = '<xsl:value-of select="@name"/>']</xsl:attribute>
+				<xsl:element name="assert">
+					<xsl:attribute name="test">count(child::*[name() != 'xsd:annotation']) = <xsl:value-of select="count(child::*[name() != 'xsd:annotation'])"/></xsl:attribute>#Issue: The number of child elements (excepts xsd:annotation) do not match.
+				</xsl:element>
+				<xsl:if test="count(@id) = 1">
+					<xsl:element name="assert">
+						<xsl:attribute name="test">@id = '<xsl:value-of select="@id"/>'</xsl:attribute>#Issue: The value of the attribute @id does not match.
+					</xsl:element>
+				</xsl:if>
+			</xsl:element>
+		</xsl:element>
+		<xsl:apply-templates/>
+	</xsl:template>
 	<xsl:template name="globalComplexTypeAndGroup" match="xsd:schema/xsd:complexType | xsd:schema/xsd:group">
 		<xsl:element name="pattern">
 			<xsl:choose>
