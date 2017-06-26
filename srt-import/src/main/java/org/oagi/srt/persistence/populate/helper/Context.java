@@ -17,6 +17,7 @@ import org.xml.sax.Locator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -56,10 +57,8 @@ public class Context {
 
         Document xmlDocument;
         if (!documentMap.containsKey(module)) {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
             try {
-                DocumentBuilder builder = builderFactory.newDocumentBuilder();
+                DocumentBuilder builder = documentBuilder();
                 try (InputStream inputStream = new URI(uri).toURL().openStream()) {
                     xmlDocument = builder.parse(inputStream);
                 }
@@ -72,6 +71,20 @@ public class Context {
         }
 
         return xmlDocument;
+    }
+
+    public static DocumentBuilder documentBuilder() {
+        return documentBuilder(true);
+    }
+
+    public static DocumentBuilder documentBuilder(boolean namespaceAware) {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(namespaceAware);
+        try {
+            return builderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private XSSchemaSet xsSchemaSet;
