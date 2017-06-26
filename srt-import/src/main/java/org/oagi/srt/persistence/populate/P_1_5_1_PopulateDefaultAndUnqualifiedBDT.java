@@ -480,8 +480,10 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                 DataTypeSupplementaryComponent dtSc = basedDtSc.clone();
                 dtSc.setGuid(Utility.generateGUID());
                 dtSc.setOwnerDtId(dataType.getDtId());
-                dtSc.setCardinalityMin(0);
-                dtSc.setCardinalityMax(0);
+                if (isDefaultBDT()) {
+                    dtSc.setCardinalityMin(0);
+                    dtSc.setCardinalityMax(0);
+                }
                 dtSc.setBasedDtScId(basedDtSc.getDtScId());
 
                 dtSc = dataTypeDAO.save(dtSc);

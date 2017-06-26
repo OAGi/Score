@@ -11,6 +11,7 @@ import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.export.model.*;
+import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.*;
@@ -23,12 +24,11 @@ import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,15 +90,11 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     }
 
     private Document createDocument(byte[] content) {
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
+        return createDocument(content, true);
+    }
 
-        DocumentBuilder documentBuilder;
-        try {
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e);
-        }
+    private Document createDocument(byte[] content, boolean namespaceAware) {
+        DocumentBuilder documentBuilder = Context.documentBuilder(namespaceAware);
         org.w3c.dom.Document document;
         if (content == null) {
             document = documentBuilder.newDocument();
@@ -230,9 +226,23 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         simpleTypeElement.setAttribute("name", name);
         simpleTypeElement.setAttribute("id", xbtSimpleType.getGuid());
 
-        Element restrictionElement = new Element("restriction", XSD_NS);
-        simpleTypeElement.addContent(restrictionElement);
-        restrictionElement.setAttribute("base", xbtSimpleType.getBaseName());
+        String schemaDefinition = xbtSimpleType.getSchemaDefinition();
+        schemaDefinition =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                schemaDefinition +
+                "</xsd:schema>";
+
+        Document document = createDocument(schemaDefinition.getBytes());
+        for (Element child : document.getRootElement().getChildren()) {
+            child = child.clone();
+            if ("restriction".equals(child.getName())) {
+                if (!Arrays.asList("xbt_DayOfWeekType", "xbt_DayOfYearType", "xbt_BooleanType").contains(name)) {
+                    child.removeContent();
+                }
+            }
+            simpleTypeElement.addContent(child);
+        }
 
         rootElement.addContent(simpleTypeElement);
     }

@@ -124,7 +124,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
     private void createXBTs(Map<Long, SchemaModule> moduleMap) {
         List<XSDBuiltInType> xbtList = importedDataProvider.findXbt().stream()
-                .filter(e -> e.getBuiltInType().startsWith("xbt"))
+                .filter(e -> e.getModule() != null)
                 .collect(Collectors.toList());
         for (XSDBuiltInType xbt : xbtList) {
             SchemaModule schemaModule = moduleMap.get(xbt.getModule().getModuleId());
