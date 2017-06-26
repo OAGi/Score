@@ -264,7 +264,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                             .collect(Collectors.toList())
             );
             unionElement.setAttribute("memberTypes", memberTypes);
-            unionElement.setAttribute("final", "union");
+            simpleTypeElement.setAttribute("final", "union");
         } else {
             Element restrictionElement = new Element("restriction", XSD_NS);
             simpleTypeElement.addContent(restrictionElement);
