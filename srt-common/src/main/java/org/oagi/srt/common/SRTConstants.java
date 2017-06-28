@@ -12,6 +12,7 @@ public class SRTConstants {
 
 	public static final String NS_CCTS_PREFIX = "ccts";
 	public static final String NS_XSD_PREFIX = "xsd";
+	public static final String NS_XS_PREFIX = "xs";
 	public static final String NS_CCTS = "urn:un:unece:uncefact:documentation:1.1";
 	public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
 

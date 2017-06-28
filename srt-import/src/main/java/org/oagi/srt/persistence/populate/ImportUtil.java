@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -55,6 +56,10 @@ public class ImportUtil {
     }
 
     public String toString(NodeList nodeList) {
+        if (nodeList.getLength() == 1 && nodeList.item(0) instanceof Text) {
+            return ((Text) nodeList.item(0)).getWholeText();
+        }
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = null;
         try {
