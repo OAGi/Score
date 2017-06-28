@@ -1,0 +1,62 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D581C858-24A8-E5DD-7EFF-F14C302220E9" name="USAGE_RULE">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:04:33 UTC</createdTime>
+<commentInRDBMS>This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_41</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="USAGE_RULE_ID" id="D3DC6B1C-213B-2973-AAD0-243B23D9166A">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:09:30 UTC</createdTime>
+<commentInRDBMS>Primary key of the usage rule.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="9AB0CAB5-783A-691B-D197-2C3BCA3A8B8E">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:09:30 UTC</createdTime>
+<commentInRDBMS>Short nmenomic name of the usage rule.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>A3A3C77D-0366-9768-FF89-1C25E56881C8</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONDITION_TYPE" id="F6ABAFCF-1947-5BBD-C375-5B87E58DC914">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:11:09 UTC</createdTime>
+<commentInRDBMS>Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<ownDataTypeParameters>,5,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="AB1F0E58-901D-58E6-CC81-AE9D36E54810" name="DT_USAGE_RULE_EXPRESSION_PK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:09:31 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D3DC6B1C-213B-2973-AAD0-243B23D9166A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
