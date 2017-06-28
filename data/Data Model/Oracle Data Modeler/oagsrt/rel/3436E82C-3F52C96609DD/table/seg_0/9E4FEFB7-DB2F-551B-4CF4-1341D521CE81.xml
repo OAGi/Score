@@ -127,22 +127,6 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:29:27 UTC</createdTime>
-<commentInRDBMS>This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="040934B2-49A0-E410-B4FA-1038C00C5612" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="CREATED_BY" id="D8E04933-D95D-8CDC-D2A4-2AE87F0BEBAB">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
@@ -410,16 +394,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="3A8E6233-2866-D9A7-CD72-7DC338E66D33"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="569E1583-1D67-1915-C0EE-48B9F4A54575" name="BCC_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:12:19 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="2B2C2B10-BD8F-C752-B55C-411C59D2054D"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

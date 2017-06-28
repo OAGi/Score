@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BIE_USER_EXT_REVISION" directorySegmentName="seg_0" id="672705A5-0476-28C8-641A-2FD8E2E9564A">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:07 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <logging>YES</logging>
 <partitionedRowMovement>DISABLE</partitionedRowMovement>
@@ -11,88 +11,88 @@
 <columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
 <ColumnProxy name="TOP_LEVEL_ABIE_ID" id="2B4F7252-7E35-537E-5504-03FC98C2CE99">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="BIE_USER_EXT_REVISION_ID" id="367B1EDE-4174-988B-24AD-9B0A54371B00">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="USER_EXT_ACC_ID" id="484CF64E-1744-4D30-8045-166095B408FC">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="EXT_ACC_ID" id="6E6040CC-FEB6-9FE2-E4D2-EC4A5E99C278">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="EXT_ABIE_ID" id="ABAB5E96-8470-5DB9-222A-3510C440554C">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REVISED_INDICATOR" id="B744B799-C371-E794-0C3F-DE97C31B0344">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 </columnProxies>
 <indexProxies>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BIE_UXR_TLVL_ABIE_ID_IDX" id="6B8A0BC4-1F0B-A144-8329-1DE5276AAF41">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BIE_UXR_PK_IDX" id="73BC21B2-A867-C72D-5D1D-379C7C8D5EF5">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BIE_UXR_EXT_ACC_ID_IDX" id="97C74C04-E0D9-825F-17AD-8F8B0EE557E1">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BIE_UXR_EXT_ABIE_ID_IDX" id="AA3DE325-2019-C0D3-5F98-DCED4C1685A2">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BIE_UXR_USR_EXT_ACC_ID_IDX" id="ABD64E5C-3038-39DD-EE13-88B80297DB0F">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 </indexProxies>
 <foreignKeys>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BUER_EXT_ABIE_ID_FK" id="2A9228DD-213D-AC6B-1BC9-065001840E26">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BUER_EXT_ACC_ID_FK" id="6804B16D-2A05-885E-721A-0F6D351E65F7">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BUER_USER_EXT_ACC_ID_FK" id="864D114F-1F7E-D661-A008-392491733A7C">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BUER_TOP_LEVEL_ABIE_ID_FK" id="9A6BD781-7B54-824F-0187-046B52166E4B">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 </foreignKeys>
 <primaryKeys>
 <PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="BUER_PK" id="B00435D5-581B-BC03-8BA1-5CB523CB87F1">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:22:54 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
 </PrimaryKey>

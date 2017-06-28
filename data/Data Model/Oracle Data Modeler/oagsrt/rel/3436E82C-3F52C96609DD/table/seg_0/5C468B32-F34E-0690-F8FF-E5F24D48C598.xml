@@ -200,22 +200,6 @@
 <ownDataTypeParameters>1,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="B7C1B4D0-F2EC-0B35-2C1A-523085C02281">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:34:07 UTC</createdTime>
-<commentInRDBMS>Description to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="AFEE0B5A-BBCC-3849-21A9-A6CD5467C636" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="REMARK" id="09348972-9A42-9D84-17AD-33249331F8C6">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
@@ -435,16 +419,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="7AD9411D-61D8-ACCB-F55D-D716AEC5C81A"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="7596632C-57B2-C95E-ECDD-9DE0F5D503AA" name="BBIE_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:11:14 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="B7C1B4D0-F2EC-0B35-2C1A-523085C02281"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

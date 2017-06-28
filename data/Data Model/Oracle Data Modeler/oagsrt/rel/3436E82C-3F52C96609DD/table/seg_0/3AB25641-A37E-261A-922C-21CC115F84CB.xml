@@ -58,22 +58,6 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="A7F8145C-9EEA-C668-C32E-FD13BFF757C4">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:23:21 UTC</createdTime>
-<commentInRDBMS>This is a documentation or description of the ACC. Since ACC is business context independent, this is a business context independent description of the ACC concept.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="882F8E74-51C1-CE54-65EE-7AC63A2163ED" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="BASED_ACC_ID" id="8EC069EA-39D3-1A01-A284-3398347BD4FA">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:23:21 UTC</createdTime>
@@ -415,16 +399,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="78D11280-7876-10D1-CAD9-375C9A43775E"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="E091101B-8E69-1F62-06F5-3823E498D889" name="ACC_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:10:01 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="A7F8145C-9EEA-C668-C32E-FD13BFF757C4"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

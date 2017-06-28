@@ -1,0 +1,6 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<SequenceOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" name="APP_USER_ID_SEQ" directorySegmentName="seg_0" id="BA2BF954-8846-ABBF-F150-BB21FD812E63">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:50:44 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</SequenceOraclev10g>

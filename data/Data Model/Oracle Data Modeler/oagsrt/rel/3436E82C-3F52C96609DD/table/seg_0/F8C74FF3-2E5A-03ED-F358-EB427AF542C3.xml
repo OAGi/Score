@@ -33,7 +33,7 @@
 <ownDataTypeParameters>,5,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="CONSTRAINT" id="307552A7-43B8-6EC8-0FC7-F174653ECCFE">
+<Column name="CONSTRAINT_TEXT" id="307552A7-43B8-6EC8-0FC7-F174653ECCFE">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 13:51:18 UTC</createdTime>
 <commentInRDBMS>This column capture the constraint expressing the usage rule. In other words, this is the expression.</commentInRDBMS>

@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="USAGE_RULE_EXPRESSION" directorySegmentName="seg_0" id="F8C74FF3-2E5A-03ED-F358-EB427AF542C3">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 13:03:16 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <logging>YES</logging>
 <partitionedRowMovement>DISABLE</partitionedRowMovement>
@@ -10,49 +10,49 @@
 <rejectLimit></rejectLimit>
 <columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
 <ColumnProxy name="USAGE_RULE_EXPRESSION_ID" id="1B5BB722-A5C2-727B-0406-5E5D67F02C0D">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 13:05:47 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="CONSTRAINT" id="307552A7-43B8-6EC8-0FC7-F174653ECCFE">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 13:51:18 UTC</createdTime>
+<ColumnProxy name="CONSTRAINT_TEXT" id="307552A7-43B8-6EC8-0FC7-F174653ECCFE">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="CONSTRAINT_TYPE" id="44010B91-41A8-A05F-5A56-750734B0DC70">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 13:51:17 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REPRESENTED_USAGE_RULE_ID" id="F58400CE-DD1E-86FD-BE49-052F2415559E">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 14:19:10 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 </columnProxies>
 <indexProxies>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="URE_REP_USAGE_RULE_ID_IDX" id="4A27EB76-6731-0679-186E-A99B0DBC2259">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 01:44:12 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="URE_URXPS_ID_IDX" id="555B642C-301F-7BAC-4231-C1BB036B282B">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 01:42:57 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 </indexProxies>
 <foreignKeys>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="USAGE_RULE_XPS_REPS_UR_ID_FK" id="62095771-32C0-37FD-777F-EFCC3356E16C">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 14:20:03 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 </foreignKeys>
 <primaryKeys>
 <PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="USAGE_RULE_EXPRESSION_PK" id="C699C821-B1B3-F8B5-914D-F6C45D28B741">
-<createdBy>bnk1</createdBy>
-<createdTime>2017-06-27 13:05:48 UTC</createdTime>
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
 </PrimaryKey>

@@ -8,24 +8,11 @@
 <existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
-<Column name="DEFINITION_ID" id="54A3D49E-9A70-49B9-5784-15DBC369DCCF">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:02:14 UTC</createdTime>
-<commentInRDBMS>A primary(and surrogate) key of definition table. It is created by UUIDv3 (REF_ID, REF_TABLE_NAME, REF_COLUMN_NAME, SEQ, LANGUAGE_CODE, CLOB_CONTENT_ID).</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>36 CHAR,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-</Column>
 <Column name="REF_ID" id="8396211E-E949-CD9B-F037-2F312F85894F">
 <createdBy>hakju</createdBy>
 <createdTime>2017-06-28 02:08:51 UTC</createdTime>
 <commentInRDBMS>The reference ID which points to this definition ID.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
@@ -38,7 +25,6 @@
 <createdTime>2017-06-28 02:08:51 UTC</createdTime>
 <commentInRDBMS>The reference table name which points to this definition ID.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -51,7 +37,6 @@
 <createdTime>2017-06-28 02:08:51 UTC</createdTime>
 <commentInRDBMS>The reference column name which points to this definition ID. The default value is &apos;DEFINITION&apos;.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -64,7 +49,6 @@
 <createdTime>2017-06-28 02:08:51 UTC</createdTime>
 <commentInRDBMS>Non-negative number of the definitions. The default value is 1.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
@@ -77,7 +61,6 @@
 <createdTime>2017-06-28 02:08:51 UTC</createdTime>
 <commentInRDBMS>The language code about the clob content. If this value is empty, it should be dealt with &apos;en&apos;, English.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -85,20 +68,28 @@
 <ownDataTypeParameters>20 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="CLOB_CONTENT_ID" id="48FDB7CA-BAFC-EC25-8101-D291BA19B305">
+<Column name="GUID" id="54A3D49E-9A70-49B9-5784-15DBC369DCCF">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:04:38 UTC</createdTime>
-<commentInRDBMS>A foreign key of clob content table.</commentInRDBMS>
+<createdTime>2017-06-28 02:02:14 UTC</createdTime>
+<commentInRDBMS>A surrogate column of definition table. It is created by UUIDv3 (REF_ID, REF_TABLE_NAME, REF_COLUMN_NAME).</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
+<ownDataTypeParameters>36 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="683FE912-1CA5-7FB8-5D82-311498FDBB8B">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 16:02:39 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="E61D1BDA-EAF6-2C86-BBB2-0AA812207063" referredColumn="13A2A7BB-5723-9735-089B-B9738074B9D7"/>
-</associations>
 </Column>
 <Column name="DEFINITION_SOURCE" id="71ACB242-F75E-C096-44E2-1584976B488D">
 <createdBy>hakju</createdBy>
@@ -135,14 +126,17 @@
 <indexState>Primary Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
+<colUsage columnID="8396211E-E949-CD9B-F037-2F312F85894F"/>
+<colUsage columnID="C4202BFC-37D0-2FEE-0F0F-86CA1F8FC9C8"/>
+<colUsage columnID="81AD63D8-E8C2-C8C1-56B2-004CC98219FF"/>
+<colUsage columnID="46C2CC55-0A56-BFF7-7D31-DED89990D344"/>
+<colUsage columnID="D5EDDAF8-BB8E-83BA-5F24-E84AAB38609A"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="584D753F-E379-3C6F-3336-BEFA67934999" name="DEFINITION_UK1">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:21:28 UTC</createdTime>
+<ind_PK_UK id="5D3C6B69-5B78-6365-F4D3-C75EF7CCC85E" name="DEFINITION_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 16:01:45 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="8396211E-E949-CD9B-F037-2F312F85894F"/>
@@ -150,17 +144,6 @@
 <colUsage columnID="81AD63D8-E8C2-C8C1-56B2-004CC98219FF"/>
 <colUsage columnID="46C2CC55-0A56-BFF7-7D31-DED89990D344"/>
 <colUsage columnID="D5EDDAF8-BB8E-83BA-5F24-E84AAB38609A"/>
-<colUsage columnID="48FDB7CA-BAFC-EC25-8101-D291BA19B305"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="2CC319B5-3749-A0B4-1E2D-FF63F04F4C5F" name="DEFINITION_CLOB_CONTENT_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:05:03 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="48FDB7CA-BAFC-EC25-8101-D291BA19B305"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

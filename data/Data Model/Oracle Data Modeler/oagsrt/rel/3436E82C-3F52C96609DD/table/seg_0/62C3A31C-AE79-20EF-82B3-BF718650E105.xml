@@ -49,22 +49,6 @@
 <colAssociation fkAssociation="6D651516-3EF9-EDA5-5105-145EF1B75214" referredColumn="2820686A-A020-3DC6-EF01-78792C666327"/>
 </associations>
 </Column>
-<Column name="DEFINITION_ID" id="163577E4-C383-8A60-0D85-D231ADBF19F7">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:18:39 UTC</createdTime>
-<commentInRDBMS>Definition to override the BCCP&apos;s Definition. If NULL, it means that the definition should be inherited from the based CC.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="44303BF5-DEC4-9E64-212E-958DC10F5342" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="REMARK" id="3AE6F5FB-8E96-3296-81A1-6EA7EF56ADAE">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:18:39 UTC</createdTime>
@@ -220,16 +204,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="9741C428-906E-457D-CD45-672EA372E68C"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="C69651B0-25AD-972A-D6B2-2026D909DBA4" name="BBIEP_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:11:28 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="163577E4-C383-8A60-0D85-D231ADBF19F7"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

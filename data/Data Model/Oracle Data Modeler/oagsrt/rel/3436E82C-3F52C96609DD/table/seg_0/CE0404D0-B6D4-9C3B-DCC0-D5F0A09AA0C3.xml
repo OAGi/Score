@@ -112,22 +112,6 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="256F2B33-3088-E1A4-40D0-DE7CE671CAA0">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:52:52 UTC</createdTime>
-<commentInRDBMS>This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID column) and the ACC under that ASCCP, definition in the ASCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the ASCCP.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="47D4D256-DD26-3C6F-C35C-7AE27CD32BCB" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="IS_DEPRECATED" id="FFA0E473-3515-79F3-B615-3CECC17C8DF6">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:52:52 UTC</createdTime>
@@ -371,16 +355,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="4C73C675-5ED4-1228-1B54-FC8AB76D60A1"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="5D9872B8-C4BE-C4C4-3941-160C61B5E9ED" name="ASCC_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:10:44 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="256F2B33-3088-E1A4-40D0-DE7CE671CAA0"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

@@ -60,22 +60,6 @@
 <ownDataTypeParameters>20,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="52642323-5559-307A-8896-24F30DB2CC6D">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 18:50:02 UTC</createdTime>
-<commentInRDBMS>Description of the supplementary component.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="6373DA12-AA44-966D-0D49-E795CA6F068E" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="OWNER_DT_ID" id="03073B13-6419-111B-CD15-4E431C55F5A3">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
@@ -174,16 +158,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="18123DEA-45AE-5B4C-388C-C3FD50AA1491"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="AE2CFC49-D324-0419-0109-41EEEF7B61F3" name="DT_SC_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:13:14 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="52642323-5559-307A-8896-24F30DB2CC6D"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

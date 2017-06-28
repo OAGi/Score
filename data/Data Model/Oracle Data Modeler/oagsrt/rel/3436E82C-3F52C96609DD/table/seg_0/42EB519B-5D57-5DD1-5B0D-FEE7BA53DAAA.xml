@@ -100,22 +100,6 @@
 <ownDataTypeParameters>10 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
-<commentInRDBMS>Description of the code list.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="E7DD30C0-BC10-08B4-1D88-11E6988E91ED" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="REMARK" id="5BEA2A63-F353-E3B1-A50F-EDEC87D83998">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:28:39 UTC</createdTime>
@@ -330,16 +314,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="FDCB2B2E-22E7-5447-24EA-39A38E160B06"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="F39EB932-8CAF-FDE2-1F55-110F46941643" name="CODE_LIST_DEFINITION_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:13:53 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

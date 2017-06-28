@@ -47,22 +47,6 @@
 <ownDataTypeParameters>60,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_ID" id="87052FD7-5922-A93A-260A-87F3200D9578">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:42:26 UTC</createdTime>
-<commentInRDBMS>Description of the ASCCP.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>36 CHAR</dataTypeSize>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="3791F5AD-10F8-5C47-6092-4F9DEDD515C7" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
-</associations>
-</Column>
 <Column name="ROLE_OF_ACC_ID" id="9216E609-8175-A92F-EA89-C82BF236C16D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:42:26 UTC</createdTime>
@@ -403,16 +387,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="133630D3-A46D-7D1C-35BD-11C353A80414"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="6D997F2A-6150-D6BC-A08C-B3C3D9FAADB2" name="ASCCP_DEFINITION_ID_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:11:00 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="87052FD7-5922-A93A-260A-87F3200D9578"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CODE_LIST" directorySegmentName="seg_0" id="42EB519B-5D57-5DD1-5B0D-FEE7BA53DAAA">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:25:50 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <logging>YES</logging>
 <partitionedRowMovement>DISABLE</partitionedRowMovement>
@@ -11,133 +11,123 @@
 <columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
 <ColumnProxy name="LAST_UPDATE_TIMESTAMP" id="148BBDBE-19DB-62CF-DF2F-868E2CC658FF">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="NAME" id="1A23B030-15EB-27C3-2DDA-939833EDC2D9">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="AGENCY_ID" id="1F1CC35D-86BA-AB66-500C-63865CBE890B">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="LIST_ID" id="2361FEB6-D128-00BD-F97D-CFA206CAC971">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="CODE_LIST_ID" id="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="BASED_CODE_LIST_ID" id="31B0C6D3-86A5-B21E-4E3F-C707B278259C">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="VERSION_ID" id="3AE9D4AD-8D32-C3D4-775F-6DC8155F6EE5">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REMARK" id="5BEA2A63-F353-E3B1-A50F-EDEC87D83998">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="EXTENSIBLE_INDICATOR" id="7DCEB7CE-7B80-515D-E9C4-C95BC740479A">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="CREATION_TIMESTAMP" id="80C56B68-77A7-EC5A-E5B7-04F48C94EE31">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="GUID" id="96C0041C-1A96-588C-B393-A742D51433E0">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="CREATED_BY" id="ACCB5BA7-DB69-9F6C-1E02-C700F5D76255">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</ColumnProxy>
-<ColumnProxy name="DEFINITION_ID" id="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="ENUM_TYPE_GUID" id="D8ABDCD2-F404-A932-A155-5C3E6E22A93F">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="MODULE_ID" id="DE9B189F-C3D2-40F6-42CB-9EB344704ED9">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="STATE" id="E5D5AC4F-789C-25F9-185D-0FE4617E7EFE">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="LAST_UPDATED_BY" id="FDCB2B2E-22E7-5447-24EA-39A38E160B06">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 </columnProxies>
 <indexProxies>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CODE_LIST_BASED_CL_ID_IDX" id="53CFAA5C-06B5-6F9F-9FA7-2CB6CDBC85B4">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-18 19:23:03 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 </indexProxies>
 <foreignKeys>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_AILV_FK" id="33138858-91C6-A29C-E34A-476B0309B6A6">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:29:01 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_CREATED_BY_FK" id="9174DC96-3CA9-D0E2-9379-4115A62020D1">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:30:03 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_LAST_UPDATED_BY_FK" id="92BA7230-B5E1-5295-93A7-C1728F63CC26">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:30:03 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_MODULE_ID_FK" id="A784C1B4-193A-8981-CE4B-FF1EE8BC0CC0">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:30:03 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</ForeignKey>
-<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_DEFINITION_FK" id="F39EB932-8CAF-FDE2-1F55-110F46941643">
-<createdBy>hakju</createdBy>
-<createdTime>2017-06-28 02:13:53 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CODE_LIST_BASED_CL_ID_FK" id="F675BF9A-CF45-CAC0-9AAB-4B410687D879">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:29:36 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
 </foreignKeys>
 <primaryKeys>
 <PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CODE_LIST_PK" id="B067AEAF-560D-5DE5-9B10-42B8CCA0896F">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
@@ -145,13 +135,13 @@
 <uniqueKeys>
 <UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="CODE_LIST_UK2" id="A4AF9572-2CAA-6C41-EC9A-562A46EA453B">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:30:16 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
 </UniqueKey>
 <UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="CODE_LIST_UK1" id="D6AC236C-7416-A366-9FA4-BE95F1CA5B79">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:30:16 UTC</createdTime>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
 </UniqueKey>
