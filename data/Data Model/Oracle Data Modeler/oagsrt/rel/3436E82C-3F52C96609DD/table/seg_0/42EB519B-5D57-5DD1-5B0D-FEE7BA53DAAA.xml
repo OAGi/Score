@@ -82,7 +82,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="19D7F3A5-BA92-929E-5AE4-294FF9426406" referredColumn="166E2644-631C-ABAE-F0C1-4E3A8A71AD0B"/>
@@ -100,7 +100,7 @@
 <ownDataTypeParameters>10 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F">
+<Column name="DEFINITION_ID" id="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:28:39 UTC</createdTime>
 <commentInRDBMS>Description of the code list.</commentInRDBMS>
@@ -108,9 +108,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E7DD30C0-BC10-08B4-1D88-11E6988E91ED" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
+</associations>
 </Column>
 <Column name="REMARK" id="5BEA2A63-F353-E3B1-A50F-EDEC87D83998">
 <createdBy>hno2</createdBy>
@@ -125,19 +129,6 @@
 <ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION_SOURCE" id="183008D0-13AD-38C1-32BB-83C2D7E7B217">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:28:39 UTC</createdTime>
-<commentInRDBMS>This is typically a URL which indicates the source of the code list&apos;s DEFINITION.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>100 CHAR</dataTypeSize>
-<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-</Column>
 <Column name="BASED_CODE_LIST_ID" id="31B0C6D3-86A5-B21E-4E3F-C707B278259C">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:28:39 UTC</createdTime>
@@ -148,7 +139,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="D5F48BAE-5833-1090-627B-E1F45F4680A6" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
@@ -176,7 +167,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="25AB0458-4D06-4939-E2AA-EE0043526B11" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
@@ -191,7 +182,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="9ADE0109-BE95-0878-2993-825E3B9625CB" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -206,7 +197,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="9C2E2DEB-3DD4-1591-244D-0457DDA53839" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -339,6 +330,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="FDCB2B2E-22E7-5447-24EA-39A38E160B06"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F39EB932-8CAF-FDE2-1F55-110F46941643" name="CODE_LIST_DEFINITION_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 02:13:53 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C886BAB1-8286-15E2-9A21-54B4AB7ACA7F"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

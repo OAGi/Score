@@ -72,12 +72,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="9BA9B410-D1C6-F04E-C36D-BA08E47A6017" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="10ADB374-A8BA-58DE-AABD-42435B3A0D48" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="CREATED_BY" id="B87AA5AC-6CE3-FC75-E351-559BE67EDE5E">
@@ -312,9 +312,9 @@
 <colUsage columnID="32BC279F-7BC0-55C4-30D6-FEE4AF40FE20"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="D15ACDA9-95E1-0FD7-419A-61A2BDA2187A" name="ABIE_DEFINITION_ID_FK">
+<ind_PK_UK id="AB2F7BD6-8937-6257-29D1-2CDCA4B31402" name="ABIE_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:06:09 UTC</createdTime>
+<createdTime>2017-06-28 02:09:39 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

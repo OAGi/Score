@@ -208,12 +208,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="337C3DD0-9F30-15A8-D403-880865399648" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="AFEE0B5A-BBCC-3849-21A9-A6CD5467C636" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="REMARK" id="09348972-9A42-9D84-17AD-33249331F8C6">
@@ -437,9 +437,9 @@
 <colUsage columnID="7AD9411D-61D8-ACCB-F55D-D716AEC5C81A"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="C495936C-5332-C532-7CF3-C24C408327C1" name="BBIE_DEFINITION_ID_FK">
+<ind_PK_UK id="7596632C-57B2-C95E-ECDD-9DE0F5D503AA" name="BBIE_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:12:25 UTC</createdTime>
+<createdTime>2017-06-28 02:11:14 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

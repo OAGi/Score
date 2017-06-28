@@ -87,12 +87,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="D2583C66-6DC1-6C76-842B-34764ECA1400" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="F2662410-537F-2F51-6742-7EEB32302B21" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="CARDINALITY_MIN" id="5AC31830-F89D-29A8-6055-EBD2E04B40F1">
@@ -320,9 +320,9 @@
 <colUsage columnID="EED998B7-B8D5-6D15-C5BC-7D3F3DC7C68B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="6A2C81CE-8486-25FC-EB5F-7FA94E392130" name="ASBIE_DEFINITION_ID_FK">
+<ind_PK_UK id="90072EFD-7261-AAAD-B1D7-D288536A23CD" name="ASBIE_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:10:47 UTC</createdTime>
+<createdTime>2017-06-28 02:10:15 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

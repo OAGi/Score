@@ -135,12 +135,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="DA7ACE95-82C0-1FFB-C0C3-15E2502FE3C8" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="040934B2-49A0-E410-B4FA-1038C00C5612" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="CREATED_BY" id="D8E04933-D95D-8CDC-D2A4-2AE87F0BEBAB">
@@ -412,9 +412,9 @@
 <colUsage columnID="3A8E6233-2866-D9A7-CD72-7DC338E66D33"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="BB70B394-15F5-D6D2-305F-501D8C88276F" name="BCC_DEFINITION_ID_FK">
+<ind_PK_UK id="569E1583-1D67-1915-C0EE-48B9F4A54575" name="BCC_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:13:48 UTC</createdTime>
+<createdTime>2017-06-28 02:12:19 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

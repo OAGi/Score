@@ -66,12 +66,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="A111813F-8B6F-A5EA-EC76-CFE3B6889D80" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="882F8E74-51C1-CE54-65EE-7AC63A2163ED" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="BASED_ACC_ID" id="8EC069EA-39D3-1A01-A284-3398347BD4FA">
@@ -417,9 +417,9 @@
 <colUsage columnID="78D11280-7876-10D1-CAD9-375C9A43775E"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="11D2A107-D24E-9853-F5B9-6339128B553C" name="ACC_DEFINITION_ID_FK">
+<ind_PK_UK id="E091101B-8E69-1F62-06F5-3823E498D889" name="ACC_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:10:09 UTC</createdTime>
+<createdTime>2017-06-28 02:10:01 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

@@ -14,5 +14,5 @@
    <object objectType="sub_view" objectID="07DE7307-4EAB-44B6-158D-340360E2AB03" name="10 - Business Information Entity (BIE)" visible="true"/>
    <object objectType="sub_view" objectID="3EED3267-088D-D59F-72BB-E2D18EA4BEE0" name="11 - BIE to CC" visible="false"/>
    <object objectType="sub_view" objectID="4121E2A9-7C4A-BD78-9B5A-0059C2B5AAD2" name="12 - Profile BOD (Top-Level ABIE)" visible="false"/>
-   <object objectType="sub_view" objectID="E8B80778-9DF3-4B7F-DF36-9829707A40B5" name="13 - BIE Usage Rule" visible="true"/>
+   <object objectType="sub_view" objectID="E8B80778-9DF3-4B7F-DF36-9829707A40B5" name="13 - BIE Usage Rule" visible="false"/>
 </oracle.dbtools.crest.model.design.relational.RelationalDesign>

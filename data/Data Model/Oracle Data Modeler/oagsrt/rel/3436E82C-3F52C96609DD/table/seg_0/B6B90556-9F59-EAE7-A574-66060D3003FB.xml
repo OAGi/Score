@@ -62,7 +62,7 @@
 <ownDataTypeParameters>100,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="32417993-D789-4004-C594-C072D4337151">
+<Column name="DEFINITION_ID" id="32417993-D789-4004-C594-C072D4337151">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:01:05 UTC</createdTime>
 <commentInRDBMS>Long description or explannation of the code list value, e.g., &apos;EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals&apos;.</commentInRDBMS>
@@ -70,22 +70,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
-</Column>
-<Column name="DEFINITION_SOURCE" id="CB969263-6925-0BD2-A8D0-2229801765D4">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 21:01:05 UTC</createdTime>
-<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>100 CHAR</dataTypeSize>
-<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AF0590FB-173E-1997-14E9-F6D5E497E7FD" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
+</associations>
 </Column>
 <Column name="USED_INDICATOR" id="37E94477-D8A5-E7B2-8D2C-B5CC2458BC5B">
 <createdBy>hno2</createdBy>
@@ -95,8 +86,7 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT006</logicalDatatype>
-<dataTypeSize>1</dataTypeSize>
-<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="LOCKED_INDICATOR" id="00D73EEA-1422-84C0-A93D-69DB49B9024E">
@@ -155,6 +145,15 @@
 <colUsage columnID="8F4770F6-992A-EBFE-D70A-9DF4CB0C9C9E"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="EF892169-725D-3F90-4AFD-070B1AEF2B80" name="CLV_DEFINITION_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 02:18:07 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="32417993-D789-4004-C594-C072D4337151"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="AC241922-5DC4-9918-3807-E77E9F28DC30" name="CLV_CODE_LIST_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:02:09 UTC</createdTime>
@@ -163,6 +162,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="8F4770F6-992A-EBFE-D70A-9DF4CB0C9C9E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="DEAD76BA-1F43-50ED-31C4-142EB22FB95B" name="CLV_DEFINITION_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 02:14:38 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="32417993-D789-4004-C594-C072D4337151"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

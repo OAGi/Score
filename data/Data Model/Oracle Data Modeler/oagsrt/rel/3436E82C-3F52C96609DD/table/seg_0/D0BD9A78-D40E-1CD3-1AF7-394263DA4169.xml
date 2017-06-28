@@ -72,12 +72,12 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="BB26316E-977A-3BA2-AAB6-53079F291F86" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="CF01C964-8223-B19D-590D-936642B7895A" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
 <Column name="REMARK" id="3EACD5FC-3876-CDF2-5852-835661B023D7">
@@ -247,9 +247,9 @@
 <colUsage columnID="87AE10D5-BD69-AA4D-8881-EDAC41D02527"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="430C2631-F17A-13E2-FEA2-D51B95C403D7" name="ASBIEP_DEFINITION_ID_FK">
+<ind_PK_UK id="C83E9977-99D5-11F8-A48A-801DF65ED2E9" name="ASBIEP_DEFINITION_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:11:05 UTC</createdTime>
+<createdTime>2017-06-28 02:10:26 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>

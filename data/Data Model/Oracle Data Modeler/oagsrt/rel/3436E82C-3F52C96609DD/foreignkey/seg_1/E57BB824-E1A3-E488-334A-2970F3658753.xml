@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_1" id="E57BB824-E1A3-E488-334A-2970F3658753" containerWithKeyObject="F8C74FF3-2E5A-03ED-F358-EB427AF542C3" localFKIndex="62095771-32C0-37FD-777F-EFCC3356E16C" name="USAGE_RULE_EXPRESSION_DT_USAGE_RULE_FK">
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_1" id="E57BB824-E1A3-E488-334A-2970F3658753" containerWithKeyObject="F8C74FF3-2E5A-03ED-F358-EB427AF542C3" localFKIndex="62095771-32C0-37FD-777F-EFCC3356E16C" name="USAGE_RULE_XPS_REPS_UR_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:20:02 UTC</createdTime>
 <notes>The usage rule  which the expression represents</notes>

@@ -150,15 +150,15 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>19</dataTypePrecision>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="823D7BA6-4555-28A5-1E03-DCAEA54D59B5" referredColumn="0C8EBDE1-4473-B00E-49B4-4D21287E3338"/>
+<colAssociation fkAssociation="B7E6F64A-8500-99ED-FF94-63469EBBE899" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
 </associations>
 </Column>
-<Column name="CONTENT_COMPONENT_DEFINITION" id="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6">
+<Column name="CONTENT_COMPONENT_DEF_ID" id="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:33:16 UTC</createdTime>
 <commentInRDBMS>Description of the content component of the data type.</commentInRDBMS>
@@ -166,9 +166,13 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT028</logicalDatatype>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>36 CHAR</dataTypeSize>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6418E81E-46CF-E610-E434-16DE2E8F541A" referredColumn="54A3D49E-9A70-49B9-5784-15DBC369DCCF"/>
+</associations>
 </Column>
 <Column name="REVISION_DOC" id="E58D77CC-FA64-A422-C9E1-DFDCA2243A11">
 <createdBy>hno2</createdBy>
@@ -384,6 +388,15 @@
 <colUsage columnID="F87B2607-5EB7-FC12-2F13-231C09B14BB7"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="7B6B6723-53A5-3C12-33AE-F660B9F7748B" name="DT_CONT_COMP_DEF_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 02:18:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="8AC69A8D-A3FB-8229-9DA9-65A210475EBF" name="DT_PREVIOUS_VERSION_DT_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:36:56 UTC</createdTime>
@@ -464,14 +477,24 @@
 <colUsage columnID="7F7A4D40-6035-59E9-73BA-D3C9E1FB116B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="7D072AC6-471E-9A98-1FD1-BD871DDE2F21" name="DT_DEFINITION_ID_FK">
+<ind_PK_UK id="278E5882-F37A-4E93-AC71-67CD700A44BC" name="DT_DEFINITION_ID_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2017-06-16 04:14:25 UTC</createdTime>
+<createdTime>2017-06-28 02:12:51 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="90A96155-C747-01D1-0200-959BCE00F85D" name="DT_CONTENT_COMPONENT_DEF_ID_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 02:16:07 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

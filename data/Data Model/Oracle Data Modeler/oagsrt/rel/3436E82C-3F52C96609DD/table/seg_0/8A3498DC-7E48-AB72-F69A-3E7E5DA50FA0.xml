@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="8A3498DC-7E48-AB72-F69A-3E7E5DA50FA0" name="DT_USAGE_RULE_ASSIGNMENT">
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="8A3498DC-7E48-AB72-F69A-3E7E5DA50FA0" name="DT_USAGE_RULE">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:31:09 UTC</createdTime>
 <commentInRDBMS>This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both.</commentInRDBMS>
@@ -81,7 +81,44 @@
 <colUsage columnID="F684591F-4778-EB50-0D39-27D0E0CBF19E"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="D8BCCA42-4274-0C88-CC2B-3FA67E682DE5" name="CONTENT_COMPONENT_USAGE_RULE_FK">
+<ind_PK_UK id="72435B4E-8662-9868-BC0B-766988923034" name="DUR_DT_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F684591F-4778-EB50-0D39-27D0E0CBF19E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="11832337-BE7B-1196-ECB0-BF94DAD811F6" name="DUR_TARGET_DT_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="680FBCF9-F36A-77C9-332D-3E61F3570B83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="69418584-ECBD-277D-E28C-3D3C6A8154DC" name="DUR_TARGET_DT_SC_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AFF6B767-1097-3E9D-7145-861640DF9F2E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="90281543-A847-AD01-5CE5-C4628D66D78B" name="DUR_ASSIGNED_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4AD74244-0C5C-18C8-4FD4-8DC3C951C80A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D8BCCA42-4274-0C88-CC2B-3FA67E682DE5" name="DT_USAGE_RULE_DT_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:45:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -91,7 +128,7 @@
 <colUsage columnID="680FBCF9-F36A-77C9-332D-3E61F3570B83"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="2B78BF07-1140-E1A5-27DD-33A78E8903B9" name="DT_SC_USAGE_RULE_FK">
+<ind_PK_UK id="2B78BF07-1140-E1A5-27DD-33A78E8903B9" name="DT_USAGE_RULE_DT_SC_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:45:56 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -101,7 +138,7 @@
 <colUsage columnID="AFF6B767-1097-3E9D-7145-861640DF9F2E"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="BD94AADA-310E-6AAA-AE71-FB46B0DE3D59" name="DT_USAGE_RULE_USAGE_RULE_FK">
+<ind_PK_UK id="BD94AADA-310E-6AAA-AE71-FB46B0DE3D59" name="DT_USAGE_RULE_USAGE_RULE_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:45:56 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

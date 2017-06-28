@@ -429,8 +429,8 @@
 				<subviews value="70"/>
 				<arcs value="70"/>
 				<physical_models_estimates>
-							<physical_model_3436E82C-36FA-5CB1-6173-3F52C96609DD_Oracle_Database_10g>
-								<physical_model_name value="Oracle Database 10g"/>
+							<physical_model_3436E82C-36FA-5CB1-6173-3F52C96609DD_Oracle_Database_12c>
+								<physical_model_name value="Oracle Database 12c"/>
 								<clusters value="70"/>
 								<contexts value="70"/>
 								<dBs value="70"/>
@@ -456,7 +456,7 @@
 								<users value="70"/>
 								<views value="70"/>
 								<triggers value="70"/>
-							</physical_model_3436E82C-36FA-5CB1-6173-3F52C96609DD_Oracle_Database_10g>
+							</physical_model_3436E82C-36FA-5CB1-6173-3F52C96609DD_Oracle_Database_12c>
 				</physical_models_estimates>
 			</relational_model_0_estimates>
 		</relational_model_estimates>

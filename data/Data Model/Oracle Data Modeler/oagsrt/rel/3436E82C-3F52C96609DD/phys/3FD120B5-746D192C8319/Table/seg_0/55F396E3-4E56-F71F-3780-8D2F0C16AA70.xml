@@ -1,0 +1,65 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="MODULE_DEP" directorySegmentName="seg_0" id="55F396E3-4E56-F71F-3780-8D2F0C16AA70">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:14:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="MODULE_DEP_ID" id="530E1452-67FC-FEA8-D19F-6DD2EE87F65C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEPENDED_MODULE_ID" id="5DEE7D02-1728-D30E-A2EE-7B313D7E10F6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEPENDENCY_TYPE" id="91346E84-023D-9C5D-92D3-B9C1499C54E4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEPENDING_MODULE_ID" id="E2BAF32D-FF97-178C-55E1-7D2229A003E9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="MODULE_DEP_DEPENDED_ID_IDX" id="1496E4A4-085F-DE82-38F6-443B4979475A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 20:45:19 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="MODULE_DEP_DEPENDING_ID_IDX" id="638E6661-456A-50F5-5A8D-DED7E79F99BC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 20:45:19 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="MODULE_DEPENDING_ID_FK" id="00169EF0-561F-E8CC-829C-59F9BE661F21">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="MODULE_DEPENDED_ID_FK" id="6EA25367-9FDC-9E4D-470E-D2BA2F16620F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="MODULE_DEP_PK" id="20A77E1E-28E9-257F-5517-7423A08E67AB">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev10g>

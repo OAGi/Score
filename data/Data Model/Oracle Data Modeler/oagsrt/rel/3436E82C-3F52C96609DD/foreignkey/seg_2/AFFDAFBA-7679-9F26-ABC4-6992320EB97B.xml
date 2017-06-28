@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_2" id="AFFDAFBA-7679-9F26-ABC4-6992320EB97B" containerWithKeyObject="769EC2C7-0F4B-2BC1-93DC-450C860872AC" localFKIndex="B066C8CE-0B00-BE93-1FB6-C492A1A92801" name="BIE_USAGE_RULE_BBIE_FK">
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_2" id="AFFDAFBA-7679-9F26-ABC4-6992320EB97B" containerWithKeyObject="769EC2C7-0F4B-2BC1-93DC-450C860872AC" localFKIndex="B066C8CE-0B00-BE93-1FB6-C492A1A92801" name="BUR_BBIE_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 17:17:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -7,7 +7,7 @@
 <referredTableID>5C468B32-F34E-0690-F8FF-E5F24D48C598</referredTableID>
 <keyObject>0B7F3180-0413-9C93-C375-DC04853644A6</keyObject>
 <referredKeyID>0B7F3180-0413-9C93-C375-DC04853644A6</referredKeyID>
-<mandatory>true</mandatory>
+<mandatory>false</mandatory>
 <transferable>true</transferable>
 <rely>false</rely>
 <columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>

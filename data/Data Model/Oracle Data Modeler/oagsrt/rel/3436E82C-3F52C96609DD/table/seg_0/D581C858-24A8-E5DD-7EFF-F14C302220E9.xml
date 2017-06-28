@@ -47,7 +47,7 @@
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="AB1F0E58-901D-58E6-CC81-AE9D36E54810" name="DT_USAGE_RULE_EXPRESSION_PK">
+<ind_PK_UK id="AB1F0E58-901D-58E6-CC81-AE9D36E54810" name="USAGE_RULE_PK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 14:09:31 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

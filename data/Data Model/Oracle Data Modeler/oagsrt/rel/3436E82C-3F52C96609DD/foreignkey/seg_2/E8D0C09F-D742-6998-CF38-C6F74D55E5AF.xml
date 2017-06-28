@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_2" id="E8D0C09F-D742-6998-CF38-C6F74D55E5AF" containerWithKeyObject="769EC2C7-0F4B-2BC1-93DC-450C860872AC" localFKIndex="D7DF1CC2-6B4A-DE46-60E4-0FCA5CE43C8A" name="BIE_USAGE_RULE_ASBIE_FK">
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_2" id="E8D0C09F-D742-6998-CF38-C6F74D55E5AF" containerWithKeyObject="769EC2C7-0F4B-2BC1-93DC-450C860872AC" localFKIndex="D7DF1CC2-6B4A-DE46-60E4-0FCA5CE43C8A" name="BUR_ASBIE_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2017-06-27 17:17:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -7,7 +7,7 @@
 <referredTableID>A4E7A8A5-667B-8C83-501D-BE8CC1AD29A6</referredTableID>
 <keyObject>AA7C6033-E2A9-84C7-3C25-8F6ADA8BDBF7</keyObject>
 <referredKeyID>AA7C6033-E2A9-84C7-3C25-8F6ADA8BDBF7</referredKeyID>
-<mandatory>true</mandatory>
+<mandatory>false</mandatory>
 <transferable>true</transferable>
 <rely>false</rely>
 <columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
