@@ -231,7 +231,7 @@ public class P_1_7_PopulateQBDTInDT {
 
     private boolean isPrepared() {
         // Sometimes, some of elements such as 'ActionCodeContentType' couldn't load into dtiHolderMap.
-        return (dtiHolderMap != null && !dtiHolderMap.containsKey("ActionCodeContentType"));
+        return (dtiHolderMap != null && dtiHolderMap.containsKey("ActionCodeContentType"));
     }
 
     private void populate() throws Exception {
@@ -459,7 +459,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
-        dtDAO.save(dataType);
+        dataType = dtDAO.save(dataType);
 
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(dataType, base);
@@ -469,11 +469,11 @@ public class P_1_7_PopulateQBDTInDT {
 
     private void insertBDTPrimitiveRestriction(DataType dataType, String base) throws Exception {
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(dataType.getBasedDtId());
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriListForSaving = new ArrayList();
+        Set<BusinessDataTypePrimitiveRestriction> bdtPriRestriListForSaving = new LinkedHashSet();
 
         String dataTypeTerm = dataType.getDataTypeTerm();
 
-        //we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
+        // we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
         if (base.endsWith("CodeContentType") && base.startsWith("oacl")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
@@ -488,13 +488,13 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
-            }//For inherited
+            } // For inherited
         } else if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             bdtPriRestri.setAgencyIdListId(getAgencyListID());
             bdtPriRestri.setDefault(false);
-            bdtPriRestriListForSaving.add(bdtPriRestri); //For AgencyIdList
+            bdtPriRestriListForSaving.add(bdtPriRestri); // For AgencyIdList
 
             for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
@@ -502,7 +502,7 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
-            }//For inherited
+            } // For inherited
         } else {
             for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();

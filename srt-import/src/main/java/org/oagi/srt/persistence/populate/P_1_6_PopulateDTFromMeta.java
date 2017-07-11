@@ -19,8 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
@@ -104,7 +103,7 @@ public class P_1_6_PopulateDTFromMeta {
 
         Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.META_XSD_FILE_PATH));
 
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestris = new ArrayList();
+        Set<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = new LinkedHashSet();
         for (int i = 0; i < result.getLength(); i++) {
             Element ele = (Element) result.item(i);
             String name = ele.getAttribute("name");
@@ -143,22 +142,26 @@ public class P_1_6_PopulateDTFromMeta {
             dataType.setReleaseId(importUtil.getReleaseId());
             dataType.setModule(module);
             logger.debug("Populating additional BDTs from meta whose name is " + name);
-            dtDAO.save(dataType);
+            dataType = dtDAO.save(dataType);
 
             // BDT_Primitive_Restriction
-            bdtPriRestris.addAll(
-                    loadBDTPrimitiveRestrictions(dtVO_01.getDtId(), dataType.getDtId())
-            );
 
+            Collection<BusinessDataTypePrimitiveRestriction> bdtPriRestris =
+                    loadBDTPrimitiveRestrictions(dtVO_01.getDtId(), dataType.getDtId());
+            if (bdtPriRestris.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+                throw new IllegalStateException("BDT_ID['" + dataType.getDtId() + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
+            }
+
+            bdtPriRestriList.addAll(bdtPriRestris);
             populateDTSC(dataType);
         }
 
-        bdtPriRestriRepository.save(bdtPriRestris);
+        bdtPriRestriRepository.save(bdtPriRestriList);
     }
 
-    private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
+    private Collection<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
             long basedBdtId, long bdtId) throws Exception {
-        List<BusinessDataTypePrimitiveRestriction> result = new ArrayList();
+        Set<BusinessDataTypePrimitiveRestriction> result = new LinkedHashSet();
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 
         for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
