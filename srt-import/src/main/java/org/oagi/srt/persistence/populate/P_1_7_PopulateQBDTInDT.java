@@ -229,13 +229,20 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
+    private boolean isPrepared() {
+        // Sometimes, some of elements such as 'ActionCodeContentType' couldn't load into dtiHolderMap.
+        return (dtiHolderMap != null && !dtiHolderMap.containsKey("ActionCodeContentType"));
+    }
+
     private void populate() throws Exception {
         fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
 
-        prepareForBCCP(ImportConstants.FIELDS_XSD_FILE_PATH,
-                ImportConstants.META_XSD_FILE_PATH,
-                ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
-                ImportConstants.COMPONENTS_XSD_FILE_PATH);
+        while (!isPrepared()) {
+            prepareForBCCP(ImportConstants.FIELDS_XSD_FILE_PATH,
+                    ImportConstants.META_XSD_FILE_PATH,
+                    ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
+                    ImportConstants.COMPONENTS_XSD_FILE_PATH);
+        }
 
         insertCodeContentTypeDT();
         insertIDContentTypeDT();
