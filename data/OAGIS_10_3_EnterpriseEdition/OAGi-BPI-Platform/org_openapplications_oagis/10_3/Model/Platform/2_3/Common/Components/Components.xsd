@@ -14826,7 +14826,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					</xsd:element>
 					<xsd:element ref="AmountDiscount" id="oagis-id-3b80660d15e346ec9e177e86f82077d0" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9"/>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ExtendedAmount" id="oagis-id-e2c23ddf31ad49ed920c69d20d9ff31d" minOccurs="0" maxOccurs="unbounded">
@@ -14871,7 +14871,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					<xsd:element ref="ServiceItem" id="oagis-id-72f347eff3954795bfe8f73cd7e3a0ff" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Effectivity" id="oagis-id-7b2720121bcf44629b52e849a6ca3b95" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ServicePersonelEmployee" id="oagis-id-4671dfaf6a7245a8b19d4b14d971b59d" minOccurs="0" maxOccurs="unbounded"/>
@@ -14908,7 +14908,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					</xsd:element>
 					<xsd:element ref="Effectivity" id="oagis-id-b49fa85d99334600800be6fdfab92cae" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ItemInstance" id="oagis-id-1bb23487a6d14abe99779d4c2c2b0140" minOccurs="0" maxOccurs="unbounded">
@@ -14947,7 +14947,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					<xsd:element ref="AttachedServiceItem" id="oagis-id-c586d9b76c9f488e97db3d58772ee285" minOccurs="0"/>
 					<xsd:element ref="Effectivity" id="oagis-id-fe9205098edc46ca96d8c40de2b242a2" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ServiceElements" id="oagis-id-4166ff9541b7469a9a9f63908ad3be57" minOccurs="0" maxOccurs="unbounded"/>
@@ -14986,7 +14986,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					<xsd:element ref="DiscountAllowancePricing" id="oagis-id-6a39dfa9aed345ea8b1e0ec91e99b934" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Effectivity" id="oagis-id-eed9b16dffd74f4b9a36e5e6ace716c0" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="SoftwareElements" id="oagis-id-f645fdef9bd9497cbaf347f513424509" minOccurs="0" maxOccurs="unbounded"/>
@@ -15021,7 +15021,7 @@ The Open Applications Group will make best efforts to quickly consider all propo
 					<xsd:element ref="DiscountAllowancePricing" id="oagis-id-3b2522a1b3014d0180979dd405288873" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Effectivity" id="oagis-id-989ebe71ef1645efbe4d796057be459d" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="SoftwareElements" id="oagis-id-310c231e41a240e38251facea21bfd62" minOccurs="0" maxOccurs="unbounded"/>

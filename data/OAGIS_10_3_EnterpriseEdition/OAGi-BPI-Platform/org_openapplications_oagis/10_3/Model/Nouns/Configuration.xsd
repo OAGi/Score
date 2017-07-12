@@ -73,7 +73,7 @@
 					</xsd:element>
 					<xsd:element ref="Effectivity" id="oagis-id-21c2aa79f318456c8c9aa2a149d481b2" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ProductLeadTimeStatus" id="oagis-id-9c8b46725ef74973b4299a567ef7e832" minOccurs="0"/>
