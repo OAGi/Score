@@ -10801,7 +10801,6 @@ Possible values:
 					<xsd:element ref="MultipleRunSaveTimeIndicator" id="oagis-id-67b93d9b84674886b79019e8545485d4" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that time can be saved by running this operation multiple times.  </xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="TrackingIndicator" id="oagis-id-51e62dcb2c994560b5e7aa304ffb7df9" minOccurs="0">

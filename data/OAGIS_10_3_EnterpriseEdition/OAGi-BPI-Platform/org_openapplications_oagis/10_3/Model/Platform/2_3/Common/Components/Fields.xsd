@@ -2526,7 +2526,6 @@ In other words if a given Option is choosen another Option out of the same Optio
 	<xsd:element name="MultipleRunSaveTimeIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-06fb8b022b0848dd912607beca6ce3e2">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that time can be saved by running this operation multiple times.  </xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="NetPriceIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-f92ddd8877c24916b18a69b5dcf6bc66"/>
