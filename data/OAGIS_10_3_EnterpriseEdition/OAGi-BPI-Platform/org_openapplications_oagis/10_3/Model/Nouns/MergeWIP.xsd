@@ -37,14 +37,16 @@
 	</xsd:element>
 	<xsd:element name="MergeWIPSource" type="MergeWIPSourceType" id="oagis-id-63e96a5b33ad426b8704601d2feede3e">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.
+
+Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="MergeWIPDestination" type="MergeWIPDestinationType" id="oagis-id-894cbd699ba7489fba07207d4ddee7fa">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.
+
+Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="MergeWIPType" id="oagis-id-9f8be535b36944f09a06000ee689b7a4">
@@ -56,14 +58,16 @@
 			</xsd:element>
 			<xsd:element ref="MergeWIPSource" id="oagis-id-3d1adf4660264c1699376e53eb59a4ec" minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
-					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.</xsd:documentation>
-					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Source Orders to be merged.
+
+Information concerning the specific production order in the WIP Merge transaction to be processed.  Instances of this Component are the source (children) production orders from which to perform the merge transaction.  The resulting merged production order (specified in the MergeWIPDestination Component must also be specified as an instance of the MergeWIPDestination Component unless it is not an existing production order.  Note that all source production orders are assumed to be at the same standard operation sequence, intraoperation steps and departments for the merge transaction to be processed successfully.  This Component is mandatory and at least one occurrence of this Component is required for each MergeWIPLine Component.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="MergeWIPDestination" id="oagis-id-ac094b445c4340ed8ac4c1e02bb87493" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.</xsd:documentation>
-					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Destination Order in which the Merger creates.
+
+Information concerning the specific production order in the WIP Merge transaction to be processed.  This Component specifies the end resulting production order (the target) to which to process the merge transaction.   This Component is mandatory for each occurrence of the MergeWIPLine for all BODs except the Request BODs (Get and GetList).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -101,9 +105,11 @@
 				<xsd:sequence>
 					<xsd:element name="Extension" type="MergeWIPDestinationExtensionType" id="oagis-id-d6da3d41bb4b4f0bb449906f502d922f" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -131,9 +137,11 @@
 				<xsd:sequence>
 					<xsd:element name="Extension" type="MergeWIPSourceExtensionType" id="oagis-id-62c99aa84a01499e9f5fbb7497e9b4c0" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

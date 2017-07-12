@@ -884,12 +884,17 @@ borne by the beneficiary customer.</xsd:documentation>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ProcessCategoryCodeEnumerationType" id="oagis-id-87ad6a845d3349528d261df0517bf2aa">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Routine Process is recording costs of goods sold.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Non-Routine Process is recording Inventory Adjustments.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of an Estimating Process is determining Inventory Obsolsence.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Estimating Processes give wide lattitude to move the profit figure and attract a high degree of scrutiny.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Non Routine Processes tend to have fewer controls in place and are exposed to more risks.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.
+
+An example of a Routine Process is recording costs of goods sold.
+
+An example of a Non-Routine Process is recording Inventory Adjustments.
+
+An example of an Estimating Process is determining Inventory Obsolsence.
+
+Estimating Processes give wide lattitude to move the profit figure and attract a high degree of scrutiny.
+
+Non Routine Processes tend to have fewer controls in place and are exposed to more risks.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Routine"/>

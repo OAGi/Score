@@ -32,8 +32,8 @@
 The scope of the LoadPayable indicates that the supplier's invoice is ready to be paid and has already been approved before the information moves to the accounts payable application.  An approved invoice is also known as the voucher.  OAGIS will define the scenario of invoices that get matched within the accounts payable application in a separate Business Service Request later.
 
 Some financial applications have the general ledger and accounts payable databases tightly integrated where updates to the accounts payable application are automatically reflected in the general ledger balances.
-</xsd:documentation>
-                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The LoadPayable will transmit all information needed for both the accounts payable and the general ledger.
+
+The LoadPayable will transmit all information needed for both the accounts payable and the general ledger.
 
 Other applications allow the general ledger balances to be updated separately from the accounts payable.  The second model illustrates that the combination of the LoadPayable and PostJournalEntry will accomplish this scenario.
 </xsd:documentation>
