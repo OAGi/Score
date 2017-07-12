@@ -55,7 +55,7 @@ public class ImportUtil {
         return namespaceId;
     }
 
-    public String toString(NodeList nodeList) {
+    public static String toString(NodeList nodeList) {
         if (nodeList.getLength() == 1 && nodeList.item(0) instanceof Text) {
             return ((Text) nodeList.item(0)).getWholeText();
         }

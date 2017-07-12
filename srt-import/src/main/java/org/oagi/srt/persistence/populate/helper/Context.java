@@ -2,6 +2,7 @@ package org.oagi.srt.persistence.populate.helper;
 
 import com.sun.xml.internal.xsom.*;
 import com.sun.xml.internal.xsom.parser.XSOMParser;
+import net.sf.saxon.lib.NamespaceConstant;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
@@ -19,10 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -40,7 +38,14 @@ public class Context {
     public static XPath xPath;
 
     static {
-        xPath = XPathFactory.newInstance().newXPath();
+        System.setProperty("javax.xml.xpath.XPathFactory:" + NamespaceConstant.OBJECT_MODEL_SAXON, "net.sf.saxon.xpath.XPathFactoryImpl");
+        XPathFactory xPathFactory = null;
+        try {
+            xPathFactory = XPathFactory.newInstance(NamespaceConstant.OBJECT_MODEL_SAXON);
+        } catch (XPathFactoryConfigurationException e) {
+            throw new IllegalStateException(e);
+        }
+        xPath = xPathFactory.newXPath();
         xPath.setNamespaceContext(new OAGiNamespaceContext());
     }
 
