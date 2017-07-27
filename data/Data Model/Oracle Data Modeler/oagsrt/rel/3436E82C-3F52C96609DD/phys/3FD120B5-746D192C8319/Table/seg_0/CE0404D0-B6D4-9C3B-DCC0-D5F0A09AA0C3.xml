@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="ASCC" directorySegmentName="seg_0" id="CE0404D0-B6D4-9C3B-DCC0-D5F0A09AA0C3">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="ASCC" directorySegmentName="seg_0" id="CE0404D0-B6D4-9C3B-DCC0-D5F0A09AA0C3">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -12,6 +12,11 @@
 <ColumnProxy name="LAST_UPDATED_BY" id="0740058B-245B-FE55-2363-C66C38CFBFBF">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="0B835485-F864-1595-704F-422A51E568DB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:11:36 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="CREATION_TIMESTAMP" id="16202FBC-D411-6A1F-6E81-60659977029A">
@@ -62,6 +67,11 @@
 <ColumnProxy name="CREATED_BY" id="7E79C6A6-2979-400A-D227-EFC70825DDBA">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="7F162A2F-C67F-CEAE-E826-8303E5F0EF5B">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:11:36 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="DEN" id="9E670FD5-71CD-7F13-A93F-F5B7D97809BF">
@@ -155,4 +165,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

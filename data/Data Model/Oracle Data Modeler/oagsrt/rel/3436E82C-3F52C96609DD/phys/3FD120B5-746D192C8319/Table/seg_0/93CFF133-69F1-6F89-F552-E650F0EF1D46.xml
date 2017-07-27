@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BBIE_SC" directorySegmentName="seg_0" id="93CFF133-69F1-6F89-F552-E650F0EF1D46">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BBIE_SC" directorySegmentName="seg_0" id="93CFF133-69F1-6F89-F552-E650F0EF1D46">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -52,6 +52,11 @@
 <ColumnProxy name="OWNER_TOP_LEVEL_ABIE_ID" id="81AD63DE-18AA-CA8E-81BD-803E54143AD4">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="99752D81-0089-3556-EFE5-F5BE37AD6432">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:13:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="IS_USED" id="9F7F3D21-8F78-99E1-84B4-3B9EB43A6A8D">
@@ -137,4 +142,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

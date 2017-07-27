@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CDT_PRI" directorySegmentName="seg_0" id="11871ED6-A0B9-36C6-2D2A-A312D72E2437">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CDT_PRI" directorySegmentName="seg_0" id="11871ED6-A0B9-36C6-2D2A-A312D72E2437">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -36,4 +36,4 @@
 <indexSort>SORTED</indexSort>
 </UniqueKey>
 </uniqueKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

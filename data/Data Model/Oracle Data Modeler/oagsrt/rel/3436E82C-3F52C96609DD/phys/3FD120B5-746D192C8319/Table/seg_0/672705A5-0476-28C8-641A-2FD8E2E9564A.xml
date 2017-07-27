@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BIE_USER_EXT_REVISION" directorySegmentName="seg_0" id="672705A5-0476-28C8-641A-2FD8E2E9564A">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BIE_USER_EXT_REVISION" directorySegmentName="seg_0" id="672705A5-0476-28C8-641A-2FD8E2E9564A">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -97,4 +97,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

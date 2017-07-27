@@ -85,6 +85,31 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="FB49F3FB-6C11-6F74-BB63-A649D08FFBCB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:52 UTC</createdTime>
+<commentInRDBMS>Description of the BCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="2CE17569-9E47-7BE5-7D0F-68B1250DFCEB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:52 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="MODULE_ID" id="327FBA50-3512-D695-7EC7-3A1026417607">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:16:59 UTC</createdTime>

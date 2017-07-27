@@ -49,6 +49,18 @@
 <colAssociation fkAssociation="6D651516-3EF9-EDA5-5105-145EF1B75214" referredColumn="2820686A-A020-3DC6-EF01-78792C666327"/>
 </associations>
 </Column>
+<Column name="DEFINITION" id="00583990-AC21-5231-4726-844D5E495D7C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:13:32 UTC</createdTime>
+<commentInRDBMS>Definition to override the BCCP&apos;s Definition. If NULL, it means that the definition should be inherited from the based CC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="REMARK" id="3AE6F5FB-8E96-3296-81A1-6EA7EF56ADAE">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:18:39 UTC</createdTime>

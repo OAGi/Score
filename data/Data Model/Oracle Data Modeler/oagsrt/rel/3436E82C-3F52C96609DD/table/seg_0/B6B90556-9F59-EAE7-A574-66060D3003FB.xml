@@ -62,6 +62,31 @@
 <ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="3B417A64-E909-45E4-0E19-F724B517EE43">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:19:31 UTC</createdTime>
+<commentInRDBMS>Long description or explannation of the code list value, e.g., &apos;EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals&apos;.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="2BEFA742-550F-4C86-4AF4-7E1D79BB02A3">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:19:31 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="USED_INDICATOR" id="37E94477-D8A5-E7B2-8D2C-B5CC2458BC5B">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:01:05 UTC</createdTime>

@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BCC" directorySegmentName="seg_0" id="9E4FEFB7-DB2F-551B-4CF4-1341D521CE81">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BCC" directorySegmentName="seg_0" id="9E4FEFB7-DB2F-551B-4CF4-1341D521CE81">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -39,6 +39,11 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION" id="2D525BCA-B2E0-9BF0-FD63-69C5D7DE4808">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:27 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="CURRENT_BCC_ID" id="3A8E6233-2866-D9A7-CD72-7DC338E66D33">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
@@ -52,6 +57,11 @@
 <ColumnProxy name="IS_NILLABLE" id="4678CBAB-3951-B489-5238-C68FF22D95E3">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="4AF2496F-5A7E-2501-5748-C1DE8A5AB3C8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REVISION_NUM" id="4B32B5F1-061B-3435-5DFF-6F9A0D062A13">
@@ -170,4 +180,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

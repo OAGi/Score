@@ -160,6 +160,18 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="99752D81-0089-3556-EFE5-F5BE37AD6432">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:13:52 UTC</createdTime>
+<commentInRDBMS>Description to override the BDT SC definition. If NULL, it means that the definition should be inherited from the based BDT SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="REMARK" id="6E001D2D-1884-8316-6E16-B6E563C62E16">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>

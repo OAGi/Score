@@ -47,6 +47,31 @@
 <ownDataTypeParameters>60,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="90B833A2-2635-575A-FD6C-2D2F87582169">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:12:15 UTC</createdTime>
+<commentInRDBMS>Description of the ASCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="BF0A4688-82E6-80B2-8B0D-2CCF41A5CE37">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:12:15 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="ROLE_OF_ACC_ID" id="9216E609-8175-A92F-EA89-C82BF236C16D">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:42:26 UTC</createdTime>

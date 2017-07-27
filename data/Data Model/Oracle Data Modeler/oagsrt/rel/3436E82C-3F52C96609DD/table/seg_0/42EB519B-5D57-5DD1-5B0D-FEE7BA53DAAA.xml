@@ -113,6 +113,31 @@
 <ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="91BA0902-A4E0-2A7B-D120-83B8868B17A9">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:18:29 UTC</createdTime>
+<commentInRDBMS>Description of the code list.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="2A48F9C4-EAD3-5AA0-BB21-BF0B26240ED8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:18:29 UTC</createdTime>
+<commentInRDBMS>This is typically a URL which indicates the source of the code list&apos;s DEFINITION.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="BASED_CODE_LIST_ID" id="31B0C6D3-86A5-B21E-4E3F-C707B278259C">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:28:39 UTC</createdTime>

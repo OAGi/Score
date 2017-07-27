@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CODE_LIST_VALUE" directorySegmentName="seg_0" id="B6B90556-9F59-EAE7-A574-66060D3003FB">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CODE_LIST_VALUE" directorySegmentName="seg_0" id="B6B90556-9F59-EAE7-A574-66060D3003FB">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -14,9 +14,19 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="2BEFA742-550F-4C86-4AF4-7E1D79BB02A3">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:19:31 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="USED_INDICATOR" id="37E94477-D8A5-E7B2-8D2C-B5CC2458BC5B">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="3B417A64-E909-45E4-0E19-F724B517EE43">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:19:31 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="EXTENSION_INDICATOR" id="42F3A0DF-5338-154B-99D5-9CAE67912F83">
@@ -51,11 +61,6 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
-<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CLV_DEFINITION_ID_IDX" id="EF892169-725D-3F90-4AFD-070B1AEF2B80">
-<createdBy>hno2</createdBy>
-<createdTime>2017-06-28 15:49:08 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</IndexProxy>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CODE_LIST_VALUE_PK_IDX" id="F06E0C8E-D242-68E6-B94A-5381E0C47A66">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
@@ -77,4 +82,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

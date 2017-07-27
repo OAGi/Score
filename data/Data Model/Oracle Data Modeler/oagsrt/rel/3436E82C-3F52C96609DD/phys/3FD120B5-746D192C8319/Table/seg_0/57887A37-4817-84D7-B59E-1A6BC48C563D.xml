@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="ASCCP" directorySegmentName="seg_0" id="57887A37-4817-84D7-B59E-1A6BC48C563D">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="ASCCP" directorySegmentName="seg_0" id="57887A37-4817-84D7-B59E-1A6BC48C563D">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -64,6 +64,11 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION" id="90B833A2-2635-575A-FD6C-2D2F87582169">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:12:15 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="PROPERTY_TERM" id="9172A573-E644-9EEE-0176-D6363478E0DE">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
@@ -102,6 +107,11 @@
 <ColumnProxy name="ASCCP_ID" id="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="BF0A4688-82E6-80B2-8B0D-2CCF41A5CE37">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:12:15 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="REUSABLE_INDICATOR" id="D40F0C1C-A13B-0463-EB01-86E2349B342A">
@@ -165,4 +175,4 @@
 <indexSort>SORTED</indexSort>
 </PrimaryKey>
 </primaryKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

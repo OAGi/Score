@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="DT" directorySegmentName="seg_0" id="0510E749-F326-D591-BA68-D37A54B1203E">
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="DT" directorySegmentName="seg_0" id="0510E749-F326-D591-BA68-D37A54B1203E">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -79,6 +79,11 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION" id="86FC8573-807C-608D-949E-BAAEA44028D2">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:15:43 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="REVISION_TRACKING_NUM" id="8838A18E-E4C8-1AB0-89CE-397E5E78CF13">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
@@ -114,6 +119,11 @@
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="EF8821A8-1F32-BD13-C96A-28DFDF817BFD">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:16:37 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
 <ColumnProxy name="REVISION_ACTION" id="F19A93C4-2CD8-D45C-DC0F-F1F1876E0E1E">
 <createdBy>hno2</createdBy>
 <createdTime>2017-06-28 15:49:08 UTC</createdTime>
@@ -130,13 +140,6 @@
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 </columnProxies>
-<indexProxies>
-<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="DT_CONT_COMP_DEF_ID_IDX" id="7B6B6723-53A5-3C12-33AE-F660B9F7748B">
-<createdBy>hno2</createdBy>
-<createdTime>2017-06-28 15:49:08 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</IndexProxy>
-</indexProxies>
 <foreignKeys>
 <ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="DT_CREATED_BY_FK" id="2E86408F-9525-C95B-C875-643C028683A6">
 <createdBy>hno2</createdBy>
@@ -195,4 +198,4 @@
 <indexSort>SORTED</indexSort>
 </UniqueKey>
 </uniqueKeys>
-</TableProxyOraclev10g>
+</TableProxyOraclev12c>

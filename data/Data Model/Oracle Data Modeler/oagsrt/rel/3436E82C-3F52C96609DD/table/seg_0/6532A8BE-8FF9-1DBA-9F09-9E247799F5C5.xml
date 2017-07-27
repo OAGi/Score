@@ -60,6 +60,31 @@
 <ownDataTypeParameters>20,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="A058EC58-F902-33F6-2E92-369E17FD5E69">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:16:15 UTC</createdTime>
+<commentInRDBMS>Description of the supplementary component.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="4A08FCE9-BFBF-945B-F983-92E50BBE8851">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:16:15 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 CHAR</dataTypeSize>
+<ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="OWNER_DT_ID" id="03073B13-6419-111B-CD15-4E431C55F5A3">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>

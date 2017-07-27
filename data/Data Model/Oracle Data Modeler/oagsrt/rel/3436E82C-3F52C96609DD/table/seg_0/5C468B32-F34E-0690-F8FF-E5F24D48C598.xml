@@ -200,6 +200,18 @@
 <ownDataTypeParameters>1,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="DEFINITION" id="42CE482D-584B-BE4E-D54B-83720F2A542B">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:12:58 UTC</createdTime>
+<commentInRDBMS>Description to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="REMARK" id="09348972-9A42-9D84-17AD-33249331F8C6">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
