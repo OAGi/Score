@@ -738,7 +738,7 @@ public class NodeService {
             abie.setGuid(abieGuid);
             abie.setBasedAcc(acc);
             abie.setBizCtx(bizCtx);
-            abie.setRawDefinition(acc.getRawDefinition().clone());
+            abie.setDefinition(acc.getDefinition());
             abie.afterLoaded();
 
             return abie;
@@ -1041,7 +1041,7 @@ public class NodeService {
             asbie.setBasedAsccId(ascc.getAsccId());
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
-            asbie.setRawDefinition(ascc.getRawDefinition().clone());
+            asbie.setDefinition(ascc.getDefinition());
             asbie.setSeqKey(seqKey);
             asbie.afterLoaded();
             return asbie;
@@ -1053,7 +1053,7 @@ public class NodeService {
             asbiep.setGuid(Utility.generateGUID());
             asbiep.setBasedAsccp(asccp);
             asbiep.setRoleOfAbie(roleOfAbie);
-            asbiep.setRawDefinition(asccp.getRawDefinition().clone());
+            asbiep.setDefinition(asccp.getDefinition());
             asbiep.afterLoaded();
             return asbiep;
         }
@@ -1239,7 +1239,7 @@ public class NodeService {
 
                         bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
                         bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
-                        bbieSc.setRawDefinition(dtSc.getRawDefinition().clone());
+                        bbieSc.setDefinition(dtSc.getDefinition());
                         bbieSc.afterLoaded();
                     }
 
@@ -1289,7 +1289,7 @@ public class NodeService {
             BasicBusinessInformationEntityProperty bbiep = new BasicBusinessInformationEntityProperty();
             bbiep.setGuid(Utility.generateGUID());
             bbiep.setBasedBccp(bccp);
-            bbiep.setRawDefinition(bccp.getRawDefinition().clone());
+            bbiep.setDefinition(bccp.getDefinition());
             bbiep.afterLoaded();
             return bbiep;
         }
@@ -1313,7 +1313,7 @@ public class NodeService {
 //                bbie.setCodeListId(codeListId);
 //            }
             bbie.setSeqKey(seqKey);
-            bbie.setRawDefinition(bcc.getRawDefinition().clone());
+            bbie.setDefinition(bcc.getDefinition());
             bbie.afterLoaded();
             return bbie;
         }
@@ -2014,7 +2014,7 @@ public class NodeService {
 
             AggregateBusinessInformationEntity abie = root.getType().getAbie();
             long abieId = abie.getAbieId();
-            abie = abie.clone(false);
+            abie = abie.clone();
             preset(abie, topLevelAbie);
 
             prevAbieIdMap.put(abieId, abie);
@@ -2026,7 +2026,7 @@ public class NodeService {
             // It has to be added whether it is dirty or not.
             AssociationBusinessInformationEntityProperty asbiep = root.getAsbiep();
             long asbiepId = asbiep.getAsbiepId();
-            asbiep = asbiep.clone(false);
+            asbiep = asbiep.clone();
             asbiep.setRoleOfAbie(abie);
             preset(asbiep, topLevelAbie);
 
@@ -2064,19 +2064,19 @@ public class NodeService {
 
                 AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
                 if (asbie != null && asbie.getAsbieId() > 0L) {
-                    prevAsbieIdMap.put(asbie.getAsbieId(), asbie.clone(false));
+                    prevAsbieIdMap.put(asbie.getAsbieId(), asbie.clone());
                 }
 
                 AssociationBusinessInformationEntityProperty asbiep = asbiepNode.getAsbiep();
                 if (asbiep != null && asbiep.getAsbiepId() > 0L) {
-                    prevAsbiepIdMap.put(asbiep.getAsbiepId(), asbiep.clone(false));
+                    prevAsbiepIdMap.put(asbiep.getAsbiepId(), asbiep.clone());
                 }
 
                 ABIENode abieNode = asbiepNode.getType();
                 AggregateBusinessInformationEntity abie =
                         abieNode.getAbie();
                 if (abie != null && abie.getAbieId() > 0L) {
-                    prevAbieIdMap.put(abie.getAbieId(), abie.clone(false));
+                    prevAbieIdMap.put(abie.getAbieId(), abie.clone());
                 }
 
                 if (abieNode instanceof ABIENodeImpl) {
@@ -2087,13 +2087,13 @@ public class NodeService {
 
                 BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbiepNode);
                 if (bbie != null && bbie.getBbieId() > 0L) {
-                    prevBbieIdMap.put(bbie.getBbieId(), bbie.clone(false));
+                    prevBbieIdMap.put(bbie.getBbieId(), bbie.clone());
                 }
 
                 BasicBusinessInformationEntityProperty bbiep =
                         bbiepNode.getBbiep();
                 if (bbiep != null && bbiep.getBbiepId() > 0L) {
-                    prevBbiepIdMap.put(bbiep.getBbiepId(), bbiep.clone(false));
+                    prevBbiepIdMap.put(bbiep.getBbiepId(), bbiep.clone());
                 }
 
                 if (bbiepNode instanceof BasicBIEPropertyNodeImpl) {
@@ -2104,7 +2104,7 @@ public class NodeService {
 
                 BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbieScNode);
                 if (bbieSc != null && bbieSc.getBbieScId() > 0L) {
-                    prevBbieScIdMap.put(bbieSc.getBbieScId(), bbieSc.clone(false));
+                    prevBbieScIdMap.put(bbieSc.getBbieScId(), bbieSc.clone());
                 }
             } else {
                 throw new IllegalStateException();

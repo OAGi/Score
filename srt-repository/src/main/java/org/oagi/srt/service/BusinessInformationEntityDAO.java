@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
-public class BusinessInformationEntityDAO extends AbstractDefinitionDAO {
+public class BusinessInformationEntityDAO {
 
     @Autowired
     private AggregateBusinessInformationEntityRepository abieRepository;
@@ -36,102 +36,79 @@ public class BusinessInformationEntityDAO extends AbstractDefinitionDAO {
 
     @Transactional
     public AggregateBusinessInformationEntity save(AggregateBusinessInformationEntity abie) {
-        return save(abie, abieRepository);
+        return abieRepository.saveAndFlush(abie);
     }
 
     @Transactional
     public AssociationBusinessInformationEntity save(AssociationBusinessInformationEntity asbie) {
-        return save(asbie, asbieRepository);
+        return asbieRepository.saveAndFlush(asbie);
     }
 
     @Transactional
     public AssociationBusinessInformationEntityProperty save(AssociationBusinessInformationEntityProperty asbiep) {
-        return save(asbiep, asbiepRepository);
+        return asbiepRepository.saveAndFlush(asbiep);
     }
 
     @Transactional
     public BasicBusinessInformationEntity save(BasicBusinessInformationEntity bbie) {
-        return save(bbie, bbieRepository);
+        return bbieRepository.saveAndFlush(bbie);
     }
 
     @Transactional
     public BasicBusinessInformationEntityProperty save(BasicBusinessInformationEntityProperty bbiep) {
-        return save(bbiep, bbiepRepository);
+        return bbiepRepository.saveAndFlush(bbiep);
     }
 
     @Transactional
     public BasicBusinessInformationEntitySupplementaryComponent save(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
-        return save(bbieSc, bbieScRepository);
+        return bbieScRepository.saveAndFlush(bbieSc);
     }
 
     @Transactional
     public List<AggregateBusinessInformationEntity> saveAbieList(
             Collection<AggregateBusinessInformationEntity> abieList) {
-        return save(abieList, abieRepository);
+        return abieRepository.save(abieList);
     }
 
     @Transactional
     public List<AssociationBusinessInformationEntity> saveAsbieList(
             Collection<AssociationBusinessInformationEntity> asbieList) {
-        return save(asbieList, asbieRepository);
+        return asbieRepository.save(asbieList);
     }
 
     @Transactional
     public List<AssociationBusinessInformationEntityProperty> saveAsbiepList(
             Collection<AssociationBusinessInformationEntityProperty> asbiepList) {
-        return save(asbiepList, asbiepRepository);
+        return asbiepRepository.save(asbiepList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntity> saveBbieList(
             Collection<BasicBusinessInformationEntity> bbieList) {
-        return save(bbieList, bbieRepository);
+        return bbieRepository.save(bbieList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntityProperty> saveBbiepList(
             Collection<BasicBusinessInformationEntityProperty> bbiepList) {
-        return save(bbiepList, bbiepRepository);
+        return bbiepRepository.save(bbiepList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntitySupplementaryComponent> saveBbieScList(
             Collection<BasicBusinessInformationEntitySupplementaryComponent> bbieScList) {
-        return save(bbieScList, bbieScRepository);
-    }
-
-    public List<AggregateBusinessInformationEntity> findAbieByBasedAccId(long basedAccId) {
-        List<AggregateBusinessInformationEntity> results = abieRepository.findByBasedAccId(basedAccId);
-        return loadDefinition(results);
+        return bbieScRepository.save(bbieScList);
     }
 
     @Transactional
     public void deleteProfileBOD(long topLevelAbieId) {
-        List<Long> definitionIds;
-
-        definitionIds = asbieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         asbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        definitionIds = asbiepRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         asbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        definitionIds = bbieScRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         bbieScRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        definitionIds = bbieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         bbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        definitionIds = bbiepRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         bbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
 
         topLevelAbieRepository.updateAbieToNull(topLevelAbieId);
-        definitionIds = abieRepository.findDefinitionIdByOwnerTopLevelAbieId(topLevelAbieId);
-        deleteDefinitions(definitionIds);
         abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
 
         topLevelAbieRepository.delete(topLevelAbieId);

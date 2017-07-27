@@ -6,7 +6,7 @@ import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 /*
  * Marker interface
  */
-public interface BusinessInformationEntity extends IDefinition, IGuidEntity {
+public interface BusinessInformationEntity extends IEntity, IGuidEntity {
 
     public long getOwnerTopLevelAbieId();
 
@@ -16,6 +16,6 @@ public interface BusinessInformationEntity extends IDefinition, IGuidEntity {
 
     public void addUpdateEventListener(UpdateEventListener updateEventListener);
 
-    public BusinessInformationEntity clone(boolean shallowCopy);
+    public BusinessInformationEntity clone();
 
 }

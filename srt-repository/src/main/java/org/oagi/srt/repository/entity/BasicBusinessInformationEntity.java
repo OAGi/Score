@@ -4,7 +4,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,7 +13,7 @@ import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestr
 
 @Entity
 @Table(name = "bbie")
-public class BasicBusinessInformationEntity extends DefinitionBase
+public class BasicBusinessInformationEntity
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable, Serializable {
 
     public static final String SEQUENCE_NAME = "BBIE_ID_SEQ";
@@ -77,6 +76,10 @@ public class BasicBusinessInformationEntity extends DefinitionBase
 
     @Column(name = "is_null", nullable = false)
     private boolean nill;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(length = 225)
     private String remark;
@@ -302,6 +305,14 @@ public class BasicBusinessInformationEntity extends DefinitionBase
         this.nill = nill;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -440,8 +451,7 @@ public class BasicBusinessInformationEntity extends DefinitionBase
         result = 31 * result + (nillable ? 1 : 0);
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
         result = 31 * result + (nill ? 1 : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
@@ -471,7 +481,7 @@ public class BasicBusinessInformationEntity extends DefinitionBase
                 ", nillable=" + nillable +
                 ", fixedValue='" + fixedValue + '\'' +
                 ", nill=" + nill +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
                 ", remark='" + remark + '\'' +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
@@ -512,11 +522,6 @@ public class BasicBusinessInformationEntity extends DefinitionBase
             public void onPostPersist(Object object) {
                 BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
                 bbie.afterLoaded();
-
-                if (bbie.definition != null) {
-                    bbie.definition.setRefId(getId());
-                    bbie.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -638,7 +643,7 @@ public class BasicBusinessInformationEntity extends DefinitionBase
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public BasicBusinessInformationEntity clone(boolean shallowCopy) {
+    public BasicBusinessInformationEntity clone() {
         BasicBusinessInformationEntity clone = new BasicBusinessInformationEntity();
         clone.guid = this.guid;
         clone.basedBccId = this.basedBccId;
@@ -653,13 +658,7 @@ public class BasicBusinessInformationEntity extends DefinitionBase
         clone.nillable = this.nillable;
         clone.fixedValue = this.fixedValue;
         clone.nill = this.nill;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = this.definition;
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;

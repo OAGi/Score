@@ -14,8 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "dt_sc")
-public class DataTypeSupplementaryComponent extends DefinitionBase
-        implements IDefinition, Serializable {
+public class DataTypeSupplementaryComponent implements IEntity {
 
     public static final String SEQUENCE_NAME = "DT_SC_ID_SEQ";
 
@@ -40,6 +39,13 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
 
     @Column(length = 20)
     private String representationTerm;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column(nullable = false)
     private long ownerDtId;
@@ -104,6 +110,22 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
         this.representationTerm = representationTerm;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public long getOwnerDtId() {
         return ownerDtId;
     }
@@ -158,8 +180,8 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (int) (ownerDtId ^ (ownerDtId >>> 32));
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -174,7 +196,8 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", representationTerm='" + representationTerm + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", ownerDtId=" + ownerDtId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
@@ -198,11 +221,6 @@ public class DataTypeSupplementaryComponent extends DefinitionBase
             public void onPostPersist(Object object) {
                 DataTypeSupplementaryComponent dtSc = (DataTypeSupplementaryComponent) object;
                 dtSc.afterLoaded();
-
-                if (dtSc.definition != null) {
-                    dtSc.definition.setRefId(getId());
-                    dtSc.definition.setRefTableName(tableName());
-                }
             }
         });
     }

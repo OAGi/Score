@@ -36,7 +36,7 @@ public class RunAll {
                 P_1_4_PopulateCodeList p4 = ctx.getBean(P_1_4_PopulateCodeList.class);
                 p4.run(ctx);
 
-                P_1_5_PopulateDefaultAndUnqualifiedBDT p5 = ctx.getBean(P_1_5_PopulateDefaultAndUnqualifiedBDT.class);
+                P_1_5_1_PopulateDefaultAndUnqualifiedBDT p5 = ctx.getBean(P_1_5_1_PopulateDefaultAndUnqualifiedBDT.class);
                 p5.run(ctx);
 
                 P_1_6_PopulateDTFromMeta p6 = ctx.getBean(P_1_6_PopulateDTFromMeta.class);
@@ -98,7 +98,6 @@ public class RunAll {
                 CodeListValue.class,
                 DataType.class,
                 DataTypeSupplementaryComponent.class,
-                Definition.class,
                 ModuleDep.class,
                 Module.class,
                 Namespace.class,

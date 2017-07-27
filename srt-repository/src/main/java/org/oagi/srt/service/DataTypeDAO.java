@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional(readOnly = true)
-public class DataTypeDAO extends AbstractDefinitionDAO {
+public class DataTypeDAO {
 
     @Autowired
     private DataTypeRepository dtRepository;
@@ -20,21 +20,11 @@ public class DataTypeDAO extends AbstractDefinitionDAO {
 
     @Transactional
     public DataType save(DataType dt) {
-        return save(dt, dtRepository);
+        return dtRepository.saveAndFlush(dt);
     }
 
     @Transactional
     public DataTypeSupplementaryComponent save(DataTypeSupplementaryComponent dtSc) {
-        return save(dtSc, dtScRepository);
-    }
-
-    public DataType findDt(Long dtId) {
-        DataType dt = dtRepository.findOne(dtId);
-        return loadDefinition(dt);
-    }
-
-    public DataTypeSupplementaryComponent findDtSc(Long dtScId) {
-        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
-        return loadDefinition(dtSc);
+        return dtScRepository.saveAndFlush(dtSc);
     }
 }

@@ -17,7 +17,7 @@ import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestr
 
 @Entity
 @Table(name = "bbie_sc")
-public class BasicBusinessInformationEntitySupplementaryComponent extends DefinitionBase
+public class BasicBusinessInformationEntitySupplementaryComponent
         implements BusinessInformationEntity, Usable, Serializable {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
@@ -64,11 +64,17 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
     @Column
     private int cardinalityMax;
 
-    @Column
+    @Lob
+    @Column(length = 10 * 1024)
     private String defaultValue;
 
-    @Column
+    @Lob
+    @Column(length = 10 * 1024)
     private String fixedValue;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(length = 225)
     private String remark;
@@ -231,6 +237,14 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
         this.fixedValue = fixedValue;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -332,8 +346,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (used ? 1 : 0);
@@ -355,7 +368,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
                 ", fixedValue='" + fixedValue + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
@@ -395,11 +408,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
                 BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                         (BasicBusinessInformationEntitySupplementaryComponent) object;
                 bbieSc.afterLoaded();
-
-                if (bbieSc.definition != null) {
-                    bbieSc.definition.setRefId(getId());
-                    bbieSc.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -522,7 +530,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public BasicBusinessInformationEntitySupplementaryComponent clone(boolean shallowCopy) {
+    public BasicBusinessInformationEntitySupplementaryComponent clone() {
         BasicBusinessInformationEntitySupplementaryComponent clone =
                 new BasicBusinessInformationEntitySupplementaryComponent();
         clone.guid = this.guid;
@@ -535,13 +543,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent extends Defini
         clone.cardinalityMax = this.cardinalityMax;
         clone.defaultValue = this.defaultValue;
         clone.fixedValue = this.fixedValue;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = this.definition;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.used = this.used;

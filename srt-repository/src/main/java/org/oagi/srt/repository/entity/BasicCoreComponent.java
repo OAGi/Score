@@ -7,7 +7,6 @@ import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,7 +14,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "bcc")
-public class BasicCoreComponent extends DefinitionBase
+public class BasicCoreComponent
         implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
@@ -57,6 +56,13 @@ public class BasicCoreComponent extends DefinitionBase
 
     @Column(nullable = false)
     private String den;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -209,6 +215,22 @@ public class BasicCoreComponent extends DefinitionBase
         setDen(acc.getObjectClassTerm() + ". " + bccp.getDen());
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public long getCreatedBy() {
         return createdBy;
     }
@@ -321,7 +343,7 @@ public class BasicCoreComponent extends DefinitionBase
         this.defaultValue = defaultValue;
     }
 
-    public BasicCoreComponent clone(boolean shallowCopy) {
+    public BasicCoreComponent clone() {
         BasicCoreComponent clone = new BasicCoreComponent();
         clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
@@ -331,13 +353,8 @@ public class BasicCoreComponent extends DefinitionBase
         clone.setSeqKey(this.seqKey);
         clone.setEntityType(this.entityType);
         clone.setDen(this.den);
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
         clone.setOwnerUserId(this.ownerUserId);
@@ -387,8 +404,8 @@ public class BasicCoreComponent extends DefinitionBase
         result = 31 * result + seqKey;
         result = 31 * result + (entityType != null ? entityType.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
@@ -418,7 +435,8 @@ public class BasicCoreComponent extends DefinitionBase
                 ", seqKey=" + seqKey +
                 ", entityType=" + entityType +
                 ", den='" + den + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
                 ", lastUpdatedBy=" + lastUpdatedBy +
@@ -454,11 +472,6 @@ public class BasicCoreComponent extends DefinitionBase
             public void onPostPersist(Object object) {
                 BasicCoreComponent bcc = (BasicCoreComponent) object;
                 bcc.afterLoaded();
-
-                if (bcc.definition != null) {
-                    bcc.definition.setRefId(getId());
-                    bcc.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);

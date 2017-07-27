@@ -12,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "asbiep")
-public class AssociationBusinessInformationEntityProperty extends DefinitionBase
+public class AssociationBusinessInformationEntityProperty
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASBIEP_ID_SEQ";
@@ -42,6 +42,10 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
     private long roleOfAbieId;
     @Transient
     private AggregateBusinessInformationEntity roleOfAbie;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(length = 225)
     private String remark;
@@ -127,6 +131,14 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
         this.roleOfAbie = roleOfAbie;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -209,8 +221,7 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
         result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -229,7 +240,7 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
                 ", guid='" + guid + '\'' +
                 ", basedAsccpId=" + basedAsccpId +
                 ", roleOfAbieId=" + roleOfAbieId +
-                ", definitionId=" + definitionId +
+                ", definition='" + definition + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", createdBy=" + createdBy +
@@ -269,11 +280,6 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
             public void onPostPersist(Object object) {
                 AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
                 asbiep.afterLoaded();
-
-                if (asbiep.definition != null) {
-                    asbiep.definition.setRefId(getId());
-                    asbiep.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -358,18 +364,12 @@ public class AssociationBusinessInformationEntityProperty extends DefinitionBase
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public AssociationBusinessInformationEntityProperty clone(boolean shallowCopy) {
+    public AssociationBusinessInformationEntityProperty clone() {
         AssociationBusinessInformationEntityProperty clone = new AssociationBusinessInformationEntityProperty();
         clone.guid = this.guid;
         clone.basedAsccpId = this.basedAsccpId;
         clone.roleOfAbieId = this.roleOfAbieId;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = this.definition;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         return clone;

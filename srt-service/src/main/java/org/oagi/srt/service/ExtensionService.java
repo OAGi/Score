@@ -180,7 +180,7 @@ public class ExtensionService {
     }
 
     private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum) {
-        AggregateCoreComponent accHistory = ueAcc.clone(true);
+        AggregateCoreComponent accHistory = ueAcc.clone();
         accHistory.setRevisionNum(revisionNum);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(Insert);
@@ -260,7 +260,7 @@ public class ExtensionService {
     }
 
     private AssociationCoreComponentProperty createASCCPHistory(AssociationCoreComponentProperty tAsccp, int revisionNum) {
-        AssociationCoreComponentProperty asccpHistory = tAsccp.clone(true);
+        AssociationCoreComponentProperty asccpHistory = tAsccp.clone();
         asccpHistory.setRevisionNum(revisionNum);
         asccpHistory.setRevisionTrackingNum(1);
         asccpHistory.setRevisionAction(Insert);
@@ -292,7 +292,7 @@ public class ExtensionService {
     }
 
     private AssociationCoreComponent createASCCHistory(AssociationCoreComponent tAscc, int revisionNum) {
-        AssociationCoreComponent asccHistory = tAscc.clone(true);
+        AssociationCoreComponent asccHistory = tAscc.clone();
         asccHistory.setRevisionNum(revisionNum);
         asccHistory.setRevisionTrackingNum(1);
         asccHistory.setRevisionAction(Insert);
@@ -320,7 +320,7 @@ public class ExtensionService {
     }
 
     private BasicCoreComponentProperty createBCCPHistory(BasicCoreComponentProperty tBccp) {
-        BasicCoreComponentProperty bccpHistory = tBccp.clone(true);
+        BasicCoreComponentProperty bccpHistory = tBccp.clone();
         bccpHistory.setRevisionNum(1);
         bccpHistory.setRevisionTrackingNum(1);
         bccpHistory.setRevisionAction(Insert);
@@ -353,7 +353,7 @@ public class ExtensionService {
     }
 
     private BasicCoreComponent createBCCHistory(BasicCoreComponent tBcc) {
-        BasicCoreComponent bccHistory = tBcc.clone(true);
+        BasicCoreComponent bccHistory = tBcc.clone();
         bccHistory.setRevisionNum(1);
         bccHistory.setRevisionTrackingNum(1);
         bccHistory.setRevisionAction(Insert);

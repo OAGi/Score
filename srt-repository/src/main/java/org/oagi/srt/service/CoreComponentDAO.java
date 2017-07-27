@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
-public class CoreComponentDAO extends AbstractDefinitionDAO {
+public class CoreComponentDAO {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -31,52 +31,52 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
 
     @Transactional
     public AggregateCoreComponent save(AggregateCoreComponent acc) {
-        return save(acc, accRepository);
+        return accRepository.saveAndFlush(acc);
     }
 
     @Transactional
     public AssociationCoreComponent save(AssociationCoreComponent ascc) {
-        return save(ascc, asccRepository);
+        return asccRepository.saveAndFlush(ascc);
     }
 
     @Transactional
     public AssociationCoreComponentProperty save(AssociationCoreComponentProperty asccp) {
-        return save(asccp, asccpRepository);
+        return asccpRepository.saveAndFlush(asccp);
     }
 
     @Transactional
     public BasicCoreComponent save(BasicCoreComponent bcc) {
-        return save(bcc, bccRepository);
+        return bccRepository.saveAndFlush(bcc);
     }
 
     @Transactional
     public BasicCoreComponentProperty save(BasicCoreComponentProperty bccp) {
-        return save(bccp, bccpRepository);
+        return bccpRepository.saveAndFlush(bccp);
     }
 
     @Transactional
     public List<AggregateCoreComponent> saveAccList(Collection<AggregateCoreComponent> accList) {
-        return save(accList, accRepository);
+        return accRepository.save(accList);
     }
 
     @Transactional
     public List<AssociationCoreComponent> saveAsccList(Collection<AssociationCoreComponent> asccList) {
-        return save(asccList, asccRepository);
+        return asccRepository.save(asccList);
     }
 
     @Transactional
     public List<AssociationCoreComponentProperty> saveAsccpList(Collection<AssociationCoreComponentProperty> asccpList) {
-        return save(asccpList, asccpRepository);
+        return asccpRepository.save(asccpList);
     }
 
     @Transactional
     public List<BasicCoreComponent> saveBccList(Collection<BasicCoreComponent> bccList) {
-        return save(bccList, bccRepository);
+        return bccRepository.save(bccList);
     }
 
     @Transactional
     public List<BasicCoreComponentProperty> saveBccpList(Collection<BasicCoreComponentProperty> bccpList) {
-        return save(bccpList, bccpRepository);
+        return bccpRepository.save(bccpList);
     }
 
     @Transactional
@@ -90,17 +90,10 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
             return;
         }
 
-        List<Long> definitionIds = new ArrayList();
-        definitionIds.addAll(accRepository.findDefinitionIdByCurrentAccId(accId));
-        definitionIds.addAll(asccRepository.findDefinitionIdByFromAccId(accId));
-        definitionIds.addAll(bccRepository.findDefinitionIdByFromAccId(accId));
-        definitionIds.add(acc.getDefinitionId());
-
         accRepository.deleteByCurrentAccId(accId); // To remove history
         asccRepository.deleteByFromAccId(accId);
         bccRepository.deleteByFromAccId(accId);
         accRepository.deleteByAccId(accId);
-        deleteDefinitions(definitionIds);
     }
 
     @Transactional
@@ -113,7 +106,6 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
         if (ascc == null) {
             return;
         }
-        deleteDefinition(ascc.getDefinitionId());
         asccRepository.delete(ascc);
     }
 
@@ -127,7 +119,6 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
         if (asccp == null) {
             return;
         }
-        deleteDefinition(asccp.getDefinitionId());
         asccpRepository.delete(asccp);
     }
 
@@ -141,7 +132,6 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
         if (bcc == null) {
             return;
         }
-        deleteDefinition(bcc.getDefinitionId());
         bccRepository.delete(bcc);
     }
 
@@ -155,7 +145,6 @@ public class CoreComponentDAO extends AbstractDefinitionDAO {
         if (bccp == null) {
             return;
         }
-        deleteDefinition(bccp.getDefinitionId());
         bccpRepository.delete(bccp);
     }
 

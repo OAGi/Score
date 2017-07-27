@@ -12,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "bbiep")
-public class BasicBusinessInformationEntityProperty extends DefinitionBase
+public class BasicBusinessInformationEntityProperty
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BBIEP_ID_SEQ";
@@ -37,6 +37,10 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
     private long basedBccpId;
     @Transient
     private BasicCoreComponentProperty basedBccp;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(length = 225)
     private String remark;
@@ -104,6 +108,14 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
 
     public void setBasedBccp(BasicCoreComponentProperty basedBccp) {
         this.basedBccp = basedBccp;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 
     public String getRemark() {
@@ -188,8 +200,7 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedBccpId ^ (basedBccpId >>> 32));
         result = 31 * result + (basedBccp != null ? basedBccp.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -209,7 +220,7 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
                 "bbiepId=" + bbiepId +
                 ", guid='" + guid + '\'' +
                 ", basedBccpId=" + basedBccpId +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", createdBy=" + createdBy +
@@ -245,11 +256,6 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
             public void onPostPersist(Object object) {
                 BasicBusinessInformationEntityProperty bbiep = (BasicBusinessInformationEntityProperty) object;
                 bbiep.afterLoaded();
-
-                if (bbiep.definition != null) {
-                    bbiep.definition.setRefId(getId());
-                    bbiep.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -334,17 +340,11 @@ public class BasicBusinessInformationEntityProperty extends DefinitionBase
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public BasicBusinessInformationEntityProperty clone(boolean shallowCopy) {
+    public BasicBusinessInformationEntityProperty clone() {
         BasicBusinessInformationEntityProperty clone = new BasicBusinessInformationEntityProperty();
         clone.guid = this.guid;
         clone.basedBccpId = this.basedBccpId;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = this.definition;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.afterLoaded();

@@ -16,9 +16,6 @@ public interface AssociationBusinessInformationEntityPropertyRepository
     @Query("select a from AssociationBusinessInformationEntityProperty a where a.ownerTopLevelAbieId = ?1")
     public List<AssociationBusinessInformationEntityProperty> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 
-    @Query("select a.definitionId from AssociationBusinessInformationEntityProperty a where a.ownerTopLevelAbieId = ?1")
-    public List<Long> findDefinitionIdByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
-
     @Modifying
     @Query("delete from AssociationBusinessInformationEntityProperty a where a.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);

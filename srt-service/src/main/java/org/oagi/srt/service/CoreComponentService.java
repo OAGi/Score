@@ -137,7 +137,7 @@ public class CoreComponentService {
 
         acc = accRepository.saveAndFlush(acc);
 
-        AggregateCoreComponent accHistory = acc.clone(true);
+        AggregateCoreComponent accHistory = acc.clone();
         int revisionNum = 1;
         accHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -163,7 +163,7 @@ public class CoreComponentService {
 
         acc = accRepository.saveAndFlush(acc);
 
-        AggregateCoreComponent accHistory = acc.clone(true);
+        AggregateCoreComponent accHistory = acc.clone();
         Long currentAccId = acc.getAccId();
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
         if (latestHistoryAccList.isEmpty()) {
@@ -204,7 +204,7 @@ public class CoreComponentService {
 
         asccp = asccpRepository.saveAndFlush(asccp);
 
-        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
         int revisionNum = 1;
         asccpHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -230,7 +230,7 @@ public class CoreComponentService {
 
         asccp = asccpRepository.saveAndFlush(asccp);
 
-        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
         Long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         if (latestHistoryAsccpList.isEmpty()) {
@@ -270,7 +270,7 @@ public class CoreComponentService {
 
         bccp = bccpRepository.saveAndFlush(bccp);
 
-        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
         int revisionNum = 1;
         bccpHistory.setRevisionNum(revisionNum);
         int revisionTrackingNum = 1;
@@ -296,7 +296,7 @@ public class CoreComponentService {
 
         bccp = bccpRepository.saveAndFlush(bccp);
 
-        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
         Long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         if (latestHistoryBccpList.isEmpty()) {
@@ -337,7 +337,7 @@ public class CoreComponentService {
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AggregateCoreComponent accHistory = acc.clone(true);
+        AggregateCoreComponent accHistory = acc.clone();
         accHistory.setRevisionNum(latestHistoryAccList.get(0).getRevisionNum());
         accHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         accHistory.setRevisionAction(Update);
@@ -436,7 +436,7 @@ public class CoreComponentService {
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AssociationCoreComponent asccHistory = ascc.clone(true);
+        AssociationCoreComponent asccHistory = ascc.clone();
         asccHistory.setRevisionNum(latestHistoryAsccList.get(0).getRevisionNum());
         asccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccHistory.setRevisionAction(Update);
@@ -523,7 +523,7 @@ public class CoreComponentService {
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        BasicCoreComponent bccHistory = bcc.clone(true);
+        BasicCoreComponent bccHistory = bcc.clone();
         bccHistory.setRevisionNum(latestHistoryBccList.get(0).getRevisionNum());
         bccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccHistory.setRevisionAction(Update);
@@ -593,7 +593,7 @@ public class CoreComponentService {
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        AssociationCoreComponentProperty asccpHistory = asccp.clone(true);
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
         asccpHistory.setRevisionNum(latestHistoryAsccpList.get(0).getRevisionNum());
         asccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         asccpHistory.setRevisionAction(Update);
@@ -658,7 +658,7 @@ public class CoreComponentService {
                 .mapToInt(e -> e.getRevisionTrackingNum())
                 .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
-        BasicCoreComponentProperty bccpHistory = bccp.clone(true);
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
         bccpHistory.setRevisionNum(latestHistoryBccpList.get(0).getRevisionNum());
         bccpHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
         bccpHistory.setRevisionAction(Update);

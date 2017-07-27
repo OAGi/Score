@@ -15,8 +15,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "dt")
-public class DataType  extends DefinitionBase
-        implements IDefinition, TimestampAware, Serializable {
+public class DataType implements IEntity, TimestampAware {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 
@@ -60,6 +59,13 @@ public class DataType  extends DefinitionBase
 
     @Column(length = 200)
     private String contentComponentDen;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -219,6 +225,22 @@ public class DataType  extends DefinitionBase
         this.contentComponentDen = contentComponentDen;
     }
 
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public String getContentComponentDefinition() {
         return contentComponentDefinition;
     }
@@ -369,8 +391,8 @@ public class DataType  extends DefinitionBase
         result = 31 * result + (basedDtId != null ? basedDtId.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (contentComponentDen != null ? contentComponentDen.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
@@ -402,7 +424,8 @@ public class DataType  extends DefinitionBase
                 ", basedDtId=" + basedDtId +
                 ", den='" + den + '\'' +
                 ", contentComponentDen='" + contentComponentDen + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
                 ", module=" + ((module != null) ? module.getModuleId() : null) +
@@ -439,11 +462,6 @@ public class DataType  extends DefinitionBase
             public void onPostPersist(Object object) {
                 DataType dt = (DataType) object;
                 dt.afterLoaded();
-
-                if (dt.definition != null) {
-                    dt.definition.setRefId(getId());
-                    dt.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);

@@ -113,16 +113,18 @@ public class P_1_7_PopulateQBDTInDT {
         private String typeName;
         private String guid;
         private String definition;
+        private String definitionSource;
         private String baseTypeName;
         private Element typeElement;
         private String uri;
         private Module module;
 
-        public DataTypeInfoHolder(String typeName, String guid, String definition,
+        public DataTypeInfoHolder(String typeName, String guid, String definition, String definitionSource,
                                   String baseTypeName, Element typeElement, String uri, Module module) {
             this.typeName = typeName;
             this.guid = guid;
             this.definition = definition;
+            this.definitionSource = definitionSource;
             this.baseTypeName = baseTypeName;
             this.typeElement = typeElement;
             this.uri = uri;
@@ -141,6 +143,10 @@ public class P_1_7_PopulateQBDTInDT {
             return definition;
         }
 
+        public String getDefinitionSource() {
+            return definitionSource;
+        }
+
         public String getBaseTypeName() {
             return baseTypeName;
         }
@@ -155,6 +161,7 @@ public class P_1_7_PopulateQBDTInDT {
                     "typeName='" + typeName + '\'' +
                     ", guid='" + guid + '\'' +
                     ", definition='" + definition + '\'' +
+                    ", definitionSource='" + definitionSource + '\'' +
                     ", baseTypeName='" + baseTypeName + '\'' +
                     ", typeElement=" + typeElement +
                     ", uri='" + uri + '\'' +
@@ -206,24 +213,23 @@ public class P_1_7_PopulateQBDTInDT {
 
                 String dtGuid = idAttribute.getNodeValue();
 
-                Node definitionNode = (Node) Context.xPath.compile(
-                        "./xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]")
-                        .evaluate(node, XPathConstants.NODE);
-                String definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
-                if (definition == null) {
-                    definitionNode = (Node) Context.xPath.compile("./xsd:annotation/xsd:documentation")
-                            .evaluate(node, XPathConstants.NODE);
-                    definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
-                }
-                if (StringUtils.isEmpty(definition)) {
-                    definition = null;
+                Element documentationNode = (Element) Context.xPath.compile("./xsd:annotation/xsd:documentation").evaluate(node, XPathConstants.NODE);
+                String definition = null;
+                String definitionSource = null;
+                if (documentationNode != null) {
+                    definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+
+                    definitionSource = documentationNode.getAttribute("source");
                 }
 
                 Node baseTypeNode = (Node) Context.xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
 
                 Module module = moduleRepository.findByModule(Utility.extractModuleName(systemId));
-                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, baseTypeName, (Element) node, systemId, module);
+                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, definitionSource, baseTypeName, (Element) node, systemId, module);
                 dtiHolderMap.put(typeName, dtiHolder);
             }
         }
@@ -349,11 +355,20 @@ public class P_1_7_PopulateQBDTInDT {
                     addToDTSC(typeXPathHandler, typeName, dataType);
                 }
 
-                Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
-                String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
+                Element documentationNode = (Element) xHandler.getNode(element, ".//xsd:documentation");
+                String definition = null;
+                String definitionSource = null;
+                if (documentationNode != null) {
+                    definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+
+                    definitionSource = documentationNode.getAttribute("source");
+                }
 
                 // add BCCP
-                addToBCCP(guid, bccp, dataType, definition, elementDecl);
+                addToBCCP(guid, bccp, dataType, definition, definitionSource, elementDecl);
             }
         }
     }
@@ -447,8 +462,8 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setDen(den);
         dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
 
-        String definition = dataTypeInfoHolder.getDefinition();
-        dataType.setDefinition(definition);
+        dataType.setDefinition(dataTypeInfoHolder.getDefinition());
+        dataType.setDefinitionSource(dataTypeInfoHolder.getDefinitionSource());
         dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
@@ -522,7 +537,7 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private void addToBCCP(String guid, String name, DataType dataType, String definition, ElementDecl elementDecl) throws Exception {
+    private void addToBCCP(String guid, String name, DataType dataType, String definition, String definitionSource, ElementDecl elementDecl) throws Exception {
         if (bccpRepository.existsByGuid(guid)) {
             return;
         }
@@ -536,6 +551,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setBdtId(dataType.getDtId());
         bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dataType.getDataTypeTerm());
         bccp.setDefinition(definition);
+        bccp.setDefinitionSource(definitionSource);
         bccp.setState(Published);
         bccp.setCreatedBy(importUtil.getUserId());
         bccp.setLastUpdatedBy(importUtil.getUserId());
@@ -564,7 +580,6 @@ public class P_1_7_PopulateQBDTInDT {
             String property_term = "";
             String representation_term = "";
 
-            String definition;
             int min_cardinality = 0;
             int max_cardinality = 1;
 
@@ -631,22 +646,25 @@ public class P_1_7_PopulateQBDTInDT {
                     throw new IllegalStateException("Not defined REPRESENTATION_TERM.");
                 }
 
-                Node documentationNode = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
-                if (documentationNode != null) {
-                    Node documentationFromCCTS = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
-                    if (documentationFromCCTS != null)
-                        definition = documentationFromCCTS.getTextContent();
-                    else
-                        definition = documentationNode.getTextContent();
-                } else {
-                    definition = null;
-                }
-
                 DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
                 dtSc.setGuid(dt_sc_guid);
                 dtSc.setPropertyTerm(Utility.spaceSeparator(property_term));
                 dtSc.setRepresentationTerm(representation_term);
-                dtSc.setDefinition(definition);
+
+                Element documentationNode = (Element) xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
+                if (documentationNode != null) {
+                    String definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+                    dtSc.setDefinition(definition);
+
+                    String definitionSource = documentationNode.getAttribute("source");
+                    if (!StringUtils.isEmpty(definitionSource)) {
+                        dtSc.setDefinitionSource(definitionSource);
+                    }
+                }
+
                 dtSc.setOwnerDtId(ownerDtId);
 
                 dtSc.setCardinalityMin(min_cardinality);
@@ -895,8 +913,8 @@ public class P_1_7_PopulateQBDTInDT {
         String den = Utility.denWithQualifier(qualifier, dVO.getDen());
         dataType.setDen(den);
         dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
-        String definition = dataTypeInfoHolder.getDefinition();
-        dataType.setDefinition(definition);
+        dataType.setDefinition(dataTypeInfoHolder.getDefinition());
+        dataType.setDefinitionSource(dataTypeInfoHolder.getDefinitionSource());
         dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
@@ -928,6 +946,7 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
             vo.setOwnerDtId(owner_dT_iD);
             vo.setDefinition(dtsc_vo.getDefinition());
+            vo.setDefinitionSource(dtsc_vo.getDefinitionSource());
             vo.setCardinalityMin(dtsc_vo.getCardinalityMin());
             vo.setCardinalityMax(0);
             vo.setBasedDtScId(dtsc_vo.getDtScId());

@@ -1,14 +1,10 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.ApplicationContextProvider;
-import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.context.ApplicationContext;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "abie")
-public class AggregateBusinessInformationEntity extends DefinitionBase
+public class AggregateBusinessInformationEntity
         implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
@@ -49,6 +45,10 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
 
     @Transient
     private String bizCtxName;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -149,6 +149,14 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
 
     public void setBizCtxName(String bizCtxName) {
         this.bizCtxName = bizCtxName;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 
     public long getCreatedBy() {
@@ -268,8 +276,7 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
@@ -295,7 +302,7 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
                 ", basedAccId=" + basedAccId +
                 ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +
@@ -350,11 +357,6 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
             public void onPostPersist(Object object) {
                 AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
                 abie.afterLoaded();
-
-                if ((abie.definitionId == null || abie.definitionId == 0L) && abie.definition != null) {
-                    abie.definition.setRefId(getId());
-                    abie.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -439,18 +441,12 @@ public class AggregateBusinessInformationEntity extends DefinitionBase
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public AggregateBusinessInformationEntity clone(boolean shallowCopy) {
+    public AggregateBusinessInformationEntity clone() {
         AggregateBusinessInformationEntity clone = new AggregateBusinessInformationEntity();
         clone.guid = this.guid;
         clone.basedAccId = this.basedAccId;
         clone.bizCtxId = this.bizCtxId;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = definition;
         clone.state = this.state;
         clone.clientId = this.clientId;
         clone.version = this.version;

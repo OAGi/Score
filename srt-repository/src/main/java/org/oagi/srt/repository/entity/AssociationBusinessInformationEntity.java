@@ -11,8 +11,8 @@ import java.util.*;
 
 @Entity
 @Table(name = "asbie")
-public class AssociationBusinessInformationEntity extends DefinitionBase
-        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable, Serializable {
+public class AssociationBusinessInformationEntity
+        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable {
 
     public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
 
@@ -45,6 +45,10 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
 
     @Column(nullable = false, updatable = false)
     private long basedAsccId;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -153,6 +157,14 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
 
     public void setBasedAsccId(long basedAsccId) {
         this.basedAsccId = basedAsccId;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 
     public int getCardinalityMin() {
@@ -278,8 +290,7 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
         result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
         result = 31 * result + (int) (toAsbiepId ^ (toAsbiepId >>> 32));
         result = 31 * result + (int) (basedAsccId ^ (basedAsccId >>> 32));
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (nillable ? 1 : 0);
@@ -303,7 +314,7 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
                 ", fromAbieId=" + fromAbieId +
                 ", toAsbiepId=" + toAsbiepId +
                 ", basedAsccId=" + basedAsccId +
-                ", definitionId=" + definitionId +
+                ", definition='" + definition + '\'' +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", nillable=" + nillable +
@@ -346,11 +357,6 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
             public void onPostPersist(Object object) {
                 AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) object;
                 asbie.afterLoaded();
-
-                if (asbie.definition != null) {
-                    asbie.definition.setRefId(getId());
-                    asbie.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
@@ -435,19 +441,13 @@ public class AssociationBusinessInformationEntity extends DefinitionBase
         return hashCodeAfterLoaded != hashCode();
     }
 
-    public AssociationBusinessInformationEntity clone(boolean shallowCopy) {
+    public AssociationBusinessInformationEntity clone() {
         AssociationBusinessInformationEntity clone = new AssociationBusinessInformationEntity();
         clone.guid = this.guid;
         clone.fromAbieId = this.fromAbieId;
         clone.toAsbiepId = this.toAsbiepId;
         clone.basedAsccId = this.basedAsccId;
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.definition = this.definition;
         clone.cardinalityMin = this.cardinalityMin;
         clone.cardinalityMax = this.cardinalityMax;
         clone.nillable = this.nillable;

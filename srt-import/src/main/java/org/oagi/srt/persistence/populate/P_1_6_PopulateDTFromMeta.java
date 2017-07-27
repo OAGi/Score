@@ -4,6 +4,7 @@ import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
+import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.DataTypeDAO;
@@ -15,10 +16,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPathConstants;
 import java.util.*;
 
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
@@ -123,11 +126,19 @@ public class P_1_6_PopulateDTFromMeta {
             dataType.setDen(Utility.typeToDen(name));
             dataType.setContentComponentDen(Utility.typeToContent(name));
 
-            Element definition = (Element) ele.getElementsByTagName("xsd:documentation").item(0);
-            if (definition != null)
-                dataType.setDefinition(definition.getTextContent());
-            else
-                dataType.setDefinition(null);
+            Element documentationNode = (Element) Context.xPath.evaluate(".//xsd:annotation/xsd:documentation", ele, XPathConstants.NODE);
+            if (documentationNode != null) {
+                String definition = ImportUtil.getCctsDefinition(documentationNode);
+                if (definition == null) {
+                    definition = ImportUtil.toString(documentationNode.getChildNodes());
+                }
+                dataType.setDefinition(definition);
+
+                String definitionSource = documentationNode.getAttribute("source");
+                if (!StringUtils.isEmpty(definitionSource)) {
+                    dataType.setDefinitionSource(definitionSource);
+                }
+            }
 
             dataType.setContentComponentDefinition(null);
             dataType.setRevisionDoc(null);
@@ -222,21 +233,27 @@ public class P_1_6_PopulateDTFromMeta {
 
             String propertyTerm = "";
             String representationTerm = "";
-            String definition = "";
 
             propertyTerm = Utility.spaceSeparatorBeforeStr(attribute_name, "Code");
 
             representationTerm = Utility.getRepresentationTerm(attribute_name);
 
-            Node defNode = meta_xsd.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='" + attribute_id + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
-
+            Element defNode = (Element) meta_xsd.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='" + attribute_id + "']/xsd:annotation/xsd:documentation");
             if (defNode != null) {
-                definition = defNode.getTextContent();
+                String definition = ImportUtil.getCctsDefinition(defNode);
+                if (definition == null) {
+                    definition = ImportUtil.toString(defNode.getChildNodes());
+                }
+                vo.setDefinition(definition);
+
+                String definitionSource = defNode.getAttribute("source");
+                if (!StringUtils.isEmpty(definitionSource)) {
+                    vo.setDefinitionSource(definitionSource);
+                }
             }
 
             vo.setPropertyTerm(propertyTerm);
             vo.setRepresentationTerm(representationTerm);
-            vo.setDefinition(definition);
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
             vo = dtDAO.save(vo);
@@ -251,6 +268,7 @@ public class P_1_6_PopulateDTFromMeta {
 
         vo.setBasedDtScId(languageCodeSC.getDtScId());
         vo.setDefinition(languageCodeSC.getDefinition());
+        vo.setDefinitionSource(languageCodeSC.getDefinitionSource());
         vo.setGuid(Utility.generateGUID());
         vo.setCardinalityMax(0);
         vo.setCardinalityMin(0);

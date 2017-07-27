@@ -1,14 +1,11 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.ApplicationContextProvider;
-import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -17,7 +14,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "asccp")
-public class AssociationCoreComponentProperty extends DefinitionBase
+public class AssociationCoreComponentProperty
         implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
@@ -40,6 +37,13 @@ public class AssociationCoreComponentProperty extends DefinitionBase
 
     @Column(nullable = false)
     private String propertyTerm;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long roleOfAccId;
@@ -150,6 +154,22 @@ public class AssociationCoreComponentProperty extends DefinitionBase
     public void setPropertyTerm(String propertyTerm, AggregateCoreComponent roleOfAcc) {
         setPropertyTerm(propertyTerm);
         setRoleOfAcc(roleOfAcc);
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public long getRoleOfAccId() {
@@ -308,17 +328,12 @@ public class AssociationCoreComponentProperty extends DefinitionBase
         this.nillable = nillable;
     }
 
-    public AssociationCoreComponentProperty clone(boolean shallowCopy) {
+    public AssociationCoreComponentProperty clone() {
         AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
         clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setRoleOfAccId(this.roleOfAccId);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
@@ -369,8 +384,8 @@ public class AssociationCoreComponentProperty extends DefinitionBase
         int result = (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (int) (roleOfAccId ^ (roleOfAccId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -398,7 +413,8 @@ public class AssociationCoreComponentProperty extends DefinitionBase
                 "asccpId=" + asccpId +
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", roleOfAccId=" + roleOfAccId +
                 ", den='" + den + '\'' +
                 ", createdBy=" + createdBy +
@@ -439,11 +455,6 @@ public class AssociationCoreComponentProperty extends DefinitionBase
             public void onPostPersist(Object object) {
                 AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) object;
                 asccp.afterLoaded();
-
-                if (asccp.definition != null) {
-                    asccp.definition.setRefId(getId());
-                    asccp.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);

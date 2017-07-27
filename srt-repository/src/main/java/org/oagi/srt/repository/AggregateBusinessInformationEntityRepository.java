@@ -23,9 +23,6 @@ public interface AggregateBusinessInformationEntityRepository
     @Query("select a from AggregateBusinessInformationEntity a where a.bizCtxId = ?1")
     public List<AggregateBusinessInformationEntity> findByBizCtxId(long bizCtxId);
 
-    @Query("select a.definitionId from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
-    public List<Long> findDefinitionIdByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
-
     @Modifying
     @Query("delete from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);

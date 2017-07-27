@@ -14,7 +14,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty extends DefinitionBase
+public class BasicCoreComponentProperty
         implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
@@ -48,6 +48,13 @@ public class BasicCoreComponentProperty extends DefinitionBase
 
     @Column(nullable = false, length = 200)
     private String den;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long moduleId;
@@ -122,11 +129,8 @@ public class BasicCoreComponentProperty extends DefinitionBase
         this.representationTerm = bccp.getRepresentationTerm();
         this.bdtId = bccp.getBdtId();
         this.den = bccp.getDen();
-        this.definitionId = bccp.getDefinitionId();
-        Definition definition = bccp.getRawDefinition();
-        if (definition != null) {
-            this.definition = definition.clone();
-        }
+        this.definition = bccp.getDefinition();
+        this.definitionSource = bccp.getDefinitionSource();
         this.moduleId = bccp.getModuleId();
         this.namespaceId = bccp.getNamespaceId();
         this.deprecated = bccp.isDeprecated();
@@ -224,6 +228,22 @@ public class BasicCoreComponentProperty extends DefinitionBase
 
     public void setDen(String den) {
         this.den = den;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public long getModuleId() {
@@ -356,19 +376,14 @@ public class BasicCoreComponentProperty extends DefinitionBase
         this.defaultValue = defaultValue;
     }
 
-    public BasicCoreComponentProperty clone(boolean shallowCopy) {
+    public BasicCoreComponentProperty clone() {
         BasicCoreComponentProperty clone = new BasicCoreComponentProperty();
         clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
         clone.setRepresentationTerm(this.representationTerm);
         clone.setBdtId(this.bdtId);
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
@@ -423,8 +438,8 @@ public class BasicCoreComponentProperty extends DefinitionBase
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
@@ -453,7 +468,8 @@ public class BasicCoreComponentProperty extends DefinitionBase
                 ", representationTerm='" + representationTerm + '\'' +
                 ", bdtId=" + bdtId +
                 ", den='" + den + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", deprecated=" + deprecated +
@@ -491,11 +507,6 @@ public class BasicCoreComponentProperty extends DefinitionBase
             public void onPostPersist(Object object) {
                 BasicCoreComponentProperty bccp = (BasicCoreComponentProperty) object;
                 bccp.afterLoaded();
-
-                if (bccp.definition != null) {
-                    bccp.definition.setRefId(getId());
-                    bccp.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);

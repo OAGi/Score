@@ -349,7 +349,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     AssociationCoreComponentProperty createASCCP(Declaration declaration,
                                                  AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
-        String definition = declaration.getDefinition();
         Module module = declaration.getModule();
         String propertyTerm = Utility.spaceSeparator(declaration.getName());
         if (acc == null) {
@@ -378,7 +377,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp = new AssociationCoreComponentProperty();
         asccp.setGuid(asccpGuid);
         asccp.setPropertyTerm(propertyTerm);
-        asccp.setDefinition(definition);
+        asccp.setDefinition(declaration.getDefinition());
+        asccp.setDefinitionSource(declaration.getDefinitionSource());
         asccp.setRoleOfAccId(roleOfAccId);
         asccp.setDen(den);
         asccp.setState(CoreComponentState.Published);
@@ -455,7 +455,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
 
-        String definition = declaration.getDefinition();
         Module module = declaration.getModule();
 
         AggregateCoreComponent acc = new AggregateCoreComponent();
@@ -468,7 +467,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
         acc.setGuid(typeGuid);
         acc.setObjectClassTerm(objectClassTerm);
-        acc.setDefinition(definition);
+        acc.setDefinition(declaration.getDefinition());
+        acc.setDefinitionSource(declaration.getDefinitionSource());
 
         AggregateCoreComponent basedAcc = null;
         if (declaration instanceof TypeDecl) {
@@ -537,7 +537,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         int cardinalityMax = declaration.getMaxOccur();
 
         String den = Utility.first(fromAcc.getDen()) + ". " + toAsccp.getDen();
-        String definition = declaration.getDefinition();
 
         ascc = new AssociationCoreComponent();
         ascc.setGuid(guid);
@@ -547,7 +546,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         ascc.setFromAccId(fromAcc.getAccId());
         ascc.setToAsccpId(toAsccp.getAsccpId());
         ascc.setDen(den);
-        ascc.setDefinition(definition);
+        ascc.setDefinition(declaration.getDefinition());
+        ascc.setDefinitionSource(declaration.getDefinitionSource());
         ascc.setState(CoreComponentState.Published);
         ascc.setDeprecated(false);
         ascc.setReleaseId(importUtil.getReleaseId());
@@ -602,6 +602,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setDen(den);
         bcc.setState(CoreComponentState.Published);
         bcc.setDefinition(declaration.getDefinition());
+        bcc.setDefinitionSource(declaration.getDefinitionSource());
         bcc.setDeprecated(false);
         bcc.setReleaseId(importUtil.getReleaseId());
         bcc.setCreatedBy(importUtil.getUserId());

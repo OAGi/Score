@@ -1,25 +1,20 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.ApplicationContextProvider;
-import org.oagi.srt.repository.DefinitionRepository;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
-import org.springframework.context.ApplicationContext;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent extends DefinitionBase
-        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
+public class AggregateCoreComponent
+        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
@@ -44,6 +39,13 @@ public class AggregateCoreComponent extends DefinitionBase
 
     @Column(nullable = false, length = 200)
     private String den;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long basedAccId;
@@ -161,6 +163,22 @@ public class AggregateCoreComponent extends DefinitionBase
 
     public void setDen(String den) {
         this.den = den;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public long getBasedAccId() {
@@ -330,18 +348,13 @@ public class AggregateCoreComponent extends DefinitionBase
         return isExtension() && "All Extension".equals(getObjectClassTerm());
     }
 
-    public AggregateCoreComponent clone(boolean shallowCopy) {
+    public AggregateCoreComponent clone() {
         AggregateCoreComponent clone = new AggregateCoreComponent();
         clone.setGuid(this.guid);
         clone.setObjectClassTerm(this.objectClassTerm);
         clone.setDen(this.den);
-
-        if (shallowCopy) {
-            clone.definitionId = this.definitionId;
-        } else {
-            clone.definition = getRawDefinition().clone();
-        }
-
+        clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         if (this.basedAccId != null) {
             clone.setBasedAccId(this.basedAccId);
         }
@@ -397,8 +410,8 @@ public class AggregateCoreComponent extends DefinitionBase
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + (definitionId != null ? definitionId.hashCode() : 0);
-        result = 31 * result + (getRawDefinition().hashCode());
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
@@ -427,7 +440,8 @@ public class AggregateCoreComponent extends DefinitionBase
                 ", guid='" + guid + '\'' +
                 ", objectClassTerm='" + objectClassTerm + '\'' +
                 ", den='" + den + '\'' +
-                ", definitionId='" + definitionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", basedAccId=" + basedAccId +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
                 ", oagisComponentType=" + oagisComponentType +
@@ -467,11 +481,6 @@ public class AggregateCoreComponent extends DefinitionBase
             public void onPostPersist(Object object) {
                 AggregateCoreComponent acc = (AggregateCoreComponent) object;
                 acc.afterLoaded();
-
-                if (acc.definition != null) {
-                    acc.definition.setRefId(getId());
-                    acc.definition.setRefTableName(tableName());
-                }
             }
         });
         addUpdateEventListener(timestampAwareEventListener);

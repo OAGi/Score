@@ -55,6 +55,27 @@ public class ImportUtil {
         return namespaceId;
     }
 
+    public static String getCctsDefinition(Element documentationElement) {
+        NodeList children = documentationElement.getChildNodes();
+        String cctsDefinition = null;
+        for (int i = 0, len = children.getLength(); i < len; ++i) {
+            Node child = children.item(i);
+            if (!(child instanceof Element)) {
+                continue;
+            }
+            if ("ccts_Definition".equals(child.getNodeName())) {
+                Node text = child.getFirstChild();
+                return (text != null) ? text.getTextContent() : null;
+            } else {
+                cctsDefinition = getCctsDefinition((Element) child);
+                if (!org.springframework.util.StringUtils.isEmpty(cctsDefinition)) {
+                    return cctsDefinition;
+                }
+            }
+        }
+        return null;
+    }
+
     public static String toString(NodeList nodeList) {
         if (nodeList.getLength() == 1 && nodeList.item(0) instanceof Text) {
             return ((Text) nodeList.item(0)).getWholeText();

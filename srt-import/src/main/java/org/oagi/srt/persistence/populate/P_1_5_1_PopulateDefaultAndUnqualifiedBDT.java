@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
@@ -163,27 +162,6 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
             }
         }
 
-        public String getCctsDefinition(Element documentationElement) {
-            NodeList children = documentationElement.getChildNodes();
-            String cctsDefinition = null;
-            for (int i = 0, len = children.getLength(); i < len; ++i) {
-                Node child = children.item(i);
-                if (!(child instanceof Element)) {
-                    continue;
-                }
-                if ("ccts_Definition".equals(child.getNodeName())) {
-                    Node text = child.getFirstChild();
-                    return (text != null) ? text.getTextContent() : null;
-                } else {
-                     cctsDefinition = getCctsDefinition((Element) child);
-                     if (!StringUtils.isEmpty(cctsDefinition)) {
-                         return cctsDefinition;
-                     }
-                }
-            }
-            return null;
-        }
-
         public String getDen() {
             return dataType.getDen();
         }
@@ -250,24 +228,24 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
 
             Element documentationNode = evaluate(".//xsd:annotation/xsd:documentation");
             if (documentationNode != null) {
-                String definition = getCctsDefinition(documentationNode);
+                String definition = ImportUtil.getCctsDefinition(documentationNode);
                 if (definition == null) {
-                    definition = importUtil.toString(documentationNode.getChildNodes());
+                    definition = ImportUtil.toString(documentationNode.getChildNodes());
                 }
                 dataType.setDefinition(definition);
 
                 String definitionSource = documentationNode.getAttribute("source");
                 if (!StringUtils.isEmpty(definitionSource)) {
-                    dataType.getRawDefinition().setDefinitionSource(definitionSource);
+                    dataType.setDefinitionSource(definitionSource);
                 }
             }
 
             Element ccDocumentationNode = evaluate(
                     ".//xsd:extension/xsd:annotation/xsd:documentation | .//xsd:restriction/xsd:annotation/xsd:documentation | .//xsd:union/xsd:annotation/xsd:documentation");
             if (ccDocumentationNode != null) {
-                String ccDefinition = getCctsDefinition(ccDocumentationNode);
+                String ccDefinition = ImportUtil.getCctsDefinition(ccDocumentationNode);
                 if (ccDefinition == null) {
-                    ccDefinition = importUtil.toString(ccDocumentationNode.getChildNodes());
+                    ccDefinition = ImportUtil.toString(ccDocumentationNode.getChildNodes());
                 }
                 dataType.setContentComponentDefinition(ccDefinition);
             }
@@ -447,11 +425,16 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
 
                     Element documentationNode = evaluate(".//xsd:annotation/xsd:documentation");
                     if (documentationNode != null) {
-                        String definition = getCctsDefinition(documentationNode);
+                        String definition = ImportUtil.getCctsDefinition(documentationNode);
                         if (definition == null) {
-                            definition = importUtil.toString(documentationNode.getChildNodes());
+                            definition = ImportUtil.toString(documentationNode.getChildNodes());
                         }
                         dtSc.setDefinition(definition);
+
+                        String definitionSource = documentationNode.getAttribute("source");
+                        if (!StringUtils.isEmpty(definitionSource)) {
+                            dtSc.setDefinitionSource(definitionSource);
+                        }
                     }
 
                     dtSc.setOwnerDtId(dataType.getDtId());

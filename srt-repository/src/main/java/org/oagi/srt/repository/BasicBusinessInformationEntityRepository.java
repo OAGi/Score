@@ -25,9 +25,6 @@ public interface BasicBusinessInformationEntityRepository
     @Query("select b from BasicBusinessInformationEntity b where b.basedBccId = ?1 and b.fromAbieId = ?2 and b.ownerTopLevelAbieId = ?3")
     public BasicBusinessInformationEntity findOneByBasedBccIdAndFromAbieIdAndOwnerTopLevelAbieId(long basedBccId, long fromAbieId, long ownerTopLevelAbieId);
 
-    @Query("select b.definitionId from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1")
-    public List<Long> findDefinitionIdByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
-
     @Modifying
     @Query("delete from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
