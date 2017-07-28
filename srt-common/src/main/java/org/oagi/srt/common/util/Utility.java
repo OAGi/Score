@@ -242,14 +242,19 @@ public class Utility {
         return result;
     }
 
-    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "UPC", "BOD", "IST");
+    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "UPC", "BOD", "IST", "MSDS", "GL");
 
     private static String sparcing(String str) {
-        for (String abbr : ABBR_LIST) {
-            if (str.contains(abbr)) {
-                str = str.replace(abbr, abbr + " ");
+        if (Pattern.compile("[A-Z]+").matcher(str).matches()) {
+            str = (str.length() > 4) ? str.replaceAll("([A-Z]+)(ID)", "$1 $2") : str;
+        } else {
+            for (String abbr : ABBR_LIST) {
+                if (str.contains(abbr)) {
+                    str = str.replace(abbr, abbr + " ");
+                }
             }
         }
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             if (Character.isUpperCase(str.charAt(i)) && i != 0) {
@@ -266,7 +271,12 @@ public class Utility {
                 sb.append(str.charAt(i));
             }
         }
+
         String result = sb.toString();
+        // #Issue 435: Exceptional Case
+        result = result.replace("E Mail", "EMail")
+                .replace("Co A", "CoA");
+
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
         result = result.replaceAll("\\s{2,}", " ");
@@ -279,8 +289,8 @@ public class Utility {
         String[] delim = space_separated_str.split(" ");
         String ret = "";
         for (int i = 0; i < delim.length; i++) {
-            if (delim[i].equals("ID")) {
-                delim[i] = "Identifier";
+            if (delim[i].startsWith("ID")) {
+                delim[i] = delim[i].replace("ID", "Identifier");
             }
             ret = ret + " " + delim[i];
         }
@@ -563,10 +573,8 @@ public class Utility {
     }
 
     public static void main(String args[]) {
+        String term = spaceSeparator("BBANID");
 
-        String qualifier =
-                Utility.qualifier("DurationMeasureType", "Duration_JJ5401. Type", "Duration");
-
-        System.out.println(qualifier);
+        System.out.println(term);
     }
 }
