@@ -2,8 +2,11 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.ProfileBODRepository;
+import org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState;
 import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.ProfileBODGenerateService;
+import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODGenerationBean {
+public class ProfileBODGenerationBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -49,7 +52,16 @@ public class ProfileBODGenerationBean {
 
     @PostConstruct
     public void init() {
+        User currentUser = getCurrentUser();
         allProfileBODs = profileBODRepository.findAll();
+        allProfileBODs = allProfileBODs.stream()
+                .filter(e -> {
+                    long ownerUserId = e.getOwnerUserId();
+                    if (ownerUserId != currentUser.getAppUserId() && e.getState() != AggregateBusinessInformationEntityState.Published) {
+                        return false;
+                    }
+                    return true;
+                }).collect(Collectors.toList());
         search();
     }
 
