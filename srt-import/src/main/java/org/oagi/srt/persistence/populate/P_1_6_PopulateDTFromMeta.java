@@ -211,9 +211,9 @@ public class P_1_6_PopulateDTFromMeta {
             String attribute_id = attrElement.getAttribute("id");
             String attribute_type = attrElement.getAttribute("type");
 
-            DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
-            vo.setOwnerDtId(dt.getDtId());
-            vo.setGuid(attribute_id);
+            DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
+            dtSc.setOwnerDtId(dt.getDtId());
+            dtSc.setGuid(attribute_id);
             if (attrElement.getAttribute("use") == null) {
                 min_cardinality = 0;
                 max_cardinality = 1;
@@ -228,8 +228,8 @@ public class P_1_6_PopulateDTFromMeta {
                 max_cardinality = 0;
             }
 
-            vo.setCardinalityMin(min_cardinality);
-            vo.setCardinalityMax(max_cardinality);
+            dtSc.setCardinalityMin(min_cardinality);
+            dtSc.setCardinalityMax(max_cardinality);
 
             String propertyTerm = "";
             String representationTerm = "";
@@ -244,40 +244,40 @@ public class P_1_6_PopulateDTFromMeta {
                 if (definition == null) {
                     definition = ImportUtil.toString(defNode.getChildNodes());
                 }
-                vo.setDefinition(definition);
+                dtSc.setDefinition(definition);
 
                 String definitionSource = defNode.getAttribute("source");
                 if (!StringUtils.isEmpty(definitionSource)) {
-                    vo.setDefinitionSource(definitionSource);
+                    dtSc.setDefinitionSource(definitionSource);
                 }
             }
 
-            vo.setPropertyTerm(propertyTerm);
-            vo.setRepresentationTerm(representationTerm);
-            logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
+            dtSc.setPropertyTerm(propertyTerm);
+            dtSc.setRepresentationTerm(representationTerm);
+            logger.debug("~~~" + dtSc.getPropertyTerm() + " " + dtSc.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-            vo = dtDAO.save(vo);
+            dtSc = dtDAO.save(dtSc);
 
-            populateCDTSCAwdPri(vo, attribute_type);
-            populateBDTSCPrimitiveRestriction(vo, attribute_type);
+            populateCDTSCAwdPri(dtSc, attribute_type);
+            populateBDTSCPrimitiveRestriction(dtSc, attribute_type);
         }
 
         //For LanguageCode SC
         DataTypeSupplementaryComponent languageCodeSC = dtScRepository.findByOwnerDtId(dt.getBasedDtId()).get(0);
-        DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
+        DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
 
-        vo.setBasedDtScId(languageCodeSC.getDtScId());
-        vo.setDefinition(languageCodeSC.getDefinition());
-        vo.setDefinitionSource(languageCodeSC.getDefinitionSource());
-        vo.setGuid(Utility.generateGUID());
-        vo.setCardinalityMax(0);
-        vo.setCardinalityMin(0);
-        vo.setOwnerDtId(dt.getDtId());
-        vo.setPropertyTerm(languageCodeSC.getPropertyTerm());
-        vo.setRepresentationTerm(languageCodeSC.getRepresentationTerm());
-        vo = dtDAO.save(vo);
+        dtSc.setBasedDtScId(languageCodeSC.getDtScId());
+        dtSc.setDefinition(languageCodeSC.getDefinition());
+        dtSc.setDefinitionSource(languageCodeSC.getDefinitionSource());
+        dtSc.setGuid(Utility.generateGUID());
+        dtSc.setCardinalityMax(0);
+        dtSc.setCardinalityMin(0);
+        dtSc.setOwnerDtId(dt.getDtId());
+        dtSc.setPropertyTerm(languageCodeSC.getPropertyTerm());
+        dtSc.setRepresentationTerm(languageCodeSC.getRepresentationTerm());
+        dtSc = dtDAO.save(dtSc);
 
-        populateBDTSCPrimitiveRestriction(vo, null);
+        populateBDTSCPrimitiveRestriction(dtSc, null);
     }
 
     public void populateCDTSCAwdPri(DataTypeSupplementaryComponent dtSc, String type) {

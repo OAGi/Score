@@ -47,10 +47,19 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
     @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
+    @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
@@ -107,6 +116,17 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
 
         findCdtScAwdPriXpsTypeMapMap = cdtScAwdPriXpsTypeMapRepository.findAll().stream()
                 .collect(Collectors.toMap(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getCdtScAwdPriXpsTypeMapId, Function.identity()));
+
+        findCdtScAwdPriMap = cdtScAwdPriRepository.findAll().stream()
+                .collect(Collectors.toMap(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId, Function.identity()));
+
+        List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findAll();
+        findCdtAwdPriMap = cdtAwdPriList.stream()
+                .collect(Collectors.toMap(CoreDataTypeAllowedPrimitive::getCdtAwdPriId, Function.identity()));
+
+        List<CoreDataTypePrimitive> cdtPriList = cdtPriRepository.findAll();
+        findCdtPriMap = cdtPriList.stream()
+                .collect(Collectors.toMap(CoreDataTypePrimitive::getCdtPriId, Function.identity()));
 
         findXbtList = xbtRepository.findAll();
         findXbtMap = findXbtList.stream()
@@ -239,11 +259,31 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return findCdtScAwdPriXpsTypeMapMap.get(cdtScAwdPriXpsTypeMapId);
     }
 
+    private Map<Long, CoreDataTypeSupplementaryComponentAllowedPrimitive> findCdtScAwdPriMap;
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive findCdtScAwdPri(long cdtScAwdPriId) {
+        return findCdtScAwdPriMap.get(cdtScAwdPriId);
+    }
+
     private List<XSDBuiltInType> findXbtList;
 
     @Override
     public List<XSDBuiltInType> findXbt() {
         return findXbtList;
+    }
+
+    private Map<Long, CoreDataTypeAllowedPrimitive> findCdtAwdPriMap;
+
+    @Override
+    public CoreDataTypeAllowedPrimitive findCdtAwdPri(long cdtAwdPriId) {
+        return findCdtAwdPriMap.get(cdtAwdPriId);
+    }
+
+    private Map<Long, CoreDataTypePrimitive> findCdtPriMap;
+
+    public CoreDataTypePrimitive findCdtPri(long cdtPriId) {
+        return findCdtPriMap.get(cdtPriId);
     }
 
     private Map<Long, XSDBuiltInType> findXbtMap;

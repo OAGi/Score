@@ -3,6 +3,7 @@ package org.oagi.srt.persistence.populate;
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.persistence.populate.backup.P_1_5_PopulateDefaultAndUnqualifiedBDT;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -248,6 +249,11 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                     ccDefinition = ImportUtil.toString(ccDocumentationNode.getChildNodes());
                 }
                 dataType.setContentComponentDefinition(ccDefinition);
+
+                String definitionSource = ccDocumentationNode.getAttribute("source");
+                if (!StringUtils.isEmpty(definitionSource)) {
+                    dataType.setDefinitionSource(definitionSource);
+                }
             }
 
             dataType = dataTypeDAO.save(dataType);
@@ -423,7 +429,7 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                     dtSc.setRepresentationTerm(representationTerm);
                     dtSc.setGuid((StringUtils.isEmpty(id)) ? Utility.generateGUID() : id);
 
-                    Element documentationNode = evaluate(".//xsd:annotation/xsd:documentation");
+                    Element documentationNode = evaluate(".//xsd:annotation/xsd:documentation", attributeElement);
                     if (documentationNode != null) {
                         String definition = ImportUtil.getCctsDefinition(documentationNode);
                         if (definition == null) {

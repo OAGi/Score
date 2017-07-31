@@ -34,7 +34,13 @@ public interface ImportedDataProvider {
 
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(long cdtScAwdPriXpsTypeMapId);
 
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive findCdtScAwdPri(long cdtScAwdPriId);
+
     public List<XSDBuiltInType> findXbt();
+
+    public CoreDataTypeAllowedPrimitive findCdtAwdPri(long cdtAwdPriId);
+
+    public CoreDataTypePrimitive findCdtPri(long cdtPriId);
 
     public XSDBuiltInType findXbt(long xbtId);
 

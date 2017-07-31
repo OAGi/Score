@@ -57,7 +57,7 @@ public class ImportUtil {
 
     public static String getCctsDefinition(Element documentationElement) {
         NodeList children = documentationElement.getChildNodes();
-        String cctsDefinition = null;
+        String cctsDefinition;
         for (int i = 0, len = children.getLength(); i < len; ++i) {
             Node child = children.item(i);
             if (!(child instanceof Element)) {
@@ -65,10 +65,11 @@ public class ImportUtil {
             }
             if ("ccts_Definition".equals(child.getNodeName())) {
                 Node text = child.getFirstChild();
-                return (text != null) ? text.getTextContent() : null;
+                cctsDefinition = (text != null) ? text.getTextContent() : null;
+                return (cctsDefinition == null) ? "" : cctsDefinition;
             } else {
                 cctsDefinition = getCctsDefinition((Element) child);
-                if (!org.springframework.util.StringUtils.isEmpty(cctsDefinition)) {
+                if (cctsDefinition != null) {
                     return cctsDefinition;
                 }
             }

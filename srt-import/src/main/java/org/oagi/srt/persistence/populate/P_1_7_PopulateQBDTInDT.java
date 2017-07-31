@@ -10,6 +10,7 @@ import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
+import org.oagi.srt.persistence.populate.backup.P_1_5_PopulateDefaultAndUnqualifiedBDT;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.persistence.populate.helper.ElementDecl;
 import org.oagi.srt.persistence.populate.helper.TypeDecl;
@@ -212,7 +213,6 @@ public class P_1_7_PopulateQBDTInDT {
                 }
 
                 String dtGuid = idAttribute.getNodeValue();
-
                 Element documentationNode = (Element) Context.xPath.compile("./xsd:annotation/xsd:documentation").evaluate(node, XPathConstants.NODE);
                 String definition = null;
                 String definitionSource = null;
@@ -222,6 +222,9 @@ public class P_1_7_PopulateQBDTInDT {
                         definition = ImportUtil.toString(documentationNode.getChildNodes());
                     }
 
+                    if (systemId.contains("Fields.xsd") && definition.contains("ccts_")) {
+                        System.out.println();
+                    }
                     definitionSource = documentationNode.getAttribute("source");
                 }
 
@@ -317,6 +320,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (StringUtils.isEmpty(guid)) {
                 continue;
             }
+
             XSElementDecl xsElementDecl = context.getXSElementDecl(SRTConstants.OAGI_NS, bccp);
             if (xsElementDecl == null) {
                 throw new IllegalStateException("Could not find " + bccp + ", GUID " + guid + " BCCP");
@@ -373,31 +377,31 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO) throws Exception {
+    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtSc) throws Exception {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestiList =
-                bdtScPriRestriRepository.findByBdtScId(dtscVO.getBasedDtScId());
+                bdtScPriRestriRepository.findByBdtScId(dtSc.getBasedDtScId());
         if (bdtScPriRestiList.isEmpty()) {
-            if (dtscVO.getBasedDtScId() == 0) {
+            if (dtSc.getBasedDtScId() == 0) {
                 return Collections.emptyList();
             }
-            DataTypeSupplementaryComponent vo = dtScRepository.findOne(dtscVO.getBasedDtScId());
-            bdtScPriRestiList = getBDTSCPrimitiveRestriction(vo);
+            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findOne(dtSc.getBasedDtScId());
+            bdtScPriRestiList = getBDTSCPrimitiveRestriction(basedDtSc);
         }
         return bdtScPriRestiList;
     }
 
-    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO,
+    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtSc,
                                                  int mode, String name, String type) throws Exception {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriListForSaving =
                 new ArrayList();
 
         // if (SC = inherit from the base BDT)
         if (mode == 1) {
-            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtscVO);
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtSc);
             for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction parent : bdtscs) {
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
                         new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                bdtScPriRestri.setBdtScId(dtSc.getDtScId());
                 bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(parent.getCdtScAwdPriXpsTypeMapId());
                 bdtScPriRestri.setCodeListId(parent.getCodeListId());
                 bdtScPriRestri.setDefault(parent.isDefault());
@@ -406,12 +410,12 @@ public class P_1_7_PopulateQBDTInDT {
             }
 
         } else { // else if (new SC)
-            populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtscVO, type);
+            populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtSc, type);
         }
 
         if (!bdtScPriRestriListForSaving.isEmpty()) {
             if (bdtScPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
-                throw new IllegalStateException("BDT_SC_ID['" + dtscVO.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
+                throw new IllegalStateException("BDT_SC_ID['" + dtSc.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
             }
             bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
         }
@@ -571,7 +575,7 @@ public class P_1_7_PopulateQBDTInDT {
         // inherit from the base BDT
         long ownerDtId = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> dtScList = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
 
         // new SC
         NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -677,10 +681,10 @@ public class P_1_7_PopulateQBDTInDT {
 
                 logger.trace(attrName + " " + representation_term);
 
-                for (int j = 0; j < dtsc_vos.size(); j++) {
-                    if (dtSc.getPropertyTerm().equals(dtsc_vos.get(j).getPropertyTerm()) &&
-                            dtSc.getRepresentationTerm().equals(dtsc_vos.get(j).getRepresentationTerm())) {
-                        dtSc.setBasedDtScId(dtsc_vos.get(j).getDtScId());
+                for (int j = 0; j < dtScList.size(); j++) {
+                    if (dtSc.getPropertyTerm().equals(dtScList.get(j).getPropertyTerm()) &&
+                            dtSc.getRepresentationTerm().equals(dtScList.get(j).getRepresentationTerm())) {
+                        dtSc.setBasedDtScId(dtScList.get(j).getDtScId());
                         isNew = false;
                         break;
                     }
@@ -730,20 +734,20 @@ public class P_1_7_PopulateQBDTInDT {
             }
         }
 
-        for (DataTypeSupplementaryComponent baseDtsc : dtsc_vos) {
+        for (DataTypeSupplementaryComponent basedDtSc : dtScList) {
             DataTypeSupplementaryComponent inheritedDtSc = new DataTypeSupplementaryComponent();
             inheritedDtSc.setGuid(Utility.generateGUID());
-            inheritedDtSc.setPropertyTerm(baseDtsc.getPropertyTerm());
-            inheritedDtSc.setRepresentationTerm(baseDtsc.getRepresentationTerm());
+            inheritedDtSc.setPropertyTerm(basedDtSc.getPropertyTerm());
+            inheritedDtSc.setRepresentationTerm(basedDtSc.getRepresentationTerm());
             inheritedDtSc.setOwnerDtId(ownerDtId);
 
             DataTypeSupplementaryComponent duplicate = checkDuplicate(inheritedDtSc);
 
             if (duplicate == null) {
 
-                inheritedDtSc.setCardinalityMin(baseDtsc.getCardinalityMin());
-                inheritedDtSc.setCardinalityMax(baseDtsc.getCardinalityMax());
-                inheritedDtSc.setBasedDtScId(baseDtsc.getDtScId());
+                inheritedDtSc.setCardinalityMin(basedDtSc.getCardinalityMin());
+                inheritedDtSc.setCardinalityMax(basedDtSc.getCardinalityMax());
+                inheritedDtSc.setBasedDtScId(basedDtSc.getDtScId());
 
                 dtDAO.save(inheritedDtSc);
 
@@ -752,9 +756,9 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) throws Exception {
+    private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtSc) throws Exception {
         return dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
-                dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
+                dtSc.getOwnerDtId(), dtSc.getPropertyTerm(), dtSc.getRepresentationTerm());
     }
 
 
@@ -784,19 +788,19 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public long getDtId(String dataTypeTerm) throws Exception {
-        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType);
-        long id = dtVO.getDtId();
+        DataType dataType = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType);
+        long id = dataType.getDtId();
         return id;
     }
 
     public String getRepresentationTerm(String Guid) throws Exception {
-        DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuid(Guid);
-        String term = dtscVO.getRepresentationTerm();
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findOneByGuid(Guid);
+        String term = dtSc.getRepresentationTerm();
         return term;
     }
 
-    public String getPrimitiveName(long CdtPriId) throws Exception {
-        return cdtPriRepository.findOne(CdtPriId).getName();
+    public String getPrimitiveName(long cdtPriId) throws Exception {
+        return cdtPriRepository.findOne(cdtPriId).getName();
     }
 
 
@@ -804,15 +808,15 @@ public class P_1_7_PopulateQBDTInDT {
         return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
-    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(long cdt_id) throws Exception {
-        return cdtAwdPriRepository.findByCdtId(cdt_id);
+    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(long cdtId) throws Exception {
+        return cdtAwdPriRepository.findByCdtId(cdtId);
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) throws Exception {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
-            res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());
+            DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dt_sc_id);
+            res = getCdtSCAllowedPrimitiveID(dtSc.getBasedDtScId());
         }
         return res;
     }
@@ -821,15 +825,15 @@ public class P_1_7_PopulateQBDTInDT {
         return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
-    public boolean checkTokenofXBT(long cdt_awd_pri_xps_type_map_id) throws Exception {
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
-                cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
-        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(
-                aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId());
-        if (aXSDBuiltInType.getName().equalsIgnoreCase("token"))
+    public boolean isTokenXBT(long cdtAwdPriXpsTypeMapId) throws Exception {
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId);
+        XSDBuiltInType xbt = xbtRepository.findOne(cdtAwdPriXpsTypeMap.getXbtId());
+        if (xbt.getName().equalsIgnoreCase("token")) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     private DataType getDataTypeWithDen(String den) throws Exception {
