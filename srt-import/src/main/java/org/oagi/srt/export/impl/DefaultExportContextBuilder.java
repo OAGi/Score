@@ -186,9 +186,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                  */
                 if (moduleId > 0L) {
                     SchemaModule schemaModule = moduleMap.get(moduleId);
-                    schemaModule.addBCCP(
-                            new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen(),
-                                    bccp.isNillable(), bccp.getDefaultValue()));
+                    schemaModule.addBCCP(new BCCP(bccp, bdt));
                 }
             }
         }

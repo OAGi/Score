@@ -254,7 +254,80 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         simpleTypeElement.setAttribute("name", name);
         simpleTypeElement.setAttribute("id", bdtSimpleType.getGuid());
 
-        if (bdtSimpleType.isTimepointCDT() && bdtSimpleType.isBaseDT_CDT() && bdtSimpleType.countBDT_PRI_RESTRI() > 1) {
+        if (bdtSimpleType.isDefaultBDT()) {
+            setDocumentation(simpleTypeElement, bdtSimpleType);
+        }
+        setRestriction(simpleTypeElement, bdtSimpleType);
+
+        rootElement.addContent(simpleTypeElement);
+    }
+
+    private void setDocumentation(Element typeElement, BDTSimple bdtSimple) {
+        DataType dataType = bdtSimple.getDataType();
+
+        Element annotationElement = new Element("annotation", XSD_NS);
+        typeElement.addContent(annotationElement);
+
+        Element documentationElement = new Element("documentation", XSD_NS);
+        annotationElement.addContent(documentationElement);
+
+        documentationElement.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+
+        String den = dataType.getDen();
+
+        if (bdtSimple.isDefaultBDT()) {
+            Element ccts_UniqueID = new Element("ccts_UniqueID", OAGI_NS);
+            documentationElement.addContent(ccts_UniqueID);
+            String uniqueId = den.substring(den.indexOf('_') + 1, den.indexOf(". Type"));
+            ccts_UniqueID.setText(uniqueId);
+
+            Element ccts_VersionID = new Element("ccts_VersionID", OAGI_NS);
+            documentationElement.addContent(ccts_VersionID);
+            ccts_VersionID.setText("1.0");
+
+            Element ccts_DictionaryEntryName = new Element("ccts_DictionaryEntryName", OAGI_NS);
+            documentationElement.addContent(ccts_DictionaryEntryName);
+            String dictionaryEntryName = den.replaceAll("_" + uniqueId, "");
+            ccts_DictionaryEntryName.setText(dictionaryEntryName);
+        } else {
+            Element ccts_UniqueID = new Element("ccts_UniqueID", OAGI_NS);
+            documentationElement.addContent(ccts_UniqueID);
+            ccts_UniqueID.setText("BDT000000");
+
+            Element ccts_CategoryCode = new Element("ccts_CategoryCode", OAGI_NS);
+            documentationElement.addContent(ccts_CategoryCode);
+            ccts_CategoryCode.setText("BDT");
+
+            Element ccts_DictionaryEntryName = new Element("ccts_DictionaryEntryName", OAGI_NS);
+            documentationElement.addContent(ccts_DictionaryEntryName);
+            ccts_DictionaryEntryName.setText(den);
+
+            Element ccts_VersionID = new Element("ccts_VersionID", OAGI_NS);
+            documentationElement.addContent(ccts_VersionID);
+            ccts_VersionID.setText("1.0");
+        }
+
+        Element ccts_Definition = new Element("ccts_Definition", OAGI_NS);
+        documentationElement.addContent(ccts_Definition);
+        String definition = dataType.getDefinition();
+        ccts_Definition.setText(definition);
+
+        Element ccts_DataTypeTermName = new Element("ccts_DataTypeTermName", OAGI_NS);
+        documentationElement.addContent(ccts_DataTypeTermName);
+        String dataTypeTerm = dataType.getDataTypeTerm();
+        ccts_DataTypeTermName.setText(dataTypeTerm);
+
+        String qualifier = dataType.getQualifier();
+        if (!StringUtils.isEmpty(qualifier)) {
+            Element ccts_QualifierTerm = new Element("ccts_QualifierTerm", OAGI_NS);
+            documentationElement.addContent(ccts_QualifierTerm);
+            ccts_QualifierTerm.setText(qualifier);
+        }
+    }
+
+    private void setRestriction(Element simpleTypeElement, BDTSimpleType bdtSimpleType) {
+        Element targetElement;
+        if (bdtSimpleType.isTimepointCDT() && bdtSimpleType.isBaseDT_CDT() && bdtSimpleType.count_BDT_PRI_RESTRI() > 1) {
             Element unionElement = new Element("union", XSD_NS);
             simpleTypeElement.addContent(unionElement);
 
@@ -265,9 +338,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             );
             unionElement.setAttribute("memberTypes", memberTypes);
             simpleTypeElement.setAttribute("final", "union");
+
+            targetElement = unionElement;
         } else {
             Element restrictionElement = new Element("restriction", XSD_NS);
             simpleTypeElement.addContent(restrictionElement);
+            String name = bdtSimpleType.getName();
 
             if ( (name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
                     (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
@@ -286,9 +362,45 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     restrictionElement.setAttribute("base", bdtSimpleType.getBaseDTName());
                 }
             }
+
+            targetElement = restrictionElement;
         }
 
-        rootElement.addContent(simpleTypeElement);
+        setDocumentationForRestrictionOrUnionOrExtension(targetElement, bdtSimpleType);
+    }
+
+    private void setDocumentationForRestrictionOrUnionOrExtension(Element extensionElement, BDTSimple bdtSimple) {
+        DataType dataType = bdtSimple.getDataType();
+        String definition = dataType.getContentComponentDefinition();
+
+        Element annotationElement = new Element("annotation", XSD_NS);
+        extensionElement.addContent(annotationElement);
+
+        Element documentationElement = new Element("documentation", XSD_NS);
+        annotationElement.addContent(documentationElement);
+
+        String definitionSource = dataType.getDefinitionSource();
+        if (!StringUtils.isEmpty(definitionSource)) {
+            documentationElement.setAttribute("source", definitionSource);
+        }
+
+        Element ccts_ContentComponentValueDomain = new Element("ccts_ContentComponentValueDomain", OAGI_NS);
+        documentationElement.addContent(ccts_ContentComponentValueDomain);
+
+        Element ccts_Definition = new Element("ccts_Definition", OAGI_NS);
+        ccts_ContentComponentValueDomain.addContent(ccts_Definition);
+        ccts_Definition.setText(definition);
+
+        CoreDataTypeAllowedPrimitive cdtAwdPri = bdtSimple.getDefaultCdtAwdPri();
+        Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
+        ccts_ContentComponentValueDomain.addContent(ccts_DefaultIndicator);
+        ccts_DefaultIndicator.setText((cdtAwdPri.isDefault()) ? "True" : "False");
+
+        Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
+        ccts_ContentComponentValueDomain.addContent(ccts_PrimitiveTypeName);
+        String primitiveTypeName = bdtSimple.getCdtPriName();
+        ccts_PrimitiveTypeName.setText(primitiveTypeName);
+
     }
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
@@ -320,10 +432,18 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.setAttribute("name", bdtSimpleContent.getName());
         complexTypeElement.setAttribute("id", bdtSimpleContent.getGuid());
 
+        setDocumentation(complexTypeElement, bdtSimpleContent);
+        setSimpleContent(complexTypeElement, bdtSimpleContent);
+
+        rootElement.addContent(complexTypeElement);
+    }
+
+    private void setSimpleContent(Element complexTypeElement, BDTSimpleContent bdtSimpleContent) {
         Element simpleContentElement = new Element("simpleContent", XSD_NS);
         complexTypeElement.addContent(simpleContentElement);
 
         Element extensionElement = new Element("extension", XSD_NS);
+        setDocumentationForRestrictionOrUnionOrExtension(extensionElement, bdtSimpleContent);
 
         String baseName = bdtSimpleContent.getBaseDTName();
         String name = bdtSimpleContent.getName();
@@ -333,7 +453,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         } else {
             extensionElement.setAttribute("base", baseName);
         }
-
 
         List<BDTSC> dtScList;
         if (baseName.endsWith("CodeContentType")) {
@@ -356,20 +475,222 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             String typeName = dtSc.getTypeName();
             attributeElement.setAttribute("type", typeName);
 
-            int useInt = dtSc.getMinCardinality() * 2 + dtSc.getMaxCardinality();
-            String useVal = getUseAttributeValue(useInt);
+            String useVal;
+            if (bdtSimpleContent.isDefaultBDT() && "timeZoneCode".equals(name)) {
+                useVal = "required";
+            } else {
+                int useInt = dtSc.getMinCardinality() * 2 + dtSc.getMaxCardinality();
+                useVal = getUseAttributeValue(useInt);
+            }
+            if (bdtSimpleContent.isDefaultBDT() && useVal == null) {
+                useVal = "optional";
+            }
+
             if (useVal != null) {
                 attributeElement.setAttribute("use", useVal);
             }
 
             attributeElement.setAttribute("id", dtSc.getGuid());
 
+            if (!schemaModule.getPath().contains("Meta")) {
+                setDocumentationForBdtSc(attributeElement, bdtSimpleContent, dtSc);
+            }
+
             extensionElement.addContent(attributeElement);
         }
 
         simpleContentElement.addContent(extensionElement);
+    }
 
-        rootElement.addContent(complexTypeElement);
+    private void setDocumentationForBdtSc(Element attributeElement, BDTSimple bdtSimple, BDTSC dtSc) {
+        Element annotationElement = new Element("annotation", XSD_NS);
+        attributeElement.addContent(annotationElement);
+
+        DataTypeSupplementaryComponent bdtSc = dtSc.getBdtSc();
+
+        Element documentationElement = new Element("documentation", XSD_NS);
+        annotationElement.addContent(documentationElement);
+
+        documentationElement.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+
+        String definitionSource = bdtSc.getDefinitionSource();
+        if (!StringUtils.isEmpty(definitionSource)) {
+            documentationElement.setAttribute("source", definitionSource);
+        }
+
+        Element ccts_Cardinality = new Element("ccts_Cardinality", OAGI_NS);
+        documentationElement.addContent(ccts_Cardinality);
+
+        if (dtSc.getCodeList() != null && dtSc.getCodeList().getName().equals("clm6DateTimeFormatCode1_DateTimeFormatCode")) {
+            ccts_Cardinality.setText("1..1");
+        } else {
+            ccts_Cardinality.setText(bdtSc.getCardinalityMin() + ".." + bdtSc.getCardinalityMax());
+        }
+
+        Element ccts_DictionaryEntryName = new Element("ccts_DictionaryEntryName", OAGI_NS);
+        documentationElement.addContent(ccts_DictionaryEntryName);
+
+        String dataTypeTerm = bdtSimple.getDataType().getDataTypeTerm();
+        String propertyTerm = bdtSc.getPropertyTerm();
+        String representationTerm = bdtSc.getRepresentationTerm();
+        String dictionaryEntryName = dataTypeTerm  + ". " + propertyTerm + ". " + representationTerm;
+        ccts_DictionaryEntryName.setText(dictionaryEntryName);
+
+        Element ccts_Definition = new Element("ccts_Definition", OAGI_NS);
+        documentationElement.addContent(ccts_Definition);
+        String definition = bdtSc.getDefinition();
+        ccts_Definition.setText(definition);
+
+        Element ccts_PropertyTermName = new Element("ccts_PropertyTermName", OAGI_NS);
+        documentationElement.addContent(ccts_PropertyTermName);
+        ccts_PropertyTermName.setText(propertyTerm);
+
+        Element ccts_RepresentationTermName = new Element("ccts_RepresentationTermName", OAGI_NS);
+        documentationElement.addContent(ccts_RepresentationTermName);
+        ccts_RepresentationTermName.setText(representationTerm);
+
+        Element ccts_DataTypeTermName = new Element("ccts_DataTypeTermName", OAGI_NS);
+        documentationElement.addContent(ccts_DataTypeTermName);
+        ccts_DataTypeTermName.setText(dataTypeTerm);
+
+        Element ccts_SupplementaryComponentValueDomain = new Element("ccts_SupplementaryComponentValueDomain", OAGI_NS);
+        documentationElement.addContent(ccts_SupplementaryComponentValueDomain);
+
+        XSDBuiltInType xbt = dtSc.getXbt();
+        if (xbt != null) {
+            Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_DefaultIndicator);
+            CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri = dtSc.getCdtScAwdPri();
+            ccts_DefaultIndicator.setText((cdtScAwdPri.isDefault()) ? "True" : "False");
+
+            Element ccts_PrimitiveTypeName = new Element("ccts_PrimitiveTypeName", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_PrimitiveTypeName);
+            CoreDataTypePrimitive cdtPri = dtSc.getCdtPri();
+            ccts_PrimitiveTypeName.setText(cdtPri.getName());
+        } else {
+            AgencyIdList agencyIdList = dtSc.getAgencyIdList();
+            CodeList codeList = dtSc.getCodeList();
+
+            Element ccts_DefaultIndicator = new Element("ccts_DefaultIndicator", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_DefaultIndicator);
+            ccts_DefaultIndicator.setText("True");
+
+            String schemeOrListID = null;
+            String schemeOrListVersionID = null;
+            String schemeOrListAgencyID = null;
+            String schemeOrListModificationAllowedIndicator = null;
+
+            if (agencyIdList != null) {
+                String name = agencyIdList.getName();
+                name = name.substring("clm".length(), name.length());
+
+                schemeOrListAgencyID = "" + name.charAt(0);
+                name = name.substring(1);
+
+                schemeOrListID = name.substring(0, name.indexOf('D'));
+
+                name = name.substring(0, name.indexOf('_'));
+                schemeOrListVersionID = name.substring(schemeOrListID.length(), name.length());
+
+                schemeOrListModificationAllowedIndicator = "False";
+            } else if (codeList != null) {
+                String name = codeList.getName();
+
+                while (name.startsWith("oacl")) {
+                    codeList = importedDataProvider.findCodeList(codeList.getBasedCodeListId());
+                    if (codeList == null) {
+                        break;
+                    }
+                    name = codeList.getName();
+                }
+
+                if (!name.startsWith("clm")) {
+                    return;
+                }
+
+                name = name.substring("clm".length(), name.length());
+
+                if (Character.isDigit(name.charAt(0))) {
+                    schemeOrListAgencyID = "" + name.charAt(0);
+                    name = name.substring(1);
+                } else {
+                    schemeOrListAgencyID = "IANA";
+                    name = name.substring(4);
+                }
+
+                name = name.substring(0, name.indexOf('_'));
+
+                String lastEightChars = name.substring(name.length() - 8, name.length());
+                if (lastEightChars.matches("[0-9]{8}")) {
+                    schemeOrListVersionID =
+                            lastEightChars.substring(0, 4) + "-" +
+                            lastEightChars.substring(4, 6) + "-" +
+                            lastEightChars.substring(6, 8);
+                    name = name.substring(0, name.length() - 8);
+                } else {
+                    schemeOrListVersionID = "" + name.charAt(name.length() - 1);
+                    name = name.substring(0, name.length() - 1);
+                }
+
+                schemeOrListID = name;
+
+                switch (schemeOrListID) {
+                    case "CharacterSetCode":
+                    case "MIMEMediaType":
+                        schemeOrListModificationAllowedIndicator = "True";
+                        break;
+                    case "42173A":
+                        if (bdtSimple.getName().startsWith("Rate")) {
+                            schemeOrListModificationAllowedIndicator = "False";
+                        } else {
+                            schemeOrListModificationAllowedIndicator = "True";
+                        }
+                        break;
+                    default:
+                        schemeOrListModificationAllowedIndicator = "False";
+                }
+            }
+
+            Element ccts_SchemeOrListID = new Element("ccts_SchemeOrListID", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_SchemeOrListID);
+            ccts_SchemeOrListID.setText(schemeOrListID);
+
+            Element ccts_SchemeOrListVersionID = new Element("ccts_SchemeOrListVersionID", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_SchemeOrListVersionID);
+            ccts_SchemeOrListVersionID.setText(schemeOrListVersionID);
+
+            Element ccts_SchemeOrListAgencyID = new Element("ccts_SchemeOrListAgencyID", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_SchemeOrListAgencyID);
+            ccts_SchemeOrListAgencyID.setText(schemeOrListAgencyID);
+
+            Element ccts_SchemeOrListModificationAllowedIndicator = new Element("ccts_SchemeOrListModificationAllowedIndicator", OAGI_NS);
+            ccts_SupplementaryComponentValueDomain.addContent(ccts_SchemeOrListModificationAllowedIndicator);
+            ccts_SchemeOrListModificationAllowedIndicator.setText(schemeOrListModificationAllowedIndicator);
+        }
+    }
+
+    private void setDocumentation(Element element, org.oagi.srt.export.model.Component component) {
+        String definition = component.getDefinition();
+        String definitionSource = component.getDefinitionSource();
+
+        setDocumentation(element, definition, definitionSource);
+    }
+
+    private void setDocumentation(Element element, String definition, String definitionSource) {
+        if (definition == null) {
+            return;
+        }
+
+        Element annotationElement = new Element("annotation", XSD_NS);
+        element.addContent(annotationElement);
+
+        Element documentationElement = new Element("documentation", XSD_NS);
+        annotationElement.addContent(documentationElement);
+
+        if (definitionSource != null) {
+            documentationElement.setAttribute("source", definitionSource);
+        }
+        documentationElement.setText(definition);
     }
 
     @Override
@@ -390,6 +711,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         element.setAttribute("name", component.getName());
         element.setAttribute("type", component.getTypeName());
         element.setAttribute("id", component.getGuid());
+
+        setDocumentation(element, component);
 
         rootElement.addContent(element);
 
@@ -487,6 +810,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     setCardinalities(element, bcc);
 
                     sequenceElement.addContent(element);
+                    setDocumentation(element, bcc.getDefinition(), bcc.getDefinitionSource());
                 }
             } else if (coreComponent instanceof AssociationCoreComponent) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
@@ -500,6 +824,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     setCardinalities(groupElement, ascc);
 
                     sequenceElement.addContent(groupElement);
+                    setDocumentation(groupElement, ascc.getDefinition(), ascc.getDefinitionSource());
                 } else {
                     Element element = new Element("element", XSD_NS);
 
@@ -514,6 +839,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     setCardinalities(element, ascc);
 
                     sequenceElement.addContent(element);
+                    setDocumentation(element, ascc.getDefinition(), ascc.getDefinitionSource());
                 }
             }
         }
@@ -572,6 +898,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     } else {
                         complexTypeElement.addContent(attributeElement);
                     }
+
+                    setDocumentation(attributeElement, bcc.getDefinition(), bcc.getDefinitionSource());
                 }
             }
         }

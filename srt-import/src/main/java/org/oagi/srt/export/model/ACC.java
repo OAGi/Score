@@ -77,4 +77,14 @@ public abstract class ACC implements Component {
     public OagisComponentType getOagisComponentType() {
         return this.oagisComponentType;
     }
+
+    public String getDefinition() {
+        return acc.getDefinition();
+    }
+
+    public String getDefinitionSource() {
+        return acc.getDefinitionSource();
+    }
+
+
 }

@@ -51,8 +51,54 @@ public class BDTSC implements Component {
         return dtSc.getGuid();
     }
 
+    public DataTypeSupplementaryComponent getBdtSc() {
+        return dtSc;
+    }
+
+    private String typeName;
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap;
+    private XSDBuiltInType xbt;
+    private AgencyIdList agencyIdList;
+    private CodeList codeList;
+
+    public XSDBuiltInType getXbt() {
+        ensureTypeName();
+        return xbt;
+    }
+
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive getCdtScAwdPri() {
+        ensureTypeName();
+        return importedDataProvider.findCdtScAwdPri(
+                cdtScAwdPriXpsTypeMap.getCdtScAwdPriId()
+        );
+    }
+
+    public CoreDataTypePrimitive getCdtPri() {
+        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri = getCdtScAwdPri();
+        return importedDataProvider.findCdtPri(cdtScAwdPri.getCdtPriId());
+    }
+
+    public AgencyIdList getAgencyIdList() {
+        ensureTypeName();
+        return agencyIdList;
+    }
+
+    public CodeList getCodeList() {
+        ensureTypeName();
+        return codeList;
+    }
+
     @Override
     public String getTypeName() {
+        ensureTypeName();
+        return typeName;
+    }
+
+    private void ensureTypeName() {
+        if (typeName != null) {
+            return;
+        }
+
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
                 importedDataProvider.findBdtScPriRestriListByDtScId(dtSc.getDtScId());
 
@@ -82,17 +128,17 @@ public class BDTSC implements Component {
                     throw new IllegalStateException();
                 }
 
-                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                cdtScAwdPriXpsTypeMap =
                         importedDataProvider.findCdtScAwdPriXpsTypeMap(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
-                XSDBuiltInType xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
-                return xbt.getBuiltInType();
+                xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+                typeName = xbt.getBuiltInType();
             } else {
-                AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
-                return agencyIdList.getName() + "ContentType";
+                agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
+                typeName = agencyIdList.getName() + "ContentType";
             }
         } else {
-            CodeList codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
-            return codeList.getName() + "ContentType";
+            codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
+            typeName = codeList.getName() + "ContentType";
         }
     }
 
@@ -106,5 +152,13 @@ public class BDTSC implements Component {
 
     public boolean hasBasedBDTSC() {
         return (dtSc.getBasedDtScId() > 0);
+    }
+
+    public String getDefinition() {
+        return dtSc.getDefinition();
+    }
+
+    public String getDefinitionSource() {
+        return dtSc.getDefinitionSource();
     }
 }

@@ -55,4 +55,12 @@ public class AgencyId implements Component {
         return agencyIdListValues.stream()
                 .map(e -> new AgencyIdValue(e)).collect(Collectors.toList());
     }
+
+    public String getDefinition() {
+        return agencyIdList.getDefinition();
+    }
+
+    public String getDefinitionSource() {
+        return null;
+    }
 }

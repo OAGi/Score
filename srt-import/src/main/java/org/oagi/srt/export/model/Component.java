@@ -7,4 +7,8 @@ public interface Component {
     public String getGuid();
 
     public String getTypeName();
+
+    public String getDefinition();
+
+    public String getDefinitionSource();
 }

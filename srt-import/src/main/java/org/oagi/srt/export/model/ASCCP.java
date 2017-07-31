@@ -10,8 +10,7 @@ public abstract class ASCCP implements Component {
     private AssociationCoreComponentProperty asccp;
     private AggregateCoreComponent roleOfAcc;
 
-    ASCCP(AssociationCoreComponentProperty asccp,
-          AggregateCoreComponent roleOfAcc) {
+    ASCCP(AssociationCoreComponentProperty asccp, AggregateCoreComponent roleOfAcc) {
         this.asccp = asccp;
         this.roleOfAcc = roleOfAcc;
     }
@@ -60,5 +59,13 @@ public abstract class ASCCP implements Component {
 
     public boolean isNillable() {
         return asccp.isNillable();
+    }
+
+    public String getDefinition() {
+        return asccp.getDefinition();
+    }
+
+    public String getDefinitionSource() {
+        return asccp.getDefinitionSource();
     }
 }

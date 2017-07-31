@@ -2,13 +2,16 @@ package org.oagi.srt.export.model;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.ImportedDataProvider;
-import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
+import org.oagi.srt.repository.entity.DataType;
+import org.oagi.srt.repository.entity.DataTypeType;
+import org.oagi.srt.repository.entity.XSDBuiltInType;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BDTSimpleType implements BDTSimple {
+public class BDTSimpleType extends AbstractBDTSimple {
 
     private DataType dataType;
 
@@ -30,6 +33,8 @@ public class BDTSimpleType implements BDTSimple {
                          List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList,
                          List<XSDBuiltInType> xbtList,
                          ImportedDataProvider importedDataProvider) {
+        super(importedDataProvider);
+
         this.dataType = dataType;
         this.baseDataType = baseDataType;
         this.isDefaultBDT = isDefaultBDT;
@@ -48,26 +53,22 @@ public class BDTSimpleType implements BDTSimple {
         return isDefaultBDT;
     }
 
+    @Override
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    @Override
+    public DataType getBaseDataType() {
+        return baseDataType;
+    }
+
     public String getName() {
         return Utility.denToName(dataType.getDen());
     }
 
     public String getGuid() {
         return dataType.getGuid();
-    }
-
-    public String getXbtName() {
-        List<BusinessDataTypePrimitiveRestriction> defaultBdtPriRestri = bdtPriRestriList.stream()
-                .filter(e -> e.isDefault())
-                .collect(Collectors.toList());
-        if (defaultBdtPriRestri.size() != 1) {
-            throw new IllegalStateException();
-        }
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
-                importedDataProvider.findCdtAwdPriXpsTypeMapById(
-                        defaultBdtPriRestri.get(0).getCdtAwdPriXpsTypeMapId()
-                );
-        return importedDataProvider.findXbt(cdtAwdPriXpsTypeMap.getXbtId()).getBuiltInType();
     }
 
     public String getBaseDTName() {
@@ -83,7 +84,7 @@ public class BDTSimpleType implements BDTSimple {
         return DataTypeType.CoreDataType == baseDataType.getType();
     }
 
-    public int countBDT_PRI_RESTRI() {
+    public int count_BDT_PRI_RESTRI() {
         return bdtPriRestriList.size();
     }
 
