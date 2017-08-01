@@ -242,16 +242,12 @@ public class Utility {
         return result;
     }
 
-    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "UPC", "BOD", "IST", "MSDS", "GL");
+    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "BOD", "IST", "MSDS");
 
     private static String sparcing(String str) {
-        if (Pattern.compile("[A-Z]+").matcher(str).matches()) {
-            str = (str.length() > 4) ? str.replaceAll("([A-Z]+)(ID)", "$1 $2") : str;
-        } else {
-            for (String abbr : ABBR_LIST) {
-                if (str.contains(abbr)) {
-                    str = str.replace(abbr, abbr + " ");
-                }
+        for (String abbr : ABBR_LIST) {
+            if (str.contains(abbr)) {
+                str = str.replace(abbr, abbr + " ");
             }
         }
 
@@ -275,7 +271,8 @@ public class Utility {
         String result = sb.toString();
         // #Issue 435: Exceptional Case
         result = result.replace("E Mail", "EMail")
-                .replace("Co A", "CoA");
+                .replace("Co A", "CoA")
+                .replace("GLDestination", "GL Destination");
 
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
