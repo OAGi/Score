@@ -34,6 +34,9 @@ public class BusinessInformationEntityDAO {
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
+    @Autowired
+    private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevRepository;
+
     @Transactional
     public AggregateBusinessInformationEntity save(AggregateBusinessInformationEntity abie) {
         return abieRepository.saveAndFlush(abie);
@@ -110,6 +113,8 @@ public class BusinessInformationEntityDAO {
 
         topLevelAbieRepository.updateAbieToNull(topLevelAbieId);
         abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
+
+        bieUserExtRevRepository.deleteByTopLevelAbieId(topLevelAbieId);
 
         topLevelAbieRepository.delete(topLevelAbieId);
     }
