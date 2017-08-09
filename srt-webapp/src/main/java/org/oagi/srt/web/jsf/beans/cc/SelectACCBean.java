@@ -3,6 +3,7 @@ package org.oagi.srt.web.jsf.beans.cc;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.OagisComponentType;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.CoreComponentService;
 import org.primefaces.event.SelectEvent;
@@ -51,7 +52,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     private List<AggregateCoreComponent> allACCs() {
         return accRepository.findAllByRevisionNum(0).stream()
-                .filter(e -> e.getOagisComponentType() != O)
+                .filter(e -> e.getOagisComponentType() != OagisComponentType.UserExtensionGroup)
                 .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
     }
