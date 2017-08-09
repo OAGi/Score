@@ -51,6 +51,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     private List<AggregateCoreComponent> allACCs() {
         return accRepository.findAllByRevisionNum(0).stream()
+                .filter(e -> e.getOagisComponentType() != O)
                 .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
     }
