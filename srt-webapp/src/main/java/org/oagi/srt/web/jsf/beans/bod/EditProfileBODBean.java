@@ -202,6 +202,9 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             ASBIEPNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
             bieService.updateState(topLevelAbieId, state);
+
+            // Issue #439: To update the screen status.
+            setTopLevelAbie(topLevelAbieRepository.findOne(topLevelAbieId));
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
