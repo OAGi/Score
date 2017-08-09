@@ -5,7 +5,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,8 +51,7 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
-                                                      AssociationCoreComponentProperty asccp, User user)
-            throws PermissionDeniedDataAccessException {
+                                                      AssociationCoreComponentProperty asccp, User user) {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
@@ -69,7 +67,7 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(
-            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws PermissionDeniedDataAccessException {
+            AssociationCoreComponentProperty asccp, User user, boolean isLocally) {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }

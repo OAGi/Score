@@ -6,7 +6,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -322,8 +321,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAccId = acc.getAccId();
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
@@ -346,6 +344,45 @@ public class CoreComponentService {
 
         accRepository.saveAndFlush(accHistory);
 
+        long accId = acc.getAccId();
+        // update ascc DEN
+        List<AssociationCoreComponent> dirtyAsccList = new ArrayList();
+        for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(accId)) {
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            ascc.setDen(acc, asccp);
+            if (ascc.isDirty()) {
+                dirtyAsccList.add(ascc);
+            }
+        }
+        if (!dirtyAsccList.isEmpty()) {
+            asccRepository.save(dirtyAsccList);
+        }
+
+        // update asccp DEN
+        List<AssociationCoreComponentProperty> dirtyAsccpList = new ArrayList();
+        for (AssociationCoreComponentProperty asccp : asccpRepository.findByRoleOfAccId(accId)) {
+            asccp.setRoleOfAcc(acc);
+            if (asccp.isDirty()) {
+                dirtyAsccpList.add(asccp);
+            }
+        }
+        if (!dirtyAsccpList.isEmpty()) {
+            asccpRepository.save(dirtyAsccpList);
+        }
+
+        // update bcc DEN
+        List<BasicCoreComponent> dirtyBccList = new ArrayList();
+        for (BasicCoreComponent bcc : bccRepository.findByFromAccId(accId)) {
+            BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+            bcc.setDen(acc, bccp);
+            if (bcc.isDirty()) {
+                dirtyBccList.add(bcc);
+            }
+        }
+        if (!dirtyBccList.isEmpty()) {
+            bccRepository.save(dirtyBccList);
+        }
+
         // to check RevisionTrackingNum
         latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
         int actualRevisionTrackingNum = latestHistoryAccList.stream()
@@ -361,8 +398,7 @@ public class CoreComponentService {
                             CoreComponentState state,
                             User requester) {
         if (acc.getOwnerUserId() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
         updateAccState(acc, state, requester);
@@ -373,8 +409,13 @@ public class CoreComponentService {
                             CoreComponentState state,
                             User requester) {
         if (asccp.getOwnerUserId() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
+        }
+
+        // #Issue 437
+        AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+        if (acc.getState() != Published) {
+            throw new IllegalStateException("This state cannot be updated until the associated ACC would be in Published state.");
         }
 
         updateAsccpState(asccp, state, requester);
@@ -385,8 +426,7 @@ public class CoreComponentService {
                             CoreComponentState state,
                             User requester) {
         if (bccp.getOwnerUserId() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
         updateBccpState(bccp, state, requester);
@@ -397,8 +437,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAccId = acc.getAccId();
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
@@ -421,8 +460,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccId = ascc.getAsccId();
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
@@ -460,8 +498,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccId = ascc.getAsccId();
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
@@ -483,8 +520,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccId = bcc.getBccId();
         List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
@@ -547,8 +583,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccId = bcc.getBccId();
         List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
@@ -572,8 +607,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
@@ -617,8 +651,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
@@ -637,8 +670,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList =
@@ -682,8 +714,7 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
@@ -743,8 +774,7 @@ public class CoreComponentService {
                             CoreComponentState state,
                             User requester) {
         if (ueAcc.getOwnerUserId() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
         updateAccState(ueAcc, state, requester);
