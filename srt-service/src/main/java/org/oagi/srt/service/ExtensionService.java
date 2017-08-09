@@ -191,7 +191,7 @@ public class ExtensionService {
                                                                      User currentLoginUser,
                                                                      AggregateCoreComponent ueAcc) {
         AssociationCoreComponentProperty ueAsccp = createASCCP(ueAcc, currentLoginUser);
-        ueAsccp.setPropertyTerm(ueAsccp.getPropertyTerm(), ueAcc);
+        ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm(), ueAcc);
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAsccp.setState(Published);
         return ccDAO.save(ueAsccp);
