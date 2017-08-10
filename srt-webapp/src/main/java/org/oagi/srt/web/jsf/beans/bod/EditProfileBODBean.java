@@ -197,7 +197,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateState(AggregateBusinessInformationEntityState state) {
+    public String updateState(AggregateBusinessInformationEntityState state) throws IOException {
         try {
             ASBIEPNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
@@ -210,6 +210,8 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        return "/views/profile_bod/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
