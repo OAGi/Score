@@ -1090,18 +1090,18 @@
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  actionListener="#{editProfileBODBean.update()}"
                                  action="#{editProfileBODBean.afterUpdate()}"
-                                 update=":form:btnGroup"/>
+                                 update=":form"/>
 
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{editProfileBODBean.updateState('Candidate')}"
-                                 update=":form:btnGroup"/>
+                                 update=":form"/>
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
                                  action="#{editProfileBODBean.updateState('Editing')}"
-                                 update=":form:btnGroup"/>
+                                 update=":form"/>
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  disabled="#{editProfileBODBean.canUpdate()}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
