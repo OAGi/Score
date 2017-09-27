@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<xsd:schema xmlns="http://www.openapplications.org/oagis/10" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xsd:complexType name="CCTSAndOAGIS_BIEDocumentationType">
+		<xsd:sequence>
+			<xsd:element name="ccts_BusinessContext" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Convey the business context information associated with the BIE. The business context information represents the situation in which the BIE should be used.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="BusinessContextGUID" type="xsd:normalizedString">
+							<xsd:annotation>
+								<xsd:documentation>Globally unique identifier (GUID) of the business context.  A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ccts_BusinessContextName" type="xsd:normalizedString">
+							<xsd:annotation>
+								<xsd:documentation>A concise (oftentime mnemonic) label of a business context</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ccts_BusinessContextDescription" type="xsd:string">
+							<xsd:annotation>
+								<xsd:documentation>Explanation describing the business context primarily for human consumption</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ccts_ContextValue" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Each context value element formally indicates a context in a particular context dimension (category) that makes up a business context. Context values in different context categories are interpreted as having logical AND relationshipasamong them, while context values in the same context category are interpreted as having logical OR relationships among them.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="ccts_ContextSchemeValueGUID" type="xsd:normalizedString">
+										<xsd:annotation>
+											<xsd:documentation>Globally unique identifier (GUID) of the context scheme value.  A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity. </xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="ccts_ContextSchemeValue" type="xsd:token">
+										<xsd:annotation>
+											<xsd:documentation>The context value from the specified context scheme below.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="ccts_ContextSchemeValueMeaning" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation>The meaning of the context value primarily for human consumption</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="ccts_ClassificationScheme">
+										<xsd:annotation>
+											<xsd:documentation>This entiity describes the classification scheme the context value comes from.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="ccts_ClassificationSchemeGUID" type="xsd:normalizedString">
+													<xsd:annotation>
+														<xsd:documentation>Globally unique identifier (GUID) of the classification scheme.  A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+												<xsd:element name="ccts_ContextCategory">
+													<xsd:annotation>
+														<xsd:documentation>Context contegory or dimension the classification scheme is used for describing. For example, industry context category, role context category.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="ccts_ContextCategoryGUID" type="xsd:normalizedString">
+																<xsd:annotation>
+																	<xsd:documentation>Globally unique identifier (GUID) of the context category. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element name="ccts_ContextCategoryName" type="xsd:normalizedString">
+																<xsd:annotation>
+																	<xsd:documentation>A concise (oftentime mnemonic) label of the context category</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="ccts_ClassificationSchemeName" type="xsd:normalizedString">
+													<xsd:annotation>
+														<xsd:documentation>A concise (oftentime mnemonic) label of the classification scheme</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+												<xsd:element name="ccts_ClassificationSchemeAgencyID">
+													<xsd:annotation>
+														<xsd:documentation>Identifier of the organization that maintains the classification scheme. The ID shall be assumed to be coming from UN/CEFACT 3055 ID list. If the ID is not in the 3055, the ID is assumed to be a company's specific ID. In other words, if the ID is 3055 list, it shall be interpreted per 3055; and if not, it is a company's specific ID understood by the company and its partners.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:simpleContent>
+															<xsd:extension base="xsd:normalizedString">
+																<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="required">
+																	<xsd:annotation>
+																		<xsd:documentation>Version ID of the Agency ID code list. This shall be the version of the Agency ID used in the SRT.</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:attribute>
+															</xsd:extension>
+														</xsd:simpleContent>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="ccts_ClassificationSchemeVersionID" type="xsd:normalizedString">
+													<xsd:annotation>
+														<xsd:documentation>Version ID of the classification scheme</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+												<xsd:element name="ccts_ClassificationSchemeDefinition" type="xsd:string">
+													<xsd:annotation>
+														<xsd:documentation>Description of the classification scheme for human consumption.</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ccts_BIEEntityTypeCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This indicates the type of BIE this documentation is capturing. For example, if the code is ABIE, it means that all the information, e.g., Dictionary Entry Name, is about an ABIE. If the code is ASBIEP, then only the elements in the ccts_BasedASCCPMetaDataGroup shall be specified. If the code is ABIE, then only the elements in the ccts_BasedACCMetaDataGroup shall be specified. If the code is ASBIE, then only the elements in the ccts_BasedASCCMetaDataGroup shall be specified. If the code is BBIEP, then only the elements in the ccts_BasedBCCPMetaDataGroup shall be specified. If the code is BBIE, then only the elements in the ccts_BasedBCCMetaDataGroup shall be specified. If the code is BDT, then only the elements in the ccts_BasedBDTMetaDataGroup shall be specified. If the code is SC, then only the elements in the ccts_BasedBDT_SCMetaDataGroup shall be specified. </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:token">
+						<xsd:enumeration value="ABIE"/>
+						<xsd:enumeration value="ASBIE"/>
+						<xsd:enumeration value="ASIEP"/>
+						<xsd:enumeration value="BBIE"/>
+						<xsd:enumeration value="BBIEP"/>
+						<xsd:enumeration value="BDT"/>
+						<xsd:enumeration value="SC">
+							<xsd:annotation>
+								<xsd:documentation>Supplementary Component</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ccts_DictionaryEntryName" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Dictionary Entry Name (DEN) of the BIE entity being documented</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_Definition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:anyURI"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ccts_ObjectClassTermName" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Object class term of the BIE entity being documented. This element is used only when the BIEEntityTypeCode is ABIE, ASBIE, or BBIE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_PropertyTermName" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Property term of the BIE entity being documented. This element is used only when the BIEEntityTypeCode is ASBIEP, BBIEP, ASBIE, BBIE, or SC.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_RepresentationTermName" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Representation term of the BIE entity being documented. This element is used only when the BIEEntityTypeCode is ASBIEP, BBIEP, ASBIE, BBIE, BDT, or SC.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_DataTypeTermName" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Data type term of the BIE entity being documented. This element is used only when the BIEEntityTypeCode is BDT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BusinessTerm" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Alternate names of the BIE. The multiple cardinality is for supporting multiple languages. Currently the SRT supports only one BusinessTerm per one BIE entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_ProfileBODVersion" type="xsd:token" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This represents the user specified version of the profile BOD generated. It is used only in the root element of the profile BOD.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_ProfileBODStatus" type="xsd:token" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This represents the user speciified status of the profile BOD such as Draft, Test, Production. It is used only in the root element of the profile BOD.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_Remark" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Remark is a non-normative documentation about the BIE entity. The user may use this, for example, to make note about what to think about, what to do, or other things still uncertained about the BIE entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_CreatedByUserName" type="xsd:token" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This is a track-n-trace field indicating the original user who created the BIE entity (in the SRT).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_LastUpdatedByUserName" type="xsd:token" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This is a track-n-trace field indicating the user who last updated the BIE entity (in the SRT).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="oag_LastUpdateTimestamp" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>This is a track-n-trace field indicating the datetime the BIE entity was last updated.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:group ref="ccts_BasedASCCPMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedACCMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedASCCMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedBCCMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedBCCPMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedBDTMetaDataGroup" minOccurs="0"/>
+				<xsd:group ref="ccts_BasedBDT_SCMetaDataGroup" minOccurs="0"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="ccts_BasedASCCPMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the ASCCP on which an ASBIEP is based. The GUID and Revision Number together uniquely identify the ASCCP record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedASCCP_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of an ASCCP. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedASCCPRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the ASCCP</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedASCCPDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the ASCCP</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedACCMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the ACC on which an ABIE is based. The GUID and Revision Number together uniquely identify the ACC record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedACC_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of an ACC. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedACCRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the ACC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedACCDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the ACC</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedASCCMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the ASCC on which an ASBIE is based. The GUID and Revision Number together uniquely identify the ASCC record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedASCC_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of an ASCC. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedASCCRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the ASCC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedASCCDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the ASCC</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedBCCPMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the BCCP on which a BBIEP is based. The GUID and Revision Number together uniquely identify the BCCP record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedBCCP_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of a BCCP. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBCCPRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the BCCP</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBCCPDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the BCCP</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedBCCMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the BCC on which a BBIE is based. The GUID and Revision Number together uniquely identify the BCC record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedBCC_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of a BCC. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBCCRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the BCC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBCCDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the BCC</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedBDTMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the BDT used by the BCCP, on which a BBIEP is based. The BDT maybe further restricted on the BIE side. The GUID and Revision Number together uniquely identify the BDT record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedBDT_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of a BDT. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBDT_RevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the BDT</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBDT_Definition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the BDT</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ccts_BasedBDT_SCMetaDataGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of elements used for identifying the SC of the BDT used by the BCCP, on which a BBIEP is based. The SC maybe further restricted on the BIE side. The GUID and Revision Number together uniquely identify the BDT SC record in the SRT database.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ccts_BasedBDT_SC_GUID" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Globally unique identifier (GUID) of an SC of a BDT. A GUID of an entity never changes so that while other parts of the entity may evolve over time, it can be recognized as the same entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBDT_SCRevisionNumber" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Revision number of the BDT's SC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ccts_BasedBDT_SCDefinition" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Description of the BDT's SC</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="source" type="xsd:normalizedString"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="UsageRule">
+		<xsd:annotation>
+			<xsd:documentation>Usage rules describe a constraint that describes specific conditions that are applicable to a component in the model. Usage rules are at least expressed as free form text or in a formal language.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ccts_UniqueID" type="xsd:token" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Globally unique ID of the usage rule.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="ccts_Constraint" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>The constraint expression. When the ccts_ConstraintTypeCode is UNS, the xml:lang attribute may be used to indicate the language; otherwise, us-en is assumed.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:attribute name="ccts_constraintTypeCode">
+							<xsd:annotation>
+								<xsd:documentation>Code indicating the encoding of the constraint. Example values are UNS for unstructured text and SCT for schematron.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="ccts_ConditionTypeCode" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Code indicating when the usage rule applies. PRE = pre-condition, i.e., the constraint shall be checked and met before the entity is used/instantiated; POS = post-condition, i.e., the constraint shall be checked and met when the entity is instantiated; INV = invariant,  i.e., the constraint must be checked and met in all situations.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:enumeration value="PRE"/>
+							<xsd:enumeration value="POS"/>
+							<xsd:enumeration value="INV"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
