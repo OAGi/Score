@@ -41,7 +41,7 @@ import java.util.*;
 
 import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 

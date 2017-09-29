@@ -1,4 +1,4 @@
-package org.oagi.srt.persistence.populate;
+package org.oagi.srt.persistence.populate.script.postgres;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Collection;
 
-public class DataImportScriptPrinter {
+public class PostgresDataImportScriptPrinter {
 
     private static PrintWriter printWriter;
 
@@ -21,7 +21,7 @@ public class DataImportScriptPrinter {
             printWriter = new PrintWriter(
                     new OutputStreamWriter(
                             new BufferedOutputStream(
-                                    new FileOutputStream("./srt-import/src/main/resources/data-oracle.sql"))));
+                                    new FileOutputStream("./srt-import/src/main/resources/data-postgres.sql"))));
         } catch (FileNotFoundException e) {
             throw new IllegalStateException("Failure to open file", e);
         }
@@ -64,10 +64,8 @@ public class DataImportScriptPrinter {
             throw new IllegalStateException(e);
         }
 
-        print("DROP SEQUENCE " + sequenceName + " ;");
         long count = getEntityCount(manager, entityClass);
-        print("CREATE SEQUENCE " + sequenceName + " START WITH " + (count + 1) +
-                " INCREMENT BY 1 MAXVALUE 999999999999999999999999 MINVALUE 1 ;");
+        print("ALTER SEQUENCE " + sequenceName + " START WITH " + (count + 1));
     }
 
     public static long getEntityCount(EntityManager manager, Class<?> entityClass) {

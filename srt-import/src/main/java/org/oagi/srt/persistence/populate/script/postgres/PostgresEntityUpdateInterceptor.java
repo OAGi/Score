@@ -1,29 +1,23 @@
-package org.oagi.srt.persistence.populate;
+package org.oagi.srt.persistence.populate.script.postgres;
 
-import com.google.common.base.Splitter;
-import org.apache.commons.io.FilenameUtils;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.*;
 import org.hibernate.type.descriptor.converter.AttributeConverterTypeAdapter;
+import org.postgresql.util.Base64;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.print;
+import static org.oagi.srt.persistence.populate.script.postgres.PostgresDataImportScriptPrinter.print;
 
-public class EntityUpdateInterceptor extends EmptyInterceptor {
+public class PostgresEntityUpdateInterceptor extends EmptyInterceptor {
 
     private String getTableName(Object entity) {
         Class<?> clazz = entity.getClass();
@@ -129,51 +123,6 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
     }
 
-    final protected static char[] hexArray = "0123456789abcdef".toCharArray();
-
-    private String toHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    private File getFile(Object entity) {
-        Class<?> clazz = entity.getClass();
-        try {
-            Field fileField = clazz.getDeclaredField("file");
-            try {
-                fileField.setAccessible(true);
-                return (File) fileField.get(entity);
-            } finally {
-                fileField.setAccessible(false);
-            }
-        } catch (NoSuchFieldException e) {
-            return null;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String getRelativePath(File file) {
-        try {
-            Path pathAbsolute = Paths.get(file.getCanonicalPath());
-            Path pathBase = Paths.get(new File(System.getProperty("user.dir")).getCanonicalPath());
-            Path pathRelative = pathBase.relativize(pathAbsolute);
-
-            return FilenameUtils.separatorsToUnix(pathRelative.toString());
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String escape(String value) {
-        return value.replace("'", "''");
-    }
-
     private void propertyNameSet(Object entity, String[] propertyNames, Type[] types, StringBuilder sb, int i) {
         sb.append(getColumnName(entity, propertyNames, types, i));
     }
@@ -188,7 +137,7 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
     }
 
-    private String valueSet(
+    private void valueSet(
             Object entity,
             Object[] state,
             Type[] types,
@@ -205,19 +154,22 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
             } else {
                 String str = (String) value;
                 if (str.length() > 4000) {
-                    sb.append("EMPTY_CLOB()");
-                    return escape(str);
+                    try {
+                        sb.append("decode('").append(Base64.encodeBytes(str.getBytes("UTF-8"))).append("', 'base64')");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException(e);
+                    }
                 } else {
-                    sb.append("'").append(escape(str)).append("'");
+                    sb.append("'").append(str).append("'");
                 }
+
             }
         } else if (type == LongType.INSTANCE || type == IntegerType.INSTANCE) {
             sb.append(value);
         } else if (type == TimestampType.INSTANCE) {
             sb.append("CURRENT_TIMESTAMP");
         } else if (type == BinaryType.INSTANCE || type == BlobType.INSTANCE || type == MaterializedBlobType.INSTANCE) {
-            sb.append("EMPTY_BLOB()");
-            return toHex((byte[]) value);
+            sb.append("decode('").append(Base64.encodeBytes((byte[]) value)).append("', 'base64')");
         } else if (type.getClass() == AttributeConverterTypeAdapter.class) {
             sb.append(getEnumValue(value));
         } else if (type.getClass() == CustomType.class) {  // EnumType
@@ -228,55 +180,6 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
             } else {
                 sb.append(value);
             }
-        }
-        return null;
-    }
-
-    private class LobValueResolver {
-        private String dbType;
-        private String lobValue;
-        private String lobColumnName;
-        private Object entity;
-        private Serializable id;
-
-        public LobValueResolver(String lobType,
-                                String lobValue,
-                                String lobColumnName,
-                                Object entity,
-                                Serializable id) {
-            this.dbType = lobType;
-            this.lobValue = lobValue;
-            this.lobColumnName = lobColumnName;
-            this.entity = entity;
-            this.id = id;
-        }
-
-        public void resolve() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("DECLARE\n" +
-                    "  buf " + dbType + "; \n" +
-                    "BEGIN\n" +
-                    "  dbms_lob.createtemporary(buf, FALSE);\n");
-
-            for (String splittedValue : Splitter.fixedLength(2000).split(lobValue)) {
-                switch (dbType.toUpperCase()) {
-                    case "BLOB":
-                        sb.append("  dbms_lob.append(buf, HEXTORAW('" + splittedValue + "'));\n");
-                        break;
-                    case "CLOB":
-                        sb.append("  dbms_lob.append(buf, '" + splittedValue + "');\n");
-                        break;
-                }
-
-            }
-
-            sb.append("  UPDATE " + getTableName(entity) + "\n" +
-                    "     SET " + lobColumnName + " = buf\n" +
-                    "   WHERE " + getIdentifierName(entity) + " = " + id + ";\n" +
-                    "END;\n" +
-                    "/");
-
-            print(sb.toString());
         }
     }
 
@@ -303,20 +206,8 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
 
         sb.append(id).append(", ");
 
-        List<LobValueResolver> lobValueResolverList = new ArrayList();
         for (int i = 0, len = state.length; i < len; ++i) {
-            String lobValue = valueSet(entity, state, types, sb, i);
-            if (lobValue != null) {
-                String lobColumnName = getColumnName(entity, propertyNames, types, i);
-                Type type = types[i];
-                String lobType;
-                if (type == BinaryType.INSTANCE || type == BlobType.INSTANCE || type == MaterializedBlobType.INSTANCE) {
-                    lobType = "BLOB";
-                } else {
-                    lobType = "CLOB";
-                }
-                lobValueResolverList.add(new LobValueResolver(lobType, lobValue, lobColumnName, entity, id));
-            }
+            valueSet(entity, state, types, sb, i);
 
             if (i + 1 == len) {
                 sb.append(");");
@@ -326,10 +217,6 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
 
         print(sb.toString());
-
-        for (LobValueResolver lobValueResolver : lobValueResolverList) {
-            lobValueResolver.resolve();
-        }
 
         return false;
     }

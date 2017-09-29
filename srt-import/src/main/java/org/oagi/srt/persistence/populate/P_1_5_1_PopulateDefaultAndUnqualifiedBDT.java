@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 
 /**

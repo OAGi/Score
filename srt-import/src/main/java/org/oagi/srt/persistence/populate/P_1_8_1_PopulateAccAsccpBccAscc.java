@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.OagisComponentType.*;
 
 @Component

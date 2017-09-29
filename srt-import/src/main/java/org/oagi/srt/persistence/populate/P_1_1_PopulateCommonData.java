@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
 import static org.oagi.srt.common.ImportConstants.DATA_TYPES_PATH;
 import static org.oagi.srt.common.ImportConstants.OAGIS_RELEASE_NOTE;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 
 @Component
 public class P_1_1_PopulateCommonData {

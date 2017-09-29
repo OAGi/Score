@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.oagi.srt.common.ImportConstants.*;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 
 /**
  * @author Jaehun Lee

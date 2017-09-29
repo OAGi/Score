@@ -97,6 +97,11 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.1.4</version>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>

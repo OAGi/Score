@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPathConstants;
 import java.util.*;
 
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 
 /**
  * Created by tnk11 on 6/27/2016.
