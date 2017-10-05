@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -54,8 +55,12 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public int countByFromAccId(long fromAccId);
 
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionNum = (" +
-            "select MAX(a.revisionNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId)")
+            "select MAX(a.revisionNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId) order by a.creationTimestamp desc")
     public List<AssociationCoreComponent> findAllWithLatestRevisionNumByCurrentAsccId(long currentAsccId);
+
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = (" +
+            "select MAX(a.revisionNum) from AssociationCoreComponent a where a.fromAccId = ?1 group by a.fromAccId) order by a.creationTimestamp desc")
+    public List<AssociationCoreComponent> findAllWithLatestRevisionNumByFromAccId(long currentAsccId);
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId in ?1")
     public List<AssociationCoreComponent> findByFromAccId(Collection<Long> fromAccId);
@@ -92,4 +97,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1 and a.state in ?2 order by a.creationTimestamp desc")
     public List<AssociationCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
+
+    @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    AssociationCoreComponent findOneByCurrentAsccIdAndRevisions(long currentAsccId, int revisionNum, int i);
 }

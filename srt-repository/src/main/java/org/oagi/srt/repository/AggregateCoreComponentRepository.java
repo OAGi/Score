@@ -33,7 +33,7 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     public List<AggregateCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = (" +
-            "select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId)")
+            "select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId) order by a.creationTimestamp desc")
     public List<AggregateCoreComponent> findAllWithLatestRevisionNumByCurrentAccId(long currentAccId);
 
     @Query("select a.basedAccId from AggregateCoreComponent a where a.accId = ?1")
@@ -46,4 +46,9 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.accId = ?1")
     public void deleteByAccId(long accId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    AggregateCoreComponent findOneByCurrentAccIdAndRevisions(long currentAccId, int revisionNum, int i);
+
+
 }

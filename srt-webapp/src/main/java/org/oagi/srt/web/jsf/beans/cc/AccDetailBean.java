@@ -1,18 +1,12 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.ACCNode;
-import org.oagi.srt.model.node.ASCCPNode;
-import org.oagi.srt.model.node.BCCPNode;
-import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.service.NamespaceService;
-import org.oagi.srt.service.NodeService;
+import org.oagi.srt.service.*;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -49,6 +43,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
+    private UndoService undoService;
+
+    @Autowired
     private CoreComponentService coreComponentService;
 
     @Autowired
@@ -71,6 +68,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
+    private boolean setSelectedTreeNodeAfterRefresh = false;
+    private TreeNode selectedNodeAfterRefresh;
 
     private DataType selectedBdt;
 
@@ -164,7 +163,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
-        this.selectedTreeNode = selectedTreeNode;
+        if (treeNode != null && selectedTreeNode == null && setSelectedTreeNodeAfterRefresh) {
+            this.selectedTreeNode = selectedNodeAfterRefresh;
+            setSelectedTreeNodeAfterRefresh = false;
+        } else {
+            this.selectedTreeNode = selectedTreeNode;
+        }
         setPreparedAppendAscc(false);
         setPreparedAppendBcc(false);
     }
@@ -1058,6 +1062,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return !latestRevisionNumAccs.isEmpty();
     }
 
+    public boolean isPreviousRevisionNotInsert(AggregateCoreComponent acc) {
+        return undoService.isPreviousRevisionNotInsert(acc);
+    }
+
     @Transactional
     public void createNewRevision(AggregateCoreComponent acc) throws IOException {
         User requester = getCurrentUser();
@@ -1067,5 +1075,17 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect("/core_component/acc/" + acc.getAccId());
     }
-}
+
+    public void undoLastAction() {
+        undoService.undoLastAction(getTargetAcc());
+        refreshTreeNode();
+    }
+
+    private void refreshTreeNode() {
+        TreeNode treeNode = createTreeNode(targetAcc, true);
+        copyExpandedState(this.treeNode, treeNode);
+        setTreeNode(treeNode);
+        setSelectedTreeNodeAfterRefresh = true;
+        selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode,((SRTNode)getSelectedTreeNode().getData()).getId()); // TODO: check if this cause problem with setting leaf node as selected after refresh
+    }}
 

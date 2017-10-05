@@ -15,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "bccp")
 public class BasicCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
+        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, RevisionAware {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 

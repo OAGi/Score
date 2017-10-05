@@ -7,7 +7,9 @@ import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.UndoService;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
 
@@ -38,6 +41,9 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private UndoService undoService;
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
@@ -55,6 +61,8 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
+    private boolean setSelectedTreeNodeAfterRefresh = false;
+    private TreeNode selectedNodeAfterRefresh;
 
     @PostConstruct
     public void init() {
@@ -107,7 +115,12 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
-        this.selectedTreeNode = selectedTreeNode;
+        if (treeNode != null && selectedTreeNode == null && setSelectedTreeNodeAfterRefresh) {
+            this.selectedTreeNode = selectedNodeAfterRefresh;
+            setSelectedTreeNodeAfterRefresh = false;
+        } else {
+            this.selectedTreeNode = selectedTreeNode;
+        }
     }
 
     public AggregateCoreComponent getSelectedAggregateCoreComponent() {
@@ -212,6 +225,10 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         return !latestRevisionNumBccps.isEmpty();
     }
 
+    public boolean isPreviousRevisionNotInsert(BasicCoreComponentProperty bccp) {
+        return undoService.isPreviousRevisionNotInsert(bccp);
+    }
+
     @Transactional
     public void createNewRevision(BasicCoreComponentProperty bccp) throws IOException {
         User requester = getCurrentUser();
@@ -221,5 +238,19 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect("/core_component/bccp/" + bccp.getBccpId());
     }
+
+    public void undoLastAction() {
+        undoService.undoLastAction(getTargetBccp());
+        refreshTreeNode();
+    }
+
+    private void refreshTreeNode() {
+        TreeNode treeNode = createTreeNode(targetBccp, true);
+        copyExpandedState(this.treeNode, treeNode);
+        setTreeNode(treeNode);
+        setSelectedTreeNodeAfterRefresh = true;
+        selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode,((SRTNode)getSelectedTreeNode().getData()).getId());
+    }
 }
+
 

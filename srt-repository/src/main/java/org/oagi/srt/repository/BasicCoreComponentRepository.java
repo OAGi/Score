@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,8 +58,12 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     public List<BasicCoreComponent> findAllByToBccpId(Long bccpId);
 
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionNum = (" +
-            "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId)")
+            "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId) order by b.creationTimestamp desc")
     public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccId(long currentBccId);
+
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = (" +
+            "select MAX(b.revisionNum) from BasicCoreComponent b where b.fromAccId = ?1 group by b.fromAccId) order by b.creationTimestamp desc")
+    public List<BasicCoreComponent> findAllWithLatestRevisionNumByFromAccId(long currentBccId);
 
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionNum = (" +
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 and b.seqKey > 0 group by b.currentBccId)")
@@ -90,4 +95,7 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select b from BasicCoreComponent b where b.toBccpId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByToBccpIdAndRevisionNum(long toBccpId, int revisionNum);
+
+    @Query("select a from BasicCoreComponent a where a.currentBccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    BasicCoreComponent findOneByCurrentBccIdAndRevisions(long currentBccId, int revisionNum, int i);
 }

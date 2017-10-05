@@ -795,6 +795,14 @@
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{accDetailBean.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton
+                        rendered="#{(accDetailBean.targetAcc.state == 'Editing' or accDetailBean.targetAcc.state == 'Candidate') and accDetailBean.isPreviousRevisionNotInsert(accDetailBean.targetAcc)}"
+                        id="btnUndo" widgetVar="btnUndo" value="Undo"
+                        action="#{accDetailBean.undoLastAction()}"
+                        update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"
+                        style="float: right;"/>
+
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Published' and accDetailBean.hasPreviousRevision(accDetailBean.targetAcc)}"
                                  id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
                                  action="#{accDetailBean.createNewRevision(accDetailBean.targetAcc)}"

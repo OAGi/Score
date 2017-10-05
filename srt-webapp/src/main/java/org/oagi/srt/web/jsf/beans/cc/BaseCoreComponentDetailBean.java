@@ -60,9 +60,9 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         return root;
     }
 
-    public TreeNode createTreeNode(BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
+    public DefaultTreeNode createTreeNode(BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
         BCCPNode bccpNode = nodeService.createCoreComponentTreeNode(bccp, enableShowingGroup);
-        TreeNode root = new DefaultTreeNode();
+        DefaultTreeNode root = new DefaultTreeNode();
         toTreeNode(bccpNode, root);
         return root;
     }
@@ -226,6 +226,73 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
             }
             ccNode.setAttribute("expanded", true);
         }
+    }
+
+    public void expand(TreeNode node) {
+        DefaultTreeNode treeNode = (DefaultTreeNode) node;
+        CCNode ccNode = (CCNode) treeNode.getData();
+        Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
+        if (expanded == null || expanded == false) {
+            if (ccNode.hasChild() || ((ccNode instanceof ACCNode) && ((ACCNode) ccNode).getBase() != null)) {
+                clearChildren(treeNode);
+            }
+
+            if (ccNode instanceof ACCNode) {
+                ACCNode accNode = (ACCNode) ccNode;
+                ACCNode baseAccNode = accNode.getBase();
+                if (baseAccNode != null) {
+                    toTreeNode(baseAccNode, treeNode);
+                }
+            }
+            if (ccNode.hasChild()) {
+                for (CCNode child : ccNode.getChildren()) {
+                    toTreeNode(child, treeNode);
+                }
+            }
+            ccNode.setAttribute("expanded", true);
+        }
+    }
+
+    public void copyExpandedState(TreeNode source, TreeNode target) {
+        if (!source.isLeaf() && !target.isLeaf()) { // TODO: check if this cause problem with setting leaf node as selected after refresh
+            target.setExpanded(source.isExpanded());
+            target.setSelected(source.isSelected());
+            if (source.isExpanded()) {
+                expand(target);
+            }
+
+            for (TreeNode sourceChild : source.getChildren()) {
+                if (sourceChild.isExpanded()) {
+                    TreeNode targetChild = findChildNodeById(target, ((SRTNode) sourceChild.getData()).getId());
+                    if (targetChild != null) {
+                        copyExpandedState(sourceChild, targetChild);
+                    }
+                }
+            }
+        }
+    }
+
+    public TreeNode findChildNodeById(TreeNode parent, String id) {
+        for (TreeNode tn : parent.getChildren()) {
+            SRTNode srtNode = (SRTNode) tn.getData();
+            if (srtNode != null) {
+                String srtNodeId = srtNode.getId();
+                if (srtNodeId.equals(id)) {
+                    return tn;
+                }
+            }
+        }
+        return null;
+    }
+
+    public TreeNode findChildNodeAnywhereById(TreeNode parent, String id) {
+        TreeNode node = findChildNodeById(parent, id);
+        if (node == null) {
+            for (TreeNode childNode : parent.getChildren()) {
+                node = findChildNodeAnywhereById(childNode, id);
+            }
+        }
+        return node;
     }
 
     private void clearChildren(DefaultTreeNode treeNode) {

@@ -15,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "asccp")
 public class AssociationCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
+        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 

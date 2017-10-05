@@ -524,6 +524,13 @@
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{asccpDetailBean.targetAsccp.dirty}"
                                  update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton
+                        rendered="#{(asccpDetailBean.targetAsccp.state == 'Editing' or asccpDetailBean.targetAsccp.state == 'Candidate') and asccpDetailBean.isPreviousRevisionNotInsert(asccpDetailBean.targetAsccp)}"
+                        id="btnUndo" widgetVar="btnUndo" value="Undo"
+                        action="#{asccpDetailBean.undoLastAction()}"
+                        update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"
+                        style="float: right;"/>
                 
                 <p:commandButton rendered="#{asccpDetailBean.targetAsccp.state == 'Published' and asccpDetailBean.hasPreviousRevision(asccpDetailBean.targetAsccp)}"
                                  id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
