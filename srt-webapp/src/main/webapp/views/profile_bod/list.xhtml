@@ -29,7 +29,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
-                    <p:column headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
+                    <p:column  style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
                         <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId or profileBOD.state ne 'Editing'}">
                             <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
                         </h:panelGroup>
