@@ -156,12 +156,17 @@
                     <p:column style="text-align: center; width: 65px;">
                         <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
                                          rendered="#{coreComponentBean.canBeDiscarded(cc)}"
-                                         action="#{coreComponentBean.discard(cc)}" update="tbl" ajax="true"/>
+                                         action="#{coreComponentBean.discard(cc)}" update="tbl" ajax="true">
+                            <p:confirm header="Confirmation"
+                                       message="This action cannot be undone. Proceed?"
+                                       icon="fa fa-exclamation-triangle"/>
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
+        <ui:include src="../dialog/global_confirm_non_undo_dialog.xhtml"/>
     </ui:define>
 </ui:composition>

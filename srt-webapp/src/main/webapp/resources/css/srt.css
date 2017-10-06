@@ -1031,3 +1031,7 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 .fa.fa-white {
     color: #ffffff;
 }
+
+.ui-confirm-dialog-severity {
+    margin-top: 5px;
+}
