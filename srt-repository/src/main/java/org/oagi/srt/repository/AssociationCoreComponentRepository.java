@@ -71,6 +71,16 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.toAsccpId = ?1")
     public List<AssociationCoreComponent> findAllByToAsccpId(Long fromAccId);
 
+    @Query("select MAX(a.revisionNum) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2")
+    public Integer findMaxRevisionNumByFromAccIdAndToAsccpId(long fromAccId, long toAsccpId);
+
+    @Query("select MAX(a.revisionTrackingNum) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3")
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(long fromAccId, long toAsccpId, int revisionNum);
+
+    @Modifying
+    @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.revisionTrackingNum <> ?4")
+    public void deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum);
+
     @Modifying
     @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +
             "where a.fromAccId = ?1 and a.seqKey > ?2 and a.revisionNum = 0")

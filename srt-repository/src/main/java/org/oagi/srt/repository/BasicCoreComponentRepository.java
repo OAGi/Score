@@ -69,6 +69,16 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 and b.seqKey > 0 group by b.currentBccId)")
     public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccIdAndSeqKeyIsNotZero(long currentBccId);
 
+    @Query("select MAX(b.revisionNum) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2")
+    public Integer findMaxRevisionNumByFromAccIdAndToBccpId(long fromAccId, long toBccpId);
+
+    @Query("select MAX(b.revisionTrackingNum) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3")
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(long fromAccId, long toBccpId, int revisionNum);
+
+    @Modifying
+    @Query("delete from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3 and b.revisionTrackingNum <> ?4")
+    public void deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toBccpId, int revisionNum, int revisionTrackingNum);
+
     @Modifying
     @Query("update BasicCoreComponent b set b.seqKey = b.seqKey + 1 " +
             "where b.fromAccId = ?1 and b.seqKey > ?2 and b.revisionNum = 0")
