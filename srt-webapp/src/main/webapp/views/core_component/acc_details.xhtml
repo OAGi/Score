@@ -822,7 +822,6 @@
                         rendered="#{accDetailBean.targetAcc.state == 'Published' and accDetailBean.hasPreviousRevision(accDetailBean.targetAcc)}"
                         id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
                         action="#{accDetailBean.createNewRevision(accDetailBean.targetAcc)}"
-                        disabled="#{accDetailBean.dirty}"
                         update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
