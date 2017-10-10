@@ -468,7 +468,15 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
+        AssociationCoreComponent oldAscc = asccRepository.findOne(ascc.getId()).clone();
+        int oldSeqKey = oldAscc.getSeqKey();
+        AssociationCoreComponent newAscc = ascc.clone();
+
         ascc = coreComponentDAO.save(ascc);
+
+        if (isSeqKeyOnlyChange(oldAscc, newAscc)) {
+            return; // do not create history records if seq key was the only change
+        }
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -480,6 +488,7 @@ public class CoreComponentService {
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
+        asccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
 
         asccRepository.saveAndFlush(asccHistory);
 
@@ -490,6 +499,17 @@ public class CoreComponentService {
                 .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isSeqKeyOnlyChange(AssociationCoreComponent oldAscc, AssociationCoreComponent newAscc) {
+        oldAscc.setSeqKey(0);
+        newAscc.setSeqKey(0);
+
+        if (oldAscc.hashCode() == newAscc.hashCode()) { // everything else is the same, only change was seqkey
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
@@ -553,7 +573,15 @@ public class CoreComponentService {
                 break;
         }
 
+        BasicCoreComponent oldBcc = bccRepository.findOne(bcc.getId()).clone();
+        int oldSeqKey = oldBcc.getSeqKey();
+        BasicCoreComponent newBcc = bcc.clone();
+
         bcc = coreComponentDAO.save(bcc);
+
+        if (isSeqKeyOnlyChange(oldBcc, newBcc)){
+            return; // do not create history records if seq key was the only change
+        }
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -565,6 +593,7 @@ public class CoreComponentService {
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
+        bccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
 
         bccRepository.saveAndFlush(bccHistory);
 
@@ -575,6 +604,17 @@ public class CoreComponentService {
                 .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isSeqKeyOnlyChange(BasicCoreComponent oldBcc, BasicCoreComponent newBcc) {
+        oldBcc.setSeqKey(0);
+        newBcc.setSeqKey(0);
+
+        if (oldBcc.hashCode() == newBcc.hashCode()) { // everything else is the same, only change was seqkey
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
