@@ -329,7 +329,14 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
+        AggregateCoreComponent oldAcc = accRepository.findOne(acc.getId()).clone();
+        AggregateCoreComponent newAcc = acc.clone();
+
         acc = coreComponentDAO.save(acc);
+
+        if (isBasedAccIdOnlyChange(oldAcc, newAcc)) {
+            return; // do not create history records if based ACC was the only change
+        }
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
@@ -390,6 +397,17 @@ public class CoreComponentService {
                 .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isBasedAccIdOnlyChange(AggregateCoreComponent oldAcc, AggregateCoreComponent newAcc) {
+        oldAcc.setBasedAccId(null);
+        newAcc.setBasedAccId(null);
+
+        if (oldAcc.hashCode() == newAcc.hashCode()) { // everything else is the same, only change was basedAccId
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
