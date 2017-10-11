@@ -171,6 +171,7 @@ public class UndoService {
         currentRecord.setObjectClassTerm(previousRecord.getObjectClassTerm());
         currentRecord.setOagisComponentType(previousRecord.getOagisComponentType());
         currentRecord.setAbstract(previousRecord.isAbstract());
+        currentRecord.setBasedAccId((previousRecord.getBasedAccId() == 0L) ? null : previousRecord.getBasedAccId());
 
         accRepository.save(currentRecord);
         accRepository.delete(acc);
