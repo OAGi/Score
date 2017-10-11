@@ -60,7 +60,7 @@ public class UndoService {
     public void undoHistoryRecord(RevisionAware ra) {
 
         if (ra.getRevisionAction().getValue() == 1) {
-            undoInsertHistoryRecord();
+            undoInsertHistoryRecord(ra);
         } else if (ra.getRevisionAction().getValue() == 2) {
             undoUpdateHistoryRecord(ra);
         } else if (ra.getRevisionAction().getValue() == 3) {
@@ -68,102 +68,150 @@ public class UndoService {
         }
     }
 
-    private void undoInsertHistoryRecord() {
-        System.out.println();// TODO: implement for ASCCs and BCCs
-    }
-
-    private void undoUpdateHistoryRecord(RevisionAware ra) {
-        if (ra instanceof BasicCoreComponentProperty) {
-            BasicCoreComponentProperty historyRecord = (BasicCoreComponentProperty) ra;
-            BasicCoreComponentProperty previousRecord = bccpRepository.findOneByCurrentBccpIdAndRevisions(historyRecord.getCurrentBccpId(), historyRecord.getRevisionNum(), historyRecord.getRevisionTrackingNum() - 1);
-            BasicCoreComponentProperty currentRecord = (BasicCoreComponentProperty) currentCC;
-
-            currentRecord.setPropertyTerm(previousRecord.getPropertyTerm());
-            currentRecord.setRepresentationTerm(previousRecord.getRepresentationTerm());
-            currentRecord.setDeprecated(previousRecord.isDeprecated());
-            currentRecord.setState(previousRecord.getState());
-            currentRecord.setNillable(previousRecord.isNillable());
-            currentRecord.setDefaultValue(previousRecord.getDefaultValue());
-            currentRecord.setDefinition(previousRecord.getDefinition());
-
-            bccpRepository.save(currentRecord);
-            bccpRepository.delete(historyRecord);
-            bccpRepository.flush();
-        }
-
-        if (ra instanceof AssociationCoreComponentProperty) {
-            AssociationCoreComponentProperty historyRecord = (AssociationCoreComponentProperty) ra;
-            AssociationCoreComponentProperty previousRecord = asccpRepository.findOneByCurrentAsccpIdAndRevisions(historyRecord.getCurrentAsccpId(), historyRecord.getRevisionNum(), historyRecord.getRevisionTrackingNum() - 1);
-            AssociationCoreComponentProperty currentRecord = (AssociationCoreComponentProperty) currentCC;
-
-            currentRecord.setPropertyTerm(previousRecord.getPropertyTerm());
-            currentRecord.setDeprecated(previousRecord.isDeprecated());
-            currentRecord.setState(previousRecord.getState());
-            currentRecord.setNillable(previousRecord.isNillable());
-            currentRecord.setReusableIndicator(previousRecord.isReusableIndicator());
-            currentRecord.setDefinition(previousRecord.getDefinition());
-
-            asccpRepository.save(currentRecord);
-            asccpRepository.delete(historyRecord);
-            asccpRepository.flush();
-        }
-
-        if (ra instanceof AggregateCoreComponent) {
-            AggregateCoreComponent historyRecord = (AggregateCoreComponent) ra;
-            AggregateCoreComponent previousRecord = accRepository.findOneByCurrentAccIdAndRevisions(historyRecord.getCurrentAccId(), historyRecord.getRevisionNum(), historyRecord.getRevisionTrackingNum() - 1);
-            AggregateCoreComponent currentRecord = (AggregateCoreComponent) currentCC;
-
-            currentRecord.setDeprecated(previousRecord.isDeprecated());
-            currentRecord.setState(previousRecord.getState());
-            currentRecord.setDefinition(previousRecord.getDefinition());
-            currentRecord.setObjectClassTerm(previousRecord.getObjectClassTerm());
-            currentRecord.setOagisComponentType(previousRecord.getOagisComponentType());
-            currentRecord.setAbstract(previousRecord.isAbstract());
-
-            accRepository.save(currentRecord);
-            accRepository.delete(historyRecord);
-            accRepository.flush();
-        }
+    private void undoInsertHistoryRecord(RevisionAware ra) {// only for ASCCs and BCCs
 
         if (ra instanceof AssociationCoreComponent) {
-            AssociationCoreComponent historyRecord = (AssociationCoreComponent) ra;
-            AssociationCoreComponent previousRecord = asccRepository.findOneByCurrentAsccIdAndRevisions(historyRecord.getCurrentAsccId(), historyRecord.getRevisionNum(), historyRecord.getRevisionTrackingNum() - 1);
-            AssociationCoreComponent currentRecord = asccRepository.findOne(historyRecord.getCurrentAsccId());
-
-            currentRecord.setDeprecated(previousRecord.isDeprecated());
-            currentRecord.setState(previousRecord.getState());
-            currentRecord.setDefinition(previousRecord.getDefinition());
-            currentRecord.setCardinalityMax(previousRecord.getCardinalityMax());
-            currentRecord.setCardinalityMin(previousRecord.getCardinalityMin());
-
-            asccRepository.save(currentRecord);
-            asccRepository.delete(historyRecord);
-            asccRepository.flush();
+            undoInsertHistoryRecord((AssociationCoreComponent) ra);
         }
 
         if (ra instanceof BasicCoreComponent) {
-            BasicCoreComponent historyRecord = (BasicCoreComponent) ra;
-            BasicCoreComponent previousRecord = bccRepository.findOneByCurrentBccIdAndRevisions(historyRecord.getCurrentBccId(), historyRecord.getRevisionNum(), historyRecord.getRevisionTrackingNum() - 1);
-            BasicCoreComponent currentRecord = bccRepository.findOne(historyRecord.getCurrentBccId());
-
-            currentRecord.setDeprecated(previousRecord.isDeprecated());
-            currentRecord.setState(previousRecord.getState());
-            currentRecord.setDefinition(previousRecord.getDefinition());
-            currentRecord.setCardinalityMax(previousRecord.getCardinalityMax());
-            currentRecord.setCardinalityMin(previousRecord.getCardinalityMin());
-            currentRecord.setNillable(previousRecord.isNillable());
-            currentRecord.setDefaultValue(previousRecord.getDefaultValue());
-
-            bccRepository.save(currentRecord);
-            bccRepository.delete(historyRecord);
-            bccRepository.flush();
+            undoInsertHistoryRecord((BasicCoreComponent) ra);
         }
 
         currentCC = null;
     }
 
+    private void undoInsertHistoryRecord (AssociationCoreComponent ascc) {
+        long currentAsccId = ascc.getCurrentAsccId();
+        asccRepository.delete(ascc.getAsccId()); // remove history record
+
+        if (asccRepository.countByCurrentAsccId(currentAsccId) - 1 == 0) { // no other history records,
+                                                                           // i.e., current record should be removed as well
+            asccRepository.delete(currentAsccId);
+        }
+
+        asccRepository.flush();
+    }
+
+    private void undoInsertHistoryRecord (BasicCoreComponent bcc) {
+        long currentBccId = bcc.getCurrentBccId();
+        bccRepository.delete(bcc.getBccId()); // remove history record
+
+        if (bccRepository.countByCurrentBccId(currentBccId) - 1 == 0) { // no other history records,
+                                                                        // i.e., current record should be removed as well
+            bccRepository.delete(currentBccId);
+        }
+
+        bccRepository.flush();
+    }
+
+    private void undoUpdateHistoryRecord(RevisionAware ra) {
+        if (ra instanceof BasicCoreComponentProperty) {
+            undoUpdateHistoryRecord((BasicCoreComponentProperty) ra);
+        }
+
+        if (ra instanceof AssociationCoreComponentProperty) {
+            undoUpdateHistoryRecord((AssociationCoreComponentProperty) ra);
+        }
+
+        if (ra instanceof AggregateCoreComponent) {
+            undoUpdateHistoryRecord((AggregateCoreComponent) ra);
+        }
+
+        if (ra instanceof AssociationCoreComponent) {
+            undoUpdateHistoryRecord((AssociationCoreComponent) ra);
+        }
+
+        if (ra instanceof BasicCoreComponent) {
+            undoUpdateHistoryRecord((BasicCoreComponent) ra);
+        }
+
+        currentCC = null;
+    }
+
+    private void undoUpdateHistoryRecord(BasicCoreComponent bcc) {
+        BasicCoreComponent previousRecord = bccRepository.findOneByCurrentBccIdAndRevisions(bcc.getCurrentBccId(), bcc.getRevisionNum(), bcc.getRevisionTrackingNum() - 1);
+        BasicCoreComponent currentRecord = bccRepository.findOne(bcc.getCurrentBccId());
+
+        currentRecord.setDeprecated(previousRecord.isDeprecated());
+        currentRecord.setState(previousRecord.getState());
+        currentRecord.setDefinition(previousRecord.getDefinition());
+        currentRecord.setCardinalityMax(previousRecord.getCardinalityMax());
+        currentRecord.setCardinalityMin(previousRecord.getCardinalityMin());
+        currentRecord.setNillable(previousRecord.isNillable());
+        currentRecord.setDefaultValue(previousRecord.getDefaultValue());
+
+        bccRepository.save(currentRecord);
+        bccRepository.delete(bcc);
+        bccRepository.flush();
+    }
+
+    private void undoUpdateHistoryRecord(AssociationCoreComponent ascc) {
+        AssociationCoreComponent previousRecord = asccRepository.findOneByCurrentAsccIdAndRevisions(ascc.getCurrentAsccId(), ascc.getRevisionNum(), ascc.getRevisionTrackingNum() - 1);
+        AssociationCoreComponent currentRecord = asccRepository.findOne(ascc.getCurrentAsccId());
+
+        currentRecord.setDeprecated(previousRecord.isDeprecated());
+        currentRecord.setState(previousRecord.getState());
+        currentRecord.setDefinition(previousRecord.getDefinition());
+        currentRecord.setCardinalityMax(previousRecord.getCardinalityMax());
+        currentRecord.setCardinalityMin(previousRecord.getCardinalityMin());
+
+        asccRepository.save(currentRecord);
+        asccRepository.delete(ascc);
+        asccRepository.flush();
+    }
+
+    private void undoUpdateHistoryRecord(AggregateCoreComponent acc) {
+        AggregateCoreComponent previousRecord = accRepository.findOneByCurrentAccIdAndRevisions(acc.getCurrentAccId(), acc.getRevisionNum(), acc.getRevisionTrackingNum() - 1);
+        AggregateCoreComponent currentRecord = (AggregateCoreComponent) currentCC;
+
+        currentRecord.setDeprecated(previousRecord.isDeprecated());
+        currentRecord.setState(previousRecord.getState());
+        currentRecord.setDefinition(previousRecord.getDefinition());
+        currentRecord.setObjectClassTerm(previousRecord.getObjectClassTerm());
+        currentRecord.setOagisComponentType(previousRecord.getOagisComponentType());
+        currentRecord.setAbstract(previousRecord.isAbstract());
+
+        accRepository.save(currentRecord);
+        accRepository.delete(acc);
+        accRepository.flush();
+    }
+
+    private void undoUpdateHistoryRecord(AssociationCoreComponentProperty asccp) {
+        AssociationCoreComponentProperty previousRecord = asccpRepository.findOneByCurrentAsccpIdAndRevisions(asccp.getCurrentAsccpId(), asccp.getRevisionNum(), asccp.getRevisionTrackingNum() - 1);
+        AssociationCoreComponentProperty currentRecord = (AssociationCoreComponentProperty) currentCC;
+
+        currentRecord.setPropertyTerm(previousRecord.getPropertyTerm());
+        currentRecord.setDeprecated(previousRecord.isDeprecated());
+        currentRecord.setState(previousRecord.getState());
+        currentRecord.setNillable(previousRecord.isNillable());
+        currentRecord.setReusableIndicator(previousRecord.isReusableIndicator());
+        currentRecord.setDefinition(previousRecord.getDefinition());
+
+        asccpRepository.save(currentRecord);
+        asccpRepository.delete(asccp);
+        asccpRepository.flush();
+    }
+
+    private void undoUpdateHistoryRecord(BasicCoreComponentProperty bcc) {
+        BasicCoreComponentProperty previousRecord = bccpRepository.findOneByCurrentBccpIdAndRevisions(bcc.getCurrentBccpId(), bcc.getRevisionNum(), bcc.getRevisionTrackingNum() - 1);
+        BasicCoreComponentProperty currentRecord = (BasicCoreComponentProperty) currentCC;
+
+        currentRecord.setPropertyTerm(previousRecord.getPropertyTerm());
+        currentRecord.setRepresentationTerm(previousRecord.getRepresentationTerm());
+        currentRecord.setDeprecated(previousRecord.isDeprecated());
+        currentRecord.setState(previousRecord.getState());
+        currentRecord.setNillable(previousRecord.isNillable());
+        currentRecord.setDefaultValue(previousRecord.getDefaultValue());
+        currentRecord.setDefinition(previousRecord.getDefinition());
+
+        bccpRepository.save(currentRecord);
+        bccpRepository.delete(bcc);
+        bccpRepository.flush();
+    }
+
     private void undoDeleteHistoryRecord() {
-        System.out.println();// TODO: implement for ASCCs and BCCs
+        System.out.println();// TODO: implement when nad if needed
     }
 
     public boolean isPreviousRevisionNotInsert(CoreComponent cc) {

@@ -110,4 +110,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
     AssociationCoreComponent findOneByCurrentAsccIdAndRevisions(long currentAsccId, int revisionNum, int i);
+
+    @Query("select count(a) from AssociationCoreComponent a where a.currentAsccId = ?1")
+    public int countByCurrentAsccId(long currentAsccId);
 }

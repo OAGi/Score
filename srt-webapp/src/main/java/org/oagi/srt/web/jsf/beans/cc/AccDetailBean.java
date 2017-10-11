@@ -1086,6 +1086,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         copyExpandedState(this.treeNode, treeNode);
         setTreeNode(treeNode);
         setSelectedTreeNodeAfterRefresh = true;
-        selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode,((SRTNode)getSelectedTreeNode().getData()).getId()); // TODO: check if this cause problem with setting leaf node as selected after refresh
-    }}
+        if (getSelectedTreeNode() != null) {
+            selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode, ((SRTNode) getSelectedTreeNode().getData()).getId()); // TODO: check if this cause problem with setting leaf node as selected after refresh
+        }
+    }
+}
 
