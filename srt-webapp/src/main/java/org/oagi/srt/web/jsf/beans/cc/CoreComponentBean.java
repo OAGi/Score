@@ -88,6 +88,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         searchTextForDen = (String) sessionMap.get(SEARCH_TEXT_DEN_KEY);
         searchTextForDefinition = (String) sessionMap.get(SEARCH_TEXT_DEFINITION_KEY);
         searchTextForModule = (String) sessionMap.get(SEARCH_TEXT_MODULE_KEY);
+
+        setCoreComponents(findCoreComponents());
     }
 
     public void invalidate() {
@@ -123,7 +125,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         Map<String, Object> sessionMap = externalContext.getSessionMap();
         sessionMap.put(SELECTED_TYPES_KEY, selectedTypes);
 
-        reset();
+        search();
     }
 
     public String[] getSelectedStates() {
@@ -153,44 +155,48 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         Map<String, Object> sessionMap = externalContext.getSessionMap();
         sessionMap.put(SELECTED_STATES_KEY, selectedStates);
 
-        reset();
+        search();
+    }
+
+    public List<CoreComponents> findCoreComponents() {
+        String sortProperty;
+        switch (sortColumnHeaderText) {
+            case "Type":
+                sortProperty = "type";
+                break;
+            case "DEN":
+                sortProperty = "den";
+                break;
+            case "Owner":
+                sortProperty = "owner";
+                break;
+            case "State":
+                sortProperty = "state";
+                break;
+            case "Last Updated By":
+                sortProperty = "last_updated_user";
+                break;
+            case "Last Updated Timestamp":
+            default:
+                sortProperty = "last_update_timestamp";
+                break;
+        }
+
+        List<CoreComponents> coreComponents = coreComponentService.getCoreComponents(selectedTypes, selectedStates,
+                new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
+
+        return coreComponents.stream()
+                .filter(new DenSearchFilter())
+                .filter(new DefinitionSearchFilter())
+                .filter(new ModuleSearchFilter())
+                .collect(Collectors.toList());
+    }
+
+    public void setCoreComponents(List<CoreComponents> coreComponents) {
+        this.coreComponents = coreComponents;
     }
 
     public List<CoreComponents> getCoreComponents() {
-        if (coreComponents == null) {
-            String sortProperty;
-            switch (sortColumnHeaderText) {
-                case "Type":
-                    sortProperty = "type";
-                    break;
-                case "DEN":
-                    sortProperty = "den";
-                    break;
-                case "Owner":
-                    sortProperty = "owner";
-                    break;
-                case "State":
-                    sortProperty = "state";
-                    break;
-                case "Last Updated By":
-                    sortProperty = "last_updated_user";
-                    break;
-                case "Last Updated Timestamp":
-                default:
-                    sortProperty = "last_update_timestamp";
-                    break;
-            }
-
-            coreComponents = coreComponentService.getCoreComponents(selectedTypes, selectedStates,
-                    new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
-
-            coreComponents = coreComponents.stream()
-                    .filter(new DenSearchFilter())
-                    .filter(new DefinitionSearchFilter())
-                    .filter(new ModuleSearchFilter())
-                    .collect(Collectors.toList());
-        }
-
         return coreComponents;
     }
 
@@ -275,6 +281,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         } else {
             this.searchTextForDen = StringUtils.trimWhitespace(searchTextForDen);
         }
+
+        onSearchTextForDenChange();
     }
 
     public void onSearchTextForDenChange() {
@@ -293,6 +301,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         } else {
             this.searchTextForDefinition = StringUtils.trimWhitespace(searchTextForDefinition);
         }
+
+        onSearchTextForDefinitionChange();
     }
 
     public void onSearchTextForDefinitionChange() {
@@ -311,6 +321,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         } else {
             this.searchTextForModule = StringUtils.trimWhitespace(searchTextForModule);
         }
+
+        onSearchTextForModuleChange();
     }
 
     public void onSearchTextForModuleChange() {
@@ -360,7 +372,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
             throw t;
         }
 
-        reset();
+        search();
     }
 
     public void onSortEvent(SortEvent sortEvent) {
@@ -369,11 +381,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public void search() {
-        reset();
-    }
-
-    private void reset() {
-        coreComponents = null;
+        setCoreComponents(findCoreComponents());
     }
 
     @Transactional

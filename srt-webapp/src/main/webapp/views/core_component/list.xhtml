@@ -28,7 +28,7 @@
                                     <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
                                     <f:selectItem itemLabel="BCC" itemValue="BCC"/>
                                     <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
-                                    <f:ajax render="pPanel" listener="#{coreComponentBean.onTypeChange}"/>
+                                    <f:ajax render="listForm" listener="#{coreComponentBean.onTypeChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
@@ -40,7 +40,7 @@
                                     <f:selectItem itemLabel="Editing" itemValue="Editing" />
                                     <f:selectItem itemLabel="Candidate" itemValue="Candidate" />
                                     <f:selectItem itemLabel="Published" itemValue="Published" />
-                                    <f:ajax render="pPanel" listener="#{coreComponentBean.onStateChange}"/>
+                                    <f:ajax render="listForm" listener="#{coreComponentBean.onStateChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
@@ -50,9 +50,7 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="1">
-                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForDenChange}"/>
-                            </p:inputText>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="1"/>
                             <p:commandButton id="createACCBtn" value="Create ACC"
                                              action="#{coreComponentBean.createACC}" tabindex="5"
                                              style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
@@ -60,9 +58,7 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="2">
-                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForDefinitionChange}"/>
-                            </p:inputText>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="2"/>
                             <p:commandButton id="createASCCPBtn" value="Create ASCCP"
                                              action="#{coreComponentBean.createASCCP}" tabindex="6"
                                              style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
@@ -70,12 +66,11 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="3">
-                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForModuleChange}"/>
-                            </p:inputText>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="3"/>
+
                             <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                             actionListener="#{coreComponentBean.search}"
-                                             update="pPanel" tabindex="4" icon="fa fa-white fa-search"/>
+                                             action="#{coreComponentBean.search}"
+                                             update="tbl" tabindex="4" icon="fa fa-white fa-search"/>
 
                             <p:commandButton id="createBCCPBtn" value="Create BCCP"
                                              action="#{coreComponentBean.createBCCP}" tabindex="7"
