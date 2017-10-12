@@ -1031,3 +1031,9 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 .fa.fa-white {
     color: #ffffff;
 }
+
+.ui-growl-item-container.ui-growl-error {
+    background: #f2dede !important;
+    border-color: #ebcccc !important;
+    color: #a94442 !important;
+}

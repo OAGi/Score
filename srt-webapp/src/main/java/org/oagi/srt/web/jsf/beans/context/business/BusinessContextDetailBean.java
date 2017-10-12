@@ -251,6 +251,12 @@ public class BusinessContextDetailBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String update() {
         String name = businessContext.getName();
+        if (StringUtils.isEmpty(name)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Please fill out 'Name' field."));
+            return null;
+        }
+
         if (!businessContextService.findByName(name).stream()
                 .filter(e -> e.getBizCtxId() != businessContext.getBizCtxId())
                 .collect(Collectors.toList()).isEmpty()) {

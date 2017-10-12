@@ -17,9 +17,8 @@
             </div>
         </div>
         <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
+            <p:growl id="growl" showDetail="true" sticky="true" life="3000"/>
+
             <p:panel>
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="GUID" styleClass="section-label"
@@ -30,11 +29,8 @@
 
                     <h:outputText value="Name" styleClass="section-label"/>
                     <h:inputText id="name" value="#{businessContextDetailBean.businessContext.name}"
-                                 required="true"
-                                 requiredMessage="Please fill out 'Name' field."
-                                 maxlength="255"
                                  label="Name" styleClass="section-content input-section">
-                        <f:validateLength maximum="255"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
                 </h:panelGrid>
             </p:panel>
@@ -143,15 +139,15 @@
 
                 <p:separator/>
 
-                <p:commandButton id="createBtn" ajax="true" value="Create"
+                <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.guid == null}"
                                  action="#{businessContextDetailBean.update()}"/>
 
-                <p:commandButton id="updateBtn" ajax="true" value="Update"
+                <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.guid != null}"
                                  action="#{businessContextDetailBean.update()}"/>
 
-                <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                <p:commandButton id="discardBtn" ajax="true" value="Discard" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
                                  styleClass="danger"
                                  onclick="PF('confirmDiscard').show()"/>
