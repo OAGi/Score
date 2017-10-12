@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.*;
@@ -665,11 +666,18 @@ public class ProfileBODGenerateService {
         }
     }
 
-    public String getCodeListTypeName(CodeList gCL) { //confirm
-        //String CodeListTypeName ="xsd:string";
-        String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType";
-        CodeListTypeName = CodeListTypeName.replaceAll(" ", "").replaceAll("oacl_", "");
-        return CodeListTypeName;
+    public String getCodeListTypeName(CodeList codeList) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(codeList.getAgencyId()).append('_');
+        sb.append(codeList.getVersionId()).append('_');
+        String name = codeList.getName();
+        if (!StringUtils.isEmpty(name)) {
+            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+        }
+        sb.append(codeList.getListId());
+
+        return sb.toString();
     }
 
     public String setCodeListRestrictionAttr(GenerationContext generationContext, DataType gBDT) {
@@ -763,8 +771,8 @@ public class ProfileBODGenerateService {
         String representationTerm = dtSc.getRepresentationTerm();
         String propertyTerm = dtSc.getPropertyTerm();
         if ("Text".equals(representationTerm) ||
-            "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm) ||
-            propertyTerm.contains(representationTerm)) {
+                "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm) ||
+                propertyTerm.contains(representationTerm)) {
             aNode.setAttribute("name", Utility.toLowerCamelCase(propertyTerm));
         } else if ("Identifier".equals(representationTerm)) {
             aNode.setAttribute("name", Utility.toLowerCamelCase(propertyTerm).concat("ID"));
@@ -816,7 +824,7 @@ public class ProfileBODGenerateService {
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
                 generationContext.findBdtScPriRestri(gBBIESC.getDtScPriRestriId());
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
-                        generationContext.findCdtScAwdPriXpsTypeMap(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
+                generationContext.findCdtScAwdPriXpsTypeMap(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType = generationContext.findXSDBuiltInType(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
@@ -876,10 +884,13 @@ public class ProfileBODGenerateService {
                     else
                         aNode = setBBIESCType2(generationContext, aBBIESC, aNode);
                 } else { //aAL = null?
-                    if (!generationContext.isAgencyListGenerated(aAL))  //isAgencyListGenerated(aAL)?
+                    if (!generationContext.isAgencyListGenerated(aAL)) { //isAgencyListGenerated(aAL)?
                         generateAgencyList(aAL, aBBIESC, gSchemaNode, generationContext);
-                    if (getAgencyListTypeName(aAL) != null) {
-                        aNode.setAttribute("type", getAgencyListTypeName(aAL));
+                    }
+
+                    String agencyListTypeName = getAgencyListTypeName(aAL, generationContext);
+                    if (!StringUtils.isEmpty(agencyListTypeName)) {
+                        aNode.setAttribute("type", agencyListTypeName);
                     }
                 }
             } else { //aCL = null?
@@ -899,15 +910,27 @@ public class ProfileBODGenerateService {
         return tNode;
     }
 
-    public String getAgencyListTypeName(AgencyIdList gAL) {
-        return gAL.getName() + "ContentType";
+    public String getAgencyListTypeName(AgencyIdList agencyIdList, GenerationContext generationContext) {
+        AgencyIdListValue agencyIdListValue =
+                generationContext.findAgencyIdListValue(agencyIdList.getAgencyIdListValueId());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(agencyIdListValue.getValue());
+        sb.append(agencyIdList.getVersionId()).append('_');
+        String name = agencyIdList.getName();
+        if (!StringUtils.isEmpty(name)) {
+            sb.append(Utility.toCamelCase(name)).append("ContentType").append('_');
+        }
+        sb.append(agencyIdList.getListId());
+
+        return sb.toString();
     }
 
     public Element generateAgencyList(AgencyIdList gAL, BasicBusinessInformationEntitySupplementaryComponent gSC,
                                       Element gSchemaNode, GenerationContext generationContext) {
         Element stNode = newElement("simpleType");
 
-        stNode.setAttribute("name", getAgencyListTypeName(gAL));
+        stNode.setAttribute("name", getAgencyListTypeName(gAL, generationContext));
         stNode.setAttribute("id", gAL.getGuid());
 
         Element rtNode = newElement("restriction");
@@ -1048,6 +1071,8 @@ public class ProfileBODGenerateService {
                     .collect(Collectors.toMap(e -> e.getAgencyIdListId(), Function.identity()));
 
             List<AgencyIdListValue> agencyIdListValues = agencyIdListValueRepository.findAll();
+            findAgencyIdListValueMap = agencyIdListValues.stream()
+                    .collect(Collectors.toMap(e -> e.getAgencyIdListValueId(), Function.identity()));
             findAgencyIdListValueByOwnerListIdMap = agencyIdListValues.stream()
                     .collect(Collectors.groupingBy(e -> e.getOwnerListId()));
 
@@ -1186,7 +1211,12 @@ public class ProfileBODGenerateService {
             return findAgencyIdListMap.get(agencyIdListId);
         }
 
+        private Map<Long, AgencyIdListValue> findAgencyIdListValueMap;
         private Map<Long, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
+
+        public AgencyIdListValue findAgencyIdListValue(long agencyIdListValueId) {
+            return findAgencyIdListValueMap.get(agencyIdListValueId);
+        }
 
         public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(long ownerListId) {
             return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ?
