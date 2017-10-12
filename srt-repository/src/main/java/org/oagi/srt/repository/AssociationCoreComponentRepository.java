@@ -78,6 +78,10 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(long fromAccId, long toAsccpId, int revisionNum);
 
     @Modifying
+    @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3")
+    public void deleteByFromAccIdAndToAsccpIdAndRevisionNum(long fromAccId, long toAsccpId, int revisionNum);
+
+    @Modifying
     @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.revisionTrackingNum <> ?4")
     public void deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum);
 
@@ -109,7 +113,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public List<AssociationCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
-    AssociationCoreComponent findOneByCurrentAsccIdAndRevisions(long currentAsccId, int revisionNum, int i);
+    AssociationCoreComponent findOneByCurrentAsccIdAndRevisions(long currentAsccId, int revisionNum, int revisionTrackingNum);
 
     @Query("select count(a) from AssociationCoreComponent a where a.currentAsccId = ?1")
     public int countByCurrentAsccId(long currentAsccId);

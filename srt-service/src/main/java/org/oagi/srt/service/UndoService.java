@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
 
 @Service
 @Transactional(readOnly = true)
@@ -81,24 +83,24 @@ public class UndoService {
         currentCC = null;
     }
 
-    private void undoInsertHistoryRecord (AssociationCoreComponent ascc) {
+    private void undoInsertHistoryRecord(AssociationCoreComponent ascc) {
         long currentAsccId = ascc.getCurrentAsccId();
         asccRepository.delete(ascc.getAsccId()); // remove history record
 
         if (asccRepository.countByCurrentAsccId(currentAsccId) - 1 == 0) { // no other history records,
-                                                                           // i.e., current record should be removed as well
+            // i.e., current record should be removed as well
             asccRepository.delete(currentAsccId);
         }
 
         asccRepository.flush();
     }
 
-    private void undoInsertHistoryRecord (BasicCoreComponent bcc) {
+    private void undoInsertHistoryRecord(BasicCoreComponent bcc) {
         long currentBccId = bcc.getCurrentBccId();
         bccRepository.delete(bcc.getBccId()); // remove history record
 
         if (bccRepository.countByCurrentBccId(currentBccId) - 1 == 0) { // no other history records,
-                                                                        // i.e., current record should be removed as well
+            // i.e., current record should be removed as well
             bccRepository.delete(currentBccId);
         }
 
@@ -262,5 +264,236 @@ public class UndoService {
         List<RevisionAware> sortedRas = ras.stream().sorted(Comparator.comparing(RevisionAware::getCreationTimestamp).reversed()).collect(Collectors.toList());
 
         return sortedRas;
+    }
+
+    private List<RevisionAware> findACCWithLatestRevisionNumWithAssociatedComponents(AggregateCoreComponent acc) {
+        List<AggregateCoreComponent> accs = accRepository.findAllWithLatestRevisionNumByCurrentAccId(acc.getAccId());
+        List<BasicCoreComponent> bccs = bccRepository.findAllWithLatestRevisionNumByFromAccId(acc.getAccId());
+        List<AssociationCoreComponent> asccs = asccRepository.findAllWithLatestRevisionNumByFromAccId(acc.getAccId());
+
+        List<RevisionAware> ras = new ArrayList<>();
+        ras.addAll(accs);
+        ras.addAll(bccs);
+        ras.addAll(asccs);
+
+        List<RevisionAware> sortedRas = ras.stream().sorted(Comparator.comparing(RevisionAware::getCreationTimestamp).reversed()).collect(Collectors.toList());
+
+        return sortedRas;
+    }
+
+    public boolean hasMultipleRevisions(AggregateCoreComponent acc) {
+
+        int revisionCount = accRepository.findMaxRevisionNumByCurrentAccId(acc.getAccId());
+
+        if (revisionCount > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMultipleRevisions(AssociationCoreComponent ascc) {
+
+        int revisionCount = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+
+        if (revisionCount > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMultipleRevisions(BasicCoreComponent bcc) {
+
+        int revisionCount = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+
+        if (revisionCount > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMultipleRevisions(AssociationCoreComponentProperty asccp) {
+
+        int revisionCount = asccpRepository.findMaxRevisionNumByCurrentAsccpId(asccp.getAsccpId());
+
+        if (revisionCount > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMultipleRevisions(BasicCoreComponentProperty bccp) {
+
+        int revisionCount = bccpRepository.findMaxRevisionNumByCurrentBccpId(bccp.getBccpId());
+
+        if (revisionCount > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMultipleRevisions(CoreComponents coreComponents) {
+
+        switch (coreComponents.getType()) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                return hasMultipleRevisions(acc);
+
+            case "ASCCP":
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                return hasMultipleRevisions(asccp);
+
+            case "BCCP":
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                return hasMultipleRevisions(bccp);
+
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    public void revertToPreviousRevision(AssociationCoreComponentProperty asccp) {
+        if (asccp.getState() != Published) {
+
+            // remove latest revision
+            int maxRevisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(asccp.getAsccpId());
+            asccpRepository.deleteByCurrentAsccpIdAndRevisionNum(asccp.getAsccpId(), maxRevisionNum);
+
+            // revert to the new latest
+            int maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(asccp.getAsccpId(), maxRevisionNum - 1);
+            AssociationCoreComponentProperty historyRecord = asccpRepository.findOneByCurrentAsccpIdAndRevisions(asccp.getAsccpId(), maxRevisionNum - 1, maxRevisionTrackingNum);
+
+            asccp.setPropertyTerm(historyRecord.getPropertyTerm());
+            asccp.setDeprecated(historyRecord.isDeprecated());
+            asccp.setState(Published);
+            asccp.setNillable(historyRecord.isNillable());
+            asccp.setReusableIndicator(historyRecord.isReusableIndicator());
+            asccp.setDefinition(historyRecord.getDefinition());
+
+            asccpRepository.save(asccp);
+            asccpRepository.flush();
+        }
+    }
+
+
+    public void revertToPreviousRevision(BasicCoreComponentProperty bccp) {
+        if (bccp.getState() != Published) {
+
+            // remove latest revision
+            int maxRevisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(bccp.getBccpId());
+            bccpRepository.deleteByCurrentBccpIdAndRevisionNum(bccp.getBccpId(), maxRevisionNum);
+
+            // revert to the new latest revision
+            int maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(bccp.getBccpId(), maxRevisionNum - 1);
+            BasicCoreComponentProperty historyRecord = bccpRepository.findOneByCurrentBccpIdAndRevisions(bccp.getBccpId(), maxRevisionNum - 1, maxRevisionTrackingNum);
+
+            bccp.setPropertyTerm(historyRecord.getPropertyTerm());
+            bccp.setRepresentationTerm(historyRecord.getRepresentationTerm());
+            bccp.setDeprecated(historyRecord.isDeprecated());
+            bccp.setState(Published);
+            bccp.setNillable(historyRecord.isNillable());
+            bccp.setDefaultValue(historyRecord.getDefaultValue());
+            bccp.setDefinition(historyRecord.getDefinition());
+
+            bccpRepository.save(bccp);
+            bccpRepository.flush();
+        }
+    }
+
+    public void revertToPreviousRevision(AssociationCoreComponent ascc) {
+        if (ascc.getState() != Published) {
+
+            // remove latest revision
+            int maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+            asccRepository.deleteByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
+
+            // revert to the new latest revision
+            int maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum - 1);
+            AssociationCoreComponent historyRecord = asccRepository.findOneByCurrentAsccIdAndRevisions(ascc.getAsccId(), maxRevisionNum - 1, maxRevisionTrackingNum);
+
+            if (historyRecord == null) { // revision was insert and only one; remove current record then
+                asccRepository.delete(ascc.getId());
+                asccRepository.flush();
+            } else {
+                ascc.setDeprecated(historyRecord.isDeprecated());
+                ascc.setState(Published);
+                ascc.setDefinition(historyRecord.getDefinition());
+                ascc.setCardinalityMax(historyRecord.getCardinalityMax());
+                ascc.setCardinalityMin(historyRecord.getCardinalityMin());
+
+                asccRepository.save(ascc);
+                asccRepository.flush();
+            }
+        }
+    }
+
+    public void revertToPreviousRevision(BasicCoreComponent bcc) {
+
+        if (bcc.getState() != Published) {
+
+            // remove latest revision
+            int maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+            bccRepository.deleteByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
+
+            // revert to the new latest revision
+            int maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum - 1);
+            BasicCoreComponent historyRecord = bccRepository.findOneByCurrentBccIdAndRevisions(bcc.getBccId(), maxRevisionNum - 1, maxRevisionTrackingNum);
+
+            if (historyRecord == null) { // revision was insert and only one; remove current record then
+                bccRepository.delete(bcc.getId());
+                bccRepository.flush();
+            } else {
+                bcc.setDeprecated(historyRecord.isDeprecated());
+                bcc.setState(Published);
+                bcc.setDefinition(historyRecord.getDefinition());
+                bcc.setCardinalityMax(historyRecord.getCardinalityMax());
+                bcc.setCardinalityMin(historyRecord.getCardinalityMin());
+                bcc.setNillable(historyRecord.isNillable());
+                bcc.setDefaultValue(historyRecord.getDefaultValue());
+
+                bccRepository.save(bcc);
+                bccRepository.flush();
+            }
+        }
+    }
+
+    public void revertToPreviousRevision(AggregateCoreComponent acc) {
+
+        if (acc.getState() != Published) {
+            // find and revert ASCCs
+            List<AssociationCoreComponent> asccs = asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
+            for (AssociationCoreComponent ascc : asccs) {
+                revertToPreviousRevision(ascc);
+            }
+
+            // find and revert BCCs
+            List<BasicCoreComponent> bccs = bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
+            for (BasicCoreComponent bcc : bccs) {
+                revertToPreviousRevision(bcc);
+            }
+
+            // remove latest ACC revision
+            int maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccId(acc.getAccId());
+            accRepository.deleteByCurrentAccIdAndRevisionNum(acc.getAccId(), maxRevisionNum);
+
+            // revert to the new latest
+            int maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(acc.getAccId(), maxRevisionNum - 1);
+            AggregateCoreComponent historyRecord = accRepository.findOneByCurrentAccIdAndRevisions(acc.getAccId(), maxRevisionNum - 1, maxRevisionTrackingNum);
+
+            acc.setDeprecated(historyRecord.isDeprecated());
+            acc.setState(Published);
+            acc.setDefinition(historyRecord.getDefinition());
+            acc.setObjectClassTerm(historyRecord.getObjectClassTerm());
+            acc.setOagisComponentType(historyRecord.getOagisComponentType());
+            acc.setAbstract(historyRecord.isAbstract());
+            acc.setBasedAccId((historyRecord.getBasedAccId() == 0L) ? null : historyRecord.getBasedAccId());
+
+            accRepository.save(acc);
+            accRepository.flush();
+        }
     }
 }

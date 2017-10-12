@@ -56,13 +56,13 @@
                                             </p:commandButton>
                                         </f:facet>
                                         <h:outputText value="#{node.getAttribute('name')}"/>
-                                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                                        <p:commandButton id="deleteBtn" icon="#{accDetailBean.getDiscardIcon(node)}" styleClass="delete"
                                                          style="float: right; border-radius: 50%;"
                                                          rendered="#{accDetailBean.canBeDiscard(node)}"
                                                          action="#{accDetailBean.discard(node)}"
-                                                         update=":form">
+                                                         update=" :form:treeTable, :form:details, :form:btnGroup">
                                             <p:confirm header="Confirmation"
-                                                       message="Deleting association cannot be undone. Proceed?"
+                                                       message="#{accDetailBean.hasMultipleRevisions(node) ? 'Reverting association to its previous revision cannot be undone. Proceed?' : 'Deleting association cannot be undone. Proceed?'}"
                                                        icon="fa fa-exclamation-triangle"/>
                                         </p:commandButton>
                                     </p:column>

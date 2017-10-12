@@ -25,6 +25,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.persistence.Basic;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -906,7 +907,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
 
         try {
-            coreComponentService.discard(ascc, requester);
+            if (hasMultipleRevisions(asccpNode)) {
+                undoService.revertToPreviousRevision(ascc);
+                refreshTreeNode();
+            } else {
+                coreComponentService.discard(ascc, requester);
+            }
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -967,7 +973,11 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
 
         try {
-            coreComponentService.discard(bcc, requester);
+            if (hasMultipleRevisions(bccpNode)) {
+                undoService.revertToPreviousRevision(bcc);
+            } else {
+                coreComponentService.discard(bcc, requester);
+            }
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -1088,6 +1098,38 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         setSelectedTreeNodeAfterRefresh = true;
         if (getSelectedTreeNode() != null) {
             selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode, ((SRTNode) getSelectedTreeNode().getData()).getId()); // TODO: check if this cause problem with setting leaf node as selected after refresh
+        }
+    }
+
+    public String getDiscardIcon(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            AssociationCoreComponent ascc = ((ASCCPNode) node).getAscc();
+            if (undoService.hasMultipleRevisions(ascc)) {
+                return "fa fa-white fa-undo";
+            } else {
+                return "fa fa-white fa-times";
+            }
+        } else if (node instanceof BCCPNode) {
+            BasicCoreComponent bcc = ((BCCPNode) node).getBcc();
+            if (undoService.hasMultipleRevisions(bcc)) {
+                return "fa fa-white fa-undo";
+            } else {
+                return "fa fa-white fa-times";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public boolean hasMultipleRevisions(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            AssociationCoreComponent ascc = ((ASCCPNode) node).getAscc();
+            return undoService.hasMultipleRevisions(ascc);
+        } else if (node instanceof BCCPNode) {
+            BasicCoreComponent bcc = ((BCCPNode) node).getBcc();
+            return undoService.hasMultipleRevisions(bcc);
+        } else {
+            return false;
         }
     }
 }

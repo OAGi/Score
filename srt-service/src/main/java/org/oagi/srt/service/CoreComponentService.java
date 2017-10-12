@@ -22,6 +22,9 @@ import static org.oagi.srt.repository.entity.RevisionAction.Update;
 public class CoreComponentService {
 
     @Autowired
+    private UndoService undoService;
+
+    @Autowired
     private AggregateCoreComponentRepository accRepository;
 
     @Autowired
@@ -597,7 +600,7 @@ public class CoreComponentService {
 
         bcc = coreComponentDAO.save(bcc);
 
-        if (isSeqKeyOnlyChange(oldBcc, newBcc)){
+        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {
             return; // do not create history records if seq key was the only change
         }
 
@@ -787,20 +790,32 @@ public class CoreComponentService {
 
     @Transactional(rollbackFor = Throwable.class)
     public void discard(CoreComponents coreComponents, User requester) {
-        switch(coreComponents.getType()) {
+        switch (coreComponents.getType()) {
             case "ACC":
                 AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
-                discard(acc, requester);
+                if (undoService.hasMultipleRevisions(acc)) {
+                    undoService.revertToPreviousRevision(acc);
+                } else {
+                    discard(acc, requester);
+                }
                 break;
 
             case "ASCCP":
                 AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
-                discard(asccp, requester);
+                if (undoService.hasMultipleRevisions(asccp)) {
+                    undoService.revertToPreviousRevision(asccp);
+                } else {
+                    discard(asccp, requester);
+                }
                 break;
 
             case "BCCP":
                 BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
-                discard(bccp, requester);
+                if (undoService.hasMultipleRevisions(bccp)) {
+                    undoService.revertToPreviousRevision(bccp);
+                } else {
+                    discard(bccp, requester);
+                }
                 break;
 
             default:
@@ -868,7 +883,7 @@ public class CoreComponentService {
         bccRepository.save(bccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
 
-        if(state == Published) {
+        if (state == Published) {
             for (AssociationCoreComponent ascc : asccList) {
                 deleteAsccHistoryRecords(fromAccId, ascc.getToAsccpId());
             }
@@ -912,7 +927,7 @@ public class CoreComponentService {
             asccpRepository.save(asccp);
         }
 
-        if (state == Published){
+        if (state == Published) {
             deleteAsccpHistoryRecords(asccp.getAsccpId());
         }
     }
@@ -1089,5 +1104,9 @@ public class CoreComponentService {
 
         acc.setOwnerUserId(newOwnerId);
         accRepository.save(acc);
+    }
+
+    public boolean hasMultipleRevisions(CoreComponents coreComponents) {
+        return undoService.hasMultipleRevisions(coreComponents);
     }
 }

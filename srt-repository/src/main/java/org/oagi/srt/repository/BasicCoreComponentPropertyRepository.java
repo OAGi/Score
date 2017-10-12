@@ -49,6 +49,10 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
 
     @Modifying
+    @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
+    public void deleteByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
+
+    @Modifying
     @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum <> ?3")
     public void deleteByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentBccpId, int revisionNum, int revisionTrackingNum);
 

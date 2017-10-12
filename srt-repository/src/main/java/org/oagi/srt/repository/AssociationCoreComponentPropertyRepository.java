@@ -74,6 +74,10 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     public Integer findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(long currentAsccpId, int revisionNum);
 
     @Modifying
+    @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = ?2")
+    public void deleteByCurrentAsccpIdAndRevisionNum(long currentAsccpId, int revisionNum);
+
+    @Modifying
     @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum <> ?3")
     public void deleteByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentAsccpId, int revisionNum, int revisionTrackingNum);
 

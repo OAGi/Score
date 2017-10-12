@@ -37,9 +37,9 @@
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
                                 <h:selectManyCheckbox id="state" styleClass="option-radio-grid"
                                                       value="#{coreComponentBean.selectedStates}">
-                                    <f:selectItem itemLabel="Editing" itemValue="Editing" />
-                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate" />
-                                    <f:selectItem itemLabel="Published" itemValue="Published" />
+                                    <f:selectItem itemLabel="Editing" itemValue="Editing"/>
+                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate"/>
+                                    <f:selectItem itemLabel="Published" itemValue="Published"/>
                                     <f:ajax render="pPanel" listener="#{coreComponentBean.onStateChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
@@ -59,9 +59,11 @@
                         </div>
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
-                            <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
+                            <p:inputText id="searchTextForDefinition"
+                                         value="#{coreComponentBean.searchTextForDefinition}"
                                          style="min-width: 440px; margin-right: 20px;" tabindex="2">
-                                <f:ajax render="pPanel" listener="#{coreComponentBean.onSearchTextForDefinitionChange}"/>
+                                <f:ajax render="pPanel"
+                                        listener="#{coreComponentBean.onSearchTextForDefinitionChange}"/>
                             </p:inputText>
                             <p:commandButton id="createASCCPBtn" value="Create ASCCP"
                                              action="#{coreComponentBean.createASCCP}" tabindex="6"
@@ -141,7 +143,8 @@
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
+                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                              headerText="Last Updated By"
                               sortBy="#{cc.lastUpdatedUser}">
                         <h:outputText value="#{cc.lastUpdatedUser}"/>
                     </p:column>
@@ -154,11 +157,12 @@
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
-                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                        <p:commandButton id="deleteBtn" icon="#{coreComponentBean.getDiscardIcon(cc)}"
+                                         styleClass="delete"
                                          rendered="#{coreComponentBean.canBeDiscarded(cc)}"
                                          action="#{coreComponentBean.discard(cc)}" update="tbl" ajax="true">
                             <p:confirm header="Confirmation"
-                                       message="This action cannot be undone. Proceed?"
+                                       message="#{coreComponentBean.hasMultipleRevisions(cc) ?'Reverting component to its previous revision cannot be undone. Proceed?' : 'Deleting component cannot be undone. Proceed?'}"
                                        icon="fa fa-exclamation-triangle"/>
                         </p:commandButton>
                     </p:column>

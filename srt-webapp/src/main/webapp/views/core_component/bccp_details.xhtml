@@ -533,7 +533,6 @@
                         rendered="#{bccpDetailBean.targetBccp.state == 'Published' and bccpDetailBean.hasPreviousRevision(bccpDetailBean.targetBccp)}"
                         id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
                         action="#{bccpDetailBean.createNewRevision(bccpDetailBean.targetBccp)}"
-                        disabled="#{bccpDetailBean.targetBccp.dirty}"
                         update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
