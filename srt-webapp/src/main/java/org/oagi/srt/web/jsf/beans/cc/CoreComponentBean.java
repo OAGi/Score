@@ -407,4 +407,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         return coreComponentService.hasMultipleRevisions(coreComponents);
     }
 
+    public String getFullRevisionNum (CoreComponents cc) {
+        return coreComponentService.getFullRevisionNum(cc);
+    }
+
 }

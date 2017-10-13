@@ -1177,4 +1177,43 @@ public class CoreComponentService {
     public boolean hasMultipleRevisions(CoreComponents coreComponents) {
         return undoService.hasMultipleRevisions(coreComponents);
     }
+
+    public String getFullRevisionNum(CoreComponents cc) {
+        StringBuilder sb = new StringBuilder("");
+        int maxRevisionNum = 0;
+        int maxRevisionTrackingNum = 0;
+
+        switch (cc.getType()) {
+            case "ACC":
+                maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccId(cc.getId());
+                maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+            case "ASCC":
+                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
+                break;
+            case "ASCCP":
+                maxRevisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(cc.getId());
+                maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+            case "BCC":
+                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
+                break;
+            case "BCCP":
+                maxRevisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(cc.getId());
+                maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+        }
+
+        if (maxRevisionNum > 0) {
+            sb.append(maxRevisionNum);
+            sb.append(".");
+            sb.append(maxRevisionTrackingNum);
+        }
+
+        return sb.toString();
+    }
 }

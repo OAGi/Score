@@ -42,10 +42,10 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum = ?3")
     public BasicCoreComponentProperty findOneByCurrentBccpIdAndRevisions(long currentBccpId, int revisionNum, int revisionTrackingNum);
 
-    @Query("select MAX(b.revisionNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1")
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1")
     public Integer findMaxRevisionNumByCurrentBccpId(long currentBccpId);
 
-    @Query("select MAX(b.revisionTrackingNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
     public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
 
     @Modifying

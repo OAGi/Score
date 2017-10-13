@@ -69,10 +69,10 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
             "select MAX(b.revisionNum) from BasicCoreComponent b where b.currentBccId = ?1 and b.seqKey > 0 group by b.currentBccId)")
     public List<BasicCoreComponent> findAllWithLatestRevisionNumByCurrentBccIdAndSeqKeyIsNotZero(long currentBccId);
 
-    @Query("select MAX(b.revisionNum) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2")
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2")
     public Integer findMaxRevisionNumByFromAccIdAndToBccpId(long fromAccId, long toBccpId);
 
-    @Query("select MAX(b.revisionTrackingNum) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3")
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3")
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(long fromAccId, long toBccpId, int revisionNum);
 
     @Modifying

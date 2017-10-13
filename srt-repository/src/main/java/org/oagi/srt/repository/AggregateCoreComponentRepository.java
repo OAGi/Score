@@ -39,10 +39,10 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select a.basedAccId from AggregateCoreComponent a where a.accId = ?1")
     public Long findBasedAccIdByAccId(long accId);
 
-    @Query("select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1")
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1")
     public Integer findMaxRevisionNumByCurrentAccId(long currentAccId);
 
-    @Query("select MAX(a.revisionTrackingNum) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
     public Integer findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(long currentAccId, int revisionNum);
 
     @Modifying
