@@ -320,6 +320,74 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponent newAssociationCoreComponentRevision(User user, AssociationCoreComponent ascc) {
+        long requesterId = user.getAppUserId();
+        if (ascc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        ascc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        ascc.addPersistEventListener(eventListener);
+
+        ascc = asccRepository.saveAndFlush(ascc);
+
+        AssociationCoreComponent asccHistory = ascc.clone();
+        Long currentAsccId = ascc.getAsccId();
+        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        if (latestHistoryAsccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        asccHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        asccHistory.setRevisionTrackingNum(revisionTrackingNum);
+        asccHistory.setRevisionAction(Insert);
+        asccHistory.setCurrentAsccId(ascc.getAsccId());
+
+        asccRepository.save(asccHistory);
+
+        return ascc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponent newBasicCoreComponentRevision(User user, BasicCoreComponent bcc) {
+        long requesterId = user.getAppUserId();
+        if (bcc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        bcc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        bcc.addPersistEventListener(eventListener);
+
+        bcc = bccRepository.saveAndFlush(bcc);
+
+        BasicCoreComponent bccHistory = bcc.clone();
+        Long currentBccId = bcc.getBccId();
+        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        if (latestHistoryBccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryBccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        bccHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        bccHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccHistory.setRevisionAction(Insert);
+        bccHistory.setCurrentBccId(bcc.getBccId());
+
+        bccRepository.save(bccHistory);
+
+        return bcc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void update(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
         long ownerId = acc.getOwnerUserId();

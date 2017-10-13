@@ -626,6 +626,11 @@ span.ui-button-text {
     background-color: #900 !important;
 }
 
+.ui-button.revise {
+    background-image: none !important;
+    background-color: #03645b !important;
+}
+
 .ui-inputfield {
     /*min-width: 440px;*/
     border: 0 !important;

@@ -61,9 +61,17 @@
                                                          rendered="#{accDetailBean.canBeDiscard(node)}"
                                                          action="#{accDetailBean.discard(node)}"
                                                          update=" :form:treeTable, :form:details, :form:btnGroup">
+                                            <p:tooltip id="tooltipDelete" for="deleteBtn" value="#{accDetailBean.hasMultipleRevisions(node) ? 'Revert to previous revision' : 'Delete'}" position="right"/>
                                             <p:confirm header="Confirmation"
                                                        message="#{accDetailBean.hasMultipleRevisions(node) ? 'Reverting association to its previous revision cannot be undone. Proceed?' : 'Deleting association cannot be undone. Proceed?'}"
                                                        icon="fa fa-exclamation-triangle"/>
+                                        </p:commandButton>
+                                        <p:commandButton id="reviseBtn" icon="fa fa-white fa-unlock" styleClass="revise"
+                                                         style="float: right; border-radius: 50%;"
+                                                         rendered="#{accDetailBean.canBeRevised(node)}"
+                                                         action="#{accDetailBean.revise(node)}"
+                                                         update=" :form:treeTable, :form:details, :form:btnGroup">
+                                            <p:tooltip id="tooltipRevise" for="reviseBtn" value="Revise" position="right"/>
                                         </p:commandButton>
                                     </p:column>
                                 </p:treeTable>

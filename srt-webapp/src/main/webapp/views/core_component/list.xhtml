@@ -164,6 +164,7 @@
                             <p:confirm header="Confirmation"
                                        message="#{coreComponentBean.hasMultipleRevisions(cc) ?'Reverting component to its previous revision cannot be undone. Proceed?' : 'Deleting component cannot be undone. Proceed?'}"
                                        icon="fa fa-exclamation-triangle"/>
+                            <p:tooltip id="tooltipDelete" for="deleteBtn" value="#{coreComponentBean.hasMultipleRevisions(cc) ? 'Revert to previous revision' : 'Delete'}" position="right"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>

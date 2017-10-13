@@ -975,6 +975,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         try {
             if (hasMultipleRevisions(bccpNode)) {
                 undoService.revertToPreviousRevision(bcc);
+                refreshTreeNode();
             } else {
                 coreComponentService.discard(bcc, requester);
             }
@@ -1030,6 +1031,43 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             discardBcc(bccpNode);
             selectedTreeNode = null;
         }
+    }
+
+    public boolean canBeRevised(CCNode node) {
+        if (targetAcc.getState() == Published) {
+            return false;
+        }
+
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (Published == ascc.getState()) {
+                return true;
+            }
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (Published == bcc.getState()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void revise(CCNode node) {
+        User requester = getCurrentUser();
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            coreComponentService.newAssociationCoreComponentRevision(requester, ascc);
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            coreComponentService.newBasicCoreComponentRevision(requester, bcc);
+        }
+        refreshTreeNode();
     }
 
     @Transactional(rollbackFor = Throwable.class)
