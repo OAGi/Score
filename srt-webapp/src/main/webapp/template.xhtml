@@ -105,10 +105,15 @@
                                         <li><h:link outcome="/views/namespace/list.jsf">Namespace</h:link>
                                         </li>
                                         </h:panelGroup>
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
+                                        <h:panelGroup>
                                         <li>
                                             <a href="/core_component">Core Component</a>
                                         </li>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                            <li>
+                                                <a href="/release">Release Management</a>
+                                            </li>
                                         </h:panelGroup>
                                     </ul>
                                 </li>
