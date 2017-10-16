@@ -86,6 +86,12 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/core_component/select_bdt.jsf"))
                 .addRule(Join.path("/core_component/bccp/{bccp_id}")
                         .to("/views/core_component/bccp_details.jsf?bccpId={bccp_id}"))
+                .addRule(Join.path("/release")
+                        .to("/views/core_component/release/list.jsf"))
+                .addRule(Join.path("/release/create")
+                        .to("/views/core_component/release/details.jsf"))
+                .addRule(Join.path("/release/{release_id}")
+                        .to("/views/core_component/release/details.jsf?release_id={release_id}"))
 
                 // Code List Menu
                 .addRule(Join.path("/code_list")

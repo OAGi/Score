@@ -54,6 +54,17 @@ public class Release implements NamespaceAware, Serializable {
     @Convert(attributeName = "state", converter = ReleaseStateConverter.class)
     private ReleaseState state;
 
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
+
     public long getReleaseId() {
         return releaseId;
     }
