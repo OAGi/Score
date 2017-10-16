@@ -1,9 +1,11 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.repository.entity.converter.ReleaseStateConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "release")
@@ -33,6 +35,24 @@ public class Release implements NamespaceAware, Serializable {
 
     @Column(nullable = false)
     private Long namespaceId;
+
+    @Column(nullable = false, updatable = false)
+    private long createdBy;
+
+    @Column(nullable = false)
+    private long lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
+    @Convert(attributeName = "state", converter = ReleaseStateConverter.class)
+    private ReleaseState state;
 
     public long getReleaseId() {
         return releaseId;
@@ -64,6 +84,46 @@ public class Release implements NamespaceAware, Serializable {
 
     public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
+    }
+
+    public long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Date getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp(Date creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }
+
+    public Date getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    public ReleaseState getState() {
+        return state;
+    }
+
+    public void setState(ReleaseState state) {
+        this.state = state;
     }
 
     @Override
