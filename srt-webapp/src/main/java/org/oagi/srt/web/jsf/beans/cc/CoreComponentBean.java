@@ -1,10 +1,8 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.CoreComponentState;
-import org.oagi.srt.repository.entity.CoreComponents;
-import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.repository.ReleaseRepository;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,7 @@ import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGro
 @Transactional(readOnly = true)
 public class CoreComponentBean extends AbstractCoreComponentBean {
 
+    private static final String SELECTED_RELEASE_KEY = "_core_component/selected_release";
     private static final String SELECTED_TYPES_KEY = "_core_component/selected_types";
     private static final String SELECTED_STATES_KEY = "_core_component/selected_states";
     private static final String SEARCH_TEXT_DEN_KEY = "_core_component/search_text_den";
@@ -49,6 +49,10 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @Autowired
     private AggregateCoreComponentRepository accRepository;
 
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
+    private Release release;
     private List<CoreComponents> coreComponents;
     private List<String> selectedTypes;
     private List<CoreComponentState> selectedStates;
@@ -63,8 +67,15 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @PostConstruct
     public void init() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-
         Map<String, Object> sessionMap = externalContext.getSessionMap();
+
+        Object selectedRelease = sessionMap.get(SELECTED_RELEASE_KEY);
+        if (selectedRelease != null) {
+            this.release = releaseRepository.findOne((Long) selectedRelease);
+        } else {
+            setRelease(releaseRepository.findOne(1L));
+        }
+
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
 
         if (selectedTypes != null) {
@@ -96,11 +107,35 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sessionMap = externalContext.getSessionMap();
 
+        sessionMap.remove(SELECTED_RELEASE_KEY);
         sessionMap.remove(SELECTED_TYPES_KEY);
         sessionMap.remove(SELECTED_STATES_KEY);
         sessionMap.remove(SEARCH_TEXT_DEN_KEY);
         sessionMap.remove(SEARCH_TEXT_DEFINITION_KEY);
         sessionMap.remove(SEARCH_TEXT_MODULE_KEY);
+    }
+
+    public Release getRelease() {
+        return release;
+    }
+
+    public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
+        setRelease(getRelease());
+        search();
+    }
+
+    public void setRelease(Release release) {
+        this.release = release;
+
+        if (release != null) {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            Map<String, Object> sessionMap = externalContext.getSessionMap();
+            sessionMap.put(SELECTED_RELEASE_KEY, this.release.getReleaseId());
+        }
+    }
+
+    public List<Release> getReleases() {
+        return releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId"));
     }
 
     public String[] getSelectedTypes() {
@@ -182,7 +217,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 break;
         }
 
-        List<CoreComponents> coreComponents = coreComponentService.getCoreComponents(selectedTypes, selectedStates,
+        List<CoreComponents> coreComponents = coreComponentService.getCoreComponents(
+                selectedTypes, selectedStates, release,
                 new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
 
         return coreComponents.stream()

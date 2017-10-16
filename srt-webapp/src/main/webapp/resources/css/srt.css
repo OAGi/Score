@@ -1037,3 +1037,11 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
     border-color: #ebcccc !important;
     color: #a94442 !important;
 }
+
+.dropdown-container tr {
+    border: 0px !important;
+}
+
+.dropdown-container label {
+    padding: 2px 0 2px 10px !important;
+}

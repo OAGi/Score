@@ -55,8 +55,8 @@ public class CoreComponentService {
     private CoreComponentDAO coreComponentDAO;
 
     public List<CoreComponents> getCoreComponents(
-            List<String> types, List<CoreComponentState> states, Sort.Order order) {
-        return coreComponentsRepository.findAll(types, states, order);
+            List<String> types, List<CoreComponentState> states, Release release, Sort.Order order) {
+        return coreComponentsRepository.findAll(types, states, release, order);
     }
 
     public List<CoreComponentRelation> getCoreComponents(

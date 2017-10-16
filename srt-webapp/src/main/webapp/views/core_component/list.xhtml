@@ -18,7 +18,20 @@
             <p:panel id="pPanel">
                 <f:facet name="header">
                     <div class="row" style="margin-bottom: 15px;">
-                        <div class="col-md-6 col-sm-6">
+                        <div class="col-md-2 col-sm-2">
+                            <h:outputText value="Release" styleClass="option-header"/>
+                            <h:panelGrid styleClass="option-panel" style="margin-top: 15px;" class="dropdown-container">
+                                <p:selectOneMenu id="release" value="#{coreComponentBean.release}"
+                                                 converter="#{releaseConverter}" style="width: 100px">
+                                    <p:ajax listener="#{coreComponentBean.onReleaseChange}" update="listForm" />
+                                    <f:selectItems value="#{coreComponentBean.releases}" var="release"
+                                                   itemLabel="#{release.releaseNum}"
+                                                   itemValue="#{release}"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+                        </div>
+
+                        <div class="col-md-5 col-sm-5">
                             <h:outputText value="Type" styleClass="option-header"/>
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
                                 <h:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
@@ -32,7 +45,7 @@
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
-                        <div class="col-md-6 col-sm-6">
+                        <div class="col-md-5 col-sm-5">
                             <h:outputText value="State" styleClass="option-header"/>
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
                                 <h:selectManyCheckbox id="state" styleClass="option-radio-grid"
