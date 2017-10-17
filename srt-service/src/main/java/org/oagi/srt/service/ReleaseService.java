@@ -36,5 +36,18 @@ public class ReleaseService {
     public List<Releases> findAllReleases() {
         return releasesRepository.findAll();
     }
+
+    public boolean isExistsReleaseNum(String releaseNum, long releaseId) {
+        return releaseRepository.existsByReleaseNumExceptReleaseId((releaseNum != null) ? releaseNum.trim() : null, releaseId);
+    }
+
+    @Transactional
+    public void update(Release release) {
+        releaseRepository.saveAndFlush(release);
+    }
+
+    public Release findByReleaseNum(String releaseNum) {
+        return releaseRepository.findOneByReleaseNum(releaseNum);
+    }
 }
 

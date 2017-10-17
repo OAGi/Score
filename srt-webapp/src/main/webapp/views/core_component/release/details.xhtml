@@ -1,11 +1,79 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<f:view>
-    <h:outputLabel value="To be completed...."/>
-</f:view>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="../../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h:panelGroup rendered="#{releaseDetailBean.release.releaseId > 0}">
+                    <h2 class="subhead-heading">Release Detail</h2>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{releaseDetailBean.release.releaseId == 0}">
+                    <h2 class="subhead-heading">Create Release</h2>
+                </h:panelGroup>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                        autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                <h:panelGrid columns="2" cellpadding="3">
+                    <h:outputText value="Release Number" styleClass="section-label"/>
+                    <h:inputText id="releaseNum" value="#{releaseDetailBean.release.releaseNum}"
+                                 maxlength="45"
+                                 label="Release Number" styleClass="section-content input-section">
+                    </h:inputText>
+
+                    <h:outputText value="Namespace" styleClass="section-label"/>
+                    <p:autoComplete id="inputNamespace" widgetVar="inputNamespace"
+                                    value="#{releaseDetailBean.selectedNamespaceUri}"
+                                    completeMethod="#{releaseDetailBean.completeInputForNamespace}"
+                                    dropdown="true"
+                                    required="true" requiredMessage="Please fill out 'Namespace' field."
+                                    styleClass="section-content input-section">
+                        <p:ajax event="itemSelect" listener="#{releaseDetailBean.onSelectNamespace}"/>
+                    </p:autoComplete>
+
+                    <h:outputText value="Note" styleClass="section-label"/>
+                    <h:inputTextarea id="note" value="#{releaseDetailBean.release.releaseNote}"
+                                     rows="6" a:placeholder="Leave a note"
+                                     styleClass="section-content input-section"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:commandButton id="createBtn" ajax="true" value="Create"
+                             rendered="#{releaseDetailBean.release.releaseId == 0}"
+                             action="#{releaseDetailBean.update()}"/>
+
+            <p:commandButton id="updateBtn" ajax="true" value="Update"
+                             rendered="#{releaseDetailBean.release.releaseId != 0}"
+                             action="#{releaseDetailBean.update()}"/>
+
+            <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                             rendered="#{releaseDetailBean.release.releaseId > 0}"
+                             styleClass="danger"
+                             onclick="PF('confirmDiscard').show()"/>
+
+            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    The release will be permanently removed.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                     action="#{releaseDetailBean.delete()}"
+                                     oncomplete="PF('confirmDiscard').hide()"/>
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                     onclick="PF('confirmDiscard').hide()"/>
+                </div>
+            </p:confirmDialog>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -2,14 +2,18 @@ package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.converter.ReleaseStateConverter;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
+import javax.print.attribute.standard.MediaSize;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "release")
-public class Release implements NamespaceAware, Serializable {
+public class Release implements NamespaceAware, TimestampAware, CreatorModifierAware, Serializable {
 
     public static final String SEQUENCE_NAME = "RELEASE_ID_SEQ";
 
@@ -33,8 +37,9 @@ public class Release implements NamespaceAware, Serializable {
     @Column(length = 10 * 1024)
     private String releaseNote;
 
-    @Column(nullable = false)
-    private Long namespaceId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "namespace_id", nullable = false)
+    private Namespace namespace;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -54,16 +59,16 @@ public class Release implements NamespaceAware, Serializable {
     @Convert(attributeName = "state", converter = ReleaseStateConverter.class)
     private ReleaseState state;
 
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
-    }
+//    @PrePersist
+//    public void prePersist() {
+//        creationTimestamp = new Date();
+//        lastUpdateTimestamp = new Date();
+//    }
+//
+//    @PreUpdate
+//    public void preUpdate() {
+//        lastUpdateTimestamp = new Date();
+//    }
 
     public long getReleaseId() {
         return releaseId;
@@ -89,12 +94,12 @@ public class Release implements NamespaceAware, Serializable {
         this.releaseNote = releaseNote;
     }
 
-    public long getNamespaceId() {
-        return (namespaceId != null) ? 0L : namespaceId;
+    public Namespace getNamespace() {
+        return namespace;
     }
 
-    public void setNamespaceId(Long namespaceId) {
-        this.namespaceId = namespaceId;
+    public void setNamespace(Namespace namespace) {
+        this.namespace = namespace;
     }
 
     public long getCreatedBy() {
@@ -153,7 +158,14 @@ public class Release implements NamespaceAware, Serializable {
         int result = (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (releaseNum != null ? releaseNum.hashCode() : 0);
         result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0);
-        result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
+        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (persistEventListeners != null ? persistEventListeners.hashCode() : 0);
+        result = 31 * result + (updateEventListeners != null ? updateEventListeners.hashCode() : 0);
         return result;
     }
 
@@ -163,7 +175,91 @@ public class Release implements NamespaceAware, Serializable {
                 "releaseId=" + releaseId +
                 ", releaseNum='" + releaseNum + '\'' +
                 ", releaseNote='" + releaseNote + '\'' +
-                ", namespaceId=" + namespaceId +
+                ", namespace=" + namespace +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public Release() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Override
+    public long getNamespaceId() {
+        if (getNamespace() != null) {
+            return getNamespace().getNamespaceId();
+        } else {
+            return 0L;
+        }
+    }
+
+    @Override
+    public void setNamespaceId(Long namespaceId) {
+        Namespace n = new Namespace();
+        n.setNamespaceId(namespaceId);
+        setNamespace(n);
     }
 }
