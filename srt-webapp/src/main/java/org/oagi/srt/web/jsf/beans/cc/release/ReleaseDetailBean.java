@@ -1,10 +1,8 @@
 package org.oagi.srt.web.jsf.beans.cc.release;
 
-import org.oagi.srt.repository.entity.Namespace;
-import org.oagi.srt.repository.entity.Release;
-import org.oagi.srt.repository.entity.ReleaseState;
-import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
+import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.NamespaceService;
 import org.oagi.srt.service.ReleaseService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -36,12 +34,16 @@ public class ReleaseDetailBean extends UIHandler {
     private ReleaseService releaseService;
     @Autowired
     private NamespaceService namespaceService;
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     private Release release;
 
     private List<Namespace> allNamespaces;
     private Map<String, Namespace> namespaceMap;
     private Namespace namespace;
+
+    private CoreComponents deltaCoreComponents;
 
     @PostConstruct
     public void init() {
@@ -87,6 +89,14 @@ public class ReleaseDetailBean extends UIHandler {
 
     public void setSelectedNamespaceUri(String selectedNamespaceUri) {
         setNamespace(namespaceMap.get(selectedNamespaceUri));
+    }
+
+    public CoreComponents getDeltaCoreComponents() {
+        return deltaCoreComponents;
+    }
+
+    public void setDeltaCoreComponents(CoreComponents deltaCoreComponents) {
+        this.deltaCoreComponents = deltaCoreComponents;
     }
 
     public String update() {
