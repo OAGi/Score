@@ -180,6 +180,7 @@ public class CoreComponentService {
         accHistory.setRevisionTrackingNum(revisionTrackingNum);
         accHistory.setRevisionAction(Insert);
         accHistory.setCurrentAccId(acc.getAccId());
+        accHistory.setReleaseId(null);
 
         accRepository.save(accHistory);
 
@@ -247,6 +248,7 @@ public class CoreComponentService {
         asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
         asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+        asccpHistory.setReleaseId(null);
 
         asccpRepository.save(asccpHistory);
 
@@ -313,6 +315,7 @@ public class CoreComponentService {
         bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
         bccpHistory.setRevisionAction(Insert);
         bccpHistory.setCurrentBccpId(bccp.getBccpId());
+        bccpHistory.setReleaseId(null);
 
         bccpRepository.save(bccpHistory);
 
@@ -347,6 +350,7 @@ public class CoreComponentService {
         asccHistory.setRevisionTrackingNum(revisionTrackingNum);
         asccHistory.setRevisionAction(Insert);
         asccHistory.setCurrentAsccId(ascc.getAsccId());
+        asccHistory.setReleaseId(null);
 
         asccRepository.save(asccHistory);
 
@@ -381,6 +385,7 @@ public class CoreComponentService {
         bccHistory.setRevisionTrackingNum(revisionTrackingNum);
         bccHistory.setRevisionAction(Insert);
         bccHistory.setCurrentBccId(bcc.getBccId());
+        bccHistory.setReleaseId(null);
 
         bccRepository.save(bccHistory);
 

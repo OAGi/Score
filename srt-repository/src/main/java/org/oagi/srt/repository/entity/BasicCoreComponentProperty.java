@@ -344,11 +344,11 @@ public class BasicCoreComponentProperty
         this.revisionAction = revisionAction;
     }
 
-    public long getReleaseId() {
+    public Long getReleaseId() {
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 
