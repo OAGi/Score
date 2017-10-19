@@ -45,6 +45,24 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
     public Integer findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(long currentAccId, int revisionNum);
 
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId = ?3")
+    public Integer findMaxRevisionNumByCurrentAccIdAndReleaseId(long currentAccId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNumAndReleaseId(long currentAccId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.releaseId = ?2")
+    public Integer findMaxRevisionNumByAccIdAndReleaseId(long accId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByAccIdAndRevisionNumAndReleaseId(long ccId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.accId = ?1")
+    public Integer findMaxRevisionNumByAccId(long accId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByAccIdAndRevisionNum(long ccId, int revisionNum);
+
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
     public void deleteByCurrentAccIdAndRevisionNum(long currentAccId, int revisionNum);

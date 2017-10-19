@@ -77,6 +77,12 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3")
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(long fromAccId, long toAsccpId, int revisionNum);
 
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseId(long fromAccId, long toAsccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.releaseId = ?4")
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseId(long fromAccId, long toAsccpId, int revisionNum,  long releaseId);
+
     @Modifying
     @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3")
     public void deleteByFromAccIdAndToAsccpIdAndRevisionNum(long fromAccId, long toAsccpId, int revisionNum);

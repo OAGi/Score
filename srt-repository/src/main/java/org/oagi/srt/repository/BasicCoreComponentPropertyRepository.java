@@ -48,6 +48,24 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
     public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
 
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.releaseId = ?2")
+    public Integer findMaxRevisionNumByCurrentBccpIdAndReleaseId(long currentBccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNumAndReleaseId(long currentBccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.releaseId = ?2")
+    public Integer findMaxRevisionNumByBccpIdAndReleaseId(long currentBccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2 and b.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndReleaseId(long currentBccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1")
+    public Integer findMaxRevisionNumByBccpId(long currentBccpId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
+
     @Modifying
     @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
     public void deleteByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);

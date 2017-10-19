@@ -154,4 +154,8 @@ public class ReleaseDetailBean extends UIHandler {
     public void onSelectNamespace(SelectEvent event) {
         setSelectedNamespaceUri(event.getObject().toString());
     }
+
+    public String getFullRevisionNum (CoreComponents cc) {
+        return releaseService.getFullRevisionNum(cc, release);
+    }
 }

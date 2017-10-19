@@ -73,6 +73,24 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = ?2")
     public Integer findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(long currentAsccpId, int revisionNum);
 
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId = ?2")
+    public Integer findMaxRevisionNumByCurrentAsccpIdAndReleaseId(long currentAsccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNumAndReleaseId(long currentAsccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.releaseId = ?2")
+    public Integer findMaxRevisionNumByAsccpIdAndReleaseId(long asccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndReleaseId(long currentAsccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1")
+    public Integer findMaxRevisionNumByAsccpId(long asccpId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByAsccpIdAndRevisionNum(long currentAsccpId, int revisionNum);
+
     @Modifying
     @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.revisionNum = ?2")
     public void deleteByCurrentAsccpIdAndRevisionNum(long currentAsccpId, int revisionNum);

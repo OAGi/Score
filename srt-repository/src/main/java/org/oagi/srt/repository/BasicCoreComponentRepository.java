@@ -75,6 +75,12 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3")
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(long fromAccId, long toBccpId, int revisionNum);
 
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.releaseId = ?3")
+    public Integer findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseId(long fromAccId, long toBccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3 and b.releaseId = ?4")
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseId(long fromAccId, long toBccpId, int revisionNum, long releaseId);
+
     @Modifying
     @Query("delete from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3")
     public void deleteByFromAccIdAndToBccpIdAndRevisionNum(long fromAccId, long toBccpId, int revisionNum);
