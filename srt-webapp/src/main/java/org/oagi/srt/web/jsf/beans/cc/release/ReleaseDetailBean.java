@@ -43,7 +43,7 @@ public class ReleaseDetailBean extends UIHandler {
     private Map<String, Namespace> namespaceMap;
     private Namespace namespace;
 
-    private CoreComponents deltaCoreComponents;
+    private List<CoreComponents> deltaCoreComponents;
 
     @PostConstruct
     public void init() {
@@ -58,6 +58,7 @@ public class ReleaseDetailBean extends UIHandler {
                 setNamespace(release.getNamespace());
             }
         }
+        setDeltaCoreComponents(coreComponentService.getDeltaForRelease(release, getCurrentUser()));
     }
 
     public Release getRelease() {
@@ -68,6 +69,7 @@ public class ReleaseDetailBean extends UIHandler {
         allNamespaces = namespaceService.findAll(Sort.Direction.ASC, "uri");
         namespaceMap = allNamespaces.stream()
                 .collect(Collectors.toMap(e -> e.getUri(), Function.identity()));
+        deltaCoreComponents = coreComponentService.getDeltaForRelease(release, getCurrentUser());
 
         this.release = release;
     }
@@ -91,11 +93,11 @@ public class ReleaseDetailBean extends UIHandler {
         setNamespace(namespaceMap.get(selectedNamespaceUri));
     }
 
-    public CoreComponents getDeltaCoreComponents() {
+    public List<CoreComponents> getDeltaCoreComponents() {
         return deltaCoreComponents;
     }
 
-    public void setDeltaCoreComponents(CoreComponents deltaCoreComponents) {
+    public void setDeltaCoreComponents(List<CoreComponents> deltaCoreComponents) {
         this.deltaCoreComponents = deltaCoreComponents;
     }
 

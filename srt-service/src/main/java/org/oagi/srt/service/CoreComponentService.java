@@ -1183,7 +1183,7 @@ public class CoreComponentService {
         return undoService.hasMultipleRevisions(coreComponents);
     }
 
-    public String getFullRevisionNum(CoreComponents cc) {
+    public String getFullRevisionNum(CoreComponents cc) { //todo: promeniti da radi za release
         StringBuilder sb = new StringBuilder("");
         int maxRevisionNum = 0;
         int maxRevisionTrackingNum = 0;
@@ -1220,5 +1220,9 @@ public class CoreComponentService {
         }
 
         return sb.toString();
+    }
+
+    public List<CoreComponents> getDeltaForRelease(Release release, User currentUser) {
+        return coreComponentsRepository.findDeltaForRelease(release, currentUser);
     }
 }
