@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
+import org.oagi.srt.repository.entity.CoreComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -100,6 +101,27 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     public void deleteByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentAsccpId, int revisionNum, int revisionTrackingNum);
 
     @Modifying
+    @Query("update AssociationCoreComponentProperty a set a.state = ?4 where a.currentAsccpId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    public void updateStateByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentAsccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+
+    @Modifying
     @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
     public void deleteByCurrentAsccpId(long currentAsccpId);
+
+    @Query("select a.revisionNum from AssociationCoreComponentProperty a where a.asccpId = ?1")
+    int findRevisionNumByAsccpId(long asccpId);
+
+    @Modifying
+    @Query("update AssociationCoreComponentProperty a set a.releaseId = ?2 where a.asccpId = ?1")
+    void updateReleaseByAsccpId(long asccpId, Long releaseId);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = (select x.currentAsccpId from AssociationCoreComponentProperty x where x.asccpId = ?1) and a.revisionNum < ?2 and a.releaseId is null")
+    List<AssociationCoreComponentProperty> findPreviousNonReleasedRevisions(long id, int revisionNum);
+
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = (select x.currentAsccpId from AssociationCoreComponentProperty x where x.asccpId = ?1) and a.revisionNum > ?2 and a.releaseId is null")
+    List<AssociationCoreComponentProperty> findFollowingNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.releaseId = ?1")
+    List<AssociationCoreComponentProperty> findByReleaseId(long releaseId);
 }

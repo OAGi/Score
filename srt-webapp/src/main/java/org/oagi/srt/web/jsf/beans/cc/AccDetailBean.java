@@ -1135,7 +1135,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         setTreeNode(treeNode);
         setSelectedTreeNodeAfterRefresh = true;
         if (getSelectedTreeNode() != null) {
-            selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode, ((SRTNode) getSelectedTreeNode().getData()).getId()); // TODO: check if this cause problem with setting leaf node as selected after refresh
+            selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode, ((SRTNode) getSelectedTreeNode().getData()).getId()); // TODO: MIRO check if this cause problem with setting leaf node as selected after refresh
         }
     }
 

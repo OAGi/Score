@@ -52,7 +52,8 @@
                 <p:dataTable id="tbl" var="cc" value="#{releaseDetailBean.deltaCoreComponents}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}">
+                             style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
+                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
 
                     <p:column selectionMode="multiple" styleClass="table-checkbox" rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
 
@@ -134,7 +135,7 @@
                              action="#{releaseDetailBean.update()}"/>
 
             <p:commandButton id="discardBtn" ajax="true" value="Discard"
-                             rendered="#{releaseDetailBean.release.releaseId > 0}"
+                             rendered="#{releaseDetailBean.release.releaseId > 0 and releaseDetailBean.release.state eq 'Draft'}"
                              styleClass="danger"
                              onclick="PF('confirmDiscard').show()"/>
 

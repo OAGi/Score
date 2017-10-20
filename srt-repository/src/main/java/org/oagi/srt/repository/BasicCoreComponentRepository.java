@@ -90,6 +90,10 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     public void deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toBccpId, int revisionNum, int revisionTrackingNum);
 
     @Modifying
+    @Query("update BasicCoreComponent b set b.state = ?5 where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3 and b.revisionTrackingNum = ?4")
+    public void deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toBccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+
+    @Modifying
     @Query("update BasicCoreComponent b set b.seqKey = b.seqKey + 1 " +
             "where b.fromAccId = ?1 and b.seqKey > ?2 and b.revisionNum = 0")
     public void increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(long fromAccId, int seqKey);
@@ -121,4 +125,20 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select count(b) from BasicCoreComponent b where b.currentBccId = ?1")
     public int countByCurrentBccId(long currentBccId);
+
+    @Query("select b.revisionNum from BasicCoreComponent b where b.bccId = ?1")
+    int findRevisionNumByBccId(long bccId);
+
+    @Modifying
+    @Query("update BasicCoreComponent b set b.releaseId = ?2 where b.bccId = ?1")
+    void updateReleaseByBccId(long bccId, Long releaseId);
+
+    @Query("select b from BasicCoreComponent b where b.currentBccId = (select x.currentBccId from BasicCoreComponent x where x.bccId = ?1) and b.revisionNum < ?2 and b.releaseId is null")
+    List<BasicCoreComponent> findPreviousNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select b from BasicCoreComponent b where b.currentBccId = (select x.currentBccId from BasicCoreComponent x where x.bccId = ?1) and b.revisionNum > ?2 and b.releaseId is null")
+    List<BasicCoreComponent> findFollowingNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select b from BasicCoreComponent b where b.releaseId = ?1")
+    List<BasicCoreComponent> findByReleaseId(long releaseId);
 }

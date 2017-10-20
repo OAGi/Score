@@ -214,7 +214,7 @@ public class UndoService {
     }
 
     private void undoDeleteHistoryRecord() {
-        System.out.println();// TODO: implement when nad if needed
+       // TODO: MIRO implement when and if needed
     }
 
     public boolean isPreviousRevisionNotInsert(CoreComponent cc) {

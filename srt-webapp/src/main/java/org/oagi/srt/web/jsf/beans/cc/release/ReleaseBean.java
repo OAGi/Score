@@ -31,8 +31,9 @@ public class ReleaseBean extends UIHandler {
         setAllReleases(releaseService.findAllReleases());
     }
 
-    public void makeReleaseFinal(Releases releases) {
-        // todo: complete this logic
+    public void makeReleaseFinal(Releases release) {
+        setAllReleases(null); // trigger refresh
+        releaseService.makeReleaseFinal(release);
     }
 
     public List<String> completeInput(String query) {
@@ -75,6 +76,9 @@ public class ReleaseBean extends UIHandler {
     }
 
     public List<Releases> getAllReleases() {
+        if (allReleases == null) {
+            setAllReleases(releaseService.findAllReleases());
+        }
         return allReleases;
     }
 

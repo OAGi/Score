@@ -3,6 +3,7 @@ package org.oagi.srt.repository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
+import org.oagi.srt.repository.entity.CoreComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1")
     public List<AssociationCoreComponent> findByFromAccId(long fromAccId);
+
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.releaseId is null")
+    public List<AssociationCoreComponent> findByFromAccIdWithNullRelease(long fromAccId);
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2")
     public List<AssociationCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
@@ -92,6 +96,10 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public void deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum);
 
     @Modifying
+    @Query("update AssociationCoreComponent a set a.state = ?5 where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.revisionTrackingNum = ?4")
+    public void updateStateByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+
+    @Modifying
     @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +
             "where a.fromAccId = ?1 and a.seqKey > ?2 and a.revisionNum = 0")
     public void increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(long fromAccId, int seqKey);
@@ -123,4 +131,21 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select count(a) from AssociationCoreComponent a where a.currentAsccId = ?1")
     public int countByCurrentAsccId(long currentAsccId);
+
+    @Query("select a.revisionNum from AssociationCoreComponent a where a.asccId = ?1")
+    int findRevisionNumByAsccId(long asccId);
+
+    @Modifying
+    @Query("update AssociationCoreComponent a set a.releaseId = ?2 where a.asccId = ?1")
+    void updateReleaseByAsccId(long asccId, Long releaseId);
+
+    @Query("select a from AssociationCoreComponent a where a.currentAsccId = (select x.currentAsccId from AssociationCoreComponent x where x.asccId = ?1) and a.revisionNum < ?2 and a.releaseId is null")
+    List<AssociationCoreComponent> findPreviousNonReleasedRevisions(long id, int maxRevisionNum);
+
+
+    @Query("select a from AssociationCoreComponent a where a.currentAsccId = (select x.currentAsccId from AssociationCoreComponent x where x.asccId = ?1) and a.revisionNum > ?2 and a.releaseId is null")
+    List<AssociationCoreComponent> findFollowingNonReleasedRevisions(long id, int maxRevisionNum);
+
+    @Query("select a from AssociationCoreComponent a where a.releaseId = ?1")
+    List<AssociationCoreComponent> findByReleaseId(long releaseId);
 }

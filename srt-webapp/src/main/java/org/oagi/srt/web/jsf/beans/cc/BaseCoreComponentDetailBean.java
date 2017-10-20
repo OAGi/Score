@@ -254,7 +254,7 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
     }
 
     public void copyExpandedState(TreeNode source, TreeNode target) {
-        if (!source.isLeaf() && !target.isLeaf()) { // TODO: check if this cause problem with setting leaf node as selected after refresh
+        if (!source.isLeaf() && !target.isLeaf()) { // TODO: MIRO check if this cause problem with setting leaf node as selected after refresh
             target.setExpanded(source.isExpanded());
             target.setSelected(source.isSelected());
             if (source.isExpanded()) {

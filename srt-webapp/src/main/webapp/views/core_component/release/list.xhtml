@@ -12,7 +12,7 @@
             </div>
         </div>
         <h:form id="listForm">
-        <p:panel>
+        <p:panel id="pPanel">
             <f:facet name="header">
                 <p:autoComplete id="releaseNum" value="#{releaseBean.releaseNum}"
                                 style="min-width: 440px; margin-right: 20px;"
@@ -68,7 +68,7 @@
                     <p:commandButton id="finalizeBtn" icon="fa fa-white fa-check" styleClass="revise"
                                      rendered="#{releases.state == 'Draft'}"
                                      action="#{releaseBean.makeReleaseFinal(releases)}"
-                                     update=":listForm">
+                                     update="tbl" ajax="true">
                         <p:tooltip id="tooltipDelete" for="finalizeBtn" value="Make release final" position="right"/>
                         <p:confirm header="Confirmation"
                                    message="Making this draft release the final one will remove all other draft releases. Proceed?"

@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
+import org.oagi.srt.repository.entity.CoreComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -79,8 +80,26 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("delete from AggregateCoreComponent a where a.accId = ?1")
     public void deleteByAccId(long accId);
 
+    @Modifying
+    @Query("update AggregateCoreComponent a set a.state = ?4 where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    public void updateStateByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(long currentAccId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
     AggregateCoreComponent findOneByCurrentAccIdAndRevisions(long currentAccId, int revisionNum, int i);
 
+    @Query("select a.revisionNum from AggregateCoreComponent a where a.accId = ?1")
+    int findRevisionNumByAccId(long accId);
 
+    @Modifying
+    @Query("update AggregateCoreComponent a set a.releaseId = ?2 where a.accId = ?1")
+    void updateReleaseByAccId(long accId, Long releaseId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = (select x.currentAccId from AggregateCoreComponent x where x.accId = ?1) and a.revisionNum < ?2 and a.releaseId is null")
+    List<AggregateCoreComponent> findPreviousNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = (select x.currentAccId from AggregateCoreComponent x where x.accId = ?1) and a.revisionNum > ?2 and a.releaseId is null")
+    List<AggregateCoreComponent> findFollowingNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.releaseId = ?1")
+    List<AggregateCoreComponent> findByReleaseId(long releaseId);
 }

@@ -424,6 +424,7 @@ public class CoreComponentService {
         accHistory.setRevisionAction(Update);
         accHistory.setLastUpdatedBy(requesterId);
         accHistory.setCurrentAccId(currentAccId);
+        accHistory.setReleaseId(null);
 
         accRepository.saveAndFlush(accHistory);
 
@@ -583,6 +584,7 @@ public class CoreComponentService {
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
         asccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
+        asccHistory.setReleaseId(null);
 
         asccRepository.saveAndFlush(asccHistory);
 
@@ -688,6 +690,7 @@ public class CoreComponentService {
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
         bccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
+        bccHistory.setReleaseId(null);
 
         bccRepository.saveAndFlush(bccHistory);
 
@@ -767,6 +770,7 @@ public class CoreComponentService {
         asccpHistory.setRevisionAction(Update);
         asccpHistory.setLastUpdatedBy(requesterId);
         asccpHistory.setCurrentAsccpId(currentAsccpId);
+        asccpHistory.setReleaseId(null);
 
         asccpRepository.saveAndFlush(asccpHistory);
 
@@ -830,6 +834,7 @@ public class CoreComponentService {
         bccpHistory.setRevisionAction(Update);
         bccpHistory.setLastUpdatedBy(requesterId);
         bccpHistory.setCurrentBccpId(currentBccpId);
+        bccpHistory.setReleaseId(null);
 
         bccpRepository.saveAndFlush(bccpHistory);
 
@@ -959,10 +964,12 @@ public class CoreComponentService {
         if (state == Published) {
             for (AssociationCoreComponent ascc : asccList) {
                 deleteAsccHistoryRecords(fromAccId, ascc.getToAsccpId());
+                updateAsccHistoryRecordState(fromAccId, ascc.getToAsccpId(), state);
             }
 
             for (BasicCoreComponent bcc : bccList) {
                 deleteBccHistoryRecords(fromAccId, bcc.getToBccpId());
+                updateBccHistoryRecordState(fromAccId, bcc.getToBccpId(), state);
             }
         }
     }
@@ -982,6 +989,7 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteAccHistoryRecords(acc.getAccId());
+            updateAccHistoryRecordState(acc.getAccId(), state);
         }
     }
 
@@ -1002,6 +1010,7 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteAsccpHistoryRecords(asccp.getAsccpId());
+            updateAsccpHistoryRecordState(asccp.getAsccpId(), state);
         }
     }
 
@@ -1022,6 +1031,7 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteBccpHistoryRecords(bccp.getBccpId());
+            updateBccpHistoryRecordState(bccp.getBccpId(), state);
         }
     }
 
@@ -1032,11 +1042,25 @@ public class CoreComponentService {
         accRepository.deleteByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum);
     }
 
+    private void updateAccHistoryRecordState(long currentAccId, CoreComponentState state) {
+        int revisionNum = accRepository.findMaxRevisionNumByCurrentAccId(currentAccId);
+        int revisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(currentAccId, revisionNum);
+
+        accRepository.updateStateByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum, state);
+    }
+
     private void deleteAsccHistoryRecords(long fromAccId, long toAsccpid) {
         int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(fromAccId, toAsccpid);
         int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(fromAccId, toAsccpid, revisionNum);
 
         asccRepository.deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toAsccpid, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateAsccHistoryRecordState(long fromAccId, long toAsccpid, CoreComponentState state) {
+        int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(fromAccId, toAsccpid);
+        int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(fromAccId, toAsccpid, revisionNum);
+
+        asccRepository.updateStateByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toAsccpid, revisionNum, revisionTrackingNum, state);
     }
 
     private void deleteBccHistoryRecords(long fromAccId, long toBccpId) {
@@ -1046,6 +1070,13 @@ public class CoreComponentService {
         bccRepository.deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toBccpId, revisionNum, revisionTrackingNum);
     }
 
+    private void updateBccHistoryRecordState(long fromAccId, long toBccpId, CoreComponentState state) {
+        int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(fromAccId, toBccpId);
+        int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(fromAccId, toBccpId, revisionNum);
+
+        bccRepository.deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toBccpId, revisionNum, revisionTrackingNum, state);
+    }
+
     private void deleteAsccpHistoryRecords(long currentAsccpId) {
         int revisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(currentAsccpId);
         int revisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(currentAsccpId, revisionNum);
@@ -1053,11 +1084,25 @@ public class CoreComponentService {
         asccpRepository.deleteByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum);
     }
 
+    private void updateAsccpHistoryRecordState(long currentAsccpId, CoreComponentState state) {
+        int revisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(currentAsccpId);
+        int revisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(currentAsccpId, revisionNum);
+
+        asccpRepository.updateStateByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum, state);
+    }
+
     private void deleteBccpHistoryRecords(long currentBccpId) {
         int revisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(currentBccpId);
         int revisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(currentBccpId, revisionNum);
 
         bccpRepository.deleteByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateBccpHistoryRecordState(long currentBccpId, CoreComponentState state) {
+        int revisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(currentBccpId);
+        int revisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(currentBccpId, revisionNum);
+
+        bccpRepository.updateStateByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum, state);
     }
 
     private void storeBieUserExtRevisions(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc) {
@@ -1264,9 +1309,5 @@ public class CoreComponentService {
         }
 
         return sb.toString();
-    }
-
-    public List<CoreComponents> getDeltaForRelease(Release release, User currentUser) {
-        return coreComponentsRepository.findDeltaForRelease(release, currentUser);
     }
 }

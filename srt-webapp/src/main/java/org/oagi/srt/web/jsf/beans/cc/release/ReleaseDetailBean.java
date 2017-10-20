@@ -2,7 +2,6 @@ package org.oagi.srt.web.jsf.beans.cc.release;
 
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
-import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.NamespaceService;
 import org.oagi.srt.service.ReleaseService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -34,8 +33,6 @@ public class ReleaseDetailBean extends UIHandler {
     private ReleaseService releaseService;
     @Autowired
     private NamespaceService namespaceService;
-    @Autowired
-    private CoreComponentService coreComponentService;
 
     private Release release;
 
@@ -44,6 +41,7 @@ public class ReleaseDetailBean extends UIHandler {
     private Namespace namespace;
 
     private List<CoreComponents> deltaCoreComponents;
+    private List<CoreComponents> selectedDeltaCoreComponents;
 
     @PostConstruct
     public void init() {
@@ -58,7 +56,7 @@ public class ReleaseDetailBean extends UIHandler {
                 setNamespace(release.getNamespace());
             }
         }
-        setDeltaCoreComponents(coreComponentService.getDeltaForRelease(release, getCurrentUser()));
+        setDeltaCoreComponents(releaseService.getDeltaForRelease(release, getCurrentUser()));
     }
 
     public Release getRelease() {
@@ -69,7 +67,7 @@ public class ReleaseDetailBean extends UIHandler {
         allNamespaces = namespaceService.findAll(Sort.Direction.ASC, "uri");
         namespaceMap = allNamespaces.stream()
                 .collect(Collectors.toMap(e -> e.getUri(), Function.identity()));
-        deltaCoreComponents = coreComponentService.getDeltaForRelease(release, getCurrentUser());
+        deltaCoreComponents = releaseService.getDeltaForRelease(release, getCurrentUser());
 
         this.release = release;
     }
@@ -103,6 +101,8 @@ public class ReleaseDetailBean extends UIHandler {
 
     public String update() {
         String releaseNum = release.getReleaseNum();
+        boolean addSelectedDelta = false;
+
         if (releaseService.isExistsReleaseNum(releaseNum, release.getReleaseId())) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Release Number is already taken."));
@@ -118,12 +118,20 @@ public class ReleaseDetailBean extends UIHandler {
         if (release.getReleaseId() == 0L) {
             release.setCreatedBy(user.getAppUserId());
             release.setState(ReleaseState.Draft);
+            addSelectedDelta = true;
         }
 
         release.setNamespace(namespace);
 
         try {
-            releaseService.update(release);
+            release = releaseService.update(release);
+
+            if (addSelectedDelta) {
+                // add selected revisions to release
+                for (CoreComponents cc : selectedDeltaCoreComponents) {
+                    addRevisionToRelease(cc);
+                }
+            }
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -132,10 +140,14 @@ public class ReleaseDetailBean extends UIHandler {
         return "/views/core_component/release/list.jsf?faces-redirect=true";
     }
 
+    private void addRevisionToRelease(CoreComponents cc) {
+        releaseService.addRevisionToRelease(cc, release);
+    }
+
     @Transactional(rollbackFor = Throwable.class)
-    public String delete() {
-//        releaseService.delete(release); todo: implement this method...
-//
+    public String delete() { // todo MIRO add implementation for this method - similar as for finalizing some draft: revisions must be moved to the next if existing
+//        releaseService.delete(release);
+
         return "/views/core_component/release/list.jsf?faces-redirect=true";
     }
 
@@ -155,7 +167,15 @@ public class ReleaseDetailBean extends UIHandler {
         setSelectedNamespaceUri(event.getObject().toString());
     }
 
-    public String getFullRevisionNum (CoreComponents cc) {
+    public String getFullRevisionNum(CoreComponents cc) {
         return releaseService.getFullRevisionNum(cc, release);
+    }
+
+    public List<CoreComponents> getSelectedDeltaCoreComponents() {
+        return selectedDeltaCoreComponents;
+    }
+
+    public void setSelectedDeltaCoreComponents(List<CoreComponents> selectedDeltaCoreComponents) {
+        this.selectedDeltaCoreComponents = selectedDeltaCoreComponents;
     }
 }
