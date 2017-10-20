@@ -101,13 +101,11 @@
                                        aria-haspopup="true" aria-expanded="false">CC Management <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
-                                        <li><h:link outcome="/views/namespace/list.jsf">Namespace</h:link>
-                                        </li>
-                                        </h:panelGroup>
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
                                         <li>
                                             <a href="/core_component">Core Component</a>
+                                        </li>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                        <li><h:link outcome="/views/namespace/list.jsf">Namespace</h:link>
                                         </li>
                                         </h:panelGroup>
                                     </ul>
@@ -134,6 +132,11 @@
                                     <ul class="dropdown-menu">
                                         <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
                                         </li>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                            <li role="separator" class="divider"></li>
+                                            <li><h:link outcome="/views/user/manage_account.jsf">Manage Account</h:link>
+                                            </li>
+                                        </h:panelGroup>
                                         <li role="separator" class="divider"></li>
                                         <li><h:link outcome="/views/user/settings.jsf">Settings</h:link></li>
                                         <li><a href="/logout">Sign out</a></li>

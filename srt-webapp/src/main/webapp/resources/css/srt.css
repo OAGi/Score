@@ -636,7 +636,7 @@ span.ui-button-text {
     padding: 2px !important;
 }
 
-input[type=text], .ui-autocomplete input[type=text] {
+input[type=text], input[type=password], .ui-autocomplete input[type=text] {
     padding: 1px 30px 1px 5px !important;
 }
 
@@ -685,7 +685,7 @@ textarea {
 
 .input-section {
     min-width: 440px !important;
-    border: 1px solid #ddd;
+    border: 1px solid #ddd !important;
 }
 
 input[type="checkbox"].input-section {

@@ -18,6 +18,9 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                 .addRule(Join.path("/signin").to("/views/user/login.jsf"))
                 .addRule(Join.path("/signup").to("/views/user/join.jsf"))
                 .addRule(Join.path("/preferences").to("/views/user/settings.jsf"))
+                .addRule(Join.path("/account/manage").to("/views/user/manage_account.jsf"))
+                .addRule(Join.path("/account/create").to("/views/user/details.jsf"))
+                .addRule(Join.path("/account/{login_id}").to("/views/user/details.jsf?loginId={login_id}"))
 
                 // Profile BOD Menu
                 .addRule(Join.path("/profile_bod")
