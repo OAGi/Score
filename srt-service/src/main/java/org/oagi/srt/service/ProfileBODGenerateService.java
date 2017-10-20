@@ -30,6 +30,10 @@ public class ProfileBODGenerateService {
 
     private static org.jdom2.Namespace XSD_NAMESPACE = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
+    private static final String CODE_LIST_NAME_PREFIX = "cl";
+
+    private static final String AGENCY_ID_LIST_NAME_PREFIX = "il";
+
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
@@ -669,6 +673,7 @@ public class ProfileBODGenerateService {
     public String getCodeListTypeName(CodeList codeList) {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(CODE_LIST_NAME_PREFIX);
         sb.append(codeList.getAgencyId()).append('_');
         sb.append(codeList.getVersionId()).append('_');
         String name = codeList.getName();
@@ -915,6 +920,8 @@ public class ProfileBODGenerateService {
                 generationContext.findAgencyIdListValue(agencyIdList.getAgencyIdListValueId());
 
         StringBuilder sb = new StringBuilder();
+
+        sb.append(AGENCY_ID_LIST_NAME_PREFIX);
         sb.append(agencyIdListValue.getValue());
         sb.append(agencyIdList.getVersionId()).append('_');
         String name = agencyIdList.getName();
