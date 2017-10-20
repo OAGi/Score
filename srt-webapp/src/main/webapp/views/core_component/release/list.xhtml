@@ -71,7 +71,8 @@
                                      update="tbl" ajax="true">
                         <p:tooltip id="tooltipDelete" for="finalizeBtn" value="Make release final" position="right"/>
                         <p:confirm header="Confirmation"
-                                   message="Making this draft release the final one will remove all other draft releases. Proceed?"
+                                   message="All previous drafts will be merged to the final release.
+                                            Older drafts will be removed, while their components will be kept but will not belong to any release. Proceed?"
                                    icon="fa fa-exclamation-triangle"/>
                     </p:commandButton>
                 </p:column>

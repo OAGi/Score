@@ -55,7 +55,8 @@
                              style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
                              selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
 
-                    <p:column selectionMode="multiple" styleClass="table-checkbox" rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
+                    <p:column selectionMode="multiple" styleClass="table-checkbox"
+                              rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
 
                     <p:column style="width: 100px; text-align: center;" headerText="Type" sortBy="#{cc.type}">
                         <span class="label label-info">${cc.type}</span>
@@ -142,7 +143,8 @@
             <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
-                    The release will be permanently removed.
+                    Components belonging to this release will be merged to the next draft release.
+                    If this is the most recent release, components will be kept, but will not belong to any release. Proceed?
                 </f:facet>
                 <div style="text-align: center;">
                     <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
@@ -155,6 +157,7 @@
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
+        <ui:include src="../../dialog/global_confirm_non_undo_dialog.xhtml"/>
     </ui:define>
 
 </ui:composition>
