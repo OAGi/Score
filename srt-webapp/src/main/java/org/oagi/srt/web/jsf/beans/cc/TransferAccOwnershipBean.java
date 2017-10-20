@@ -54,9 +54,16 @@ public class TransferAccOwnershipBean extends UIHandler {
         }
 
         User currentUser = getCurrentUser();
+
         allUsers = userRepository.findAll().stream()
                 .filter(e -> e.getAppUserId() != currentUser.getAppUserId())
-                .filter(e -> !e.isOagisDeveloperIndicator())
+                .filter(e -> {
+                    if (currentUser.isOagisDeveloperIndicator()) {
+                        return e.isOagisDeveloperIndicator();
+                    } else {
+                        return !e.isOagisDeveloperIndicator();
+                    }
+                })
                 .collect(Collectors.toList());
 
         setUsers(allUsers);

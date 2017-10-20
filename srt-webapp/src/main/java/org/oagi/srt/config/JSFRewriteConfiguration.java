@@ -81,6 +81,8 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/core_component/extension.jsf?accId={acc_id}"))
                 .addRule(Join.path("/core_component/acc/{acc_id}")
                         .to("/views/core_component/acc_details.jsf?accId={acc_id}"))
+                .addRule(Join.path("/core_component/{acc_id}/transfer_ownership")
+                        .to("/views/core_component/transfer_acc_ownership.jsf?accId={acc_id}"))
                 .addRule(Join.path("/core_component/asccp/create")
                         .to("/views/core_component/select_acc.jsf"))
                 .addRule(Join.path("/core_component/asccp/{asccp_id}")

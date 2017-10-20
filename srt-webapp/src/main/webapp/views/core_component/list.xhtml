@@ -135,6 +135,15 @@
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{cc.owner}">
                         <h:outputText value="#{cc.owner}"/>
+
+                        <h:link rendered="#{cc.type eq 'ACC' and coreComponentBean.currentUser.appUserId eq cc.ownerUserId and cc.state eq 'Editing'}"
+                                outcome="/views/core_component/transfer_acc_ownership.jsf">
+                            <f:param name="accId" value="#{cc.id}"/>
+                            <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                            </h:panelGroup>
+                        </h:link>
+                        <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
 
                     <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cc.state}">
