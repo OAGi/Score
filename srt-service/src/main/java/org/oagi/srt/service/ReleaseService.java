@@ -7,6 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -322,6 +324,29 @@ public class ReleaseService {
             bccp.setReleaseId(releaseId);
             bccpRepository.saveAndFlush(bccp);
         }
+    }
+
+    public void delete(Release releaseToDelete) {
+        List<Release> currentDraftReleases = releaseRepository.findByState(releaseToDelete.getState());
+        Collections.reverse(currentDraftReleases);
+        Releases followingRelease = null;
+
+        for (int i = 0; i < currentDraftReleases.size() - 1; i++) {
+            if (currentDraftReleases.get(i).getReleaseId() == releaseToDelete.getReleaseId()) {
+                followingRelease = new Releases();
+                followingRelease.setReleaseId(currentDraftReleases.get(i + 1).getReleaseId());
+                break;
+            }
+        }
+
+        if (followingRelease != null) {
+            moveCCsBetweenReleases(releaseToDelete, followingRelease);
+        } else {
+            moveCCsBetweenReleases(releaseToDelete, null);
+        }
+
+        releaseRepository.delete(releaseToDelete);
+        releaseRepository.flush();
     }
 }
 

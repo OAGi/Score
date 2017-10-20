@@ -145,8 +145,8 @@ public class ReleaseDetailBean extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String delete() { // todo MIRO add implementation for this method - similar as for finalizing some draft: revisions must be moved to the next if existing
-//        releaseService.delete(release);
+    public String delete() {
+        releaseService.delete(release);
 
         return "/views/core_component/release/list.jsf?faces-redirect=true";
     }
