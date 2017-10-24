@@ -82,7 +82,7 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
 
     @Modifying
     @Query("update AggregateCoreComponent a set a.state = ?4 where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
-    public void updateStateByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(long currentAccId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+    public void updateStateByCurrentAccIdAndRevisionNumAndRevisionTrackingNum(long currentAccId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
     AggregateCoreComponent findOneByCurrentAccIdAndRevisions(long currentAccId, int revisionNum, int i);

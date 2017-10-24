@@ -25,7 +25,7 @@
                     <h:outputText value="Release Number" styleClass="section-label"/>
                     <h:inputText id="releaseNum" value="#{releaseDetailBean.release.releaseNum}"
                                  maxlength="45"
-                                 label="Release Number" styleClass="section-content input-section">
+                                 label="Release Number" styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
                     </h:inputText>
 
                     <h:outputText value="Namespace" styleClass="section-label"/>
@@ -34,14 +34,14 @@
                                     completeMethod="#{releaseDetailBean.completeInputForNamespace}"
                                     dropdown="true"
                                     required="true" requiredMessage="Please fill out 'Namespace' field."
-                                    styleClass="section-content input-section">
+                                    styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
                         <p:ajax event="itemSelect" listener="#{releaseDetailBean.onSelectNamespace}"/>
                     </p:autoComplete>
 
                     <h:outputText value="Note" styleClass="section-label"/>
                     <h:inputTextarea id="note" value="#{releaseDetailBean.release.releaseNote}"
                                      rows="6" a:placeholder="Leave a note"
-                                     styleClass="section-content input-section"/>
+                                     styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}"/>
                 </h:panelGrid>
             </p:panel>
             <p:separator/>
@@ -53,7 +53,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
-                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
+                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}" disabledSelection="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}">
 
                     <p:column selectionMode="multiple" styleClass="table-checkbox"
                               rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
@@ -64,30 +64,27 @@
 
                     <p:column headerText="DEN" sortBy="#{cc.den}">
                         <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and
-                                          ((releaseDetailBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and cc.state ne 'Editing'}">
                             <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
 
                         <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and
-                                ((releaseDetailBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing') }">
+                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and cc.state ne 'Editing'}">
                             <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
 
                         <h:panelGroup
-                                rendered="#{cc.type eq 'ASCCP' and ((releaseDetailBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                                rendered="#{cc.type eq 'ASCCP' and cc.state ne 'Editing'}">
                             <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
 
                         <h:panelGroup
-                                rendered="#{cc.type eq 'BCCP' and ((releaseDetailBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                                rendered="#{cc.type eq 'BCCP' and cc.state ne 'Editing'}">
                             <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
 
                         <h:outputText value="${cc.den}"
-                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' or
-                                                 (releaseDetailBean.getCurrentUser().appUserId ne cc.ownerUserId) and cc.state eq 'Editing'}"/>
+                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' and cc.state eq 'Editing'}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
@@ -132,7 +129,7 @@
                              action="#{releaseDetailBean.update()}"/>
 
             <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{releaseDetailBean.release.releaseId != 0}"
+                             rendered="#{releaseDetailBean.release.releaseId != 0 and releaseDetailBean.release.state eq 'Draft'}"
                              action="#{releaseDetailBean.update()}"/>
 
             <p:commandButton id="discardBtn" ajax="true" value="Discard"

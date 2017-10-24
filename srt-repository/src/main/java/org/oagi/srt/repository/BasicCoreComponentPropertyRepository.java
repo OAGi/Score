@@ -76,7 +76,7 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
 
     @Modifying
     @Query("update BasicCoreComponentProperty b set b.state = ?4 where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum = ?3")
-    public void updateStateByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentBccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+    public void updateStateByCurrentBccpIdAndRevisionNumAndRevisionTrackingNum(long currentBccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
 
     @Modifying
     @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1")

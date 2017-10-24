@@ -964,13 +964,20 @@ public class CoreComponentService {
         if (state == Published) {
             for (AssociationCoreComponent ascc : asccList) {
                 deleteAsccHistoryRecords(fromAccId, ascc.getToAsccpId());
-                updateAsccHistoryRecordState(fromAccId, ascc.getToAsccpId(), state);
             }
 
             for (BasicCoreComponent bcc : bccList) {
                 deleteBccHistoryRecords(fromAccId, bcc.getToBccpId());
                 updateBccHistoryRecordState(fromAccId, bcc.getToBccpId(), state);
             }
+        }
+
+        for (AssociationCoreComponent ascc : asccList) {
+            updateAsccHistoryRecordState(fromAccId, ascc.getToAsccpId(), state);
+        }
+
+        for (BasicCoreComponent bcc : bccList) {
+            updateBccHistoryRecordState(fromAccId, bcc.getToBccpId(), state);
         }
     }
 
@@ -989,8 +996,8 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteAccHistoryRecords(acc.getAccId());
-            updateAccHistoryRecordState(acc.getAccId(), state);
         }
+        updateAccHistoryRecordState(acc.getAccId(), state);
     }
 
     private void updateAsccpState(AssociationCoreComponentProperty asccp,
@@ -1010,8 +1017,9 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteAsccpHistoryRecords(asccp.getAsccpId());
-            updateAsccpHistoryRecordState(asccp.getAsccpId(), state);
         }
+        updateAsccpHistoryRecordState(asccp.getAsccpId(), state);
+
     }
 
     private void updateBccpState(BasicCoreComponentProperty bccp,
@@ -1031,8 +1039,8 @@ public class CoreComponentService {
 
         if (state == Published) {
             deleteBccpHistoryRecords(bccp.getBccpId());
-            updateBccpHistoryRecordState(bccp.getBccpId(), state);
         }
+        updateBccpHistoryRecordState(bccp.getBccpId(), state);
     }
 
     private void deleteAccHistoryRecords(long currentAccId) {
@@ -1046,7 +1054,7 @@ public class CoreComponentService {
         int revisionNum = accRepository.findMaxRevisionNumByCurrentAccId(currentAccId);
         int revisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(currentAccId, revisionNum);
 
-        accRepository.updateStateByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum, state);
+        accRepository.updateStateByCurrentAccIdAndRevisionNumAndRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum, state);
     }
 
     private void deleteAsccHistoryRecords(long fromAccId, long toAsccpid) {
@@ -1088,7 +1096,7 @@ public class CoreComponentService {
         int revisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(currentAsccpId);
         int revisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(currentAsccpId, revisionNum);
 
-        asccpRepository.updateStateByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum, state);
+        asccpRepository.updateStateByCurrentAsccpIdAndRevisionNumAndRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum, state);
     }
 
     private void deleteBccpHistoryRecords(long currentBccpId) {
@@ -1102,7 +1110,7 @@ public class CoreComponentService {
         int revisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(currentBccpId);
         int revisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(currentBccpId, revisionNum);
 
-        bccpRepository.updateStateByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum, state);
+        bccpRepository.updateStateByCurrentBccpIdAndRevisionNumAndRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum, state);
     }
 
     private void storeBieUserExtRevisions(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc) {

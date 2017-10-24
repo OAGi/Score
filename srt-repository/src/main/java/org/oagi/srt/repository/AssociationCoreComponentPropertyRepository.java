@@ -102,7 +102,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Modifying
     @Query("update AssociationCoreComponentProperty a set a.state = ?4 where a.currentAsccpId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
-    public void updateStateByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentAsccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+    public void updateStateByCurrentAsccpIdAndRevisionNumAndRevisionTrackingNum(long currentAsccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
 
     @Modifying
     @Query("delete from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")

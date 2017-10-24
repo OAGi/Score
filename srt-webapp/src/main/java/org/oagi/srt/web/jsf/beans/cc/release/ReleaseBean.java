@@ -5,6 +5,7 @@ import org.oagi.srt.service.ReleaseService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
@@ -25,6 +26,7 @@ public class ReleaseBean extends UIHandler {
 
     private List<Releases> allReleases;
     private String releaseNum;
+    private Releases selectedReleases;
 
     @PostConstruct
     public void init() {
@@ -34,6 +36,13 @@ public class ReleaseBean extends UIHandler {
     public void makeReleaseFinal(Releases release) {
         setAllReleases(null); // trigger refresh
         releaseService.makeReleaseFinal(release);
+    }
+
+    public void makeReleaseFinal () {
+        if (selectedReleases != null) {
+            setAllReleases(null); // trigger refresh
+            releaseService.makeReleaseFinal(selectedReleases);
+        }
     }
 
     public List<String> completeInput(String query) {
@@ -94,4 +103,11 @@ public class ReleaseBean extends UIHandler {
         this.releaseNum = releaseNum;
     }
 
+    public Releases getSelectedReleases() {
+        return selectedReleases;
+    }
+
+    public void setSelectedReleases(Releases selectedReleases) {
+        this.selectedReleases = selectedReleases;
+    }
 }

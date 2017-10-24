@@ -55,7 +55,7 @@ public class CoreComponentsRepository {
                     "SELECT 'BCCP' as type, bccp.bccp_id AS id, bccp.den, bccp.owner_user_id, u.login_id AS owner, bccp.state, 0 AS oagis_component_type, bccp.last_updated_by, bccp.last_update_timestamp, m.module, bccp.definition, bccp.release_id " +
                     "FROM bccp JOIN app_user u ON bccp.owner_user_id = u.app_user_id LEFT JOIN module m ON bccp.module_id = m.module_id WHERE bccp.revision_num != 0 " +
                     ") t JOIN app_user uu ON t.last_updated_by = uu.app_user_id " +
-                    "WHERE t.state = 3 and t.owner_user_id = (:ownerId)";
+                    "WHERE t.state in (2, 3) and t.owner_user_id in (select au.app_user_id from app_user au where au.oagis_developer_indicator = 1)";
 
     public List<CoreComponents> findAll(List<String> types, List<CoreComponentState> states, Sort.Order order) {
         if (types.isEmpty()) {
@@ -79,7 +79,7 @@ public class CoreComponentsRepository {
         return query.getResultList();
     }
 
-    public List<CoreComponents> findDeltaForRelease(Release release, User currentUser) {
+    public List<CoreComponents> findDeltaForRelease(Release release) {
         String releaseClause = " and t.release_id";
 
         if (release.getReleaseId() == 0L) {
@@ -89,7 +89,6 @@ public class CoreComponentsRepository {
         }
 
         Query query = entityManager.createNativeQuery(FIND_DELTA_STATEMENT + releaseClause + " ORDER BY t.last_update_timestamp DESC", CoreComponents.class);
-        query.setParameter("ownerId", currentUser.getAppUserId());
 
         return query.getResultList();
     }

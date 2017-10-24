@@ -56,7 +56,7 @@ public class ReleaseDetailBean extends UIHandler {
                 setNamespace(release.getNamespace());
             }
         }
-        setDeltaCoreComponents(releaseService.getDeltaForRelease(release, getCurrentUser()));
+        setDeltaCoreComponents(releaseService.getDeltaForRelease(release));
     }
 
     public Release getRelease() {
@@ -67,7 +67,7 @@ public class ReleaseDetailBean extends UIHandler {
         allNamespaces = namespaceService.findAll(Sort.Direction.ASC, "uri");
         namespaceMap = allNamespaces.stream()
                 .collect(Collectors.toMap(e -> e.getUri(), Function.identity()));
-        deltaCoreComponents = releaseService.getDeltaForRelease(release, getCurrentUser());
+        deltaCoreComponents = releaseService.getDeltaForRelease(release);
 
         this.release = release;
     }
