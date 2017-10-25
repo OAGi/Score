@@ -148,4 +148,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.releaseId = ?1")
     List<AssociationCoreComponent> findByReleaseId(long releaseId);
+
+    @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1")
+    List<AssociationCoreComponent> findByCurrentAsccId(long currentAsccId);
 }

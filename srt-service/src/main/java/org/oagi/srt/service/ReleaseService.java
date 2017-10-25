@@ -309,7 +309,7 @@ public class ReleaseService {
 //        }
     }
 
-    public void makeReleaseFinal(Releases release) {
+    public void makeReleaseFinal(Releases release, boolean purge) {
         List<Release> currentDraftReleases = releaseRepository.findByState(release.getState());
 
         for (Release r : currentDraftReleases) {
@@ -325,7 +325,11 @@ public class ReleaseService {
             }
 
             if (r.getLastUpdateTimestamp().after(release.getLastUpdateTimestamp())) { // draft is after final release
-                deleteCCsByRelease(r);
+                if (purge) {
+                    deleteCCsByRelease(r);
+                } else {
+                    moveCCsBetweenReleases(r, null);
+                }
             }
 
             releaseRepository.delete(r.getReleaseId());
@@ -399,7 +403,7 @@ public class ReleaseService {
             accRepository.delete(acc);
             accRepository.flush();
 
-            if (acc.getRevisionNum() == 1 & acc.getRevisionTrackingNum() == 1) { // acc is the only revision, remove current as well
+            if (accRepository.findByCurrentAccId(acc.getCurrentAccId()).isEmpty()) { // acc was the only revision, remove current as well
                 accRepository.delete(acc.getCurrentAccId());
                 accRepository.flush();
             }
@@ -409,7 +413,7 @@ public class ReleaseService {
             asccRepository.delete(ascc);
             asccRepository.flush();
 
-            if (ascc.getRevisionNum() == 1 & ascc.getRevisionTrackingNum() == 1) { // acsc is the only revision, remove current as well
+            if (asccRepository.findByCurrentAsccId(ascc.getCurrentAsccId()).isEmpty()) { // ascc was the only revision, remove current as well
                 asccRepository.delete(ascc.getCurrentAsccId());
                 asccRepository.flush();
             }
@@ -419,7 +423,7 @@ public class ReleaseService {
             asccpRepository.delete(asccp);
             asccpRepository.flush();
 
-            if (asccp.getRevisionNum() == 1 & asccp.getRevisionTrackingNum() == 1) { // acsccp is the only revision, remove current as well
+            if (asccpRepository.findByCurrentAsccpId(asccp.getCurrentAsccpId()).isEmpty()) { // acsccp was the only revision, remove current as well
                 asccpRepository.delete(asccp.getCurrentAsccpId());
                 asccpRepository.flush();
             }
@@ -429,7 +433,7 @@ public class ReleaseService {
             bccRepository.delete(bcc);
             bccRepository.flush();
 
-            if (bcc.getRevisionNum() == 1 & bcc.getRevisionTrackingNum() == 1) { // bcc is the only revision, remove current as well
+            if (bccRepository.findByCurrentBccId(bcc.getCurrentBccId()).isEmpty()) { // bcc was the only revision, remove current as well
                 bccRepository.delete(bcc.getCurrentBccId());
                 bccRepository.flush();
             }
@@ -439,7 +443,7 @@ public class ReleaseService {
             bccpRepository.delete(bccp);
             bccpRepository.flush();
 
-            if (bccp.getRevisionNum() == 1 & bccp.getRevisionTrackingNum() == 1) { // bccp is the only revision, remove current as well
+            if (bccpRepository.findByCurrentBccpId(bccp.getCurrentBccpId()).isEmpty()) { // bccp was the only revision, remove current as well
                 bccpRepository.delete(bccp.getCurrentBccpId());
                 bccpRepository.flush();
             }

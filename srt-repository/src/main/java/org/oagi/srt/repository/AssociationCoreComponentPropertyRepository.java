@@ -124,4 +124,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select a from AssociationCoreComponentProperty a where a.releaseId = ?1")
     List<AssociationCoreComponentProperty> findByReleaseId(long releaseId);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
+    List<AssociationCoreComponentProperty> findByCurrentAsccpId(long currentAsccpId);
 }

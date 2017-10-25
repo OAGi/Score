@@ -5,7 +5,6 @@ import org.oagi.srt.service.ReleaseService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
@@ -33,15 +32,15 @@ public class ReleaseBean extends UIHandler {
         setAllReleases(releaseService.findAllReleases());
     }
 
-    public void makeReleaseFinal(Releases release) {
+    public void makeReleaseFinal(Releases release, boolean purge) {
         setAllReleases(null); // trigger refresh
-        releaseService.makeReleaseFinal(release);
+        releaseService.makeReleaseFinal(release, purge);
     }
 
-    public void makeReleaseFinal () {
+    public void makeReleaseFinal (boolean purge) {
         if (selectedReleases != null) {
             setAllReleases(null); // trigger refresh
-            releaseService.makeReleaseFinal(selectedReleases);
+            releaseService.makeReleaseFinal(selectedReleases, purge);
         }
     }
 

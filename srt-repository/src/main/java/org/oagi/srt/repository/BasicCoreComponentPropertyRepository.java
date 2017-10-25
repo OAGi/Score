@@ -98,4 +98,7 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
 
     @Query("select b from BasicCoreComponentProperty b where b.releaseId = ?1")
     List<BasicCoreComponentProperty> findByReleaseId(long releaseId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1")
+    List<BasicCoreComponentProperty> findByCurrentBccpId(long currentBccpId);
 }
