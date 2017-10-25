@@ -185,7 +185,6 @@ public class ReleaseService {
         List<BasicCoreComponentProperty> followingNonreleased = bccpRepository.findFollowingNonReleasedRevisions(cc.getId(), revisionNum);
 
         for (BasicCoreComponentProperty bccp : previousNonreleased) { // remove previous non-released revisions
-//            bccpRepository.updateReleaseByBccpId(bccp.getId(), release.getReleaseId());
             bccpRepository.delete(bccp.getId());
             bccpRepository.flush();
         }
@@ -203,7 +202,6 @@ public class ReleaseService {
         List<BasicCoreComponent> followingNonreleased = bccRepository.findFollowingNonReleasedRevisions(cc.getId(), revisionNum);
 
         for (BasicCoreComponent bcc : previousNonreleased) { // remove previous non-released revisions
-//            bccRepository.updateReleaseByBccId(bcc.getId(), release.getReleaseId());
             bccRepository.delete(bcc.getId());
             bccRepository.flush();
         }
@@ -221,7 +219,6 @@ public class ReleaseService {
         List<BasicCoreComponent> followingNonreleased = bccRepository.findFollowingNonReleasedRevisions(bccId, revisionNum);
 
         for (BasicCoreComponent bcc : previousNonreleased) { // remove previous non-released revisions
-//            bccRepository.updateReleaseByBccId(bcc.getId(), release.getReleaseId());
             bccRepository.delete(bcc.getId());
             bccRepository.flush();
         }
@@ -239,7 +236,6 @@ public class ReleaseService {
         List<AssociationCoreComponentProperty> followingNonreleased = asccpRepository.findFollowingNonReleasedRevisions(cc.getId(), revisionNum);
 
         for (AssociationCoreComponentProperty asccp : previousNonreleased) { // remove previous non-released revisions
-//            asccpRepository.updateReleaseByAsccpId(asccp.getId(), release.getReleaseId());
             asccpRepository.delete(asccp.getId());
             asccpRepository.flush();
         }
@@ -257,7 +253,6 @@ public class ReleaseService {
         List<AssociationCoreComponent> followingNonreleased = asccRepository.findFollowingNonReleasedRevisions(cc.getId(), revisionNum);
 
         for (AssociationCoreComponent ascc : previousNonreleased) { // remove previous non-released revisions
-//            asccRepository.updateReleaseByAsccId(ccs.getId(), release.getReleaseId());
             asccRepository.delete(ascc.getId());
             asccRepository.flush();
         }
@@ -275,7 +270,6 @@ public class ReleaseService {
         List<AssociationCoreComponent> followingNonreleased = asccRepository.findFollowingNonReleasedRevisions(asccId, revisionNum);
 
         for (AssociationCoreComponent ascc : previousNonreleased) { // remove previous non-released revisions
-//            asccRepository.updateReleaseByAsccId(ccs.getId(), release.getReleaseId());
             asccRepository.delete(ascc.getId());
             asccRepository.flush();
         }
@@ -293,7 +287,6 @@ public class ReleaseService {
         List<AggregateCoreComponent> followingNonreleased = accRepository.findFollowingNonReleasedRevisions(cc.getId(), revisionNum);
 
         for (AggregateCoreComponent acc : previousNonreleased) { // remove previous non-released revisions
-//            accRepository.updateReleaseByAccId(acc.getId(), release.getReleaseId());
             accRepository.delete(acc.getId());
             accRepository.flush();
         }
@@ -303,17 +296,17 @@ public class ReleaseService {
         }
 
         // add children associations to release
-        AggregateCoreComponent acc = accRepository.findOne(cc.getId());
-
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getCurrentAccId());
-        for (AssociationCoreComponent ascc : asccList) {
-            addAsccRevisionToRelease(ascc.getAsccId(), release);
-        }
-
-        List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getCurrentAccId());
-        for (BasicCoreComponent bcc : bccList) {
-            addBccRevisionToRelease(bcc.getBccId(), release);
-        }
+//        AggregateCoreComponent acc = accRepository.findOne(cc.getId());
+//
+//        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getCurrentAccId());
+//        for (AssociationCoreComponent ascc : asccList) {
+//            addAsccRevisionToRelease(ascc.getAsccId(), release);
+//        }
+//
+//        List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getCurrentAccId());
+//        for (BasicCoreComponent bcc : bccList) {
+//            addBccRevisionToRelease(bcc.getBccId(), release);
+//        }
     }
 
     public void makeReleaseFinal(Releases release) {
@@ -405,26 +398,51 @@ public class ReleaseService {
         for (AggregateCoreComponent acc : accs) {
             accRepository.delete(acc);
             accRepository.flush();
+
+            if (acc.getRevisionNum() == 1 & acc.getRevisionTrackingNum() == 1) { // acc is the only revision, remove current as well
+                accRepository.delete(acc.getCurrentAccId());
+                accRepository.flush();
+            }
         }
 
         for (AssociationCoreComponent ascc : asccs) {
             asccRepository.delete(ascc);
             asccRepository.flush();
+
+            if (ascc.getRevisionNum() == 1 & ascc.getRevisionTrackingNum() == 1) { // acsc is the only revision, remove current as well
+                asccRepository.delete(ascc.getCurrentAsccId());
+                asccRepository.flush();
+            }
         }
 
         for (AssociationCoreComponentProperty asccp : asccps) {
             asccpRepository.delete(asccp);
             asccpRepository.flush();
+
+            if (asccp.getRevisionNum() == 1 & asccp.getRevisionTrackingNum() == 1) { // acsccp is the only revision, remove current as well
+                asccpRepository.delete(asccp.getCurrentAsccpId());
+                asccpRepository.flush();
+            }
         }
 
         for (BasicCoreComponent bcc : bccs) {
             bccRepository.delete(bcc);
             bccRepository.flush();
+
+            if (bcc.getRevisionNum() == 1 & bcc.getRevisionTrackingNum() == 1) { // bcc is the only revision, remove current as well
+                bccRepository.delete(bcc.getCurrentBccId());
+                bccRepository.flush();
+            }
         }
 
         for (BasicCoreComponentProperty bccp : bccps) {
             bccpRepository.delete(bccp);
             bccpRepository.flush();
+
+            if (bccp.getRevisionNum() == 1 & bccp.getRevisionTrackingNum() == 1) { // bccp is the only revision, remove current as well
+                bccpRepository.delete(bccp.getCurrentBccpId());
+                bccpRepository.flush();
+            }
         }
     }
 
@@ -504,6 +522,10 @@ public class ReleaseService {
      * Check if release contains multiple revisons of the same component and remove all of them, but the latest one.
      */
     private void removeMultipleRevisionsFromRelease(Long releaseId) {
+        if (releaseId == null) {
+            return;
+        }
+
         HashMap<Long, CoreComponent> ccs = new HashMap<>();
 
         List<AggregateCoreComponent> accs = accRepository.findByReleaseId(releaseId);

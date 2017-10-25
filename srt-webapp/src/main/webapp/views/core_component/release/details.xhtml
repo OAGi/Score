@@ -53,7 +53,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
-                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}" disabledSelection="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}">
+                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
 
                     <p:column selectionMode="multiple" styleClass="table-checkbox"
                               rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
@@ -84,7 +84,7 @@
                         </h:panelGroup>
 
                         <h:outputText value="${cc.den}"
-                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' and cc.state eq 'Editing'}"/>
+                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
