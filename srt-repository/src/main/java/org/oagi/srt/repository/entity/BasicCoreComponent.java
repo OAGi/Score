@@ -15,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "bcc")
 public class BasicCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable {
+        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, RevisionAware, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 
@@ -303,11 +303,11 @@ public class BasicCoreComponent
         this.revisionAction = revisionAction;
     }
 
-    public long getReleaseId() {
+    public Long getReleaseId() {
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 

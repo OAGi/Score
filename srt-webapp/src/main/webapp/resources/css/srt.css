@@ -626,6 +626,11 @@ span.ui-button-text {
     background-color: #900 !important;
 }
 
+.ui-button.revise {
+    background-image: none !important;
+    background-color: #03645b !important;
+}
+
 .ui-inputfield {
     /*min-width: 440px;*/
     border: 0 !important;
@@ -1044,4 +1049,7 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 
 .dropdown-container label {
     padding: 2px 0 2px 10px !important;
+
+.ui-confirm-dialog-severity {
+    margin-top: 5px;
 }

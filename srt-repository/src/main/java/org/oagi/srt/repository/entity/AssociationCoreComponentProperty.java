@@ -15,7 +15,7 @@ import java.util.*;
 @Entity
 @Table(name = "asccp")
 public class AssociationCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable {
+        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
@@ -304,11 +304,11 @@ public class AssociationCoreComponentProperty
         this.revisionAction = revisionAction;
     }
 
-    public long getReleaseId() {
+    public Long getReleaseId() {
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 

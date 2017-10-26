@@ -14,7 +14,7 @@ import java.util.*;
 @Entity
 @Table(name = "acc")
 public class AggregateCoreComponent
-        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware {
+        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
@@ -295,11 +295,11 @@ public class AggregateCoreComponent
         this.revisionAction = revisionAction;
     }
 
-    public long getReleaseId() {
+    public Long getReleaseId() {
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 

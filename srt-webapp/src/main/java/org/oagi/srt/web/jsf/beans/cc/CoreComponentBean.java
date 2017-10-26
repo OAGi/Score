@@ -438,4 +438,21 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect("/core_component/bccp/create");
     }
+
+    public String getDiscardIcon(CoreComponents coreComponents) {
+        if (hasMultipleRevisions(coreComponents)) {
+            return "fa fa-white fa-undo";
+        } else {
+            return "fa fa-white fa-times";
+        }
+    }
+
+    public boolean hasMultipleRevisions(CoreComponents coreComponents) {
+        return coreComponentService.hasMultipleRevisions(coreComponents);
+    }
+
+    public String getFullRevisionNum (CoreComponents cc) {
+        return coreComponentService.getFullRevisionNum(cc);
+    }
+
 }

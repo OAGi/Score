@@ -36,10 +36,69 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     public List<BasicCoreComponentProperty> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
     @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = (" +
-            "select MAX(b.revisionNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 group by b.currentBccpId)")
+            "select MAX(b.revisionNum) from BasicCoreComponentProperty b where b.currentBccpId = ?1 group by b.currentBccpId) order by b.creationTimestamp desc")
     public List<BasicCoreComponentProperty> findAllWithLatestRevisionNumByCurrentBccpId(long currentBccpId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum = ?3")
+    public BasicCoreComponentProperty findOneByCurrentBccpIdAndRevisions(long currentBccpId, int revisionNum, int revisionTrackingNum);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1")
+    public Integer findMaxRevisionNumByCurrentBccpId(long currentBccpId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.releaseId = ?2")
+    public Integer findMaxRevisionNumByCurrentBccpIdAndReleaseId(long currentBccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNumAndReleaseId(long currentBccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.releaseId = ?2")
+    public Integer findMaxRevisionNumByBccpIdAndReleaseId(long currentBccpId, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2 and b.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndReleaseId(long currentBccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1")
+    public Integer findMaxRevisionNumByBccpId(long currentBccpId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
+
+    @Modifying
+    @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2")
+    public void deleteByCurrentBccpIdAndRevisionNum(long currentBccpId, int revisionNum);
+
+    @Modifying
+    @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum <> ?3")
+    public void deleteByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(long currentBccpId, int revisionNum, int revisionTrackingNum);
+
+    @Modifying
+    @Query("update BasicCoreComponentProperty b set b.state = ?4 where b.currentBccpId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum = ?3")
+    public void updateStateByCurrentBccpIdAndRevisionNumAndRevisionTrackingNum(long currentBccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
 
     @Modifying
     @Query("delete from BasicCoreComponentProperty b where b.currentBccpId = ?1")
     public void deleteByCurrentBccpId(long currentBccpId);
+
+
+    @Query("select b.revisionNum from BasicCoreComponentProperty b where b.bccpId = ?1")
+    int findRevisionNumByBccpId(long bccpId);
+
+    @Modifying
+    @Query("update BasicCoreComponentProperty b set b.releaseId = ?2 where b.bccpId = ?1")
+    void updateReleaseByBccpId(long bccpId, Long releaseId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = (select x.currentBccpId from BasicCoreComponentProperty x where x.bccpId = ?1) and b.revisionNum < ?2 and b.releaseId is null")
+    List<BasicCoreComponentProperty> findPreviousNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = (select x.currentBccpId from BasicCoreComponentProperty x where x.bccpId = ?1) and b.revisionNum > ?2 and b.releaseId is null")
+    List<BasicCoreComponentProperty> findFollowingNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select b from BasicCoreComponentProperty b where b.releaseId = ?1")
+    List<BasicCoreComponentProperty> findByReleaseId(long releaseId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1")
+    List<BasicCoreComponentProperty> findByCurrentBccpId(long currentBccpId);
 }

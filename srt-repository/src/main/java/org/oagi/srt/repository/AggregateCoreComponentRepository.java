@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.CoreComponentState;
+import org.oagi.srt.repository.entity.CoreComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,11 +34,43 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     public List<AggregateCoreComponent> findAllByRevisionNumAndStates(int revisionNum, Collection<CoreComponentState> states);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = (" +
-            "select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId)")
+            "select MAX(a.revisionNum) from AggregateCoreComponent a where a.currentAccId = ?1 group by a.currentAccId) order by a.creationTimestamp desc")
     public List<AggregateCoreComponent> findAllWithLatestRevisionNumByCurrentAccId(long currentAccId);
 
     @Query("select a.basedAccId from AggregateCoreComponent a where a.accId = ?1")
     public Long findBasedAccIdByAccId(long accId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1")
+    public Integer findMaxRevisionNumByCurrentAccId(long currentAccId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(long currentAccId, int revisionNum);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId = ?3")
+    public Integer findMaxRevisionNumByCurrentAccIdAndReleaseId(long currentAccId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNumAndReleaseId(long currentAccId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.releaseId = ?2")
+    public Integer findMaxRevisionNumByAccIdAndReleaseId(long accId, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
+    public Integer findMaxRevisionTrackingNumByAccIdAndRevisionNumAndReleaseId(long ccId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AggregateCoreComponent a where a.accId = ?1")
+    public Integer findMaxRevisionNumByAccId(long accId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2")
+    public Integer findMaxRevisionTrackingNumByAccIdAndRevisionNum(long ccId, int revisionNum);
+
+    @Modifying
+    @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2")
+    public void deleteByCurrentAccIdAndRevisionNum(long currentAccId, int revisionNum);
+
+    @Modifying
+    @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum <> ?3")
+    public void deleteByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(long currentAccId, int revisionNum, int revisionTrackingNum);
 
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.currentAccId = ?1")
@@ -46,4 +79,30 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Modifying
     @Query("delete from AggregateCoreComponent a where a.accId = ?1")
     public void deleteByAccId(long accId);
+
+    @Modifying
+    @Query("update AggregateCoreComponent a set a.state = ?4 where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    public void updateStateByCurrentAccIdAndRevisionNumAndRevisionTrackingNum(long currentAccId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    AggregateCoreComponent findOneByCurrentAccIdAndRevisions(long currentAccId, int revisionNum, int i);
+
+    @Query("select a.revisionNum from AggregateCoreComponent a where a.accId = ?1")
+    int findRevisionNumByAccId(long accId);
+
+    @Modifying
+    @Query("update AggregateCoreComponent a set a.releaseId = ?2 where a.accId = ?1")
+    void updateReleaseByAccId(long accId, Long releaseId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = (select x.currentAccId from AggregateCoreComponent x where x.accId = ?1) and a.revisionNum < ?2 and a.releaseId is null")
+    List<AggregateCoreComponent> findPreviousNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = (select x.currentAccId from AggregateCoreComponent x where x.accId = ?1) and a.revisionNum > ?2 and a.releaseId is null")
+    List<AggregateCoreComponent> findFollowingNonReleasedRevisions(long id, int revisionNum);
+
+    @Query("select a from AggregateCoreComponent a where a.releaseId = ?1")
+    List<AggregateCoreComponent> findByReleaseId(long releaseId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1")
+    List<AggregateCoreComponent> findByCurrentAccId(long currentAccid);
 }

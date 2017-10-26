@@ -1,18 +1,12 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.ACCNode;
-import org.oagi.srt.model.node.ASCCPNode;
-import org.oagi.srt.model.node.BCCPNode;
-import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.ExtensionService;
-import org.oagi.srt.service.NamespaceService;
-import org.oagi.srt.service.NodeService;
+import org.oagi.srt.service.*;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -31,6 +25,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.persistence.Basic;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +42,9 @@ import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private UndoService undoService;
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -71,6 +69,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
+    private boolean setSelectedTreeNodeAfterRefresh = false;
+    private TreeNode selectedNodeAfterRefresh;
 
     private DataType selectedBdt;
 
@@ -164,7 +164,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
-        this.selectedTreeNode = selectedTreeNode;
+        if (treeNode != null && selectedTreeNode == null && setSelectedTreeNodeAfterRefresh) {
+            this.selectedTreeNode = selectedNodeAfterRefresh;
+            setSelectedTreeNodeAfterRefresh = false;
+        } else {
+            this.selectedTreeNode = selectedTreeNode;
+        }
         setPreparedAppendAscc(false);
         setPreparedAppendBcc(false);
     }
@@ -902,7 +907,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
 
         try {
-            coreComponentService.discard(ascc, requester);
+            if (hasMultipleRevisions(asccpNode)) {
+                undoService.revertToPreviousRevision(ascc);
+                refreshTreeNode();
+            } else {
+                coreComponentService.discard(ascc, requester);
+            }
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -963,7 +973,12 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
 
         try {
-            coreComponentService.discard(bcc, requester);
+            if (hasMultipleRevisions(bccpNode)) {
+                undoService.revertToPreviousRevision(bcc);
+                refreshTreeNode();
+            } else {
+                coreComponentService.discard(bcc, requester);
+            }
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -1018,6 +1033,43 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
     }
 
+    public boolean canBeRevised(CCNode node) {
+        if (targetAcc.getState() == Published) {
+            return false;
+        }
+
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (Published == ascc.getState()) {
+                return true;
+            }
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (Published == bcc.getState()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void revise(CCNode node) {
+        User requester = getCurrentUser();
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            coreComponentService.newAssociationCoreComponentRevision(requester, ascc);
+        } else if (node instanceof BCCPNode) {
+            BCCPNode bccpNode = (BCCPNode) node;
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            coreComponentService.newBasicCoreComponentRevision(requester, bcc);
+        }
+        refreshTreeNode();
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void update() {
         updateAcc(getRootNode());
@@ -1058,6 +1110,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return !latestRevisionNumAccs.isEmpty();
     }
 
+    public boolean isPreviousRevisionNotInsert(AggregateCoreComponent acc) {
+        return undoService.isPreviousRevisionNotInsert(acc);
+    }
+
     @Transactional
     public void createNewRevision(AggregateCoreComponent acc) throws IOException {
         User requester = getCurrentUser();
@@ -1066,6 +1122,53 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect("/core_component/acc/" + acc.getAccId());
+    }
+
+    public void undoLastAction() {
+        undoService.undoLastAction(getTargetAcc());
+        refreshTreeNode();
+    }
+
+    private void refreshTreeNode() {
+        TreeNode treeNode = createTreeNode(targetAcc, true);
+        copyExpandedState(this.treeNode, treeNode);
+        setTreeNode(treeNode);
+        setSelectedTreeNodeAfterRefresh = true;
+        if (getSelectedTreeNode() != null) {
+            selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode, ((SRTNode) getSelectedTreeNode().getData()).getId()); // TODO: MIRO check if this cause problem with setting leaf node as selected after refresh
+        }
+    }
+
+    public String getDiscardIcon(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            AssociationCoreComponent ascc = ((ASCCPNode) node).getAscc();
+            if (undoService.hasMultipleRevisions(ascc)) {
+                return "fa fa-white fa-undo";
+            } else {
+                return "fa fa-white fa-times";
+            }
+        } else if (node instanceof BCCPNode) {
+            BasicCoreComponent bcc = ((BCCPNode) node).getBcc();
+            if (undoService.hasMultipleRevisions(bcc)) {
+                return "fa fa-white fa-undo";
+            } else {
+                return "fa fa-white fa-times";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public boolean hasMultipleRevisions(CCNode node) {
+        if (node instanceof ASCCPNode) {
+            AssociationCoreComponent ascc = ((ASCCPNode) node).getAscc();
+            return undoService.hasMultipleRevisions(ascc);
+        } else if (node instanceof BCCPNode) {
+            BasicCoreComponent bcc = ((BCCPNode) node).getBcc();
+            return undoService.hasMultipleRevisions(bcc);
+        } else {
+            return false;
+        }
     }
 }
 
