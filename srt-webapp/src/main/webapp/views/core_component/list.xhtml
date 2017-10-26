@@ -22,7 +22,7 @@
                             <h:outputText value="Release" styleClass="option-header"/>
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;" class="dropdown-container">
                                 <p:selectOneMenu id="release" value="#{coreComponentBean.release}"
-                                                 converter="#{releaseConverter}" style="width: 100px">
+                                                 converter="#{releaseConverter}" style="width: 150px">
                                     <p:ajax listener="#{coreComponentBean.onReleaseChange}" update="listForm" />
                                     <f:selectItems value="#{coreComponentBean.releases}" var="release"
                                                    itemLabel="#{release.releaseNum}"
