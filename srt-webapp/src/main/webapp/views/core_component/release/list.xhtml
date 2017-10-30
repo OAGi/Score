@@ -64,9 +64,9 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column style="text-align: center; width: 50px;"
+                    <p:column style="text-align: center; width: 100px;"
                               rendered="#{releaseBean.allReleases.isEmpty() == false}">
-                        <p:commandButton id="finalizeBtn" icon="fa fa-white fa-check" styleClass="revise"
+                        <p:commandButton id="finalizeBtn" value="Finalize" styleClass="revise"
                                          rendered="#{releases.state == 'Draft'}"
                                          onclick="PF('confirmFinalize').show()"
                                          update="tbl" ajax="true">
