@@ -803,7 +803,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareAppendBcc() {
-        allBccpList = bccpRepository.findAllByRevisionNumAndStates(0, Arrays.asList(Published)).stream()
+        allBccpList = bccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
         setBccpList(
