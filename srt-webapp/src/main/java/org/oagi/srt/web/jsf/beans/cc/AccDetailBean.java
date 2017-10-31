@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -577,7 +578,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return allAccList.stream()
                 .map(e -> e.getObjectClassTerm())
                 .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .filter(e -> {
+                    String lowercaseTerm = e.toLowerCase();
+                    for (String token : query.toLowerCase().split(" ")) {
+                        if (!lowercaseTerm.contains(token)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -594,7 +603,23 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         } else {
             setAccList(
                     allAccList.stream()
-                            .filter(e -> e.getObjectClassTerm().toLowerCase().contains(selectedObjectClassTerm.toLowerCase()))
+                            .filter(e -> {
+                                String lowercaseTerm = e.getObjectClassTerm().toLowerCase();
+                                for (String token : selectedObjectClassTerm.toLowerCase().split(" ")) {
+                                    if (!lowercaseTerm.contains(token)) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            })
+                            .sorted((a, b) -> {
+                                int aDist = getLevenshteinDistance(selectedObjectClassTerm, a.getObjectClassTerm());
+                                int bDist = getLevenshteinDistance(selectedObjectClassTerm, b.getObjectClassTerm());
+                                if (aDist == bDist) {
+                                    return a.getObjectClassTerm().compareTo(b.getObjectClassTerm());
+                                }
+                                return aDist - bDist;
+                            })
                             .collect(Collectors.toList())
             );
         }
@@ -712,7 +737,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return allAsccpList.stream()
                 .map(e -> e.getPropertyTerm())
                 .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .filter(e -> {
+                    String lowercaseTerm = e.toLowerCase();
+                    for (String token : query.toLowerCase().split(" ")) {
+                        if (!lowercaseTerm.contains(token)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -724,12 +757,28 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedAsccpPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setAsccpList(allAsccpList.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
                     .collect(Collectors.toList()));
         } else {
             setAsccpList(
                     allAsccpList.stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
+                            .filter(e -> {
+                                String lowercaseTerm = e.getPropertyTerm().toLowerCase();
+                                for (String token : selectedPropertyTerm.toLowerCase().split(" ")) {
+                                    if (!lowercaseTerm.contains(token)) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            })
+                            .sorted((a, b) -> {
+                                int aDist = getLevenshteinDistance(selectedPropertyTerm, a.getPropertyTerm());
+                                int bDist = getLevenshteinDistance(selectedPropertyTerm, b.getPropertyTerm());
+                                if (aDist == bDist) {
+                                    return a.getPropertyTerm().compareTo(b.getPropertyTerm());
+                                }
+                                return aDist - bDist;
+                            })
                             .collect(Collectors.toList())
             );
         }
@@ -845,7 +894,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         return allBccpList.stream()
                 .map(e -> e.getPropertyTerm())
                 .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .filter(e -> {
+                    String lowercaseTerm = e.toLowerCase();
+                    for (String token : query.toLowerCase().split(" ")) {
+                        if (!lowercaseTerm.contains(token)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -857,12 +914,28 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedBccpPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setBccpList(allBccpList.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(BasicCoreComponentProperty::getPropertyTerm))
                     .collect(Collectors.toList()));
         } else {
             setBccpList(
                     allBccpList.stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
+                            .filter(e -> {
+                                String lowercaseTerm = e.getPropertyTerm().toLowerCase();
+                                for (String token : selectedPropertyTerm.toLowerCase().split(" ")) {
+                                    if (!lowercaseTerm.contains(token)) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            })
+                            .sorted((a, b) -> {
+                                int aDist = getLevenshteinDistance(selectedPropertyTerm, a.getPropertyTerm());
+                                int bDist = getLevenshteinDistance(selectedPropertyTerm, b.getPropertyTerm());
+                                if (aDist == bDist) {
+                                    return a.getPropertyTerm().compareTo(b.getPropertyTerm());
+                                }
+                                return aDist - bDist;
+                            })
                             .collect(Collectors.toList())
             );
         }

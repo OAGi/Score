@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Controller
@@ -225,6 +226,39 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 .filter(new DenSearchFilter())
                 .filter(new DefinitionSearchFilter())
                 .filter(new ModuleSearchFilter())
+                .sorted((a, b) -> {
+                    String den = getSearchTextForDen();
+                    if (!StringUtils.isEmpty(den)) {
+                        int aDist = getLevenshteinDistance(den, a.getDen());
+                        int bDist = getLevenshteinDistance(den, b.getDen());
+                        if (aDist == bDist) {
+                            return a.getDen().compareTo(b.getDen());
+                        }
+                        return aDist - bDist;
+                    }
+
+                    String definition = getSearchTextForDefinition();
+                    if (!StringUtils.isEmpty(definition)) {
+                        int aDist = getLevenshteinDistance(den, a.getDefinition());
+                        int bDist = getLevenshteinDistance(den, b.getDefinition());
+                        if (aDist == bDist) {
+                            return a.getDefinition().compareTo(b.getDefinition());
+                        }
+                        return aDist - bDist;
+                    }
+
+                    String module = getSearchTextForModule();
+                    if (!StringUtils.isEmpty(module)) {
+                        int aDist = getLevenshteinDistance(den, a.getModule());
+                        int bDist = getLevenshteinDistance(den, b.getModule());
+                        if (aDist == bDist) {
+                            return a.getModule().compareTo(b.getModule());
+                        }
+                        return aDist - bDist;
+                    }
+
+                    return 0;
+                })
                 .collect(Collectors.toList());
     }
 
