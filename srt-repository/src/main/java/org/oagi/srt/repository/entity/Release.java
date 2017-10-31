@@ -173,6 +173,12 @@ public class Release implements NamespaceAware, TimestampAware, CreatorModifierA
     @Transient
     private transient List<UpdateEventListener> updateEventListeners;
 
+    public static final Release CURRENT_RELEASE = new Release();
+
+    static {
+        CURRENT_RELEASE.setReleaseNum("Current");
+    }
+
     public Release() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);

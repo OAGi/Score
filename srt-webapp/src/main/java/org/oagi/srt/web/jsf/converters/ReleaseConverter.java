@@ -11,6 +11,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
+import static org.oagi.srt.repository.entity.Release.CURRENT_RELEASE;
+
 @Component
 @Scope("request")
 public class ReleaseConverter implements Converter {
@@ -24,7 +26,11 @@ public class ReleaseConverter implements Converter {
         if (StringUtils.isEmpty(value)) {
             return null;
         }
+
         String releaseNum = value;
+        if (releaseNum.equals(CURRENT_RELEASE.getReleaseNum())) {
+            return CURRENT_RELEASE;
+        }
         return releaseRepository.findOneByReleaseNum(releaseNum);
     }
 
@@ -35,8 +41,6 @@ public class ReleaseConverter implements Converter {
             if (StringUtils.isEmpty(value)) {
                 return null;
             }
-
-
         }
 
         Release release = (Release) value;

@@ -53,7 +53,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @Autowired
     private ReleaseRepository releaseRepository;
 
-    private Release release;
+    private Release release = Release.CURRENT_RELEASE;
     private List<CoreComponents> coreComponents;
     private List<String> selectedTypes;
     private List<CoreComponentState> selectedStates;
@@ -136,7 +136,10 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public List<Release> getReleases() {
-        return releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId"));
+        List<Release> releases = new ArrayList();
+        releases.add(Release.CURRENT_RELEASE);
+        releases.addAll(releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId")));
+        return releases;
     }
 
     public String[] getSelectedTypes() {

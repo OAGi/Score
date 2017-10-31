@@ -59,6 +59,9 @@ public class CoreComponentService {
 
     public List<CoreComponents> getCoreComponents(
             List<String> types, List<CoreComponentState> states, Release release, Sort.Order order) {
+        if (release == null) {
+            release = Release.CURRENT_RELEASE;
+        }
         return coreComponentsRepository.findAll(types, states, release, order);
     }
 
