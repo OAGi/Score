@@ -99,14 +99,14 @@
                 <p:dataTable id="tbl" var="cc" value="#{coreComponentBean.coreComponents}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}">
+                             styleClass="core-components-table" rowKey="#{cc.id}">
                     <p:ajax event="sort" listener="#{coreComponentBean.onSortEvent}"/>
 
-                    <p:column style="width: 100px; text-align: center;" headerText="Type" sortBy="#{cc.type}">
+                    <p:column styleClass="type text-align-center" headerText="Type" sortBy="#{cc.type}">
                         <span class="label label-info">${cc.type}</span>
                     </p:column>
 
-                    <p:column headerText="DEN" sortBy="#{cc.den}">
+                    <p:column headerText="DEN" styleClass="den" sortBy="#{cc.den}">
                         <h:panelGroup
                                 rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and
                                           ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
@@ -132,9 +132,12 @@
                         <h:outputText value="${cc.den}"
                                       rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' or
                                                  (coreComponentBean.getCurrentUser().appUserId ne cc.ownerUserId) and cc.state eq 'Editing'}"/>
+                        <div>
+                            <span class="guid">#{cc.guid}</span>
+                        </div>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                    <p:column styleClass="owner text-align-center ellipsis" headerText="Owner"
                               sortBy="#{cc.owner}">
                         <h:outputText value="#{cc.owner}"/>
 
@@ -148,7 +151,7 @@
                         <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
 
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cc.state}">
+                    <p:column styleClass="state text-align-center" headerText="State" sortBy="#{cc.state}">
                         <h:panelGroup rendered="#{cc.state == 'Published'}">
                             <span class="label label-default">#{cc.state}</span>
                         </h:panelGroup>
@@ -160,25 +163,25 @@
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Revision"
+                    <p:column styleClass="revision text-align-center ellipsis" headerText="Revision"
                               sortBy="#{coreComponentBean.getFullRevisionNum(cc)}">
                         <h:outputText value="#{coreComponentBean.getFullRevisionNum(cc)}"/>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                    <p:column styleClass="last-updated-by text-align-center ellipsis"
                               headerText="Last Updated By"
                               sortBy="#{cc.lastUpdatedUser}">
                         <h:outputText value="#{cc.lastUpdatedUser}"/>
                     </p:column>
 
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
+                    <p:column styleClass="last-updated-timestamp text-align-center" headerText="Last Updated Timestamp"
                               sortBy="#{cc.lastUpdateTimestamp}">
                         <h:outputText value="#{cc.lastUpdateTimestamp}">
                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
                     </p:column>
 
-                    <p:column style="text-align: center; width: 65px;">
+                    <p:column styleClass="action-btn text-align-center">
                         <p:commandButton id="deleteBtn" icon="#{coreComponentBean.getDiscardIcon(cc)}"
                                          styleClass="delete"
                                          rendered="#{coreComponentBean.canBeDiscarded(cc)}"

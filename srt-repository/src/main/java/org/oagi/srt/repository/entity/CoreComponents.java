@@ -12,6 +12,9 @@ public class CoreComponents {
     @EmbeddedId
     private CoreComponentsId coreComponentsId;
 
+    @Column(nullable = false, length = 41)
+    private String guid;
+
     @Column(nullable = false, length = 200)
     private String den;
 
@@ -57,6 +60,14 @@ public class CoreComponents {
 
     public void setId(long id) {
         coreComponentsId.setId(id);
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getType() {
@@ -149,6 +160,7 @@ public class CoreComponents {
         if (ownerUserId != that.ownerUserId) return false;
         if (coreComponentsId != null ? !coreComponentsId.equals(that.coreComponentsId) : that.coreComponentsId != null)
             return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (den != null ? !den.equals(that.den) : that.den != null) return false;
         if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
         if (state != that.state) return false;
@@ -164,6 +176,7 @@ public class CoreComponents {
     @Override
     public int hashCode() {
         int result = coreComponentsId != null ? coreComponentsId.hashCode() : 0;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
@@ -180,6 +193,7 @@ public class CoreComponents {
     public String toString() {
         return "CoreComponents{" +
                 "coreComponentsId=" + coreComponentsId +
+                ", guid='" + guid + '\'' +
                 ", den='" + den + '\'' +
                 ", ownerUserId=" + ownerUserId +
                 ", owner='" + owner + '\'' +
