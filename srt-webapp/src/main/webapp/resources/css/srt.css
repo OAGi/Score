@@ -702,7 +702,7 @@ input[type="checkbox"].section-content {
 }
 
 .disabled {
-    border: 0;
+    border: 0 !important;
 }
 
 .ui-chkbox.input-section {
