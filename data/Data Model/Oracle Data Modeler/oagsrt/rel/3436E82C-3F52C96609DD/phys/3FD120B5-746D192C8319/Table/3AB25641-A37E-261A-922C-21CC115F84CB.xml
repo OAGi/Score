@@ -1,0 +1,183 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="ACC" directorySegmentName="seg_0" id="3AB25641-A37E-261A-922C-21CC115F84CB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="STATE" id="0E44667D-7BD4-4517-9544-99E5D8764E69">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REVISION_NUM" id="19FD9D28-9171-E3E7-7F63-7513C974A774">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OAGIS_COMPONENT_TYPE" id="2883E6C6-0C7D-7A18-876F-A0FE8BBB170A">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="LAST_UPDATED_BY" id="386C5DFF-CA0C-1F04-97FB-03C1D5B9AED2">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CREATED_BY" id="452F0788-5C1B-E5D8-EC27-9552DBA02841">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="4C716DDD-3CA6-8D83-8EBE-41382BFC628E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REVISION_ACTION" id="5789BC70-6B80-0A70-2FAE-857E3AB87869">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="IS_DEPRECATED" id="58A60508-80E5-B5CA-2651-93C6499589FD">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="LAST_UPDATE_TIMESTAMP" id="5F9740CD-23D7-1BF0-2593-11D3F3CD7787">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="GUID" id="61BEF519-ED3D-32CC-9946-E23F3BDB5816">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REVISION_TRACKING_NUM" id="6749F14E-C021-91D6-3B9F-E1863E9238CC">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OBJECT_CLASS_TERM" id="6D671569-0028-E741-8C2D-026B67051C59">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="RELEASE_ID" id="6DB0A4DC-0778-B7B7-5E3D-7AEAA8F9A1E5">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NAMESPACE_ID" id="762151C1-EE35-1AE0-3AB4-28639F10F3BE">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CURRENT_ACC_ID" id="78D11280-7876-10D1-CAD9-375C9A43775E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OBJECT_CLASS_QUALIFIER" id="8DB50F4F-0F25-AC03-9D8F-53DCDA78BD6C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BASED_ACC_ID" id="8EC069EA-39D3-1A01-A284-3398347BD4FA">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="MODULE_ID" id="8FB0F7CF-7830-F8AF-4FF5-25441DA9B299">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="IS_ABSTRACT" id="C1FA1AFD-4A96-4650-4CD4-931AB04D9833">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CREATION_TIMESTAMP" id="D0F4AABA-BACE-C649-6EB3-C9EAB28FC8F6">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION_SOURCE" id="DB351CFD-6B09-E0DE-713B-4A7FF835BA12">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OWNER_USER_ID" id="E77F5244-6B57-5F7E-DC63-FD43BFC78FB2">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEN" id="EBDFABDB-E498-2A63-9BE9-2FA55E660999">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ACC_ID" id="F9D15F1A-0722-828B-738F-D5C2F57C349C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_RELEASE_ID_FK" id="053719A9-16F7-F1B2-A60E-0E83EB5F1A04">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_CURRENT_ACC_ID_FK" id="0ECB19A8-4D5D-8F71-F6ED-E05967D8BF2F">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_LAST_UPDATED_BY_FK" id="1AA4C903-F8C4-0A6E-77D7-7B6ADBDECC7E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_MODULE_ID_FK" id="289EBA99-DF68-C119-62E3-6716B0ED2DED">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_NAMESPACE_ID_FK" id="37F78615-148D-9421-8605-4D99D58D4C06">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_OWNER_USER_ID_FK" id="4BBA3A0D-58FF-7A6A-F231-621FDF44B5FB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_BASED_ACC_ID_FK" id="A1C6FE64-EFBF-77CC-9658-439EB2C87E13">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ACC_CREATED_BY_FK" id="D7D208FD-31FB-422B-2D61-8A51C3EA2A73">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="ACC_PK" id="271E0CC9-7703-1425-507D-5F17E3BA6318">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev12c>
