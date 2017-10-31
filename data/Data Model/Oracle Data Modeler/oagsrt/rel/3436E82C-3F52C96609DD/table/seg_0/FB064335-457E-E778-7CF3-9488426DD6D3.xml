@@ -56,11 +56,77 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="6FDF3BF2-DD0B-B794-2DCE-D4F4803CF823" referredColumn="D15FD659-BBEC-F525-3E84-220244871286"/>
 </associations>
+</Column>
+<Column name="CREATED_BY" id="66CF8D2E-A1BA-BF6E-76AB-31CCED07493F">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:58:17 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the user who creates the entity.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="75260909-0614-9971-2039-B6FD626D09FB" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="DC7B49F3-63CE-4B5E-43EC-6114FCB72745">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:58:17 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the last user who updated the record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DC194537-5C53-65DA-A287-35AE4BA172A8" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="EA764599-7FBD-545C-3DC9-E884BD519945">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:58:17 UTC</createdTime>
+<commentInRDBMS>Timestamp when the record was created.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="6E74A340-3E4F-F2BB-ADFC-2F60072AA9A5">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:58:17 UTC</createdTime>
+<commentInRDBMS>The timestamp when the record was last updated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STATE" id="33669397-D079-B601-207E-BCB72237318E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:58:17 UTC</createdTime>
+<commentInRDBMS>1 = DRAFT, 2 = FINAL. This the revision life cycle state of the Release.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
@@ -83,6 +149,26 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="115E4871-BE79-40D7-A93C-B8442DE2A213"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="02EAE409-E48F-1233-C66A-97BA6644602B" name="RELEASE_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:59:15 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="66CF8D2E-A1BA-BF6E-76AB-31CCED07493F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7E648593-F070-EF75-0416-56680CF9E58B" name="RELEASE_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 15:00:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DC7B49F3-63CE-4B5E-43EC-6114FCB72745"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>
