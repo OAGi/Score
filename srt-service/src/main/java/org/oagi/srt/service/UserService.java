@@ -69,6 +69,7 @@ public class UserService {
     public long register(String username, String rawPassword) {
         User user = new User();
         user.setLoginId(username);
+        user.setPassword(rawPassword);
         user.setName(username);
         user.setOagisDeveloperIndicator(false);
         user.setOrganization(null);
