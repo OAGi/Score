@@ -7,7 +7,6 @@ import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
-import javax.print.attribute.standard.MediaSize;
 import java.io.Serializable;
 import java.util.*;
 
@@ -58,17 +57,6 @@ public class Release implements NamespaceAware, TimestampAware, CreatorModifierA
     @Column(nullable = false)
     @Convert(attributeName = "state", converter = ReleaseStateConverter.class)
     private ReleaseState state;
-
-//    @PrePersist
-//    public void prePersist() {
-//        creationTimestamp = new Date();
-//        lastUpdateTimestamp = new Date();
-//    }
-//
-//    @PreUpdate
-//    public void preUpdate() {
-//        lastUpdateTimestamp = new Date();
-//    }
 
     public long getReleaseId() {
         return releaseId;

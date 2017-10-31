@@ -99,7 +99,7 @@ public class P_1_1_PopulateCommonData {
 
         oagisUser = populateUser();
         namespace = populateNamespace();
-        release = populateRelease(namespace);
+        release = populateRelease(namespace, oagisUser);
 
         populateModule();
         populateXbtFromXMLSchemaBuiltInTypes();
@@ -144,13 +144,16 @@ public class P_1_1_PopulateCommonData {
         return namespaceRepository.saveAndFlush(namespace);
     }
 
-    private Release populateRelease(Namespace namespace) {
+    private Release populateRelease(Namespace namespace, User oagisUser) {
         printTitle("Populate OAGIS release " + OAGIS_VERSION);
 
         Release release = new Release();
         release.setReleaseNum(Double.toString(OAGIS_VERSION));
         release.setNamespaceId(namespace.getNamespaceId());
         release.setReleaseNote(OAGIS_RELEASE_NOTE);
+        release.setCreatedBy(oagisUser.getAppUserId());
+        release.setLastUpdatedBy(oagisUser.getAppUserId());
+        release.setState(ReleaseState.Final);
 
         return releaseRepository.saveAndFlush(release);
     }
