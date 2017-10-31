@@ -158,6 +158,14 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         setNodeName(bccpNode);
     }
 
+    public boolean isDisabled(BasicCoreComponentProperty bccp) {
+        User currentUser = getCurrentUser();
+        if (bccp.getOwnerUserId() != currentUser.getAppUserId() || bccp.getState() != Editing) {
+            return true;
+        }
+        return false;
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void updateState(CoreComponentState state) {
         User requester = getCurrentUser();

@@ -25,7 +25,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.persistence.Basic;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -386,6 +385,34 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
 
         return basedAcc.isAbstract();
+    }
+
+    public boolean isDisabled(CoreComponent coreComponent) {
+        User currentUser = getCurrentUser();
+        if (coreComponent instanceof AggregateCoreComponent) {
+            AggregateCoreComponent acc = (AggregateCoreComponent) coreComponent;
+            if (acc.getOwnerUserId() != currentUser.getAppUserId() || acc.getState() != Editing) {
+                return true;
+            }
+        } else if (coreComponent instanceof AssociationCoreComponent) {
+            AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+            return isDisabled(accRepository.findOne(ascc.getFromAccId()));
+        } else if (coreComponent instanceof BasicCoreComponent) {
+            BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+            return isDisabled(accRepository.findOne(bcc.getFromAccId()));
+        } else if (coreComponent instanceof AssociationCoreComponentProperty) {
+            AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) coreComponent;
+            if (asccp.getOwnerUserId() != currentUser.getAppUserId() || asccp.getState() != Editing) {
+                return true;
+            }
+        } else if (coreComponent instanceof BasicCoreComponentProperty) {
+            BasicCoreComponentProperty bccp = (BasicCoreComponentProperty) coreComponent;
+            if (bccp.getOwnerUserId() != currentUser.getAppUserId() || bccp.getState() != Editing) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -1003,16 +1030,22 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public boolean canBeDiscard(CCNode node) {
+        User currentUser = getCurrentUser();
+
         if (node instanceof ASCCPNode) {
             ASCCPNode asccpNode = (ASCCPNode) node;
             AssociationCoreComponent ascc = asccpNode.getAscc();
-            if (Editing == ascc.getState()) {
+            AggregateCoreComponent acc = accRepository.findOne(ascc.getFromAccId());
+
+            if (acc.getOwnerUserId() == currentUser.getAppUserId() && Editing == ascc.getState()) {
                 return true;
             }
         } else if (node instanceof BCCPNode) {
             BCCPNode bccpNode = (BCCPNode) node;
             BasicCoreComponent bcc = bccpNode.getBcc();
-            if (Editing == bcc.getState()) {
+            AggregateCoreComponent acc = accRepository.findOne(bcc.getFromAccId());
+
+            if (acc.getOwnerUserId() == currentUser.getAppUserId() && Editing == bcc.getState()) {
                 return true;
             }
         }

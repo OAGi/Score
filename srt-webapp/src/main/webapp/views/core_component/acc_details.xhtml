@@ -347,8 +347,8 @@
                                                              required="true"
                                                              requiredMessage="Please fill out 'Object Class Term' field."
                                                              value="#{accDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
-                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc)}">
                                                     <p:ajax listener="#{accDetailBean.onChangeObjectClassTerm(accDetailBean.selectedTreeNode)}"
                                                             update="headerMessage, leftPanel, accPanel, :form:btnGroup"/>
                                                 </h:inputText>
@@ -362,8 +362,8 @@
                                                 <h:outputText value="Component Type" styleClass="section-label"/>
                                                 <p:selectOneMenu id="accType"
                                                                  value="#{accDetailBean.selectedTreeNode.data.acc.oagisComponentType}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc)}">
                                                     <f:selectItems
                                                             value="#{accDetailBean.availableOagisComponentTypes(accDetailBean.selectedTreeNode.data.acc)}"/>
                                                     <p:ajax update="accPanel, :form:btnGroup"/>
@@ -372,9 +372,9 @@
                                                 <h:outputText value="Abstract" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="abstractCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.acc.abstractComponent}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : '' or
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? 'disabled' : '' or
                                                                                                     accDetailBean.canBeAbstract(accDetailBean.selectedTreeNode.data.acc) eq false}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' or
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) or
                                                                     accDetailBean.canBeAbstract(accDetailBean.selectedTreeNode.data.acc) eq false}">
                                                     <p:ajax update="accPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
@@ -382,9 +382,9 @@
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="accDeprecatedCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.acc.deprecated}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : '' or
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? 'disabled' : '' or
                                                                                                     accDetailBean.selectedTreeNode.data.acc.revisionNum lt 2}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' or
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) or
                                                                     accDetailBean.selectedTreeNode.data.acc.revisionNum lt 2}">
                                                     <p:ajax update="accPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
@@ -392,12 +392,12 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="accDefinitionCB"
                                                                  value="#{accDetailBean.selectedTreeNode.data.acc.definition}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) and
                                                                 accDetailBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.acc.state != 'Editing'}">
+                                                                 a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc)}">
                                                     <p:ajax update="accPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>
@@ -432,8 +432,8 @@
                                                 <h:outputText value="Min" styleClass="section-label"/>
                                                 <h:inputText id="asccMin"
                                                              value="#{accDetailBean.selectedTreeNode.data.ascc.cardinalityMin}"
-                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc)}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
                                                     <p:ajax listener="#{accDetailBean.validate(accDetailBean.selectedTreeNode.data)}"
@@ -444,8 +444,8 @@
                                                 <h:inputText id="asccMax"
                                                              editable="true"
                                                              value="#{accDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
-                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc)}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                     <f:converter binding="#{cardinalityMaxConverter}"/>
                                                     <f:validator binding="#{cardinalityMaxConverter}"/>
@@ -456,20 +456,20 @@
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="asccDeprecatedCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.ascc.deprecated}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) ? 'disabled' : ''}"
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc)}">
                                                     <p:ajax update="asccPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="asccDefinition"
                                                                  value="#{accDetailBean.selectedTreeNode.data.ascc.definition}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) and
                                                                 accDetailBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.ascc.state != 'Editing'}">
+                                                                 a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.ascc)}">
                                                     <p:ajax update="asccPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>
@@ -509,12 +509,12 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="asccpDefinitionCB"
                                                                  value="#{accDetailBean.selectedTreeNode.data.asccp.definition}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.asccp.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.asccp) and
                                                                 accDetailBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{accDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                                 a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.asccp) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.asccp)}">
                                                     <p:ajax update="asccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>
@@ -551,9 +551,9 @@
                                                 <p:selectOneMenu id="type"
                                                                  value="#{accDetailBean.selectedTreeNode.data.bcc.entityType}"
                                                                  styleClass="section-content input-section
-                                                                   #{accDetailBean.selectedTreeNode.data.bcc.state ne 'Editing' or
+                                                                   #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) or
                                                                      accDetailBean.selectedTreeNode.children.isEmpty() ne true ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.bcc.state ne 'Editing' or
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) or
                                                                     accDetailBean.selectedTreeNode.children.isEmpty() ne true}">
                                                     <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
                                                     <f:selectItem itemLabel="Element" itemValue="Element"/>
@@ -564,8 +564,8 @@
                                                 <h:outputText value="Min" styleClass="section-label"/>
                                                 <h:inputText id="bccMin"
                                                              value="#{accDetailBean.selectedTreeNode.data.bcc.cardinalityMin}"
-                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
                                                     <p:ajax listener="#{accDetailBean.validate(accDetailBean.selectedTreeNode.data)}"
@@ -576,8 +576,8 @@
                                                 <h:inputText id="bccMax"
                                                              editable="true"
                                                              value="#{accDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
-                                                             styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                             disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                     <f:converter binding="#{cardinalityMaxConverter}"/>
                                                     <f:validator binding="#{cardinalityMaxConverter}"/>
@@ -588,39 +588,39 @@
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="bccNillableCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.bcc.nillable}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <p:ajax update="bccPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="bccDeprecatedCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.bcc.deprecated}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <p:ajax update="bccPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Default Value" styleClass="section-label"/>
                                                 <h:inputTextarea id="bccDefault"
                                                                  value="#{accDetailBean.selectedTreeNode.data.bcc.defaultValue}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) and
                                                                 accDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <p:ajax update="bccPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="bccDefinition"
                                                                  value="#{accDetailBean.selectedTreeNode.data.bcc.definition}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) and
                                                                 accDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                                 a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
                                                     <p:ajax update="bccPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>
@@ -649,39 +649,39 @@
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="bccpNillableCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.bccp.nillable}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="deprecatedCB"
                                                                          value="${accDetailBean.selectedTreeNode.data.bccp.deprecated}"
-                                                                         styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                         disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Default Value" styleClass="section-label"/>
                                                 <h:inputTextarea id="default"
                                                                  value="#{accDetailBean.selectedTreeNode.data.bccp.defaultValue}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) and
                                                                 accDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="bccpDefinition"
                                                                  value="#{accDetailBean.selectedTreeNode.data.bccp.definition}"
-                                                                 rows="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                 rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) and
                                                                 accDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{accDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                 a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                 disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>

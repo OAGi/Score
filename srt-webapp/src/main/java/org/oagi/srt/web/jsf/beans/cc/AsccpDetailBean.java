@@ -148,6 +148,14 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         setNodeName(asccpNode);
     }
 
+    public boolean isDisabled(AssociationCoreComponentProperty asccp) {
+        User currentUser = getCurrentUser();
+        if (asccp.getOwnerUserId() != currentUser.getAppUserId() || asccp.getState() != Editing) {
+            return true;
+        }
+        return false;
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void updateState(CoreComponentState state) {
         User requester = getCurrentUser();

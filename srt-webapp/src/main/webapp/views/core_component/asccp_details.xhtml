@@ -195,8 +195,8 @@
                                                 <h:outputText value="Property Term" styleClass="section-label"/>
                                                 <h:inputText id="asccpTerm"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
-                                                        styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                        styleClass="section-content input-section #{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
+                                                        disabled="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp)}">
                                                     <p:ajax listener="#{asccpDetailBean.onChangePropertyTerm(asccpDetailBean.selectedTreeNode.data)}"
                                                             update="headerMessage, leftPanel, asccpPanel, :form:btnGroup"/>
                                                 </h:inputText>
@@ -210,28 +210,28 @@
                                                 <h:outputText value="Reusable" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="reusableCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.asccp.reusableIndicator}"
-                                                        styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                        styleClass="section-content input-section #{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
+                                                        disabled="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp)}">
                                                     <p:ajax update="asccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="asccpDeprecatedCB"
                                                         value="${asccpDetailBean.selectedTreeNode.data.asccp.deprecated}"
-                                                        styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                        styleClass="section-content input-section #{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
+                                                        disabled="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp)}">
                                                     <p:ajax update="asccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="asccpDefinition"
                                                         value="#{asccpDetailBean.selectedTreeNode.data.asccp.definition}"
-                                                        rows="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' and
+                                                        rows="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) and
                                                                 asccpDetailBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
                                                         autoResize="false"
-                                                        a:placeholder="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                        styleClass="section-content input-section #{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{asccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing'}">
+                                                        a:placeholder="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? '' : 'Leave a definition'}"
+                                                        styleClass="section-content input-section #{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
+                                                        disabled="#{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp)}">
                                                     <p:ajax update="asccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>

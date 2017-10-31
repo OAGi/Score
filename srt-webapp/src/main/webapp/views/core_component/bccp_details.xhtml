@@ -340,8 +340,8 @@
                                                 <h:outputText value="Property Term" styleClass="section-label"/>
                                                 <h:inputText id="bccpTerm"
                                                              value="#{bccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
-                                                             styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                             disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                             styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                             disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax listener="#{bccpDetailBean.onChangePropertyTerm(bccpDetailBean.selectedTreeNode.data)}"
                                                             update="headerMessage, leftPanel, bccpPanel, :form:btnGroup"/>
                                                 </h:inputText>
@@ -355,39 +355,39 @@
                                                 <h:outputText value="Nillable" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="nillableCB"
                                                                          value="${bccpDetailBean.selectedTreeNode.data.bccp.nillable}"
-                                                                         styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                         disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Deprecated" styleClass="section-label"/>
                                                 <h:selectBooleanCheckbox id="deprecated"
                                                                          value="${bccpDetailBean.selectedTreeNode.data.bccp.deprecated}"
-                                                                         styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                         disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                         styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                         disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Default Value" styleClass="section-label"/>
                                                 <h:inputTextarea id="default"
                                                                  value="#{bccpDetailBean.selectedTreeNode.data.bccp.defaultValue}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                 rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
                                                                 bccpDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                 styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                 disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="bccpDefinition"
                                                                  value="#{bccpDetailBean.selectedTreeNode.data.bccp.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                 rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
                                                                 bccpDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
                                                                  autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
-                                                                 disabled="#{bccpDetailBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                                 a:placeholder="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? '' : 'Leave a definition'}"
+                                                                 styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                 disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
                                                     <p:ajax update="bccpPanel, :form:btnGroup"/>
                                                 </h:inputTextarea>
                                             </h:panelGrid>
