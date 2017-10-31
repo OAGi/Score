@@ -53,8 +53,7 @@
                     <h:panelGroup rendered="#{request.userPrincipal != null}">
                         <div id="navbar-collapse-1">
                             <ul class="nav navbar-nav">
-                                <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
-                                <li class="dropdown">
+                                <li class="dropdown menu-first">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Profile BODs <span
                                             class="caret"></span></a>
@@ -69,8 +68,7 @@
                                         </li>
                                     </ul>
                                 </li>
-                                </h:panelGroup>
-                                <li class="dropdown #{authenticationBean.oagisDeveloper ? 'menu-first' : ''}">
+                                <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Profile BOD Expression <span
                                             class="caret"></span></a>
@@ -101,17 +99,13 @@
                                        aria-haspopup="true" aria-expanded="false">CC Management <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
-                                        <li>
-                                            <a href="/namespace">Namespace</a>
-                                        </li>
-                                        </h:panelGroup>
-                                        <h:panelGroup>
                                         <li>
                                             <a href="/core_component">Core Component</a>
                                         </li>
-                                        </h:panelGroup>
                                         <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                            <li>
+                                                <a href="/namespace">Namespace</a>
+                                            </li>
                                             <li>
                                                 <a href="/release">Release Management</a>
                                             </li>
