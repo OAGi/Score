@@ -53,7 +53,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     @Autowired
     private ReleaseRepository releaseRepository;
 
-    private Release release = Release.CURRENT_RELEASE;
+    private Release release;
     private List<CoreComponents> coreComponents;
     private List<String> selectedTypes;
     private List<CoreComponentState> selectedStates;
@@ -74,7 +74,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         if (selectedRelease != null) {
             this.release = releaseRepository.findOne((Long) selectedRelease);
         } else {
-            setRelease(releaseRepository.findOne(1L));
+            setRelease(Release.CURRENT_RELEASE);
         }
 
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
