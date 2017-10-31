@@ -10,7 +10,6 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.populate.helper.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.repository.entity.OagisComponentType;
 import org.oagi.srt.service.CoreComponentDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,10 @@ import java.util.List;
 
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.OagisComponentType.*;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
 
 @Component
 public class P_1_8_1_PopulateAccAsccpBccAscc {
@@ -65,6 +66,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private ReleaseRepository releaseRepository;
+    private Release release;
+
+    @Autowired
     private ImportUtil importUtil;
 
     @Autowired
@@ -85,6 +90,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         logger.info("### 1.8 Start");
 
         printTitle("Populate ACCs, ASCCPs, BCCPs, BCCs and ASCCs top down from BODs");
+
+        release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
         populateForAny();
         populate();
 
@@ -105,9 +112,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyACC.setOwnerUserId(importUtil.getUserId());
         anyACC.setCreatedBy(importUtil.getUserId());
         anyACC.setLastUpdatedBy(importUtil.getUserId());
-        anyACC.setReleaseId(importUtil.getReleaseId());
         anyACC.setNamespaceId(importUtil.getNamespaceId());
-        ccDAO.save(anyACC);
+        anyACC = ccDAO.save(anyACC);
+        saveHistory(anyACC, release);
 
         AssociationCoreComponentProperty anyASCCP = new AssociationCoreComponentProperty();
         anyASCCP.setGuid(Utility.generateGUID());
@@ -119,9 +126,73 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyASCCP.setOwnerUserId(importUtil.getUserId());
         anyASCCP.setCreatedBy(importUtil.getUserId());
         anyASCCP.setLastUpdatedBy(importUtil.getUserId());
-        anyASCCP.setReleaseId(importUtil.getReleaseId());
         anyASCCP.setNamespaceId(importUtil.getNamespaceId());
-        ccDAO.save(anyASCCP);
+        anyASCCP = ccDAO.save(anyASCCP);
+        saveHistory(anyASCCP, release);
+    }
+
+    private void saveHistory(CoreComponent coreComponent, Release release) {
+        if (coreComponent instanceof AggregateCoreComponent) {
+            AggregateCoreComponent acc = (AggregateCoreComponent) coreComponent;
+            AggregateCoreComponent accHistory = acc.clone();
+            int revisionNum = 1;
+            accHistory.setRevisionNum(revisionNum);
+            int revisionTrackingNum = 1;
+            accHistory.setRevisionTrackingNum(revisionTrackingNum);
+            accHistory.setRevisionAction(Insert);
+            accHistory.setReleaseId(release.getReleaseId());
+            accHistory.setCurrentAccId(acc.getAccId());
+
+            ccDAO.save(accHistory);
+        } else if (coreComponent instanceof AssociationCoreComponent) {
+            AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+            AssociationCoreComponent asccHistory = ascc.clone();
+            int revisionNum = 1;
+            asccHistory.setRevisionNum(revisionNum);
+            int revisionTrackingNum = 1;
+            asccHistory.setRevisionTrackingNum(revisionTrackingNum);
+            asccHistory.setRevisionAction(Insert);
+            asccHistory.setReleaseId(release.getReleaseId());
+            asccHistory.setCurrentAsccId(ascc.getAsccId());
+
+            ccDAO.save(asccHistory);
+        } else if (coreComponent instanceof AssociationCoreComponentProperty) {
+            AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) coreComponent;
+            AssociationCoreComponentProperty asccpHistory = asccp.clone();
+            int revisionNum = 1;
+            asccpHistory.setRevisionNum(revisionNum);
+            int revisionTrackingNum = 1;
+            asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+            asccpHistory.setRevisionAction(Insert);
+            asccpHistory.setReleaseId(release.getReleaseId());
+            asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+
+            ccDAO.save(asccpHistory);
+        } else if (coreComponent instanceof BasicCoreComponent) {
+            BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+            BasicCoreComponent bccHistory = bcc.clone();
+            int revisionNum = 1;
+            bccHistory.setRevisionNum(revisionNum);
+            int revisionTrackingNum = 1;
+            bccHistory.setRevisionTrackingNum(revisionTrackingNum);
+            bccHistory.setRevisionAction(Insert);
+            bccHistory.setReleaseId(release.getReleaseId());
+            bccHistory.setCurrentBccId(bcc.getBccId());
+
+            ccDAO.save(bccHistory);
+        } else if (coreComponent instanceof BasicCoreComponentProperty) {
+            BasicCoreComponentProperty bccp = (BasicCoreComponentProperty) coreComponent;
+            BasicCoreComponentProperty bccpHistory = bccp.clone();
+            int revisionNum = 1;
+            bccpHistory.setRevisionNum(revisionNum);
+            int revisionTrackingNum = 1;
+            bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+            bccpHistory.setRevisionAction(Insert);
+            bccpHistory.setReleaseId(release.getReleaseId());
+            bccpHistory.setCurrentBccpId(bccp.getBccpId());
+
+            ccDAO.save(bccpHistory);
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -388,10 +459,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setOwnerUserId(importUtil.getUserId());
         asccp.setDeprecated(false);
         asccp.setNamespaceId(importUtil.getNamespaceId());
-        asccp.setReleaseId(importUtil.getReleaseId());
         asccp.setReusableIndicator(reusableIndicator);
         asccp.setNillable(declaration.isNillable());
-        return ccDAO.save(asccp);
+        asccp = ccDAO.save(asccp);
+        saveHistory(asccp, release);
+        return asccp;
     }
 
     private AggregateCoreComponent createACC(Declaration declaration) {
@@ -490,8 +562,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             acc.setAbstract(((TypeDecl) declaration).isAbstract());
         }
         acc.setNamespaceId(importUtil.getNamespaceId());
-        acc.setReleaseId(importUtil.getReleaseId());
-        return ccDAO.save(acc);
+        acc = ccDAO.save(acc);
+        saveHistory(acc, release);
+        return acc;
     }
 
     private AggregateCoreComponent doCreateACC(Declaration declaration) {
@@ -550,11 +623,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         ascc.setDefinitionSource(declaration.getDefinitionSource());
         ascc.setState(CoreComponentState.Published);
         ascc.setDeprecated(false);
-        ascc.setReleaseId(importUtil.getReleaseId());
         ascc.setCreatedBy(importUtil.getUserId());
         ascc.setLastUpdatedBy(importUtil.getUserId());
         ascc.setOwnerUserId(importUtil.getUserId());
-        return ccDAO.save(ascc);
+        ascc = ccDAO.save(ascc);
+        saveHistory(ascc, release);
+        return ascc;
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
@@ -604,7 +678,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setDefinition(declaration.getDefinition());
         bcc.setDefinitionSource(declaration.getDefinitionSource());
         bcc.setDeprecated(false);
-        bcc.setReleaseId(importUtil.getReleaseId());
         bcc.setCreatedBy(importUtil.getUserId());
         bcc.setLastUpdatedBy(importUtil.getUserId());
         bcc.setOwnerUserId(importUtil.getUserId());
@@ -614,7 +687,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             defaultValue = toBccp.getDefaultValue();
         }
         bcc.setDefaultValue(defaultValue);
-        ccDAO.save(bcc);
+        bcc = ccDAO.save(bcc);
+        saveHistory(bcc, release);
 
         return true;
     }
@@ -672,10 +746,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setLastUpdatedBy(importUtil.getUserId());
             bccp.setOwnerUserId(importUtil.getUserId());
             bccp.setDeprecated(false);
-            bccp.setReleaseId(importUtil.getReleaseId());
             bccp.setNamespaceId(importUtil.getNamespaceId());
             bccp.setNillable(declaration.isNillable());
             bccp = ccDAO.save(bccp);
+            saveHistory(bccp, release);
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }

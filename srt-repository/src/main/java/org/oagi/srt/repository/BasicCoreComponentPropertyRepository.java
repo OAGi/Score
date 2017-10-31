@@ -17,7 +17,8 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select b from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2 and b.state = ?3")
     public BasicCoreComponentProperty findOneByBccpIdAndRevisionNumAndState(long bccpId, int revisionNum, CoreComponentState state);
 
-    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.propertyTerm = ?1 and b.bdtId = ?2")
+    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b " +
+            "where b.revisionNum = 0 and b.propertyTerm = ?1 and b.bdtId = ?2")
     public BasicCoreComponentProperty findBccpIdAndDenByPropertyTermAndBdtId(String propertyTerm, long bdtId);
 
     @Query("select b from BasicCoreComponentProperty b where b.guid = ?1")
@@ -26,7 +27,7 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select case when count(b) > 0 then true else false end from BasicCoreComponentProperty b where b.guid = ?1")
     public boolean existsByGuid(String guid);
 
-    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.guid = ?1")
+    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.revisionNum = 0 and b.guid = ?1")
     public BasicCoreComponentProperty findBccpIdAndDenByGuid(String guid);
 
     @Query("select b from BasicCoreComponentProperty b where b.revisionNum = ?1 order by b.creationTimestamp desc")

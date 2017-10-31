@@ -41,9 +41,11 @@ import java.util.*;
 
 import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
 
 /**
  * @author Yunsu Lee
@@ -95,6 +97,10 @@ public class P_1_7_PopulateQBDTInDT {
 
     @Autowired
     private ModuleRepository moduleRepository;
+
+    @Autowired
+    private ReleaseRepository releaseRepository;
+    private Release release;
 
     @Autowired
     private ImportUtil importUtil;
@@ -561,13 +567,26 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setLastUpdatedBy(importUtil.getUserId());
         bccp.setOwnerUserId(importUtil.getUserId());
         bccp.setDeprecated(false);
-        bccp.setReleaseId(importUtil.getReleaseId());
         Module module = elementDecl.getModule();
         bccp.setModuleId((module != null) ? module.getModuleId() : 0L);
         bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());
-        ccDAO.save(bccp);
+        bccp = ccDAO.save(bccp);
+        saveHistory(bccp, release);
+    }
+
+    private void saveHistory(BasicCoreComponentProperty bccp, Release release) {
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        int revisionNum = 1;
+        bccpHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setReleaseId(release.getReleaseId());
+        bccpHistory.setCurrentBccpId(bccp.getBccpId());
+
+        ccDAO.save(bccpHistory);
     }
 
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
@@ -966,6 +985,7 @@ public class P_1_7_PopulateQBDTInDT {
         logger.info("### 1.7 Start");
         printTitle("Populate Qualified BDTs");
 
+        release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
         populate();
 
         logger.info("### 1.7 End");

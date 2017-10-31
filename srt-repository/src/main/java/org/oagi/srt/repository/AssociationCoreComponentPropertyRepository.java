@@ -29,7 +29,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.roleOfAccId = ?1 and a.revisionNum = 0")
     public List<AssociationCoreComponentProperty> findByRoleOfAccId(long roleOfAccId);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.guid = ?1")
+    @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = 0 and a.guid = ?1")
     public AssociationCoreComponentProperty findOneByGuid(String guid);
 
     @Query("select case when count(a) > 0 then true else false end from AssociationCoreComponentProperty a where a.guid = ?1")
@@ -46,7 +46,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
             "asccp.propertyTerm like %?1%")
     public List<String> findPropertyTermByPropertyTermContains(String propertyTerm);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.den = '" + ANY_ASCCP_DEN + "'")
+    @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = 0 and a.den = '" + ANY_ASCCP_DEN + "'")
     public AssociationCoreComponentProperty findAny();
 
     @Query("select a from AssociationCoreComponentProperty a where a.asccpId in ?1")
