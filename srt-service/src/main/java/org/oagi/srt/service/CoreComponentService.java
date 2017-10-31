@@ -511,7 +511,7 @@ public class CoreComponentService {
         if (state == Published) {
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
             if (acc.getState() != Published) {
-                throw new IllegalStateException("This state cannot be updated until the associated ACC would be in Published state.");
+                throw new IllegalStateException("This state cannot be updated until the associated ACC is in Publish state.");
             }
         }
 
