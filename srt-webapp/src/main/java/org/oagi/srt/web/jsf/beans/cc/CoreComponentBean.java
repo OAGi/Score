@@ -20,10 +20,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -225,7 +222,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 selectedTypes, selectedStates, release,
                 new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
 
-        return coreComponents.stream()
+        coreComponents = coreComponents.stream()
                 .filter(new DenSearchFilter())
                 .filter(new DefinitionSearchFilter())
                 .filter(new ModuleSearchFilter())
@@ -263,6 +260,21 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                     return 0;
                 })
                 .collect(Collectors.toList());
+
+        Map<String, CoreComponents> ccMap = new LinkedHashMap();
+        coreComponents.stream().forEachOrdered(e -> {
+            String guid = e.getGuid();
+            if (ccMap.containsKey(guid)) {
+                CoreComponents p = ccMap.get(guid);
+                if (e.getLastUpdateTimestamp().compareTo(p.getLastUpdateTimestamp()) <= 0) {
+                    return;
+                }
+            }
+
+            ccMap.put(guid, e);
+        });
+
+        return new ArrayList(ccMap.values());
     }
 
     public void setCoreComponents(List<CoreComponents> coreComponents) {
