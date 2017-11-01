@@ -1245,7 +1245,11 @@ public class CoreComponentService {
         StringBuilder sb = new StringBuilder("");
         int maxRevisionNum = 0;
         int maxRevisionTrackingNum = 0;
-        long releaseId = release.getReleaseId();
+        long releaseId = 0L;
+
+        if (release != null) {
+            releaseId = release.getReleaseId();
+        }
 
         if (releaseId == 0L) {
             return getFullRevisionNum(cc);

@@ -353,6 +353,31 @@ public class ReleaseService {
             AggregateCoreComponent currentACC = accRepository.findOne(acc.getCurrentAccId());
             currentACC.setState(CoreComponentState.Published);
             accRepository.saveAndFlush(currentACC);
+
+            //move all children assocs to publish state
+            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getCurrentAccId());
+            for (AssociationCoreComponent ascc : asccList) {
+                ascc.setState(CoreComponentState.Published);
+                asccRepository.saveAndFlush(ascc);
+            }
+
+            List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getCurrentAccId());
+            for (BasicCoreComponent bcc : bccList) {
+                bcc.setState(CoreComponentState.Published);
+                bccRepository.saveAndFlush(bcc);
+            }
+
+            List<AssociationCoreComponent> asccList2 = asccRepository.findByFromAccId(currentACC.getCurrentAccId());
+            for (AssociationCoreComponent ascc : asccList2) {
+                ascc.setState(CoreComponentState.Published);
+                asccRepository.saveAndFlush(ascc);
+            }
+
+            List<BasicCoreComponent> bccList2 = bccRepository.findByFromAccId(currentACC.getCurrentAccId());
+            for (BasicCoreComponent bcc : bccList2) {
+                bcc.setState(CoreComponentState.Published);
+                bccRepository.saveAndFlush(bcc);
+            }
         }
 
         for (AssociationCoreComponent ascc : asccs) {
