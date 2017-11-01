@@ -102,6 +102,10 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public void deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum);
 
     @Modifying
+    @Query("update AssociationCoreComponent a set a.state = ?2 where a.fromAccId = ?1")
+    public void updateStateByFromAccId(long fromAccId, CoreComponentState state);
+
+    @Modifying
     @Query("update AssociationCoreComponent a set a.state = ?5 where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.revisionTrackingNum = ?4")
     public void updateStateByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(long fromAccId, long toAsccpId, int revisionNum, int revisionTrackingNum, CoreComponentState state);
 

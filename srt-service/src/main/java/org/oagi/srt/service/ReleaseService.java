@@ -68,7 +68,6 @@ public class ReleaseService {
         return releaseRepository.findOneByReleaseNum(releaseNum);
     }
 
-
     public String getFullRevisionNum(CoreComponents cc, Release release) {
         StringBuilder sb = new StringBuilder("");
         int maxRevisionNum = 0;
@@ -156,7 +155,7 @@ public class ReleaseService {
         return coreComponentsRepository.findDeltaForRelease(release);
     }
 
-
+    @Transactional
     public void addRevisionToRelease(CoreComponents cc, Release release) {
         switch (cc.getType()) {
             case "ACC":
@@ -309,6 +308,7 @@ public class ReleaseService {
 //        }
     }
 
+    @Transactional
     public void makeReleaseFinal(Releases release, boolean purge) {
         List<Release> currentDraftReleases = releaseRepository.findByState(release.getState());
 
@@ -354,30 +354,12 @@ public class ReleaseService {
             currentACC.setState(CoreComponentState.Published);
             accRepository.saveAndFlush(currentACC);
 
-            //move all children assocs to publish state
-            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getCurrentAccId());
-            for (AssociationCoreComponent ascc : asccList) {
-                ascc.setState(CoreComponentState.Published);
-                asccRepository.saveAndFlush(ascc);
-            }
+            // move all children assocs to publish state
+            asccRepository.updateStateByFromAccId(acc.getCurrentAccId(), CoreComponentState.Published);
+            bccRepository.updateStateByFromAccId(acc.getCurrentAccId(), CoreComponentState.Published);
 
-            List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getCurrentAccId());
-            for (BasicCoreComponent bcc : bccList) {
-                bcc.setState(CoreComponentState.Published);
-                bccRepository.saveAndFlush(bcc);
-            }
-
-            List<AssociationCoreComponent> asccList2 = asccRepository.findByFromAccId(currentACC.getCurrentAccId());
-            for (AssociationCoreComponent ascc : asccList2) {
-                ascc.setState(CoreComponentState.Published);
-                asccRepository.saveAndFlush(ascc);
-            }
-
-            List<BasicCoreComponent> bccList2 = bccRepository.findByFromAccId(currentACC.getCurrentAccId());
-            for (BasicCoreComponent bcc : bccList2) {
-                bcc.setState(CoreComponentState.Published);
-                bccRepository.saveAndFlush(bcc);
-            }
+            asccRepository.updateStateByFromAccId(currentACC.getCurrentAccId(), CoreComponentState.Published);
+            bccRepository.updateStateByFromAccId(currentACC.getCurrentAccId(), CoreComponentState.Published);
         }
 
         for (AssociationCoreComponent ascc : asccs) {
@@ -715,6 +697,7 @@ public class ReleaseService {
         }
     }
 
+    @Transactional
     public void delete(Release releaseToDelete) {
         List<Release> currentDraftReleases = releaseRepository.findByState(releaseToDelete.getState());
         Collections.reverse(currentDraftReleases);
