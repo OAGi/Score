@@ -303,7 +303,7 @@ public class BasicCoreComponent
         this.revisionAction = revisionAction;
     }
 
-    public Long getReleaseId() {
+    public long getReleaseId() {
         return (releaseId == null) ? 0L : releaseId;
     }
 

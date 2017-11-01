@@ -266,7 +266,16 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
             String guid = e.getGuid();
             if (ccMap.containsKey(guid)) {
                 CoreComponents p = ccMap.get(guid);
-                if (e.getLastUpdateTimestamp().compareTo(p.getLastUpdateTimestamp()) <= 0) {
+                Long pReleaseId = p.getReleaseId();
+                if (pReleaseId == null) {
+                    pReleaseId = 0L;
+                }
+                Long eReleaseId = e.getReleaseId();
+                if (eReleaseId == null) {
+                    eReleaseId = 0L;
+                }
+
+                if (pReleaseId > eReleaseId) {
                     return;
                 }
             }

@@ -5,4 +5,6 @@ public interface CoreComponent extends IEntity, IGuidEntity, TimestampAware {
     public String getDen();
 
     public boolean isDirty();
+
+    public long getReleaseId();
 }

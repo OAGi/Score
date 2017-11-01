@@ -309,29 +309,64 @@ public class NodeService {
 
     private List<CoreComponentRelation> getAssociationsWithoutRecursive(AggregateCoreComponent acc, CoreComponentState state) {
         long accId = acc.getAccId();
+        long releaseId = acc.getReleaseId();
 
         List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-        if (state != null) {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
-            coreComponentRelations.addAll(bccList);
-            Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
-
-            return coreComponentRelations;
+        if (releaseId == 0L) { // current records
+            if (state != null) {
+                List<AssociationCoreComponent> asccList =
+                        asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+                coreComponentRelations.addAll(asccList);
+                List<BasicCoreComponent> bccList =
+                        bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+                coreComponentRelations.addAll(bccList);
+            } else {
+                List<AssociationCoreComponent> asccList =
+                        asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+                coreComponentRelations.addAll(asccList);
+                List<BasicCoreComponent> bccList =
+                        bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+                coreComponentRelations.addAll(bccList);
+            }
         } else {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-            coreComponentRelations.addAll(bccList);
-            Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
+            accId = acc.getCurrentAccId();
+            if (state != null) {
+                List<AssociationCoreComponent> asccList =
+                        asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                coreComponentRelations.addAll(asccList);
+                List<BasicCoreComponent> bccList =
+                        bccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                coreComponentRelations.addAll(bccList);
+            } else {
+                List<AssociationCoreComponent> asccList =
+                        asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                coreComponentRelations.addAll(asccList);
+                List<BasicCoreComponent> bccList =
+                        bccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                coreComponentRelations.addAll(bccList);
+            }
 
-            return coreComponentRelations;
+            Map<String, CoreComponentRelation> ccMap = new LinkedHashMap();
+            coreComponentRelations.stream().forEachOrdered(e -> {
+                String guid = e.getGuid();
+                if (ccMap.containsKey(guid)) {
+                    CoreComponentRelation p = ccMap.get(guid);
+                    long pReleaseId = p.getReleaseId();
+                    Long eReleaseId = e.getReleaseId();
+                    if (pReleaseId > eReleaseId) {
+                        return;
+                    }
+                }
+
+                ccMap.put(guid, e);
+            });
+
+            coreComponentRelations = new ArrayList(ccMap.values());
         }
+
+        Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
+
+        return coreComponentRelations;
     }
 
     private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent associationCoreComponent) {

@@ -24,6 +24,9 @@ public class CoreComponents {
     @Column(nullable = false, length = 45)
     private String owner;
 
+    @Column
+    private Long releaseId;
+
     @Column(nullable = false)
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
@@ -102,6 +105,14 @@ public class CoreComponents {
         this.owner = owner;
     }
 
+    public Long getReleaseId() {
+        return releaseId;
+    }
+
+    public void setReleaseId(Long releaseId) {
+        this.releaseId = releaseId;
+    }
+
     public CoreComponentState getState() {
         return state;
     }
@@ -163,6 +174,7 @@ public class CoreComponents {
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (den != null ? !den.equals(that.den) : that.den != null) return false;
         if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
+        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
         if (state != that.state) return false;
         if (oagisComponentType != that.oagisComponentType) return false;
         if (lastUpdatedUser != null ? !lastUpdatedUser.equals(that.lastUpdatedUser) : that.lastUpdatedUser != null)
@@ -180,6 +192,7 @@ public class CoreComponents {
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
         result = 31 * result + (lastUpdatedUser != null ? lastUpdatedUser.hashCode() : 0);
@@ -197,6 +210,7 @@ public class CoreComponents {
                 ", den='" + den + '\'' +
                 ", ownerUserId=" + ownerUserId +
                 ", owner='" + owner + '\'' +
+                ", releaseId=" + releaseId +
                 ", state=" + state +
                 ", oagisComponentType=" + oagisComponentType +
                 ", lastUpdatedUser='" + lastUpdatedUser + '\'' +
