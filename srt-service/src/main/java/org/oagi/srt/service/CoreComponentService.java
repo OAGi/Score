@@ -1253,26 +1253,26 @@ public class CoreComponentService {
 
         switch (cc.getType()) {
             case "ACC":
-                maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccIdAndReleaseId(cc.getId(), releaseId);
-                maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNumAndReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                maxRevisionNum = accRepository.findMaxRevisionNumByAccIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByAccIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "ASCC":
                 AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
-                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
-                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
+                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndLessThanReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
+                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndLessThanReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
                 break;
             case "ASCCP":
-                maxRevisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpIdAndReleaseId(cc.getId(), releaseId);
-                maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNumAndReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                maxRevisionNum = asccpRepository.findMaxRevisionNumByAsccpIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "BCC":
                 BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
-                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
-                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
+                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndLessThanReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
+                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndLessThanReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
                 break;
             case "BCCP":
-                maxRevisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpIdAndReleaseId(cc.getId(), releaseId);
-                maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNumAndReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                maxRevisionNum = bccpRepository.findMaxRevisionNumByBccpIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
         }
 

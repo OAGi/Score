@@ -83,8 +83,14 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.releaseId = ?2")
     public Integer findMaxRevisionNumByAsccpIdAndReleaseId(long asccpId, long releaseId);
 
+    @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.releaseId <= ?2")
+    public Integer findMaxRevisionNumByAsccpIdAndLessThanReleaseId(long asccpId, long releaseId);
+
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2 and a.releaseId = ?3")
     public Integer findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndReleaseId(long currentAsccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2 and a.releaseId <= ?3")
+    public Integer findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndLessThanReleaseId(long currentAsccpId, int revisionNum, long releaseId);
 
     @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponentProperty a where a.asccpId = ?1")
     public Integer findMaxRevisionNumByAsccpId(long asccpId);

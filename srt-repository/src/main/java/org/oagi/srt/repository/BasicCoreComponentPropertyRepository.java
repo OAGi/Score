@@ -58,8 +58,14 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.releaseId = ?2")
     public Integer findMaxRevisionNumByBccpIdAndReleaseId(long currentBccpId, long releaseId);
 
+    @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.releaseId <= ?2")
+    public Integer findMaxRevisionNumByBccpIdAndLessThanReleaseId(long currentBccpId, long releaseId);
+
     @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2 and b.releaseId = ?3")
     public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndReleaseId(long currentBccpId, int revisionNum, long releaseId);
+
+    @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2 and b.releaseId <= ?3")
+    public Integer findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndLessThanReleaseId(long currentBccpId, int revisionNum, long releaseId);
 
     @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponentProperty b where b.bccpId = ?1")
     public Integer findMaxRevisionNumByBccpId(long currentBccpId);

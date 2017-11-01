@@ -489,7 +489,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public String getFullRevisionNum (CoreComponents cc) {
-        return coreComponentService.getFullRevisionNum(cc);
+        return coreComponentService.getFullRevisionNum(cc, release);
     }
 
 }
