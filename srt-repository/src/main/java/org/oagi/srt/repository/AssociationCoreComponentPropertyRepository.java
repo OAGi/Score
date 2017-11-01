@@ -2,7 +2,6 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
-import org.oagi.srt.repository.entity.CoreComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -130,6 +129,9 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select a from AssociationCoreComponentProperty a where a.releaseId = ?1")
     List<AssociationCoreComponentProperty> findByReleaseId(long releaseId);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId <= ?2")
+    List<AssociationCoreComponentProperty> findByCurrentAsccpIdAndReleaseId(long currentAsccpId, long releaseId);
 
     @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
     List<AssociationCoreComponentProperty> findByCurrentAsccpId(long currentAsccpId);
