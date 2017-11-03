@@ -23,11 +23,11 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<spring.framework.version>4.3.10.RELEASE</spring.framework.version>
-		<spring.boot.version>1.5.6.RELEASE</spring.boot.version>
-		<spring.data.jpa.version>1.11.6.RELEASE</spring.data.jpa.version>
-		<spring.data.commons.version>1.13.6.RELEASE</spring.data.commons.version>
-		<spring.data.rest.version>2.6.6.RELEASE</spring.data.rest.version>
+		<spring.framework.version>4.3.12.RELEASE</spring.framework.version>
+		<spring.boot.version>1.5.8.RELEASE</spring.boot.version>
+		<spring.data.jpa.version>1.11.8.RELEASE</spring.data.jpa.version>
+		<spring.data.commons.version>1.13.8.RELEASE</spring.data.commons.version>
+		<spring.data.rest.version>2.6.8.RELEASE</spring.data.rest.version>
 		<spring.hateoas.version>0.23.0.RELEASE</spring.hateoas.version>
 		<spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
 		<spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
@@ -36,6 +36,6 @@
 		<hibernate.version>5.0.12.Final</hibernate.version>
 		<org.ow2.asm.version>5.0.4</org.ow2.asm.version>
 		<xml.apis.version>1.4.01</xml.apis.version>
-		<lucene.version>6.6.0</lucene.version>
+		<lucene.version>7.1.0</lucene.version>
 	</properties>
 </project>
