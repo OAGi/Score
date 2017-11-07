@@ -71,7 +71,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         if (selectedRelease != null) {
             this.release = releaseRepository.findOne((Long) selectedRelease);
         } else {
-            setRelease(Release.CURRENT_RELEASE);
+            setRelease(Release.WORKING_RELEASE);
         }
 
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
@@ -134,7 +134,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
     public List<Release> getReleases() {
         List<Release> releases = new ArrayList();
-        releases.add(Release.CURRENT_RELEASE);
+        releases.add(Release.WORKING_RELEASE);
         releases.addAll(releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId")));
         return releases;
     }

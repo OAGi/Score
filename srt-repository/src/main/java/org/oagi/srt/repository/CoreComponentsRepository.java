@@ -133,7 +133,7 @@ public class CoreComponentsRepository {
 
         String sortProperty = order.getProperty() + " " + order.getDirection().toString();
         Query query;
-        if (release.equals(Release.CURRENT_RELEASE)) {
+        if (release.equals(Release.WORKING_RELEASE)) {
             String statement =
                     FIND_ALL_STATEMENT_FOR_CURRENT_RELEASE.replace("$INNER_QUERY$",
                             String.join(" UNION ALL ",

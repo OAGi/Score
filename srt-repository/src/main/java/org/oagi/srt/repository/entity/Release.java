@@ -173,10 +173,10 @@ public class Release implements NamespaceAware, TimestampAware, CreatorModifierA
     @Transient
     private transient List<UpdateEventListener> updateEventListeners;
 
-    public static final Release CURRENT_RELEASE = new Release();
+    public static final Release WORKING_RELEASE = new Release();
 
     static {
-        CURRENT_RELEASE.setReleaseNum("Current");
+        WORKING_RELEASE.setReleaseNum("Working");
     }
 
     public Release() {
