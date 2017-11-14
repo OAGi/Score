@@ -79,7 +79,7 @@
                                 <p:contextMenu id="cMenu" for="treeTable" nodeType="ACC-Target"
                                                rendered="#{accDetailBean.targetAcc.state == 'Editing'}">
                                     <p:menuitem id="setACCItem" value="Set based ACC" style="width: 100%;"
-                                                actionListener="#{accDetailBean.prepareSetBasedAcc}"
+                                                action="#{accDetailBean.prepareSetBasedAcc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
                                     <p:menuitem id="discardACCItem" value="Discard based ACC" style="width: 100%;"
@@ -91,11 +91,13 @@
                                                    icon="fa fa-exclamation-triangle"/>
                                     </p:menuitem>
                                     <p:menuitem id="appendASCCItem" value="Append ASCC" style="width: 100%;"
-                                                actionListener="#{accDetailBean.prepareAppendAscc}"
+                                                actionListener="#{accDetailBean.onClickAppendASCCButton}"
+                                                action="#{accDetailBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
                                     <p:menuitem id="appendBCCItem" value="Append BCC" style="width: 100%;"
-                                                actionListener="#{accDetailBean.prepareAppendBcc}"
+                                                actionListener="#{accDetailBean.onClickAppendBCCButton}"
+                                                action="#{accDetailBean.prepareAppendBcc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
                                 </p:contextMenu>
@@ -110,15 +112,16 @@
                                         To set based ACC
                                     -->
                                     <h:panelGroup rendered="#{accDetailBean.preparedSetBasedAcc}">
+                                        <p:defaultCommand target="setBasedACCSearchBtn"/>
+
                                         <p:panel id="setBasedACCPanel">
                                             <f:facet name="header">
                                                 <p:autoComplete id="accObjectClassTerm" widgetVar="accObjectClassTerm"
                                                                 value="#{accDetailBean.selectedAccObjectClassTerm}"
                                                                 completeMethod="#{accDetailBean.completeInputAcc}"
                                                                 style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectAccObjectClassTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                    <p:ajax listener="#{accDetailBean.onSelectAccObjectClassTerm}"
+                                                            update=":form:details"/>
                                                 </p:autoComplete>
                                                 <p:commandButton id="setBasedACCSearchBtn" value="Search" ajax="true"
                                                                  actionListener="#{accDetailBean.searchAcc}"
@@ -132,9 +135,14 @@
                                                          rowKey="#{acc.accId}"
                                                          selection="#{accDetailBean.selectedAcc}"
                                                          selectionMode="single">
-                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onAccRowSelect}"/>
-                                                <p:ajax event="rowUnselect"
-                                                        listener="#{accDetailBean.onAccRowUnselect}"/>
+                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onAccRowSelect}" update="tblAcc"/>
+                                                <p:ajax event="rowUnselect" listener="#{accDetailBean.onAccRowUnselect}" update="tblAcc"/>
+
+                                                <p:column style="width: 50px; text-align: center;">
+                                                    <p:selectBooleanCheckbox value="#{accDetailBean.getBasedAccCheckBox(acc.accId).checked}">
+                                                        <p:ajax update="tblAcc"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </p:column>
 
                                                 <p:column headerText="ACC Object Class Term"
                                                           sortBy="#{acc.objectClassTerm}">
@@ -179,12 +187,12 @@
                                                              actionListener="#{accDetailBean.setPreparedSetBasedAcc(false)}"
                                                              action="#{accDetailBean.setBasedAcc()}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                             <p:commandButton id="setBasedACCDiscardBtn" value="Discard"
                                                              styleClass="danger"
                                                              actionListener="#{accDetailBean.setPreparedSetBasedAcc(false)}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                         </p:panel>
                                     </h:panelGroup>
 
@@ -192,19 +200,20 @@
                                         To append ASCC
                                     -->
                                     <h:panelGroup rendered="#{accDetailBean.preparedAppendAscc}">
+                                        <p:defaultCommand target="appendASCCSearchBtn"/>
+
                                         <p:panel id="appendASCCPanel">
                                             <f:facet name="header">
                                                 <p:autoComplete id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
                                                                 value="#{accDetailBean.selectedAsccpPropertyTerm}"
                                                                 completeMethod="#{accDetailBean.completeInputAsccp}"
                                                                 style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectAsccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                    <p:ajax listener="#{accDetailBean.onSelectAsccpPropertyTerm}"
+                                                            update=":form:details"/>
                                                 </p:autoComplete>
                                                 <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
                                                                  action="#{accDetailBean.searchAsccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                                 update="appendASCCPanel" icon="fa fa-white fa-search"/>
                                             </f:facet>
 
                                             <p:dataTable id="tblAsccp" var="asccp" value="#{accDetailBean.asccpList}"
@@ -214,9 +223,14 @@
                                                          rowKey="#{asccp.asccpId}"
                                                          selection="#{accDetailBean.selectedAsccp}"
                                                          selectionMode="single">
-                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onAsccpRowSelect}"/>
-                                                <p:ajax event="rowUnselect"
-                                                        listener="#{accDetailBean.onAsccpRowUnselect}"/>
+                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onAsccpRowSelect}" update="tblAsccp"/>
+                                                <p:ajax event="rowUnselect" listener="#{accDetailBean.onAsccpRowUnselect}" update="tblAsccp"/>
+
+                                                <p:column style="width: 50px; text-align: center;">
+                                                    <p:selectBooleanCheckbox value="#{accDetailBean.getAsccpCheckBox(asccp.asccpId).checked}">
+                                                        <p:ajax update="tblAsccp"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </p:column>
 
                                                 <p:column headerText="ASCCP Property Term"
                                                           sortBy="#{asccp.propertyTerm}">
@@ -248,12 +262,12 @@
                                                              actionListener="#{accDetailBean.setPreparedAppendAscc(false)}"
                                                              action="#{accDetailBean.appendAscc()}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                             <p:commandButton id="appendASCCDiscardBtn" value="Discard"
                                                              styleClass="danger"
                                                              actionListener="#{accDetailBean.setPreparedAppendAscc(false)}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                         </p:panel>
                                     </h:panelGroup>
 
@@ -261,19 +275,20 @@
                                         To append BCC
                                     -->
                                     <h:panelGroup rendered="#{accDetailBean.preparedAppendBcc}">
+                                        <p:defaultCommand target="appendBCCSearchBtn"/>
+
                                         <p:panel id="appendBCCPanel">
                                             <f:facet name="header">
                                                 <p:autoComplete id="bccpPropertyTerm" widgetVar="bccpPropertyTerm"
                                                                 value="#{accDetailBean.selectedBccpPropertyTerm}"
                                                                 completeMethod="#{accDetailBean.completeInputBccp}"
                                                                 style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectBccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                    <p:ajax listener="#{accDetailBean.onSelectBccpPropertyTerm}"
+                                                            update=":form:details"/>
                                                 </p:autoComplete>
-                                                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                                <p:commandButton id="appendBCCSearchBtn" value="Search" ajax="true"
                                                                  actionListener="#{accDetailBean.searchBccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                                 update="appendBCCPanel" icon="fa fa-white fa-search"/>
                                             </f:facet>
 
                                             <p:dataTable id="tblBccp" var="bccp" value="#{accDetailBean.bccpList}"
@@ -283,9 +298,14 @@
                                                          rowKey="#{bccp.bccpId}"
                                                          selection="#{accDetailBean.selectedBccp}"
                                                          selectionMode="single">
-                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onBccpRowSelect}"/>
-                                                <p:ajax event="rowUnselect"
-                                                        listener="#{accDetailBean.onBccpRowUnselect}"/>
+                                                <p:ajax event="rowSelect" listener="#{accDetailBean.onBccpRowSelect}" update="tblBccp"/>
+                                                <p:ajax event="rowUnselect" listener="#{accDetailBean.onBccpRowUnselect}" update="tblBccp"/>
+
+                                                <p:column style="width: 50px; text-align: center;">
+                                                    <p:selectBooleanCheckbox value="#{accDetailBean.getBccpCheckBox(bccp.bccpId).checked}">
+                                                        <p:ajax update="tblBccp"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </p:column>
 
                                                 <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
                                                     <a href="/core_component/bccp/#{bccp.bccpId}"
@@ -316,12 +336,12 @@
                                                              actionListener="#{accDetailBean.setPreparedAppendBcc(false)}"
                                                              action="#{accDetailBean.appendBcc()}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                             <p:commandButton id="appendBCCDiscardBtn" value="Discard"
                                                              styleClass="danger"
                                                              actionListener="#{accDetailBean.setPreparedAppendBcc(false)}"
                                                              onclick="PF('leftBlockUI').hide()"
-                                                             update=":form"/>
+                                                             update="form"/>
                                         </p:panel>
                                     </h:panelGroup>
 

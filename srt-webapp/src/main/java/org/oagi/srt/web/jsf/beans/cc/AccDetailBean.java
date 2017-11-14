@@ -7,6 +7,7 @@ import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.*;
+import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -27,6 +28,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
@@ -516,9 +518,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     private boolean preparedSetBasedAcc;
     private List<AggregateCoreComponent> allAccList;
+    private Map<Long, AggregateCoreComponent> allAccMap;
     private List<AggregateCoreComponent> accList;
     private String selectedAccObjectClassTerm;
     private AggregateCoreComponent selectedAcc;
+
+    private void resetBasedAccStates() {
+        this.selectedAcc = null;
+        this.basedAccCheckBoxes = new HashMap();
+    }
 
     public boolean isPreparedSetBasedAcc() {
         return preparedSetBasedAcc;
@@ -550,15 +558,51 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedAcc(AggregateCoreComponent selectedAcc) {
-        this.selectedAcc = selectedAcc;
+        if (selectedAcc != null) {
+            getBasedAccCheckBox(selectedAcc.getAccId()).setChecked(false);
+        }
     }
 
     public void onAccRowSelect(SelectEvent event) {
-        setSelectedAcc((AggregateCoreComponent) event.getObject());
+        getBasedAccCheckBox(((AggregateCoreComponent) event.getObject()).getAccId()).setChecked(true);
     }
 
     public void onAccRowUnselect(UnselectEvent event) {
-        setSelectedAcc(null);
+        getBasedAccCheckBox(((AggregateCoreComponent) event.getObject()).getAccId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> basedAccCheckBoxes = new HashMap();
+    public class BasedAccCheckBox {
+        private Long basedAccId;
+
+        public BasedAccCheckBox(Long basedAccId) {
+            this.basedAccId = basedAccId;
+        }
+
+        public boolean isChecked() {
+            return basedAccCheckBoxes.getOrDefault(basedAccId, false);
+        }
+
+        public void setChecked(boolean value) {
+            basedAccCheckBoxes = new HashMap();
+
+            if (value) {
+                AggregateCoreComponent previousOne = getSelectedAcc();
+                if (previousOne != null) {
+                    basedAccCheckBoxes.put(previousOne.getAccId(), false);
+                }
+
+                selectedAcc = allAccMap.get(basedAccId);
+            } else {
+                selectedAcc = null;
+            }
+
+            basedAccCheckBoxes.put(basedAccId, value);
+        }
+    }
+
+    public BasedAccCheckBox getBasedAccCheckBox(Long basedAccId) {
+        return new BasedAccCheckBox(basedAccId);
     }
 
     public void prepareSetBasedAcc() {
@@ -566,11 +610,14 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 .filter(e -> getTargetAcc().isAbstract() ? e.isAbstract() : true)
                 .filter(e -> e.getAccId() != getTargetAcc().getAccId())
                 .collect(Collectors.toList());
+        allAccMap = allAccList.stream()
+                .collect(Collectors.toMap(AggregateCoreComponent::getAccId, Function.identity()));
 
         setAccList(allAccList.stream()
                 .sorted(Comparator.comparing(AggregateCoreComponent::getObjectClassTerm))
                 .collect(Collectors.toList())
         );
+
         setPreparedSetBasedAcc(true);
     }
 
@@ -624,6 +671,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             );
         }
         setPreparedSetBasedAcc(true);
+        resetBasedAccStates();
     }
 
     @Transactional
@@ -675,9 +723,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private AssociationCoreComponentPropertyRepository asccpRepository;
     private boolean preparedAppendAscc;
     private List<AssociationCoreComponentProperty> allAsccpList;
+    private Map<Long, AssociationCoreComponentProperty> allAsccpMap;
     private List<AssociationCoreComponentProperty> asccpList;
     private String selectedAsccpPropertyTerm;
     private AssociationCoreComponentProperty selectedAsccp;
+
+    private void resetAsccpStates() {
+        this.selectedAsccp = null;
+        this.asccpCheckBoxes = new HashMap();
+    }
 
     public boolean isPreparedAppendAscc() {
         return preparedAppendAscc;
@@ -709,15 +763,51 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedAsccp(AssociationCoreComponentProperty selectedAsccp) {
-        this.selectedAsccp = selectedAsccp;
+        if (selectedAsccp != null) {
+            getAsccpCheckBox(selectedAsccp.getAsccpId()).setChecked(true);
+        }
     }
 
     public void onAsccpRowSelect(SelectEvent event) {
-        setSelectedAsccp((AssociationCoreComponentProperty) event.getObject());
+        getAsccpCheckBox(((AssociationCoreComponentProperty) event.getObject()).getAsccpId()).setChecked(true);
     }
 
     public void onAsccpRowUnselect(UnselectEvent event) {
-        setSelectedAsccp(null);
+        getAsccpCheckBox(((AssociationCoreComponentProperty) event.getObject()).getAsccpId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> asccpCheckBoxes = new HashMap();
+    public class AsccpCheckBox {
+        private Long asccpId;
+
+        public AsccpCheckBox(Long asccpId) {
+            this.asccpId = asccpId;
+        }
+
+        public boolean isChecked() {
+            return asccpCheckBoxes.getOrDefault(asccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            asccpCheckBoxes = new HashMap();
+
+            if (value) {
+                AssociationCoreComponentProperty previousOne = getSelectedAsccp();
+                if (previousOne != null) {
+                    asccpCheckBoxes.put(previousOne.getAsccpId(), false);
+                }
+
+                selectedAsccp = allAsccpMap.get(asccpId);
+            } else {
+                selectedAsccp = null;
+            }
+
+            asccpCheckBoxes.put(asccpId, value);
+        }
+    }
+
+    public AsccpCheckBox getAsccpCheckBox(Long asccpId) {
+        return new AsccpCheckBox(asccpId);
     }
 
     public void prepareAppendAscc() {
@@ -725,12 +815,20 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
+        allAsccpMap = allAsccpList.stream()
+                .collect(Collectors.toMap(AssociationCoreComponentProperty::getAsccpId, Function.identity()));
+
         setAsccpList(
                 allAsccpList.stream()
                         .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
                         .collect(Collectors.toList())
         );
         setPreparedAppendAscc(true);
+    }
+
+    public void onClickAppendASCCButton() {
+        setSelectedAsccpPropertyTerm(null);
+        resetAsccpStates();
     }
 
     public List<String> completeInputAsccp(String query) {
@@ -783,6 +881,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             );
         }
         setPreparedAppendAscc(true);
+        resetAsccpStates();
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -833,9 +932,15 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private BasicCoreComponentPropertyRepository bccpRepository;
     private boolean preparedAppendBcc;
     private List<BasicCoreComponentProperty> allBccpList;
+    private Map<Long, BasicCoreComponentProperty> allBccpMap;
     private List<BasicCoreComponentProperty> bccpList;
     private String selectedBccpPropertyTerm;
     private BasicCoreComponentProperty selectedBccp;
+
+    private void resetBccpStates() {
+        this.selectedBccp = null;
+        this.bccpCheckBoxes = new HashMap();
+    }
 
     public boolean isPreparedAppendBcc() {
         return preparedAppendBcc;
@@ -867,27 +972,71 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedBccp(BasicCoreComponentProperty selectedBccp) {
-        this.selectedBccp = selectedBccp;
+        if (selectedBccp != null) {
+            getBccpCheckBox(selectedBccp.getBccpId()).setChecked(true);
+        }
     }
 
     public void onBccpRowSelect(SelectEvent event) {
-        setSelectedBccp((BasicCoreComponentProperty) event.getObject());
+        getBccpCheckBox(((BasicCoreComponentProperty) event.getObject()).getBccpId()).setChecked(true);
     }
 
     public void onBccpRowUnselect(UnselectEvent event) {
-        setSelectedBccp(null);
+        getBccpCheckBox(((BasicCoreComponentProperty) event.getObject()).getBccpId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> bccpCheckBoxes = new HashMap();
+    public class BccpCheckBox {
+        private Long bccpId;
+
+        public BccpCheckBox(Long bccpId) {
+            this.bccpId = bccpId;
+        }
+
+        public boolean isChecked() {
+            return bccpCheckBoxes.getOrDefault(bccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bccpCheckBoxes = new HashMap();
+
+            if (value) {
+                BasicCoreComponentProperty previousOne = getSelectedBccp();
+                if (previousOne != null) {
+                    bccpCheckBoxes.put(previousOne.getBccpId(), false);
+                }
+
+                selectedBccp = allBccpMap.get(bccpId);
+            } else {
+                selectedBccp = null;
+            }
+
+            bccpCheckBoxes.put(bccpId, value);
+        }
+    }
+
+    public BccpCheckBox getBccpCheckBox(Long asccpId) {
+        return new BccpCheckBox(asccpId);
     }
 
     public void prepareAppendBcc() {
         allBccpList = bccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
+        allBccpMap = allBccpList.stream()
+                .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
+
         setBccpList(
                 allBccpList.stream()
                         .sorted(Comparator.comparing(BasicCoreComponentProperty::getPropertyTerm))
                         .collect(Collectors.toList())
         );
         setPreparedAppendBcc(true);
+    }
+
+    public void onClickAppendBCCButton() {
+        setSelectedBccpPropertyTerm(null);
+        resetBccpStates();
     }
 
     public List<String> completeInputBccp(String query) {
@@ -939,7 +1088,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                             .collect(Collectors.toList())
             );
         }
+
         setPreparedAppendBcc(true);
+        resetBccpStates();
     }
 
     @Transactional(rollbackFor = Throwable.class)
