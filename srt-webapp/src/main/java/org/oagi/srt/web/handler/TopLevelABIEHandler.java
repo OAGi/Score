@@ -166,7 +166,7 @@ public class TopLevelABIEHandler implements Serializable {
         maxBIEID = bbieRepository.count();
         maxBBIESCID = bbiescRepository.count();
 
-        asccpVOs = topLevelConceptRepository.findAll().stream()
+        asccpVOs = topLevelConceptRepository.findAll(Release.WORKING_RELEASE).stream()
                 .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                 .collect(Collectors.toList());
     }
@@ -350,7 +350,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void search() {
-        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(getPropertyTerm());
+        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(Release.WORKING_RELEASE, getPropertyTerm());
     }
 
     public void addMessage(String summary) {
@@ -884,7 +884,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public List<String> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
-        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll();
+        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll(Release.WORKING_RELEASE);
 
         if (StringUtils.isEmpty(q)) {
             return topLevelConcepts.stream()

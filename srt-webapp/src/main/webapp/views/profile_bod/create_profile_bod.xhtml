@@ -27,6 +27,15 @@
                     </f:facet>
                     <p:panel>
                         <f:facet name="header">
+                            <h:panelGrid styleClass="option-panel" style="float: left; margin-right: 15px;" class="dropdown-container">
+                                <p:selectOneMenu id="release" value="#{createProfileBODBean.release}"
+                                                 converter="#{releaseConverter}" style="width: 150px">
+                                    <p:ajax listener="#{createProfileBODBean.onReleaseChange}" update=":form" />
+                                    <f:selectItems value="#{createProfileBODBean.releases}" var="release"
+                                                   itemLabel="#{release.releaseNum}"
+                                                   itemValue="#{release}"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
                             <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
                                             completeMethod="#{createProfileBODBean.completeInput}"
                                             style="width: 440px; margin-right: 20px;">
@@ -42,6 +51,16 @@
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
                                      selectionMode="single">
+
+                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="tbl1"/>
+                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="tbl1"/>
+
+                            <p:column style="width: 50px; text-align: center;">
+                                <p:selectBooleanCheckbox value="#{createProfileBODBean.getTopLevelConceptCheckBox(topLevelConcept.asccpId).checked}">
+                                    <p:ajax update="tbl1"/>
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+
                             <p:column style="width: 40%" headerText="ASCCP Property Term"
                                       sortBy="#{topLevelConcept.propertyTerm}">
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
@@ -96,6 +115,16 @@
                                      selection="#{createProfileBODBean.selectedBusinessContext}"
                                      selectionMode="single"
                                      rowKey="#{businessContext.bizCtxId}">
+
+                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onBusinessContextSelect}" update="tbl2"/>
+                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onBusinessContextUnselect}" update="tbl2"/>
+
+                            <p:column style="width: 50px; text-align: center;">
+                                <p:selectBooleanCheckbox value="#{createProfileBODBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
+                                    <p:ajax update="tbl2"/>
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+
                             <p:column headerText="Business Context Name" sortBy="#{businessContext.name}">
                                 <h:outputText value="#{businessContext.name}"/>
                                 <div>

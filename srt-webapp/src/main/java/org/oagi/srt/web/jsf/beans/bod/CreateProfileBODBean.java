@@ -1,21 +1,18 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.node.ASBIEPNode;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BusinessContextRepository;
-import org.oagi.srt.repository.ModuleRepository;
-import org.oagi.srt.repository.TopLevelConceptRepository;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.entity.TopLevelConcept;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -24,7 +21,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.List;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -49,7 +48,12 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     /*
      * for 'Select Top-Level Concept' Step
      */
+    @Autowired
+    private ReleaseRepository releaseRepository;
+    private Release release = Release.WORKING_RELEASE;
+
     private List<TopLevelConcept> allTopLevelConcepts;
+    private Map<Long, TopLevelConcept> allTopLevelConceptMap;
     private String selectedPropertyTerm;
     private List<TopLevelConcept> topLevelConcepts;
     private TopLevelConcept selectedTopLevelConcept;
@@ -60,6 +64,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private BusinessContextRepository businessContextRepository;
     private List<BusinessContext> businessContexts;
+    private Map<Long, BusinessContext> businessContextMap;
     private BusinessContext selectedBusinessContext;
 
     /*
@@ -72,9 +77,34 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    public Release getRelease() {
+        return release;
+    }
+
+    public void setRelease(Release release) {
+        this.release = release;
+    }
+
+    public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
+        reset();
+    }
+
+    public List<Release> getReleases() {
+        List<Release> releases = new ArrayList();
+        releases.add(Release.WORKING_RELEASE);
+        releases.addAll(
+                releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId")).stream()
+                        .filter(e -> e.getState() == ReleaseState.Final)
+                        .collect(Collectors.toList())
+        );
+        return releases;
+    }
+
     public List<TopLevelConcept> getAllTopLevelConcepts() {
         if (allTopLevelConcepts == null) {
-            allTopLevelConcepts = topLevelConceptRepository.findAll();
+            allTopLevelConcepts = topLevelConceptRepository.findAll(getRelease());
+            allTopLevelConceptMap = allTopLevelConcepts.stream()
+                    .collect(Collectors.toMap(TopLevelConcept::getAsccpId, Function.identity()));
         }
         return allTopLevelConcepts;
     }
@@ -118,10 +148,18 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     public List<TopLevelConcept> getTopLevelConcepts() {
         if (topLevelConcepts == null) {
             setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(TopLevelConcept::getPropertyTerm))
                     .collect(Collectors.toList()));
         }
         return topLevelConcepts;
+    }
+
+    private void reset() {
+        allTopLevelConcepts = null;
+        topLevelConcepts = null;
+        setSelectedPropertyTerm(null);
+        setSelectedTopLevelConcept(null);
+        topLevelConceptCheckBoxes = new HashMap();
     }
 
     public void setTopLevelConcepts(List<TopLevelConcept> topLevelConcepts) {
@@ -133,7 +171,51 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void setSelectedTopLevelConcept(TopLevelConcept selectedTopLevelConcept) {
-        this.selectedTopLevelConcept = selectedTopLevelConcept;
+        if (selectedTopLevelConcept != null) {
+            getTopLevelConceptCheckBox(selectedTopLevelConcept.getAsccpId()).setChecked(true);
+        }
+    }
+
+    public void onTopLevelConceptSelect(SelectEvent event) {
+        getTopLevelConceptCheckBox(((TopLevelConcept) event.getObject()).getAsccpId()).setChecked(true);
+    }
+
+    public void onTopLevelConceptUnselect(SelectEvent event) {
+        getTopLevelConceptCheckBox(((TopLevelConcept) event.getObject()).getAsccpId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> topLevelConceptCheckBoxes = new HashMap();
+    public class TopLevelConceptCheckBox {
+        private Long asccpId;
+
+        public TopLevelConceptCheckBox(Long asccpId) {
+            this.asccpId = asccpId;
+        }
+
+        public boolean isChecked() {
+            return topLevelConceptCheckBoxes.getOrDefault(asccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            topLevelConceptCheckBoxes = new HashMap();
+
+            if (value) {
+                TopLevelConcept previousOne = getSelectedTopLevelConcept();
+                if (previousOne != null) {
+                    topLevelConceptCheckBoxes.put(previousOne.getAsccpId(), false);
+                }
+
+                selectedTopLevelConcept = allTopLevelConceptMap.get(asccpId);
+            } else {
+                selectedTopLevelConcept = null;
+            }
+
+            topLevelConceptCheckBoxes.put(asccpId, value);
+        }
+    }
+
+    public TopLevelConceptCheckBox getTopLevelConceptCheckBox(Long asccpId) {
+        return new TopLevelConceptCheckBox(asccpId);
     }
 
     public List<String> completeInput(String query) {
@@ -186,6 +268,8 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     public void setBusinessContexts(List<BusinessContext> businessContexts) {
         this.businessContexts = businessContexts;
+        this.businessContextMap = businessContexts.stream()
+                .collect(Collectors.toMap(BusinessContext::getBizCtxId, Function.identity()));
     }
 
     public BusinessContext getSelectedBusinessContext() {
@@ -193,7 +277,51 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void setSelectedBusinessContext(BusinessContext selectedBusinessContext) {
-        this.selectedBusinessContext = selectedBusinessContext;
+        if (selectedBusinessContext != null) {
+            getBusinessContextCheckBox(selectedBusinessContext.getBizCtxId()).setChecked(true);
+        }
+    }
+
+    public void onBusinessContextSelect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(true);
+    }
+
+    public void onBusinessContextUnselect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> bizCtxCheckBoxes = new HashMap();
+    public class BusinessContextCheckBox {
+        private Long bizCtxId;
+
+        public BusinessContextCheckBox(Long bizCtxId) {
+            this.bizCtxId = bizCtxId;
+        }
+
+        public boolean isChecked() {
+            return bizCtxCheckBoxes.getOrDefault(bizCtxId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bizCtxCheckBoxes = new HashMap();
+
+            if (value) {
+                BusinessContext previousOne = getSelectedBusinessContext();
+                if (previousOne != null) {
+                    bizCtxCheckBoxes.put(previousOne.getBizCtxId(), false);
+                }
+
+                selectedBusinessContext = businessContextMap.get(bizCtxId);
+            } else {
+                selectedBusinessContext = null;
+            }
+
+            bizCtxCheckBoxes.put(bizCtxId, value);
+        }
+    }
+
+    public BusinessContextCheckBox getBusinessContextCheckBox(Long bizCtxId) {
+        return new BusinessContextCheckBox(bizCtxId);
     }
 
     public String getModule(long moduleId) {

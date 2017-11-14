@@ -10,14 +10,16 @@ import java.util.Date;
                         entityClass = AssociationCoreComponentProperty.class,
                         fields = {
                                 @FieldResult(name = "asccpId", column = "asccp_id"),
+                                @FieldResult(name = "guid", column = "guid"),
+                                @FieldResult(name = "releaseId", column = "release_id"),
                                 @FieldResult(name = "propertyTerm", column = "property_term"),
+                                @FieldResult(name = "lastUpdateTimestamp", column = "last_update_timestamp"),
                         }
                 ),
                 @EntityResult(
                         entityClass = Module.class,
                         fields = {
                                 @FieldResult(name = "module", column = "module"),
-                                @FieldResult(name = "lastUpdateTimestamp", column = "last_update_timestamp"),
                         }
                 )
         }
@@ -27,6 +29,12 @@ public class TopLevelConcept {
 
     @Id
     private long asccpId;
+
+    @Column(length = 41, nullable = false)
+    private String guid;
+
+    @Column
+    private Long releaseId;
 
     @Column(nullable = false)
     private String propertyTerm;
@@ -44,6 +52,22 @@ public class TopLevelConcept {
 
     public void setAsccpId(long asccpId) {
         this.asccpId = asccpId;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public Long getReleaseId() {
+        return releaseId;
+    }
+
+    public void setReleaseId(Long releaseId) {
+        this.releaseId = releaseId;
     }
 
     public String getPropertyTerm() {
@@ -84,6 +108,8 @@ public class TopLevelConcept {
     @Override
     public int hashCode() {
         int result = (int) (asccpId ^ (asccpId >>> 32));
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
@@ -94,6 +120,8 @@ public class TopLevelConcept {
     public String toString() {
         return "TopLevelConcept{" +
                 "asccpId=" + asccpId +
+                ", guid='" + guid + '\'' +
+                ", releaseId=" + releaseId +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", module='" + module + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
