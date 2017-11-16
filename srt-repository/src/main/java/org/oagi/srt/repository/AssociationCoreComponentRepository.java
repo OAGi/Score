@@ -167,4 +167,8 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1")
     List<AssociationCoreComponent> findByCurrentAsccId(long currentAsccId);
+
+    @Modifying
+    @Query("update AssociationCoreComponent a set a.seqKey = ?4 where a.currentAsccId = ?1 and a.revisionNum = ?2 and a.revisionTrackingNum = ?3")
+    void updateSeqKeyByCurrentAsccIdAndRevisionNumAndRevisionTrackingNum(long curentAsccId, int revisionNum, int revisionTrackingNum, int seqKey);
 }

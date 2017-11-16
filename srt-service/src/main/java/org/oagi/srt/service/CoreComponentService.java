@@ -574,8 +574,14 @@ public class CoreComponentService {
 
         ascc = coreComponentDAO.save(ascc);
 
-        if (isSeqKeyOnlyChange(oldAscc, newAscc)) {
-            return; // do not create history records if seq key was the only change
+        if (isSeqKeyOnlyChange(oldAscc, newAscc)) { // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+            int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                asccRepository.updateSeqKeyByCurrentAsccIdAndRevisionNumAndRevisionTrackingNum(ascc.getAsccId(), revisionNum, revisionTrackingNum, ascc.getSeqKey());
+            }
+            return;
         }
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
@@ -588,7 +594,6 @@ public class CoreComponentService {
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
-        asccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
         asccHistory.setReleaseId(null);
 
         asccRepository.saveAndFlush(asccHistory);
@@ -680,8 +685,15 @@ public class CoreComponentService {
 
         bcc = coreComponentDAO.save(bcc);
 
-        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {
-            return; // do not create history records if seq key was the only change
+        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {  // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+            int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                bccRepository.updateSeqKeyByCurrentBccIdAndRevisionNumAndRevisionTrackingNum(bcc.getBccId(), revisionNum, revisionTrackingNum, bcc.getSeqKey());
+            }
+
+            return;
         }
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
@@ -694,7 +706,6 @@ public class CoreComponentService {
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
-        bccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
         bccHistory.setReleaseId(null);
 
         bccRepository.saveAndFlush(bccHistory);
