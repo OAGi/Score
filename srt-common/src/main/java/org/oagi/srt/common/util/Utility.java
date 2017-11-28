@@ -6,7 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
 
 public class Utility {
 
@@ -567,6 +570,18 @@ public class Utility {
             out = out + delim[i] + " ";
         }
         return out.trim();
+    }
+
+    public static <T> int compareLevenshteinDistance(String source, T a, T b, Function<T, String> function) {
+        String aStr = function.apply(a);
+        String bStr = function.apply(b);
+
+        int aDist = getLevenshteinDistance(source, aStr);
+        int bDist = getLevenshteinDistance(source, bStr);
+        if (aDist == bDist) {
+            return aStr.compareTo(bStr);
+        }
+        return aDist - bDist;
     }
 
     public static void main(String args[]) {

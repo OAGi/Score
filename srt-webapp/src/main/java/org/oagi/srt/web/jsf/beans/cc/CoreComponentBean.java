@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Controller
@@ -229,32 +229,17 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 .sorted((a, b) -> {
                     String den = getSearchTextForDen();
                     if (!StringUtils.isEmpty(den)) {
-                        int aDist = getLevenshteinDistance(den, a.getDen());
-                        int bDist = getLevenshteinDistance(den, b.getDen());
-                        if (aDist == bDist) {
-                            return a.getDen().compareTo(b.getDen());
-                        }
-                        return aDist - bDist;
+                        return compareLevenshteinDistance(den, a, b, CoreComponents::getDen);
                     }
 
                     String definition = getSearchTextForDefinition();
                     if (!StringUtils.isEmpty(definition)) {
-                        int aDist = getLevenshteinDistance(den, a.getDefinition());
-                        int bDist = getLevenshteinDistance(den, b.getDefinition());
-                        if (aDist == bDist) {
-                            return a.getDefinition().compareTo(b.getDefinition());
-                        }
-                        return aDist - bDist;
+                        return compareLevenshteinDistance(definition, a, b, CoreComponents::getDefinition);
                     }
 
                     String module = getSearchTextForModule();
                     if (!StringUtils.isEmpty(module)) {
-                        int aDist = getLevenshteinDistance(den, a.getModule());
-                        int bDist = getLevenshteinDistance(den, b.getModule());
-                        if (aDist == bDist) {
-                            return a.getModule().compareTo(b.getModule());
-                        }
-                        return aDist - bDist;
+                        return compareLevenshteinDistance(module, a, b, CoreComponents::getModule);
                     }
 
                     return 0;

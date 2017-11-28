@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -612,14 +612,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                                 }
                                 return true;
                             })
-                            .sorted((a, b) -> {
-                                int aDist = getLevenshteinDistance(selectedObjectClassTerm, a.getObjectClassTerm());
-                                int bDist = getLevenshteinDistance(selectedObjectClassTerm, b.getObjectClassTerm());
-                                if (aDist == bDist) {
-                                    return a.getObjectClassTerm().compareTo(b.getObjectClassTerm());
-                                }
-                                return aDist - bDist;
-                            })
+                            .sorted((a, b) -> compareLevenshteinDistance(selectedObjectClassTerm, a, b,
+                                    AggregateCoreComponent::getObjectClassTerm))
                             .collect(Collectors.toList())
             );
         }
@@ -771,14 +765,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                                 }
                                 return true;
                             })
-                            .sorted((a, b) -> {
-                                int aDist = getLevenshteinDistance(selectedPropertyTerm, a.getPropertyTerm());
-                                int bDist = getLevenshteinDistance(selectedPropertyTerm, b.getPropertyTerm());
-                                if (aDist == bDist) {
-                                    return a.getPropertyTerm().compareTo(b.getPropertyTerm());
-                                }
-                                return aDist - bDist;
-                            })
+                            .sorted((a, b) -> compareLevenshteinDistance(selectedPropertyTerm, a, b,
+                                    AssociationCoreComponentProperty::getPropertyTerm))
                             .collect(Collectors.toList())
             );
         }
@@ -928,14 +916,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                                 }
                                 return true;
                             })
-                            .sorted((a, b) -> {
-                                int aDist = getLevenshteinDistance(selectedPropertyTerm, a.getPropertyTerm());
-                                int bDist = getLevenshteinDistance(selectedPropertyTerm, b.getPropertyTerm());
-                                if (aDist == bDist) {
-                                    return a.getPropertyTerm().compareTo(b.getPropertyTerm());
-                                }
-                                return aDist - bDist;
-                            })
+                            .sorted((a, b) -> compareLevenshteinDistance(selectedPropertyTerm, a, b,
+                                    BasicCoreComponentProperty::getPropertyTerm))
                             .collect(Collectors.toList())
             );
         }
