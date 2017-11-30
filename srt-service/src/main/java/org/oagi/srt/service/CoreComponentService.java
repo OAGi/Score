@@ -574,8 +574,14 @@ public class CoreComponentService {
 
         ascc = coreComponentDAO.save(ascc);
 
-        if (isSeqKeyOnlyChange(oldAscc, newAscc)) {
-            return; // do not create history records if seq key was the only change
+        if (isSeqKeyOnlyChange(oldAscc, newAscc)) { // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+            int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                asccRepository.updateSeqKeyByCurrentAsccIdAndRevisionNumAndRevisionTrackingNum(ascc.getAsccId(), revisionNum, revisionTrackingNum, ascc.getSeqKey());
+            }
+            return;
         }
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
@@ -588,7 +594,6 @@ public class CoreComponentService {
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
-        asccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
         asccHistory.setReleaseId(null);
 
         asccRepository.saveAndFlush(asccHistory);
@@ -680,8 +685,15 @@ public class CoreComponentService {
 
         bcc = coreComponentDAO.save(bcc);
 
-        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {
-            return; // do not create history records if seq key was the only change
+        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {  // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+            int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                bccRepository.updateSeqKeyByCurrentBccIdAndRevisionNumAndRevisionTrackingNum(bcc.getBccId(), revisionNum, revisionTrackingNum, bcc.getSeqKey());
+            }
+
+            return;
         }
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
@@ -694,7 +706,6 @@ public class CoreComponentService {
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
-        bccHistory.setSeqKey(oldSeqKey); // if seq key update was combined with other updates, revert it to original seq key
         bccHistory.setReleaseId(null);
 
         bccRepository.saveAndFlush(bccHistory);
@@ -1326,5 +1337,252 @@ public class CoreComponentService {
         }
 
         return sb.toString();
+    }
+
+    public AggregateCoreComponent findRoleOfAcc(AssociationCoreComponentProperty asccp, long releaseId) {
+        return findRoleOfAcc(asccp, releaseId, null);
+    }
+
+    public AggregateCoreComponent findRoleOfAcc(AssociationCoreComponentProperty asccp, long releaseId, CoreComponentState state) {
+        long roleOfAccId = asccp.getRoleOfAccId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return accRepository.findOne(roleOfAccId);
+            } else {
+                return accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, state);
+            }
+        } else {
+            List<AggregateCoreComponent> accList;
+            if (state == null) {
+                accList = accRepository.findByCurrentAccIdAndReleaseId(roleOfAccId, releaseId);
+            } else {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdAndState(roleOfAccId, releaseId, state);
+            }
+            if (accList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = accList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AggregateCoreComponent acc : accList) {
+                if (acc.getReleaseId() == maxReleaseId &&
+                    acc.getRevisionNum() == maxRevisionNum &&
+                    acc.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return acc;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public AssociationCoreComponentProperty findAsccp(AssociationCoreComponent ascc, long releaseId) {
+        return findAsccp(ascc, releaseId, null);
+    }
+
+    public AssociationCoreComponentProperty findAsccp(AssociationCoreComponent ascc, long releaseId, CoreComponentState state) {
+        long asccpId = ascc.getToAsccpId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return asccpRepository.findOne(asccpId);
+            } else {
+                return asccpRepository.findOneByAsccpIdAndRevisionNumAndState(asccpId, 0, state);
+            }
+        } else {
+            List<AssociationCoreComponentProperty> asccpList;
+            if (state == null) {
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseId(asccpId, releaseId);
+            } else {
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdAndState(asccpId, releaseId, state);
+            }
+            if (asccpList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = asccpList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = asccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = asccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AssociationCoreComponentProperty asccp : asccpList) {
+                if (asccp.getReleaseId() == maxReleaseId &&
+                    asccp.getRevisionNum() == maxRevisionNum &&
+                    asccp.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return asccp;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public BasicCoreComponentProperty findBccp(BasicCoreComponent bcc, long releaseId) {
+        return findBccp(bcc, releaseId, null);
+    }
+
+    public BasicCoreComponentProperty findBccp(BasicCoreComponent bcc, long releaseId, CoreComponentState state) {
+        long bccpId = bcc.getToBccpId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return bccpRepository.findOne(bccpId);
+            } else {
+                return bccpRepository.findOneByBccpIdAndRevisionNumAndState(bccpId, 0, state);
+            }
+        } else {
+            List<BasicCoreComponentProperty> bccpList;
+            if (state == null) {
+                bccpList = bccpRepository.findByCurrentBccpIdAndReleaseId(bccpId, releaseId);
+            } else {
+                bccpList = bccpRepository.findByCurrentBccpIdAndReleaseIdAndState(bccpId, releaseId, state);
+            }
+            if (bccpList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = bccpList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = bccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = bccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (BasicCoreComponentProperty bccp : bccpList) {
+                if (bccp.getReleaseId() == maxReleaseId &&
+                    bccp.getRevisionNum() == maxRevisionNum &&
+                    bccp.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return bccp;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public AggregateCoreComponent findBasedAcc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        long basedAccId = acc.getBasedAccId();
+        if (releaseId <= 0L) {
+            return accRepository.findOneByAccIdAndRevisionNumAndState(basedAccId, 0, state);
+        } else {
+            List<AggregateCoreComponent> accList =
+                    accRepository.findByCurrentAccIdAndReleaseIdAndState(basedAccId, releaseId, state);
+            if (accList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = accList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AggregateCoreComponent e : accList) {
+                if (e.getReleaseId() == maxReleaseId &&
+                    e.getRevisionNum() == maxRevisionNum &&
+                    e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return e;
+                }
+            }
+
+            throw new IllegalStateException();
+
+        }
+    }
+
+    public List<AssociationCoreComponent> findAscc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        if (releaseId <= 0L) {
+            long accId = acc.getAccId();
+            if (state == null) {
+                return asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            } else {
+                return asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            }
+        } else {
+            long accId = acc.getCurrentAccId();
+            List<AssociationCoreComponent> asccList;
+            if (state == null) {
+                asccList = asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+            } else {
+                asccList = asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+            }
+            if (asccList.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Map<String, AssociationCoreComponent> map = new LinkedHashMap();
+            asccList.stream().forEachOrdered(e -> {
+                String guid = e.getGuid();
+                if (map.containsKey(guid)) {
+                    CoreComponentRelation p = map.get(guid);
+                    long pReleaseId = p.getReleaseId();
+                    long eReleaseId = e.getReleaseId();
+                    if (pReleaseId > eReleaseId) {
+                        return;
+                    }
+                }
+
+                map.put(guid, e);
+            });
+
+            return new ArrayList(map.values());
+        }
+    }
+
+    public List<BasicCoreComponent> findBcc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        if (releaseId <= 0L) {
+            long accId = acc.getAccId();
+            if (state == null) {
+                return bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            } else {
+                return bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            }
+        } else {
+            long accId = acc.getCurrentAccId();
+            List<BasicCoreComponent> bccList;
+            if (state == null) {
+                bccList = bccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+            } else {
+                bccList = bccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+            }
+            if (bccList.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Map<String, BasicCoreComponent> map = new LinkedHashMap();
+            bccList.stream().forEachOrdered(e -> {
+                String guid = e.getGuid();
+                if (map.containsKey(guid)) {
+                    CoreComponentRelation p = map.get(guid);
+                    long pReleaseId = p.getReleaseId();
+                    long eReleaseId = e.getReleaseId();
+                    if (pReleaseId > eReleaseId) {
+                        return;
+                    }
+                }
+
+                map.put(guid, e);
+            });
+
+            return new ArrayList(map.values());
+        }
     }
 }

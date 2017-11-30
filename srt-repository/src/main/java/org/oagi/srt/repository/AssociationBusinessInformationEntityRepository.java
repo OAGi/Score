@@ -23,7 +23,8 @@ public interface AssociationBusinessInformationEntityRepository
     public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 
     @Query("select a from AssociationBusinessInformationEntity a where a.basedAsccId = ?1 and a.fromAbieId = ?2 and a.ownerTopLevelAbieId = ?3")
-    public AssociationBusinessInformationEntity findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(long basedAsccId, long fromAbieId, long ownerTopLevelAbieId);
+    public AssociationBusinessInformationEntity findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(
+            long basedAsccId, long fromAbieId, long ownerTopLevelAbieId);
 
     @Modifying
     @Query("delete from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")

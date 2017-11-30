@@ -160,4 +160,8 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1")
     List<BasicCoreComponent> findByCurrentBccId(long currentBccId);
+
+    @Modifying
+    @Query("update BasicCoreComponent b set b.seqKey = ?4 where b.currentBccId = ?1 and b.revisionNum = ?2 and b.revisionTrackingNum = ?3")
+    void updateSeqKeyByCurrentBccIdAndRevisionNumAndRevisionTrackingNum(long currentBccId, int revisionNum, int revisionTrackingNum, int seqKey);
 }

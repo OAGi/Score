@@ -82,80 +82,132 @@ public class NodeService {
     @Autowired
     private BusinessInformationEntityDAO bieDAO;
 
+    @Autowired
+    private CoreComponentService coreComponentService;
+
     public ACCNode createCoreComponentTreeNode(
             AggregateCoreComponent aggregateCoreComponent, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(aggregateCoreComponent, aggregateCoreComponent.getReleaseId(), enableShowingGroup);
+    }
+
+    public ACCNode createCoreComponentTreeNode(
+            AggregateCoreComponent aggregateCoreComponent, long releaseId, boolean enableShowingGroup) {
         if (aggregateCoreComponent == null) {
             throw new IllegalArgumentException("'aggregateCoreComponent' argument must not be null.");
         }
-        return new AggregateCoreComponentNodeImpl(aggregateCoreComponent, enableShowingGroup);
+        return new AggregateCoreComponentNodeImpl(aggregateCoreComponent, releaseId, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             ACCNode parent,
             BasicCoreComponent basicCoreComponent, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(parent, basicCoreComponent, basicCoreComponent.getReleaseId(), enableShowingGroup);
+    }
+
+    public BCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            BasicCoreComponent basicCoreComponent, long releaseId, boolean enableShowingGroup) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponent, enableShowingGroup);
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponent, releaseId, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             BasicCoreComponent basicCoreComponent, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(basicCoreComponent, basicCoreComponent.getReleaseId(), enableShowingGroup);
+    }
+
+    public BCCPNode createCoreComponentTreeNode(
+            BasicCoreComponent basicCoreComponent, long releaseId, boolean enableShowingGroup) {
         if (basicCoreComponent == null) {
             throw new IllegalArgumentException("'basicCoreComponent' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponent, enableShowingGroup);
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponent, releaseId, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             AssociationCoreComponent associationCoreComponent, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(associationCoreComponent, associationCoreComponent.getReleaseId(), enableShowingGroup);
+    }
+
+    public ASCCPNode createCoreComponentTreeNode(
+            AssociationCoreComponent associationCoreComponent, long releaseId, boolean enableShowingGroup) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponent, enableShowingGroup);
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponent, releaseId, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             ACCNode parent,
             AssociationCoreComponent associationCoreComponent, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(parent, associationCoreComponent, associationCoreComponent.getReleaseId(), enableShowingGroup);
+    }
+
+    public ASCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            AssociationCoreComponent associationCoreComponent, long releaseId, boolean enableShowingGroup) {
         if (associationCoreComponent == null) {
             throw new IllegalArgumentException("'associationCoreComponent' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent, enableShowingGroup);
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponent, releaseId, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             AssociationCoreComponentProperty associationCoreComponentProperty, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(associationCoreComponentProperty, associationCoreComponentProperty.getReleaseId(), enableShowingGroup);
+    }
+
+    public ASCCPNode createCoreComponentTreeNode(
+            AssociationCoreComponentProperty associationCoreComponentProperty, long releaseId, boolean enableShowingGroup) {
         if (associationCoreComponentProperty == null) {
             throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponentProperty, enableShowingGroup);
+        return new AssociationCoreComponentPropertyNodeImpl(associationCoreComponentProperty, releaseId, enableShowingGroup);
     }
 
     public ASCCPNode createCoreComponentTreeNode(
             ACCNode parent,
             AssociationCoreComponentProperty associationCoreComponentProperty, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(parent, associationCoreComponentProperty, associationCoreComponentProperty.getReleaseId(), enableShowingGroup);
+    }
+
+    public ASCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            AssociationCoreComponentProperty associationCoreComponentProperty, long releaseId, boolean enableShowingGroup) {
         if (associationCoreComponentProperty == null) {
             throw new IllegalArgumentException("'associationCoreComponentProperty' argument must not be null.");
         }
-        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty, enableShowingGroup);
+        return new AssociationCoreComponentPropertyNodeImpl(parent, associationCoreComponentProperty, releaseId, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             BasicCoreComponentProperty basicCoreComponentProperty, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(basicCoreComponentProperty, basicCoreComponentProperty.getReleaseId(), enableShowingGroup);
+    }
+
+    public BCCPNode createCoreComponentTreeNode(
+            BasicCoreComponentProperty basicCoreComponentProperty, long releaseId, boolean enableShowingGroup) {
         if (basicCoreComponentProperty == null) {
             throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponentProperty, enableShowingGroup);
+        return new BasicCoreComponentPropertyNodeImpl(basicCoreComponentProperty, releaseId, enableShowingGroup);
     }
 
     public BCCPNode createCoreComponentTreeNode(
             ACCNode parent,
             BasicCoreComponentProperty basicCoreComponentProperty, boolean enableShowingGroup) {
+        return createCoreComponentTreeNode(parent, basicCoreComponentProperty, basicCoreComponentProperty.getReleaseId(), enableShowingGroup);
+    }
+
+    public BCCPNode createCoreComponentTreeNode(
+            ACCNode parent,
+            BasicCoreComponentProperty basicCoreComponentProperty, long releaseId, boolean enableShowingGroup) {
         if (basicCoreComponentProperty == null) {
             throw new IllegalArgumentException("'basicCoreComponentProperty' argument must not be null.");
         }
-        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponentProperty, enableShowingGroup);
+        return new BasicCoreComponentPropertyNodeImpl(parent, basicCoreComponentProperty, releaseId, enableShowingGroup);
     }
 
     private abstract class AbstractSRTNode implements SRTNode {
@@ -258,11 +310,11 @@ public class NodeService {
                     for (CoreComponentRelation association : associations()) {
                         if (association instanceof AssociationCoreComponent) {
                             ASCCPNode asccpNode =
-                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) association, enableShowingGroup);
+                                    createCoreComponentTreeNode(this, (AssociationCoreComponent) association, releaseId, enableShowingGroup);
                             children.add(asccpNode);
                         } else if (association instanceof BasicCoreComponent) {
                             BCCPNode bccpNode =
-                                    createCoreComponentTreeNode(this, (BasicCoreComponent) association, enableShowingGroup);
+                                    createCoreComponentTreeNode(this, (BasicCoreComponent) association, releaseId, enableShowingGroup);
                             children.add(bccpNode);
                         }
                     }
@@ -314,76 +366,17 @@ public class NodeService {
         return associations;
     }
 
-    private List<CoreComponentRelation> getAssociationsWithoutRecursive(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+    private List<CoreComponentRelation> getAssociationsWithoutRecursive(
+            AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
         List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-        if (releaseId == 0L) { // current records
-            return getAssociationsWithoutRecursive(acc.getAccId(), state);
-        } else {
-            return getAssociationsWithoutRecursive(acc.getCurrentAccId(), releaseId, state);
-        }
-    }
-
-    private List<CoreComponentRelation> getAssociationsWithoutRecursive(long accId, CoreComponentState state) {
-        List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-        if (state != null) {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
-            coreComponentRelations.addAll(bccList);
-        } else {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
-            coreComponentRelations.addAll(bccList);
-        }
-        Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
-        return coreComponentRelations;
-    }
-
-    private List<CoreComponentRelation> getAssociationsWithoutRecursive(long accId, long releaseId, CoreComponentState state) {
-        List<CoreComponentRelation> coreComponentRelations = new ArrayList();
-        if (state != null) {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
-            coreComponentRelations.addAll(bccList);
-        } else {
-            List<AssociationCoreComponent> asccList =
-                    asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
-            coreComponentRelations.addAll(asccList);
-            List<BasicCoreComponent> bccList =
-                    bccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
-            coreComponentRelations.addAll(bccList);
-        }
-
-        Map<String, CoreComponentRelation> ccMap = new LinkedHashMap();
-        coreComponentRelations.stream().forEachOrdered(e -> {
-            String guid = e.getGuid();
-            if (ccMap.containsKey(guid)) {
-                CoreComponentRelation p = ccMap.get(guid);
-                long pReleaseId = p.getReleaseId();
-                Long eReleaseId = e.getReleaseId();
-                if (pReleaseId > eReleaseId) {
-                    return;
-                }
-            }
-
-            ccMap.put(guid, e);
-        });
-
-        coreComponentRelations = new ArrayList(ccMap.values());
+        List<AssociationCoreComponent> asccList = coreComponentService.findAscc(acc, releaseId, state);
+        coreComponentRelations.addAll(asccList);
+        List<BasicCoreComponent> bccList = coreComponentService.findBcc(acc, releaseId, state);
+        coreComponentRelations.addAll(bccList);
 
         Collections.sort(coreComponentRelations, comparingCoreComponentRelation());
         return coreComponentRelations;
     }
-
-
 
     private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent associationCoreComponent) {
         long toAsccpId = associationCoreComponent.getToAsccpId();
@@ -407,49 +400,40 @@ public class NodeService {
         private boolean enableShowingGroup;
 
         private final AssociationCoreComponentProperty asccp;
+        private final long releaseId;
         private ACCNode type;
 
         private Boolean hasChild = null;
         private Collection<CCNode> children = null;
 
-        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponent ascc, boolean enableShowingGroup) {
-            this(null, ascc, enableShowingGroup);
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponent ascc,
+                                                         long releaseId, boolean enableShowingGroup) {
+            this(null, ascc, releaseId, enableShowingGroup);
         }
 
-        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponentProperty asccp, boolean enableShowingGroup) {
-            this(null, asccp, enableShowingGroup);
+        private AssociationCoreComponentPropertyNodeImpl(AssociationCoreComponentProperty asccp,
+                                                         long releaseId, boolean enableShowingGroup) {
+            this(null, asccp, releaseId, enableShowingGroup);
         }
 
         private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
                                                          AssociationCoreComponent ascc,
+                                                         long releaseId,
                                                          boolean enableShowingGroup) {
             this.parent = parent;
             this.ascc = ascc;
+            this.releaseId = releaseId;
             this.enableShowingGroup = enableShowingGroup;
-
-            long asccpId = ascc.getToAsccpId();
-            long releaseId = ascc.getReleaseId();
-            if (releaseId == 0L) {
-                this.asccp = asccpRepository.findOne(asccpId);
-            } else {
-                AssociationCoreComponentProperty latestAsccp = null;
-                for (AssociationCoreComponentProperty asccp :
-                        asccpRepository.findByCurrentAsccpIdAndReleaseId(asccpId, releaseId)) {
-                    if (latestAsccp != null && latestAsccp.getReleaseId() > asccp.getReleaseId()) {
-                        continue;
-                    }
-                    latestAsccp = asccp;
-                }
-
-                this.asccp = latestAsccp;
-            }
+            this.asccp = coreComponentService.findAsccp(ascc, releaseId);
         }
 
         private AssociationCoreComponentPropertyNodeImpl(ACCNode parent,
                                                          AssociationCoreComponentProperty asccp,
+                                                         long releaseId,
                                                          boolean enableShowingGroup) {
             this.parent = parent;
             this.asccp = asccp;
+            this.releaseId = releaseId;
             this.enableShowingGroup = enableShowingGroup;
         }
 
@@ -468,22 +452,8 @@ public class NodeService {
             if (type == null) {
                 AssociationCoreComponentProperty asccp = getAsccp();
                 long roleOfAccId = asccp.getRoleOfAccId();
-                long releaseId = asccp.getReleaseId();
                 if (roleOfAccId > 0L) {
-                    AggregateCoreComponent roleOfAcc;
-                    if (releaseId == 0L) {
-                        roleOfAcc = accRepository.findOne(roleOfAccId);
-                    } else {
-                        AggregateCoreComponent latestAcc = null;
-                        for (AggregateCoreComponent acc :
-                                accRepository.findByCurrentAccIdAndReleaseId(roleOfAccId, releaseId)) {
-                            if (latestAcc != null && latestAcc.getReleaseId() > acc.getReleaseId()) {
-                                continue;
-                            }
-                            latestAcc = acc;
-                        }
-                        roleOfAcc = latestAcc;
-                    }
+                    AggregateCoreComponent roleOfAcc = coreComponentService.findRoleOfAcc(asccp, releaseId);
                     type = new AggregateCoreComponentNodeImpl(roleOfAcc, enableShowingGroup);
                 }
             }
@@ -568,32 +538,37 @@ public class NodeService {
         private boolean enableShowingGroup;
 
         private final BasicCoreComponentProperty bccp;
+        private final long releaseId;
         private DataType dataType;
 
         private Collection<BDTSCNode> children = null;
 
-        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc, boolean enableShowingGroup) {
-            this(null, bcc, enableShowingGroup);
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponent bcc,
+                                                   long releaseId, boolean enableShowingGroup) {
+            this(null, bcc, releaseId, enableShowingGroup);
         }
 
-        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
-            this(null, bccp, enableShowingGroup);
+        private BasicCoreComponentPropertyNodeImpl(BasicCoreComponentProperty bccp,
+                                                   long releaseId, boolean enableShowingGroup) {
+            this(null, bccp, releaseId, enableShowingGroup);
         }
 
         private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                   BasicCoreComponent bcc, boolean enableShowingGroup) {
+                                                   BasicCoreComponent bcc,
+                                                   long releaseId, boolean enableShowingGroup) {
             this.parent = parent;
             this.bcc = bcc;
+            this.releaseId = releaseId;
             this.enableShowingGroup = enableShowingGroup;
-
-            long bccpId = bcc.getToBccpId();
-            this.bccp = bccpRepository.findOne(bccpId);
+            this.bccp = coreComponentService.findBccp(bcc, releaseId);
         }
 
         private BasicCoreComponentPropertyNodeImpl(ACCNode parent,
-                                                   BasicCoreComponentProperty bccp, boolean enableShowingGroup) {
+                                                   BasicCoreComponentProperty bccp,
+                                                   long releaseId, boolean enableShowingGroup) {
             this.parent = parent;
             this.bccp = bccp;
+            this.releaseId = releaseId;
             this.enableShowingGroup = enableShowingGroup;
         }
 
@@ -762,7 +737,7 @@ public class NodeService {
             throw new IllegalArgumentException("'bizCtx' argument must not be null.");
         }
 
-        return new AssociationBIEPropertyNodeImpl(asccp, bizCtx);
+        return new AssociationBIEPropertyNodeImpl(asccp, asccp.getReleaseId(), bizCtx);
     }
 
     public ASBIEPNode createBusinessInformationEntityTreeNode(
@@ -774,10 +749,9 @@ public class NodeService {
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
 
-        ABIENodeImpl abieNode =
-                new ABIENodeImpl(abie, acc, bizCtx);
+        ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, acc.getReleaseId(), bizCtx);
 
-        return new AssociationBIEPropertyNodeImpl(asbiep, asccp, abieNode);
+        return new AssociationBIEPropertyNodeImpl(asbiep, asccp, asccp.getReleaseId(), abieNode);
     }
 
     private class ABIENodeImpl
@@ -788,21 +762,25 @@ public class NodeService {
 
         private AggregateBusinessInformationEntity abie;
         private AggregateCoreComponent basedAcc;
+        private final long releaseId;
         private BusinessContext bizCtx;
 
         private Boolean hasChild = null;
         private List<BIENode> children = null;
 
-        public ABIENodeImpl(AggregateCoreComponent acc, BusinessContext bizCtx) {
+        public ABIENodeImpl(AggregateCoreComponent acc, long releaseId, BusinessContext bizCtx) {
             this.abie = createABIE(acc, bizCtx);
             this.basedAcc = acc;
+            this.releaseId = releaseId;
             this.bizCtx = bizCtx;
         }
 
         public ABIENodeImpl(AggregateBusinessInformationEntity abie,
-                            AggregateCoreComponent acc, BusinessContext bizCtx) {
+                            AggregateCoreComponent acc,
+                            long releaseId, BusinessContext bizCtx) {
             this.abie = abie;
             this.basedAcc = acc;
+            this.releaseId = releaseId;
             this.bizCtx = bizCtx;
         }
 
@@ -858,21 +836,17 @@ public class NodeService {
             if (hasChild == null) {
                 AggregateCoreComponent acc = this.basedAcc;
                 while (acc != null) {
-                    long accId = acc.getAccId();
-                    int asccCount = asccRepository.countByFromAccIdAndRevisionNumAndState(
-                            accId, 0, CoreComponentState.Published);
+                    int asccCount = coreComponentService.findAscc(acc, releaseId, Published).size();
                     if (asccCount > 0) {
                         hasChild = true;
                         break;
                     } else {
-                        int bccCount = bccRepository.countByFromAccIdAndRevisionNumAndState(
-                                accId, 0, CoreComponentState.Published);
+                        int bccCount = coreComponentService.findBcc(acc, releaseId, Published).size();
                         if (bccCount > 0) {
                             hasChild = true;
                             break;
                         } else {
-                            long basedAccId = acc.getBasedAccId();
-                            acc = accRepository.findOneByAccIdAndRevisionNumAndState(basedAccId, 0, Published);
+                            acc = coreComponentService.findBasedAcc(acc, releaseId, Published);
                         }
                     }
                 }
@@ -892,7 +866,7 @@ public class NodeService {
                 AggregateCoreComponent acc = this.basedAcc;
                 while (acc != null) {
                     accList.add(acc);
-                    acc = accRepository.findOneByAccIdAndRevisionNumAndState(acc.getBasedAccId(), 0, Published);
+                    acc = coreComponentService.findBasedAcc(acc, releaseId, Published);
                 }
 
                 AggregateBusinessInformationEntity abie = getAbie();
@@ -900,12 +874,12 @@ public class NodeService {
                 while (!accList.isEmpty()) {
                     acc = accList.pollLast();
 
-                    List<CoreComponentRelation> associations = getAssociations(acc, acc.getReleaseId(), CoreComponentState.Published);
+                    List<CoreComponentRelation> associations = getAssociations(acc, releaseId, CoreComponentState.Published);
                     for (CoreComponentRelation relation : associations) {
                         if (relation instanceof AssociationCoreComponent) {
                             AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
                             AssociationBIEPropertyNodeImpl asbieChild =
-                                    new AssociationBIEPropertyNodeImpl(abie, ascc, bizCtx, ++seqKey);
+                                    new AssociationBIEPropertyNodeImpl(abie, ascc, releaseId, bizCtx, ++seqKey);
                             asbieChild.setParent(parent);
 
                             children.add(asbieChild);
@@ -914,7 +888,7 @@ public class NodeService {
 
                             BasicBIEPropertyNodeImpl bbieChild =
                                     new BasicBIEPropertyNodeImpl(
-                                            abie, bcc, (bcc.getEntityType() == Attribute ? 0 : ++seqKey));
+                                            abie, bcc, releaseId, (bcc.getEntityType() == Attribute ? 0 : ++seqKey));
                             bbieChild.setParent(parent);
 
                             children.add(bbieChild);
@@ -971,16 +945,18 @@ public class NodeService {
 
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationCoreComponentProperty asccp;
+        private final long releaseId;
 
         private ABIENodeImpl type;
 
         public AssociationBIEPropertyNodeImpl(AssociationCoreComponentProperty asccp,
+                                              long releaseId,
                                               BusinessContext bizCtx) {
             this.asccp = asccp;
+            this.releaseId = releaseId;
 
-            long roleOfAccId = asccp.getRoleOfAccId();
-            AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
-            type = new ABIENodeImpl(acc, bizCtx);
+            AggregateCoreComponent acc = coreComponentService.findRoleOfAcc(asccp, releaseId);
+            type = new ABIENodeImpl(acc, releaseId, bizCtx);
             type.setParent(this);
 
             AggregateBusinessInformationEntity roleOfAbie = type.getAbie();
@@ -989,9 +965,11 @@ public class NodeService {
 
         public AssociationBIEPropertyNodeImpl(AssociationBusinessInformationEntityProperty asbiep,
                                               AssociationCoreComponentProperty asccp,
+                                              long releaseId,
                                               ABIENodeImpl type) {
             this.asbiep = asbiep;
             this.asccp = asccp;
+            this.releaseId = releaseId;
             this.type = type;
 
             type.setParent(this);
@@ -999,9 +977,11 @@ public class NodeService {
 
         public AssociationBIEPropertyNodeImpl(AggregateBusinessInformationEntity fromAbie,
                                               AssociationCoreComponent ascc,
+                                              long releaseId,
                                               BusinessContext bizCtx,
                                               int seqKey) {
             this.ascc = ascc;
+            this.releaseId = releaseId;
 
             long abieId = fromAbie.getAbieId();
             if (abieId > 0L) {
@@ -1015,18 +995,15 @@ public class NodeService {
                 asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
 
                 AggregateBusinessInformationEntity roleOfAbie = abieRepository.findOne(asbiep.getRoleOfAbieId());
-                long roleOfAccId = asccp.getRoleOfAccId();
-                AggregateCoreComponent basedAcc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+                AggregateCoreComponent basedAcc = coreComponentService.findRoleOfAcc(asccp, releaseId, Published);
 
-                type = new ABIENodeImpl(roleOfAbie, basedAcc, bizCtx);
+                type = new ABIENodeImpl(roleOfAbie, basedAcc, releaseId, bizCtx);
 
             } else {
-                long toAsccpId = ascc.getToAsccpId();
-                asccp = asccpRepository.findOneByAsccpIdAndRevisionNumAndState(toAsccpId, 0, Published);
-                long roleOfAccId = asccp.getRoleOfAccId();
-                AggregateCoreComponent basedAcc = accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, Published);
+                asccp = coreComponentService.findAsccp(ascc, releaseId, Published);
+                AggregateCoreComponent basedAcc = coreComponentService.findRoleOfAcc(asccp, releaseId, Published);
 
-                type = new ABIENodeImpl(basedAcc, bizCtx);
+                type = new ABIENodeImpl(basedAcc, releaseId, bizCtx);
                 AggregateBusinessInformationEntity roleOfAbie = type.getAbie();
                 asbiep = createASBIEP(asccp, roleOfAbie);
                 asbie = createASBIE(fromAbie, asbiep, ascc, seqKey);
@@ -1177,6 +1154,7 @@ public class NodeService {
 
         private BasicBusinessInformationEntity bbie;
         private BasicCoreComponent bcc;
+        private final long releaseId;
 
         private DataType bdt;
 
@@ -1185,8 +1163,10 @@ public class NodeService {
 
         public BasicBIEPropertyNodeImpl(AggregateBusinessInformationEntity fromAbie,
                                         BasicCoreComponent bcc,
+                                        long releaseId,
                                         int seqKey) {
             this.bcc = bcc;
+            this.releaseId = releaseId;
 
             long abieId = fromAbie.getAbieId();
             if (abieId > 0L) {
@@ -1202,8 +1182,7 @@ public class NodeService {
             }
 
             if (bbie == null) {
-                long toBccpId = bcc.getToBccpId();
-                bccp = bccpRepository.findOneByBccpIdAndRevisionNumAndState(toBccpId, 0, Published);
+                bccp = coreComponentService.findBccp(bcc, releaseId, Published);
                 bbiep = createBBIEP(bccp);
             }
 

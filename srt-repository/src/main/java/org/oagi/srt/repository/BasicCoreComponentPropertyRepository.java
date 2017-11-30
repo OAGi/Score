@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -108,4 +109,10 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
 
     @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1")
     List<BasicCoreComponentProperty> findByCurrentBccpId(long currentBccpId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.releaseId <= ?2")
+    List<BasicCoreComponentProperty> findByCurrentBccpIdAndReleaseId(long currentBccpId, long releaseId);
+
+    @Query("select b from BasicCoreComponentProperty b where b.currentBccpId = ?1 and b.releaseId <= ?2 and b.state = ?3")
+    List<BasicCoreComponentProperty> findByCurrentBccpIdAndReleaseIdAndState(long currentBccpId, long releaseId, CoreComponentState state);
 }

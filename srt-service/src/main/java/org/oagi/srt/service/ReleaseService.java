@@ -351,8 +351,10 @@ public class ReleaseService {
             accRepository.saveAndFlush(acc);
 
             AggregateCoreComponent currentACC = accRepository.findOne(acc.getCurrentAccId());
-            currentACC.setState(CoreComponentState.Published);
-            accRepository.saveAndFlush(currentACC);
+            if (isLatestRevision(acc, currentACC)) { // do not update current record because of acc if there are later releases (Issue #463)
+                currentACC.setState(CoreComponentState.Published);
+                accRepository.saveAndFlush(currentACC);
+            }
 
             // move all children assocs to publish state
             asccRepository.updateStateByFromAccId(acc.getCurrentAccId(), CoreComponentState.Published);
@@ -397,6 +399,21 @@ public class ReleaseService {
             currentBccp.setState(CoreComponentState.Published);
             bccpRepository.saveAndFlush(currentBccp);
         }
+    }
+
+    private boolean isLatestRevision(AggregateCoreComponent acc, AggregateCoreComponent currentACC) {
+        if (acc.getCurrentAccId() != currentACC.getAccId()) {
+            return false;
+        }
+
+        int maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccId(currentACC.getAccId());
+        int maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(currentACC.getAccId(), maxRevisionNum);
+
+        if (acc.getRevisionNum() != maxRevisionNum || acc.getRevisionTrackingNum() != maxRevisionTrackingNum) {
+            return false;
+        }
+
+        return true;
     }
 
     private void deleteCCsByRelease(Release fromRel) {

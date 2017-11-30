@@ -1069,6 +1069,7 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 }
 
 .core-components-table .den {
+    width: 350px;
 }
 
 .core-components-table .den .guid {

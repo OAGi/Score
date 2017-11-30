@@ -6,7 +6,7 @@ spring:
 # DataSource
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe
+    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
     username: oagi
     password: oagi
     platform: oracle

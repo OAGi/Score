@@ -110,8 +110,11 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     List<AggregateCoreComponent> findByReleaseId(long releaseId);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2")
-    List<AggregateCoreComponent> findByCurrentAccIdAndReleaseId(long currentAccid, long releaseId);
+    List<AggregateCoreComponent> findByCurrentAccIdAndReleaseId(long currentAccId, long releaseId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2 and a.state = ?3")
+    List<AggregateCoreComponent> findByCurrentAccIdAndReleaseIdAndState(long currentAccId, long releaseId, CoreComponentState state);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1")
-    List<AggregateCoreComponent> findByCurrentAccId(long currentAccid);
+    List<AggregateCoreComponent> findByCurrentAccId(long currentAccId);
 }

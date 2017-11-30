@@ -99,7 +99,7 @@
                 <p:dataTable id="tbl" var="cc" value="#{coreComponentBean.coreComponents}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
-                             styleClass="core-components-table" rowKey="#{cc.id}">
+                             styleClass="core-components-table" rowKey="#{cc.id}" tableStyle="width: auto">
                     <p:ajax event="sort" listener="#{coreComponentBean.onSortEvent}"/>
 
                     <p:column styleClass="type text-align-center" headerText="Type" sortBy="#{cc.type}">
