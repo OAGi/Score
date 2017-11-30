@@ -29,7 +29,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
-                    <p:column  style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
+                    <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
                         <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId or profileBOD.state ne 'Editing'}">
                             <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
                         </h:panelGroup>
@@ -37,12 +37,15 @@
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
                         <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
                     </p:column>
+                    <p:column headerText="Release" style="width: 80px; text-align: center;" styleClass="ellipsis" sortBy="#{profileBOD.releaseNum}">
+                        <h:outputText value="#{profileBOD.releaseNum}"/>
+                    </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
                               sortBy="#{profileBOD.bizCtxName}">
                         <a href="/context_management/business_context/#{profileBOD.bizCtxId}">#{profileBOD.bizCtxName}</a>
                     </p:column>
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                    <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.ownerName}">
                         <h:outputText value="#{profileBOD.ownerName}"/>
 
@@ -55,11 +58,11 @@
                         </h:panelGroup>
                         <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
-                    <p:column style="width: 120px; text-align: center;" styleClass="ellipsis" headerText="Version"
+                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Version"
                               sortBy="#{profileBOD.version}">
                         <h:outputText value="#{profileBOD.version}"/>
                     </p:column>
-                    <p:column style="width: 120px; text-align: center;" styleClass="ellipsis" headerText="Status"
+                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Status"
                               sortBy="#{profileBOD.status}">
                         <h:outputText value="#{profileBOD.status}"/>
                     </p:column>
@@ -69,7 +72,7 @@
                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
                     </p:column>
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
+                    <p:column style="width: 80px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
                         <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
                             <span class="label label-primary">Editing</span>
                         </h:panelGroup>

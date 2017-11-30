@@ -36,6 +36,9 @@ public class TopLevelAbie implements Serializable {
     @Column(nullable = false)
     private long ownerUserId;
 
+    @Column
+    private Long releaseId;
+
     public long getTopLevelAbieId() {
         return topLevelAbieId;
     }
@@ -68,6 +71,14 @@ public class TopLevelAbie implements Serializable {
         this.ownerUserId = ownerUserId;
     }
 
+    public long getReleaseId() {
+        return (releaseId != null) ? releaseId : 0L;
+    }
+
+    public void setReleaseId(Long releaseId) {
+        this.releaseId = releaseId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,9 +93,10 @@ public class TopLevelAbie implements Serializable {
     @Override
     public int hashCode() {
         int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
-        result = 31 * result + (abie != null ? (int) (abie.getAbieId() ^ (abie.getAbieId() >>> 32)) : 0);
+        result = 31 * result + (abie != null ? abie.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         return result;
     }
 
@@ -95,6 +107,7 @@ public class TopLevelAbie implements Serializable {
                 ", abie=" + abie +
                 ", state=" + state +
                 ", ownerUserId=" + ownerUserId +
+                ", releaseId=" + releaseId +
                 '}';
     }
 }

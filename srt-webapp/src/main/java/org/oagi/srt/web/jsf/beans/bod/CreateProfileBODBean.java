@@ -425,7 +425,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
             ASBIEPNode topLevelNode = getTopLevelNode();
             nodeService.validate(topLevelNode);
-            nodeService.submit(topLevelNode, getCurrentUser(), progressListener);
+            nodeService.submit(topLevelNode, release, getCurrentUser(), progressListener);
 
             return "/views/profile_bod/list.jsf?faces-redirect=true";
         } finally {

@@ -1531,7 +1531,7 @@ public class NodeService {
     }
 
     @Transactional
-    public TopLevelAbie submit(ASBIEPNode bieNode,
+    public TopLevelAbie submit(ASBIEPNode bieNode, Release release,
                                User user, ProgressListener progressListener) {
         Boolean isTopLevel = (Boolean) bieNode.getAttribute("isTopLevel");
         if (isTopLevel == null || isTopLevel == false) {
@@ -1539,7 +1539,7 @@ public class NodeService {
         }
 
         BusinessInformationEntityTreeNodeSubmitHandler submitHandler =
-                new BusinessInformationEntityTreeNodeSubmitHandler(bieNode, user);
+                new BusinessInformationEntityTreeNodeSubmitHandler(bieNode, release, user);
         submitHandler.setProgressListener(progressListener);
         TopLevelAbie topLevelAbie = submitHandler.submit();
         return topLevelAbie;
@@ -1595,6 +1595,7 @@ public class NodeService {
 
     private class BusinessInformationEntityTreeNodeSubmitHandler {
         private ASBIEPNode root;
+        private Release release;
         private User user;
         private ProgressListener progressListener;
 
@@ -1606,9 +1607,9 @@ public class NodeService {
         private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
         public BusinessInformationEntityTreeNodeSubmitHandler(
-                ASBIEPNode root,
-                User user) {
+                ASBIEPNode root, Release release, User user) {
             this.root = root;
+            this.release = release;
             this.user = user;
         }
 
@@ -1650,6 +1651,9 @@ public class NodeService {
         private TopLevelAbie prepareForTopLevelAbieEntity() {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
+            if (release != null && !Release.WORKING_RELEASE.equals(release)) {
+                topLevelAbie.setReleaseId(release.getReleaseId());
+            }
             topLevelAbie.setState(Editing);
             topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 
@@ -1987,10 +1991,10 @@ public class NodeService {
     }
 
     @Transactional
-    public TopLevelAbie copy(ASBIEPNode bieNode, User user,
+    public TopLevelAbie copy(ASBIEPNode bieNode, Release release, User user,
                              BusinessContext bizCtx, ProgressListener progressListener) {
         BusinessInformationEntityTreeNodeCopyHandler copyHandler =
-                new BusinessInformationEntityTreeNodeCopyHandler(bieNode, user, bizCtx);
+                new BusinessInformationEntityTreeNodeCopyHandler(bieNode, release, user, bizCtx);
         copyHandler.setProgressListener(progressListener);
 
         return copyHandler.copy();
@@ -1998,6 +2002,7 @@ public class NodeService {
 
     private class BusinessInformationEntityTreeNodeCopyHandler {
         private ASBIEPNode root;
+        private Release release;
         private User user;
         private BusinessContext bizCtx;
 
@@ -2018,9 +2023,10 @@ public class NodeService {
         private Set<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new LinkedHashSet();
 
         public BusinessInformationEntityTreeNodeCopyHandler(
-                ASBIEPNode root,
+                ASBIEPNode root, Release release,
                 User user, BusinessContext bizCtx) {
             this.root = root;
+            this.release = release;
             this.user = user;
             this.bizCtx = bizCtx;
         }
@@ -2069,6 +2075,9 @@ public class NodeService {
         private TopLevelAbie prepareForTopLevelAbieEntity() {
             TopLevelAbie topLevelAbie = new TopLevelAbie();
             topLevelAbie.setOwnerUserId(user.getAppUserId());
+            if (release != null && !Release.WORKING_RELEASE.equals(release)) {
+                topLevelAbie.setReleaseId(release.getReleaseId());
+            }
             topLevelAbie.setState(Editing);
             topLevelAbie = topLevelAbieRepository.saveAndFlush(topLevelAbie);
 

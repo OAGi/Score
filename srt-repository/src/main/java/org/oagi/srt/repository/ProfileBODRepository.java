@@ -15,12 +15,16 @@ public class ProfileBODRepository {
     private EntityManager entityManager;
 
     private static final String FIND_ALL_STATEMENT =
-            "select tla.top_level_abie_id, abie.abie_id, tla.state, tla.owner_user_id, u.name as owner_name, " +
-            "abie.creation_timestamp, abie.version, abie.status, asbiep.asbiep_id,asccp.asccp_id, asccp.property_term, " +
-            "bc.biz_ctx_id, bc.name as biz_ctx_name " +
-            "from top_level_abie tla, abie, asbiep, asccp, biz_ctx bc, app_user u " +
-            "where tla.abie_id = abie.abie_id and abie.biz_ctx_id = bc.biz_ctx_id and abie.abie_id = asbiep.role_of_abie_id " +
-            "and asbiep.based_asccp_id = asccp.asccp_id and tla.owner_user_id = u.app_user_id";
+            "SELECT tla.top_level_abie_id, abie.abie_id, tla.state, tla.owner_user_id, u.name as owner_name, tla.release_id, " +
+            "abie.creation_timestamp, abie.version, abie.status, asbiep.asbiep_id, " +
+            "asccp.asccp_id, asccp.property_term, " +
+            "bc.biz_ctx_id, bc.name as biz_ctx_name, release.release_num " +
+            "FROM top_level_abie tla JOIN abie ON tla.abie_id = abie.abie_id " +
+                                    "JOIN asbiep ON abie.abie_id = asbiep.role_of_abie_id " +
+                                    "JOIN asccp ON asbiep.based_asccp_id = asccp.asccp_id " +
+                                    "JOIN biz_ctx bc ON abie.biz_ctx_id = bc.biz_ctx_id " +
+                                    "JOIN app_user u ON tla.owner_user_id = u.app_user_id " +
+                                    "LEFT JOIN release ON tla.release_id = release.release_id";
 
     public List<ProfileBOD> findAll() {
         Query query = entityManager.createNativeQuery(FIND_ALL_STATEMENT, ProfileBOD.class);
