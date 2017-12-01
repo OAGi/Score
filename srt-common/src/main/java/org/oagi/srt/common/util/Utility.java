@@ -1,15 +1,26 @@
 package org.oagi.srt.common.util;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.StandardDirectoryReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.spell.LuceneDictionary;
+import org.apache.lucene.search.spell.LuceneLevenshteinDistance;
 import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -607,11 +618,19 @@ public class Utility {
         }
 
         try {
-            SpellChecker spellChecker = new SpellChecker(directory);
-            IndexReader reader = StandardDirectoryReader.open(directory);
+            IndexReader reader = DirectoryReader.open(directory);
+            IndexSearcher searcher = new IndexSearcher(reader);
+
+            Query q = new QueryParser(field, new StandardAnalyzer()).parse(word);
+            TopDocs topDocs = searcher.search(q, 1);
+            if (topDocs.totalHits > 0L) {
+                return Arrays.asList(word);
+            }
+
+            SpellChecker spellChecker = new SpellChecker(directory, new LuceneLevenshteinDistance());
             spellChecker.indexDictionary(new LuceneDictionary(reader, field), new IndexWriterConfig(), true);
-            return Arrays.asList(spellChecker.suggestSimilar(word, 5));
-        } catch (IOException e) {
+            return Arrays.asList(spellChecker.suggestSimilar(word, 10));
+        } catch (IOException | ParseException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -624,6 +643,116 @@ public class Utility {
             }
         }
         return word;
+    }
+
+    public static <T> Directory createDirectory(Collection<T> list,
+                                                String[] fields,
+                                                String[] delims,
+                                                Function<T, String>... functions) {
+
+        Map<String, Set<String>> tokenSet = new HashMap();
+        for (String field : fields) {
+            tokenSet.put(field, new HashSet());
+        }
+
+        for (T e : list) {
+            for (int i = 0, len = functions.length; i < len; ++i) {
+                Function<T, String> func = functions[i];
+                String field = fields[i];
+                String delim = delims[i];
+
+                String str = func.apply(e);
+                if (!StringUtils.isEmpty(str)) {
+                    for (String token : str.split(delim)) {
+                        tokenSet.get(field).add(token.toLowerCase());
+                    }
+                }
+            }
+        }
+
+        Directory directory = new RAMDirectory();
+
+        IndexWriterConfig conf = new IndexWriterConfig();
+        IndexWriter indexWriter = null;
+        try {
+            indexWriter = new IndexWriter(directory, conf);
+            Document doc = new Document();
+            for (Map.Entry<String, Set<String>> entry : tokenSet.entrySet()) {
+                String field = entry.getKey();
+                for (String token : entry.getValue()) {
+                    doc.add(new StringField(field, token, Field.Store.YES));
+                }
+            }
+            indexWriter.addDocument(doc);
+
+            indexWriter.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeQuietly(indexWriter);
+        }
+
+        return directory;
+    }
+
+    public static <T extends Serializable> Directory createDirectoryForText(
+            Collection<T> list,
+            String[] fields,
+            Function<T, String>... functions) {
+
+        Directory directory = new RAMDirectory();
+        IndexWriterConfig conf = new IndexWriterConfig();
+        IndexWriter indexWriter = null;
+        try {
+            indexWriter = new IndexWriter(directory, conf);
+
+            for (T e : list) {
+                Document doc = new Document();
+                for (int i = 0, len = functions.length; i < len; ++i) {
+                    String field = fields[i];
+                    Function<T, String> func = functions[i];
+
+                    String text = func.apply(e);
+                    if (!StringUtils.isEmpty(text)) {
+                        doc.add(new TextField(field, text, Field.Store.NO));
+                    }
+                }
+                doc.add(new StoredField("obj", toByteArray(e)));
+                indexWriter.addDocument(doc);
+            }
+
+            indexWriter.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeQuietly(indexWriter);
+        }
+
+        return directory;
+    }
+
+    public static <T> T toObject(byte[] bytes, Class<T> clazz) throws IOException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        try {
+            return clazz.cast(objectInputStream.readObject());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            objectInputStream.close();
+        }
+    }
+
+    public static byte[] toByteArray(Serializable serializable) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        try {
+            objectOutputStream.writeObject(serializable);
+            objectOutputStream.flush();
+        } finally {
+            objectOutputStream.close();
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     public static void main(String args[]) {

@@ -1,11 +1,9 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.*;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -13,7 +11,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.*;
@@ -33,15 +30,13 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
-import static org.oagi.srt.common.util.Utility.suggestWord;
+import static org.oagi.srt.common.util.Utility.*;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Controller
@@ -196,14 +191,21 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
         coreComponents = new ArrayList(ccMap.values());
 
-        try {
-            makeVocabulary(coreComponents);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        directory = createDirectory(coreComponents,
+                new String[]{DEN_FIELD, MODULE_FIELD},
+                new String[]{" ", Pattern.quote("\\")},
+                CoreComponents::getDen, CoreComponents::getModule);
+        definition_index = createDirectoryForText(coreComponents,
+                new String[]{DEFINITION_FIELD},
+                CoreComponents::getDefinition);
 
         allCoreComponents = coreComponents;
     }
+
+    private Directory directory, definition_index;
+    private static final String DEN_FIELD = "den";
+    private static final String DEFINITION_FIELD = "definition";
+    private static final String MODULE_FIELD = "module";
 
     public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
         setRelease(getRelease());
@@ -339,85 +341,6 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 })
                 .collect(Collectors.toList());
         return coreComponents;
-    }
-
-    private Directory directory, definition_index;
-    private static final String DEN_FIELD = "den";
-    private static final String DEFINITION_FIELD = "definition";
-    private static final String MODULE_FIELD = "module";
-
-    private void makeVocabulary(List<CoreComponents> coreComponents) throws IOException {
-        directory = new RAMDirectory();
-
-        IndexWriterConfig conf = new IndexWriterConfig();
-        IndexWriter indexWriter = new IndexWriter(directory, conf);
-        try {
-            Document doc = new Document();
-            for (CoreComponents e : coreComponents) {
-                String den = e.getDen();
-                if (!StringUtils.isEmpty(den)) {
-                    for (String token : den.split(" ")) {
-                        doc.add(new StringField(DEN_FIELD, token.toLowerCase(), Field.Store.YES));
-                    }
-                }
-
-                String module = e.getModule();
-                if (!StringUtils.isEmpty(module)) {
-                    for (String token : module.split(Pattern.quote("\\"))) {
-                        doc.add(new StringField(MODULE_FIELD, token.toLowerCase(), Field.Store.YES));
-                    }
-                }
-            }
-
-            indexWriter.addDocument(doc);
-            indexWriter.flush();
-        } finally {
-            indexWriter.close();
-        }
-
-
-        definition_index = new RAMDirectory();
-        conf = new IndexWriterConfig();
-        indexWriter = new IndexWriter(definition_index, conf);
-        try {
-            for (CoreComponents e : coreComponents) {
-                Document doc = new Document();
-                String definition = e.getDefinition();
-
-                if (!StringUtils.isEmpty(definition)) {
-                    doc.add(new TextField(DEFINITION_FIELD, definition, Field.Store.NO));
-                    doc.add(new StoredField("obj", toByteArray(e)));
-                    indexWriter.addDocument(doc);
-                }
-            }
-            indexWriter.flush();
-        } finally {
-            indexWriter.close();
-        }
-    }
-
-    private <T> T toObject(byte[] bytes, Class<T> clazz) throws IOException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        try {
-            return clazz.cast(objectInputStream.readObject());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            objectInputStream.close();
-        }
-    }
-
-    private byte[] toByteArray(Serializable serializable) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        try {
-            objectOutputStream.writeObject(serializable);
-            objectOutputStream.flush();
-        } finally {
-            objectOutputStream.close();
-        }
-        return byteArrayOutputStream.toByteArray();
     }
 
     public void setCoreComponents(List<CoreComponents> coreComponents) {

@@ -1,12 +1,6 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.oagi.srt.model.node.ASBIEPNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
@@ -31,16 +25,13 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
-import static org.oagi.srt.common.util.Utility.suggestWord;
+import static org.oagi.srt.common.util.Utility.*;
 
 @Controller
 @Scope("view")
@@ -88,54 +79,24 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    private Directory directory;
+    private static final String PROPERTY_TERM_FIELD = "property_term";
+    private static final String MODULE_FIELD = "module";
+
     public List<TopLevelConcept> getAllTopLevelConcepts() {
         if (allTopLevelConcepts == null) {
             allTopLevelConcepts = topLevelConceptRepository.findAll();
-            try {
-                makeVocabulary(allTopLevelConcepts);
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
+
+            directory = createDirectory(allTopLevelConcepts,
+                    new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
+                    new String[]{" ", Pattern.quote("\\")},
+                    TopLevelConcept::getPropertyTerm, TopLevelConcept::getModule);
         }
         return allTopLevelConcepts;
     }
 
     public void setAllTopLevelConcepts(List<TopLevelConcept> allTopLevelConcepts) {
         this.allTopLevelConcepts = allTopLevelConcepts;
-    }
-
-    private Directory directory;
-    private static final String PROPERTY_TERM_FIELD = "property_term";
-    private static final String MODULE_FIELD = "module";
-
-    private void makeVocabulary(List<TopLevelConcept> topLevelConcepts) throws IOException {
-        directory = new RAMDirectory();
-
-        IndexWriterConfig conf = new IndexWriterConfig();
-        IndexWriter indexWriter = new IndexWriter(directory, conf);
-        try {
-            Document doc = new Document();
-            for (TopLevelConcept e : topLevelConcepts) {
-                String propertyTerm = e.getPropertyTerm();
-                if (!StringUtils.isEmpty(propertyTerm)) {
-                    for (String token : propertyTerm.split(" ")) {
-                        doc.add(new StringField(PROPERTY_TERM_FIELD, token.toLowerCase(), Field.Store.YES));
-                    }
-                }
-
-                String module = e.getModule();
-                if (!StringUtils.isEmpty(module)) {
-                    for (String token : module.split(Pattern.quote("\\"))) {
-                        doc.add(new StringField(MODULE_FIELD, token.toLowerCase(), Field.Store.YES));
-                    }
-                }
-            }
-
-            indexWriter.addDocument(doc);
-            indexWriter.flush();
-        } finally {
-            indexWriter.close();
-        }
     }
 
     public String getCurrentStep() {
