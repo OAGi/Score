@@ -194,17 +194,23 @@
                                     <h:panelGroup rendered="#{accDetailBean.preparedAppendAscc}">
                                         <p:panel id="appendASCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
-                                                                value="#{accDetailBean.selectedAsccpPropertyTerm}"
-                                                                completeMethod="#{accDetailBean.completeInputAsccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectAsccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                                                </p:autoComplete>
-                                                <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
-                                                                 action="#{accDetailBean.searchAsccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
+                                                                     value="#{accDetailBean.selectedAsccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <p:ajax listener="#{accDetailBean.onSelectAsccpPropertyTerm}"/>
+                                                            <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{accDetailBean.searchAsccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendASCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblAsccp" var="asccp" value="#{accDetailBean.asccpList}"
@@ -218,7 +224,7 @@
                                                 <p:ajax event="rowUnselect"
                                                         listener="#{accDetailBean.onAsccpRowUnselect}"/>
 
-                                                <p:column headerText="ASCCP Property Term"
+                                                <p:column headerText="Property Term"
                                                           sortBy="#{asccp.propertyTerm}">
                                                     <a href="/core_component/asccp/#{asccp.asccpId}"
                                                        target="_new">#{asccp.propertyTerm}</a>
@@ -227,9 +233,11 @@
                                                            style="font-size: 12px !important; color: #767676 !important;">GUID: #{asccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{asccp.definition}">
                                                     <h:outputText value="#{asccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{asccp.state}">
                                                     <h:panelGroup rendered="#{asccp.state == 'Editing'}">

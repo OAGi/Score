@@ -373,7 +373,10 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
                 return true;
             }
 
-            List<String> den = Arrays.asList(e.getDen().toLowerCase().split(" "));
+            List<String> den = Arrays.asList(e.getDen().toLowerCase().split(" ")).stream()
+                    .map(s -> s.replaceAll("[.]", ""))
+                    .collect(Collectors.toList());
+
             String[] split = q.split(" ");
             for (String s : split) {
                 if (!den.contains(s)) {

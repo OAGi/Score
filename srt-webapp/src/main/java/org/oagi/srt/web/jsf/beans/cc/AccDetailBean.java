@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
+import org.apache.lucene.store.Directory;
 import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
@@ -7,6 +8,7 @@ import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.*;
+import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -27,9 +29,10 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.*;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -671,6 +674,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private List<AssociationCoreComponentProperty> allAsccpList;
     private List<AssociationCoreComponentProperty> asccpList;
     private String selectedAsccpPropertyTerm;
+    private String selectedAsccpModule;
     private AssociationCoreComponentProperty selectedAsccp;
 
     public boolean isPreparedAppendAscc() {
@@ -698,6 +702,22 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         this.selectedAsccpPropertyTerm = selectedAsccpPropertyTerm;
     }
 
+    public void onSelectAsccpPropertyTerm(SelectEvent event) {
+        setSelectedAsccpPropertyTerm(event.getObject().toString());
+    }
+
+    public String getSelectedAsccpModule() {
+        return selectedAsccpModule;
+    }
+
+    public void setSelectedAsccpModule(String selectedAsccpModule) {
+        this.selectedAsccpModule = selectedAsccpModule;
+    }
+
+    public void onSelectAsccpModule(SelectEvent event) {
+        setSelectedAsccpModule(event.getObject().toString());
+    }
+
     public AssociationCoreComponentProperty getSelectedAsccp() {
         return selectedAsccp;
     }
@@ -714,11 +734,24 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         setSelectedAsccp(null);
     }
 
+    private Directory asccp_directory, asccp_definition_index;
+    private static final String PROPERTY_TERM_FIELD = "property_term";
+    private static final String DEFINITION_FIELD = "definition";
+
     public void prepareAppendAscc() {
         allAsccpList = asccpRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
+
+        asccp_directory = createDirectory(allAsccpList,
+                new String[]{PROPERTY_TERM_FIELD},
+                new String[]{" "},
+                AssociationCoreComponentProperty::getPropertyTerm);
+//        asccp_definition_index = createDirectoryForText(allAsccpList,
+//                new String[]{DEFINITION_FIELD},
+//                AssociationCoreComponentProperty::getDefinition);
+
         setAsccpList(
                 allAsccpList.stream()
                         .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
@@ -727,50 +760,56 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         setPreparedAppendAscc(true);
     }
 
-    public List<String> completeInputAsccp(String query) {
-        return allAsccpList.stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> {
-                    String lowercaseTerm = e.toLowerCase();
-                    for (String token : query.toLowerCase().split(" ")) {
-                        if (!lowercaseTerm.contains(token)) {
-                            return false;
-                        }
+    public void searchAsccp() {
+        String propertyTerm = getSelectedAsccpPropertyTerm();
+
+        List<AssociationCoreComponentProperty> asccpList = allAsccpList.stream()
+                .filter(new PropertyTermSearchFilter(propertyTerm))
+                .sorted((a, b) -> {
+                    if (!StringUtils.isEmpty(propertyTerm)) {
+                        return compareLevenshteinDistance(propertyTerm, a, b, AssociationCoreComponentProperty::getPropertyTerm);
                     }
-                    return true;
+
+                    return 0;
                 })
                 .collect(Collectors.toList());
-    }
 
-    public void onSelectAsccpPropertyTerm(SelectEvent event) {
-        setSelectedAsccpPropertyTerm(event.getObject().toString());
-    }
+        setAsccpList(asccpList);
 
-    public void searchAsccp() {
-        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedAsccpPropertyTerm());
-        if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setAsccpList(allAsccpList.stream()
-                    .sorted(Comparator.comparing(AssociationCoreComponentProperty::getPropertyTerm))
-                    .collect(Collectors.toList()));
-        } else {
-            setAsccpList(
-                    allAsccpList.stream()
-                            .filter(e -> {
-                                String lowercaseTerm = e.getPropertyTerm().toLowerCase();
-                                for (String token : selectedPropertyTerm.toLowerCase().split(" ")) {
-                                    if (!lowercaseTerm.contains(token)) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            })
-                            .sorted((a, b) -> compareLevenshteinDistance(selectedPropertyTerm, a, b,
-                                    AssociationCoreComponentProperty::getPropertyTerm))
-                            .collect(Collectors.toList())
-            );
-        }
         setPreparedAppendAscc(true);
+    }
+
+    private interface SearchFilter extends Predicate<AssociationCoreComponentProperty> {
+    }
+
+    private class PropertyTermSearchFilter implements SearchFilter {
+        private String q;
+
+        public PropertyTermSearchFilter(String q) {
+            if (!StringUtils.isEmpty(q)) {
+                this.q = Arrays.asList(q.split(" ")).stream()
+                        .map(s -> suggestWord(s.toLowerCase(), asccp_directory, PROPERTY_TERM_FIELD))
+                        .collect(Collectors.joining(" "));
+            } else {
+                this.q = q;
+            }
+        }
+
+        @Override
+        public boolean test(AssociationCoreComponentProperty e) {
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            List<String> propertyTerm = Arrays.asList(e.getPropertyTerm().toLowerCase().split(" "));
+            String[] split = q.split(" ");
+            for (String s : split) {
+                if (!propertyTerm.contains(s)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)

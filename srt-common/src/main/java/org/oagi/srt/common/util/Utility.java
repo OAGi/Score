@@ -664,7 +664,8 @@ public class Utility {
                 String str = func.apply(e);
                 if (!StringUtils.isEmpty(str)) {
                     for (String token : str.split(delim)) {
-                        tokenSet.get(field).add(token.toLowerCase());
+                        token = token.toLowerCase().replaceAll("[.]", "");
+                        tokenSet.get(field).add(token);
                     }
                 }
             }
