@@ -43,7 +43,7 @@
                                     <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
                                     <f:selectItem itemLabel="BCC" itemValue="BCC"/>
                                     <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
-                                    <f:ajax render="listForm" listener="#{coreComponentBean.onTypeChange}"/>
+                                    <p:ajax update="listForm" listener="#{coreComponentBean.onTypeChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
@@ -55,7 +55,7 @@
                                     <f:selectItem itemLabel="Editing" itemValue="Editing" />
                                     <f:selectItem itemLabel="Candidate" itemValue="Candidate" />
                                     <f:selectItem itemLabel="Published" itemValue="Published" />
-                                    <f:ajax render="listForm" listener="#{coreComponentBean.onStateChange}"/>
+                                    <p:ajax update="listForm" listener="#{coreComponentBean.onStateChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
@@ -65,7 +65,9 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="1"/>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
                             <p:commandButton id="createACCBtn" value="Create ACC"
                                              action="#{coreComponentBean.createACC}" tabindex="5"
                                              style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
@@ -73,7 +75,9 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="2"/>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
                             <p:commandButton id="createASCCPBtn" value="Create ASCCP"
                                              action="#{coreComponentBean.createASCCP}" tabindex="6"
                                              style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
@@ -81,7 +85,9 @@
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
                             <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
-                                         style="min-width: 440px; margin-right: 20px;" tabindex="3"/>
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
 
                             <p:commandButton id="searchBtn" value="Search" ajax="true"
                                              action="#{coreComponentBean.search}"

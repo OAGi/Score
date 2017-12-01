@@ -1,13 +1,19 @@
 package org.oagi.srt.common.util;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.StandardDirectoryReader;
+import org.apache.lucene.search.spell.LuceneDictionary;
+import org.apache.lucene.search.spell.SpellChecker;
+import org.apache.lucene.store.Directory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
 
@@ -372,7 +378,7 @@ public class Utility {
             }
 
             String baseType = baseDen.replace(" ", "").replace("_", "").replace(".", "");
-            if (type.contains (baseType)) {
+            if (type.contains(baseType)) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, baseType);
             }
 
@@ -572,9 +578,20 @@ public class Utility {
         return out.trim();
     }
 
+    private static String sortedStr(String s, String regex) {
+        return Arrays.asList(s.split(regex)).stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+    }
+
     public static <T> int compareLevenshteinDistance(String source, T a, T b, Function<T, String> function) {
-        String aStr = function.apply(a);
-        String bStr = function.apply(b);
+        return compareLevenshteinDistance(source, a, b, function, " ");
+    }
+
+    public static <T> int compareLevenshteinDistance(String source, T a, T b, Function<T, String> function, String regex) {
+        source = sortedStr(source, regex);
+        String aStr = sortedStr(function.apply(a), regex);
+        String bStr = sortedStr(function.apply(b), regex);
 
         int aDist = getLevenshteinDistance(source, aStr);
         int bDist = getLevenshteinDistance(source, bStr);
@@ -582,6 +599,31 @@ public class Utility {
             return aStr.compareTo(bStr);
         }
         return aDist - bDist;
+    }
+
+    public static List<String> suggestWords(String word, Directory directory, String field) {
+        if (StringUtils.isEmpty(word)) {
+            return Collections.emptyList();
+        }
+
+        try {
+            SpellChecker spellChecker = new SpellChecker(directory);
+            IndexReader reader = StandardDirectoryReader.open(directory);
+            spellChecker.indexDictionary(new LuceneDictionary(reader, field), new IndexWriterConfig(), true);
+            return Arrays.asList(spellChecker.suggestSimilar(word, 5));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String suggestWord(String word, Directory directory, String field) {
+        List<String> suggestWords = suggestWords(word, directory, field);
+        if (suggestWords.size() > 0) {
+            if (!suggestWords.contains(word)) {
+                return suggestWords.get(0);
+            }
+        }
+        return word;
     }
 
     public static void main(String args[]) {

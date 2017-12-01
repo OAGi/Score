@@ -1,5 +1,12 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 import org.oagi.srt.model.node.ASBIEPNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
@@ -24,12 +31,16 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.suggestWord;
 
 @Controller
 @Scope("view")
@@ -80,12 +91,51 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     public List<TopLevelConcept> getAllTopLevelConcepts() {
         if (allTopLevelConcepts == null) {
             allTopLevelConcepts = topLevelConceptRepository.findAll();
+            try {
+                makeVocabulary(allTopLevelConcepts);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         }
         return allTopLevelConcepts;
     }
 
     public void setAllTopLevelConcepts(List<TopLevelConcept> allTopLevelConcepts) {
         this.allTopLevelConcepts = allTopLevelConcepts;
+    }
+
+    private Directory directory;
+    private static final String PROPERTY_TERM_FIELD = "property_term";
+    private static final String MODULE_FIELD = "module";
+
+    private void makeVocabulary(List<TopLevelConcept> topLevelConcepts) throws IOException {
+        directory = new RAMDirectory();
+
+        IndexWriterConfig conf = new IndexWriterConfig();
+        IndexWriter indexWriter = new IndexWriter(directory, conf);
+        try {
+            Document doc = new Document();
+            for (TopLevelConcept e : topLevelConcepts) {
+                String propertyTerm = e.getPropertyTerm();
+                if (!StringUtils.isEmpty(propertyTerm)) {
+                    for (String token : propertyTerm.split(" ")) {
+                        doc.add(new StringField(PROPERTY_TERM_FIELD, token.toLowerCase(), Field.Store.YES));
+                    }
+                }
+
+                String module = e.getModule();
+                if (!StringUtils.isEmpty(module)) {
+                    for (String token : module.split(Pattern.quote("\\"))) {
+                        doc.add(new StringField(MODULE_FIELD, token.toLowerCase(), Field.Store.YES));
+                    }
+                }
+            }
+
+            indexWriter.addDocument(doc);
+            indexWriter.flush();
+        } finally {
+            indexWriter.close();
+        }
     }
 
     public String getCurrentStep() {
@@ -138,9 +188,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     public List<TopLevelConcept> getTopLevelConcepts() {
         if (topLevelConcepts == null) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted(Comparator.comparing(TopLevelConcept::getPropertyTerm))
-                    .collect(Collectors.toList()));
+            search();
         }
         return topLevelConcepts;
     }
@@ -158,18 +206,18 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void search() {
+        String propertyTerm = getSearchTextForPropertyTerm();
+        String module = getSearchTextForModule();
+
         List<TopLevelConcept> topLevelConcepts = getAllTopLevelConcepts().stream()
-                .filter(new PropertyTermSearchFilter())
-                .filter(new ModuleSearchFilter())
+                .filter(new PropertyTermSearchFilter(propertyTerm))
+                .filter(new ModuleSearchFilter(module))
                 .sorted((a, b) -> {
-                    String propertyTerm = getSearchTextForPropertyTerm();
                     if (!StringUtils.isEmpty(propertyTerm)) {
                         return compareLevenshteinDistance(propertyTerm, a, b, TopLevelConcept::getPropertyTerm);
                     }
-
-                    String module = getSearchTextForModule();
                     if (!StringUtils.isEmpty(module)) {
-                        return compareLevenshteinDistance(module, a, b, TopLevelConcept::getModule);
+                        return compareLevenshteinDistance(module, a, b, TopLevelConcept::getModule, Pattern.quote("\\"));
                     }
 
                     return 0;
@@ -183,18 +231,28 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     private class PropertyTermSearchFilter implements SearchFilter {
+        private String q;
+
+        public PropertyTermSearchFilter(String q) {
+            if (!StringUtils.isEmpty(q)) {
+                this.q = Arrays.asList(q.split(" ")).stream()
+                        .map(s -> suggestWord(s.toLowerCase(), directory, PROPERTY_TERM_FIELD))
+                        .collect(Collectors.joining(" "));
+            } else {
+                this.q = q;
+            }
+        }
 
         @Override
         public boolean test(TopLevelConcept e) {
-            String q = getSearchTextForPropertyTerm();
             if (StringUtils.isEmpty(q)) {
                 return true;
             }
 
-            String den = e.getPropertyTerm().toLowerCase();
+            List<String> propertyTerm = Arrays.asList(e.getPropertyTerm().toLowerCase().split(" "));
             String[] split = q.split(" ");
             for (String s : split) {
-                if (!den.contains(s.toLowerCase())) {
+                if (!propertyTerm.contains(s)) {
                     return false;
                 }
             }
@@ -203,22 +261,31 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     private class ModuleSearchFilter implements SearchFilter {
+        private String q;
+
+        public ModuleSearchFilter(String q) {
+            if (!StringUtils.isEmpty(q)) {
+                this.q = Arrays.asList(q.split(Pattern.quote("\\"))).stream()
+                        .map(s -> suggestWord(s.toLowerCase(), directory, MODULE_FIELD))
+                        .collect(Collectors.joining("\\"));
+            } else {
+                this.q = q;
+            }
+        }
 
         @Override
         public boolean test(TopLevelConcept e) {
-            String q = getSearchTextForModule();
             if (StringUtils.isEmpty(q)) {
                 return true;
             }
 
-            String module = e.getModule();
-            if (StringUtils.isEmpty(module)) {
+            if (StringUtils.isEmpty(e.getModule())) {
                 return false;
             }
-            module = module.toLowerCase();
-            String[] split = q.split(" ");
+            List<String> module = Arrays.asList(e.getModule().toLowerCase().split(Pattern.quote("\\")));
+            String[] split = q.split(Pattern.quote("\\"));
             for (String s : split) {
-                if (!module.contains(s.toLowerCase())) {
+                if (!module.contains(s)) {
                     return false;
                 }
             }

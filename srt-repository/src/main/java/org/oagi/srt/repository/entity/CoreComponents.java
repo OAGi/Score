@@ -4,10 +4,11 @@ import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-public class CoreComponents {
+public class CoreComponents implements Serializable {
 
     @EmbeddedId
     private CoreComponentsId coreComponentsId;
