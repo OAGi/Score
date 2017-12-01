@@ -27,13 +27,24 @@
                     </f:facet>
                     <p:panel>
                         <f:facet name="header">
-                            <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
-                                            completeMethod="#{createProfileBODBean.completeInput}"
-                                            style="width: 440px; margin-right: 20px;">
-                                <p:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                            </p:autoComplete>
-                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{createProfileBODBean.search}"
-                                             update="tbl1" icon="fa fa-white fa-search"/>
+                            <h:panelGroup>
+                                <div style="padding: 3px 0 3px 0;">
+                                    <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                    <p:inputText id="searchTextForPropertyTerm" value="#{createProfileBODBean.searchTextForPropertyTerm}"
+                                                 style="min-width: 440px; margin-right: 20px;" tabindex="1"/>
+                                </div>
+                                <div style="padding: 3px 0 3px 0;">
+                                    <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                    <p:inputText id="searchTextForModule" value="#{createProfileBODBean.searchTextForModule}"
+                                                 style="min-width: 440px; margin-right: 20px;" tabindex="2"/>
+
+                                    <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                                     actionListener="#{createProfileBODBean.search}"
+                                                     update="tbl1" icon="fa fa-white fa-search"/>
+                                </div>
+
+                                <p:defaultCommand target="searchBtn"/>
+                            </h:panelGroup>
                         </f:facet>
                         <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -42,7 +53,7 @@
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
                                      selectionMode="single">
-                            <p:column style="width: 40%" headerText="ASCCP Property Term"
+                            <p:column style="width: 40%" headerText="Property Term"
                                       sortBy="#{topLevelConcept.propertyTerm}">
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                             </p:column>

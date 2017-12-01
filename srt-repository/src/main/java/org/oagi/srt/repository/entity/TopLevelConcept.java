@@ -31,7 +31,7 @@ public class TopLevelConcept {
     @Column(nullable = false)
     private String propertyTerm;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String module;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")

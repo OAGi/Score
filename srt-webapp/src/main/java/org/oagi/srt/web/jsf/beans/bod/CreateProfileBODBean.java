@@ -24,8 +24,12 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
 
 @Controller
 @Scope("view")
@@ -50,8 +54,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
      * for 'Select Top-Level Concept' Step
      */
     private List<TopLevelConcept> allTopLevelConcepts;
-    private String selectedPropertyTerm;
     private List<TopLevelConcept> topLevelConcepts;
+    private String searchTextForPropertyTerm;
+    private String searchTextForModule;
     private TopLevelConcept selectedTopLevelConcept;
 
     /*
@@ -107,18 +112,34 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         this.btnNextDisable = btnNextDisable;
     }
 
-    public String getSelectedPropertyTerm() {
-        return selectedPropertyTerm;
+    public String getSearchTextForPropertyTerm() {
+        return searchTextForPropertyTerm;
     }
 
-    public void setSelectedPropertyTerm(String selectedPropertyTerm) {
-        this.selectedPropertyTerm = selectedPropertyTerm;
+    public void setSearchTextForPropertyTerm(String searchTextForPropertyTerm) {
+        if (StringUtils.isEmpty(searchTextForPropertyTerm)) {
+            this.searchTextForPropertyTerm = null;
+        } else {
+            this.searchTextForPropertyTerm = StringUtils.trimWhitespace(searchTextForPropertyTerm);
+        }
+    }
+
+    public String getSearchTextForModule() {
+        return searchTextForModule;
+    }
+
+    public void setSearchTextForModule(String searchTextForModule) {
+        if (StringUtils.isEmpty(searchTextForModule)) {
+            this.searchTextForModule = null;
+        } else {
+            this.searchTextForModule = StringUtils.trimWhitespace(searchTextForModule);
+        }
     }
 
     public List<TopLevelConcept> getTopLevelConcepts() {
         if (topLevelConcepts == null) {
             setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(TopLevelConcept::getPropertyTerm))
                     .collect(Collectors.toList()));
         }
         return topLevelConcepts;
@@ -136,44 +157,72 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         this.selectedTopLevelConcept = selectedTopLevelConcept;
     }
 
-    public List<String> completeInput(String query) {
-        String q = (query != null) ? query.trim() : null;
+    public void search() {
+        List<TopLevelConcept> topLevelConcepts = getAllTopLevelConcepts().stream()
+                .filter(new PropertyTermSearchFilter())
+                .filter(new ModuleSearchFilter())
+                .sorted((a, b) -> {
+                    String propertyTerm = getSearchTextForPropertyTerm();
+                    if (!StringUtils.isEmpty(propertyTerm)) {
+                        return compareLevenshteinDistance(propertyTerm, a, b, TopLevelConcept::getPropertyTerm);
+                    }
 
-        if (StringUtils.isEmpty(q)) {
-            return getAllTopLevelConcepts().stream()
-                    .map(e -> e.getPropertyTerm())
-                    .collect(Collectors.toList());
-        } else {
+                    String module = getSearchTextForModule();
+                    if (!StringUtils.isEmpty(module)) {
+                        return compareLevenshteinDistance(module, a, b, TopLevelConcept::getModule);
+                    }
+
+                    return 0;
+                })
+                .collect(Collectors.toList());
+
+        setTopLevelConcepts(topLevelConcepts);
+    }
+
+    private interface SearchFilter extends Predicate<TopLevelConcept> {
+    }
+
+    private class PropertyTermSearchFilter implements SearchFilter {
+
+        @Override
+        public boolean test(TopLevelConcept e) {
+            String q = getSearchTextForPropertyTerm();
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            String den = e.getPropertyTerm().toLowerCase();
             String[] split = q.split(" ");
-
-            return getAllTopLevelConcepts().stream()
-                    .map(e -> e.getPropertyTerm())
-                    .distinct()
-                    .filter(e -> {
-                        e = e.toLowerCase();
-                        for (String s : split) {
-                            if (!e.contains(s.toLowerCase())) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
-                    .collect(Collectors.toList());
+            for (String s : split) {
+                if (!den.contains(s.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
-    public void search() {
-        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
-        if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
-        } else {
-            setTopLevelConcepts(
-                    getAllTopLevelConcepts().stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
-                            .collect(Collectors.toList())
-            );
+    private class ModuleSearchFilter implements SearchFilter {
+
+        @Override
+        public boolean test(TopLevelConcept e) {
+            String q = getSearchTextForModule();
+            if (StringUtils.isEmpty(q)) {
+                return true;
+            }
+
+            String module = e.getModule();
+            if (StringUtils.isEmpty(module)) {
+                return false;
+            }
+            module = module.toLowerCase();
+            String[] split = q.split(" ");
+            for (String s : split) {
+                if (!module.contains(s.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 

@@ -18,8 +18,8 @@ public class TopLevelConceptRepository {
 
     private static final String FIND_ALL_STATEMENT =
             "select asccp.asccp_id, asccp.property_term, module.module, asccp.last_update_timestamp " +
-            "from asccp, module " +
-            "where asccp.release_id IS NULL and module.module_id = asccp.module_id";
+            "from asccp LEFT JOIN module ON module.module_id = asccp.module_id " +
+            "where asccp.release_id IS NULL";
 
     public TopLevelConcept findOne(long asccpId) {
         Query query = entityManager.createNativeQuery(
