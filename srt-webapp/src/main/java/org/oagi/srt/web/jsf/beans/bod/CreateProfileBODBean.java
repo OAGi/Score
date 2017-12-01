@@ -11,6 +11,7 @@ import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.TopLevelConcept;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
+import org.oagi.srt.web.jsf.beans.SearchFilter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.slf4j.Logger;
@@ -25,13 +26,12 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.common.util.Utility.*;
+import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.createDirectory;
 
 @Controller
 @Scope("view")
@@ -171,8 +171,8 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         String module = getSearchTextForModule();
 
         List<TopLevelConcept> topLevelConcepts = getAllTopLevelConcepts().stream()
-                .filter(new PropertyTermSearchFilter(propertyTerm))
-                .filter(new ModuleSearchFilter(module))
+                .filter(new SearchFilter<>(propertyTerm, directory, PROPERTY_TERM_FIELD, " ", TopLevelConcept::getPropertyTerm))
+                .filter(new SearchFilter<>(module, directory, MODULE_FIELD, "\\", TopLevelConcept::getModule))
                 .sorted((a, b) -> {
                     if (!StringUtils.isEmpty(propertyTerm)) {
                         return compareLevenshteinDistance(propertyTerm, a, b, TopLevelConcept::getPropertyTerm);
@@ -186,72 +186,6 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                 .collect(Collectors.toList());
 
         setTopLevelConcepts(topLevelConcepts);
-    }
-
-    private interface SearchFilter extends Predicate<TopLevelConcept> {
-    }
-
-    private class PropertyTermSearchFilter implements SearchFilter {
-        private String q;
-
-        public PropertyTermSearchFilter(String q) {
-            if (!StringUtils.isEmpty(q)) {
-                this.q = Arrays.asList(q.split(" ")).stream()
-                        .map(s -> suggestWord(s.toLowerCase(), directory, PROPERTY_TERM_FIELD))
-                        .collect(Collectors.joining(" "));
-            } else {
-                this.q = q;
-            }
-        }
-
-        @Override
-        public boolean test(TopLevelConcept e) {
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            List<String> propertyTerm = Arrays.asList(e.getPropertyTerm().toLowerCase().split(" "));
-            String[] split = q.split(" ");
-            for (String s : split) {
-                if (!propertyTerm.contains(s)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    private class ModuleSearchFilter implements SearchFilter {
-        private String q;
-
-        public ModuleSearchFilter(String q) {
-            if (!StringUtils.isEmpty(q)) {
-                this.q = Arrays.asList(q.split(Pattern.quote("\\"))).stream()
-                        .map(s -> suggestWord(s.toLowerCase(), directory, MODULE_FIELD))
-                        .collect(Collectors.joining("\\"));
-            } else {
-                this.q = q;
-            }
-        }
-
-        @Override
-        public boolean test(TopLevelConcept e) {
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            if (StringUtils.isEmpty(e.getModule())) {
-                return false;
-            }
-            List<String> module = Arrays.asList(e.getModule().toLowerCase().split(Pattern.quote("\\")));
-            String[] split = q.split(Pattern.quote("\\"));
-            for (String s : split) {
-                if (!module.contains(s)) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     public List<BusinessContext> getBusinessContexts() {

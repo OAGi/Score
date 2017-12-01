@@ -15,6 +15,7 @@ import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.web.jsf.beans.SearchFilter;
 import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -32,7 +33,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -326,8 +326,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         coreComponents = coreComponents.stream()
                 .filter(e -> selectedTypes.contains(e.getType()))
                 .filter(e -> selectedStates.contains(e.getState()))
-                .filter(new DenSearchFilter(den))
-                .filter(new ModuleSearchFilter(module))
+                .filter(new SearchFilter<>(den, directory,DEN_FIELD, " ", CoreComponents::getDen))
+                .filter(new SearchFilter<>(module, directory, MODULE_FIELD, "\\", CoreComponents::getModule))
                 .sorted((a, b) -> {
                     if (!StringUtils.isEmpty(den)) {
                         return compareLevenshteinDistance(den, a, b, CoreComponents::getDen);
@@ -349,80 +349,6 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
     public List<CoreComponents> getCoreComponents() {
         return coreComponents;
-    }
-
-    private interface SearchFilter extends Predicate<CoreComponents> {
-    }
-
-    private class DenSearchFilter implements SearchFilter {
-        private String q;
-
-        public DenSearchFilter(String q) {
-            if (!StringUtils.isEmpty(q)) {
-                this.q = Arrays.asList(q.split(" ")).stream()
-                        .map(s -> suggestWord(s.toLowerCase(), directory, DEN_FIELD))
-                        .collect(Collectors.joining(" "));
-            } else {
-                this.q = q;
-            }
-        }
-
-        @Override
-        public boolean test(CoreComponents e) {
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            List<String> den = Arrays.asList(e.getDen().toLowerCase().split(" ")).stream()
-                    .map(s -> s.replaceAll("[.]", ""))
-                    .collect(Collectors.toList());
-
-            String[] split = q.split(" ");
-            for (String s : split) {
-                if (!den.contains(s)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    private class ModuleSearchFilter implements SearchFilter {
-
-        private String q;
-
-        public ModuleSearchFilter(String q) {
-            if (!StringUtils.isEmpty(q)) {
-                this.q = Arrays.asList(q.split(Pattern.quote("\\"))).stream()
-                        .map(s -> suggestWord(s.toLowerCase(), directory, MODULE_FIELD))
-                        .collect(Collectors.joining("\\"));
-            } else {
-                this.q = q;
-            }
-        }
-
-        @Override
-        public boolean test(CoreComponents e) {
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            if (StringUtils.isEmpty(e.getModule())) {
-                return false;
-            }
-
-            List<String> module = Arrays.asList(e.getModule().toLowerCase().split(Pattern.quote("\\")));
-            if (StringUtils.isEmpty(module)) {
-                return false;
-            }
-            String[] split = q.split(Pattern.quote("\\"));
-            for (String s : split) {
-                if (!module.contains(s)) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     public String getSearchTextForDen() {

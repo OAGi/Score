@@ -197,11 +197,26 @@
                                                 <h:panelGroup>
                                                     <div style="padding: 3px 0 3px 0;">
                                                         <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
-                                                        <p:inputText id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
+                                                        <p:inputText id="asccpPropertyTermInputText" widgetVar="asccpPropertyTermInputText"
                                                                      value="#{accDetailBean.selectedAsccpPropertyTerm}"
                                                                      style="min-width: 440px; margin-right: 20px;" tabindex="1">
-                                                            <p:ajax listener="#{accDetailBean.onSelectAsccpPropertyTerm}"/>
-                                                            <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                                                            <p:ajax update="appendASCCPanel"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpDefinitionInputText" widgetVar="asccpDefinitionInputText"
+                                                                     value="#{accDetailBean.selectedAsccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <p:ajax update="appendASCCPanel"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpModuleInputText" widgetVar="asccpModuleInputText"
+                                                                     value="#{accDetailBean.selectedAsccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <p:ajax update="appendASCCPanel"/>
                                                         </p:inputText>
 
                                                         <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
@@ -271,17 +286,38 @@
                                     <h:panelGroup rendered="#{accDetailBean.preparedAppendBcc}">
                                         <p:panel id="appendBCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="bccpPropertyTerm" widgetVar="bccpPropertyTerm"
-                                                                value="#{accDetailBean.selectedBccpPropertyTerm}"
-                                                                completeMethod="#{accDetailBean.completeInputBccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{accDetailBean.onSelectBccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                                                </p:autoComplete>
-                                                <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                                                 actionListener="#{accDetailBean.searchBccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpPropertyTermInputText" widgetVar="bccpPropertyTermInputText"
+                                                                     value="#{accDetailBean.selectedBccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <p:ajax update="appendBCCPanel"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpDefinitionInputText" widgetVar="bccpDefinitionInputText"
+                                                                     value="#{accDetailBean.selectedBccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <p:ajax update="appendBCCPanel"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpModuleInputText" widgetVar="bccpModuleInputText"
+                                                                     value="#{accDetailBean.selectedBccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <p:ajax update="appendBCCPanel"/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendBCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{accDetailBean.searchBccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendBCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblBccp" var="bccp" value="#{accDetailBean.bccpList}"
@@ -303,9 +339,11 @@
                                                            style="font-size: 12px !important; color: #767676 !important;">GUID: #{bccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{bccp.definition}">
                                                     <h:outputText value="#{bccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{bccp.state}">
                                                     <h:panelGroup rendered="#{bccp.state == 'Editing'}">
