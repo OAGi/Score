@@ -1252,7 +1252,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         User requester = getCurrentUser();
         try {
             AggregateCoreComponent eAcc = getTargetAcc();
-
             coreComponentService.updateState(eAcc, state, requester);
 
             TreeNode root = getTreeNode();

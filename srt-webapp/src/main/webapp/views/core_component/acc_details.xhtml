@@ -847,26 +847,27 @@
                                  disabled="#{!accDetailBean.dirty}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{accDetailBean.update()}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
 
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{accDetailBean.updateState('Candidate')}"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
                                  id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
                                  action="#{accDetailBean.updateState('Editing')}"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
 
                 <p:commandButton
-                        rendered="#{(accDetailBean.targetAcc.state == 'Editing' or accDetailBean.targetAcc.state == 'Candidate') and accDetailBean.isPreviousRevisionNotInsert(accDetailBean.targetAcc)}"
+                        rendered="#{(accDetailBean.targetAcc.state == 'Editing' or accDetailBean.targetAcc.state == 'Candidate') and
+                                     accDetailBean.isPreviousRevisionNotInsert(accDetailBean.targetAcc)}"
                         id="btnUndo" widgetVar="btnUndo" value="Undo"
                         action="#{accDetailBean.undoLastAction()}"
                         update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"
