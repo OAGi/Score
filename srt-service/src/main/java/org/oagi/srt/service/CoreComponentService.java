@@ -1236,16 +1236,61 @@ public class CoreComponentService {
         return dtSc.getCardinalityMax();
     }
 
-    public void transferOwner(AggregateCoreComponent acc, User newOwner) {
-        long oldOwnerId = acc.getOwnerUserId();
-        long newOwnerId = newOwner.getAppUserId();
-
-        if (oldOwnerId == newOwnerId) {
-            return;
+    @Transactional
+    public void transferOwner(Long ccId, String type, User newOwner) {
+        if (ccId == null || ccId <= 0L) {
+            throw new IllegalArgumentException();
         }
+        long newOwnerId = newOwner.getAppUserId();
+        long oldOwnerId;
+        switch (type) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(ccId);
+                oldOwnerId = acc.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
 
-        acc.setOwnerUserId(newOwnerId);
-        accRepository.save(acc);
+                acc.setOwnerUserId(newOwnerId);
+                accRepository.save(acc);
+
+                for (AssociationCoreComponent ascc :
+                        asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0)) {
+                    ascc.setOwnerUserId(newOwnerId);
+                    asccRepository.save(ascc);
+                }
+                for (BasicCoreComponent bcc :
+                        bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0)) {
+                    bcc.setOwnerUserId(newOwnerId);
+                    bccRepository.save(bcc);
+                }
+
+                break;
+            case "ASCCP":
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ccId);
+                oldOwnerId = asccp.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
+
+                asccp.setOwnerUserId(newOwnerId);
+                asccpRepository.save(asccp);
+
+                break;
+            case "BCCP":
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(ccId);
+                oldOwnerId = bccp.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
+
+                bccp.setOwnerUserId(newOwnerId);
+                bccpRepository.save(bccp);
+
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public boolean hasMultipleRevisions(CoreComponents coreComponents) {

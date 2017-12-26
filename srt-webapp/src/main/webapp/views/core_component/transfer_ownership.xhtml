@@ -13,25 +13,25 @@
         <h:form id="form">
             <p:panel id="panel">
                 <f:facet name="header">
-                    <p:autoComplete id="loginId" value="#{transferAccOwnershipBean.selectedLoginId}"
-                                    completeMethod="#{transferAccOwnershipBean.completeInput}" maxResults="20"
+                    <p:autoComplete id="loginId" value="#{transferOwnershipBean.selectedLoginId}"
+                                    completeMethod="#{transferOwnershipBean.completeInput}" maxResults="20"
                                     style="width: 440px; margin-right: 20px;">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                     actionListener="#{transferAccOwnershipBean.search}"
+                                     actionListener="#{transferOwnershipBean.search}"
                                      update="tbl" icon="fa fa-white fa-search"/>
                 </f:facet>
 
-                <p:dataTable id="tbl" var="user" value="#{transferAccOwnershipBean.users}"
+                <p:dataTable id="tbl" var="user" value="#{transferOwnershipBean.users}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
-                             selectionMode="single" selection="#{transferAccOwnershipBean.selectedUser}"
+                             selectionMode="single" selection="#{transferOwnershipBean.selectedUser}"
                              style="width: 100%; margin-bottom:20px" rowKey="#{user.appUserId}">
                     <p:ajax event="rowSelect" update=":form:btnGroup"
-                            listener="#{transferAccOwnershipBean.onUserSelect}"/>
+                            listener="#{transferOwnershipBean.onUserSelect}"/>
                     <p:ajax event="rowUnselect" update=":form:btnGroup"
-                            listener="#{transferAccOwnershipBean.onUserUnselect}"/>
+                            listener="#{transferOwnershipBean.onUserUnselect}"/>
 
                     <p:column headerText="Login ID" style="width: 20%; text-align: center;" styleClass="ellipsis" sortBy="#{user.loginId}">
                         <h:outputText value="#{user.loginId}"/>
@@ -49,8 +49,8 @@
 
             <p:panel id="btnGroup">
                 <p:commandButton id="btnTransfer" widgetVar="btnTransfer" value="Transfer"
-                                 disabled="#{transferAccOwnershipBean.selectedUser eq null}"
-                                 action="#{transferAccOwnershipBean.transfer()}"/>
+                                 disabled="#{transferOwnershipBean.selectedUser eq null}"
+                                 action="#{transferOwnershipBean.transfer()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

@@ -1,8 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.UserRepository;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -18,8 +16,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,10 +27,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class TransferAccOwnershipBean extends UIHandler {
-
-    @Autowired
-    private AggregateCoreComponentRepository accRepository;
+public class TransferOwnershipBean extends UIHandler {
 
     @Autowired
     private UserRepository userRepository;
@@ -38,7 +35,9 @@ public class TransferAccOwnershipBean extends UIHandler {
     @Autowired
     private CoreComponentService coreComponentService;
 
-    private AggregateCoreComponent acc;
+    private Long ccId;
+    private String type;
+
     private List<User> allUsers;
     private List<User> users;
     private String selectedLoginId;
@@ -46,12 +45,12 @@ public class TransferAccOwnershipBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        String paramAccId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("accId");
-        Long accId = Long.parseLong(paramAccId);
-        if (accId != null) {
-            AggregateCoreComponent acc = accRepository.findOne(accId);
-            setAcc(acc);
-        }
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> parameterMap = externalContext.getRequestParameterMap();
+
+        String paramCcId = parameterMap.get("ccId");
+        ccId = Long.parseLong(paramCcId);
+        type = parameterMap.get("type");
 
         User currentUser = getCurrentUser();
 
@@ -67,14 +66,6 @@ public class TransferAccOwnershipBean extends UIHandler {
                 .collect(Collectors.toList());
 
         setUsers(allUsers);
-    }
-
-    public AggregateCoreComponent getAcc() {
-        return acc;
-    }
-
-    public void setAcc(AggregateCoreComponent acc) {
-        this.acc = acc;
     }
 
     public List<User> getUsers() {
@@ -158,7 +149,7 @@ public class TransferAccOwnershipBean extends UIHandler {
             return null;
         }
 
-        coreComponentService.transferOwner(acc, selectedUser);
+        coreComponentService.transferOwner(ccId, type, selectedUser);
 
         return "/views/core_component/list.jsf?faces-redirect=true";
     }

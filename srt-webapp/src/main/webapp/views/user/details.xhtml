@@ -22,7 +22,7 @@
             <p:panel>
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="Login ID" styleClass="section-label"/>
-                    <h:inputText id="loginId" value="#{userDetailBean.user.loginId}"
+                    <h:inputText id="bG9naW5JZA" value="#{userDetailBean.user.loginId}"
                                  required="true"
                                  requiredMessage="Please fill out 'Login ID' field."
                                  maxlength="45"
@@ -31,7 +31,7 @@
                     </h:inputText>
 
                     <h:outputText value="Password" styleClass="section-label"/>
-                    <p:password id="Password" value="#{userDetailBean.user.password}"
+                    <p:password id="cGFzc3dvcmQ" value="#{userDetailBean.user.password}"
                                 label="Password" styleClass="section-content input-section" required="true"
                                 requiredMessage="Please fill out 'Password' field."
                                 validatorMessage="Password is too short (minimum is 5 characters)">
@@ -58,6 +58,11 @@
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
+        <script>
+            $(document).ready(function() {
+                $('input').attr('autocomplete', 'off');
+            });
+        </script>
     </ui:define>
 
 </ui:composition>
