@@ -78,8 +78,6 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
     @PostConstruct
     public void init() {
-        searchAllCoreComponents();
-
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sessionMap = externalContext.getSessionMap();
 
@@ -89,6 +87,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         } else {
             setRelease(Release.WORKING_RELEASE);
         }
+
+        searchAllCoreComponents(getRelease());
 
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
 
@@ -129,7 +129,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         sessionMap.remove(SEARCH_TEXT_MODULE_KEY);
     }
 
-    private void searchAllCoreComponents() {
+    private void searchAllCoreComponents(Release release) {
         String sortProperty;
         switch (sortColumnHeaderText) {
             case "Type":
@@ -208,8 +208,9 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     private static final String MODULE_FIELD = "module";
 
     public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
-        setRelease(getRelease());
-        searchAllCoreComponents();
+        Release release = getRelease();
+        setRelease(release);
+        searchAllCoreComponents(release);
         search();
     }
 
@@ -326,7 +327,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         coreComponents = coreComponents.stream()
                 .filter(e -> selectedTypes.contains(e.getType()))
                 .filter(e -> selectedStates.contains(e.getState()))
-                .filter(new SearchFilter<>(den, directory,DEN_FIELD, " ", CoreComponents::getDen))
+                .filter(new SearchFilter<>(den, directory, DEN_FIELD, " ", CoreComponents::getDen))
                 .filter(new SearchFilter<>(module, directory, MODULE_FIELD, "\\", CoreComponents::getModule))
                 .sorted((a, b) -> {
                     if (!StringUtils.isEmpty(den)) {
@@ -495,7 +496,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         return coreComponentService.hasMultipleRevisions(coreComponents);
     }
 
-    public String getFullRevisionNum (CoreComponents cc) {
+    public String getFullRevisionNum(CoreComponents cc) {
         return coreComponentService.getFullRevisionNum(cc, release);
     }
 
