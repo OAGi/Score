@@ -63,11 +63,11 @@
             </p:panel>
 
             <p:panel id="btnGroup">
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
-                                 action="#{selectACCBean.back}"/>
                 <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
                                  disabled="#{selectACCBean.selectedACC eq null}"
                                  action="#{selectACCBean.createASCCP()}"/>
+                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
+                                 action="#{selectACCBean.back}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
