@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class SimpleBCCP implements Serializable {
+public class SimpleBCCP implements OwnerUserAware, Serializable {
 
     @Id
     private long bccpId;
@@ -32,7 +32,7 @@ public class SimpleBCCP implements Serializable {
     private CoreComponentState state;
 
     @Column
-    private Long ownerUserId;
+    private long ownerUserId;
 
     public long getBccpId() {
         return bccpId;
@@ -82,11 +82,11 @@ public class SimpleBCCP implements Serializable {
         this.state = state;
     }
 
-    public Long getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(Long ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
@@ -96,12 +96,12 @@ public class SimpleBCCP implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         SimpleBCCP that = (SimpleBCCP) o;
         return bccpId == that.bccpId &&
+                ownerUserId == that.ownerUserId &&
                 Objects.equals(guid, that.guid) &&
                 Objects.equals(propertyTerm, that.propertyTerm) &&
                 Objects.equals(module, that.module) &&
                 Objects.equals(definition, that.definition) &&
-                state == that.state &&
-                Objects.equals(ownerUserId, that.ownerUserId);
+                state == that.state;
     }
 
     @Override

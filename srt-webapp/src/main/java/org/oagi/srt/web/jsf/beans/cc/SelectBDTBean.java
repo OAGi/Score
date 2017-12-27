@@ -1,7 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.DataTypeRepository;
-import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.User;
@@ -23,7 +22,6 @@ import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -37,13 +35,13 @@ import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 public class SelectBDTBean extends AbstractCoreComponentBean {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private DataTypeRepository dataTypeRepository;
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<DataType> bdtList;
     private String qualifierDataTypeTerm;
@@ -72,14 +70,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
          * The OAGi developers should be able to select only OAGi developers' components
          * when making a reference to a component
          */
-        User currentUser = getCurrentUser();
-        if (currentUser.isOagisDeveloperIndicator()) {
-            Map<Long, User> userMap = userRepository.findAll().stream()
-                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
-            allBDTs = allBDTs.stream()
-                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
-                    .collect(Collectors.toList());
-        }
+        allBDTs = coreComponentBeanHelper.filterByUser(allBDTs, getCurrentUser(), DataType.class);
 
         return allBDTs;
     }

@@ -1,7 +1,6 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.OagisComponentType;
@@ -23,7 +22,6 @@ import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -34,13 +32,13 @@ import java.util.stream.Collectors;
 public class SelectACCBean extends AbstractCoreComponentBean {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AggregateCoreComponentRepository accRepository;
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<AggregateCoreComponent> accList;
     private String objectClassTerm;
@@ -69,14 +67,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
          * The OAGi developers should be able to select only OAGi developers' components
          * when making a reference to a component
          */
-        User currentUser = getCurrentUser();
-        if (currentUser.isOagisDeveloperIndicator()) {
-            Map<Long, User> userMap = userRepository.findAll().stream()
-                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
-            allACCs = allACCs.stream()
-                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
-                    .collect(Collectors.toList());
-        }
+        allACCs = coreComponentBeanHelper.filterByUser(allACCs, getCurrentUser(), AggregateCoreComponent.class);
 
         return allACCs;
     }

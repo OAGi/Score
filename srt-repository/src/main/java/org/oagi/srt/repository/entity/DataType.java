@@ -10,12 +10,11 @@ import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "dt")
-public class DataType implements IEntity, TimestampAware {
+public class DataType implements CoreComponent {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 

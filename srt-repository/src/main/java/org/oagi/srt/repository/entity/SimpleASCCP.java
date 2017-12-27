@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class SimpleASCCP implements Serializable {
+public class SimpleASCCP implements OwnerUserAware, Serializable {
 
     @Id
     private long asccpId;
@@ -32,7 +32,7 @@ public class SimpleASCCP implements Serializable {
     private CoreComponentState state;
 
     @Column
-    private Long ownerUserId;
+    private long ownerUserId;
 
     public long getAsccpId() {
         return asccpId;
@@ -82,11 +82,11 @@ public class SimpleASCCP implements Serializable {
         this.state = state;
     }
 
-    public Long getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(Long ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
@@ -96,12 +96,12 @@ public class SimpleASCCP implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         SimpleASCCP that = (SimpleASCCP) o;
         return asccpId == that.asccpId &&
+                ownerUserId == that.ownerUserId &&
                 Objects.equals(guid, that.guid) &&
                 Objects.equals(propertyTerm, that.propertyTerm) &&
                 Objects.equals(module, that.module) &&
                 Objects.equals(definition, that.definition) &&
-                state == that.state &&
-                Objects.equals(ownerUserId, that.ownerUserId);
+                state == that.state;
     }
 
     @Override

@@ -36,7 +36,6 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -70,13 +69,13 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     private AggregateCoreComponentRepository accRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private NamespaceService namespaceService;
 
     @Autowired
     private ModuleRepository moduleRepository;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private AggregateCoreComponent targetAcc;
     private int targetAccMaxSeqKey;
@@ -587,14 +586,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
          * The OAGi developers should be able to select only OAGi developers' components
          * when making a reference to a component
          */
-        User currentUser = getCurrentUser();
-        if (currentUser.isOagisDeveloperIndicator()) {
-            Map<Long, User> userMap = userRepository.findAll().stream()
-                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
-            allAccList = allAccList.stream()
-                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
-                    .collect(Collectors.toList());
-        }
+        allAccList = coreComponentBeanHelper.filterByUser(allAccList, getCurrentUser(), AggregateCoreComponent.class);
 
         setAccList(allAccList.stream()
                 .sorted(Comparator.comparing(AggregateCoreComponent::getObjectClassTerm))
@@ -780,14 +772,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
          * The OAGi developers should be able to select only OAGi developers' components
          * when making a reference to a component
          */
-        User currentUser = getCurrentUser();
-        if (currentUser.isOagisDeveloperIndicator()) {
-            Map<Long, User> userMap = userRepository.findAll().stream()
-                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
-            allAsccpList = allAsccpList.stream()
-                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
-                    .collect(Collectors.toList());
-        }
+        allAsccpList = coreComponentBeanHelper.filterByUser(allAsccpList, getCurrentUser(), SimpleASCCP.class);
 
         asccp_directory = createDirectory(allAsccpList,
                 new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
@@ -982,14 +967,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
          * The OAGi developers should be able to select only OAGi developers' components
          * when making a reference to a component
          */
-        User currentUser = getCurrentUser();
-        if (currentUser.isOagisDeveloperIndicator()) {
-            Map<Long, User> userMap = userRepository.findAll().stream()
-                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
-            allBccpList = allBccpList.stream()
-                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
-                    .collect(Collectors.toList());
-        }
+        allBccpList = coreComponentBeanHelper.filterByUser(allBccpList, getCurrentUser(), SimpleBCCP.class);
 
         bccp_directory = createDirectory(allBccpList,
                 new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},

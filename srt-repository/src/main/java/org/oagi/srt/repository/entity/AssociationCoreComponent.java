@@ -8,13 +8,12 @@ import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "ascc")
 public class AssociationCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, RevisionAware, Serializable {
+        implements CoreComponentRelation, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 
