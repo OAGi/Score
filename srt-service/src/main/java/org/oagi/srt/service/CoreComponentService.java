@@ -408,14 +408,7 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        AggregateCoreComponent oldAcc = accRepository.findOne(acc.getId()).clone();
-        AggregateCoreComponent newAcc = acc.clone();
-
         acc = coreComponentDAO.save(acc);
-
-        if (isBasedAccIdOnlyChange(oldAcc, newAcc)) {
-            return; // do not create history records if based ACC was the only change
-        }
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
