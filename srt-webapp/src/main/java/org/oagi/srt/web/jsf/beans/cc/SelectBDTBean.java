@@ -1,6 +1,7 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
 import org.oagi.srt.repository.DataTypeRepository;
+import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.User;
@@ -22,6 +23,7 @@ import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -35,7 +37,11 @@ import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 public class SelectBDTBean extends AbstractCoreComponentBean {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private DataTypeRepository dataTypeRepository;
+
     @Autowired
     private CoreComponentService coreComponentService;
 
@@ -54,10 +60,28 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     }
 
     private List<DataType> allBDTs() {
-        return dataTypeRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
+        List<DataType> allBDTs = dataTypeRepository.findAll(
+                new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
                 .filter(e -> BusinessDataType == e.getType())
                 .filter(e -> Published == e.getState())
                 .collect(Collectors.toList());
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        User currentUser = getCurrentUser();
+        if (currentUser.isOagisDeveloperIndicator()) {
+            Map<Long, User> userMap = userRepository.findAll().stream()
+                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
+            allBDTs = allBDTs.stream()
+                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
+                    .collect(Collectors.toList());
+        }
+
+        return allBDTs;
     }
 
     public List<DataType> getBdtList() {

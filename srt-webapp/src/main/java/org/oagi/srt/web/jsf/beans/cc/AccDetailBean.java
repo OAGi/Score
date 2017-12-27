@@ -36,6 +36,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -67,6 +68,9 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private NamespaceService namespaceService;
@@ -577,6 +581,21 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 .filter(e -> e.getAccId() != getTargetAcc().getAccId())
                 .collect(Collectors.toList());
 
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        User currentUser = getCurrentUser();
+        if (currentUser.isOagisDeveloperIndicator()) {
+            Map<Long, User> userMap = userRepository.findAll().stream()
+                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
+            allAccList = allAccList.stream()
+                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
+                    .collect(Collectors.toList());
+        }
+
         setAccList(allAccList.stream()
                 .sorted(Comparator.comparing(AggregateCoreComponent::getObjectClassTerm))
                 .collect(Collectors.toList())
@@ -754,6 +773,21 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void prepareAppendAscc() {
         allAsccpList = simpleASCCPRepository.findAll();
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        User currentUser = getCurrentUser();
+        if (currentUser.isOagisDeveloperIndicator()) {
+            Map<Long, User> userMap = userRepository.findAll().stream()
+                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
+            allAsccpList = allAsccpList.stream()
+                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
+                    .collect(Collectors.toList());
+        }
 
         asccp_directory = createDirectory(allAsccpList,
                 new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
@@ -941,6 +975,21 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void prepareAppendBcc() {
         allBccpList = simpleBCCPRepository.findAll();
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        User currentUser = getCurrentUser();
+        if (currentUser.isOagisDeveloperIndicator()) {
+            Map<Long, User> userMap = userRepository.findAll().stream()
+                    .collect(Collectors.toMap(User::getAppUserId, Function.identity()));
+            allBccpList = allBccpList.stream()
+                    .filter(e -> userMap.get(e.getOwnerUserId()).isOagisDeveloperIndicator())
+                    .collect(Collectors.toList());
+        }
 
         bccp_directory = createDirectory(allBccpList,
                 new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},

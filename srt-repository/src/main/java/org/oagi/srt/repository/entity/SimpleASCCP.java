@@ -7,6 +7,7 @@ import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 public class SimpleASCCP implements Serializable {
@@ -29,6 +30,9 @@ public class SimpleASCCP implements Serializable {
     @Column
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
+
+    @Column
+    private Long ownerUserId;
 
     public long getAsccpId() {
         return asccpId;
@@ -78,30 +82,31 @@ public class SimpleASCCP implements Serializable {
         this.state = state;
     }
 
+    public Long getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(Long ownerUserId) {
+        this.ownerUserId = ownerUserId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         SimpleASCCP that = (SimpleASCCP) o;
-
-        if (asccpId != that.asccpId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        return state == that.state;
+        return asccpId == that.asccpId &&
+                Objects.equals(guid, that.guid) &&
+                Objects.equals(propertyTerm, that.propertyTerm) &&
+                Objects.equals(module, that.module) &&
+                Objects.equals(definition, that.definition) &&
+                state == that.state &&
+                Objects.equals(ownerUserId, that.ownerUserId);
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (asccpId ^ (asccpId >>> 32));
-        result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
-        result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        return result;
+        return Objects.hash(asccpId, guid, propertyTerm, module, definition, state, ownerUserId);
     }
 
     @Override
@@ -113,6 +118,7 @@ public class SimpleASCCP implements Serializable {
                 ", module='" + module + '\'' +
                 ", definition='" + definition + '\'' +
                 ", state=" + state +
+                ", ownerUserId=" + ownerUserId +
                 '}';
     }
 }
