@@ -16,6 +16,7 @@ import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.web.jsf.beans.SearchFilter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -453,6 +454,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
             throw t;
         }
 
+        searchAllCoreComponents(getRelease()); // refresh
         search();
     }
 
