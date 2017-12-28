@@ -1240,12 +1240,18 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         if (node instanceof ASCCPNode) {
             ASCCPNode asccpNode = (ASCCPNode) node;
             AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (ascc.getDen().contains(". Extension.")) {
+                return false;
+            }
             if (Published == ascc.getState()) {
                 return true;
             }
         } else if (node instanceof BCCPNode) {
             BCCPNode bccpNode = (BCCPNode) node;
             BasicCoreComponent bcc = bccpNode.getBcc();
+            if (bcc.getDen().contains(". Extension.")) {
+                return false;
+            }
             if (Published == bcc.getState()) {
                 return true;
             }
