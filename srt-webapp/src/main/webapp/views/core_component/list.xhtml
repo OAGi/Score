@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="../../template.xhtml">
 
-    <p:importConstants type="org.oagi.srt.web.jsf.converters.ReleaseConverter" var="ReleaseConverter" />
+    <p:importConstants type="org.oagi.srt.web.jsf.converters.ReleaseConverter" var="ReleaseConverter"/>
 
     <ui:define name="content">
         <div class="settings-next">
@@ -25,7 +25,7 @@
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;" class="dropdown-container">
                                 <p:selectOneMenu id="release" value="#{coreComponentBean.release}"
                                                  converter="#{releaseConverter}" style="width: 150px">
-                                    <p:ajax listener="#{coreComponentBean.onReleaseChange}" update="listForm" />
+                                    <p:ajax listener="#{coreComponentBean.onReleaseChange}" update="listForm"/>
                                     <f:selectItems value="#{coreComponentBean.releases}" var="release"
                                                    itemLabel="#{release.releaseNum}"
                                                    itemValue="#{release}"/>
@@ -52,9 +52,9 @@
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
                                 <h:selectManyCheckbox id="state" styleClass="option-radio-grid"
                                                       value="#{coreComponentBean.selectedStates}">
-                                    <f:selectItem itemLabel="Editing" itemValue="Editing" />
-                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate" />
-                                    <f:selectItem itemLabel="Published" itemValue="Published" />
+                                    <f:selectItem itemLabel="Editing" itemValue="Editing"/>
+                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate"/>
+                                    <f:selectItem itemLabel="Published" itemValue="Published"/>
                                     <p:ajax update="listForm" listener="#{coreComponentBean.onStateChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
@@ -74,7 +74,8 @@
                         </div>
                         <div style="padding: 3px 0 3px 0;">
                             <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
-                            <p:inputText id="searchTextForDefinition" value="#{coreComponentBean.searchTextForDefinition}"
+                            <p:inputText id="searchTextForDefinition"
+                                         value="#{coreComponentBean.searchTextForDefinition}"
                                          style="min-width: 440px; margin-right: 20px;" tabindex="2">
                                 <p:ajax update="pPanel"/>
                             </p:inputText>
@@ -146,20 +147,20 @@
                     <p:column styleClass="owner text-align-center ellipsis" headerText="Owner"
                               sortBy="#{cc.owner}">
                         <h:outputText value="#{cc.owner}"/>
-                    </p:column>
+                        <h:panelGroup styleClass="ownership-transfer"
+                                      rendered="#{ (cc.type eq 'ACC' or cc.type eq 'BCCP' or cc.type eq 'ASCCP')
+                                         and coreComponentBean.currentUser.appUserId eq cc.ownerUserId and cc.state eq 'Editing'}">
+                            <h:link outcome="/views/core_component/transfer_ownership.jsf">
+                                <f:param name="ccId" value="#{cc.id}"/>
+                                <f:param name="type" value="#{cc.type}"/>
 
-                    <p:column styleClass="ownership-transfer text-align-center ellipsis">
-                        <h:link rendered="#{ (cc.type eq 'ACC' or cc.type eq 'BCCP' or cc.type eq 'ASCCP')
-                                         and coreComponentBean.currentUser.appUserId eq cc.ownerUserId and cc.state eq 'Editing'}"
-                                outcome="/views/core_component/transfer_ownership.jsf">
-                            <f:param name="ccId" value="#{cc.id}"/>
-                            <f:param name="type" value="#{cc.type}"/>
-
-                            <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
-                                <i class="fa fa-exchange" aria-hidden="true"></i>
-                            </h:panelGroup>
-                        </h:link>
-                        <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
+                                <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
+                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                </h:panelGroup>
+                            </h:link>
+                            <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner"
+                                       value="Click to transfer the ownership." position="bottom"/>
+                        </h:panelGroup>
                     </p:column>
 
                     <p:column styleClass="state text-align-center" headerText="State" sortBy="#{cc.state}">
@@ -200,7 +201,9 @@
                             <p:confirm header="Confirmation"
                                        message="#{coreComponentBean.hasMultipleRevisions(cc) ?'Reverting component to its previous revision cannot be undone. Proceed?' : 'Deleting component cannot be undone. Proceed?'}"
                                        icon="fa fa-exclamation-triangle"/>
-                            <p:tooltip id="tooltipDelete" for="deleteBtn" value="#{coreComponentBean.hasMultipleRevisions(cc) ? 'Revert to previous revision' : 'Delete'}" position="right"/>
+                            <p:tooltip id="tooltipDelete" for="deleteBtn"
+                                       value="#{coreComponentBean.hasMultipleRevisions(cc) ? 'Revert to previous revision' : 'Delete'}"
+                                       position="right"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>

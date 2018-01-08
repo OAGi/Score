@@ -1082,7 +1082,7 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 }
 
 .core-components-table .ownership-transfer {
-    width: 65px;
+    display: block;
 }
 
 .core-components-table .state {
