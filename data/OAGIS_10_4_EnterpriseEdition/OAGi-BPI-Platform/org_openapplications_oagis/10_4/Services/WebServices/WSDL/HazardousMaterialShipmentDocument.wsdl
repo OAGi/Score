@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/HazardousMaterialShipmentDocument.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyHazardousMaterialShipmentDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:CancelHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="CancelAcknowledgeHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:CancelAcknowledgeHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="ChangeHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:ChangeHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="ChangeAcknowledgeHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:ChangeAcknowledgeHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="GetHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:GetHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="ShowHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:ShowHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="ProcessHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:ProcessHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="AcknowledgeHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:AcknowledgeHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="SyncHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:SyncHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="SyncResponseHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:SyncResponseHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="NotifyHazardousMaterialShipmentDocument">
+		<part name="Message" element="oa:NotifyHazardousMaterialShipmentDocument"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestHazardousMaterialShipmentDocumentPortType">
+		<operation name="ProcessHazardousMaterialShipmentDocument">
+			<input message="oaws:ProcessHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="ChangeHazardousMaterialShipmentDocument">
+			<input message="oaws:ChangeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="CancelHazardousMaterialShipmentDocument">
+			<input message="oaws:CancelHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="GetHazardousMaterialShipmentDocument">
+			<input message="oaws:GetHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="SyncHazardousMaterialShipmentDocument">
+			<input message="oaws:SyncHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="NotifyHazardousMaterialShipmentDocument">
+			<input message="oaws:NotifyHazardousMaterialShipmentDocument"/>
+		</operation>
+	</portType>
+	<portType name="ResponseHazardousMaterialShipmentDocumentPortType">
+		<operation name="AcknowledgeHazardousMaterialShipmentDocument">
+			<input message="oaws:AcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="ChangeAcknowledgeHazardousMaterialShipmentDocument">
+			<input message="oaws:ChangeAcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="CancelAcknowledgeHazardousMaterialShipmentDocument">
+			<input message="oaws:CancelAcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="ShowHazardousMaterialShipmentDocument">
+			<input message="oaws:ShowHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="SyncResponseHazardousMaterialShipmentDocument">
+			<input message="oaws:SyncResponseHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncHazardousMaterialShipmentDocumentPortType">
+		<operation name="ProcessHazardousMaterialShipmentDocument">
+			<input message="oaws:ProcessHazardousMaterialShipmentDocument"/>
+			<output message="oaws:AcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="ChangeHazardousMaterialShipmentDocument">
+			<input message="oaws:ChangeHazardousMaterialShipmentDocument"/>
+			<output message="oaws:ChangeAcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="CancelHazardousMaterialShipmentDocument">
+			<input message="oaws:CancelHazardousMaterialShipmentDocument"/>
+			<output message="oaws:CancelAcknowledgeHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="GetHazardousMaterialShipmentDocument">
+			<input message="oaws:GetHazardousMaterialShipmentDocument"/>
+			<output message="oaws:ShowHazardousMaterialShipmentDocument"/>
+		</operation>
+		<operation name="SyncHazardousMaterialShipmentDocument">
+			<input message="oaws:SyncHazardousMaterialShipmentDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyHazardousMaterialShipmentDocument">
+			<input message="oaws:NotifyHazardousMaterialShipmentDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestHazardousMaterialShipmentDocumentBinding" type="oaws:RequestHazardousMaterialShipmentDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseHazardousMaterialShipmentDocumentBinding" type="oaws:ResponseHazardousMaterialShipmentDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncHazardousMaterialShipmentDocumentBinding" type="oaws:SyncHazardousMaterialShipmentDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyHazardousMaterialShipmentDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/HazardousMaterialShipmentDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestHazardousMaterialShipmentDocumentService">
+		<port name="RequestHazardousMaterialShipmentDocumentBinding" binding="oaws:RequestHazardousMaterialShipmentDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestHazardousMaterialShipmentDocument"/>
+		</port>
+	</service>
+	<service name="ResponseHazardousMaterialShipmentDocumentService">
+		<port name="ResponseHazardousMaterialShipmentDocumentBinding" binding="oaws:ResponseHazardousMaterialShipmentDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseHazardousMaterialShipmentDocument"/>
+		</port>
+	</service>
+	<service name="SyncHazardousMaterialShipmentDocumentService">
+		<port name="SyncHazardousMaterialShipmentDocumentBinding" binding="oaws:SyncHazardousMaterialShipmentDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncHazardousMaterialShipmentDocument"/>
+		</port>
+	</service>
+</definitions>

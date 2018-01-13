@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/BudgetLedger.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgeBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponseBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyBudgetLedger.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelBudgetLedger">
+		<part name="Message" element="oa:CancelBudgetLedger"/>
+	</message>
+	<message name="CancelAcknowledgeBudgetLedger">
+		<part name="Message" element="oa:CancelAcknowledgeBudgetLedger"/>
+	</message>
+	<message name="ChangeBudgetLedger">
+		<part name="Message" element="oa:ChangeBudgetLedger"/>
+	</message>
+	<message name="ChangeAcknowledgeBudgetLedger">
+		<part name="Message" element="oa:ChangeAcknowledgeBudgetLedger"/>
+	</message>
+	<message name="GetBudgetLedger">
+		<part name="Message" element="oa:GetBudgetLedger"/>
+	</message>
+	<message name="ShowBudgetLedger">
+		<part name="Message" element="oa:ShowBudgetLedger"/>
+	</message>
+	<message name="PostBudgetLedger">
+		<part name="Message" element="oa:PostBudgetLedger"/>
+	</message>
+	<message name="PostAcknowledgeBudgetLedger">
+		<part name="Message" element="oa:PostAcknowledgeBudgetLedger"/>
+	</message>
+	<message name="LoadBudgetLedger">
+		<part name="Message" element="oa:LoadBudgetLedger"/>
+	</message>
+	<message name="LoadResponseBudgetLedger">
+		<part name="Message" element="oa:LoadResponseBudgetLedger"/>
+	</message>
+	<message name="NotifyBudgetLedger">
+		<part name="Message" element="oa:NotifyBudgetLedger"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestBudgetLedgerPortType">
+		<operation name="PostBudgetLedger">
+			<input message="oaws:PostBudgetLedger"/>
+		</operation>
+		<operation name="ChangeBudgetLedger">
+			<input message="oaws:ChangeBudgetLedger"/>
+		</operation>
+		<operation name="CancelBudgetLedger">
+			<input message="oaws:CancelBudgetLedger"/>
+		</operation>
+		<operation name="GetBudgetLedger">
+			<input message="oaws:GetBudgetLedger"/>
+		</operation>
+		<operation name="LoadBudgetLedger">
+			<input message="oaws:LoadBudgetLedger"/>
+		</operation>
+		<operation name="NotifyBudgetLedger">
+			<input message="oaws:NotifyBudgetLedger"/>
+		</operation>
+	</portType>
+	<portType name="ResponseBudgetLedgerPortType">
+		<operation name="PostAcknowledgeBudgetLedger">
+			<input message="oaws:PostAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="ChangeAcknowledgeBudgetLedger">
+			<input message="oaws:ChangeAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="CancelAcknowledgeBudgetLedger">
+			<input message="oaws:CancelAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="ShowBudgetLedger">
+			<input message="oaws:ShowBudgetLedger"/>
+		</operation>
+		<operation name="LoadResponseBudgetLedger">
+			<input message="oaws:LoadResponseBudgetLedger"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadBudgetLedgerPortType">
+		<operation name="PostBudgetLedger">
+			<input message="oaws:PostBudgetLedger"/>
+			<output message="oaws:PostAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="ChangeBudgetLedger">
+			<input message="oaws:ChangeBudgetLedger"/>
+			<output message="oaws:ChangeAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="CancelBudgetLedger">
+			<input message="oaws:CancelBudgetLedger"/>
+			<output message="oaws:CancelAcknowledgeBudgetLedger"/>
+		</operation>
+		<operation name="GetBudgetLedger">
+			<input message="oaws:GetBudgetLedger"/>
+			<output message="oaws:ShowBudgetLedger"/>
+		</operation>
+		<operation name="LoadBudgetLedger">
+			<input message="oaws:LoadBudgetLedger"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyBudgetLedger">
+			<input message="oaws:NotifyBudgetLedger"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestBudgetLedgerBinding" type="oaws:RequestBudgetLedgerPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseBudgetLedgerBinding" type="oaws:ResponseBudgetLedgerPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgeBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponseBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadBudgetLedgerBinding" type="oaws:LoadBudgetLedgerPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyBudgetLedger">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BudgetLedger.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestBudgetLedgerService">
+		<port name="RequestBudgetLedgerBinding" binding="oaws:RequestBudgetLedgerBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestBudgetLedger"/>
+		</port>
+	</service>
+	<service name="ResponseBudgetLedgerService">
+		<port name="ResponseBudgetLedgerBinding" binding="oaws:ResponseBudgetLedgerBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseBudgetLedger"/>
+		</port>
+	</service>
+	<service name="LoadBudgetLedgerService">
+		<port name="LoadBudgetLedgerBinding" binding="oaws:LoadBudgetLedgerBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/LoadBudgetLedger"/>
+		</port>
+	</service>
+</definitions>

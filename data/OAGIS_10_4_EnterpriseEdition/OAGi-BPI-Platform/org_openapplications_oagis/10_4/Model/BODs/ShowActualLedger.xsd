@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ActualLedger.xsd"/>
+        <xsd:element name="ShowActualLedger" type="ShowActualLedgerType" id="oagis-id-6336fb1e17af45e6a676e5007d896aec">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowActualLedger is to communicate to an enterprise application the sending systems representation of ledger information specifically requested.   This may be in response to a GetActualLedger request or to proactively publish a listing of ledger information for a business event.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowActualLedgerType" id="oagis-id-3c003c4254be49a3bbed729f38ad86af">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowActualLedgerDataAreaType" id="oagis-id-1bd63881bbe148a882df714cdc9e8fb6">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowActualLedger. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ActualLedger).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowActualLedgerDataAreaType" id="oagis-id-d3e14cf78dfd438685301934f5e7b314">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-9e467dd543d34c558f2406e4da94c0a8"/>
+                        <xsd:element ref="ActualLedger" maxOccurs="unbounded" id="oagis-id-f91e5e66616e41e7b66f6581b6b346f1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Requisition.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRequisition.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRequisition">
+		<part name="Message" element="oa:CancelRequisition"/>
+	</message>
+	<message name="CancelAcknowledgeRequisition">
+		<part name="Message" element="oa:CancelAcknowledgeRequisition"/>
+	</message>
+	<message name="ChangeRequisition">
+		<part name="Message" element="oa:ChangeRequisition"/>
+	</message>
+	<message name="ChangeAcknowledgeRequisition">
+		<part name="Message" element="oa:ChangeAcknowledgeRequisition"/>
+	</message>
+	<message name="GetRequisition">
+		<part name="Message" element="oa:GetRequisition"/>
+	</message>
+	<message name="ShowRequisition">
+		<part name="Message" element="oa:ShowRequisition"/>
+	</message>
+	<message name="ProcessRequisition">
+		<part name="Message" element="oa:ProcessRequisition"/>
+	</message>
+	<message name="AcknowledgeRequisition">
+		<part name="Message" element="oa:AcknowledgeRequisition"/>
+	</message>
+	<message name="SyncRequisition">
+		<part name="Message" element="oa:SyncRequisition"/>
+	</message>
+	<message name="SyncResponseRequisition">
+		<part name="Message" element="oa:SyncResponseRequisition"/>
+	</message>
+	<message name="NotifyRequisition">
+		<part name="Message" element="oa:NotifyRequisition"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRequisitionPortType">
+		<operation name="ProcessRequisition">
+			<input message="oaws:ProcessRequisition"/>
+		</operation>
+		<operation name="ChangeRequisition">
+			<input message="oaws:ChangeRequisition"/>
+		</operation>
+		<operation name="CancelRequisition">
+			<input message="oaws:CancelRequisition"/>
+		</operation>
+		<operation name="GetRequisition">
+			<input message="oaws:GetRequisition"/>
+		</operation>
+		<operation name="SyncRequisition">
+			<input message="oaws:SyncRequisition"/>
+		</operation>
+		<operation name="NotifyRequisition">
+			<input message="oaws:NotifyRequisition"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRequisitionPortType">
+		<operation name="AcknowledgeRequisition">
+			<input message="oaws:AcknowledgeRequisition"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRequisition">
+			<input message="oaws:ChangeAcknowledgeRequisition"/>
+		</operation>
+		<operation name="CancelAcknowledgeRequisition">
+			<input message="oaws:CancelAcknowledgeRequisition"/>
+		</operation>
+		<operation name="ShowRequisition">
+			<input message="oaws:ShowRequisition"/>
+		</operation>
+		<operation name="SyncResponseRequisition">
+			<input message="oaws:SyncResponseRequisition"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRequisitionPortType">
+		<operation name="ProcessRequisition">
+			<input message="oaws:ProcessRequisition"/>
+			<output message="oaws:AcknowledgeRequisition"/>
+		</operation>
+		<operation name="ChangeRequisition">
+			<input message="oaws:ChangeRequisition"/>
+			<output message="oaws:ChangeAcknowledgeRequisition"/>
+		</operation>
+		<operation name="CancelRequisition">
+			<input message="oaws:CancelRequisition"/>
+			<output message="oaws:CancelAcknowledgeRequisition"/>
+		</operation>
+		<operation name="GetRequisition">
+			<input message="oaws:GetRequisition"/>
+			<output message="oaws:ShowRequisition"/>
+		</operation>
+		<operation name="SyncRequisition">
+			<input message="oaws:SyncRequisition"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRequisition">
+			<input message="oaws:NotifyRequisition"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRequisitionBinding" type="oaws:RequestRequisitionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRequisitionBinding" type="oaws:ResponseRequisitionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRequisitionBinding" type="oaws:SyncRequisitionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRequisition">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Requisition.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRequisitionService">
+		<port name="RequestRequisitionBinding" binding="oaws:RequestRequisitionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRequisition"/>
+		</port>
+	</service>
+	<service name="ResponseRequisitionService">
+		<port name="ResponseRequisitionBinding" binding="oaws:ResponseRequisitionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRequisition"/>
+		</port>
+	</service>
+	<service name="SyncRequisitionService">
+		<port name="SyncRequisitionBinding" binding="oaws:SyncRequisitionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRequisition"/>
+		</port>
+	</service>
+</definitions>

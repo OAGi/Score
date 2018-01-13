@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+        <xsd:element name="ShowRequireProduct" type="ShowRequireProductType" id="oagis-id-ae7ee5bbda7840dfa8bc9dbc65b94773">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowRequireProduct is to supply RequireProduct information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowRequireProductType" id="oagis-id-1564a13c1597448c8cb13107abd5d428">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowRequireProductDataAreaType" id="oagis-id-d2508375c01345d3a1ee7559a9d4dff3">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowRequireProduct. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowRequireProductDataAreaType" id="oagis-id-8b1fc4a4a77f4e2d9993ee231f7fbc71">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-705b0bb86bb0472fb8886e5f114b0756"/>
+                        <xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-fb92571dedb945b387b9bf33c2a04801"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

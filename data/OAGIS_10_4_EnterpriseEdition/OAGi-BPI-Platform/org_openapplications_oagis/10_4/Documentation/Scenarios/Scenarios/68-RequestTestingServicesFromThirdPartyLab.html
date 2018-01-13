@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>OAGIS 10.4 Scenarios - Scenario 68</title>
+
+  
+
+  
+  <base target="body"></head><body bgproperties="fixed" style="background-color: rgb(255, 255, 255);">
+<table border="1" cellpadding="10" cellspacing="1" height="100%" width="78%">
+
+  <tbody>
+    <tr>
+      <td wrap="" align="left" bgcolor="#ffffff" height="80" valign="top" width="78%">
+      <h1><b><span style="font-family: Arial; font-size: large;">Scenario
+68 - Request Testing Services from Third Party Lab</span></b></h1>
+      <hr>
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.0
+Overview</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Scenario #67 describes the integration of business software involved with the process of a customer requesting a third party laboratory to perform lab tests on customer provided samples.  The request is made via an InspectionOrder and the results of the testing are conveyed to the customer using TestResults.   The process through which the customer queries the laboratory about available testing services and their prices to gather the information to properly create an InspectionOrder and the process through which the laboratory invoices the customer for the testing services performed are also illustrated in this scenario using PriceList and Invoice, respectively. </span>&nbsp; 
+      <br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">The purpose of this scenario is to describe the participants in a mainstream business process, and to illustrate how the business systems of those participants can be integrated through messages exchange to realize the goals of that business process.  This scenario is not meant to be the only model for integrating customer applications to lab information management applications. It is simply one model that may be used to guide one's own integration efforts. </span>&nbsp; <br>
+      <br>
+      <span style="font-family: Arial; font-size: small;">Since the function and composition of the business software components that might be used to produce or exchange the information described in the scenario vary widely, specific software components will not be described.  Software components which might be involved in realizing this scenario include:</span>&nbsp;
+<br>
+
+<br>
+      <br>
+
+      <ul>
+         <li><span style="font-family: Arial; font-size: small;">
+          <p>Purchasing / Procurement Systems<br>
+          </p>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">
+          <p>Lab Information Management Systems<br>
+          </p>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">
+          <p>Enterprise Resource Planning / Customer Relationship Management Systems</p>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">
+          <p>Order Management System</p>
+          </span></li>
+        
+      </ul>
+<span style="font-family: Arial; font-size: small;">This is not a complete list but is meant to be a representative sample of systems that might be involved in generation or exchange of the information involved in the Request Testing Services from Third Party Lab process. 
+      
+      <span style="font-family: Arial; font-size: small;"> </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.1 Scenario Diagram</span></b></h1>
+      <h1><b><span style="font-family: Arial; font-size: medium;"></span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The scenario below contains the participants involved in the interaction, the dialog flows or conversation between them, certain assumptions about the sequence of events, and assumptions about the technical approach, for example, whether a publish and subscribe or a query and response model is used for the exchange of information.  This is a model to be used as a design recommendation, not a required approach. <br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">This is a model to be used as a design recommendation, not a required approach..</span> <br>
+      <br>
+      <br>
+      <img style="width: 900px; height: 791px;" alt="Test Specification Scenario" src="../OAGIS_Scenarios_GraphicsFiles/68-RequestTestingServicesFromThirdPartyLab.jpg"><br>
+      <br>
+      <br>
+      <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.2
+Assumptions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This scenario assumes a loosely coupled, asynchronous approach with transaction management required but not explicitly defined.<br>
+      <br>
+This scenario describes how one or more components of a Customer�s business systems can interact with one or more of the business systems of a Third Party Laboratory for testing services. </span> <br>
+      <br>
+      <span style="font-family: Arial; font-size: small;">The creation of samples labeled in accordance with the associated InspectionOrder is required but not depicted.  The manual exchange, from the Customer to the Third Party Laboratory, of the labeled samples upon which testing is to be performed is required but not depicted.<br>
+      <br>
+<span style="font-family: Arial; font-size: small;">There may be instances where all of the data necessary to accomplish the business goal is contained in the documents and other instances where additional binary information accompanies the InspectionOrder, TestResults, and/or PriceList documents.<br>
+      <br>
+<span style="font-family: Arial; font-size: small;">This scenario presents two methods through which the TestResults noun is transmitted from the Third Party Laboratory to the Customer.  One method follows a Notify-Get-Show pattern of interaction, where the customer receives a notification message when results are available and then submits a requests for the results which are subsequently returned.  In the other method, when initial, updated, or final results are available, the laboratory sends them directly to the customer without prompting until all results have been transmitted.  Both methods are described in this scenario document.  Neither method is required and implementations of this scenario are free to support either or both methods.<br>
+      <br>      
+<span style="font-family: Arial; font-size: small;">This scenario covers approaches for the exchange of information related to the availability and cost of testing services.  They are included to provide a complete illustration of the overall business process and to provide context for the focus of the scenario � the part of the business process that involves the exchange of messages to support the request for and performance of testing services.   The approaches depicted in this scenario for supplying this functionality are not required.  Implementers may choose to adopt these integration approaches or to provide the functionality through other means.<br>
+      <br>            
+      
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.3
+Participant Definitions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This scenario contains two major components: business operations and manufacturing operations.  Business Operations participants are Inventory Management, Quality Management, Production Planning.  Manufacturing operations also includes the Lab Management. <br>
+      </span>
+ <span style="font-family: Arial; font-size: small;"> The definitions and details of these applications are left to the designer but are assumed to contain the functionality as defined by what is commonly sold in the commercial marketplace today. This definition is broadly accepted by the scenario designers and is a direct result of the decision not to define how the processing takes place within any individual application. <br>
+      </span>      
+      <span style="font-family: Arial; font-size: small;">Typical capabilities of these participants are described: <br>
+      </span>
+      <ul>
+        <li><span style="font-family: Arial; font-size: small;">Customer is the participant that requests the testing services<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">The Third Party Lab participant uses an application often referred to a Lab Information Management Systems (LIMS).  The LIMS will manage testing services, and collect data off test instruments 
+<br>
+          </span></li>
+         
+      </ul>
+      <span style="font-family: Arial; font-size: small;">Each application must be able perform the services defined by the message BOD (business object document), but the internals of the application are not required or desired to be exposed at this level of standardized abstraction.  <br>
+      <br>
+The most important factors in defining these participants is to ensure that an integration designer can communicate the requirements precisely enough to specify and design the integration processes needed and their interrelationships. 
+<br>
+      <br>
+      
+Note that the evolution of eCommerce has yielded independent trading exchanges and other intermediaries between business operations and inventory management providers. Requirements and operations for intermediaries should be similar to direct links between the two components<br>      
+      </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.4
+Business Workflow (Sequence)</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The business workflow is graphically represented by starting at the Scenario top and reading from top down and from left to right.  The arrows in a sequence diagrams shows the message exchanged, and the response to the message.  A ConfirmBOD provides an acknowledge to the initial request that the original request was received and understood as a valid.  The Acknowledge(noun) message indicates that the transaction was processed (committed), and a business person has reviewed and provided information related to the next step (accepted, rejected, etc.).
+<br>
+      <br>
+      </span>
+      <span style="font-family: Arial; font-size: small;">The exchange of OAGIS BODs such as the InspectionOrder and TestResults may follow several different workflows depending on the capabilities of the customer submitting the InspectionOrder. The sequence diagram illustrates the data exchanges involved within the business process.
+<br>
+      <br>
+      </span>
+      <ol>
+        <li><span style="font-family: Arial; font-size: small;">The first business event in the integration scenario is the request for the Customer-specific Price list using the GetPriceList and ShowPriceList BODs.
+<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">In second business event the Customer sends the ProcessInspectionOrder BOD to the laboratory, which identifies the samples and tests to be performed on each sample.  The Customer manually sends the physical samples to the lab.
+<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Upon receipt of the samples, the LIMS system sends the AcknowledgeInspectionOrder BOD to the Customer.  The Lab prepares the (sub)samples (physical movement of samples out of scope for this scenario).
+  </span></li>
+         <li><span style="font-family: Arial; font-size: small;">After all tests are performed according to referenced test methods, in implementation approach #1, the NotifyTestResults BOD is sent to the Customer, indicating the availability of the test results.   </span></li>
+         <li><span style="font-family: Arial; font-size: small;">The Customer uses information in the NotifyTestResults payload to query the Lab using the GetTestResults BOD.
+ </span></li>
+         <li><span style="font-family: Arial; font-size: small;">The ShowTestResults BOD is returned to the Customer as a result of the query.
+ </span></li>
+         
+      </ol>
+
+<span style="font-family: Arial; font-size: small;">The alternate sequence involves direct publishing the TestResults to the Customer, starting with step #3: 
+<br>
+      <br>
+      </span>      
+
+<ol>
+         <li><span style="font-family: Arial; font-size: small;">After all tests are performed according to referenced test methods, in implementation approach #1, the ProcessTestResults BOD is send to the Customer.
+</span></li>
+         <li><span style="font-family: Arial; font-size: small;">The Customer responds to the lab they have transacted the test results with the AcknowledgeTestResults BOD.</span></li>
+         <li><span style="font-family: Arial; font-size: small;">If test methods take longer to process (e.g., weeks), an updated set of test results can be sent by the lab to the customer using the ChangeTestResults BOD.
+</span></li>
+         <li><span style="font-family: Arial; font-size: small;">In this case, the Customer sends the ChangeAcknowledgeTestResults BOD when that data is processed.
+</span></li>
+         
+</ol>      
+
+<span style="font-family: Arial; font-size: small;">Retests are not shown in this scenario, but are another potential use case, most often requiring a new ProcessInspectionOrder BOD (not a change).</span>
+
+<br>
+      <br>
+<span style="font-family: Arial; font-size: small;">What is not shown in the diagram are the instructions related to the physical movement of the samples to the laboratory or the movement of product from its staging location into inventory.  This activity may involve additional logistics related messages that are covered within other OAGIS Scenarios, especially if Inventory Management is a third party (e.g., 3PL). </span>
+      <br>
+      <br>
+      <h1><b><span style="font-family: Arial; font-size: medium;">68.5
+Exception Handling</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Exception handling is highly localized as the result of how business capabilities are implemented including the deployed infrastructure, management and business rules. As such, this section of the Scenario documentation is planned to be used as a guide to help understand the additional intent of these Scenarios. If no exceptions are noted here, then it can be assumed that the Scenario designers agreed that the Scenario is straightforward and has no additional needs:
+</span><br>
+
+
+      
+      
+      <ul>
+<li><span style="font-family: Arial; font-size: small;">The Confirm BOD is typically intended to be used by the original receiving application to communicate to the sending application that the information it sent in the message BOD (business object document) was received and understood and can be processed. 
+</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">If the information was not received or understood, or contained errors of any type, it is accepted practice for the OAGIS users to presume that the data was not acted on.</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">In the absence of a Confirm BOD within a previously agreed time limit (e.g., SLA, normally defined in an out-of-band agreement), the originator will resend the original message. <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">As errors and assumptions are the bane of any implementation, it is strongly recommended that the Confirm BOD be used to prevent any potential problem although it is not a requirement by OAGIS use.</span></li>
+      </ul>
+<span style="font-family: Arial; font-size: small;">&nbsp;</span><br>
+      <span style="font-family: Arial; font-size: small;"><br>
+      </span><span style="font-family: Arial; font-size: small;"> </span>
+      <hr> <span style="font-family: Arial; font-size: xx-small;">Copyright
+OAGi 2017 - All Rights Reserved  --  OAGIS release 10.4 - Document Number: 20170501</span><span style="font-family: Arial; font-size: xx-small;">-68</span> </td>
+    </tr>
+  </tbody>
+</table>
+
+</body></html>

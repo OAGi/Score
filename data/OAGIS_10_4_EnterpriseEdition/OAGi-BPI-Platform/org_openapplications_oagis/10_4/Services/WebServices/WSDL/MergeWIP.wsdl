@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/MergeWIP.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyMergeWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelMergeWIP">
+		<part name="Message" element="oa:CancelMergeWIP"/>
+	</message>
+	<message name="CancelAcknowledgeMergeWIP">
+		<part name="Message" element="oa:CancelAcknowledgeMergeWIP"/>
+	</message>
+	<message name="ChangeMergeWIP">
+		<part name="Message" element="oa:ChangeMergeWIP"/>
+	</message>
+	<message name="ChangeAcknowledgeMergeWIP">
+		<part name="Message" element="oa:ChangeAcknowledgeMergeWIP"/>
+	</message>
+	<message name="GetMergeWIP">
+		<part name="Message" element="oa:GetMergeWIP"/>
+	</message>
+	<message name="ShowMergeWIP">
+		<part name="Message" element="oa:ShowMergeWIP"/>
+	</message>
+	<message name="ProcessMergeWIP">
+		<part name="Message" element="oa:ProcessMergeWIP"/>
+	</message>
+	<message name="AcknowledgeMergeWIP">
+		<part name="Message" element="oa:AcknowledgeMergeWIP"/>
+	</message>
+	<message name="SyncMergeWIP">
+		<part name="Message" element="oa:SyncMergeWIP"/>
+	</message>
+	<message name="SyncResponseMergeWIP">
+		<part name="Message" element="oa:SyncResponseMergeWIP"/>
+	</message>
+	<message name="NotifyMergeWIP">
+		<part name="Message" element="oa:NotifyMergeWIP"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestMergeWIPPortType">
+		<operation name="ProcessMergeWIP">
+			<input message="oaws:ProcessMergeWIP"/>
+		</operation>
+		<operation name="ChangeMergeWIP">
+			<input message="oaws:ChangeMergeWIP"/>
+		</operation>
+		<operation name="CancelMergeWIP">
+			<input message="oaws:CancelMergeWIP"/>
+		</operation>
+		<operation name="GetMergeWIP">
+			<input message="oaws:GetMergeWIP"/>
+		</operation>
+		<operation name="SyncMergeWIP">
+			<input message="oaws:SyncMergeWIP"/>
+		</operation>
+		<operation name="NotifyMergeWIP">
+			<input message="oaws:NotifyMergeWIP"/>
+		</operation>
+	</portType>
+	<portType name="ResponseMergeWIPPortType">
+		<operation name="AcknowledgeMergeWIP">
+			<input message="oaws:AcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="ChangeAcknowledgeMergeWIP">
+			<input message="oaws:ChangeAcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="CancelAcknowledgeMergeWIP">
+			<input message="oaws:CancelAcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="ShowMergeWIP">
+			<input message="oaws:ShowMergeWIP"/>
+		</operation>
+		<operation name="SyncResponseMergeWIP">
+			<input message="oaws:SyncResponseMergeWIP"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncMergeWIPPortType">
+		<operation name="ProcessMergeWIP">
+			<input message="oaws:ProcessMergeWIP"/>
+			<output message="oaws:AcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="ChangeMergeWIP">
+			<input message="oaws:ChangeMergeWIP"/>
+			<output message="oaws:ChangeAcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="CancelMergeWIP">
+			<input message="oaws:CancelMergeWIP"/>
+			<output message="oaws:CancelAcknowledgeMergeWIP"/>
+		</operation>
+		<operation name="GetMergeWIP">
+			<input message="oaws:GetMergeWIP"/>
+			<output message="oaws:ShowMergeWIP"/>
+		</operation>
+		<operation name="SyncMergeWIP">
+			<input message="oaws:SyncMergeWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyMergeWIP">
+			<input message="oaws:NotifyMergeWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestMergeWIPBinding" type="oaws:RequestMergeWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseMergeWIPBinding" type="oaws:ResponseMergeWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncMergeWIPBinding" type="oaws:SyncMergeWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyMergeWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MergeWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestMergeWIPService">
+		<port name="RequestMergeWIPBinding" binding="oaws:RequestMergeWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestMergeWIP"/>
+		</port>
+	</service>
+	<service name="ResponseMergeWIPService">
+		<port name="ResponseMergeWIPBinding" binding="oaws:ResponseMergeWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseMergeWIP"/>
+		</port>
+	</service>
+	<service name="SyncMergeWIPService">
+		<port name="SyncMergeWIPBinding" binding="oaws:SyncMergeWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncMergeWIP"/>
+		</port>
+	</service>
+</definitions>

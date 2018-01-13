@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/RiskControlLibrary.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRiskControlLibrary.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRiskControlLibrary">
+		<part name="Message" element="oa:CancelRiskControlLibrary"/>
+	</message>
+	<message name="CancelAcknowledgeRiskControlLibrary">
+		<part name="Message" element="oa:CancelAcknowledgeRiskControlLibrary"/>
+	</message>
+	<message name="ChangeRiskControlLibrary">
+		<part name="Message" element="oa:ChangeRiskControlLibrary"/>
+	</message>
+	<message name="ChangeAcknowledgeRiskControlLibrary">
+		<part name="Message" element="oa:ChangeAcknowledgeRiskControlLibrary"/>
+	</message>
+	<message name="GetRiskControlLibrary">
+		<part name="Message" element="oa:GetRiskControlLibrary"/>
+	</message>
+	<message name="ShowRiskControlLibrary">
+		<part name="Message" element="oa:ShowRiskControlLibrary"/>
+	</message>
+	<message name="ProcessRiskControlLibrary">
+		<part name="Message" element="oa:ProcessRiskControlLibrary"/>
+	</message>
+	<message name="AcknowledgeRiskControlLibrary">
+		<part name="Message" element="oa:AcknowledgeRiskControlLibrary"/>
+	</message>
+	<message name="SyncRiskControlLibrary">
+		<part name="Message" element="oa:SyncRiskControlLibrary"/>
+	</message>
+	<message name="SyncResponseRiskControlLibrary">
+		<part name="Message" element="oa:SyncResponseRiskControlLibrary"/>
+	</message>
+	<message name="NotifyRiskControlLibrary">
+		<part name="Message" element="oa:NotifyRiskControlLibrary"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRiskControlLibraryPortType">
+		<operation name="ProcessRiskControlLibrary">
+			<input message="oaws:ProcessRiskControlLibrary"/>
+		</operation>
+		<operation name="ChangeRiskControlLibrary">
+			<input message="oaws:ChangeRiskControlLibrary"/>
+		</operation>
+		<operation name="CancelRiskControlLibrary">
+			<input message="oaws:CancelRiskControlLibrary"/>
+		</operation>
+		<operation name="GetRiskControlLibrary">
+			<input message="oaws:GetRiskControlLibrary"/>
+		</operation>
+		<operation name="SyncRiskControlLibrary">
+			<input message="oaws:SyncRiskControlLibrary"/>
+		</operation>
+		<operation name="NotifyRiskControlLibrary">
+			<input message="oaws:NotifyRiskControlLibrary"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRiskControlLibraryPortType">
+		<operation name="AcknowledgeRiskControlLibrary">
+			<input message="oaws:AcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRiskControlLibrary">
+			<input message="oaws:ChangeAcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="CancelAcknowledgeRiskControlLibrary">
+			<input message="oaws:CancelAcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="ShowRiskControlLibrary">
+			<input message="oaws:ShowRiskControlLibrary"/>
+		</operation>
+		<operation name="SyncResponseRiskControlLibrary">
+			<input message="oaws:SyncResponseRiskControlLibrary"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRiskControlLibraryPortType">
+		<operation name="ProcessRiskControlLibrary">
+			<input message="oaws:ProcessRiskControlLibrary"/>
+			<output message="oaws:AcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="ChangeRiskControlLibrary">
+			<input message="oaws:ChangeRiskControlLibrary"/>
+			<output message="oaws:ChangeAcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="CancelRiskControlLibrary">
+			<input message="oaws:CancelRiskControlLibrary"/>
+			<output message="oaws:CancelAcknowledgeRiskControlLibrary"/>
+		</operation>
+		<operation name="GetRiskControlLibrary">
+			<input message="oaws:GetRiskControlLibrary"/>
+			<output message="oaws:ShowRiskControlLibrary"/>
+		</operation>
+		<operation name="SyncRiskControlLibrary">
+			<input message="oaws:SyncRiskControlLibrary"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRiskControlLibrary">
+			<input message="oaws:NotifyRiskControlLibrary"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRiskControlLibraryBinding" type="oaws:RequestRiskControlLibraryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRiskControlLibraryBinding" type="oaws:ResponseRiskControlLibraryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRiskControlLibraryBinding" type="oaws:SyncRiskControlLibraryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRiskControlLibrary">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RiskControlLibrary.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRiskControlLibraryService">
+		<port name="RequestRiskControlLibraryBinding" binding="oaws:RequestRiskControlLibraryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRiskControlLibrary"/>
+		</port>
+	</service>
+	<service name="ResponseRiskControlLibraryService">
+		<port name="ResponseRiskControlLibraryBinding" binding="oaws:ResponseRiskControlLibraryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRiskControlLibrary"/>
+		</port>
+	</service>
+	<service name="SyncRiskControlLibraryService">
+		<port name="SyncRiskControlLibraryBinding" binding="oaws:SyncRiskControlLibraryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRiskControlLibrary"/>
+		</port>
+	</service>
+</definitions>

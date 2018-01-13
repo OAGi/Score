@@ -1,0 +1,1922 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OAGIS 10_4 -- CarrierRoute Noun -- Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array('element_CarrierRoute_xibox', 'element_RouteStop_xibox', 'element_StopDetail_xibox', 'type_CarrierRouteBaseType_xibox', 'type_CarrierRouteType_xibox', 'type_RouteStopBaseType_xibox', 'type_RouteStopType_xibox', 'type_StopDetailBaseType_xibox', 'type_StopDetailType_xibox');
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox', 'element_CarrierRoute_scbox', 'element_RouteStop_scbox', 'element_StopDetail_scbox', 'type_CarrierRouteBaseType_scbox', 'type_CarrierRouteType_scbox', 'type_RouteStopBaseType_scbox', 'type_RouteStopType_scbox', 'type_StopDetailBaseType_scbox', 'type_StopDetailType_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">OAGIS 10_4 -- CarrierRoute Noun -- Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+<li>
+<a href="#SchemaComponents">Global Schema Components</a>
+<ul>
+<li>
+<a href="#element_CarrierRoute">Element: <strong>CarrierRoute</strong>
+</a>
+</li>
+<li>
+<a href="#element_RouteStop">Element: <strong>RouteStop</strong>
+</a>
+</li>
+<li>
+<a href="#element_StopDetail">Element: <strong>StopDetail</strong>
+</a>
+</li>
+<li>
+<a href="#type_CarrierRouteBaseType">Complex Type: <strong>CarrierRouteBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_CarrierRouteType">Complex Type: <strong>CarrierRouteType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RouteStopBaseType">Complex Type: <strong>RouteStopBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RouteStopType">Complex Type: <strong>RouteStopType</strong>
+</a>
+</li>
+<li>
+<a href="#type_StopDetailBaseType">Complex Type: <strong>StopDetailBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_StopDetailType">Complex Type: <strong>StopDetailType</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>Target Namespace</th>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations have no namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>../Platform/2_4/Common/Components/Components.xsd</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_">Default namespace</a>
+</td>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xsd">xsd</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:schema</span> <span class="scTag">targetNamespace</span>="<span class="scContent">http://www.openapplications.org/oagis/10</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">attributeFormDefault</span>="<span class="scContent">unqualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">../Platform/2_4/Common/Components/Components.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xsd:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaComponents">Global Schema Components</a>
+</h2>
+<h3>Element: <a class="name" name="element_CarrierRoute">CarrierRoute</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CarrierRoute</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_CarrierRouteType" title="Jump to &quot;CarrierRouteType&quot; type definition.">CarrierRouteType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Describes a scheduled journey that a particular goods transportation service provider (freight carrier) is requested to perform on the behalf of a shipper, customer or other transportation corrdinator. The journey may contain one or more stops.
+
+There are many possible business applications in several environments that may use this capability.
+
+A CarrierRoute is typically generated by a transportation planning system to coordinate and optimize the movement of many goods shipment to reduce overall freight cost, improve overall delivery schedules, and ensure that a carrier's equipment is utilized efficiently.
+
+Other business systems typically interested in a CarrierRoute document include supply chain execution, supply chain visibility, warehouse management, and transportaion management systems.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_CarrierRoute_xibox'); return false;" class="control" id="element_CarrierRoute_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_CarrierRoute_xibox">
+<div style="margin-left: 0em">&lt;CarrierRoute<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RequiredDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'LoadingDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EarliestShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfLoadingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfShipmentCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfStagingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationTerm', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Container', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Status', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; ... &lt;/<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RouteStop', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CarrierRouteExtensionType&quot; type definition could not be found." onclick="alert('&quot;CarrierRouteExtensionType&quot; type definition could not be found.');">CarrierRouteExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/CarrierRoute&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CarrierRoute_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_CarrierRoute_scbox'); return false;" class="control" id="element_CarrierRoute_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_CarrierRoute_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">CarrierRoute</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CarrierRouteType" title="Jump to &quot;CarrierRouteType&quot; type definition.">CarrierRouteType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fba85dc216c64363a2bddf35f5a267a5</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CarrierRoute_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_RouteStop">RouteStop</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RouteStop</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_RouteStopType" title="Jump to &quot;RouteStopType&quot; type definition.">RouteStopType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Provides information pertaining to a particular pickup or delivery stop along the journey of a routed shipment.
+
+Each instance of the RouteStop pertains to a single physical destination shipping location and requires a subordinate ShipToParty.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_RouteStop_xibox'); return false;" class="control" id="element_RouteStop_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_RouteStop_xibox">
+<div style="margin-left: 0em">&lt;RouteStop<br />
+<span style="margin-left: 0.5em"> sequenceNumber="<span class="type">
+<a href="javascript:void(0)" title="&quot;NumberType_B98233&quot; type definition could not be found." onclick="alert('&quot;NumberType_B98233&quot; type definition could not be found.');">NumberType_B98233</a>
+</span> <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Attribute', 'sequenceNumber', docArray);">?</a>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'HazardousMaterial', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; ... &lt;/<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RouteStopExtensionType&quot; type definition could not be found." onclick="alert('&quot;RouteStopExtensionType&quot; type definition could not be found.');">RouteStopExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/RouteStop&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RouteStop_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_RouteStop_scbox'); return false;" class="control" id="element_RouteStop_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_RouteStop_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">RouteStop</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RouteStopType" title="Jump to &quot;RouteStopType&quot; type definition.">RouteStopType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ab19a22ec7cb4b48a10372b5b1e702ce</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RouteStop_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_StopDetail">StopDetail</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>StopDetail</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_StopDetailType" title="Jump to &quot;StopDetailType&quot; type definition.">StopDetailType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_StopDetail_xibox'); return false;" class="control" id="element_StopDetail_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_StopDetail_xibox">
+<div style="margin-left: 0em">&lt;StopDetail&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipmentReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillOfLadingReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;StopDetailExtensionType&quot; type definition could not be found." onclick="alert('&quot;StopDetailExtensionType&quot; type definition could not be found.');">StopDetailExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/StopDetail&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_StopDetail_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_StopDetail_scbox'); return false;" class="control" id="element_StopDetail_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_StopDetail_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">StopDetail</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_StopDetailType" title="Jump to &quot;StopDetailType&quot; type definition.">StopDetailType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d1250d77fff94b1d976608c4795a5132</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_StopDetail_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CarrierRouteBaseType">CarrierRouteBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span> &lt; <strong>CarrierRouteBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_CarrierRouteType" title="Jump to &quot;CarrierRouteType&quot; type definition.">CarrierRouteType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CarrierRouteBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CarrierRouteBaseType_xibox'); return false;" class="control" id="type_CarrierRouteBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CarrierRouteBaseType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em" class="newFields"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em" class="newFields"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RequiredDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'LoadingDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EarliestShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfLoadingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfShipmentCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfStagingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationTerm', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Container', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Status', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; ... &lt;/<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RouteStop', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CarrierRouteBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CarrierRouteBaseType_scbox'); return false;" class="control" id="type_CarrierRouteBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CarrierRouteBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CarrierRouteBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-41be22160c9849aa9a94b56377c5ed49</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fc808b0e4ae348d4bc731b605d3ff32d</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-25b8374925624557a2b49e53ceae8f11</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-80477611398449aba97d76be8d508c04</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e50a0926c18c4d3ba7ae0c7edcca50b9</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7ef845cb56b944a18452f2c3404baa48</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-9d00476a898349ef8a1e78c0b19d3149</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a8fa31d065d0414ca98843174d0f0f83</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a1135738d6bb43418f672cfeffb3bb3d</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a2d9806290624f41aac1b2f57d993461</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-652505ce4281421ba3632e090232bc96</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fc97a6682e254bd8b6510b55c8850742</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5566037285f2486296a2d2f0bddaf2c8</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d6ba32d1cd3245ee9df2f0a7dc42509c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-434c8f6612b247e2a66fdafa8584999c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b1e6ea0685cc49878d8aeb6d3a5af2a4</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e9bf409daba04ed3bc5b94575c33742b</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a84dd5441e7f4a43a4fe232ae91f567b</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-8b408e415b7b4b6bbfa7354b27b874ba</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f631abfabfcf4f2e8f96f6a07584d1fd</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e00eb51431a64a36ba33d92c4b457e9c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-908638e4995048f2b90d633a1720b128</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ae2fa4d7f2414d598ba870481d1f61eb</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-596a2b60a3fc4d10a09c810126bf64c7</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">typeCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span>
+</span>" <span class="scTag">use</span>="<span class="scContent">optional</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-53e8aa11d9f14ab6b39468b132700e1b</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">actionCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fd33f01144cd4c4697614d113cf987b3</span>"/&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CarrierRouteBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CarrierRouteType">CarrierRouteType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_CarrierRouteBaseType" title="Jump to &quot;CarrierRouteBaseType&quot; type definition.">CarrierRouteBaseType</a>
+</span> (by extension) &lt; <strong>CarrierRouteType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CarrierRouteType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CarrierRouteType_xibox'); return false;" class="control" id="type_CarrierRouteType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CarrierRouteType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em" class="inherited"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em" class="inherited"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualShipDateTime&quot; element declaration could not be found.');">ActualShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledDeliveryDateTime&quot; element declaration could not be found.');">ScheduledDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ActualDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;ActualDeliveryDateTime&quot; element declaration could not be found.');">ActualDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ActualDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RequiredDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedDeliveryDateTime&quot; element declaration could not be found.');">PromisedDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedDeliveryDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;LoadingDateTime&quot; element declaration could not be found." onclick="alert('&quot;LoadingDateTime&quot; element declaration could not be found.');">LoadingDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'LoadingDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EarliestShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;EarliestShipDateTime&quot; element declaration could not be found.');">EarliestShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EarliestShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PromisedShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;PromisedShipDateTime&quot; element declaration could not be found.');">PromisedShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PromisedShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ScheduledShipDateTime&quot; element declaration could not be found." onclick="alert('&quot;ScheduledShipDateTime&quot; element declaration could not be found.');">ScheduledShipDateTime</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ScheduledShipDateTime', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfLoadingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfLoadingCode&quot; element declaration could not be found.');">PointOfLoadingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfLoadingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfShipmentCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfShipmentCode&quot; element declaration could not be found.');">PointOfShipmentCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfShipmentCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PointOfStagingCode&quot; element declaration could not be found." onclick="alert('&quot;PointOfStagingCode&quot; element declaration could not be found.');">PointOfStagingCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PointOfStagingCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationMethodCode&quot; element declaration could not be found." onclick="alert('&quot;TransportationMethodCode&quot; element declaration could not be found.');">TransportationMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransportationTerm&quot; element declaration could not be found." onclick="alert('&quot;TransportationTerm&quot; element declaration could not be found.');">TransportationTerm</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransportationTerm', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Container&quot; element declaration could not be found." onclick="alert('&quot;Container&quot; element declaration could not be found.');">Container</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Container', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Status&quot; element declaration could not be found." onclick="alert('&quot;Status&quot; element declaration could not be found.');">Status</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Status', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; ... &lt;/<a href="#element_RouteStop" title="Jump to &quot;RouteStop&quot; element declaration.">RouteStop</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RouteStop', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CarrierRouteExtensionType&quot; type definition could not be found." onclick="alert('&quot;CarrierRouteExtensionType&quot; type definition could not be found.');">CarrierRouteExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CarrierRouteType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CarrierRouteType_scbox'); return false;" class="control" id="type_CarrierRouteType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CarrierRouteType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CarrierRouteType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b0dd19d9e5d849769a586e5c8fe0c1de</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CarrierRouteBaseType" title="Jump to &quot;CarrierRouteBaseType&quot; type definition.">CarrierRouteBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CarrierRouteExtensionType&quot; type definition could not be found." onclick="alert('&quot;CarrierRouteExtensionType&quot; type definition could not be found.');">CarrierRouteExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7b7a9d019e0245a894f47a3529a7337e</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CarrierRouteType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RouteStopBaseType">RouteStopBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <strong>RouteStopBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_RouteStopType" title="Jump to &quot;RouteStopType&quot; type definition.">RouteStopType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RouteStopBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RouteStopBaseType_xibox'); return false;" class="control" id="type_RouteStopBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RouteStopBaseType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em" class="newFields"> sequenceNumber="<span class="type">
+<a href="javascript:void(0)" title="&quot;NumberType_B98233&quot; type definition could not be found." onclick="alert('&quot;NumberType_B98233&quot; type definition could not be found.');">NumberType_B98233</a>
+</span> <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Attribute', 'sequenceNumber', docArray);">?</a>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'HazardousMaterial', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; ... &lt;/<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RouteStopBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RouteStopBaseType_scbox'); return false;" class="control" id="type_RouteStopBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RouteStopBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RouteStopBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b2dbae156b954d7688587800f72a57e2</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-629a35eaf3fe4e16a87d8f1065912be6</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-43f2bd3d95a64647917f86a96dfe73bc</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b29a949549074c87a7a7e8096d72a886</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-452cb60ffbf34c98873a7926d3cc88cf</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-66ffa779399548709501269cd1576f00</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5c7d7c80229f46be8aed6f1976c78c9f</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-55ae992ed2a644a582d7dd9dbf5bd631</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c646ccb68f9d4d0384af79051db6dd37</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-28efe339f1b3478ca8bf82f146043c7c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-eaa9c528f8cf497c8eca8a65d28bbc80</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-85944d9775b3405886376e2c417b5c41</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">sequenceNumber</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;NumberType_B98233&quot; type definition could not be found." onclick="alert('&quot;NumberType_B98233&quot; type definition could not be found.');">NumberType_B98233</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-2c484bf45fde4b32a487f12dac45bf96</span>"/&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RouteStopBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RouteStopType">RouteStopType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <span class="type">
+<a href="#type_RouteStopBaseType" title="Jump to &quot;RouteStopBaseType&quot; type definition.">RouteStopBaseType</a>
+</span> (by extension) &lt; <strong>RouteStopType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RouteStopType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RouteStopType_xibox'); return false;" class="control" id="type_RouteStopType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RouteStopType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em" class="inherited"> sequenceNumber="<span class="type">
+<a href="javascript:void(0)" title="&quot;NumberType_B98233&quot; type definition could not be found." onclick="alert('&quot;NumberType_B98233&quot; type definition could not be found.');">NumberType_B98233</a>
+</span> <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Attribute', 'sequenceNumber', docArray);">?</a>"</span>&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found." onclick="alert('&quot;ShippingWeightAndVolumeGroup&quot; group definition could not be found.');">ShippingWeightAndVolumeGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;HazardousMaterial&quot; element declaration could not be found." onclick="alert('&quot;HazardousMaterial&quot; element declaration could not be found.');">HazardousMaterial</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'HazardousMaterial', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Charge&quot; element declaration could not be found." onclick="alert('&quot;Charge&quot; element declaration could not be found.');">Charge</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Charge', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RouteStopParty&quot; element declaration could not be found." onclick="alert('&quot;RouteStopParty&quot; element declaration could not be found.');">RouteStopParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DocumentReference&quot; element declaration could not be found." onclick="alert('&quot;DocumentReference&quot; element declaration could not be found.');">DocumentReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; ... &lt;/<a href="#element_StopDetail" title="Jump to &quot;StopDetail&quot; element declaration.">StopDetail</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RouteStopExtensionType&quot; type definition could not be found." onclick="alert('&quot;RouteStopExtensionType&quot; type definition could not be found.');">RouteStopExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RouteStopType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RouteStopType_scbox'); return false;" class="control" id="type_RouteStopType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RouteStopType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RouteStopType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c7e418cb966943e182f0885d6f06abbe</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RouteStopBaseType" title="Jump to &quot;RouteStopBaseType&quot; type definition.">RouteStopBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RouteStopExtensionType&quot; type definition could not be found." onclick="alert('&quot;RouteStopExtensionType&quot; type definition could not be found.');">RouteStopExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6bf8199d38594d15b2786aa8df3f0f5c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RouteStopType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_StopDetailBaseType">StopDetailBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <strong>StopDetailBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_StopDetailType" title="Jump to &quot;StopDetailType&quot; type definition.">StopDetailType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>StopDetailBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_StopDetailBaseType_xibox'); return false;" class="control" id="type_StopDetailBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_StopDetailBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipmentReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillOfLadingReference', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_StopDetailBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_StopDetailBaseType_scbox'); return false;" class="control" id="type_StopDetailBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_StopDetailBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">StopDetailBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-334ba81435df48df931d8507a33fd9c9</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b89fba9eed1a465e8b569b9ac7b9f387</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-85e89a67902d49bd93d6e6e04243246d</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d9b5763b24a94e588d1bd3169bd06ebf</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-26883008f3cb41cb83ac9471f032c996</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-39319b62cfad492ba965f54776ea65ce</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e9f769efb5c0426fadd5593a4cfea017</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-427e7a99e16243929d448c2170ddaac4</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-57dc9e81f63b43f3ac4a7c35ebbd5e25</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b05630c3a3cf4c16a53d48344e579925</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f666a94ac1d644b7bc89c92e4d579bae</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_StopDetailBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_StopDetailType">StopDetailType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <span class="type">
+<a href="#type_StopDetailBaseType" title="Jump to &quot;StopDetailBaseType&quot; type definition.">StopDetailBaseType</a>
+</span> (by extension) &lt; <strong>StopDetailType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>StopDetailType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_StopDetailType_xibox'); return false;" class="control" id="type_StopDetailType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_StopDetailType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ContainerID&quot; element declaration could not be found." onclick="alert('&quot;ContainerID&quot; element declaration could not be found.');">ContainerID</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ContainerID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TrackingID&quot; element declaration could not be found." onclick="alert('&quot;TrackingID&quot; element declaration could not be found.');">TrackingID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TrackingID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipToParty&quot; element declaration could not be found." onclick="alert('&quot;ShipToParty&quot; element declaration could not be found.');">ShipToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CarrierParty&quot; element declaration could not be found." onclick="alert('&quot;CarrierParty&quot; element declaration could not be found.');">CarrierParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipUnitReference&quot; element declaration could not be found." onclick="alert('&quot;ShipUnitReference&quot; element declaration could not be found.');">ShipUnitReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ShipmentReference&quot; element declaration could not be found." onclick="alert('&quot;ShipmentReference&quot; element declaration could not be found.');">ShipmentReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ShipmentReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillOfLadingReference&quot; element declaration could not be found." onclick="alert('&quot;BillOfLadingReference&quot; element declaration could not be found.');">BillOfLadingReference</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillOfLadingReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;StopDetailExtensionType&quot; type definition could not be found." onclick="alert('&quot;StopDetailExtensionType&quot; type definition could not be found.');">StopDetailExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_StopDetailType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_StopDetailType_scbox'); return false;" class="control" id="type_StopDetailType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_StopDetailType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">StopDetailType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5fcb60faabe647ed8ac0c1dcda2b3d6a</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_StopDetailBaseType" title="Jump to &quot;StopDetailBaseType&quot; type definition.">StopDetailBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StopDetailExtensionType&quot; type definition could not be found." onclick="alert('&quot;StopDetailExtensionType&quot; type definition could not be found.');">StopDetailExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-35921afb30974ed4b405081bfc5a4042</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_StopDetailType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<p class="footer">Generated by <a href="http://titanium.dstc.edu.au/xml/xs3p">xs3p</a>. Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

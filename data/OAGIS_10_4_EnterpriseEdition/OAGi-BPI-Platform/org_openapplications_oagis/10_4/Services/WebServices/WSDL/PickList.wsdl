@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/PickList.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgePickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponsePickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPickList.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPickList">
+		<part name="Message" element="oa:CancelPickList"/>
+	</message>
+	<message name="CancelAcknowledgePickList">
+		<part name="Message" element="oa:CancelAcknowledgePickList"/>
+	</message>
+	<message name="ChangePickList">
+		<part name="Message" element="oa:ChangePickList"/>
+	</message>
+	<message name="ChangeAcknowledgePickList">
+		<part name="Message" element="oa:ChangeAcknowledgePickList"/>
+	</message>
+	<message name="GetPickList">
+		<part name="Message" element="oa:GetPickList"/>
+	</message>
+	<message name="ShowPickList">
+		<part name="Message" element="oa:ShowPickList"/>
+	</message>
+	<message name="ProcessPickList">
+		<part name="Message" element="oa:ProcessPickList"/>
+	</message>
+	<message name="AcknowledgePickList">
+		<part name="Message" element="oa:AcknowledgePickList"/>
+	</message>
+	<message name="SyncPickList">
+		<part name="Message" element="oa:SyncPickList"/>
+	</message>
+	<message name="SyncResponsePickList">
+		<part name="Message" element="oa:SyncResponsePickList"/>
+	</message>
+	<message name="NotifyPickList">
+		<part name="Message" element="oa:NotifyPickList"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPickListPortType">
+		<operation name="ProcessPickList">
+			<input message="oaws:ProcessPickList"/>
+		</operation>
+		<operation name="ChangePickList">
+			<input message="oaws:ChangePickList"/>
+		</operation>
+		<operation name="CancelPickList">
+			<input message="oaws:CancelPickList"/>
+		</operation>
+		<operation name="GetPickList">
+			<input message="oaws:GetPickList"/>
+		</operation>
+		<operation name="SyncPickList">
+			<input message="oaws:SyncPickList"/>
+		</operation>
+		<operation name="NotifyPickList">
+			<input message="oaws:NotifyPickList"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePickListPortType">
+		<operation name="AcknowledgePickList">
+			<input message="oaws:AcknowledgePickList"/>
+		</operation>
+		<operation name="ChangeAcknowledgePickList">
+			<input message="oaws:ChangeAcknowledgePickList"/>
+		</operation>
+		<operation name="CancelAcknowledgePickList">
+			<input message="oaws:CancelAcknowledgePickList"/>
+		</operation>
+		<operation name="ShowPickList">
+			<input message="oaws:ShowPickList"/>
+		</operation>
+		<operation name="SyncResponsePickList">
+			<input message="oaws:SyncResponsePickList"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncPickListPortType">
+		<operation name="ProcessPickList">
+			<input message="oaws:ProcessPickList"/>
+			<output message="oaws:AcknowledgePickList"/>
+		</operation>
+		<operation name="ChangePickList">
+			<input message="oaws:ChangePickList"/>
+			<output message="oaws:ChangeAcknowledgePickList"/>
+		</operation>
+		<operation name="CancelPickList">
+			<input message="oaws:CancelPickList"/>
+			<output message="oaws:CancelAcknowledgePickList"/>
+		</operation>
+		<operation name="GetPickList">
+			<input message="oaws:GetPickList"/>
+			<output message="oaws:ShowPickList"/>
+		</operation>
+		<operation name="SyncPickList">
+			<input message="oaws:SyncPickList"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPickList">
+			<input message="oaws:NotifyPickList"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPickListBinding" type="oaws:RequestPickListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePickListBinding" type="oaws:ResponsePickListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponsePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncPickListBinding" type="oaws:SyncPickListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPickList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PickList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPickListService">
+		<port name="RequestPickListBinding" binding="oaws:RequestPickListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestPickList"/>
+		</port>
+	</service>
+	<service name="ResponsePickListService">
+		<port name="ResponsePickListBinding" binding="oaws:ResponsePickListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponsePickList"/>
+		</port>
+	</service>
+	<service name="SyncPickListService">
+		<port name="SyncPickListBinding" binding="oaws:SyncPickListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncPickList"/>
+		</port>
+	</service>
+</definitions>

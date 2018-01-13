@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_2  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Services/WebServices/WSDL/MatchDocument.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgeMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponseMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyMatchDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelMatchDocument">
+		<part name="Message" element="oa:CancelMatchDocument"/>
+	</message>
+	<message name="CancelAcknowledgeMatchDocument">
+		<part name="Message" element="oa:CancelAcknowledgeMatchDocument"/>
+	</message>
+	<message name="ChangeMatchDocument">
+		<part name="Message" element="oa:ChangeMatchDocument"/>
+	</message>
+	<message name="ChangeAcknowledgeMatchDocument">
+		<part name="Message" element="oa:ChangeAcknowledgeMatchDocument"/>
+	</message>
+	<message name="GetMatchDocument">
+		<part name="Message" element="oa:GetMatchDocument"/>
+	</message>
+	<message name="ShowMatchDocument">
+		<part name="Message" element="oa:ShowMatchDocument"/>
+	</message>
+	<message name="PostMatchDocument">
+		<part name="Message" element="oa:PostMatchDocument"/>
+	</message>
+	<message name="PostAcknowledgeMatchDocument">
+		<part name="Message" element="oa:PostAcknowledgeMatchDocument"/>
+	</message>
+	<message name="LoadMatchDocument">
+		<part name="Message" element="oa:LoadMatchDocument"/>
+	</message>
+	<message name="LoadResponseMatchDocument">
+		<part name="Message" element="oa:LoadResponseMatchDocument"/>
+	</message>
+	<message name="NotifyMatchDocument">
+		<part name="Message" element="oa:NotifyMatchDocument"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestMatchDocumentPortType">
+		<operation name="PostMatchDocument">
+			<input message="oaws:PostMatchDocument"/>
+		</operation>
+		<operation name="ChangeMatchDocument">
+			<input message="oaws:ChangeMatchDocument"/>
+		</operation>
+		<operation name="CancelMatchDocument">
+			<input message="oaws:CancelMatchDocument"/>
+		</operation>
+		<operation name="GetMatchDocument">
+			<input message="oaws:GetMatchDocument"/>
+		</operation>
+		<operation name="LoadMatchDocument">
+			<input message="oaws:LoadMatchDocument"/>
+		</operation>
+		<operation name="NotifyMatchDocument">
+			<input message="oaws:NotifyMatchDocument"/>
+		</operation>
+	</portType>
+	<portType name="ResponseMatchDocumentPortType">
+		<operation name="PostAcknowledgeMatchDocument">
+			<input message="oaws:PostAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="ChangeAcknowledgeMatchDocument">
+			<input message="oaws:ChangeAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="CancelAcknowledgeMatchDocument">
+			<input message="oaws:CancelAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="ShowMatchDocument">
+			<input message="oaws:ShowMatchDocument"/>
+		</operation>
+		<operation name="LoadResponseMatchDocument">
+			<input message="oaws:LoadResponseMatchDocument"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadMatchDocumentPortType">
+		<operation name="PostMatchDocument">
+			<input message="oaws:PostMatchDocument"/>
+			<output message="oaws:PostAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="ChangeMatchDocument">
+			<input message="oaws:ChangeMatchDocument"/>
+			<output message="oaws:ChangeAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="CancelMatchDocument">
+			<input message="oaws:CancelMatchDocument"/>
+			<output message="oaws:CancelAcknowledgeMatchDocument"/>
+		</operation>
+		<operation name="GetMatchDocument">
+			<input message="oaws:GetMatchDocument"/>
+			<output message="oaws:ShowMatchDocument"/>
+		</operation>
+		<operation name="LoadMatchDocument">
+			<input message="oaws:LoadMatchDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyMatchDocument">
+			<input message="oaws:NotifyMatchDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestMatchDocumentBinding" type="oaws:RequestMatchDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseMatchDocumentBinding" type="oaws:ResponseMatchDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgeMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponseMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadMatchDocumentBinding" type="oaws:LoadMatchDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyMatchDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MatchDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestMatchDocumentService">
+		<port name="RequestMatchDocumentBinding" binding="oaws:RequestMatchDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/RequestMatchDocument"/>
+		</port>
+	</service>
+	<service name="ResponseMatchDocumentService">
+		<port name="ResponseMatchDocumentBinding" binding="oaws:ResponseMatchDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/ResponseMatchDocument"/>
+		</port>
+	</service>
+	<service name="LoadMatchDocumentService">
+		<port name="LoadMatchDocumentBinding" binding="oaws:LoadMatchDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/LoadMatchDocument"/>
+		</port>
+	</service>
+</definitions>

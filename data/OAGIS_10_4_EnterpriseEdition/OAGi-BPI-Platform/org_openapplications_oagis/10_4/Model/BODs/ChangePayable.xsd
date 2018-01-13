@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downChange package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangePayable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Payable.xsd"/>
+	<xsd:element name="ChangePayable" type="ChangePayableType" id="oagis-id-d3b7c92dc691481691164cc77ea534d8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangePayable is to transmit data to create a payable open item in a payables application from the purchasing information generated in a purchasing application.  The ChangePayable may also update the General Ledger, depending on the specific architecture of the financial applications.
+
+The scope of the ChangePayable indicates that the supplier's invoice is ready to be paid and has already been approved before the information moves to the accounts payable application.  An approved invoice is also known as the voucher.  OAGIS will define the scenario of invoices that get matched within the accounts payable application in a separate Business Service Request later.
+
+Some financial applications have the general ledger and accounts payable databases tightly integrated where updates to the accounts payable application are automatically reflected in the general ledger balances.
+</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The ChangePayable will transmit all information needed for both the accounts payable and the general ledger.
+
+Other applications allow the general ledger balances to be updated separately from the accounts payable.  The second model illustrates that the combination of the ChangePayable and ChangeJournalEntry will accomplish this scenario.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangePayableType" id="oagis-id-672c58523b874ba5a3e048cefe55b6e1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangePayableDataAreaType" id="oagis-id-1d6217ca36b14a229d98e387cef2cfc5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangePayable. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (Payable).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangePayableDataAreaType" id="oagis-id-8840ffb8159e426a87adc5baeab07a44">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-d587556cc3974c87b2d2b5be271b967c"/>
+			<xsd:element ref="Payable" maxOccurs="unbounded" id="oagis-id-044a045bef1e4a05addf5532958c89de"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

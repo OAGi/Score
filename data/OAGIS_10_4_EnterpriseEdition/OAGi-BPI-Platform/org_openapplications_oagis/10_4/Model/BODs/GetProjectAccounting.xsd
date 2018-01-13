@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProjectAccounting.xsd"/>
+        <xsd:element name="GetProjectAccounting" type="GetProjectAccountingType" id="oagis-id-834512a9a67949c2819df37af08083dd">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetProjectAccounting is to enable an application to request specific ProjectAccounting information from another business application module.  The response to the GetProjectAccounting is the ShowProjectAccounting.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetProjectAccountingType" id="oagis-id-c1676838c9ad47e4913dc607ae827d7e">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetProjectAccountingDataAreaType" id="oagis-id-c37c56508c3b4de290fc6fd7c9dc9a21">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetProjectAccounting. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ProjectAccounting).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetProjectAccountingDataAreaType" id="oagis-id-1c4e952cac43498fb8dcf34deb7a9507">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-8d1969f55add499d88553f630488778a"/>
+                        <xsd:element ref="ProjectAccounting" maxOccurs="unbounded" id="oagis-id-72f54e25110b4ba68ad0585c8f7e90d2"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

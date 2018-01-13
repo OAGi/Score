@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowChartOfAccounts.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ChartOfAccounts.xsd"/>
+        <xsd:element name="ShowChartOfAccounts" type="ShowChartOfAccountsType" id="oagis-id-58612fc8985c4f8d8b7a0dc6f01f04b4">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowChartOfAccounts is to supply ChartOfAccounts information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowChartOfAccountsType" id="oagis-id-2c2367591b9a4983881beaa9ec8971a0">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowChartOfAccountsDataAreaType" id="oagis-id-494dd7cb84ad4630b444286babb96f8c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowChartOfAccounts. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ChartOfAccounts).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowChartOfAccountsDataAreaType" id="oagis-id-5d875cad6641414ba8849128aa83b627">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-b1644cc444f6485981efb285a1a67e36"/>
+                        <xsd:element ref="ChartOfAccounts" maxOccurs="unbounded" id="oagis-id-c501aef607b74335a998dbb596f415fe"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

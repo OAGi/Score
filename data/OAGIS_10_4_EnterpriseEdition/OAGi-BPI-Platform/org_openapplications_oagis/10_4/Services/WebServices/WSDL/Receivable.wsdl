@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Receivable.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgeReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponseReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyReceivable.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelReceivable">
+		<part name="Message" element="oa:CancelReceivable"/>
+	</message>
+	<message name="CancelAcknowledgeReceivable">
+		<part name="Message" element="oa:CancelAcknowledgeReceivable"/>
+	</message>
+	<message name="ChangeReceivable">
+		<part name="Message" element="oa:ChangeReceivable"/>
+	</message>
+	<message name="ChangeAcknowledgeReceivable">
+		<part name="Message" element="oa:ChangeAcknowledgeReceivable"/>
+	</message>
+	<message name="GetReceivable">
+		<part name="Message" element="oa:GetReceivable"/>
+	</message>
+	<message name="ShowReceivable">
+		<part name="Message" element="oa:ShowReceivable"/>
+	</message>
+	<message name="PostReceivable">
+		<part name="Message" element="oa:PostReceivable"/>
+	</message>
+	<message name="PostAcknowledgeReceivable">
+		<part name="Message" element="oa:PostAcknowledgeReceivable"/>
+	</message>
+	<message name="LoadReceivable">
+		<part name="Message" element="oa:LoadReceivable"/>
+	</message>
+	<message name="LoadResponseReceivable">
+		<part name="Message" element="oa:LoadResponseReceivable"/>
+	</message>
+	<message name="NotifyReceivable">
+		<part name="Message" element="oa:NotifyReceivable"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestReceivablePortType">
+		<operation name="PostReceivable">
+			<input message="oaws:PostReceivable"/>
+		</operation>
+		<operation name="ChangeReceivable">
+			<input message="oaws:ChangeReceivable"/>
+		</operation>
+		<operation name="CancelReceivable">
+			<input message="oaws:CancelReceivable"/>
+		</operation>
+		<operation name="GetReceivable">
+			<input message="oaws:GetReceivable"/>
+		</operation>
+		<operation name="LoadReceivable">
+			<input message="oaws:LoadReceivable"/>
+		</operation>
+		<operation name="NotifyReceivable">
+			<input message="oaws:NotifyReceivable"/>
+		</operation>
+	</portType>
+	<portType name="ResponseReceivablePortType">
+		<operation name="PostAcknowledgeReceivable">
+			<input message="oaws:PostAcknowledgeReceivable"/>
+		</operation>
+		<operation name="ChangeAcknowledgeReceivable">
+			<input message="oaws:ChangeAcknowledgeReceivable"/>
+		</operation>
+		<operation name="CancelAcknowledgeReceivable">
+			<input message="oaws:CancelAcknowledgeReceivable"/>
+		</operation>
+		<operation name="ShowReceivable">
+			<input message="oaws:ShowReceivable"/>
+		</operation>
+		<operation name="LoadResponseReceivable">
+			<input message="oaws:LoadResponseReceivable"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadReceivablePortType">
+		<operation name="PostReceivable">
+			<input message="oaws:PostReceivable"/>
+			<output message="oaws:PostAcknowledgeReceivable"/>
+		</operation>
+		<operation name="ChangeReceivable">
+			<input message="oaws:ChangeReceivable"/>
+			<output message="oaws:ChangeAcknowledgeReceivable"/>
+		</operation>
+		<operation name="CancelReceivable">
+			<input message="oaws:CancelReceivable"/>
+			<output message="oaws:CancelAcknowledgeReceivable"/>
+		</operation>
+		<operation name="GetReceivable">
+			<input message="oaws:GetReceivable"/>
+			<output message="oaws:ShowReceivable"/>
+		</operation>
+		<operation name="LoadReceivable">
+			<input message="oaws:LoadReceivable"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyReceivable">
+			<input message="oaws:NotifyReceivable"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestReceivableBinding" type="oaws:RequestReceivablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseReceivableBinding" type="oaws:ResponseReceivablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgeReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponseReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadReceivableBinding" type="oaws:LoadReceivablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyReceivable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Receivable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestReceivableService">
+		<port name="RequestReceivableBinding" binding="oaws:RequestReceivableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestReceivable"/>
+		</port>
+	</service>
+	<service name="ResponseReceivableService">
+		<port name="ResponseReceivableBinding" binding="oaws:ResponseReceivableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseReceivable"/>
+		</port>
+	</service>
+	<service name="LoadReceivableService">
+		<port name="LoadReceivableBinding" binding="oaws:LoadReceivableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/LoadReceivable"/>
+		</port>
+	</service>
+</definitions>

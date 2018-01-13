@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/PriceList.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgePriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponsePriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPriceList.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPriceList">
+		<part name="Message" element="oa:CancelPriceList"/>
+	</message>
+	<message name="CancelAcknowledgePriceList">
+		<part name="Message" element="oa:CancelAcknowledgePriceList"/>
+	</message>
+	<message name="ChangePriceList">
+		<part name="Message" element="oa:ChangePriceList"/>
+	</message>
+	<message name="ChangeAcknowledgePriceList">
+		<part name="Message" element="oa:ChangeAcknowledgePriceList"/>
+	</message>
+	<message name="GetPriceList">
+		<part name="Message" element="oa:GetPriceList"/>
+	</message>
+	<message name="ShowPriceList">
+		<part name="Message" element="oa:ShowPriceList"/>
+	</message>
+	<message name="ProcessPriceList">
+		<part name="Message" element="oa:ProcessPriceList"/>
+	</message>
+	<message name="AcknowledgePriceList">
+		<part name="Message" element="oa:AcknowledgePriceList"/>
+	</message>
+	<message name="SyncPriceList">
+		<part name="Message" element="oa:SyncPriceList"/>
+	</message>
+	<message name="SyncResponsePriceList">
+		<part name="Message" element="oa:SyncResponsePriceList"/>
+	</message>
+	<message name="NotifyPriceList">
+		<part name="Message" element="oa:NotifyPriceList"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPriceListPortType">
+		<operation name="ProcessPriceList">
+			<input message="oaws:ProcessPriceList"/>
+		</operation>
+		<operation name="ChangePriceList">
+			<input message="oaws:ChangePriceList"/>
+		</operation>
+		<operation name="CancelPriceList">
+			<input message="oaws:CancelPriceList"/>
+		</operation>
+		<operation name="GetPriceList">
+			<input message="oaws:GetPriceList"/>
+		</operation>
+		<operation name="SyncPriceList">
+			<input message="oaws:SyncPriceList"/>
+		</operation>
+		<operation name="NotifyPriceList">
+			<input message="oaws:NotifyPriceList"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePriceListPortType">
+		<operation name="AcknowledgePriceList">
+			<input message="oaws:AcknowledgePriceList"/>
+		</operation>
+		<operation name="ChangeAcknowledgePriceList">
+			<input message="oaws:ChangeAcknowledgePriceList"/>
+		</operation>
+		<operation name="CancelAcknowledgePriceList">
+			<input message="oaws:CancelAcknowledgePriceList"/>
+		</operation>
+		<operation name="ShowPriceList">
+			<input message="oaws:ShowPriceList"/>
+		</operation>
+		<operation name="SyncResponsePriceList">
+			<input message="oaws:SyncResponsePriceList"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncPriceListPortType">
+		<operation name="ProcessPriceList">
+			<input message="oaws:ProcessPriceList"/>
+			<output message="oaws:AcknowledgePriceList"/>
+		</operation>
+		<operation name="ChangePriceList">
+			<input message="oaws:ChangePriceList"/>
+			<output message="oaws:ChangeAcknowledgePriceList"/>
+		</operation>
+		<operation name="CancelPriceList">
+			<input message="oaws:CancelPriceList"/>
+			<output message="oaws:CancelAcknowledgePriceList"/>
+		</operation>
+		<operation name="GetPriceList">
+			<input message="oaws:GetPriceList"/>
+			<output message="oaws:ShowPriceList"/>
+		</operation>
+		<operation name="SyncPriceList">
+			<input message="oaws:SyncPriceList"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPriceList">
+			<input message="oaws:NotifyPriceList"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPriceListBinding" type="oaws:RequestPriceListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePriceListBinding" type="oaws:ResponsePriceListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponsePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncPriceListBinding" type="oaws:SyncPriceListPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPriceList">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PriceList.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPriceListService">
+		<port name="RequestPriceListBinding" binding="oaws:RequestPriceListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestPriceList"/>
+		</port>
+	</service>
+	<service name="ResponsePriceListService">
+		<port name="ResponsePriceListBinding" binding="oaws:ResponsePriceListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponsePriceList"/>
+		</port>
+	</service>
+	<service name="SyncPriceListService">
+		<port name="SyncPriceListBinding" binding="oaws:SyncPriceListBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncPriceList"/>
+		</port>
+	</service>
+</definitions>

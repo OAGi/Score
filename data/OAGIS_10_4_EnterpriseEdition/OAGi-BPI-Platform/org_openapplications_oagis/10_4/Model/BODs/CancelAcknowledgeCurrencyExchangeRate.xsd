@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeCurrencyExchangeRate.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CurrencyExchangeRate.xsd"/>
+	<xsd:element name="CancelAcknowledgeCurrencyExchangeRate" type="CancelAcknowledgeCurrencyExchangeRateType" id="oagis-id-713eb3dbb4854436984a08eccb22c9a4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeCurrencyExchangeRate is to enable the passing of updates of currency exchange rates to other applications that have exchange rate tables.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeCurrencyExchangeRateType" id="oagis-id-679ba670578746de84c62f0d660583c4">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeCurrencyExchangeRateDataAreaType" id="oagis-id-ee7eca56229642e883ae36f45c09740c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeCurrencyExchangeRate. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (CurrencyExchangeRate).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeCurrencyExchangeRateDataAreaType" id="oagis-id-b8a23a179c094548b649c733a9e98019">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-a910586d58f04f3cb845555d20df709b"/>
+			<xsd:element ref="CurrencyExchangeRate" maxOccurs="unbounded" id="oagis-id-7e5a116c82e04f8bb9e96c75f481aded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

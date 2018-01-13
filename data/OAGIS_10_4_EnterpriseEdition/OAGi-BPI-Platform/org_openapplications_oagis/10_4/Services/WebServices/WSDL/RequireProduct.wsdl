@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/RequireProduct.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRequireProduct.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRequireProduct">
+		<part name="Message" element="oa:CancelRequireProduct"/>
+	</message>
+	<message name="CancelAcknowledgeRequireProduct">
+		<part name="Message" element="oa:CancelAcknowledgeRequireProduct"/>
+	</message>
+	<message name="ChangeRequireProduct">
+		<part name="Message" element="oa:ChangeRequireProduct"/>
+	</message>
+	<message name="ChangeAcknowledgeRequireProduct">
+		<part name="Message" element="oa:ChangeAcknowledgeRequireProduct"/>
+	</message>
+	<message name="GetRequireProduct">
+		<part name="Message" element="oa:GetRequireProduct"/>
+	</message>
+	<message name="ShowRequireProduct">
+		<part name="Message" element="oa:ShowRequireProduct"/>
+	</message>
+	<message name="ProcessRequireProduct">
+		<part name="Message" element="oa:ProcessRequireProduct"/>
+	</message>
+	<message name="AcknowledgeRequireProduct">
+		<part name="Message" element="oa:AcknowledgeRequireProduct"/>
+	</message>
+	<message name="SyncRequireProduct">
+		<part name="Message" element="oa:SyncRequireProduct"/>
+	</message>
+	<message name="SyncResponseRequireProduct">
+		<part name="Message" element="oa:SyncResponseRequireProduct"/>
+	</message>
+	<message name="NotifyRequireProduct">
+		<part name="Message" element="oa:NotifyRequireProduct"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRequireProductPortType">
+		<operation name="ProcessRequireProduct">
+			<input message="oaws:ProcessRequireProduct"/>
+		</operation>
+		<operation name="ChangeRequireProduct">
+			<input message="oaws:ChangeRequireProduct"/>
+		</operation>
+		<operation name="CancelRequireProduct">
+			<input message="oaws:CancelRequireProduct"/>
+		</operation>
+		<operation name="GetRequireProduct">
+			<input message="oaws:GetRequireProduct"/>
+		</operation>
+		<operation name="SyncRequireProduct">
+			<input message="oaws:SyncRequireProduct"/>
+		</operation>
+		<operation name="NotifyRequireProduct">
+			<input message="oaws:NotifyRequireProduct"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRequireProductPortType">
+		<operation name="AcknowledgeRequireProduct">
+			<input message="oaws:AcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRequireProduct">
+			<input message="oaws:ChangeAcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="CancelAcknowledgeRequireProduct">
+			<input message="oaws:CancelAcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="ShowRequireProduct">
+			<input message="oaws:ShowRequireProduct"/>
+		</operation>
+		<operation name="SyncResponseRequireProduct">
+			<input message="oaws:SyncResponseRequireProduct"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRequireProductPortType">
+		<operation name="ProcessRequireProduct">
+			<input message="oaws:ProcessRequireProduct"/>
+			<output message="oaws:AcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="ChangeRequireProduct">
+			<input message="oaws:ChangeRequireProduct"/>
+			<output message="oaws:ChangeAcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="CancelRequireProduct">
+			<input message="oaws:CancelRequireProduct"/>
+			<output message="oaws:CancelAcknowledgeRequireProduct"/>
+		</operation>
+		<operation name="GetRequireProduct">
+			<input message="oaws:GetRequireProduct"/>
+			<output message="oaws:ShowRequireProduct"/>
+		</operation>
+		<operation name="SyncRequireProduct">
+			<input message="oaws:SyncRequireProduct"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRequireProduct">
+			<input message="oaws:NotifyRequireProduct"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRequireProductBinding" type="oaws:RequestRequireProductPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRequireProductBinding" type="oaws:ResponseRequireProductPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRequireProductBinding" type="oaws:SyncRequireProductPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRequireProduct">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RequireProduct.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRequireProductService">
+		<port name="RequestRequireProductBinding" binding="oaws:RequestRequireProductBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRequireProduct"/>
+		</port>
+	</service>
+	<service name="ResponseRequireProductService">
+		<port name="ResponseRequireProductBinding" binding="oaws:ResponseRequireProductBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRequireProduct"/>
+		</port>
+	</service>
+	<service name="SyncRequireProductService">
+		<port name="SyncRequireProductBinding" binding="oaws:SyncRequireProductBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRequireProduct"/>
+		</port>
+	</service>
+</definitions>

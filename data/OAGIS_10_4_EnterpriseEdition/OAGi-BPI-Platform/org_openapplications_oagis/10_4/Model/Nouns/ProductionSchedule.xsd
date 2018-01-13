@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/ProductionSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="ProductionSchedule" type="ProductionScheduleType" id="oagis-id-5a3728eaf34d47f583a5b23860ea4431">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ProductionSchedule is generally used in the Process Manufacturing Industries to schedule a Production run or multiple production runs.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProductionRequest" type="ProductionRequestType" id="oagis-id-10d17bab6bb740d8b378fb1975fd21ff"/>
+	<xsd:complexType name="ProductionScheduleBaseType" id="oagis-id-486cec7da8f74ed7b8b5b9719ba2e444">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Description" id="oagis-id-abdb68eff1a14dc1b22a4654350dce58" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Location" id="oagis-id-aa251083850d48a38445bf5cd6c59cf3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The location of a thing, as captured by an address (or addresses), GPS Coordinates, and/or in relation to other locations.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DocumentDateTime" id="oagis-id-ca3a3a0b43414b6e9b829b61a7f1f0ba" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date that document was created within the system of record.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReportTimePeriod" id="oagis-id-96a0473bad264f7b85e9eac7c7aab88d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time period that the report covers. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EquipmentElementLevel" id="oagis-id-4f6ec5d326b4438d9f6c3fb8e2f97bfd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identification of the associated element of the equipment hierarchy model.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScheduleStateCode" id="oagis-id-0abda93f86b440a59ed5264690b1466a" minOccurs="0"/>
+					<xsd:element ref="ProductionRequest" id="oagis-id-6e0551d8aed74f1087378c880a6153b8" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionScheduleType" id="oagis-id-02551ccc4b7e4f889050c3f9315b8676">
+		<xsd:complexContent>
+			<xsd:extension base="ProductionScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductionScheduleExtensionType" id="oagis-id-96c672412bc74ce19cd1284207b9a614" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionRequestBaseType" id="oagis-id-d2cd5808e2944d6a900326933db43d8d">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Description" id="oagis-id-4d440e4a5e804d389097d7800bdabb65" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductProductionRuleID" id="oagis-id-0fa467e9c1594d11a15b72e7ffa8881f" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Location" id="oagis-id-8b9463c8ab4e4f3591235503db2806cf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The location of a thing, as captured by an address (or addresses), GPS Coordinates, and/or in relation to other locations.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReportTimePeriod" id="oagis-id-6c4950ce37ba49bf8edb462ed5d85341" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time period that the report covers. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PriorityCode" id="oagis-id-8858c50c592e42c8b991e6b575ede54b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SegmentRequirement" id="oagis-id-d23a1e4f736843deb91cffdb0002336a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SegmentResponse" id="oagis-id-1991d74931e94512858afafb651f465d" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RequestStateCode" id="oagis-id-44c5f83ed70d49268b60f651e11cd2a7" minOccurs="0"/>
+					<xsd:element ref="RequiredByRequestedSegmentResponseCode" id="oagis-id-26187675bcc2477bb4493592a23bc144" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Add enumerated list of Required, optional</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductionRequestType" id="oagis-id-646ea3051aba451f8977e7e11c5c8e24">
+		<xsd:complexContent>
+			<xsd:extension base="ProductionRequestBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductionRequestExtensionType" id="oagis-id-49732a5edba74814a4af4729a899f12b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

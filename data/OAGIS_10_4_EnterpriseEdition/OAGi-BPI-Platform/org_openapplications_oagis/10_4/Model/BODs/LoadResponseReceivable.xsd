@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downLoadResponse package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/LoadResponseReceivable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Receivable.xsd"/>
+	<xsd:element name="LoadResponseReceivable" type="LoadResponseReceivableType" id="oagis-id-6d1c2dbe4cc94721baf917e02d677876">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadResponseReceiveable is to transmit data to create a receivable open item in a receivable application from the billing information generated in an order management application.  The LoadResponseReceiveable may also update the General Ledger, depending on the specific architecture of the accounting application.
+
+The scope of the LoadResponseReceiveable is to create a BOD to recognize customer obligation (accounts receivable asset).  Specific transactions include:
+1.	Sales Invoice
+2.	Credit Memo
+3.	Debit Memo
+4.	Charge Back
+
+The LoadResponseReceiveable may also be used for transaction that do not originate from an order management application.
+
+The following two models illustrate that the LoadResponseReceiveable may, in some cases, be adequate to update the financial applications, i.e., Receivables and General Ledger, and in other cases, will also require the PostJournal Business Object Document (BOD) to assure the General Ledger account balances are updated.
+</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In the model above, the receivable application is a sub-ledger of the general ledger.  Updates to G/L balances occur via the receivables module, therefore the LoadResponse Receivable contains both receivable and general ledger transaction information.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This other model illustrates the environment that sometime exists when General Ledger updates occur directly from the Order Management application.  The reconciliation between the receivable and general ledger is a function within the financial applications and not of the integration space.  This model allows the G/L balances to be updated in either detail or summarized form.
+
+The scope of the role of the receivable application includes functions such as:
+·	Allowing Cash Application
+·	Dunning
+·	Dispute management
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LoadResponseReceivableType" id="oagis-id-806b85b86c95493896835d07e0c3fef8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="LoadResponseReceivableDataAreaType" id="oagis-id-9a71b2db49e54b778c566f37eca4da2c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadResponseReceivable. The information consists of a Verb and one or more Nouns. The verb (LoadResponse) indicates the action to be performed on the Noun (Receivable).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LoadResponseReceivableDataAreaType" id="oagis-id-8021bbc3d06e48b089fa2f2307e9e198">
+		<xsd:sequence>
+			<xsd:element ref="LoadResponse" id="oagis-id-e411943f1b784c308a0262fc3f75859c"/>
+			<xsd:element ref="Receivable" maxOccurs="unbounded" id="oagis-id-9cb403a4472844d5b718a4eb2d89ef47"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

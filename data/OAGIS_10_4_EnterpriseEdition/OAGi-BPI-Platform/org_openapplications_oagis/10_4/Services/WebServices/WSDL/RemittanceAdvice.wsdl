@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/RemittanceAdvice.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRemittanceAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRemittanceAdvice">
+		<part name="Message" element="oa:CancelRemittanceAdvice"/>
+	</message>
+	<message name="CancelAcknowledgeRemittanceAdvice">
+		<part name="Message" element="oa:CancelAcknowledgeRemittanceAdvice"/>
+	</message>
+	<message name="ChangeRemittanceAdvice">
+		<part name="Message" element="oa:ChangeRemittanceAdvice"/>
+	</message>
+	<message name="ChangeAcknowledgeRemittanceAdvice">
+		<part name="Message" element="oa:ChangeAcknowledgeRemittanceAdvice"/>
+	</message>
+	<message name="GetRemittanceAdvice">
+		<part name="Message" element="oa:GetRemittanceAdvice"/>
+	</message>
+	<message name="ShowRemittanceAdvice">
+		<part name="Message" element="oa:ShowRemittanceAdvice"/>
+	</message>
+	<message name="ProcessRemittanceAdvice">
+		<part name="Message" element="oa:ProcessRemittanceAdvice"/>
+	</message>
+	<message name="AcknowledgeRemittanceAdvice">
+		<part name="Message" element="oa:AcknowledgeRemittanceAdvice"/>
+	</message>
+	<message name="SyncRemittanceAdvice">
+		<part name="Message" element="oa:SyncRemittanceAdvice"/>
+	</message>
+	<message name="SyncResponseRemittanceAdvice">
+		<part name="Message" element="oa:SyncResponseRemittanceAdvice"/>
+	</message>
+	<message name="NotifyRemittanceAdvice">
+		<part name="Message" element="oa:NotifyRemittanceAdvice"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRemittanceAdvicePortType">
+		<operation name="ProcessRemittanceAdvice">
+			<input message="oaws:ProcessRemittanceAdvice"/>
+		</operation>
+		<operation name="ChangeRemittanceAdvice">
+			<input message="oaws:ChangeRemittanceAdvice"/>
+		</operation>
+		<operation name="CancelRemittanceAdvice">
+			<input message="oaws:CancelRemittanceAdvice"/>
+		</operation>
+		<operation name="GetRemittanceAdvice">
+			<input message="oaws:GetRemittanceAdvice"/>
+		</operation>
+		<operation name="SyncRemittanceAdvice">
+			<input message="oaws:SyncRemittanceAdvice"/>
+		</operation>
+		<operation name="NotifyRemittanceAdvice">
+			<input message="oaws:NotifyRemittanceAdvice"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRemittanceAdvicePortType">
+		<operation name="AcknowledgeRemittanceAdvice">
+			<input message="oaws:AcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRemittanceAdvice">
+			<input message="oaws:ChangeAcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="CancelAcknowledgeRemittanceAdvice">
+			<input message="oaws:CancelAcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="ShowRemittanceAdvice">
+			<input message="oaws:ShowRemittanceAdvice"/>
+		</operation>
+		<operation name="SyncResponseRemittanceAdvice">
+			<input message="oaws:SyncResponseRemittanceAdvice"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRemittanceAdvicePortType">
+		<operation name="ProcessRemittanceAdvice">
+			<input message="oaws:ProcessRemittanceAdvice"/>
+			<output message="oaws:AcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="ChangeRemittanceAdvice">
+			<input message="oaws:ChangeRemittanceAdvice"/>
+			<output message="oaws:ChangeAcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="CancelRemittanceAdvice">
+			<input message="oaws:CancelRemittanceAdvice"/>
+			<output message="oaws:CancelAcknowledgeRemittanceAdvice"/>
+		</operation>
+		<operation name="GetRemittanceAdvice">
+			<input message="oaws:GetRemittanceAdvice"/>
+			<output message="oaws:ShowRemittanceAdvice"/>
+		</operation>
+		<operation name="SyncRemittanceAdvice">
+			<input message="oaws:SyncRemittanceAdvice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRemittanceAdvice">
+			<input message="oaws:NotifyRemittanceAdvice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRemittanceAdviceBinding" type="oaws:RequestRemittanceAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRemittanceAdviceBinding" type="oaws:ResponseRemittanceAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRemittanceAdviceBinding" type="oaws:SyncRemittanceAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRemittanceAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RemittanceAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRemittanceAdviceService">
+		<port name="RequestRemittanceAdviceBinding" binding="oaws:RequestRemittanceAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRemittanceAdvice"/>
+		</port>
+	</service>
+	<service name="ResponseRemittanceAdviceService">
+		<port name="ResponseRemittanceAdviceBinding" binding="oaws:ResponseRemittanceAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRemittanceAdvice"/>
+		</port>
+	</service>
+	<service name="SyncRemittanceAdviceService">
+		<port name="SyncRemittanceAdviceBinding" binding="oaws:SyncRemittanceAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRemittanceAdvice"/>
+		</port>
+	</service>
+</definitions>

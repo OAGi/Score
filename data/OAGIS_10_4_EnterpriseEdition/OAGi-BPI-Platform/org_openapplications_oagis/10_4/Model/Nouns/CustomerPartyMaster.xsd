@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/CustomerPartyMaster.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="CustomerPartyMaster" type="CustomerPartyMasterType" id="oagis-id-38b3e90c081b4f33b329e9a4a81bdad6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the Customer Party Master records.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CustomerPartyMasterBaseType" id="oagis-id-ea099b0980e94ef387ce7a0ada228cc4">
+		<xsd:complexContent>
+			<xsd:extension base="PartyMasterBaseType">
+				<xsd:sequence>
+					<!-- Land O'Lakes -->
+					<xsd:element ref="CustomerClassification" id="oagis-id-a3c3b27c9d8d40d4ba9a598785206351" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2"/>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerCredit" id="oagis-id-3c4321bd588c45d98ac65758be4bf24b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies how much a buyer is willing extend credit to a customer beyond normal terms and conditions, e.g., NET 30, and repeated occurrences.  Customers may be put on credit hold.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<!-- Land O'Lakes -->
+					<xsd:element ref="PlannerContact" id="oagis-id-7fed17566eea4596a9560dfa2e8fdf7b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information of the person, organization, department, or group that planned for the timing of the exchange of goods/services that this document is associated at the document or line level.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BuyerContact" id="oagis-id-a3c3c8c9fe0b4e73b76e58170d48a8c3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information for the buying person, organization, department, or group on the associated document or line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivingContact" id="oagis-id-40f62dde43d545c283a13247a9833c08" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information of the person, organization, department, or group that is to receive the contents communicated by the document or line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CustomerPartyMasterType" id="oagis-id-5b7dee01c9f043568e9378262fe9d4db">
+		<xsd:complexContent>
+			<xsd:extension base="CustomerPartyMasterBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CustomerPartyMasterExtensionType" id="oagis-id-9bf4dee8591445bd99ccecf69d8acbce" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

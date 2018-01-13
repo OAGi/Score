@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+	<xsd:element name="CancelAcknowledgeReceiveDelivery" type="CancelAcknowledgeReceiveDeliveryType" id="oagis-id-00594326a6e64c6e8efd298337b52311">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The CancelAcknowledgeReceiveDelivery may be used to update the CancelAcknowledger's internal receiving and order management business applications to indicate that the requested material has arrived, including any unexpected quantity, condition or other exception discrepancies.
+
+The CancelAcknowledgeReceiveDelivery supports receiving at either the line item level and/or the ship unit level.  Intermediate transportation/logistics providers or freight forwarding partners can use this document to acknowledge the receipt of entire shipping units without detailing the corCancelAcknowledgeing contents. 
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeReceiveDeliveryType" id="oagis-id-cefb2b8de30c4b489baa0bb7a40c983a">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeReceiveDeliveryDataAreaType" id="oagis-id-fc578e4f951f4533a4e0920fe5f56f54">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeReceiveDeliveryDataAreaType" id="oagis-id-4f8f90319b3c4568b2796bb99598ffe9">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-a6e5bed58b544f4fb6fbbd463dee7e46"/>
+			<xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-58f474b3a5b947798c0543355b2c1b6f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

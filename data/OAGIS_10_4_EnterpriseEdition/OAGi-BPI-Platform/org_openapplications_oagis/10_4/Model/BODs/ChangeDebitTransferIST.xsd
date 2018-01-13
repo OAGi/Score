@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeDebitTransferIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.008.001.04" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/DebitTransferIST.xsd"/>
+	<xsd:element name="ChangeDebitTransferIST" type="ChangeDebitTransferISTType" id="oagis-id-cd2dbfd67da344dba6f969521afb08ec">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeDebitTransferIST is to enable an application to request specific DebitTransferIST information from another business application module.  The response to the ChangeDebitTransferIST is the ShowDebitTransferIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeDebitTransferISTType" id="oagis-id-94ada6b117124c448a3147df5ebcdd94">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeDebitTransferISTDataAreaType" id="oagis-id-163af71d3f684ddc982bd7a20088d0ea">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeDebitTransferIST. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (DebitTransferIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeDebitTransferISTDataAreaType" id="oagis-id-a12c39406e0b47139c45f7ec30d3fca3">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-8ab7c7d13e424628a67ce49b44974d56"/>
+			<xsd:element ref="DebitTransferIST" maxOccurs="unbounded" id="oagis-id-391313f5b45b4141a7b8002a1b2830e9"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

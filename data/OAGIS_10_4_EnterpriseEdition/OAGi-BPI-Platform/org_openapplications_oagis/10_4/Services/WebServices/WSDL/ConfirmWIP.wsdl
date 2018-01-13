@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ConfirmWIP.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyConfirmWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelConfirmWIP">
+		<part name="Message" element="oa:CancelConfirmWIP"/>
+	</message>
+	<message name="CancelAcknowledgeConfirmWIP">
+		<part name="Message" element="oa:CancelAcknowledgeConfirmWIP"/>
+	</message>
+	<message name="ChangeConfirmWIP">
+		<part name="Message" element="oa:ChangeConfirmWIP"/>
+	</message>
+	<message name="ChangeAcknowledgeConfirmWIP">
+		<part name="Message" element="oa:ChangeAcknowledgeConfirmWIP"/>
+	</message>
+	<message name="GetConfirmWIP">
+		<part name="Message" element="oa:GetConfirmWIP"/>
+	</message>
+	<message name="ShowConfirmWIP">
+		<part name="Message" element="oa:ShowConfirmWIP"/>
+	</message>
+	<message name="ProcessConfirmWIP">
+		<part name="Message" element="oa:ProcessConfirmWIP"/>
+	</message>
+	<message name="AcknowledgeConfirmWIP">
+		<part name="Message" element="oa:AcknowledgeConfirmWIP"/>
+	</message>
+	<message name="SyncConfirmWIP">
+		<part name="Message" element="oa:SyncConfirmWIP"/>
+	</message>
+	<message name="SyncResponseConfirmWIP">
+		<part name="Message" element="oa:SyncResponseConfirmWIP"/>
+	</message>
+	<message name="NotifyConfirmWIP">
+		<part name="Message" element="oa:NotifyConfirmWIP"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestConfirmWIPPortType">
+		<operation name="ProcessConfirmWIP">
+			<input message="oaws:ProcessConfirmWIP"/>
+		</operation>
+		<operation name="ChangeConfirmWIP">
+			<input message="oaws:ChangeConfirmWIP"/>
+		</operation>
+		<operation name="CancelConfirmWIP">
+			<input message="oaws:CancelConfirmWIP"/>
+		</operation>
+		<operation name="GetConfirmWIP">
+			<input message="oaws:GetConfirmWIP"/>
+		</operation>
+		<operation name="SyncConfirmWIP">
+			<input message="oaws:SyncConfirmWIP"/>
+		</operation>
+		<operation name="NotifyConfirmWIP">
+			<input message="oaws:NotifyConfirmWIP"/>
+		</operation>
+	</portType>
+	<portType name="ResponseConfirmWIPPortType">
+		<operation name="AcknowledgeConfirmWIP">
+			<input message="oaws:AcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="ChangeAcknowledgeConfirmWIP">
+			<input message="oaws:ChangeAcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="CancelAcknowledgeConfirmWIP">
+			<input message="oaws:CancelAcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="ShowConfirmWIP">
+			<input message="oaws:ShowConfirmWIP"/>
+		</operation>
+		<operation name="SyncResponseConfirmWIP">
+			<input message="oaws:SyncResponseConfirmWIP"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncConfirmWIPPortType">
+		<operation name="ProcessConfirmWIP">
+			<input message="oaws:ProcessConfirmWIP"/>
+			<output message="oaws:AcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="ChangeConfirmWIP">
+			<input message="oaws:ChangeConfirmWIP"/>
+			<output message="oaws:ChangeAcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="CancelConfirmWIP">
+			<input message="oaws:CancelConfirmWIP"/>
+			<output message="oaws:CancelAcknowledgeConfirmWIP"/>
+		</operation>
+		<operation name="GetConfirmWIP">
+			<input message="oaws:GetConfirmWIP"/>
+			<output message="oaws:ShowConfirmWIP"/>
+		</operation>
+		<operation name="SyncConfirmWIP">
+			<input message="oaws:SyncConfirmWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyConfirmWIP">
+			<input message="oaws:NotifyConfirmWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestConfirmWIPBinding" type="oaws:RequestConfirmWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseConfirmWIPBinding" type="oaws:ResponseConfirmWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncConfirmWIPBinding" type="oaws:SyncConfirmWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyConfirmWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ConfirmWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestConfirmWIPService">
+		<port name="RequestConfirmWIPBinding" binding="oaws:RequestConfirmWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestConfirmWIP"/>
+		</port>
+	</service>
+	<service name="ResponseConfirmWIPService">
+		<port name="ResponseConfirmWIPBinding" binding="oaws:ResponseConfirmWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseConfirmWIP"/>
+		</port>
+	</service>
+	<service name="SyncConfirmWIPService">
+		<port name="SyncConfirmWIPBinding" binding="oaws:SyncConfirmWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncConfirmWIP"/>
+		</port>
+	</service>
+</definitions>

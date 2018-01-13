@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Invoice.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelInvoice">
+		<part name="Message" element="oa:CancelInvoice"/>
+	</message>
+	<message name="CancelAcknowledgeInvoice">
+		<part name="Message" element="oa:CancelAcknowledgeInvoice"/>
+	</message>
+	<message name="ChangeInvoice">
+		<part name="Message" element="oa:ChangeInvoice"/>
+	</message>
+	<message name="ChangeAcknowledgeInvoice">
+		<part name="Message" element="oa:ChangeAcknowledgeInvoice"/>
+	</message>
+	<message name="GetInvoice">
+		<part name="Message" element="oa:GetInvoice"/>
+	</message>
+	<message name="ShowInvoice">
+		<part name="Message" element="oa:ShowInvoice"/>
+	</message>
+	<message name="ProcessInvoice">
+		<part name="Message" element="oa:ProcessInvoice"/>
+	</message>
+	<message name="AcknowledgeInvoice">
+		<part name="Message" element="oa:AcknowledgeInvoice"/>
+	</message>
+	<message name="SyncInvoice">
+		<part name="Message" element="oa:SyncInvoice"/>
+	</message>
+	<message name="SyncResponseInvoice">
+		<part name="Message" element="oa:SyncResponseInvoice"/>
+	</message>
+	<message name="NotifyInvoice">
+		<part name="Message" element="oa:NotifyInvoice"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestInvoicePortType">
+		<operation name="ProcessInvoice">
+			<input message="oaws:ProcessInvoice"/>
+		</operation>
+		<operation name="ChangeInvoice">
+			<input message="oaws:ChangeInvoice"/>
+		</operation>
+		<operation name="CancelInvoice">
+			<input message="oaws:CancelInvoice"/>
+		</operation>
+		<operation name="GetInvoice">
+			<input message="oaws:GetInvoice"/>
+		</operation>
+		<operation name="SyncInvoice">
+			<input message="oaws:SyncInvoice"/>
+		</operation>
+		<operation name="NotifyInvoice">
+			<input message="oaws:NotifyInvoice"/>
+		</operation>
+	</portType>
+	<portType name="ResponseInvoicePortType">
+		<operation name="AcknowledgeInvoice">
+			<input message="oaws:AcknowledgeInvoice"/>
+		</operation>
+		<operation name="ChangeAcknowledgeInvoice">
+			<input message="oaws:ChangeAcknowledgeInvoice"/>
+		</operation>
+		<operation name="CancelAcknowledgeInvoice">
+			<input message="oaws:CancelAcknowledgeInvoice"/>
+		</operation>
+		<operation name="ShowInvoice">
+			<input message="oaws:ShowInvoice"/>
+		</operation>
+		<operation name="SyncResponseInvoice">
+			<input message="oaws:SyncResponseInvoice"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncInvoicePortType">
+		<operation name="ProcessInvoice">
+			<input message="oaws:ProcessInvoice"/>
+			<output message="oaws:AcknowledgeInvoice"/>
+		</operation>
+		<operation name="ChangeInvoice">
+			<input message="oaws:ChangeInvoice"/>
+			<output message="oaws:ChangeAcknowledgeInvoice"/>
+		</operation>
+		<operation name="CancelInvoice">
+			<input message="oaws:CancelInvoice"/>
+			<output message="oaws:CancelAcknowledgeInvoice"/>
+		</operation>
+		<operation name="GetInvoice">
+			<input message="oaws:GetInvoice"/>
+			<output message="oaws:ShowInvoice"/>
+		</operation>
+		<operation name="SyncInvoice">
+			<input message="oaws:SyncInvoice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyInvoice">
+			<input message="oaws:NotifyInvoice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestInvoiceBinding" type="oaws:RequestInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseInvoiceBinding" type="oaws:ResponseInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncInvoiceBinding" type="oaws:SyncInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Invoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestInvoiceService">
+		<port name="RequestInvoiceBinding" binding="oaws:RequestInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestInvoice"/>
+		</port>
+	</service>
+	<service name="ResponseInvoiceService">
+		<port name="ResponseInvoiceBinding" binding="oaws:ResponseInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseInvoice"/>
+		</port>
+	</service>
+	<service name="SyncInvoiceService">
+		<port name="SyncInvoiceBinding" binding="oaws:SyncInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncInvoice"/>
+		</port>
+	</service>
+</definitions>

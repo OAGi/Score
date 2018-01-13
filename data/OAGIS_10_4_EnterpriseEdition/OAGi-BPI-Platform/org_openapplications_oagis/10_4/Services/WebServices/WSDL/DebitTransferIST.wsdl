@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/DebitTransferIST.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyDebitTransferIST.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelDebitTransferIST">
+		<part name="Message" element="oa:CancelDebitTransferIST"/>
+	</message>
+	<message name="CancelAcknowledgeDebitTransferIST">
+		<part name="Message" element="oa:CancelAcknowledgeDebitTransferIST"/>
+	</message>
+	<message name="ChangeDebitTransferIST">
+		<part name="Message" element="oa:ChangeDebitTransferIST"/>
+	</message>
+	<message name="ChangeAcknowledgeDebitTransferIST">
+		<part name="Message" element="oa:ChangeAcknowledgeDebitTransferIST"/>
+	</message>
+	<message name="GetDebitTransferIST">
+		<part name="Message" element="oa:GetDebitTransferIST"/>
+	</message>
+	<message name="ShowDebitTransferIST">
+		<part name="Message" element="oa:ShowDebitTransferIST"/>
+	</message>
+	<message name="ProcessDebitTransferIST">
+		<part name="Message" element="oa:ProcessDebitTransferIST"/>
+	</message>
+	<message name="AcknowledgeDebitTransferIST">
+		<part name="Message" element="oa:AcknowledgeDebitTransferIST"/>
+	</message>
+	<message name="SyncDebitTransferIST">
+		<part name="Message" element="oa:SyncDebitTransferIST"/>
+	</message>
+	<message name="SyncResponseDebitTransferIST">
+		<part name="Message" element="oa:SyncResponseDebitTransferIST"/>
+	</message>
+	<message name="NotifyDebitTransferIST">
+		<part name="Message" element="oa:NotifyDebitTransferIST"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestDebitTransferISTPortType">
+		<operation name="ProcessDebitTransferIST">
+			<input message="oaws:ProcessDebitTransferIST"/>
+		</operation>
+		<operation name="ChangeDebitTransferIST">
+			<input message="oaws:ChangeDebitTransferIST"/>
+		</operation>
+		<operation name="CancelDebitTransferIST">
+			<input message="oaws:CancelDebitTransferIST"/>
+		</operation>
+		<operation name="GetDebitTransferIST">
+			<input message="oaws:GetDebitTransferIST"/>
+		</operation>
+		<operation name="SyncDebitTransferIST">
+			<input message="oaws:SyncDebitTransferIST"/>
+		</operation>
+		<operation name="NotifyDebitTransferIST">
+			<input message="oaws:NotifyDebitTransferIST"/>
+		</operation>
+	</portType>
+	<portType name="ResponseDebitTransferISTPortType">
+		<operation name="AcknowledgeDebitTransferIST">
+			<input message="oaws:AcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="ChangeAcknowledgeDebitTransferIST">
+			<input message="oaws:ChangeAcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="CancelAcknowledgeDebitTransferIST">
+			<input message="oaws:CancelAcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="ShowDebitTransferIST">
+			<input message="oaws:ShowDebitTransferIST"/>
+		</operation>
+		<operation name="SyncResponseDebitTransferIST">
+			<input message="oaws:SyncResponseDebitTransferIST"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncDebitTransferISTPortType">
+		<operation name="ProcessDebitTransferIST">
+			<input message="oaws:ProcessDebitTransferIST"/>
+			<output message="oaws:AcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="ChangeDebitTransferIST">
+			<input message="oaws:ChangeDebitTransferIST"/>
+			<output message="oaws:ChangeAcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="CancelDebitTransferIST">
+			<input message="oaws:CancelDebitTransferIST"/>
+			<output message="oaws:CancelAcknowledgeDebitTransferIST"/>
+		</operation>
+		<operation name="GetDebitTransferIST">
+			<input message="oaws:GetDebitTransferIST"/>
+			<output message="oaws:ShowDebitTransferIST"/>
+		</operation>
+		<operation name="SyncDebitTransferIST">
+			<input message="oaws:SyncDebitTransferIST"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyDebitTransferIST">
+			<input message="oaws:NotifyDebitTransferIST"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestDebitTransferISTBinding" type="oaws:RequestDebitTransferISTPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseDebitTransferISTBinding" type="oaws:ResponseDebitTransferISTPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncDebitTransferISTBinding" type="oaws:SyncDebitTransferISTPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyDebitTransferIST">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/DebitTransferIST.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestDebitTransferISTService">
+		<port name="RequestDebitTransferISTBinding" binding="oaws:RequestDebitTransferISTBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestDebitTransferIST"/>
+		</port>
+	</service>
+	<service name="ResponseDebitTransferISTService">
+		<port name="ResponseDebitTransferISTBinding" binding="oaws:ResponseDebitTransferISTBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseDebitTransferIST"/>
+		</port>
+	</service>
+	<service name="SyncDebitTransferISTService">
+		<port name="SyncDebitTransferISTBinding" binding="oaws:SyncDebitTransferISTBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncDebitTransferIST"/>
+		</port>
+	</service>
+</definitions>

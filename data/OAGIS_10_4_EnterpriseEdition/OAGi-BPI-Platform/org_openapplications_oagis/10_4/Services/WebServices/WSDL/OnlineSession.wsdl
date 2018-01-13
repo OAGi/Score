@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/OnlineSession.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyOnlineSession.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelOnlineSession">
+		<part name="Message" element="oa:CancelOnlineSession"/>
+	</message>
+	<message name="CancelAcknowledgeOnlineSession">
+		<part name="Message" element="oa:CancelAcknowledgeOnlineSession"/>
+	</message>
+	<message name="ChangeOnlineSession">
+		<part name="Message" element="oa:ChangeOnlineSession"/>
+	</message>
+	<message name="ChangeAcknowledgeOnlineSession">
+		<part name="Message" element="oa:ChangeAcknowledgeOnlineSession"/>
+	</message>
+	<message name="GetOnlineSession">
+		<part name="Message" element="oa:GetOnlineSession"/>
+	</message>
+	<message name="ShowOnlineSession">
+		<part name="Message" element="oa:ShowOnlineSession"/>
+	</message>
+	<message name="ProcessOnlineSession">
+		<part name="Message" element="oa:ProcessOnlineSession"/>
+	</message>
+	<message name="AcknowledgeOnlineSession">
+		<part name="Message" element="oa:AcknowledgeOnlineSession"/>
+	</message>
+	<message name="SyncOnlineSession">
+		<part name="Message" element="oa:SyncOnlineSession"/>
+	</message>
+	<message name="SyncResponseOnlineSession">
+		<part name="Message" element="oa:SyncResponseOnlineSession"/>
+	</message>
+	<message name="NotifyOnlineSession">
+		<part name="Message" element="oa:NotifyOnlineSession"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestOnlineSessionPortType">
+		<operation name="ProcessOnlineSession">
+			<input message="oaws:ProcessOnlineSession"/>
+		</operation>
+		<operation name="ChangeOnlineSession">
+			<input message="oaws:ChangeOnlineSession"/>
+		</operation>
+		<operation name="CancelOnlineSession">
+			<input message="oaws:CancelOnlineSession"/>
+		</operation>
+		<operation name="GetOnlineSession">
+			<input message="oaws:GetOnlineSession"/>
+		</operation>
+		<operation name="SyncOnlineSession">
+			<input message="oaws:SyncOnlineSession"/>
+		</operation>
+		<operation name="NotifyOnlineSession">
+			<input message="oaws:NotifyOnlineSession"/>
+		</operation>
+	</portType>
+	<portType name="ResponseOnlineSessionPortType">
+		<operation name="AcknowledgeOnlineSession">
+			<input message="oaws:AcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="ChangeAcknowledgeOnlineSession">
+			<input message="oaws:ChangeAcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="CancelAcknowledgeOnlineSession">
+			<input message="oaws:CancelAcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="ShowOnlineSession">
+			<input message="oaws:ShowOnlineSession"/>
+		</operation>
+		<operation name="SyncResponseOnlineSession">
+			<input message="oaws:SyncResponseOnlineSession"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncOnlineSessionPortType">
+		<operation name="ProcessOnlineSession">
+			<input message="oaws:ProcessOnlineSession"/>
+			<output message="oaws:AcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="ChangeOnlineSession">
+			<input message="oaws:ChangeOnlineSession"/>
+			<output message="oaws:ChangeAcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="CancelOnlineSession">
+			<input message="oaws:CancelOnlineSession"/>
+			<output message="oaws:CancelAcknowledgeOnlineSession"/>
+		</operation>
+		<operation name="GetOnlineSession">
+			<input message="oaws:GetOnlineSession"/>
+			<output message="oaws:ShowOnlineSession"/>
+		</operation>
+		<operation name="SyncOnlineSession">
+			<input message="oaws:SyncOnlineSession"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyOnlineSession">
+			<input message="oaws:NotifyOnlineSession"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestOnlineSessionBinding" type="oaws:RequestOnlineSessionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseOnlineSessionBinding" type="oaws:ResponseOnlineSessionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncOnlineSessionBinding" type="oaws:SyncOnlineSessionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyOnlineSession">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/OnlineSession.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestOnlineSessionService">
+		<port name="RequestOnlineSessionBinding" binding="oaws:RequestOnlineSessionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestOnlineSession"/>
+		</port>
+	</service>
+	<service name="ResponseOnlineSessionService">
+		<port name="ResponseOnlineSessionBinding" binding="oaws:ResponseOnlineSessionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseOnlineSession"/>
+		</port>
+	</service>
+	<service name="SyncOnlineSessionService">
+		<port name="SyncOnlineSessionBinding" binding="oaws:SyncOnlineSessionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncOnlineSession"/>
+		</port>
+	</service>
+</definitions>

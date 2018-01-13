@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/WarehouseShippingOrder.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyWarehouseShippingOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelWarehouseShippingOrder">
+		<part name="Message" element="oa:CancelWarehouseShippingOrder"/>
+	</message>
+	<message name="CancelAcknowledgeWarehouseShippingOrder">
+		<part name="Message" element="oa:CancelAcknowledgeWarehouseShippingOrder"/>
+	</message>
+	<message name="ChangeWarehouseShippingOrder">
+		<part name="Message" element="oa:ChangeWarehouseShippingOrder"/>
+	</message>
+	<message name="ChangeAcknowledgeWarehouseShippingOrder">
+		<part name="Message" element="oa:ChangeAcknowledgeWarehouseShippingOrder"/>
+	</message>
+	<message name="GetWarehouseShippingOrder">
+		<part name="Message" element="oa:GetWarehouseShippingOrder"/>
+	</message>
+	<message name="ShowWarehouseShippingOrder">
+		<part name="Message" element="oa:ShowWarehouseShippingOrder"/>
+	</message>
+	<message name="ProcessWarehouseShippingOrder">
+		<part name="Message" element="oa:ProcessWarehouseShippingOrder"/>
+	</message>
+	<message name="AcknowledgeWarehouseShippingOrder">
+		<part name="Message" element="oa:AcknowledgeWarehouseShippingOrder"/>
+	</message>
+	<message name="SyncWarehouseShippingOrder">
+		<part name="Message" element="oa:SyncWarehouseShippingOrder"/>
+	</message>
+	<message name="SyncResponseWarehouseShippingOrder">
+		<part name="Message" element="oa:SyncResponseWarehouseShippingOrder"/>
+	</message>
+	<message name="NotifyWarehouseShippingOrder">
+		<part name="Message" element="oa:NotifyWarehouseShippingOrder"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestWarehouseShippingOrderPortType">
+		<operation name="ProcessWarehouseShippingOrder">
+			<input message="oaws:ProcessWarehouseShippingOrder"/>
+		</operation>
+		<operation name="ChangeWarehouseShippingOrder">
+			<input message="oaws:ChangeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="CancelWarehouseShippingOrder">
+			<input message="oaws:CancelWarehouseShippingOrder"/>
+		</operation>
+		<operation name="GetWarehouseShippingOrder">
+			<input message="oaws:GetWarehouseShippingOrder"/>
+		</operation>
+		<operation name="SyncWarehouseShippingOrder">
+			<input message="oaws:SyncWarehouseShippingOrder"/>
+		</operation>
+		<operation name="NotifyWarehouseShippingOrder">
+			<input message="oaws:NotifyWarehouseShippingOrder"/>
+		</operation>
+	</portType>
+	<portType name="ResponseWarehouseShippingOrderPortType">
+		<operation name="AcknowledgeWarehouseShippingOrder">
+			<input message="oaws:AcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="ChangeAcknowledgeWarehouseShippingOrder">
+			<input message="oaws:ChangeAcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="CancelAcknowledgeWarehouseShippingOrder">
+			<input message="oaws:CancelAcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="ShowWarehouseShippingOrder">
+			<input message="oaws:ShowWarehouseShippingOrder"/>
+		</operation>
+		<operation name="SyncResponseWarehouseShippingOrder">
+			<input message="oaws:SyncResponseWarehouseShippingOrder"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncWarehouseShippingOrderPortType">
+		<operation name="ProcessWarehouseShippingOrder">
+			<input message="oaws:ProcessWarehouseShippingOrder"/>
+			<output message="oaws:AcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="ChangeWarehouseShippingOrder">
+			<input message="oaws:ChangeWarehouseShippingOrder"/>
+			<output message="oaws:ChangeAcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="CancelWarehouseShippingOrder">
+			<input message="oaws:CancelWarehouseShippingOrder"/>
+			<output message="oaws:CancelAcknowledgeWarehouseShippingOrder"/>
+		</operation>
+		<operation name="GetWarehouseShippingOrder">
+			<input message="oaws:GetWarehouseShippingOrder"/>
+			<output message="oaws:ShowWarehouseShippingOrder"/>
+		</operation>
+		<operation name="SyncWarehouseShippingOrder">
+			<input message="oaws:SyncWarehouseShippingOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyWarehouseShippingOrder">
+			<input message="oaws:NotifyWarehouseShippingOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestWarehouseShippingOrderBinding" type="oaws:RequestWarehouseShippingOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseWarehouseShippingOrderBinding" type="oaws:ResponseWarehouseShippingOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncWarehouseShippingOrderBinding" type="oaws:SyncWarehouseShippingOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyWarehouseShippingOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestWarehouseShippingOrderService">
+		<port name="RequestWarehouseShippingOrderBinding" binding="oaws:RequestWarehouseShippingOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestWarehouseShippingOrder"/>
+		</port>
+	</service>
+	<service name="ResponseWarehouseShippingOrderService">
+		<port name="ResponseWarehouseShippingOrderBinding" binding="oaws:ResponseWarehouseShippingOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseWarehouseShippingOrder"/>
+		</port>
+	</service>
+	<service name="SyncWarehouseShippingOrderService">
+		<port name="SyncWarehouseShippingOrderBinding" binding="oaws:SyncWarehouseShippingOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncWarehouseShippingOrder"/>
+		</port>
+	</service>
+</definitions>

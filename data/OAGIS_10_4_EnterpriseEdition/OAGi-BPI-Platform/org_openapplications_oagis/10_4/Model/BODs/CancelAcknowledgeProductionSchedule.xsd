@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeProductionSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductionSchedule.xsd"/>
+	<xsd:element name="CancelAcknowledgeProductionSchedule" type="CancelAcknowledgeProductionScheduleType" id="oagis-id-cfcb63ab108a44849c98add267f418ec">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeProductionSchedule is to respond to a request to Process a ProductionSchedule with the resulst of that Processing.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeProductionScheduleType" id="oagis-id-87a3bef501734cc1b5e373f27ac27ad7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeProductionScheduleDataAreaType" id="oagis-id-d9b1225f909e48559b7cd7985cbf1326">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeProductionSchedule. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ProductionSchedule).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeProductionScheduleDataAreaType" id="oagis-id-0702a17106ca408285ae4f267732a9c9">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-4497f82ba1f44651a259ade9d70d040e"/>
+			<xsd:element ref="ProductionSchedule" maxOccurs="unbounded" id="oagis-id-16ca05b9a93a43969e0c3fac69d94259"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

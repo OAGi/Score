@@ -1,0 +1,1903 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OAGIS 10_4 -- WorkOrder Noun -- Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array('element_WorkOrder_xibox', 'type_WorkOrderType_xibox', 'element_WorkOrderHeader_xibox', 'type_WorkOrderHeaderType_xibox', 'type_WorkOrderHeaderBaseType_xibox', 'element_WorkOrderLine_xibox', 'type_WorkOrderLineType_xibox', 'type_WorkOrderLineBaseType_xibox', 'element_WorkOrderSchedule_xibox', 'type_WorkOrderScheduldeType_xibox', 'element_WorkOrderSubLine_xibox', 'type_WorkOrderSubLineType_xibox');
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox', 'element_WorkOrder_scbox', 'type_WorkOrderType_scbox', 'element_WorkOrderHeader_scbox', 'type_WorkOrderHeaderType_scbox', 'type_WorkOrderHeaderBaseType_scbox', 'element_WorkOrderLine_scbox', 'type_WorkOrderLineType_scbox', 'type_WorkOrderLineBaseType_scbox', 'element_WorkOrderSchedule_scbox', 'type_WorkOrderScheduldeType_scbox', 'element_WorkOrderSubLine_scbox', 'type_WorkOrderSubLineType_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">OAGIS 10_4 -- WorkOrder Noun -- Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+<li>
+<a href="#SchemaComponents">Global Schema Components</a>
+<ul>
+<li>
+<a href="#element_WorkOrder">Element: <strong>WorkOrder</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderType">Complex Type: <strong>WorkOrderType</strong>
+</a>
+</li>
+<li>
+<a href="#element_WorkOrderHeader">Element: <strong>WorkOrderHeader</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderHeaderType">Complex Type: <strong>WorkOrderHeaderType</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderHeaderBaseType">Complex Type: <strong>WorkOrderHeaderBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#element_WorkOrderLine">Element: <strong>WorkOrderLine</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderLineType">Complex Type: <strong>WorkOrderLineType</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderLineBaseType">Complex Type: <strong>WorkOrderLineBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#element_WorkOrderSchedule">Element: <strong>WorkOrderSchedule</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderScheduldeType">Complex Type: <strong>WorkOrderScheduldeType</strong>
+</a>
+</li>
+<li>
+<a href="#element_WorkOrderSubLine">Element: <strong>WorkOrderSubLine</strong>
+</a>
+</li>
+<li>
+<a href="#type_WorkOrderSubLineType">Complex Type: <strong>WorkOrderSubLineType</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>Target Namespace</th>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations have no namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>../Platform/2_4/Common/Components/Components.xsd</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_">Default namespace</a>
+</td>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xsd">xsd</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:schema</span> <span class="scTag">targetNamespace</span>="<span class="scContent">http://www.openapplications.org/oagis/10</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">attributeFormDefault</span>="<span class="scContent">unqualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">../Platform/2_4/Common/Components/Components.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xsd:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaComponents">Global Schema Components</a>
+</h2>
+<h3>Element: <a class="name" name="element_WorkOrder">WorkOrder</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrder</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_WorkOrderType" title="Jump to &quot;WorkOrderType&quot; type definition.">WorkOrderType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Is a request for the purchase of goods or services.  Typically, a WorkOrder leads to the creation of a purchase order to a specific supplier.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrder_xibox'); return false;" class="control" id="element_WorkOrder_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_WorkOrder_xibox">
+<div style="margin-left: 0em">&lt;WorkOrder<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderHeader" title="Jump to &quot;WorkOrderHeader&quot; element declaration.">WorkOrderHeader</a>&gt; ... &lt;/<a href="#element_WorkOrderHeader" title="Jump to &quot;WorkOrderHeader&quot; element declaration.">WorkOrderHeader</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderLine" title="Jump to &quot;WorkOrderLine&quot; element declaration.">WorkOrderLine</a>&gt; ... &lt;/<a href="#element_WorkOrderLine" title="Jump to &quot;WorkOrderLine&quot; element declaration.">WorkOrderLine</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/WorkOrder&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrder_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrder_scbox'); return false;" class="control" id="element_WorkOrder_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_WorkOrder_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrder</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderType" title="Jump to &quot;WorkOrderType&quot; type definition.">WorkOrderType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e24f036c5c5f4ff69d0b1aa24ebff18f</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrder_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderType">WorkOrderType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>None</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Is a request for the purchase of goods or services.  Typically, a WorkOrder leads to the creation of a purchase order to a specific supplier.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderType_xibox'); return false;" class="control" id="type_WorkOrderType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderHeader" title="Jump to &quot;WorkOrderHeader&quot; element declaration.">WorkOrderHeader</a>&gt; ... &lt;/<a href="#element_WorkOrderHeader" title="Jump to &quot;WorkOrderHeader&quot; element declaration.">WorkOrderHeader</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderLine" title="Jump to &quot;WorkOrderLine&quot; element declaration.">WorkOrderLine</a>&gt; ... &lt;/<a href="#element_WorkOrderLine" title="Jump to &quot;WorkOrderLine&quot; element declaration.">WorkOrderLine</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderType_scbox'); return false;" class="control" id="type_WorkOrderType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-74931af7739043cd9ef4360f36ff1120</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_WorkOrderHeader" title="Jump to &quot;WorkOrderHeader&quot; element declaration.">WorkOrderHeader</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-1f4b905fb3b34f8fa44c4a1a28da863c</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_WorkOrderLine" title="Jump to &quot;WorkOrderLine&quot; element declaration.">WorkOrderLine</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c7098888f28848f0846b75e9b5239dec</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">typeCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span>
+</span>" <span class="scTag">use</span>="<span class="scContent">optional</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f17dd1fe69dc4728b41eb8086a8621e3</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">actionCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-380716cc787b4997aafffb5ea5a7d1a8</span>"/&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_WorkOrderHeader">WorkOrderHeader</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderHeader</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_WorkOrderHeaderType" title="Jump to &quot;WorkOrderHeaderType&quot; type definition.">WorkOrderHeaderType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Information that applies to the WorkOrder.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderHeader_xibox'); return false;" class="control" id="element_WorkOrderHeader_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderHeader_xibox">
+<div style="margin-left: 0em">&lt;WorkOrderHeader&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found.');">WorkOrderHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/WorkOrderHeader&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderHeader_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderHeader_scbox'); return false;" class="control" id="element_WorkOrderHeader_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderHeader_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderHeader</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderHeaderType" title="Jump to &quot;WorkOrderHeaderType&quot; type definition.">WorkOrderHeaderType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-bb68cd93e59645c19f48c6644671f772</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderHeader_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderHeaderType">WorkOrderHeaderType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_WorkOrderHeaderBaseType" title="Jump to &quot;WorkOrderHeaderBaseType&quot; type definition.">WorkOrderHeaderBaseType</a>
+</span> (by extension) &lt; <strong>WorkOrderHeaderType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderHeaderType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderHeaderType_xibox'); return false;" class="control" id="type_WorkOrderHeaderType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderHeaderType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found.');">WorkOrderHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderHeaderType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderHeaderType_scbox'); return false;" class="control" id="type_WorkOrderHeaderType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderHeaderType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderHeaderType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b6cec74e08f14016b3cb7b87074a1904</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderHeaderBaseType" title="Jump to &quot;WorkOrderHeaderBaseType&quot; type definition.">WorkOrderHeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderHeaderExtensionType&quot; type definition could not be found.');">WorkOrderHeaderExtensionType</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fb34819dfdc845e7abac10bae3e7212c</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderHeaderType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderHeaderBaseType">WorkOrderHeaderBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span> &lt; <strong>WorkOrderHeaderBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_WorkOrderHeaderType" title="Jump to &quot;WorkOrderHeaderType&quot; type definition.">WorkOrderHeaderType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderHeaderBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderHeaderBaseType_xibox'); return false;" class="control" id="type_WorkOrderHeaderBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderHeaderBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderHeaderBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderHeaderBaseType_scbox'); return false;" class="control" id="type_WorkOrderHeaderBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderHeaderBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderHeaderBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f5532bd4c0224d648f32df68d43c5177</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestHeaderBaseType&quot; type definition could not be found.');">RequestHeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PurchaseOrderReference&quot; element declaration could not be found." onclick="alert('&quot;PurchaseOrderReference&quot; element declaration could not be found.');">PurchaseOrderReference</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f3d586d4fad64742b191b70d9d9eb973</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;BuyerParty&quot; element declaration could not be found." onclick="alert('&quot;BuyerParty&quot; element declaration could not be found.');">BuyerParty</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7c2360f1201849ceb486e378b56d59c1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-3f2807c11ad84c848407e030314caefb</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RequiredDeliveryDateTime&quot; element declaration could not be found." onclick="alert('&quot;RequiredDeliveryDateTime&quot; element declaration could not be found.');">RequiredDeliveryDateTime</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-8fbcac57d00342059d8f0f1ef0945e26</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;SalesOrderReference&quot; element declaration could not be found." onclick="alert('&quot;SalesOrderReference&quot; element declaration could not be found.');">SalesOrderReference</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-65f32ba4580c4a43b35bf9998dc8b895</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderHeaderBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_WorkOrderLine">WorkOrderLine</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderLine</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_WorkOrderLineType" title="Jump to &quot;WorkOrderLineType&quot; type definition.">WorkOrderLineType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Information that describes the requested item and its attributes.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderLine_xibox'); return false;" class="control" id="element_WorkOrderLine_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderLine_xibox">
+<div style="margin-left: 0em">&lt;WorkOrderLine&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; ... &lt;/<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('Describes the details of WorkOrderLineActivity and its execution requirement'); viewDocumentation('Element', 'Operation', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;WorkOrderSubLine&gt; <span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span> &lt;/WorkOrderSubLine&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'WorkOrderSubLine', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderLineExtensionType&quot; type definition could not be found.');">WorkOrderLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/WorkOrderLine&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderLine_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderLine_scbox'); return false;" class="control" id="element_WorkOrderLine_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderLine_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderLine</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderLineType" title="Jump to &quot;WorkOrderLineType&quot; type definition.">WorkOrderLineType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-3016587505a64e6e92a24ff033226aa0</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderLine_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderLineType">WorkOrderLineType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_WorkOrderLineBaseType" title="Jump to &quot;WorkOrderLineBaseType&quot; type definition.">WorkOrderLineBaseType</a>
+</span> (by extension) &lt; <strong>WorkOrderLineType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderLineType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderLineType_xibox'); return false;" class="control" id="type_WorkOrderLineType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderLineType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; ... &lt;/<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('Describes the details of WorkOrderLineActivity and its execution requirement'); viewDocumentation('Element', 'Operation', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;WorkOrderSubLine&gt; <span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span> &lt;/WorkOrderSubLine&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'WorkOrderSubLine', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderLineExtensionType&quot; type definition could not be found.');">WorkOrderLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderLineType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderLineType_scbox'); return false;" class="control" id="type_WorkOrderLineType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderLineType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderLineType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d98392cf8494455bbad28af1c86c2a56</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderLineBaseType" title="Jump to &quot;WorkOrderLineBaseType&quot; type definition.">WorkOrderLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderSubLine</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-31341d09ff1c474e91ecda91e59536b1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderLineExtensionType&quot; type definition could not be found.');">WorkOrderLineExtensionType</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-996e471dced342118c2b76f5b445666b</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderLineType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderLineBaseType">WorkOrderLineBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span> &lt; <strong>WorkOrderLineBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_WorkOrderLineType" title="Jump to &quot;WorkOrderLineType&quot; type definition.">WorkOrderLineType</a>
+</span> (by extension)</li>
+<li>
+<span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderLineBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderLineBaseType_xibox'); return false;" class="control" id="type_WorkOrderLineBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderLineBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; ... &lt;/<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('Describes the details of WorkOrderLineActivity and its execution requirement'); viewDocumentation('Element', 'Operation', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderLineBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderLineBaseType_scbox'); return false;" class="control" id="type_WorkOrderLineBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderLineBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderLineBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-867d32a451ee45e9a140c90bb306a3f2</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6021cbe1fbaa4b23a48ea13c0ceba343</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-9316b1511c38403aa3df655bffaeebb2</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b368c6d4d1104cf9baf1009d4f1299be</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-59413dd2488e479e80aa7ee00d24c735</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-847bbd6b12664341857741b7c19aeff4</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c473618698b94994be3464b10c92fbb6</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-39a368aeb05a4e36a91f95440bb4377b</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-56906424f8194dc4835b6716ea3be40c</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e32684babf324064af631501fd3aecb1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-8f9f3cc9133d415ba4c7883137f9c70d</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderLineBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_WorkOrderSchedule">WorkOrderSchedule</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderSchedule</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_WorkOrderScheduldeType" title="Jump to &quot;WorkOrderScheduldeType&quot; type definition.">WorkOrderScheduldeType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderSchedule_xibox'); return false;" class="control" id="element_WorkOrderSchedule_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderSchedule_xibox">
+<div style="margin-left: 0em">&lt;WorkOrderSchedule&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;ProcurementScheduleBaseType&quot; type definition could not be found." onclick="alert('&quot;ProcurementScheduleBaseType&quot; type definition could not be found.');">ProcurementScheduleBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found.');">WorkOrderScheduleExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/WorkOrderSchedule&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderSchedule_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderSchedule_scbox'); return false;" class="control" id="element_WorkOrderSchedule_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderSchedule_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderSchedule</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderScheduldeType" title="Jump to &quot;WorkOrderScheduldeType&quot; type definition.">WorkOrderScheduldeType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f1d8dab461114cc69b075655b61fcf22</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderSchedule_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderScheduldeType">WorkOrderScheduldeType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ProcurementScheduleBaseType&quot; type definition could not be found." onclick="alert('&quot;ProcurementScheduleBaseType&quot; type definition could not be found.');">ProcurementScheduleBaseType</a>
+</span> &lt; <strong>WorkOrderScheduldeType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderScheduldeType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderScheduldeType_xibox'); return false;" class="control" id="type_WorkOrderScheduldeType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderScheduldeType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;ProcurementScheduleBaseType&quot; type definition could not be found." onclick="alert('&quot;ProcurementScheduleBaseType&quot; type definition could not be found.');">ProcurementScheduleBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found.');">WorkOrderScheduleExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderScheduldeType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderScheduldeType_scbox'); return false;" class="control" id="type_WorkOrderScheduldeType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderScheduldeType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderScheduldeType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7c1b703a260a43abb267293400bcc988</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ProcurementScheduleBaseType&quot; type definition could not be found." onclick="alert('&quot;ProcurementScheduleBaseType&quot; type definition could not be found.');">ProcurementScheduleBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderScheduleExtensionType&quot; type definition could not be found.');">WorkOrderScheduleExtensionType</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-99f193fc8fe74df8b9c38aedeee10579</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderScheduldeType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_WorkOrderSubLine">WorkOrderSubLine</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderSubLine</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Used if the item on the WorkOrderLine needs to be divided into smaller units such as sub-components or subassemblies.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderSubLine_xibox'); return false;" class="control" id="element_WorkOrderSubLine_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderSubLine_xibox">
+<div style="margin-left: 0em">&lt;WorkOrderSubLine&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; ... &lt;/<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('Describes the details of WorkOrderLineActivity and its execution requirement'); viewDocumentation('Element', 'Operation', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found.');">WorkOrderSubLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/WorkOrderSubLine&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderSubLine_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_WorkOrderSubLine_scbox'); return false;" class="control" id="element_WorkOrderSubLine_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_WorkOrderSubLine_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderSubLine</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderSubLineType" title="Jump to &quot;WorkOrderSubLineType&quot; type definition.">WorkOrderSubLineType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-62902c48b3154bf0b43b111aaf67b191</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_WorkOrderSubLine_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_WorkOrderSubLineType">WorkOrderSubLineType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_WorkOrderLineBaseType" title="Jump to &quot;WorkOrderLineBaseType&quot; type definition.">WorkOrderLineBaseType</a>
+</span> (by extension) &lt; <strong>WorkOrderSubLineType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>WorkOrderSubLineType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderSubLineType_xibox'); return false;" class="control" id="type_WorkOrderSubLineType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderSubLineType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;RequestLineBaseType&quot; type definition could not be found." onclick="alert('&quot;RequestLineBaseType&quot; type definition could not be found.');">RequestLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequestedQuantity&quot; element declaration could not be found." onclick="alert('&quot;RequestedQuantity&quot; element declaration could not be found.');">RequestedQuantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RequesterParty&quot; element declaration could not be found." onclick="alert('&quot;RequesterParty&quot; element declaration could not be found.');">RequesterParty</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; ... &lt;/<a href="#element_WorkOrderSchedule" title="Jump to &quot;WorkOrderSchedule&quot; element declaration.">WorkOrderSchedule</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;OperationReference&quot; element declaration could not be found." onclick="alert('&quot;OperationReference&quot; element declaration could not be found.');">OperationReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ResourceAllocation&quot; element declaration could not be found." onclick="alert('&quot;ResourceAllocation&quot; element declaration could not be found.');">ResourceAllocation</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Distribution&quot; element declaration could not be found." onclick="alert('&quot;Distribution&quot; element declaration could not be found.');">Distribution</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EstimatedAllocateResources&quot; element declaration could not be found." onclick="alert('&quot;EstimatedAllocateResources&quot; element declaration could not be found.');">EstimatedAllocateResources</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Operation&quot; element declaration could not be found." onclick="alert('&quot;Operation&quot; element declaration could not be found.');">Operation</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('Describes the details of WorkOrderLineActivity and its execution requirement'); viewDocumentation('Element', 'Operation', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Specification&quot; element declaration could not be found." onclick="alert('&quot;Specification&quot; element declaration could not be found.');">Specification</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BOMReference&quot; element declaration could not be found." onclick="alert('&quot;BOMReference&quot; element declaration could not be found.');">BOMReference</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found.');">WorkOrderSubLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderSubLineType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_WorkOrderSubLineType_scbox'); return false;" class="control" id="type_WorkOrderSubLineType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_WorkOrderSubLineType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">WorkOrderSubLineType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a45ed2c7eec044bf89bc93a6a32bcaa6</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_WorkOrderLineBaseType" title="Jump to &quot;WorkOrderLineBaseType&quot; type definition.">WorkOrderLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;WorkOrderSubLineExtensionType&quot; type definition could not be found.');">WorkOrderSubLineExtensionType</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b6636d701c914de2bac40744e109440a</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_WorkOrderSubLineType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<p class="footer">Generated by <a href="http://titanium.dstc.edu.au/xml/xs3p">xs3p</a>. Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetPersonnel.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Personnel.xsd"/>
+        <xsd:element name="GetPersonnel" type="GetPersonnelType" id="oagis-id-3166a04d4b254a4b98ab04164b8537d0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetPersonnel is to request Personnel data for a worker.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetPersonnelType" id="oagis-id-d1eaf69da91e4c9da3df4e55c9f5e15b">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetPersonnelDataAreaType" id="oagis-id-13f59908423741e7be10c60910889188">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetPersonnel. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Personnel).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetPersonnelDataAreaType" id="oagis-id-8cdb4de9786140fbac8064857d950732">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-eab3faab2d1549e4b903d9a9dbc78491"/>
+                        <xsd:element ref="Personnel" maxOccurs="unbounded" id="oagis-id-fede09ac282c4920bee69ddb9f91304f"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

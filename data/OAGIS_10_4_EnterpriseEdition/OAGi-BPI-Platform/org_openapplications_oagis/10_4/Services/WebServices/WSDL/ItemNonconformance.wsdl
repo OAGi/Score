@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ItemNonconformance.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyItemNonconformance.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelItemNonconformance">
+		<part name="Message" element="oa:CancelItemNonconformance"/>
+	</message>
+	<message name="CancelAcknowledgeItemNonconformance">
+		<part name="Message" element="oa:CancelAcknowledgeItemNonconformance"/>
+	</message>
+	<message name="ChangeItemNonconformance">
+		<part name="Message" element="oa:ChangeItemNonconformance"/>
+	</message>
+	<message name="ChangeAcknowledgeItemNonconformance">
+		<part name="Message" element="oa:ChangeAcknowledgeItemNonconformance"/>
+	</message>
+	<message name="GetItemNonconformance">
+		<part name="Message" element="oa:GetItemNonconformance"/>
+	</message>
+	<message name="ShowItemNonconformance">
+		<part name="Message" element="oa:ShowItemNonconformance"/>
+	</message>
+	<message name="ProcessItemNonconformance">
+		<part name="Message" element="oa:ProcessItemNonconformance"/>
+	</message>
+	<message name="AcknowledgeItemNonconformance">
+		<part name="Message" element="oa:AcknowledgeItemNonconformance"/>
+	</message>
+	<message name="SyncItemNonconformance">
+		<part name="Message" element="oa:SyncItemNonconformance"/>
+	</message>
+	<message name="SyncResponseItemNonconformance">
+		<part name="Message" element="oa:SyncResponseItemNonconformance"/>
+	</message>
+	<message name="NotifyItemNonconformance">
+		<part name="Message" element="oa:NotifyItemNonconformance"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestItemNonconformancePortType">
+		<operation name="ProcessItemNonconformance">
+			<input message="oaws:ProcessItemNonconformance"/>
+		</operation>
+		<operation name="ChangeItemNonconformance">
+			<input message="oaws:ChangeItemNonconformance"/>
+		</operation>
+		<operation name="CancelItemNonconformance">
+			<input message="oaws:CancelItemNonconformance"/>
+		</operation>
+		<operation name="GetItemNonconformance">
+			<input message="oaws:GetItemNonconformance"/>
+		</operation>
+		<operation name="SyncItemNonconformance">
+			<input message="oaws:SyncItemNonconformance"/>
+		</operation>
+		<operation name="NotifyItemNonconformance">
+			<input message="oaws:NotifyItemNonconformance"/>
+		</operation>
+	</portType>
+	<portType name="ResponseItemNonconformancePortType">
+		<operation name="AcknowledgeItemNonconformance">
+			<input message="oaws:AcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="ChangeAcknowledgeItemNonconformance">
+			<input message="oaws:ChangeAcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="CancelAcknowledgeItemNonconformance">
+			<input message="oaws:CancelAcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="ShowItemNonconformance">
+			<input message="oaws:ShowItemNonconformance"/>
+		</operation>
+		<operation name="SyncResponseItemNonconformance">
+			<input message="oaws:SyncResponseItemNonconformance"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncItemNonconformancePortType">
+		<operation name="ProcessItemNonconformance">
+			<input message="oaws:ProcessItemNonconformance"/>
+			<output message="oaws:AcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="ChangeItemNonconformance">
+			<input message="oaws:ChangeItemNonconformance"/>
+			<output message="oaws:ChangeAcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="CancelItemNonconformance">
+			<input message="oaws:CancelItemNonconformance"/>
+			<output message="oaws:CancelAcknowledgeItemNonconformance"/>
+		</operation>
+		<operation name="GetItemNonconformance">
+			<input message="oaws:GetItemNonconformance"/>
+			<output message="oaws:ShowItemNonconformance"/>
+		</operation>
+		<operation name="SyncItemNonconformance">
+			<input message="oaws:SyncItemNonconformance"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyItemNonconformance">
+			<input message="oaws:NotifyItemNonconformance"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestItemNonconformanceBinding" type="oaws:RequestItemNonconformancePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseItemNonconformanceBinding" type="oaws:ResponseItemNonconformancePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncItemNonconformanceBinding" type="oaws:SyncItemNonconformancePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyItemNonconformance">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemNonconformance.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestItemNonconformanceService">
+		<port name="RequestItemNonconformanceBinding" binding="oaws:RequestItemNonconformanceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestItemNonconformance"/>
+		</port>
+	</service>
+	<service name="ResponseItemNonconformanceService">
+		<port name="ResponseItemNonconformanceBinding" binding="oaws:ResponseItemNonconformanceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseItemNonconformance"/>
+		</port>
+	</service>
+	<service name="SyncItemNonconformanceService">
+		<port name="SyncItemNonconformanceBinding" binding="oaws:SyncItemNonconformanceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncItemNonconformance"/>
+		</port>
+	</service>
+</definitions>

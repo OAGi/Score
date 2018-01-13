@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifySalesOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/SalesOrder.xsd"/>
+        <xsd:element name="NotifySalesOrder" type="NotifySalesOrderType" id="oagis-id-adef177edc9445138b553e5598b493b0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Notify SalesOrder is to facilitate keeping sales or customer order information synchronized on separate data bases throughout an enterprise.  The Notify SalesOrder allows the adding of new sales orders and the modification of previously established sales orders.
+
+This BOD commonly causes updates to occur.
+
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifySalesOrderType" id="oagis-id-fe1c02416f514f7c80180661e8d6d695">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifySalesOrderDataAreaType" id="oagis-id-479d97ec5cd24cda92a34b5e0e965764">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifySalesOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (SalesOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifySalesOrderDataAreaType" id="oagis-id-91ea849ad84440eaaeb9351ed6dca3dd">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-a5f729bed9644cb2aa6c5beba4e44945"/>
+                        <xsd:element ref="SalesOrder" maxOccurs="unbounded" id="oagis-id-537d49297f1841caadbc459a99e24bee"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

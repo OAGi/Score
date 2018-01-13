@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncCreditTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CreditTransfer.xsd"/>
+	<xsd:element name="SyncCreditTransfer" type="SyncCreditTransferType" id="oagis-id-82ba80f8a699404788e80e1ffdb4da3b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncCreditTransfer is to enable an application to request specific CreditTransfer information from another business application module.  The response to the SyncCreditTransfer is the SyncCreditTransfer.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncCreditTransferType" id="oagis-id-f4b951b135b44b1bbd0cc68553cf02c2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncCreditTransferDataAreaType" id="oagis-id-ff52f16b33884b74916c6bae53a0a6c6">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncCreditTransfer. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (CreditTransfer).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncCreditTransferDataAreaType" id="oagis-id-51fcfb10af4444dbaf3e8008bb758e77">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-acfe27b5088e4a94b67ee4b424246bcc"/>
+			<xsd:element ref="CreditTransfer" maxOccurs="unbounded" id="oagis-id-102b1f82ef504ae2b0c51126ad332270"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

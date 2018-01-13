@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/IssueInventory.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyIssueInventory.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelIssueInventory">
+		<part name="Message" element="oa:CancelIssueInventory"/>
+	</message>
+	<message name="CancelAcknowledgeIssueInventory">
+		<part name="Message" element="oa:CancelAcknowledgeIssueInventory"/>
+	</message>
+	<message name="ChangeIssueInventory">
+		<part name="Message" element="oa:ChangeIssueInventory"/>
+	</message>
+	<message name="ChangeAcknowledgeIssueInventory">
+		<part name="Message" element="oa:ChangeAcknowledgeIssueInventory"/>
+	</message>
+	<message name="GetIssueInventory">
+		<part name="Message" element="oa:GetIssueInventory"/>
+	</message>
+	<message name="ShowIssueInventory">
+		<part name="Message" element="oa:ShowIssueInventory"/>
+	</message>
+	<message name="ProcessIssueInventory">
+		<part name="Message" element="oa:ProcessIssueInventory"/>
+	</message>
+	<message name="AcknowledgeIssueInventory">
+		<part name="Message" element="oa:AcknowledgeIssueInventory"/>
+	</message>
+	<message name="SyncIssueInventory">
+		<part name="Message" element="oa:SyncIssueInventory"/>
+	</message>
+	<message name="SyncResponseIssueInventory">
+		<part name="Message" element="oa:SyncResponseIssueInventory"/>
+	</message>
+	<message name="NotifyIssueInventory">
+		<part name="Message" element="oa:NotifyIssueInventory"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestIssueInventoryPortType">
+		<operation name="ProcessIssueInventory">
+			<input message="oaws:ProcessIssueInventory"/>
+		</operation>
+		<operation name="ChangeIssueInventory">
+			<input message="oaws:ChangeIssueInventory"/>
+		</operation>
+		<operation name="CancelIssueInventory">
+			<input message="oaws:CancelIssueInventory"/>
+		</operation>
+		<operation name="GetIssueInventory">
+			<input message="oaws:GetIssueInventory"/>
+		</operation>
+		<operation name="SyncIssueInventory">
+			<input message="oaws:SyncIssueInventory"/>
+		</operation>
+		<operation name="NotifyIssueInventory">
+			<input message="oaws:NotifyIssueInventory"/>
+		</operation>
+	</portType>
+	<portType name="ResponseIssueInventoryPortType">
+		<operation name="AcknowledgeIssueInventory">
+			<input message="oaws:AcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="ChangeAcknowledgeIssueInventory">
+			<input message="oaws:ChangeAcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="CancelAcknowledgeIssueInventory">
+			<input message="oaws:CancelAcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="ShowIssueInventory">
+			<input message="oaws:ShowIssueInventory"/>
+		</operation>
+		<operation name="SyncResponseIssueInventory">
+			<input message="oaws:SyncResponseIssueInventory"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncIssueInventoryPortType">
+		<operation name="ProcessIssueInventory">
+			<input message="oaws:ProcessIssueInventory"/>
+			<output message="oaws:AcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="ChangeIssueInventory">
+			<input message="oaws:ChangeIssueInventory"/>
+			<output message="oaws:ChangeAcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="CancelIssueInventory">
+			<input message="oaws:CancelIssueInventory"/>
+			<output message="oaws:CancelAcknowledgeIssueInventory"/>
+		</operation>
+		<operation name="GetIssueInventory">
+			<input message="oaws:GetIssueInventory"/>
+			<output message="oaws:ShowIssueInventory"/>
+		</operation>
+		<operation name="SyncIssueInventory">
+			<input message="oaws:SyncIssueInventory"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyIssueInventory">
+			<input message="oaws:NotifyIssueInventory"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestIssueInventoryBinding" type="oaws:RequestIssueInventoryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseIssueInventoryBinding" type="oaws:ResponseIssueInventoryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncIssueInventoryBinding" type="oaws:SyncIssueInventoryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyIssueInventory">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/IssueInventory.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestIssueInventoryService">
+		<port name="RequestIssueInventoryBinding" binding="oaws:RequestIssueInventoryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestIssueInventory"/>
+		</port>
+	</service>
+	<service name="ResponseIssueInventoryService">
+		<port name="ResponseIssueInventoryBinding" binding="oaws:ResponseIssueInventoryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseIssueInventory"/>
+		</port>
+	</service>
+	<service name="SyncIssueInventoryService">
+		<port name="SyncIssueInventoryBinding" binding="oaws:SyncIssueInventoryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncIssueInventory"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downCancelAcknowledge package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProjectAccounting.xsd"/>
+	<xsd:element name="CancelAcknowledgeProjectAccounting" type="CancelAcknowledgeProjectAccountingType" id="oagis-id-6e5892c63427429d9e4f4c0784a573a2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeProjectAccounting  is to enable all relevant sub-systems that submit single sided transactions to send information to a Project Accounting Application. This would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+
+The CancelAcknowledgeProjectAccounting will cause common data to be CancelAcknowledgeed in a project accounting application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeProjectAccountingType" id="oagis-id-5ab2fa84308b41e38adeb932d37c7d5f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeProjectAccountingDataAreaType" id="oagis-id-2bbc7115aefd459f95eb72fc231c1cad">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeProjectAccounting. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ProjectAccounting).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeProjectAccountingDataAreaType" id="oagis-id-0423c17a34944a02b2f035e0edd84585">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-0a6662a5fe5d48238a128cb4ce4fe558"/>
+			<xsd:element ref="ProjectAccounting" maxOccurs="unbounded" id="oagis-id-9dbfca3cb8b1428483b8422c0f469fda"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

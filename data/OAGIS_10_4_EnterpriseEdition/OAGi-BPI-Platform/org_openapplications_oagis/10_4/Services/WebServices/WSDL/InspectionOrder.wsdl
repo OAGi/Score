@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/InspectionOrder.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyInspectionOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelInspectionOrder">
+		<part name="Message" element="oa:CancelInspectionOrder"/>
+	</message>
+	<message name="CancelAcknowledgeInspectionOrder">
+		<part name="Message" element="oa:CancelAcknowledgeInspectionOrder"/>
+	</message>
+	<message name="ChangeInspectionOrder">
+		<part name="Message" element="oa:ChangeInspectionOrder"/>
+	</message>
+	<message name="ChangeAcknowledgeInspectionOrder">
+		<part name="Message" element="oa:ChangeAcknowledgeInspectionOrder"/>
+	</message>
+	<message name="GetInspectionOrder">
+		<part name="Message" element="oa:GetInspectionOrder"/>
+	</message>
+	<message name="ShowInspectionOrder">
+		<part name="Message" element="oa:ShowInspectionOrder"/>
+	</message>
+	<message name="ProcessInspectionOrder">
+		<part name="Message" element="oa:ProcessInspectionOrder"/>
+	</message>
+	<message name="AcknowledgeInspectionOrder">
+		<part name="Message" element="oa:AcknowledgeInspectionOrder"/>
+	</message>
+	<message name="SyncInspectionOrder">
+		<part name="Message" element="oa:SyncInspectionOrder"/>
+	</message>
+	<message name="SyncResponseInspectionOrder">
+		<part name="Message" element="oa:SyncResponseInspectionOrder"/>
+	</message>
+	<message name="NotifyInspectionOrder">
+		<part name="Message" element="oa:NotifyInspectionOrder"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestInspectionOrderPortType">
+		<operation name="ProcessInspectionOrder">
+			<input message="oaws:ProcessInspectionOrder"/>
+		</operation>
+		<operation name="ChangeInspectionOrder">
+			<input message="oaws:ChangeInspectionOrder"/>
+		</operation>
+		<operation name="CancelInspectionOrder">
+			<input message="oaws:CancelInspectionOrder"/>
+		</operation>
+		<operation name="GetInspectionOrder">
+			<input message="oaws:GetInspectionOrder"/>
+		</operation>
+		<operation name="SyncInspectionOrder">
+			<input message="oaws:SyncInspectionOrder"/>
+		</operation>
+		<operation name="NotifyInspectionOrder">
+			<input message="oaws:NotifyInspectionOrder"/>
+		</operation>
+	</portType>
+	<portType name="ResponseInspectionOrderPortType">
+		<operation name="AcknowledgeInspectionOrder">
+			<input message="oaws:AcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="ChangeAcknowledgeInspectionOrder">
+			<input message="oaws:ChangeAcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="CancelAcknowledgeInspectionOrder">
+			<input message="oaws:CancelAcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="ShowInspectionOrder">
+			<input message="oaws:ShowInspectionOrder"/>
+		</operation>
+		<operation name="SyncResponseInspectionOrder">
+			<input message="oaws:SyncResponseInspectionOrder"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncInspectionOrderPortType">
+		<operation name="ProcessInspectionOrder">
+			<input message="oaws:ProcessInspectionOrder"/>
+			<output message="oaws:AcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="ChangeInspectionOrder">
+			<input message="oaws:ChangeInspectionOrder"/>
+			<output message="oaws:ChangeAcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="CancelInspectionOrder">
+			<input message="oaws:CancelInspectionOrder"/>
+			<output message="oaws:CancelAcknowledgeInspectionOrder"/>
+		</operation>
+		<operation name="GetInspectionOrder">
+			<input message="oaws:GetInspectionOrder"/>
+			<output message="oaws:ShowInspectionOrder"/>
+		</operation>
+		<operation name="SyncInspectionOrder">
+			<input message="oaws:SyncInspectionOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyInspectionOrder">
+			<input message="oaws:NotifyInspectionOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestInspectionOrderBinding" type="oaws:RequestInspectionOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseInspectionOrderBinding" type="oaws:ResponseInspectionOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncInspectionOrderBinding" type="oaws:SyncInspectionOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyInspectionOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectionOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestInspectionOrderService">
+		<port name="RequestInspectionOrderBinding" binding="oaws:RequestInspectionOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestInspectionOrder"/>
+		</port>
+	</service>
+	<service name="ResponseInspectionOrderService">
+		<port name="ResponseInspectionOrderBinding" binding="oaws:ResponseInspectionOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseInspectionOrder"/>
+		</port>
+	</service>
+	<service name="SyncInspectionOrderService">
+		<port name="SyncInspectionOrderBinding" binding="oaws:SyncInspectionOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncInspectionOrder"/>
+		</port>
+	</service>
+</definitions>

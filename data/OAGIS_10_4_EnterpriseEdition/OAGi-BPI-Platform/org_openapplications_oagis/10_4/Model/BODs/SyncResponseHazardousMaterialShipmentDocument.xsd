@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseHazardousMaterialShipmentDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/HazardousMaterialShipmentDocument.xsd"/>
+	<xsd:element name="SyncResponseHazardousMaterialShipmentDocument" type="SyncResponseHazardousMaterialShipmentDocumentType" id="oagis-id-65448f42da754919b42fa5e91a92ca31">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponse HazardousMaterialShipmentDocument is to communicate HazardousMaterialShipmentDocument Information from the owner of a HazardousMaterialShipmentDocument  to another business application module.  The receiver of this BOD does is expected to take the information provided and populate their information on the HazardousMaterialShipmentDocument from this BOD.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseHazardousMaterialShipmentDocumentType" id="oagis-id-be5301a2ea024ae19ad6ef2e5a805300">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-a230c8aecb6140709f7d1d1aee6c91f1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseHazardousMaterialShipmentDocument. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (HazardousMaterialShipmentDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-694e9787027c4fa2a1a48818818c71f5">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-094e3478858648a594e98f01c4f5f4d4"/>
+			<xsd:element ref="HazardousMaterialShipmentDocument" maxOccurs="unbounded" id="oagis-id-5241dab9ccf54fe8a60ee7a21cba0f9a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

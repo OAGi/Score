@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeCreditTransferIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.001.001.05" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CreditTransferIST.xsd"/>
+	<xsd:element name="ChangeCreditTransferIST" type="ChangeCreditTransferISTType" id="oagis-id-0c716022c091457989453c027f69b24a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeCreditTransferIST is to enable an application to request specific CreditTransferIST information from another business application module.  The response to the ChangeCreditTransferIST is the ChangeCreditTransferIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeCreditTransferISTType" id="oagis-id-3db97af7f07c44e78310042f60951f3b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeCreditTransferISTDataAreaType" id="oagis-id-2c9c6e74a8094cf1be262507fb72142f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeCreditTransferIST. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (CreditTransferIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeCreditTransferISTDataAreaType" id="oagis-id-f9dc281885c44cd1b0ada6792116fbf5">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-e43aaa1fdf5f4119ad9d136ff7248270"/>
+			<xsd:element ref="CreditTransferIST" maxOccurs="unbounded" id="oagis-id-f21a0ce655514e3cb18c9f4c7cbd108a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

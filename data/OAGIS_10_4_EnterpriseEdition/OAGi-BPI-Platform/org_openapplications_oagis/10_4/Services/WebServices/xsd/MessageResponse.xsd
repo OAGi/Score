@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:     OAGIS 10_4  
+   Date:               	05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/XSD/MessageResponse.xsd
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="MessageResponse">
+		<xs:sequence>
+			<xs:element name="Text" type="xs:string"/>
+			<xs:element name="Code" type="xs:token"/>
+			<xs:element name="ReceiptId" type="xs:token" minOccurs="0"/>
+			<xs:element name="DateTime" type="xs:dateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TransportMessageReponse" type="oaws:MessageResponse"/>
+	<xs:complexType name="MessageToken">
+		<xs:sequence>
+			<xs:element name="Token" type="xs:token"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TransportRequestResponse" type="oaws:MessageToken"/>
+	<xs:element name="TransportMessageHeader" type="xs:string"/>
+	<xs:element name="MessageHeader" type="xs:string"/>
+	<xs:element name="FaultHeader"/>
+	<xs:element name="MessageResponse" type="oaws:MessageResponse"/>
+</xs:schema>

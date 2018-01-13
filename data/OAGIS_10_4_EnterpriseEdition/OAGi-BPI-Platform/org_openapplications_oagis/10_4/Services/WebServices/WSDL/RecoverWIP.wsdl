@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/RecoverWIP.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRecoverWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRecoverWIP">
+		<part name="Message" element="oa:CancelRecoverWIP"/>
+	</message>
+	<message name="CancelAcknowledgeRecoverWIP">
+		<part name="Message" element="oa:CancelAcknowledgeRecoverWIP"/>
+	</message>
+	<message name="ChangeRecoverWIP">
+		<part name="Message" element="oa:ChangeRecoverWIP"/>
+	</message>
+	<message name="ChangeAcknowledgeRecoverWIP">
+		<part name="Message" element="oa:ChangeAcknowledgeRecoverWIP"/>
+	</message>
+	<message name="GetRecoverWIP">
+		<part name="Message" element="oa:GetRecoverWIP"/>
+	</message>
+	<message name="ShowRecoverWIP">
+		<part name="Message" element="oa:ShowRecoverWIP"/>
+	</message>
+	<message name="ProcessRecoverWIP">
+		<part name="Message" element="oa:ProcessRecoverWIP"/>
+	</message>
+	<message name="AcknowledgeRecoverWIP">
+		<part name="Message" element="oa:AcknowledgeRecoverWIP"/>
+	</message>
+	<message name="SyncRecoverWIP">
+		<part name="Message" element="oa:SyncRecoverWIP"/>
+	</message>
+	<message name="SyncResponseRecoverWIP">
+		<part name="Message" element="oa:SyncResponseRecoverWIP"/>
+	</message>
+	<message name="NotifyRecoverWIP">
+		<part name="Message" element="oa:NotifyRecoverWIP"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRecoverWIPPortType">
+		<operation name="ProcessRecoverWIP">
+			<input message="oaws:ProcessRecoverWIP"/>
+		</operation>
+		<operation name="ChangeRecoverWIP">
+			<input message="oaws:ChangeRecoverWIP"/>
+		</operation>
+		<operation name="CancelRecoverWIP">
+			<input message="oaws:CancelRecoverWIP"/>
+		</operation>
+		<operation name="GetRecoverWIP">
+			<input message="oaws:GetRecoverWIP"/>
+		</operation>
+		<operation name="SyncRecoverWIP">
+			<input message="oaws:SyncRecoverWIP"/>
+		</operation>
+		<operation name="NotifyRecoverWIP">
+			<input message="oaws:NotifyRecoverWIP"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRecoverWIPPortType">
+		<operation name="AcknowledgeRecoverWIP">
+			<input message="oaws:AcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRecoverWIP">
+			<input message="oaws:ChangeAcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="CancelAcknowledgeRecoverWIP">
+			<input message="oaws:CancelAcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="ShowRecoverWIP">
+			<input message="oaws:ShowRecoverWIP"/>
+		</operation>
+		<operation name="SyncResponseRecoverWIP">
+			<input message="oaws:SyncResponseRecoverWIP"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRecoverWIPPortType">
+		<operation name="ProcessRecoverWIP">
+			<input message="oaws:ProcessRecoverWIP"/>
+			<output message="oaws:AcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="ChangeRecoverWIP">
+			<input message="oaws:ChangeRecoverWIP"/>
+			<output message="oaws:ChangeAcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="CancelRecoverWIP">
+			<input message="oaws:CancelRecoverWIP"/>
+			<output message="oaws:CancelAcknowledgeRecoverWIP"/>
+		</operation>
+		<operation name="GetRecoverWIP">
+			<input message="oaws:GetRecoverWIP"/>
+			<output message="oaws:ShowRecoverWIP"/>
+		</operation>
+		<operation name="SyncRecoverWIP">
+			<input message="oaws:SyncRecoverWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRecoverWIP">
+			<input message="oaws:NotifyRecoverWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRecoverWIPBinding" type="oaws:RequestRecoverWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRecoverWIPBinding" type="oaws:ResponseRecoverWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRecoverWIPBinding" type="oaws:SyncRecoverWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRecoverWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RecoverWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRecoverWIPService">
+		<port name="RequestRecoverWIPBinding" binding="oaws:RequestRecoverWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRecoverWIP"/>
+		</port>
+	</service>
+	<service name="ResponseRecoverWIPService">
+		<port name="ResponseRecoverWIPBinding" binding="oaws:ResponseRecoverWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRecoverWIP"/>
+		</port>
+	</service>
+	<service name="SyncRecoverWIPService">
+		<port name="SyncRecoverWIPBinding" binding="oaws:SyncRecoverWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRecoverWIP"/>
+		</port>
+	</service>
+</definitions>

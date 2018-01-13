@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/AcknowledgeCustomerPartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CustomerPartyMaster.xsd"/>
+	<xsd:element name="AcknowledgeCustomerPartyMaster" type="AcknowledgeCustomerPartyMasterType" id="oagis-id-c56caf848e2f4862b7722f73d145283f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeCustomerPartyMaster is to facilitate keeping party information Acknowledgehronized that exists on separate data bases.  The AcknowledgeCustomerPartyMaster allows the adding of new party and the modification of previously established CustomerPartyMaster.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeCustomerPartyMasterType" id="oagis-id-93a4de80864f4d9b97d658e5e09fcb77">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeCustomerPartyMasterDataAreaType" id="oagis-id-4c72b66cd4e04250bfd1e1acd4ff3534">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeCustomerPartyMaster. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (CustomerPartyMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeCustomerPartyMasterDataAreaType" id="oagis-id-726f4c60aace482889694413064e1694">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-431fe69ec4444c37a9e36d3af5536474"/>
+			<xsd:element ref="CustomerPartyMaster" maxOccurs="unbounded" id="oagis-id-11808e07993d4a90aa5366b3bc05aa2a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

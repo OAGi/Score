@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Opportunity.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyOpportunity.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelOpportunity">
+		<part name="Message" element="oa:CancelOpportunity"/>
+	</message>
+	<message name="CancelAcknowledgeOpportunity">
+		<part name="Message" element="oa:CancelAcknowledgeOpportunity"/>
+	</message>
+	<message name="ChangeOpportunity">
+		<part name="Message" element="oa:ChangeOpportunity"/>
+	</message>
+	<message name="ChangeAcknowledgeOpportunity">
+		<part name="Message" element="oa:ChangeAcknowledgeOpportunity"/>
+	</message>
+	<message name="GetOpportunity">
+		<part name="Message" element="oa:GetOpportunity"/>
+	</message>
+	<message name="ShowOpportunity">
+		<part name="Message" element="oa:ShowOpportunity"/>
+	</message>
+	<message name="ProcessOpportunity">
+		<part name="Message" element="oa:ProcessOpportunity"/>
+	</message>
+	<message name="AcknowledgeOpportunity">
+		<part name="Message" element="oa:AcknowledgeOpportunity"/>
+	</message>
+	<message name="SyncOpportunity">
+		<part name="Message" element="oa:SyncOpportunity"/>
+	</message>
+	<message name="SyncResponseOpportunity">
+		<part name="Message" element="oa:SyncResponseOpportunity"/>
+	</message>
+	<message name="NotifyOpportunity">
+		<part name="Message" element="oa:NotifyOpportunity"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestOpportunityPortType">
+		<operation name="ProcessOpportunity">
+			<input message="oaws:ProcessOpportunity"/>
+		</operation>
+		<operation name="ChangeOpportunity">
+			<input message="oaws:ChangeOpportunity"/>
+		</operation>
+		<operation name="CancelOpportunity">
+			<input message="oaws:CancelOpportunity"/>
+		</operation>
+		<operation name="GetOpportunity">
+			<input message="oaws:GetOpportunity"/>
+		</operation>
+		<operation name="SyncOpportunity">
+			<input message="oaws:SyncOpportunity"/>
+		</operation>
+		<operation name="NotifyOpportunity">
+			<input message="oaws:NotifyOpportunity"/>
+		</operation>
+	</portType>
+	<portType name="ResponseOpportunityPortType">
+		<operation name="AcknowledgeOpportunity">
+			<input message="oaws:AcknowledgeOpportunity"/>
+		</operation>
+		<operation name="ChangeAcknowledgeOpportunity">
+			<input message="oaws:ChangeAcknowledgeOpportunity"/>
+		</operation>
+		<operation name="CancelAcknowledgeOpportunity">
+			<input message="oaws:CancelAcknowledgeOpportunity"/>
+		</operation>
+		<operation name="ShowOpportunity">
+			<input message="oaws:ShowOpportunity"/>
+		</operation>
+		<operation name="SyncResponseOpportunity">
+			<input message="oaws:SyncResponseOpportunity"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncOpportunityPortType">
+		<operation name="ProcessOpportunity">
+			<input message="oaws:ProcessOpportunity"/>
+			<output message="oaws:AcknowledgeOpportunity"/>
+		</operation>
+		<operation name="ChangeOpportunity">
+			<input message="oaws:ChangeOpportunity"/>
+			<output message="oaws:ChangeAcknowledgeOpportunity"/>
+		</operation>
+		<operation name="CancelOpportunity">
+			<input message="oaws:CancelOpportunity"/>
+			<output message="oaws:CancelAcknowledgeOpportunity"/>
+		</operation>
+		<operation name="GetOpportunity">
+			<input message="oaws:GetOpportunity"/>
+			<output message="oaws:ShowOpportunity"/>
+		</operation>
+		<operation name="SyncOpportunity">
+			<input message="oaws:SyncOpportunity"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyOpportunity">
+			<input message="oaws:NotifyOpportunity"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestOpportunityBinding" type="oaws:RequestOpportunityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseOpportunityBinding" type="oaws:ResponseOpportunityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncOpportunityBinding" type="oaws:SyncOpportunityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyOpportunity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Opportunity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestOpportunityService">
+		<port name="RequestOpportunityBinding" binding="oaws:RequestOpportunityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestOpportunity"/>
+		</port>
+	</service>
+	<service name="ResponseOpportunityService">
+		<port name="ResponseOpportunityBinding" binding="oaws:ResponseOpportunityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseOpportunity"/>
+		</port>
+	</service>
+	<service name="SyncOpportunityService">
+		<port name="SyncOpportunityBinding" binding="oaws:SyncOpportunityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncOpportunity"/>
+		</port>
+	</service>
+</definitions>

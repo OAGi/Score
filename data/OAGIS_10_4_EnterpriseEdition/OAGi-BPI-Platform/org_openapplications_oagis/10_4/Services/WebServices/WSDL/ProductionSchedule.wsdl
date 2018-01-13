@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ProductionSchedule.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyProductionSchedule.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelProductionSchedule">
+		<part name="Message" element="oa:CancelProductionSchedule"/>
+	</message>
+	<message name="CancelAcknowledgeProductionSchedule">
+		<part name="Message" element="oa:CancelAcknowledgeProductionSchedule"/>
+	</message>
+	<message name="ChangeProductionSchedule">
+		<part name="Message" element="oa:ChangeProductionSchedule"/>
+	</message>
+	<message name="ChangeAcknowledgeProductionSchedule">
+		<part name="Message" element="oa:ChangeAcknowledgeProductionSchedule"/>
+	</message>
+	<message name="GetProductionSchedule">
+		<part name="Message" element="oa:GetProductionSchedule"/>
+	</message>
+	<message name="ShowProductionSchedule">
+		<part name="Message" element="oa:ShowProductionSchedule"/>
+	</message>
+	<message name="ProcessProductionSchedule">
+		<part name="Message" element="oa:ProcessProductionSchedule"/>
+	</message>
+	<message name="AcknowledgeProductionSchedule">
+		<part name="Message" element="oa:AcknowledgeProductionSchedule"/>
+	</message>
+	<message name="SyncProductionSchedule">
+		<part name="Message" element="oa:SyncProductionSchedule"/>
+	</message>
+	<message name="SyncResponseProductionSchedule">
+		<part name="Message" element="oa:SyncResponseProductionSchedule"/>
+	</message>
+	<message name="NotifyProductionSchedule">
+		<part name="Message" element="oa:NotifyProductionSchedule"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestProductionSchedulePortType">
+		<operation name="ProcessProductionSchedule">
+			<input message="oaws:ProcessProductionSchedule"/>
+		</operation>
+		<operation name="ChangeProductionSchedule">
+			<input message="oaws:ChangeProductionSchedule"/>
+		</operation>
+		<operation name="CancelProductionSchedule">
+			<input message="oaws:CancelProductionSchedule"/>
+		</operation>
+		<operation name="GetProductionSchedule">
+			<input message="oaws:GetProductionSchedule"/>
+		</operation>
+		<operation name="SyncProductionSchedule">
+			<input message="oaws:SyncProductionSchedule"/>
+		</operation>
+		<operation name="NotifyProductionSchedule">
+			<input message="oaws:NotifyProductionSchedule"/>
+		</operation>
+	</portType>
+	<portType name="ResponseProductionSchedulePortType">
+		<operation name="AcknowledgeProductionSchedule">
+			<input message="oaws:AcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="ChangeAcknowledgeProductionSchedule">
+			<input message="oaws:ChangeAcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="CancelAcknowledgeProductionSchedule">
+			<input message="oaws:CancelAcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="ShowProductionSchedule">
+			<input message="oaws:ShowProductionSchedule"/>
+		</operation>
+		<operation name="SyncResponseProductionSchedule">
+			<input message="oaws:SyncResponseProductionSchedule"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncProductionSchedulePortType">
+		<operation name="ProcessProductionSchedule">
+			<input message="oaws:ProcessProductionSchedule"/>
+			<output message="oaws:AcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="ChangeProductionSchedule">
+			<input message="oaws:ChangeProductionSchedule"/>
+			<output message="oaws:ChangeAcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="CancelProductionSchedule">
+			<input message="oaws:CancelProductionSchedule"/>
+			<output message="oaws:CancelAcknowledgeProductionSchedule"/>
+		</operation>
+		<operation name="GetProductionSchedule">
+			<input message="oaws:GetProductionSchedule"/>
+			<output message="oaws:ShowProductionSchedule"/>
+		</operation>
+		<operation name="SyncProductionSchedule">
+			<input message="oaws:SyncProductionSchedule"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyProductionSchedule">
+			<input message="oaws:NotifyProductionSchedule"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestProductionScheduleBinding" type="oaws:RequestProductionSchedulePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseProductionScheduleBinding" type="oaws:ResponseProductionSchedulePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncProductionScheduleBinding" type="oaws:SyncProductionSchedulePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyProductionSchedule">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ProductionSchedule.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestProductionScheduleService">
+		<port name="RequestProductionScheduleBinding" binding="oaws:RequestProductionScheduleBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestProductionSchedule"/>
+		</port>
+	</service>
+	<service name="ResponseProductionScheduleService">
+		<port name="ResponseProductionScheduleBinding" binding="oaws:ResponseProductionScheduleBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseProductionSchedule"/>
+		</port>
+	</service>
+	<service name="SyncProductionScheduleService">
+		<port name="SyncProductionScheduleBinding" binding="oaws:SyncProductionScheduleBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncProductionSchedule"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/WarehouseShippingAdvice.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyWarehouseShippingAdvice.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelWarehouseShippingAdvice">
+		<part name="Message" element="oa:CancelWarehouseShippingAdvice"/>
+	</message>
+	<message name="CancelAcknowledgeWarehouseShippingAdvice">
+		<part name="Message" element="oa:CancelAcknowledgeWarehouseShippingAdvice"/>
+	</message>
+	<message name="ChangeWarehouseShippingAdvice">
+		<part name="Message" element="oa:ChangeWarehouseShippingAdvice"/>
+	</message>
+	<message name="ChangeAcknowledgeWarehouseShippingAdvice">
+		<part name="Message" element="oa:ChangeAcknowledgeWarehouseShippingAdvice"/>
+	</message>
+	<message name="GetWarehouseShippingAdvice">
+		<part name="Message" element="oa:GetWarehouseShippingAdvice"/>
+	</message>
+	<message name="ShowWarehouseShippingAdvice">
+		<part name="Message" element="oa:ShowWarehouseShippingAdvice"/>
+	</message>
+	<message name="ProcessWarehouseShippingAdvice">
+		<part name="Message" element="oa:ProcessWarehouseShippingAdvice"/>
+	</message>
+	<message name="AcknowledgeWarehouseShippingAdvice">
+		<part name="Message" element="oa:AcknowledgeWarehouseShippingAdvice"/>
+	</message>
+	<message name="SyncWarehouseShippingAdvice">
+		<part name="Message" element="oa:SyncWarehouseShippingAdvice"/>
+	</message>
+	<message name="SyncResponseWarehouseShippingAdvice">
+		<part name="Message" element="oa:SyncResponseWarehouseShippingAdvice"/>
+	</message>
+	<message name="NotifyWarehouseShippingAdvice">
+		<part name="Message" element="oa:NotifyWarehouseShippingAdvice"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestWarehouseShippingAdvicePortType">
+		<operation name="ProcessWarehouseShippingAdvice">
+			<input message="oaws:ProcessWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="ChangeWarehouseShippingAdvice">
+			<input message="oaws:ChangeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="CancelWarehouseShippingAdvice">
+			<input message="oaws:CancelWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="GetWarehouseShippingAdvice">
+			<input message="oaws:GetWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="SyncWarehouseShippingAdvice">
+			<input message="oaws:SyncWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="NotifyWarehouseShippingAdvice">
+			<input message="oaws:NotifyWarehouseShippingAdvice"/>
+		</operation>
+	</portType>
+	<portType name="ResponseWarehouseShippingAdvicePortType">
+		<operation name="AcknowledgeWarehouseShippingAdvice">
+			<input message="oaws:AcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="ChangeAcknowledgeWarehouseShippingAdvice">
+			<input message="oaws:ChangeAcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="CancelAcknowledgeWarehouseShippingAdvice">
+			<input message="oaws:CancelAcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="ShowWarehouseShippingAdvice">
+			<input message="oaws:ShowWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="SyncResponseWarehouseShippingAdvice">
+			<input message="oaws:SyncResponseWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncWarehouseShippingAdvicePortType">
+		<operation name="ProcessWarehouseShippingAdvice">
+			<input message="oaws:ProcessWarehouseShippingAdvice"/>
+			<output message="oaws:AcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="ChangeWarehouseShippingAdvice">
+			<input message="oaws:ChangeWarehouseShippingAdvice"/>
+			<output message="oaws:ChangeAcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="CancelWarehouseShippingAdvice">
+			<input message="oaws:CancelWarehouseShippingAdvice"/>
+			<output message="oaws:CancelAcknowledgeWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="GetWarehouseShippingAdvice">
+			<input message="oaws:GetWarehouseShippingAdvice"/>
+			<output message="oaws:ShowWarehouseShippingAdvice"/>
+		</operation>
+		<operation name="SyncWarehouseShippingAdvice">
+			<input message="oaws:SyncWarehouseShippingAdvice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyWarehouseShippingAdvice">
+			<input message="oaws:NotifyWarehouseShippingAdvice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestWarehouseShippingAdviceBinding" type="oaws:RequestWarehouseShippingAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseWarehouseShippingAdviceBinding" type="oaws:ResponseWarehouseShippingAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncWarehouseShippingAdviceBinding" type="oaws:SyncWarehouseShippingAdvicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyWarehouseShippingAdvice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarehouseShippingAdvice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestWarehouseShippingAdviceService">
+		<port name="RequestWarehouseShippingAdviceBinding" binding="oaws:RequestWarehouseShippingAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestWarehouseShippingAdvice"/>
+		</port>
+	</service>
+	<service name="ResponseWarehouseShippingAdviceService">
+		<port name="ResponseWarehouseShippingAdviceBinding" binding="oaws:ResponseWarehouseShippingAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseWarehouseShippingAdvice"/>
+		</port>
+	</service>
+	<service name="SyncWarehouseShippingAdviceService">
+		<port name="SyncWarehouseShippingAdviceBinding" binding="oaws:SyncWarehouseShippingAdviceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncWarehouseShippingAdvice"/>
+		</port>
+	</service>
+</definitions>

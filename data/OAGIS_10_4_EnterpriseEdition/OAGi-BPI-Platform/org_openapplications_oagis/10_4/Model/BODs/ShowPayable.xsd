@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowPayable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Payable.xsd"/>
+        <xsd:element name="ShowPayable" type="ShowPayableType" id="oagis-id-eb492d8b5daf40d58430fcc1d5536821">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">ShowPayable is the response to a request for information about Payables. The request is provided by the GetPayable BOD.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowPayableType" id="oagis-id-3da8d713f4864c8c91e46931c44f092b">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowPayableDataAreaType" id="oagis-id-1e095698f22a4e5a83454d0d0ba323e4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPayable. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Payable).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowPayableDataAreaType" id="oagis-id-1eec94a300d148c3ba2dec6208c7851a">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-13d722f67fc54977afcefee58759bbe5"/>
+                        <xsd:element ref="Payable" maxOccurs="unbounded" id="oagis-id-e258c93ad5564b5e90df574e03622097"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

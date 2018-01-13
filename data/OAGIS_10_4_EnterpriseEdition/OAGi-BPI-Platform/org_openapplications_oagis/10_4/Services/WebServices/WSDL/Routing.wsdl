@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Routing.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRouting.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRouting">
+		<part name="Message" element="oa:CancelRouting"/>
+	</message>
+	<message name="CancelAcknowledgeRouting">
+		<part name="Message" element="oa:CancelAcknowledgeRouting"/>
+	</message>
+	<message name="ChangeRouting">
+		<part name="Message" element="oa:ChangeRouting"/>
+	</message>
+	<message name="ChangeAcknowledgeRouting">
+		<part name="Message" element="oa:ChangeAcknowledgeRouting"/>
+	</message>
+	<message name="GetRouting">
+		<part name="Message" element="oa:GetRouting"/>
+	</message>
+	<message name="ShowRouting">
+		<part name="Message" element="oa:ShowRouting"/>
+	</message>
+	<message name="ProcessRouting">
+		<part name="Message" element="oa:ProcessRouting"/>
+	</message>
+	<message name="AcknowledgeRouting">
+		<part name="Message" element="oa:AcknowledgeRouting"/>
+	</message>
+	<message name="SyncRouting">
+		<part name="Message" element="oa:SyncRouting"/>
+	</message>
+	<message name="SyncResponseRouting">
+		<part name="Message" element="oa:SyncResponseRouting"/>
+	</message>
+	<message name="NotifyRouting">
+		<part name="Message" element="oa:NotifyRouting"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRoutingPortType">
+		<operation name="ProcessRouting">
+			<input message="oaws:ProcessRouting"/>
+		</operation>
+		<operation name="ChangeRouting">
+			<input message="oaws:ChangeRouting"/>
+		</operation>
+		<operation name="CancelRouting">
+			<input message="oaws:CancelRouting"/>
+		</operation>
+		<operation name="GetRouting">
+			<input message="oaws:GetRouting"/>
+		</operation>
+		<operation name="SyncRouting">
+			<input message="oaws:SyncRouting"/>
+		</operation>
+		<operation name="NotifyRouting">
+			<input message="oaws:NotifyRouting"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRoutingPortType">
+		<operation name="AcknowledgeRouting">
+			<input message="oaws:AcknowledgeRouting"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRouting">
+			<input message="oaws:ChangeAcknowledgeRouting"/>
+		</operation>
+		<operation name="CancelAcknowledgeRouting">
+			<input message="oaws:CancelAcknowledgeRouting"/>
+		</operation>
+		<operation name="ShowRouting">
+			<input message="oaws:ShowRouting"/>
+		</operation>
+		<operation name="SyncResponseRouting">
+			<input message="oaws:SyncResponseRouting"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRoutingPortType">
+		<operation name="ProcessRouting">
+			<input message="oaws:ProcessRouting"/>
+			<output message="oaws:AcknowledgeRouting"/>
+		</operation>
+		<operation name="ChangeRouting">
+			<input message="oaws:ChangeRouting"/>
+			<output message="oaws:ChangeAcknowledgeRouting"/>
+		</operation>
+		<operation name="CancelRouting">
+			<input message="oaws:CancelRouting"/>
+			<output message="oaws:CancelAcknowledgeRouting"/>
+		</operation>
+		<operation name="GetRouting">
+			<input message="oaws:GetRouting"/>
+			<output message="oaws:ShowRouting"/>
+		</operation>
+		<operation name="SyncRouting">
+			<input message="oaws:SyncRouting"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRouting">
+			<input message="oaws:NotifyRouting"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRoutingBinding" type="oaws:RequestRoutingPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRoutingBinding" type="oaws:ResponseRoutingPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRoutingBinding" type="oaws:SyncRoutingPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRouting">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Routing.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRoutingService">
+		<port name="RequestRoutingBinding" binding="oaws:RequestRoutingBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRouting"/>
+		</port>
+	</service>
+	<service name="ResponseRoutingService">
+		<port name="ResponseRoutingBinding" binding="oaws:ResponseRoutingBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRouting"/>
+		</port>
+	</service>
+	<service name="SyncRoutingService">
+		<port name="SyncRoutingBinding" binding="oaws:SyncRoutingBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRouting"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/BudgetLedger.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="BudgetLedger" type="BudgetLedgerType" id="oagis-id-b4199c3058614e9985cdc667305aceb0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Ledger Budget represents budget amounts by account within ledger within company or business area.  Budget amounts may be generated in a source application and then loaded to a specific ledger within the enterprise general ledger or budget application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BudgetLedgerHeader" type="BudgetLedgerHeaderType" id="oagis-id-2d51fb06a00f436880cf4974155c934d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Budget Header information</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BudgetLedgerLine" type="BudgetLedgerLineType" id="oagis-id-c16e0c3a564f41948324d4aede8f7121"/>
+	<xsd:complexType name="BudgetLedgerType" id="oagis-id-571022256d734216a82ad95ee3abd7ae">
+		<xsd:sequence>
+			<xsd:element ref="BudgetLedgerHeader" id="oagis-id-ee953b1f3cbc40058b4420ded6f0b6dd" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Budget Header information</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BudgetLedgerLine" id="oagis-id-4b065f800b684b9c9ada3d182fa8540a" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2b1dce8320464809bb5858e3f2f80616"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-a5c276a52cf14a2495a62f61da0a4213"/>
+	</xsd:complexType>
+	<xsd:complexType name="BudgetLedgerHeaderBaseType" id="oagis-id-3e4a75af9e4f48cda3a208d867218559">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The JournalEntryID is the  ID in the source sub-ledger that generated the transaction
+
+The IncrementIndicator identifies if the amounts in the ledger budget lines are intended to increment or replace any existing amounts</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="JournalEntryID" id="oagis-id-90bd4e2eadd54508b5209673196e8fcb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the externally created identifier for a general ledger journal entry.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="IncrementIndicator" id="oagis-id-f7f3f2f530694baca9a49009d787f604" minOccurs="0"/>
+					<xsd:element ref="LedgerID" id="oagis-id-91af781268064c4d95cb8d7543e5d905" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the financial ledger to be used when updating balances</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GLEntityID" id="oagis-id-f46039e6e3554a97936e4e08b002eb23" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
+
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SourceDocumentReference" id="oagis-id-6073d99d06b44864882d084203cd3815" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the link that ties back to a sub ledger transaction entry ID.  It is the identifier of an original/ source transaction or document.  The type indicates the type of document i.e. PurchaseOrder, Invoice, Receipt, Credit Memo, Voucher etc. For example, it could be the receipt or the summarized inventory activity.  This is the singular field that refers to an audit record.  Together with the Sender information, this is part of the referencing system, which will enable drill back audit trail functionality.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransactionAnalysisCode" id="oagis-id-c7cf8ac039f44aa5b2346cb831d40d08" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a segmenting code used to analyze accounting transactions.  It is commonly used in project accounting applications.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="User" id="oagis-id-7d7a7778694142939b0985e7fc5a70c5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the user of a given system.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-21e47457126b4209b8abad487a8c13a8" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BudgetLedgerHeaderType" id="oagis-id-3db63228953841048ab0191e0c6db0a1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The JournalEntryID is the  ID in the source sub-ledger that generated the transaction
+
+The IncrementIndicator identifies if the amounts in the ledger budget lines are intended to increment or replace any existing amounts</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="BudgetLedgerHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BudgetLedgerHeaderExtensionType" id="oagis-id-f577702755424b25b648f36476b0e3e7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BudgetLedgerLineBaseType" id="oagis-id-a4d85181224f4111b57d58ac515d6187">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:group ref="LedgerAmountGroup" id="oagis-id-7c4ab32ff6724f208bedd75d8e98de2d"/>
+					<xsd:group ref="LedgerEntryContentGroup" id="oagis-id-967ff06727c6490e96a1d61b35c94168"/>
+					<xsd:element ref="AccountingPeriod" id="oagis-id-f632d6529a7b4ac09efe71d1e1df5418" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the date, accounting period and financial year.  It is also known as the effective or post date</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BudgetLedgerLineType" id="oagis-id-87374e30d6854195ad53ada917abe1e1">
+		<xsd:complexContent>
+			<xsd:extension base="BudgetLedgerLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="BudgetLedgerLineExtensionType" id="oagis-id-84b68435e6484fe6b93c5fb31f536eab" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

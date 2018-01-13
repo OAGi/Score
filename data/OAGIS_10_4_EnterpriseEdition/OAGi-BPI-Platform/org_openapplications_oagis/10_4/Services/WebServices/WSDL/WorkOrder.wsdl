@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/WorkOrder.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyWorkOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelWorkOrder">
+		<part name="Message" element="oa:CancelWorkOrder"/>
+	</message>
+	<message name="CancelAcknowledgeWorkOrder">
+		<part name="Message" element="oa:CancelAcknowledgeWorkOrder"/>
+	</message>
+	<message name="ChangeWorkOrder">
+		<part name="Message" element="oa:ChangeWorkOrder"/>
+	</message>
+	<message name="ChangeAcknowledgeWorkOrder">
+		<part name="Message" element="oa:ChangeAcknowledgeWorkOrder"/>
+	</message>
+	<message name="GetWorkOrder">
+		<part name="Message" element="oa:GetWorkOrder"/>
+	</message>
+	<message name="ShowWorkOrder">
+		<part name="Message" element="oa:ShowWorkOrder"/>
+	</message>
+	<message name="ProcessWorkOrder">
+		<part name="Message" element="oa:ProcessWorkOrder"/>
+	</message>
+	<message name="AcknowledgeWorkOrder">
+		<part name="Message" element="oa:AcknowledgeWorkOrder"/>
+	</message>
+	<message name="SyncWorkOrder">
+		<part name="Message" element="oa:SyncWorkOrder"/>
+	</message>
+	<message name="SyncResponseWorkOrder">
+		<part name="Message" element="oa:SyncResponseWorkOrder"/>
+	</message>
+	<message name="NotifyWorkOrder">
+		<part name="Message" element="oa:NotifyWorkOrder"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestWorkOrderPortType">
+		<operation name="ProcessWorkOrder">
+			<input message="oaws:ProcessWorkOrder"/>
+		</operation>
+		<operation name="ChangeWorkOrder">
+			<input message="oaws:ChangeWorkOrder"/>
+		</operation>
+		<operation name="CancelWorkOrder">
+			<input message="oaws:CancelWorkOrder"/>
+		</operation>
+		<operation name="GetWorkOrder">
+			<input message="oaws:GetWorkOrder"/>
+		</operation>
+		<operation name="SyncWorkOrder">
+			<input message="oaws:SyncWorkOrder"/>
+		</operation>
+		<operation name="NotifyWorkOrder">
+			<input message="oaws:NotifyWorkOrder"/>
+		</operation>
+	</portType>
+	<portType name="ResponseWorkOrderPortType">
+		<operation name="AcknowledgeWorkOrder">
+			<input message="oaws:AcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="ChangeAcknowledgeWorkOrder">
+			<input message="oaws:ChangeAcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="CancelAcknowledgeWorkOrder">
+			<input message="oaws:CancelAcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="ShowWorkOrder">
+			<input message="oaws:ShowWorkOrder"/>
+		</operation>
+		<operation name="SyncResponseWorkOrder">
+			<input message="oaws:SyncResponseWorkOrder"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncWorkOrderPortType">
+		<operation name="ProcessWorkOrder">
+			<input message="oaws:ProcessWorkOrder"/>
+			<output message="oaws:AcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="ChangeWorkOrder">
+			<input message="oaws:ChangeWorkOrder"/>
+			<output message="oaws:ChangeAcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="CancelWorkOrder">
+			<input message="oaws:CancelWorkOrder"/>
+			<output message="oaws:CancelAcknowledgeWorkOrder"/>
+		</operation>
+		<operation name="GetWorkOrder">
+			<input message="oaws:GetWorkOrder"/>
+			<output message="oaws:ShowWorkOrder"/>
+		</operation>
+		<operation name="SyncWorkOrder">
+			<input message="oaws:SyncWorkOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyWorkOrder">
+			<input message="oaws:NotifyWorkOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestWorkOrderBinding" type="oaws:RequestWorkOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseWorkOrderBinding" type="oaws:ResponseWorkOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncWorkOrderBinding" type="oaws:SyncWorkOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyWorkOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WorkOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestWorkOrderService">
+		<port name="RequestWorkOrderBinding" binding="oaws:RequestWorkOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestWorkOrder"/>
+		</port>
+	</service>
+	<service name="ResponseWorkOrderService">
+		<port name="ResponseWorkOrderBinding" binding="oaws:ResponseWorkOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseWorkOrder"/>
+		</port>
+	</service>
+	<service name="SyncWorkOrderService">
+		<port name="SyncWorkOrderBinding" binding="oaws:SyncWorkOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncWorkOrder"/>
+		</port>
+	</service>
+</definitions>

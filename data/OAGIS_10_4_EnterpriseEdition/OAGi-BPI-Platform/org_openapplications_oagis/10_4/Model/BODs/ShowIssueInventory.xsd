@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowIssueInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/IssueInventory.xsd"/>
+        <xsd:element name="ShowIssueInventory" type="ShowIssueInventoryType" id="oagis-id-1fcdd1207b6140e0b22ab33a72884f65">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowIssueInventory is to supply inventory issue information against an order, from an ERP system into a PDC system to confirm the IssueInventory transaction (BOD).</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowIssueInventoryType" id="oagis-id-3b3a096458994bccb3202396efe90356">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowIssueInventoryDataAreaType" id="oagis-id-3ed612014874441aa1710e265d2135e5">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowIssueInventory. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (IssueInventory).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowIssueInventoryDataAreaType" id="oagis-id-3af946024a624e44ae0cc48630af7810">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-4160ad1352904f0cbc3dc66d2ac3f675"/>
+                        <xsd:element ref="IssueInventory" maxOccurs="unbounded" id="oagis-id-98b7e8d1b23f4401ab6369c2eb4b3a02"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

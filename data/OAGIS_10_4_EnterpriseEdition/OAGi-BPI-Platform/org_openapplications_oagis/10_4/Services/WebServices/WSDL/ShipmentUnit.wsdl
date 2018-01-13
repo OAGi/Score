@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ShipmentUnit.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyShipmentUnit.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelShipmentUnit">
+		<part name="Message" element="oa:CancelShipmentUnit"/>
+	</message>
+	<message name="CancelAcknowledgeShipmentUnit">
+		<part name="Message" element="oa:CancelAcknowledgeShipmentUnit"/>
+	</message>
+	<message name="ChangeShipmentUnit">
+		<part name="Message" element="oa:ChangeShipmentUnit"/>
+	</message>
+	<message name="ChangeAcknowledgeShipmentUnit">
+		<part name="Message" element="oa:ChangeAcknowledgeShipmentUnit"/>
+	</message>
+	<message name="GetShipmentUnit">
+		<part name="Message" element="oa:GetShipmentUnit"/>
+	</message>
+	<message name="ShowShipmentUnit">
+		<part name="Message" element="oa:ShowShipmentUnit"/>
+	</message>
+	<message name="ProcessShipmentUnit">
+		<part name="Message" element="oa:ProcessShipmentUnit"/>
+	</message>
+	<message name="AcknowledgeShipmentUnit">
+		<part name="Message" element="oa:AcknowledgeShipmentUnit"/>
+	</message>
+	<message name="SyncShipmentUnit">
+		<part name="Message" element="oa:SyncShipmentUnit"/>
+	</message>
+	<message name="SyncResponseShipmentUnit">
+		<part name="Message" element="oa:SyncResponseShipmentUnit"/>
+	</message>
+	<message name="NotifyShipmentUnit">
+		<part name="Message" element="oa:NotifyShipmentUnit"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestShipmentUnitPortType">
+		<operation name="ProcessShipmentUnit">
+			<input message="oaws:ProcessShipmentUnit"/>
+		</operation>
+		<operation name="ChangeShipmentUnit">
+			<input message="oaws:ChangeShipmentUnit"/>
+		</operation>
+		<operation name="CancelShipmentUnit">
+			<input message="oaws:CancelShipmentUnit"/>
+		</operation>
+		<operation name="GetShipmentUnit">
+			<input message="oaws:GetShipmentUnit"/>
+		</operation>
+		<operation name="SyncShipmentUnit">
+			<input message="oaws:SyncShipmentUnit"/>
+		</operation>
+		<operation name="NotifyShipmentUnit">
+			<input message="oaws:NotifyShipmentUnit"/>
+		</operation>
+	</portType>
+	<portType name="ResponseShipmentUnitPortType">
+		<operation name="AcknowledgeShipmentUnit">
+			<input message="oaws:AcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="ChangeAcknowledgeShipmentUnit">
+			<input message="oaws:ChangeAcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="CancelAcknowledgeShipmentUnit">
+			<input message="oaws:CancelAcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="ShowShipmentUnit">
+			<input message="oaws:ShowShipmentUnit"/>
+		</operation>
+		<operation name="SyncResponseShipmentUnit">
+			<input message="oaws:SyncResponseShipmentUnit"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncShipmentUnitPortType">
+		<operation name="ProcessShipmentUnit">
+			<input message="oaws:ProcessShipmentUnit"/>
+			<output message="oaws:AcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="ChangeShipmentUnit">
+			<input message="oaws:ChangeShipmentUnit"/>
+			<output message="oaws:ChangeAcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="CancelShipmentUnit">
+			<input message="oaws:CancelShipmentUnit"/>
+			<output message="oaws:CancelAcknowledgeShipmentUnit"/>
+		</operation>
+		<operation name="GetShipmentUnit">
+			<input message="oaws:GetShipmentUnit"/>
+			<output message="oaws:ShowShipmentUnit"/>
+		</operation>
+		<operation name="SyncShipmentUnit">
+			<input message="oaws:SyncShipmentUnit"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyShipmentUnit">
+			<input message="oaws:NotifyShipmentUnit"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestShipmentUnitBinding" type="oaws:RequestShipmentUnitPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseShipmentUnitBinding" type="oaws:ResponseShipmentUnitPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncShipmentUnitBinding" type="oaws:SyncShipmentUnitPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyShipmentUnit">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShipmentUnit.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestShipmentUnitService">
+		<port name="RequestShipmentUnitBinding" binding="oaws:RequestShipmentUnitBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestShipmentUnit"/>
+		</port>
+	</service>
+	<service name="ResponseShipmentUnitService">
+		<port name="ResponseShipmentUnitBinding" binding="oaws:ResponseShipmentUnitBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseShipmentUnit"/>
+		</port>
+	</service>
+	<service name="SyncShipmentUnitService">
+		<port name="SyncShipmentUnitBinding" binding="oaws:SyncShipmentUnitBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncShipmentUnit"/>
+		</port>
+	</service>
+</definitions>

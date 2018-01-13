@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>OAGIS 10.0 Scenario - Scenario 52</title>
+
+
+  
+
+  
+  <base target="body"></head><body bgproperties="fixed" style="background-color: rgb(255, 255, 255);">
+<table border="1" cellpadding="10" cellspacing="1" height="100%" width="78%">
+
+  <tbody>
+    <tr>
+      <td wrap="" align="left" bgcolor="#ffffff" height="80" valign="top" width="78%">
+      <h1><b><span style="font-family: Arial; font-size: large;">Scenario
+52 - Sarbanes-Oxley (SOX) Data Exchange<br>
+</span></b></h1>
+      <hr>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.0
+Overview</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Scenario
+#52
+describes the integration for customer party applications to integrate
+with an audit firms applications to load and exchange the processes,
+procedures and that actual assessments of risks within a firm.<br>
+<br>
+      </span><span style="font-family: Arial; font-size: small;">The
+purpose of this scenario is to enable the visualization of the
+participants in the process and the dialogs between them for this
+specific integration. This scenario is not meant to be the only model
+for integrating general ledger applications to a budget
+applications. This is simply one model that may be used to guide one's
+own integration efforts.<br>
+      <br>
+      <br>
+      </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.1
+Scenario Diagram</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The scenario
+below contains the participants involved in the
+interaction, the dialog flows or conversation between them, certain
+assumptions about the sequence of events, and assumptions about the
+technical approach, for example, publish and subscribe.<br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">This
+is a model to be used as a design recommendation, not a required
+approach.</span><br>
+      <br>
+      <img style="width: 427px; height: 312px;" alt="Location Services Scenario" src="../OAGIS_Scenarios_GraphicsFiles/52-SarbanesOxley.jpg"><br>
+      <br>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.2
+Assumptions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This
+scenario assumes a loosely coupled, asynchronous approach with
+transaction management required but not
+explicitly defined.<br>
+      </span><span style="font-family: Arial; font-size: small;"><br>
+The environment for this initial integration is typically within an
+enterprise and/or between divisions. It can also be used for
+integration between two enterprises. <br>
+      <br>
+This scenario also assumes that one application will maintain the master
+data for integration.<br>
+      <br>
+      <br>
+      </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.3
+Participant Definitions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This
+scenario contains two participants or roles: that of a firm creating or
+using SOX procedures or being audited and an application within an
+audit firm needing to provide a library of procedures or to access to
+the customers library of risk control options and any results of
+applying those procedures.<br>
+      <br>
+      <br>
+      </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.4
+Business Workflow (Sequence)</span></b></h1>
+      <span style="font-family: Arial; font-size: small;"></span><span style="color: rgb(0, 0, 0); font-family: Arial; font-size: small; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; background-color: rgb(255, 255, 255); display: inline ! important; float: none;">The
+business workflow is graphically represented by starting at the
+Scenario top and reading from top down and from left to right.<span class="Apple-converted-space"> <br>
+      <br>
+      </span></span><span style="font-family: Arial; font-size: small;">This scenario
+contains the following events in the workflow sequence:<br>
+      </span>
+      <ol><li style="font-family: Arial;"><font size="-1">An offer to load a risk control to a customer system and an indication of a level of acceptance <br>
+          </font></li><li><span style="font-family: Arial;"><font size="-1"><span style="font-family: Arial;"></span></font></span><span style="font-family: Arial; font-size: small;">Ability to query the risk control procedures and test results as needed<br>
+          <br>
+. </span></li>
+      </ol>
+      <h1><b><span style="font-family: Arial; font-size: medium;">52.5
+Exception Handling</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Exception
+handling is highly localized as the result of an implementation's
+infrastructure, management and business rules. As such, this section of
+the Scenario documentation is planned to be used as a
+guide to help understand the additional intent of these Scenarios. If no exceptions are noted here, then it can be assumed that
+the Scenario designers agreed that the Scenario is straight forward and
+has no additional needs:</span><br>
+
+
+      
+      <ul><li><span style="font-family: Arial; font-size: small;">Note
+that the Confirm BOD is not shown in the scenario and that it is the
+most obvious method for
+providing an application level exception and feedback mechanism between
+business
+software components. Full Confirm BOD use is described in other OAGIS
+documentation in detail, but it should be noted that the specific use
+of the Confirm
+BOD may vary significantly from scenario to scenario and from
+integration to integration.</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">The
+Confirm BOD is typically intended to be used by the original receiving
+application to communicate to the sending application that the
+information
+it sent in the message BOD (business object document) was received and understood and can be
+processed.</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">If the
+information was not
+received or nor understood, or contained errors of any type, it is
+accepted practice for the OAGIS users to presume that the data was
+not acted on and in the absence of a Confirm BOD within a partnership previously agreed to
+time limit to resend the original message again. <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">As errors and assumptions are the bane of any implementation,
+it is strongly recommended that the Confirm BOD be used to prevent any
+potential problem although it is not a requirement by OAGIS use.<br>
+          <br>
+          <br>
+          </span></li>
+      </ul>
+      <span style="font-family: Arial; font-size: small;"></span>
+      <hr><span style="font-family: Arial; font-size: xx-small;">Copyright
+OAGi 2017 - All Rights Reserved  --  
+OAGIS
+release 10.4 - Document Number: 20170501-</span><span style="font-family: Arial; font-size: xx-small;">52</span><span style="font-family: Arial; font-size: xx-small;"></span> </td>
+    </tr>
+  </tbody>
+</table>
+
+</body></html>

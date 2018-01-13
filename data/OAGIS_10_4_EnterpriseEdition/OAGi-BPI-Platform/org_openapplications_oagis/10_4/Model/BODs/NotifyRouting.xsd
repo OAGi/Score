@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyRouting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Routing.xsd"/>
+	<xsd:element name="NotifyRouting" type="NotifyRoutingType" id="oagis-id-3a72ac31540847f8b7d98f08ad3f3388">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyRouting is to communicate to a business application component or system the need to report an event occurre regarding a Routing or to update an existing Routing structure.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyRoutingType" id="oagis-id-206184843439415db18bc8069acbc064">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyRoutingDataAreaType" id="oagis-id-58af6c743b7d4b308eb3fc5c04270e72">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyRouting. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (Routing).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyRoutingDataAreaType" id="oagis-id-a6f427fe7f2640b59a059634f35f4d9c">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-3b992bc057b340a3a372f1753a1c1de8"/>
+			<xsd:element ref="Routing" maxOccurs="unbounded" id="oagis-id-699b83f68ccd45a198d698489fce76ef"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/MoveWIP.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyMoveWIP.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelMoveWIP">
+		<part name="Message" element="oa:CancelMoveWIP"/>
+	</message>
+	<message name="CancelAcknowledgeMoveWIP">
+		<part name="Message" element="oa:CancelAcknowledgeMoveWIP"/>
+	</message>
+	<message name="ChangeMoveWIP">
+		<part name="Message" element="oa:ChangeMoveWIP"/>
+	</message>
+	<message name="ChangeAcknowledgeMoveWIP">
+		<part name="Message" element="oa:ChangeAcknowledgeMoveWIP"/>
+	</message>
+	<message name="GetMoveWIP">
+		<part name="Message" element="oa:GetMoveWIP"/>
+	</message>
+	<message name="ShowMoveWIP">
+		<part name="Message" element="oa:ShowMoveWIP"/>
+	</message>
+	<message name="ProcessMoveWIP">
+		<part name="Message" element="oa:ProcessMoveWIP"/>
+	</message>
+	<message name="AcknowledgeMoveWIP">
+		<part name="Message" element="oa:AcknowledgeMoveWIP"/>
+	</message>
+	<message name="SyncMoveWIP">
+		<part name="Message" element="oa:SyncMoveWIP"/>
+	</message>
+	<message name="SyncResponseMoveWIP">
+		<part name="Message" element="oa:SyncResponseMoveWIP"/>
+	</message>
+	<message name="NotifyMoveWIP">
+		<part name="Message" element="oa:NotifyMoveWIP"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestMoveWIPPortType">
+		<operation name="ProcessMoveWIP">
+			<input message="oaws:ProcessMoveWIP"/>
+		</operation>
+		<operation name="ChangeMoveWIP">
+			<input message="oaws:ChangeMoveWIP"/>
+		</operation>
+		<operation name="CancelMoveWIP">
+			<input message="oaws:CancelMoveWIP"/>
+		</operation>
+		<operation name="GetMoveWIP">
+			<input message="oaws:GetMoveWIP"/>
+		</operation>
+		<operation name="SyncMoveWIP">
+			<input message="oaws:SyncMoveWIP"/>
+		</operation>
+		<operation name="NotifyMoveWIP">
+			<input message="oaws:NotifyMoveWIP"/>
+		</operation>
+	</portType>
+	<portType name="ResponseMoveWIPPortType">
+		<operation name="AcknowledgeMoveWIP">
+			<input message="oaws:AcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="ChangeAcknowledgeMoveWIP">
+			<input message="oaws:ChangeAcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="CancelAcknowledgeMoveWIP">
+			<input message="oaws:CancelAcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="ShowMoveWIP">
+			<input message="oaws:ShowMoveWIP"/>
+		</operation>
+		<operation name="SyncResponseMoveWIP">
+			<input message="oaws:SyncResponseMoveWIP"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncMoveWIPPortType">
+		<operation name="ProcessMoveWIP">
+			<input message="oaws:ProcessMoveWIP"/>
+			<output message="oaws:AcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="ChangeMoveWIP">
+			<input message="oaws:ChangeMoveWIP"/>
+			<output message="oaws:ChangeAcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="CancelMoveWIP">
+			<input message="oaws:CancelMoveWIP"/>
+			<output message="oaws:CancelAcknowledgeMoveWIP"/>
+		</operation>
+		<operation name="GetMoveWIP">
+			<input message="oaws:GetMoveWIP"/>
+			<output message="oaws:ShowMoveWIP"/>
+		</operation>
+		<operation name="SyncMoveWIP">
+			<input message="oaws:SyncMoveWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyMoveWIP">
+			<input message="oaws:NotifyMoveWIP"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestMoveWIPBinding" type="oaws:RequestMoveWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseMoveWIPBinding" type="oaws:ResponseMoveWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncMoveWIPBinding" type="oaws:SyncMoveWIPPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyMoveWIP">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/MoveWIP.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestMoveWIPService">
+		<port name="RequestMoveWIPBinding" binding="oaws:RequestMoveWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestMoveWIP"/>
+		</port>
+	</service>
+	<service name="ResponseMoveWIPService">
+		<port name="ResponseMoveWIPBinding" binding="oaws:ResponseMoveWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseMoveWIP"/>
+		</port>
+	</service>
+	<service name="SyncMoveWIPService">
+		<port name="SyncMoveWIPBinding" binding="oaws:SyncMoveWIPBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncMoveWIP"/>
+		</port>
+	</service>
+</definitions>

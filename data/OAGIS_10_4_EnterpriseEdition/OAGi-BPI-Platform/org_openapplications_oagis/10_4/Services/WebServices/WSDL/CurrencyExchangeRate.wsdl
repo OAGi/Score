@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/CurrencyExchangeRate.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCurrencyExchangeRate.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCurrencyExchangeRate">
+		<part name="Message" element="oa:CancelCurrencyExchangeRate"/>
+	</message>
+	<message name="CancelAcknowledgeCurrencyExchangeRate">
+		<part name="Message" element="oa:CancelAcknowledgeCurrencyExchangeRate"/>
+	</message>
+	<message name="ChangeCurrencyExchangeRate">
+		<part name="Message" element="oa:ChangeCurrencyExchangeRate"/>
+	</message>
+	<message name="ChangeAcknowledgeCurrencyExchangeRate">
+		<part name="Message" element="oa:ChangeAcknowledgeCurrencyExchangeRate"/>
+	</message>
+	<message name="GetCurrencyExchangeRate">
+		<part name="Message" element="oa:GetCurrencyExchangeRate"/>
+	</message>
+	<message name="ShowCurrencyExchangeRate">
+		<part name="Message" element="oa:ShowCurrencyExchangeRate"/>
+	</message>
+	<message name="ProcessCurrencyExchangeRate">
+		<part name="Message" element="oa:ProcessCurrencyExchangeRate"/>
+	</message>
+	<message name="AcknowledgeCurrencyExchangeRate">
+		<part name="Message" element="oa:AcknowledgeCurrencyExchangeRate"/>
+	</message>
+	<message name="SyncCurrencyExchangeRate">
+		<part name="Message" element="oa:SyncCurrencyExchangeRate"/>
+	</message>
+	<message name="SyncResponseCurrencyExchangeRate">
+		<part name="Message" element="oa:SyncResponseCurrencyExchangeRate"/>
+	</message>
+	<message name="NotifyCurrencyExchangeRate">
+		<part name="Message" element="oa:NotifyCurrencyExchangeRate"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCurrencyExchangeRatePortType">
+		<operation name="ProcessCurrencyExchangeRate">
+			<input message="oaws:ProcessCurrencyExchangeRate"/>
+		</operation>
+		<operation name="ChangeCurrencyExchangeRate">
+			<input message="oaws:ChangeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="CancelCurrencyExchangeRate">
+			<input message="oaws:CancelCurrencyExchangeRate"/>
+		</operation>
+		<operation name="GetCurrencyExchangeRate">
+			<input message="oaws:GetCurrencyExchangeRate"/>
+		</operation>
+		<operation name="SyncCurrencyExchangeRate">
+			<input message="oaws:SyncCurrencyExchangeRate"/>
+		</operation>
+		<operation name="NotifyCurrencyExchangeRate">
+			<input message="oaws:NotifyCurrencyExchangeRate"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCurrencyExchangeRatePortType">
+		<operation name="AcknowledgeCurrencyExchangeRate">
+			<input message="oaws:AcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCurrencyExchangeRate">
+			<input message="oaws:ChangeAcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="CancelAcknowledgeCurrencyExchangeRate">
+			<input message="oaws:CancelAcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="ShowCurrencyExchangeRate">
+			<input message="oaws:ShowCurrencyExchangeRate"/>
+		</operation>
+		<operation name="SyncResponseCurrencyExchangeRate">
+			<input message="oaws:SyncResponseCurrencyExchangeRate"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncCurrencyExchangeRatePortType">
+		<operation name="ProcessCurrencyExchangeRate">
+			<input message="oaws:ProcessCurrencyExchangeRate"/>
+			<output message="oaws:AcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="ChangeCurrencyExchangeRate">
+			<input message="oaws:ChangeCurrencyExchangeRate"/>
+			<output message="oaws:ChangeAcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="CancelCurrencyExchangeRate">
+			<input message="oaws:CancelCurrencyExchangeRate"/>
+			<output message="oaws:CancelAcknowledgeCurrencyExchangeRate"/>
+		</operation>
+		<operation name="GetCurrencyExchangeRate">
+			<input message="oaws:GetCurrencyExchangeRate"/>
+			<output message="oaws:ShowCurrencyExchangeRate"/>
+		</operation>
+		<operation name="SyncCurrencyExchangeRate">
+			<input message="oaws:SyncCurrencyExchangeRate"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCurrencyExchangeRate">
+			<input message="oaws:NotifyCurrencyExchangeRate"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCurrencyExchangeRateBinding" type="oaws:RequestCurrencyExchangeRatePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCurrencyExchangeRateBinding" type="oaws:ResponseCurrencyExchangeRatePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncCurrencyExchangeRateBinding" type="oaws:SyncCurrencyExchangeRatePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCurrencyExchangeRate">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CurrencyExchangeRate.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCurrencyExchangeRateService">
+		<port name="RequestCurrencyExchangeRateBinding" binding="oaws:RequestCurrencyExchangeRateBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCurrencyExchangeRate"/>
+		</port>
+	</service>
+	<service name="ResponseCurrencyExchangeRateService">
+		<port name="ResponseCurrencyExchangeRateBinding" binding="oaws:ResponseCurrencyExchangeRateBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCurrencyExchangeRate"/>
+		</port>
+	</service>
+	<service name="SyncCurrencyExchangeRateService">
+		<port name="SyncCurrencyExchangeRateBinding" binding="oaws:SyncCurrencyExchangeRateBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncCurrencyExchangeRate"/>
+		</port>
+	</service>
+</definitions>

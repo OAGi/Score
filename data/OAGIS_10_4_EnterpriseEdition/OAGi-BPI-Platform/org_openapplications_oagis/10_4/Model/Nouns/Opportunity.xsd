@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/Opportunity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="Opportunity" type="OpportunityType" id="oagis-id-152fd9583e534ec285a8793bdba6fbdb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines how leads interact with other Partner systems and SalesLead systems.
+
+Life cycle of an order typically is as follows:
+SalesLead -&gt; Opportunity -&gt; Opportunity -&gt; Quote -&gt; PurchaseOrder -&gt; SalesOrder</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="OpportunityHeader" type="OpportunityHeaderType" id="oagis-id-14d5426b06184e2bbd096ea85bd0c9bd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Content that applies to the entire Opprotunity.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="OpportunityLine" type="OpportunityLineType" id="oagis-id-dd9351ed1645458fbda4b8d1c5996cd6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Opportunity Detail.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OpportunityType" id="oagis-id-150e0791946a48d6b54dfcf9a7428e1f">
+		<xsd:sequence>
+			<xsd:element ref="OpportunityHeader" id="oagis-id-b44158a6e86d4311a104c5ac90b68c94" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Content that applies to the entire Opprotunity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="OpportunityLine" id="oagis-id-44f381dff6e44759b7110049d27e0bb5" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Opportunity Detail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7afd7b8093cc4852b44b12fa5cc593dc"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-3d0d2615eb5645c4a0adf032d94da903"/>
+	</xsd:complexType>
+	<xsd:complexType name="OpportunityHeaderBaseType" id="oagis-id-7958409c287f4ff98f12de8b9cdf5590">
+		<xsd:complexContent>
+			<xsd:extension base="CRMHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseTimePeriod" id="oagis-id-68902f16f33b4725bfb5b7048dc7cedf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the period in which the prospect would consider purchase.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BudgetStatus" id="oagis-id-42bcdb6554354b7cbde3517b32a58b24" minOccurs="0"/>
+					<xsd:element ref="WinningProbabilityPercent" id="oagis-id-33a0136322dd4b6e8fad890217b1fd21" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Probability for winning the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesStageCode" id="oagis-id-692f112fe1bf44d5b69a19ba5216b548" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Stage of the sale.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DecisionDateTime" id="oagis-id-48442ad49b9449a983d3719942ba904d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Date and time that te decision is expected to be made.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProjectReference" id="oagis-id-d6d97b1cbbb846a6a708f6f320ef7fe2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a project that is associated with the given component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesLeadReference" id="oagis-id-2027a5a447d9439587ec16188b5400c1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to an existing SalesLead that is associated with the given document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Classification" id="oagis-id-180e586d17864cb28fbaa097417a9ed8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the classification of an entity. An entity may be classified into mulitple groups for different reasons. Examples of Classification include Commodity Codes, Freight Classifications, Product Line classifications and so on. Suggested Values are COMMODITY, FREIGHT, PRODUCTLINE</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OpportunityHeaderType" id="oagis-id-494303e87b0d4f59bea689542c0e692d">
+		<xsd:complexContent>
+			<xsd:extension base="OpportunityHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OpportunityHeaderExtensionType" id="oagis-id-dc6cc78f27c442319a60c98b901492af" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OpportunityLineBaseType" id="oagis-id-15c27d228032458eaf361ecfca5892f8">
+		<xsd:complexContent>
+			<xsd:extension base="CRMLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="DecisionDateTime" id="oagis-id-301941bc525744e18062970b310bd624" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Date and time that te decision is expected to be made.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Financing" id="oagis-id-591f17d49fc7469aa5f37fa020689acb" minOccurs="0"/>
+					<xsd:element ref="Appointment" id="oagis-id-31ddefcbb467401f9aacb1d0fd29a59e" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SalesActivity" id="oagis-id-2a547f059d9b471ab052d058435c4ac3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An associated sales activity as a result of the lead/opportunity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OpportunityLineType" id="oagis-id-7955fec12b4e495cae3c55520d748083">
+		<xsd:complexContent>
+			<xsd:extension base="OpportunityLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OpportunityLineExtensionType" id="oagis-id-5e5b3c20160a479387826364fe601e03" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

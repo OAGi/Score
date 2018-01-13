@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Operation.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyOperation.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelOperation">
+		<part name="Message" element="oa:CancelOperation"/>
+	</message>
+	<message name="CancelAcknowledgeOperation">
+		<part name="Message" element="oa:CancelAcknowledgeOperation"/>
+	</message>
+	<message name="ChangeOperation">
+		<part name="Message" element="oa:ChangeOperation"/>
+	</message>
+	<message name="ChangeAcknowledgeOperation">
+		<part name="Message" element="oa:ChangeAcknowledgeOperation"/>
+	</message>
+	<message name="GetOperation">
+		<part name="Message" element="oa:GetOperation"/>
+	</message>
+	<message name="ShowOperation">
+		<part name="Message" element="oa:ShowOperation"/>
+	</message>
+	<message name="ProcessOperation">
+		<part name="Message" element="oa:ProcessOperation"/>
+	</message>
+	<message name="AcknowledgeOperation">
+		<part name="Message" element="oa:AcknowledgeOperation"/>
+	</message>
+	<message name="SyncOperation">
+		<part name="Message" element="oa:SyncOperation"/>
+	</message>
+	<message name="SyncResponseOperation">
+		<part name="Message" element="oa:SyncResponseOperation"/>
+	</message>
+	<message name="NotifyOperation">
+		<part name="Message" element="oa:NotifyOperation"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestOperationPortType">
+		<operation name="ProcessOperation">
+			<input message="oaws:ProcessOperation"/>
+		</operation>
+		<operation name="ChangeOperation">
+			<input message="oaws:ChangeOperation"/>
+		</operation>
+		<operation name="CancelOperation">
+			<input message="oaws:CancelOperation"/>
+		</operation>
+		<operation name="GetOperation">
+			<input message="oaws:GetOperation"/>
+		</operation>
+		<operation name="SyncOperation">
+			<input message="oaws:SyncOperation"/>
+		</operation>
+		<operation name="NotifyOperation">
+			<input message="oaws:NotifyOperation"/>
+		</operation>
+	</portType>
+	<portType name="ResponseOperationPortType">
+		<operation name="AcknowledgeOperation">
+			<input message="oaws:AcknowledgeOperation"/>
+		</operation>
+		<operation name="ChangeAcknowledgeOperation">
+			<input message="oaws:ChangeAcknowledgeOperation"/>
+		</operation>
+		<operation name="CancelAcknowledgeOperation">
+			<input message="oaws:CancelAcknowledgeOperation"/>
+		</operation>
+		<operation name="ShowOperation">
+			<input message="oaws:ShowOperation"/>
+		</operation>
+		<operation name="SyncResponseOperation">
+			<input message="oaws:SyncResponseOperation"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncOperationPortType">
+		<operation name="ProcessOperation">
+			<input message="oaws:ProcessOperation"/>
+			<output message="oaws:AcknowledgeOperation"/>
+		</operation>
+		<operation name="ChangeOperation">
+			<input message="oaws:ChangeOperation"/>
+			<output message="oaws:ChangeAcknowledgeOperation"/>
+		</operation>
+		<operation name="CancelOperation">
+			<input message="oaws:CancelOperation"/>
+			<output message="oaws:CancelAcknowledgeOperation"/>
+		</operation>
+		<operation name="GetOperation">
+			<input message="oaws:GetOperation"/>
+			<output message="oaws:ShowOperation"/>
+		</operation>
+		<operation name="SyncOperation">
+			<input message="oaws:SyncOperation"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyOperation">
+			<input message="oaws:NotifyOperation"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestOperationBinding" type="oaws:RequestOperationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseOperationBinding" type="oaws:ResponseOperationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncOperationBinding" type="oaws:SyncOperationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyOperation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Operation.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestOperationService">
+		<port name="RequestOperationBinding" binding="oaws:RequestOperationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestOperation"/>
+		</port>
+	</service>
+	<service name="ResponseOperationService">
+		<port name="ResponseOperationBinding" binding="oaws:ResponseOperationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseOperation"/>
+		</port>
+	</service>
+	<service name="SyncOperationService">
+		<port name="SyncOperationBinding" binding="oaws:SyncOperationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncOperation"/>
+		</port>
+	</service>
+</definitions>

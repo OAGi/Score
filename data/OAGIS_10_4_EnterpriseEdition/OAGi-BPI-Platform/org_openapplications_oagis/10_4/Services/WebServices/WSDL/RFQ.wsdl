@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/RFQ.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyRFQ.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelRFQ">
+		<part name="Message" element="oa:CancelRFQ"/>
+	</message>
+	<message name="CancelAcknowledgeRFQ">
+		<part name="Message" element="oa:CancelAcknowledgeRFQ"/>
+	</message>
+	<message name="ChangeRFQ">
+		<part name="Message" element="oa:ChangeRFQ"/>
+	</message>
+	<message name="ChangeAcknowledgeRFQ">
+		<part name="Message" element="oa:ChangeAcknowledgeRFQ"/>
+	</message>
+	<message name="GetRFQ">
+		<part name="Message" element="oa:GetRFQ"/>
+	</message>
+	<message name="ShowRFQ">
+		<part name="Message" element="oa:ShowRFQ"/>
+	</message>
+	<message name="ProcessRFQ">
+		<part name="Message" element="oa:ProcessRFQ"/>
+	</message>
+	<message name="AcknowledgeRFQ">
+		<part name="Message" element="oa:AcknowledgeRFQ"/>
+	</message>
+	<message name="SyncRFQ">
+		<part name="Message" element="oa:SyncRFQ"/>
+	</message>
+	<message name="SyncResponseRFQ">
+		<part name="Message" element="oa:SyncResponseRFQ"/>
+	</message>
+	<message name="NotifyRFQ">
+		<part name="Message" element="oa:NotifyRFQ"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestRFQPortType">
+		<operation name="ProcessRFQ">
+			<input message="oaws:ProcessRFQ"/>
+		</operation>
+		<operation name="ChangeRFQ">
+			<input message="oaws:ChangeRFQ"/>
+		</operation>
+		<operation name="CancelRFQ">
+			<input message="oaws:CancelRFQ"/>
+		</operation>
+		<operation name="GetRFQ">
+			<input message="oaws:GetRFQ"/>
+		</operation>
+		<operation name="SyncRFQ">
+			<input message="oaws:SyncRFQ"/>
+		</operation>
+		<operation name="NotifyRFQ">
+			<input message="oaws:NotifyRFQ"/>
+		</operation>
+	</portType>
+	<portType name="ResponseRFQPortType">
+		<operation name="AcknowledgeRFQ">
+			<input message="oaws:AcknowledgeRFQ"/>
+		</operation>
+		<operation name="ChangeAcknowledgeRFQ">
+			<input message="oaws:ChangeAcknowledgeRFQ"/>
+		</operation>
+		<operation name="CancelAcknowledgeRFQ">
+			<input message="oaws:CancelAcknowledgeRFQ"/>
+		</operation>
+		<operation name="ShowRFQ">
+			<input message="oaws:ShowRFQ"/>
+		</operation>
+		<operation name="SyncResponseRFQ">
+			<input message="oaws:SyncResponseRFQ"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncRFQPortType">
+		<operation name="ProcessRFQ">
+			<input message="oaws:ProcessRFQ"/>
+			<output message="oaws:AcknowledgeRFQ"/>
+		</operation>
+		<operation name="ChangeRFQ">
+			<input message="oaws:ChangeRFQ"/>
+			<output message="oaws:ChangeAcknowledgeRFQ"/>
+		</operation>
+		<operation name="CancelRFQ">
+			<input message="oaws:CancelRFQ"/>
+			<output message="oaws:CancelAcknowledgeRFQ"/>
+		</operation>
+		<operation name="GetRFQ">
+			<input message="oaws:GetRFQ"/>
+			<output message="oaws:ShowRFQ"/>
+		</operation>
+		<operation name="SyncRFQ">
+			<input message="oaws:SyncRFQ"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyRFQ">
+			<input message="oaws:NotifyRFQ"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestRFQBinding" type="oaws:RequestRFQPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseRFQBinding" type="oaws:ResponseRFQPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncRFQBinding" type="oaws:SyncRFQPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyRFQ">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/RFQ.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestRFQService">
+		<port name="RequestRFQBinding" binding="oaws:RequestRFQBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestRFQ"/>
+		</port>
+	</service>
+	<service name="ResponseRFQService">
+		<port name="ResponseRFQBinding" binding="oaws:ResponseRFQBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseRFQ"/>
+		</port>
+	</service>
+	<service name="SyncRFQService">
+		<port name="SyncRFQBinding" binding="oaws:SyncRFQBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncRFQ"/>
+		</port>
+	</service>
+</definitions>

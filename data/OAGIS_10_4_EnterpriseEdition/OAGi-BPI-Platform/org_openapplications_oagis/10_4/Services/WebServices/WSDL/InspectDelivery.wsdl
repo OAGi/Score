@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/InspectDelivery.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyInspectDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelInspectDelivery">
+		<part name="Message" element="oa:CancelInspectDelivery"/>
+	</message>
+	<message name="CancelAcknowledgeInspectDelivery">
+		<part name="Message" element="oa:CancelAcknowledgeInspectDelivery"/>
+	</message>
+	<message name="ChangeInspectDelivery">
+		<part name="Message" element="oa:ChangeInspectDelivery"/>
+	</message>
+	<message name="ChangeAcknowledgeInspectDelivery">
+		<part name="Message" element="oa:ChangeAcknowledgeInspectDelivery"/>
+	</message>
+	<message name="GetInspectDelivery">
+		<part name="Message" element="oa:GetInspectDelivery"/>
+	</message>
+	<message name="ShowInspectDelivery">
+		<part name="Message" element="oa:ShowInspectDelivery"/>
+	</message>
+	<message name="ProcessInspectDelivery">
+		<part name="Message" element="oa:ProcessInspectDelivery"/>
+	</message>
+	<message name="AcknowledgeInspectDelivery">
+		<part name="Message" element="oa:AcknowledgeInspectDelivery"/>
+	</message>
+	<message name="SyncInspectDelivery">
+		<part name="Message" element="oa:SyncInspectDelivery"/>
+	</message>
+	<message name="SyncResponseInspectDelivery">
+		<part name="Message" element="oa:SyncResponseInspectDelivery"/>
+	</message>
+	<message name="NotifyInspectDelivery">
+		<part name="Message" element="oa:NotifyInspectDelivery"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestInspectDeliveryPortType">
+		<operation name="ProcessInspectDelivery">
+			<input message="oaws:ProcessInspectDelivery"/>
+		</operation>
+		<operation name="ChangeInspectDelivery">
+			<input message="oaws:ChangeInspectDelivery"/>
+		</operation>
+		<operation name="CancelInspectDelivery">
+			<input message="oaws:CancelInspectDelivery"/>
+		</operation>
+		<operation name="GetInspectDelivery">
+			<input message="oaws:GetInspectDelivery"/>
+		</operation>
+		<operation name="SyncInspectDelivery">
+			<input message="oaws:SyncInspectDelivery"/>
+		</operation>
+		<operation name="NotifyInspectDelivery">
+			<input message="oaws:NotifyInspectDelivery"/>
+		</operation>
+	</portType>
+	<portType name="ResponseInspectDeliveryPortType">
+		<operation name="AcknowledgeInspectDelivery">
+			<input message="oaws:AcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="ChangeAcknowledgeInspectDelivery">
+			<input message="oaws:ChangeAcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="CancelAcknowledgeInspectDelivery">
+			<input message="oaws:CancelAcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="ShowInspectDelivery">
+			<input message="oaws:ShowInspectDelivery"/>
+		</operation>
+		<operation name="SyncResponseInspectDelivery">
+			<input message="oaws:SyncResponseInspectDelivery"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncInspectDeliveryPortType">
+		<operation name="ProcessInspectDelivery">
+			<input message="oaws:ProcessInspectDelivery"/>
+			<output message="oaws:AcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="ChangeInspectDelivery">
+			<input message="oaws:ChangeInspectDelivery"/>
+			<output message="oaws:ChangeAcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="CancelInspectDelivery">
+			<input message="oaws:CancelInspectDelivery"/>
+			<output message="oaws:CancelAcknowledgeInspectDelivery"/>
+		</operation>
+		<operation name="GetInspectDelivery">
+			<input message="oaws:GetInspectDelivery"/>
+			<output message="oaws:ShowInspectDelivery"/>
+		</operation>
+		<operation name="SyncInspectDelivery">
+			<input message="oaws:SyncInspectDelivery"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyInspectDelivery">
+			<input message="oaws:NotifyInspectDelivery"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestInspectDeliveryBinding" type="oaws:RequestInspectDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseInspectDeliveryBinding" type="oaws:ResponseInspectDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncInspectDeliveryBinding" type="oaws:SyncInspectDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyInspectDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InspectDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestInspectDeliveryService">
+		<port name="RequestInspectDeliveryBinding" binding="oaws:RequestInspectDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestInspectDelivery"/>
+		</port>
+	</service>
+	<service name="ResponseInspectDeliveryService">
+		<port name="ResponseInspectDeliveryBinding" binding="oaws:ResponseInspectDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseInspectDelivery"/>
+		</port>
+	</service>
+	<service name="SyncInspectDeliveryService">
+		<port name="SyncInspectDeliveryBinding" binding="oaws:SyncInspectDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncInspectDelivery"/>
+		</port>
+	</service>
+</definitions>

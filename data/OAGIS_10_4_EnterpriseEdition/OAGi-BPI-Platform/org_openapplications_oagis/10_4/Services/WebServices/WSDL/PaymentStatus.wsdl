@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/PaymentStatus.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgePaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponsePaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPaymentStatus.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPaymentStatus">
+		<part name="Message" element="oa:CancelPaymentStatus"/>
+	</message>
+	<message name="CancelAcknowledgePaymentStatus">
+		<part name="Message" element="oa:CancelAcknowledgePaymentStatus"/>
+	</message>
+	<message name="ChangePaymentStatus">
+		<part name="Message" element="oa:ChangePaymentStatus"/>
+	</message>
+	<message name="ChangeAcknowledgePaymentStatus">
+		<part name="Message" element="oa:ChangeAcknowledgePaymentStatus"/>
+	</message>
+	<message name="GetPaymentStatus">
+		<part name="Message" element="oa:GetPaymentStatus"/>
+	</message>
+	<message name="ShowPaymentStatus">
+		<part name="Message" element="oa:ShowPaymentStatus"/>
+	</message>
+	<message name="ProcessPaymentStatus">
+		<part name="Message" element="oa:ProcessPaymentStatus"/>
+	</message>
+	<message name="AcknowledgePaymentStatus">
+		<part name="Message" element="oa:AcknowledgePaymentStatus"/>
+	</message>
+	<message name="SyncPaymentStatus">
+		<part name="Message" element="oa:SyncPaymentStatus"/>
+	</message>
+	<message name="SyncResponsePaymentStatus">
+		<part name="Message" element="oa:SyncResponsePaymentStatus"/>
+	</message>
+	<message name="NotifyPaymentStatus">
+		<part name="Message" element="oa:NotifyPaymentStatus"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPaymentStatusPortType">
+		<operation name="ProcessPaymentStatus">
+			<input message="oaws:ProcessPaymentStatus"/>
+		</operation>
+		<operation name="ChangePaymentStatus">
+			<input message="oaws:ChangePaymentStatus"/>
+		</operation>
+		<operation name="CancelPaymentStatus">
+			<input message="oaws:CancelPaymentStatus"/>
+		</operation>
+		<operation name="GetPaymentStatus">
+			<input message="oaws:GetPaymentStatus"/>
+		</operation>
+		<operation name="SyncPaymentStatus">
+			<input message="oaws:SyncPaymentStatus"/>
+		</operation>
+		<operation name="NotifyPaymentStatus">
+			<input message="oaws:NotifyPaymentStatus"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePaymentStatusPortType">
+		<operation name="AcknowledgePaymentStatus">
+			<input message="oaws:AcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="ChangeAcknowledgePaymentStatus">
+			<input message="oaws:ChangeAcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="CancelAcknowledgePaymentStatus">
+			<input message="oaws:CancelAcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="ShowPaymentStatus">
+			<input message="oaws:ShowPaymentStatus"/>
+		</operation>
+		<operation name="SyncResponsePaymentStatus">
+			<input message="oaws:SyncResponsePaymentStatus"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncPaymentStatusPortType">
+		<operation name="ProcessPaymentStatus">
+			<input message="oaws:ProcessPaymentStatus"/>
+			<output message="oaws:AcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="ChangePaymentStatus">
+			<input message="oaws:ChangePaymentStatus"/>
+			<output message="oaws:ChangeAcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="CancelPaymentStatus">
+			<input message="oaws:CancelPaymentStatus"/>
+			<output message="oaws:CancelAcknowledgePaymentStatus"/>
+		</operation>
+		<operation name="GetPaymentStatus">
+			<input message="oaws:GetPaymentStatus"/>
+			<output message="oaws:ShowPaymentStatus"/>
+		</operation>
+		<operation name="SyncPaymentStatus">
+			<input message="oaws:SyncPaymentStatus"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPaymentStatus">
+			<input message="oaws:NotifyPaymentStatus"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPaymentStatusBinding" type="oaws:RequestPaymentStatusPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePaymentStatusBinding" type="oaws:ResponsePaymentStatusPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponsePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncPaymentStatusBinding" type="oaws:SyncPaymentStatusPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPaymentStatus">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PaymentStatus.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPaymentStatusService">
+		<port name="RequestPaymentStatusBinding" binding="oaws:RequestPaymentStatusBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestPaymentStatus"/>
+		</port>
+	</service>
+	<service name="ResponsePaymentStatusService">
+		<port name="ResponsePaymentStatusBinding" binding="oaws:ResponsePaymentStatusBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponsePaymentStatus"/>
+		</port>
+	</service>
+	<service name="SyncPaymentStatusService">
+		<port name="SyncPaymentStatusBinding" binding="oaws:SyncPaymentStatusBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncPaymentStatus"/>
+		</port>
+	</service>
+</definitions>

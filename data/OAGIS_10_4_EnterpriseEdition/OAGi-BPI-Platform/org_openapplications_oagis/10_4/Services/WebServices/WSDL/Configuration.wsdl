@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Configuration.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyConfiguration.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelConfiguration">
+		<part name="Message" element="oa:CancelConfiguration"/>
+	</message>
+	<message name="CancelAcknowledgeConfiguration">
+		<part name="Message" element="oa:CancelAcknowledgeConfiguration"/>
+	</message>
+	<message name="ChangeConfiguration">
+		<part name="Message" element="oa:ChangeConfiguration"/>
+	</message>
+	<message name="ChangeAcknowledgeConfiguration">
+		<part name="Message" element="oa:ChangeAcknowledgeConfiguration"/>
+	</message>
+	<message name="GetConfiguration">
+		<part name="Message" element="oa:GetConfiguration"/>
+	</message>
+	<message name="ShowConfiguration">
+		<part name="Message" element="oa:ShowConfiguration"/>
+	</message>
+	<message name="ProcessConfiguration">
+		<part name="Message" element="oa:ProcessConfiguration"/>
+	</message>
+	<message name="AcknowledgeConfiguration">
+		<part name="Message" element="oa:AcknowledgeConfiguration"/>
+	</message>
+	<message name="SyncConfiguration">
+		<part name="Message" element="oa:SyncConfiguration"/>
+	</message>
+	<message name="SyncResponseConfiguration">
+		<part name="Message" element="oa:SyncResponseConfiguration"/>
+	</message>
+	<message name="NotifyConfiguration">
+		<part name="Message" element="oa:NotifyConfiguration"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestConfigurationPortType">
+		<operation name="ProcessConfiguration">
+			<input message="oaws:ProcessConfiguration"/>
+		</operation>
+		<operation name="ChangeConfiguration">
+			<input message="oaws:ChangeConfiguration"/>
+		</operation>
+		<operation name="CancelConfiguration">
+			<input message="oaws:CancelConfiguration"/>
+		</operation>
+		<operation name="GetConfiguration">
+			<input message="oaws:GetConfiguration"/>
+		</operation>
+		<operation name="SyncConfiguration">
+			<input message="oaws:SyncConfiguration"/>
+		</operation>
+		<operation name="NotifyConfiguration">
+			<input message="oaws:NotifyConfiguration"/>
+		</operation>
+	</portType>
+	<portType name="ResponseConfigurationPortType">
+		<operation name="AcknowledgeConfiguration">
+			<input message="oaws:AcknowledgeConfiguration"/>
+		</operation>
+		<operation name="ChangeAcknowledgeConfiguration">
+			<input message="oaws:ChangeAcknowledgeConfiguration"/>
+		</operation>
+		<operation name="CancelAcknowledgeConfiguration">
+			<input message="oaws:CancelAcknowledgeConfiguration"/>
+		</operation>
+		<operation name="ShowConfiguration">
+			<input message="oaws:ShowConfiguration"/>
+		</operation>
+		<operation name="SyncResponseConfiguration">
+			<input message="oaws:SyncResponseConfiguration"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncConfigurationPortType">
+		<operation name="ProcessConfiguration">
+			<input message="oaws:ProcessConfiguration"/>
+			<output message="oaws:AcknowledgeConfiguration"/>
+		</operation>
+		<operation name="ChangeConfiguration">
+			<input message="oaws:ChangeConfiguration"/>
+			<output message="oaws:ChangeAcknowledgeConfiguration"/>
+		</operation>
+		<operation name="CancelConfiguration">
+			<input message="oaws:CancelConfiguration"/>
+			<output message="oaws:CancelAcknowledgeConfiguration"/>
+		</operation>
+		<operation name="GetConfiguration">
+			<input message="oaws:GetConfiguration"/>
+			<output message="oaws:ShowConfiguration"/>
+		</operation>
+		<operation name="SyncConfiguration">
+			<input message="oaws:SyncConfiguration"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyConfiguration">
+			<input message="oaws:NotifyConfiguration"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestConfigurationBinding" type="oaws:RequestConfigurationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseConfigurationBinding" type="oaws:ResponseConfigurationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncConfigurationBinding" type="oaws:SyncConfigurationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyConfiguration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Configuration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestConfigurationService">
+		<port name="RequestConfigurationBinding" binding="oaws:RequestConfigurationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestConfiguration"/>
+		</port>
+	</service>
+	<service name="ResponseConfigurationService">
+		<port name="ResponseConfigurationBinding" binding="oaws:ResponseConfigurationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseConfiguration"/>
+		</port>
+	</service>
+	<service name="SyncConfigurationService">
+		<port name="SyncConfigurationBinding" binding="oaws:SyncConfigurationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncConfiguration"/>
+		</port>
+	</service>
+</definitions>

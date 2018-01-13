@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgePartyScreen.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PartyScreen.xsd"/>
+	<xsd:element name="ChangeAcknowledgePartyScreen" type="ChangeAcknowledgePartyScreenType" id="oagis-id-000a473af38c446698eb6def79c10bc3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgePartyScreen BOD is to provide a response with the results from the ProcessPartyScreen.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgePartyScreenType" id="oagis-id-4a889c956c9f4849b45ef206ecd2dac9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgePartyScreenDataAreaType" id="oagis-id-7bad8808573e422b945c81786e97ecac">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgePartyScreen. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (PartyScreen).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgePartyScreenDataAreaType" id="oagis-id-8e912307086f4a64ab64cc9d016d74e8">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-a6092dc1056349bc98709fa2e780fb8a"/>
+			<xsd:element ref="PartyScreen" maxOccurs="unbounded" id="oagis-id-15dd77682df749d0a7a7dcb07c314f9f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

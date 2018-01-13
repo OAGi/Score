@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/BOM.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyBOM.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelBOM">
+		<part name="Message" element="oa:CancelBOM"/>
+	</message>
+	<message name="CancelAcknowledgeBOM">
+		<part name="Message" element="oa:CancelAcknowledgeBOM"/>
+	</message>
+	<message name="ChangeBOM">
+		<part name="Message" element="oa:ChangeBOM"/>
+	</message>
+	<message name="ChangeAcknowledgeBOM">
+		<part name="Message" element="oa:ChangeAcknowledgeBOM"/>
+	</message>
+	<message name="GetBOM">
+		<part name="Message" element="oa:GetBOM"/>
+	</message>
+	<message name="ShowBOM">
+		<part name="Message" element="oa:ShowBOM"/>
+	</message>
+	<message name="ProcessBOM">
+		<part name="Message" element="oa:ProcessBOM"/>
+	</message>
+	<message name="AcknowledgeBOM">
+		<part name="Message" element="oa:AcknowledgeBOM"/>
+	</message>
+	<message name="SyncBOM">
+		<part name="Message" element="oa:SyncBOM"/>
+	</message>
+	<message name="SyncResponseBOM">
+		<part name="Message" element="oa:SyncResponseBOM"/>
+	</message>
+	<message name="NotifyBOM">
+		<part name="Message" element="oa:NotifyBOM"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestBOMPortType">
+		<operation name="ProcessBOM">
+			<input message="oaws:ProcessBOM"/>
+		</operation>
+		<operation name="ChangeBOM">
+			<input message="oaws:ChangeBOM"/>
+		</operation>
+		<operation name="CancelBOM">
+			<input message="oaws:CancelBOM"/>
+		</operation>
+		<operation name="GetBOM">
+			<input message="oaws:GetBOM"/>
+		</operation>
+		<operation name="SyncBOM">
+			<input message="oaws:SyncBOM"/>
+		</operation>
+		<operation name="NotifyBOM">
+			<input message="oaws:NotifyBOM"/>
+		</operation>
+	</portType>
+	<portType name="ResponseBOMPortType">
+		<operation name="AcknowledgeBOM">
+			<input message="oaws:AcknowledgeBOM"/>
+		</operation>
+		<operation name="ChangeAcknowledgeBOM">
+			<input message="oaws:ChangeAcknowledgeBOM"/>
+		</operation>
+		<operation name="CancelAcknowledgeBOM">
+			<input message="oaws:CancelAcknowledgeBOM"/>
+		</operation>
+		<operation name="ShowBOM">
+			<input message="oaws:ShowBOM"/>
+		</operation>
+		<operation name="SyncResponseBOM">
+			<input message="oaws:SyncResponseBOM"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncBOMPortType">
+		<operation name="ProcessBOM">
+			<input message="oaws:ProcessBOM"/>
+			<output message="oaws:AcknowledgeBOM"/>
+		</operation>
+		<operation name="ChangeBOM">
+			<input message="oaws:ChangeBOM"/>
+			<output message="oaws:ChangeAcknowledgeBOM"/>
+		</operation>
+		<operation name="CancelBOM">
+			<input message="oaws:CancelBOM"/>
+			<output message="oaws:CancelAcknowledgeBOM"/>
+		</operation>
+		<operation name="GetBOM">
+			<input message="oaws:GetBOM"/>
+			<output message="oaws:ShowBOM"/>
+		</operation>
+		<operation name="SyncBOM">
+			<input message="oaws:SyncBOM"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyBOM">
+			<input message="oaws:NotifyBOM"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestBOMBinding" type="oaws:RequestBOMPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseBOMBinding" type="oaws:ResponseBOMPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncBOMBinding" type="oaws:SyncBOMPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyBOM">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/BOM.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestBOMService">
+		<port name="RequestBOMBinding" binding="oaws:RequestBOMBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestBOM"/>
+		</port>
+	</service>
+	<service name="ResponseBOMService">
+		<port name="ResponseBOMBinding" binding="oaws:ResponseBOMBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseBOM"/>
+		</port>
+	</service>
+	<service name="SyncBOMService">
+		<port name="SyncBOMBinding" binding="oaws:SyncBOMBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncBOM"/>
+		</port>
+	</service>
+</definitions>

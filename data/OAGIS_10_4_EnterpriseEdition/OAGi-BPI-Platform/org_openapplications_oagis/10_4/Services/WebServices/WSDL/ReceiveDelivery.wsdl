@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ReceiveDelivery.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyReceiveDelivery.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelReceiveDelivery">
+		<part name="Message" element="oa:CancelReceiveDelivery"/>
+	</message>
+	<message name="CancelAcknowledgeReceiveDelivery">
+		<part name="Message" element="oa:CancelAcknowledgeReceiveDelivery"/>
+	</message>
+	<message name="ChangeReceiveDelivery">
+		<part name="Message" element="oa:ChangeReceiveDelivery"/>
+	</message>
+	<message name="ChangeAcknowledgeReceiveDelivery">
+		<part name="Message" element="oa:ChangeAcknowledgeReceiveDelivery"/>
+	</message>
+	<message name="GetReceiveDelivery">
+		<part name="Message" element="oa:GetReceiveDelivery"/>
+	</message>
+	<message name="ShowReceiveDelivery">
+		<part name="Message" element="oa:ShowReceiveDelivery"/>
+	</message>
+	<message name="ProcessReceiveDelivery">
+		<part name="Message" element="oa:ProcessReceiveDelivery"/>
+	</message>
+	<message name="AcknowledgeReceiveDelivery">
+		<part name="Message" element="oa:AcknowledgeReceiveDelivery"/>
+	</message>
+	<message name="SyncReceiveDelivery">
+		<part name="Message" element="oa:SyncReceiveDelivery"/>
+	</message>
+	<message name="SyncResponseReceiveDelivery">
+		<part name="Message" element="oa:SyncResponseReceiveDelivery"/>
+	</message>
+	<message name="NotifyReceiveDelivery">
+		<part name="Message" element="oa:NotifyReceiveDelivery"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestReceiveDeliveryPortType">
+		<operation name="ProcessReceiveDelivery">
+			<input message="oaws:ProcessReceiveDelivery"/>
+		</operation>
+		<operation name="ChangeReceiveDelivery">
+			<input message="oaws:ChangeReceiveDelivery"/>
+		</operation>
+		<operation name="CancelReceiveDelivery">
+			<input message="oaws:CancelReceiveDelivery"/>
+		</operation>
+		<operation name="GetReceiveDelivery">
+			<input message="oaws:GetReceiveDelivery"/>
+		</operation>
+		<operation name="SyncReceiveDelivery">
+			<input message="oaws:SyncReceiveDelivery"/>
+		</operation>
+		<operation name="NotifyReceiveDelivery">
+			<input message="oaws:NotifyReceiveDelivery"/>
+		</operation>
+	</portType>
+	<portType name="ResponseReceiveDeliveryPortType">
+		<operation name="AcknowledgeReceiveDelivery">
+			<input message="oaws:AcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="ChangeAcknowledgeReceiveDelivery">
+			<input message="oaws:ChangeAcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="CancelAcknowledgeReceiveDelivery">
+			<input message="oaws:CancelAcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="ShowReceiveDelivery">
+			<input message="oaws:ShowReceiveDelivery"/>
+		</operation>
+		<operation name="SyncResponseReceiveDelivery">
+			<input message="oaws:SyncResponseReceiveDelivery"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncReceiveDeliveryPortType">
+		<operation name="ProcessReceiveDelivery">
+			<input message="oaws:ProcessReceiveDelivery"/>
+			<output message="oaws:AcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="ChangeReceiveDelivery">
+			<input message="oaws:ChangeReceiveDelivery"/>
+			<output message="oaws:ChangeAcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="CancelReceiveDelivery">
+			<input message="oaws:CancelReceiveDelivery"/>
+			<output message="oaws:CancelAcknowledgeReceiveDelivery"/>
+		</operation>
+		<operation name="GetReceiveDelivery">
+			<input message="oaws:GetReceiveDelivery"/>
+			<output message="oaws:ShowReceiveDelivery"/>
+		</operation>
+		<operation name="SyncReceiveDelivery">
+			<input message="oaws:SyncReceiveDelivery"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyReceiveDelivery">
+			<input message="oaws:NotifyReceiveDelivery"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestReceiveDeliveryBinding" type="oaws:RequestReceiveDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseReceiveDeliveryBinding" type="oaws:ResponseReceiveDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncReceiveDeliveryBinding" type="oaws:SyncReceiveDeliveryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyReceiveDelivery">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ReceiveDelivery.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestReceiveDeliveryService">
+		<port name="RequestReceiveDeliveryBinding" binding="oaws:RequestReceiveDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestReceiveDelivery"/>
+		</port>
+	</service>
+	<service name="ResponseReceiveDeliveryService">
+		<port name="ResponseReceiveDeliveryBinding" binding="oaws:ResponseReceiveDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseReceiveDelivery"/>
+		</port>
+	</service>
+	<service name="SyncReceiveDeliveryService">
+		<port name="SyncReceiveDeliveryBinding" binding="oaws:SyncReceiveDeliveryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncReceiveDelivery"/>
+		</port>
+	</service>
+</definitions>

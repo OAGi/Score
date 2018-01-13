@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/CorrectiveActionPlan.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCorrectiveActionPlan.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCorrectiveActionPlan">
+		<part name="Message" element="oa:CancelCorrectiveActionPlan"/>
+	</message>
+	<message name="CancelAcknowledgeCorrectiveActionPlan">
+		<part name="Message" element="oa:CancelAcknowledgeCorrectiveActionPlan"/>
+	</message>
+	<message name="ChangeCorrectiveActionPlan">
+		<part name="Message" element="oa:ChangeCorrectiveActionPlan"/>
+	</message>
+	<message name="ChangeAcknowledgeCorrectiveActionPlan">
+		<part name="Message" element="oa:ChangeAcknowledgeCorrectiveActionPlan"/>
+	</message>
+	<message name="GetCorrectiveActionPlan">
+		<part name="Message" element="oa:GetCorrectiveActionPlan"/>
+	</message>
+	<message name="ShowCorrectiveActionPlan">
+		<part name="Message" element="oa:ShowCorrectiveActionPlan"/>
+	</message>
+	<message name="ProcessCorrectiveActionPlan">
+		<part name="Message" element="oa:ProcessCorrectiveActionPlan"/>
+	</message>
+	<message name="AcknowledgeCorrectiveActionPlan">
+		<part name="Message" element="oa:AcknowledgeCorrectiveActionPlan"/>
+	</message>
+	<message name="SyncCorrectiveActionPlan">
+		<part name="Message" element="oa:SyncCorrectiveActionPlan"/>
+	</message>
+	<message name="SyncResponseCorrectiveActionPlan">
+		<part name="Message" element="oa:SyncResponseCorrectiveActionPlan"/>
+	</message>
+	<message name="NotifyCorrectiveActionPlan">
+		<part name="Message" element="oa:NotifyCorrectiveActionPlan"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCorrectiveActionPlanPortType">
+		<operation name="ProcessCorrectiveActionPlan">
+			<input message="oaws:ProcessCorrectiveActionPlan"/>
+		</operation>
+		<operation name="ChangeCorrectiveActionPlan">
+			<input message="oaws:ChangeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="CancelCorrectiveActionPlan">
+			<input message="oaws:CancelCorrectiveActionPlan"/>
+		</operation>
+		<operation name="GetCorrectiveActionPlan">
+			<input message="oaws:GetCorrectiveActionPlan"/>
+		</operation>
+		<operation name="SyncCorrectiveActionPlan">
+			<input message="oaws:SyncCorrectiveActionPlan"/>
+		</operation>
+		<operation name="NotifyCorrectiveActionPlan">
+			<input message="oaws:NotifyCorrectiveActionPlan"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCorrectiveActionPlanPortType">
+		<operation name="AcknowledgeCorrectiveActionPlan">
+			<input message="oaws:AcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCorrectiveActionPlan">
+			<input message="oaws:ChangeAcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="CancelAcknowledgeCorrectiveActionPlan">
+			<input message="oaws:CancelAcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="ShowCorrectiveActionPlan">
+			<input message="oaws:ShowCorrectiveActionPlan"/>
+		</operation>
+		<operation name="SyncResponseCorrectiveActionPlan">
+			<input message="oaws:SyncResponseCorrectiveActionPlan"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncCorrectiveActionPlanPortType">
+		<operation name="ProcessCorrectiveActionPlan">
+			<input message="oaws:ProcessCorrectiveActionPlan"/>
+			<output message="oaws:AcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="ChangeCorrectiveActionPlan">
+			<input message="oaws:ChangeCorrectiveActionPlan"/>
+			<output message="oaws:ChangeAcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="CancelCorrectiveActionPlan">
+			<input message="oaws:CancelCorrectiveActionPlan"/>
+			<output message="oaws:CancelAcknowledgeCorrectiveActionPlan"/>
+		</operation>
+		<operation name="GetCorrectiveActionPlan">
+			<input message="oaws:GetCorrectiveActionPlan"/>
+			<output message="oaws:ShowCorrectiveActionPlan"/>
+		</operation>
+		<operation name="SyncCorrectiveActionPlan">
+			<input message="oaws:SyncCorrectiveActionPlan"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCorrectiveActionPlan">
+			<input message="oaws:NotifyCorrectiveActionPlan"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCorrectiveActionPlanBinding" type="oaws:RequestCorrectiveActionPlanPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCorrectiveActionPlanBinding" type="oaws:ResponseCorrectiveActionPlanPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncCorrectiveActionPlanBinding" type="oaws:SyncCorrectiveActionPlanPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCorrectiveActionPlan">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CorrectiveActionPlan.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCorrectiveActionPlanService">
+		<port name="RequestCorrectiveActionPlanBinding" binding="oaws:RequestCorrectiveActionPlanBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCorrectiveActionPlan"/>
+		</port>
+	</service>
+	<service name="ResponseCorrectiveActionPlanService">
+		<port name="ResponseCorrectiveActionPlanBinding" binding="oaws:ResponseCorrectiveActionPlanBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCorrectiveActionPlan"/>
+		</port>
+	</service>
+	<service name="SyncCorrectiveActionPlanService">
+		<port name="SyncCorrectiveActionPlanBinding" binding="oaws:SyncCorrectiveActionPlanBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncCorrectiveActionPlan"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/AcknowledgePersonnel.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Personnel.xsd"/>
+	<xsd:element name="AcknowledgePersonnel" type="AcknowledgePersonnelType" id="oagis-id-6024c90913c54da4b66a2df3d348d3f4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgePersonnel is to enable the Acknowledgehronization of employee data that exists on separate data bases between manufacturing and human resource applications.  The AcknowledgePersonnel allows the adding of new employees and their relevant data as well as the modification of previously established employees.
+
+The AcknowledgePersonnel is used to facilitate the maintenance of human resource data in a manufacturing work force planning module.  This enables the workforce planning module to use current personnel information when creating finite production schedules.  The AcknowledgePersonnel can also be used by a project accounting application or a work order management application to assign qualified personnel or to perform resource planning.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgePersonnelType" id="oagis-id-9b8dda3787de48649d8585b11d675ce1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgePersonnelDataAreaType" id="oagis-id-0095e29790f24ad3bb537d748896281a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgePersonnel. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (Personnel).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgePersonnelDataAreaType" id="oagis-id-343eb7333b37486ebab2ec1bc15dbd43">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-024beb1e5b8149c8a25fd89c7c283a41"/>
+			<xsd:element ref="Personnel" maxOccurs="unbounded" id="oagis-id-29de617797a146588967b142b6c44126"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ShippersExportDeclaration.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyShippersExportDeclaration.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelShippersExportDeclaration">
+		<part name="Message" element="oa:CancelShippersExportDeclaration"/>
+	</message>
+	<message name="CancelAcknowledgeShippersExportDeclaration">
+		<part name="Message" element="oa:CancelAcknowledgeShippersExportDeclaration"/>
+	</message>
+	<message name="ChangeShippersExportDeclaration">
+		<part name="Message" element="oa:ChangeShippersExportDeclaration"/>
+	</message>
+	<message name="ChangeAcknowledgeShippersExportDeclaration">
+		<part name="Message" element="oa:ChangeAcknowledgeShippersExportDeclaration"/>
+	</message>
+	<message name="GetShippersExportDeclaration">
+		<part name="Message" element="oa:GetShippersExportDeclaration"/>
+	</message>
+	<message name="ShowShippersExportDeclaration">
+		<part name="Message" element="oa:ShowShippersExportDeclaration"/>
+	</message>
+	<message name="ProcessShippersExportDeclaration">
+		<part name="Message" element="oa:ProcessShippersExportDeclaration"/>
+	</message>
+	<message name="AcknowledgeShippersExportDeclaration">
+		<part name="Message" element="oa:AcknowledgeShippersExportDeclaration"/>
+	</message>
+	<message name="SyncShippersExportDeclaration">
+		<part name="Message" element="oa:SyncShippersExportDeclaration"/>
+	</message>
+	<message name="SyncResponseShippersExportDeclaration">
+		<part name="Message" element="oa:SyncResponseShippersExportDeclaration"/>
+	</message>
+	<message name="NotifyShippersExportDeclaration">
+		<part name="Message" element="oa:NotifyShippersExportDeclaration"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestShippersExportDeclarationPortType">
+		<operation name="ProcessShippersExportDeclaration">
+			<input message="oaws:ProcessShippersExportDeclaration"/>
+		</operation>
+		<operation name="ChangeShippersExportDeclaration">
+			<input message="oaws:ChangeShippersExportDeclaration"/>
+		</operation>
+		<operation name="CancelShippersExportDeclaration">
+			<input message="oaws:CancelShippersExportDeclaration"/>
+		</operation>
+		<operation name="GetShippersExportDeclaration">
+			<input message="oaws:GetShippersExportDeclaration"/>
+		</operation>
+		<operation name="SyncShippersExportDeclaration">
+			<input message="oaws:SyncShippersExportDeclaration"/>
+		</operation>
+		<operation name="NotifyShippersExportDeclaration">
+			<input message="oaws:NotifyShippersExportDeclaration"/>
+		</operation>
+	</portType>
+	<portType name="ResponseShippersExportDeclarationPortType">
+		<operation name="AcknowledgeShippersExportDeclaration">
+			<input message="oaws:AcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="ChangeAcknowledgeShippersExportDeclaration">
+			<input message="oaws:ChangeAcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="CancelAcknowledgeShippersExportDeclaration">
+			<input message="oaws:CancelAcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="ShowShippersExportDeclaration">
+			<input message="oaws:ShowShippersExportDeclaration"/>
+		</operation>
+		<operation name="SyncResponseShippersExportDeclaration">
+			<input message="oaws:SyncResponseShippersExportDeclaration"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncShippersExportDeclarationPortType">
+		<operation name="ProcessShippersExportDeclaration">
+			<input message="oaws:ProcessShippersExportDeclaration"/>
+			<output message="oaws:AcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="ChangeShippersExportDeclaration">
+			<input message="oaws:ChangeShippersExportDeclaration"/>
+			<output message="oaws:ChangeAcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="CancelShippersExportDeclaration">
+			<input message="oaws:CancelShippersExportDeclaration"/>
+			<output message="oaws:CancelAcknowledgeShippersExportDeclaration"/>
+		</operation>
+		<operation name="GetShippersExportDeclaration">
+			<input message="oaws:GetShippersExportDeclaration"/>
+			<output message="oaws:ShowShippersExportDeclaration"/>
+		</operation>
+		<operation name="SyncShippersExportDeclaration">
+			<input message="oaws:SyncShippersExportDeclaration"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyShippersExportDeclaration">
+			<input message="oaws:NotifyShippersExportDeclaration"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestShippersExportDeclarationBinding" type="oaws:RequestShippersExportDeclarationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseShippersExportDeclarationBinding" type="oaws:ResponseShippersExportDeclarationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncShippersExportDeclarationBinding" type="oaws:SyncShippersExportDeclarationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyShippersExportDeclaration">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersExportDeclaration.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestShippersExportDeclarationService">
+		<port name="RequestShippersExportDeclarationBinding" binding="oaws:RequestShippersExportDeclarationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestShippersExportDeclaration"/>
+		</port>
+	</service>
+	<service name="ResponseShippersExportDeclarationService">
+		<port name="ResponseShippersExportDeclarationBinding" binding="oaws:ResponseShippersExportDeclarationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseShippersExportDeclaration"/>
+		</port>
+	</service>
+	<service name="SyncShippersExportDeclarationService">
+		<port name="SyncShippersExportDeclarationBinding" binding="oaws:SyncShippersExportDeclarationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncShippersExportDeclaration"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyInspectDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InspectDelivery.xsd"/>
+        <xsd:element name="NotifyInspectDelivery" type="NotifyInspectDeliveryType" id="oagis-id-b904d464653e4f048cc271f947ec7980">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyInspectDelivery is to supply InspectDelivery information for goods or services to another business application module.  This BOD may is initiated by the sending system upon some event occurring.  There are many possible business applications in several environments that may use this capability.
+
+For example;
+1.  A PurchaseOrder application could use this to send information to a Plant Data Collection application, or vice versa. 
+2.  An MRP, Inventory, Purchasing or Manufacturing business application could use this to communicate InspectDelivery information.
+3.  A Laboratory Information System could send quality information to an Inventory application,
+4.  A Quality Control application could send information to an MRP, Inventory, or Purchasing application.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyInspectDeliveryType" id="oagis-id-f078f7be6e6b4e75b7c4ca4e763d8f29">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyInspectDeliveryDataAreaType" id="oagis-id-1792a3a70836401eb57ee306ced1df40">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyInspectDelivery. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (InspectDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyInspectDeliveryDataAreaType" id="oagis-id-4de8af1ed6e84b9fb165e40b21c0d5be">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-2a528eac9a7b4660b8a6ec67adf20189"/>
+                        <xsd:element ref="InspectDelivery" maxOccurs="unbounded" id="oagis-id-963752588cd342fbb809440f550393bb"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

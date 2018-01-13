@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeCorrectiveAction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveAction.xsd"/>
+	<xsd:element name="CancelAcknowledgeCorrectiveAction" type="CancelAcknowledgeCorrectiveActionType" id="oagis-id-85d21b7782ea49289897f1242595ceb2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeCorrectiveAction is to communicate to a business application module or system the need to initiate the creation of a CorrectiveAction structure.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeCorrectiveActionType" id="oagis-id-03526e5ac3d946989ab7ee030e585daf">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeCorrectiveActionDataAreaType" id="oagis-id-e8dd55b0e1d543feab5eee7f56822f80">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeCorrectiveAction. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (CorrectiveAction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeCorrectiveActionDataAreaType" id="oagis-id-b2bba2b81ab4443c82f61d613534bc81">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-7d3c278e2efc48d5800bdbdb6a0cc1d0"/>
+			<xsd:element ref="CorrectiveAction" id="oagis-id-f6b3399281204855b9d1a4da6e285429"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

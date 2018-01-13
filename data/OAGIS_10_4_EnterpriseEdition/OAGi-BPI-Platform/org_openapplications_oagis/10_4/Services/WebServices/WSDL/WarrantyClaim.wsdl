@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/WarrantyClaim.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyWarrantyClaim.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelWarrantyClaim">
+		<part name="Message" element="oa:CancelWarrantyClaim"/>
+	</message>
+	<message name="CancelAcknowledgeWarrantyClaim">
+		<part name="Message" element="oa:CancelAcknowledgeWarrantyClaim"/>
+	</message>
+	<message name="ChangeWarrantyClaim">
+		<part name="Message" element="oa:ChangeWarrantyClaim"/>
+	</message>
+	<message name="ChangeAcknowledgeWarrantyClaim">
+		<part name="Message" element="oa:ChangeAcknowledgeWarrantyClaim"/>
+	</message>
+	<message name="GetWarrantyClaim">
+		<part name="Message" element="oa:GetWarrantyClaim"/>
+	</message>
+	<message name="ShowWarrantyClaim">
+		<part name="Message" element="oa:ShowWarrantyClaim"/>
+	</message>
+	<message name="ProcessWarrantyClaim">
+		<part name="Message" element="oa:ProcessWarrantyClaim"/>
+	</message>
+	<message name="AcknowledgeWarrantyClaim">
+		<part name="Message" element="oa:AcknowledgeWarrantyClaim"/>
+	</message>
+	<message name="SyncWarrantyClaim">
+		<part name="Message" element="oa:SyncWarrantyClaim"/>
+	</message>
+	<message name="SyncResponseWarrantyClaim">
+		<part name="Message" element="oa:SyncResponseWarrantyClaim"/>
+	</message>
+	<message name="NotifyWarrantyClaim">
+		<part name="Message" element="oa:NotifyWarrantyClaim"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestWarrantyClaimPortType">
+		<operation name="ProcessWarrantyClaim">
+			<input message="oaws:ProcessWarrantyClaim"/>
+		</operation>
+		<operation name="ChangeWarrantyClaim">
+			<input message="oaws:ChangeWarrantyClaim"/>
+		</operation>
+		<operation name="CancelWarrantyClaim">
+			<input message="oaws:CancelWarrantyClaim"/>
+		</operation>
+		<operation name="GetWarrantyClaim">
+			<input message="oaws:GetWarrantyClaim"/>
+		</operation>
+		<operation name="SyncWarrantyClaim">
+			<input message="oaws:SyncWarrantyClaim"/>
+		</operation>
+		<operation name="NotifyWarrantyClaim">
+			<input message="oaws:NotifyWarrantyClaim"/>
+		</operation>
+	</portType>
+	<portType name="ResponseWarrantyClaimPortType">
+		<operation name="AcknowledgeWarrantyClaim">
+			<input message="oaws:AcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="ChangeAcknowledgeWarrantyClaim">
+			<input message="oaws:ChangeAcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="CancelAcknowledgeWarrantyClaim">
+			<input message="oaws:CancelAcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="ShowWarrantyClaim">
+			<input message="oaws:ShowWarrantyClaim"/>
+		</operation>
+		<operation name="SyncResponseWarrantyClaim">
+			<input message="oaws:SyncResponseWarrantyClaim"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncWarrantyClaimPortType">
+		<operation name="ProcessWarrantyClaim">
+			<input message="oaws:ProcessWarrantyClaim"/>
+			<output message="oaws:AcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="ChangeWarrantyClaim">
+			<input message="oaws:ChangeWarrantyClaim"/>
+			<output message="oaws:ChangeAcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="CancelWarrantyClaim">
+			<input message="oaws:CancelWarrantyClaim"/>
+			<output message="oaws:CancelAcknowledgeWarrantyClaim"/>
+		</operation>
+		<operation name="GetWarrantyClaim">
+			<input message="oaws:GetWarrantyClaim"/>
+			<output message="oaws:ShowWarrantyClaim"/>
+		</operation>
+		<operation name="SyncWarrantyClaim">
+			<input message="oaws:SyncWarrantyClaim"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyWarrantyClaim">
+			<input message="oaws:NotifyWarrantyClaim"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestWarrantyClaimBinding" type="oaws:RequestWarrantyClaimPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseWarrantyClaimBinding" type="oaws:ResponseWarrantyClaimPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncWarrantyClaimBinding" type="oaws:SyncWarrantyClaimPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyWarrantyClaim">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/WarrantyClaim.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestWarrantyClaimService">
+		<port name="RequestWarrantyClaimBinding" binding="oaws:RequestWarrantyClaimBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestWarrantyClaim"/>
+		</port>
+	</service>
+	<service name="ResponseWarrantyClaimService">
+		<port name="ResponseWarrantyClaimBinding" binding="oaws:ResponseWarrantyClaimBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseWarrantyClaim"/>
+		</port>
+	</service>
+	<service name="SyncWarrantyClaimService">
+		<port name="SyncWarrantyClaimBinding" binding="oaws:SyncWarrantyClaimBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncWarrantyClaim"/>
+		</port>
+	</service>
+</definitions>

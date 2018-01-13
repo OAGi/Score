@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/TestSpecification.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyTestSpecification.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelTestSpecification">
+		<part name="Message" element="oa:CancelTestSpecification"/>
+	</message>
+	<message name="CancelAcknowledgeTestSpecification">
+		<part name="Message" element="oa:CancelAcknowledgeTestSpecification"/>
+	</message>
+	<message name="ChangeTestSpecification">
+		<part name="Message" element="oa:ChangeTestSpecification"/>
+	</message>
+	<message name="ChangeAcknowledgeTestSpecification">
+		<part name="Message" element="oa:ChangeAcknowledgeTestSpecification"/>
+	</message>
+	<message name="GetTestSpecification">
+		<part name="Message" element="oa:GetTestSpecification"/>
+	</message>
+	<message name="ShowTestSpecification">
+		<part name="Message" element="oa:ShowTestSpecification"/>
+	</message>
+	<message name="ProcessTestSpecification">
+		<part name="Message" element="oa:ProcessTestSpecification"/>
+	</message>
+	<message name="AcknowledgeTestSpecification">
+		<part name="Message" element="oa:AcknowledgeTestSpecification"/>
+	</message>
+	<message name="SyncTestSpecification">
+		<part name="Message" element="oa:SyncTestSpecification"/>
+	</message>
+	<message name="SyncResponseTestSpecification">
+		<part name="Message" element="oa:SyncResponseTestSpecification"/>
+	</message>
+	<message name="NotifyTestSpecification">
+		<part name="Message" element="oa:NotifyTestSpecification"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestTestSpecificationPortType">
+		<operation name="ProcessTestSpecification">
+			<input message="oaws:ProcessTestSpecification"/>
+		</operation>
+		<operation name="ChangeTestSpecification">
+			<input message="oaws:ChangeTestSpecification"/>
+		</operation>
+		<operation name="CancelTestSpecification">
+			<input message="oaws:CancelTestSpecification"/>
+		</operation>
+		<operation name="GetTestSpecification">
+			<input message="oaws:GetTestSpecification"/>
+		</operation>
+		<operation name="SyncTestSpecification">
+			<input message="oaws:SyncTestSpecification"/>
+		</operation>
+		<operation name="NotifyTestSpecification">
+			<input message="oaws:NotifyTestSpecification"/>
+		</operation>
+	</portType>
+	<portType name="ResponseTestSpecificationPortType">
+		<operation name="AcknowledgeTestSpecification">
+			<input message="oaws:AcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="ChangeAcknowledgeTestSpecification">
+			<input message="oaws:ChangeAcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="CancelAcknowledgeTestSpecification">
+			<input message="oaws:CancelAcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="ShowTestSpecification">
+			<input message="oaws:ShowTestSpecification"/>
+		</operation>
+		<operation name="SyncResponseTestSpecification">
+			<input message="oaws:SyncResponseTestSpecification"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncTestSpecificationPortType">
+		<operation name="ProcessTestSpecification">
+			<input message="oaws:ProcessTestSpecification"/>
+			<output message="oaws:AcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="ChangeTestSpecification">
+			<input message="oaws:ChangeTestSpecification"/>
+			<output message="oaws:ChangeAcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="CancelTestSpecification">
+			<input message="oaws:CancelTestSpecification"/>
+			<output message="oaws:CancelAcknowledgeTestSpecification"/>
+		</operation>
+		<operation name="GetTestSpecification">
+			<input message="oaws:GetTestSpecification"/>
+			<output message="oaws:ShowTestSpecification"/>
+		</operation>
+		<operation name="SyncTestSpecification">
+			<input message="oaws:SyncTestSpecification"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyTestSpecification">
+			<input message="oaws:NotifyTestSpecification"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestTestSpecificationBinding" type="oaws:RequestTestSpecificationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseTestSpecificationBinding" type="oaws:ResponseTestSpecificationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncTestSpecificationBinding" type="oaws:SyncTestSpecificationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyTestSpecification">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestSpecification.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestTestSpecificationService">
+		<port name="RequestTestSpecificationBinding" binding="oaws:RequestTestSpecificationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestTestSpecification"/>
+		</port>
+	</service>
+	<service name="ResponseTestSpecificationService">
+		<port name="ResponseTestSpecificationBinding" binding="oaws:ResponseTestSpecificationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseTestSpecification"/>
+		</port>
+	</service>
+	<service name="SyncTestSpecificationService">
+		<port name="SyncTestSpecificationBinding" binding="oaws:SyncTestSpecificationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncTestSpecification"/>
+		</port>
+	</service>
+</definitions>

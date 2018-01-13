@@ -1,0 +1,2373 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OAGIS 10_4 -- Catalog Noun -- Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array('element_Catalog_xibox', 'element_CatalogHeader_xibox', 'element_ClassificationDefinition_xibox', 'element_ItemPrice_xibox', 'element_ClassificationScheme_xibox', 'element_CatalogLine_xibox', 'type_CatalogType_xibox', 'type_CatalogHeaderBaseType_xibox', 'type_CatalogHeaderType_xibox', 'type_ClassificationSchemeBaseType_xibox', 'type_ClassificationSchemeType_xibox', 'type_ClassificationDetailsBaseType_xibox', 'type_ClassificationDetailsType_xibox', 'type_CatalogLineBaseType_xibox', 'type_CatalogLineType_xibox', 'type_ItemPriceBaseType_xibox', 'type_ItemPriceType_xibox');
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox', 'element_Catalog_scbox', 'element_CatalogHeader_scbox', 'element_ClassificationDefinition_scbox', 'element_ItemPrice_scbox', 'element_ClassificationScheme_scbox', 'element_CatalogLine_scbox', 'type_CatalogType_scbox', 'type_CatalogHeaderBaseType_scbox', 'type_CatalogHeaderType_scbox', 'type_ClassificationSchemeBaseType_scbox', 'type_ClassificationSchemeType_scbox', 'type_ClassificationDetailsBaseType_scbox', 'type_ClassificationDetailsType_scbox', 'type_CatalogLineBaseType_scbox', 'type_CatalogLineType_scbox', 'type_ItemPriceBaseType_scbox', 'type_ItemPriceType_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">OAGIS 10_4 -- Catalog Noun -- Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+<li>
+<a href="#SchemaComponents">Global Schema Components</a>
+<ul>
+<li>
+<a href="#element_Catalog">Element: <strong>Catalog</strong>
+</a>
+</li>
+<li>
+<a href="#element_CatalogHeader">Element: <strong>CatalogHeader</strong>
+</a>
+</li>
+<li>
+<a href="#element_ClassificationDefinition">Element: <strong>ClassificationDefinition</strong>
+</a>
+</li>
+<li>
+<a href="#element_ItemPrice">Element: <strong>ItemPrice</strong>
+</a>
+</li>
+<li>
+<a href="#element_ClassificationScheme">Element: <strong>ClassificationScheme</strong>
+</a>
+</li>
+<li>
+<a href="#element_CatalogLine">Element: <strong>CatalogLine</strong>
+</a>
+</li>
+<li>
+<a href="#type_CatalogType">Complex Type: <strong>CatalogType</strong>
+</a>
+</li>
+<li>
+<a href="#type_CatalogHeaderBaseType">Complex Type: <strong>CatalogHeaderBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_CatalogHeaderType">Complex Type: <strong>CatalogHeaderType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ClassificationSchemeBaseType">Complex Type: <strong>ClassificationSchemeBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ClassificationSchemeType">Complex Type: <strong>ClassificationSchemeType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ClassificationDetailsBaseType">Complex Type: <strong>ClassificationDetailsBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ClassificationDetailsType">Complex Type: <strong>ClassificationDetailsType</strong>
+</a>
+</li>
+<li>
+<a href="#type_CatalogLineBaseType">Complex Type: <strong>CatalogLineBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_CatalogLineType">Complex Type: <strong>CatalogLineType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ItemPriceBaseType">Complex Type: <strong>ItemPriceBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_ItemPriceType">Complex Type: <strong>ItemPriceType</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>Target Namespace</th>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations have no namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>../Platform/2_4/Common/Components/Components.xsd</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_">Default namespace</a>
+</td>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xsd">xsd</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:schema</span> <span class="scTag">targetNamespace</span>="<span class="scContent">http://www.openapplications.org/oagis/10</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">attributeFormDefault</span>="<span class="scContent">unqualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">../Platform/2_4/Common/Components/Components.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xsd:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaComponents">Global Schema Components</a>
+</h2>
+<h3>Element: <a class="name" name="element_Catalog">Catalog</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>Catalog</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_CatalogType" title="Jump to &quot;CatalogType&quot; type definition.">CatalogType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Catalog is a list of items or commodities. The items may be arranged according to a classification scheme. The Catalog can identify the classification scheme it uses, and the classifications and features that are defined within that scheme. Within the Catalog, each item can be classified into one oe more categories , and the specifications of each item can be identified. A Catalog has at least one publisher and one or many suppliers for the items in the Catalog.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_Catalog_xibox'); return false;" class="control" id="element_Catalog_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_Catalog_xibox">
+<div style="margin-left: 0em">&lt;Catalog<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_CatalogHeader" title="Jump to &quot;CatalogHeader&quot; element declaration.">CatalogHeader</a>&gt; ... &lt;/<a href="#element_CatalogHeader" title="Jump to &quot;CatalogHeader&quot; element declaration.">CatalogHeader</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'CatalogHeader', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; ... &lt;/<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationScheme', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_CatalogLine" title="Jump to &quot;CatalogLine&quot; element declaration.">CatalogLine</a>&gt; ... &lt;/<a href="#element_CatalogLine" title="Jump to &quot;CatalogLine&quot; element declaration.">CatalogLine</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'CatalogLine', docArray);">?</a>
+</div>&lt;/Catalog&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_Catalog_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_Catalog_scbox'); return false;" class="control" id="element_Catalog_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_Catalog_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Catalog</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CatalogType" title="Jump to &quot;CatalogType&quot; type definition.">CatalogType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-376ff215e4554c41bc09237cf9f09266</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_Catalog_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_CatalogHeader">CatalogHeader</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogHeader</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_CatalogHeaderType" title="Jump to &quot;CatalogHeaderType&quot; type definition.">CatalogHeaderType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Describes the Catalog as a whole and communicates information that pertains to the entire Catalog.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_CatalogHeader_xibox'); return false;" class="control" id="element_CatalogHeader_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_CatalogHeader_xibox">
+<div style="margin-left: 0em">&lt;CatalogHeader&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Name', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CurrencyCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveTimePeriod', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UsageRestrictionCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; ... &lt;/<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationScheme', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PublisherParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogHeaderExtensionType&quot; type definition could not be found.');">CatalogHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/CatalogHeader&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CatalogHeader_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_CatalogHeader_scbox'); return false;" class="control" id="element_CatalogHeader_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_CatalogHeader_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">CatalogHeader</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CatalogHeaderType" title="Jump to &quot;CatalogHeaderType&quot; type definition.">CatalogHeaderType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-0225179f86a94f3685dcd337f3bb146b</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CatalogHeader_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_ClassificationDefinition">ClassificationDefinition</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationDefinition</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_ClassificationDetailsType" title="Jump to &quot;ClassificationDetailsType&quot; type definition.">ClassificationDetailsType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Describes a hierarchical association of classifications. A unique identifier for each ClassificationStructure can also be specified.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_ClassificationDefinition_xibox'); return false;" class="control" id="element_ClassificationDefinition_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_ClassificationDefinition_xibox">
+<div style="margin-left: 0em">&lt;ClassificationDefinition&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationDetailsExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationDetailsExtensionType&quot; type definition could not be found.');">ClassificationDetailsExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/ClassificationDefinition&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ClassificationDefinition_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_ClassificationDefinition_scbox'); return false;" class="control" id="element_ClassificationDefinition_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_ClassificationDefinition_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">ClassificationDefinition</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ClassificationDetailsType" title="Jump to &quot;ClassificationDetailsType&quot; type definition.">ClassificationDetailsType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f91aa4918f1d4fa7a4ac374f6994a465</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ClassificationDefinition_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_ItemPrice">ItemPrice</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ItemPrice</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_ItemPriceType" title="Jump to &quot;ItemPriceType&quot; type definition.">ItemPriceType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Identifies the price of the item.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_ItemPrice_xibox'); return false;" class="control" id="element_ItemPrice_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_ItemPrice_xibox">
+<div style="margin-left: 0em">&lt;ItemPrice&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UnitPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CustomerParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BuyerContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PriceBreak', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ItemPriceExtensionType&quot; type definition could not be found." onclick="alert('&quot;ItemPriceExtensionType&quot; type definition could not be found.');">ItemPriceExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/ItemPrice&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ItemPrice_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_ItemPrice_scbox'); return false;" class="control" id="element_ItemPrice_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_ItemPrice_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">ItemPrice</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ItemPriceType" title="Jump to &quot;ItemPriceType&quot; type definition.">ItemPriceType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f4189403ff0e4e30bada791b21de4d81</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ItemPrice_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_ClassificationScheme">ClassificationScheme</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationScheme</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_ClassificationSchemeType" title="Jump to &quot;ClassificationSchemeType&quot; type definition.">ClassificationSchemeType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Describes the classification scheme as a whole. A Catalog can have one ClassificationScheme associated with it. For example, a classification scheme for inventory management may classify items according to handling characteristics.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_ClassificationScheme_xibox'); return false;" class="control" id="element_ClassificationScheme_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_ClassificationScheme_xibox">
+<div style="margin-left: 0em">&lt;ClassificationScheme&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; ... &lt;/<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationDefinition', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationSchemeExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationSchemeExtensionType&quot; type definition could not be found.');">ClassificationSchemeExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/ClassificationScheme&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ClassificationScheme_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_ClassificationScheme_scbox'); return false;" class="control" id="element_ClassificationScheme_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_ClassificationScheme_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">ClassificationScheme</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ClassificationSchemeType" title="Jump to &quot;ClassificationSchemeType&quot; type definition.">ClassificationSchemeType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d5353fbd0f3f409dbcdcf3526a6ab215</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_ClassificationScheme_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_CatalogLine">CatalogLine</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogLine</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_CatalogLineType" title="Jump to &quot;CatalogLineType&quot; type definition.">CatalogLineType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>Describes the items that are in the Catalog.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_CatalogLine_xibox'); return false;" class="control" id="element_CatalogLine_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_CatalogLine_xibox">
+<div style="margin-left: 0em">&lt;CatalogLine&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Item', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UOMCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; ... &lt;/<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ItemPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogLineExtensionType&quot; type definition could not be found.');">CatalogLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/CatalogLine&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CatalogLine_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_CatalogLine_scbox'); return false;" class="control" id="element_CatalogLine_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_CatalogLine_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">CatalogLine</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CatalogLineType" title="Jump to &quot;CatalogLineType&quot; type definition.">CatalogLineType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5bb13c8cd55147ceb59f10c7d8d2a4db</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_CatalogLine_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CatalogType">CatalogType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>None</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogType_xibox'); return false;" class="control" id="type_CatalogType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CatalogType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_CatalogHeader" title="Jump to &quot;CatalogHeader&quot; element declaration.">CatalogHeader</a>&gt; ... &lt;/<a href="#element_CatalogHeader" title="Jump to &quot;CatalogHeader&quot; element declaration.">CatalogHeader</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'CatalogHeader', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; ... &lt;/<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationScheme', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_CatalogLine" title="Jump to &quot;CatalogLine&quot; element declaration.">CatalogLine</a>&gt; ... &lt;/<a href="#element_CatalogLine" title="Jump to &quot;CatalogLine&quot; element declaration.">CatalogLine</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'CatalogLine', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogType_scbox'); return false;" class="control" id="type_CatalogType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CatalogType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CatalogType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-9e1cc23ac7bf4ae68f8f1b645bd3a797</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_CatalogHeader" title="Jump to &quot;CatalogHeader&quot; element declaration.">CatalogHeader</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7ef00873451c4db6aeb1720a37b6cac5</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-222d814e908c4e6ea70c6feeaa0ea365</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_CatalogLine" title="Jump to &quot;CatalogLine&quot; element declaration.">CatalogLine</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-2dc9fa0e93e34fb69a26c630694f9f96</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">typeCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span>
+</span>" <span class="scTag">use</span>="<span class="scContent">optional</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-1a865cb3848c48b998f6481948ea509a</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">actionCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-1b4837d80e9b47829ceaed24b6792d89</span>"/&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CatalogHeaderBaseType">CatalogHeaderBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span> &lt; <strong>CatalogHeaderBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_CatalogHeaderType" title="Jump to &quot;CatalogHeaderType&quot; type definition.">CatalogHeaderType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogHeaderBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies header information about the Catalog. This information applies to all the lines in the Catalog. PartyReferences in the Header are defaults that apply to all the Catalog lines, if there is no value specified at line level
+
+The SupplierParty in the Header identifies the provider of the item. Depending on the exchange scenario, the provider may be either a Supplier, Manufacturer or a Catalog Party. If no SupplierParty is specified at line level, the header value of the SupplierParty is assumed to hold true for the line <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogHeaderBaseType_xibox'); return false;" class="control" id="type_CatalogHeaderBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CatalogHeaderBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Name', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CurrencyCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveTimePeriod', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UsageRestrictionCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; ... &lt;/<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationScheme', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PublisherParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogHeaderBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogHeaderBaseType_scbox'); return false;" class="control" id="type_CatalogHeaderBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CatalogHeaderBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CatalogHeaderBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-8eb363b052af41228e65f46065ca7b6d</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-2569eabbb6844462a3b41a927f10c62d</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fb82ea00fa104eca9922bd7a8a2f1d00</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-dc1b963ef41049179fe14460e55ee516</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5dfed3b2e3f7411b96f9444ab10d153c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b5cfac97d24046b192937ca9ee7a362a</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-db040b6e00ab490cb13980658d1e8141</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b0ced6dcf5da4127936e1e4d4ae7b7d8</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c94edfa5d2fe4020940468c644124695</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogHeaderBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CatalogHeaderType">CatalogHeaderType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_CatalogHeaderBaseType" title="Jump to &quot;CatalogHeaderBaseType&quot; type definition.">CatalogHeaderBaseType</a>
+</span> (by extension) &lt; <strong>CatalogHeaderType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogHeaderType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies header information about the Catalog. This information applies to all the lines in the Catalog. PartyReferences in the Header are defaults that apply to all the Catalog lines, if there is no value specified at line level
+
+The SupplierParty in the Header identifies the provider of the item. Depending on the exchange scenario, the provider may be either a Supplier, Manufacturer or a Catalog Party. If no SupplierParty is specified at line level, the header value of the SupplierParty is assumed to hold true for the line <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogHeaderType_xibox'); return false;" class="control" id="type_CatalogHeaderType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CatalogHeaderType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;HeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;HeaderBaseType&quot; type definition could not be found.');">HeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Name&quot; element declaration could not be found." onclick="alert('&quot;Name&quot; element declaration could not be found.');">Name</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Name', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CurrencyCode&quot; element declaration could not be found." onclick="alert('&quot;CurrencyCode&quot; element declaration could not be found.');">CurrencyCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CurrencyCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveTimePeriod&quot; element declaration could not be found." onclick="alert('&quot;EffectiveTimePeriod&quot; element declaration could not be found.');">EffectiveTimePeriod</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveTimePeriod', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UsageRestrictionCode&quot; element declaration could not be found." onclick="alert('&quot;UsageRestrictionCode&quot; element declaration could not be found.');">UsageRestrictionCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UsageRestrictionCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; ... &lt;/<a href="#element_ClassificationScheme" title="Jump to &quot;ClassificationScheme&quot; element declaration.">ClassificationScheme</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationScheme', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PublisherParty&quot; element declaration could not be found." onclick="alert('&quot;PublisherParty&quot; element declaration could not be found.');">PublisherParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PublisherParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogHeaderExtensionType&quot; type definition could not be found.');">CatalogHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogHeaderType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogHeaderType_scbox'); return false;" class="control" id="type_CatalogHeaderType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CatalogHeaderType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CatalogHeaderType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-d5c195c4d5434167bfc2b7cd1d1c9974</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CatalogHeaderBaseType" title="Jump to &quot;CatalogHeaderBaseType&quot; type definition.">CatalogHeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogHeaderExtensionType&quot; type definition could not be found.');">CatalogHeaderExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-dc56809410ae460d8652d0cd9c089add</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogHeaderType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ClassificationSchemeBaseType">ClassificationSchemeBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <strong>ClassificationSchemeBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_ClassificationSchemeType" title="Jump to &quot;ClassificationSchemeType&quot; type definition.">ClassificationSchemeType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationSchemeBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies the classification scheme used by all the items in the Catalog. Additionally, this also identifies all the classifications within this scheme and their hierarchical representation. The features that are defined in this classification scheme and also the features that are associated with each hierarchical classification representation can also be specified <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationSchemeBaseType_xibox'); return false;" class="control" id="type_ClassificationSchemeBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ClassificationSchemeBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; ... &lt;/<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationDefinition', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationSchemeBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationSchemeBaseType_scbox'); return false;" class="control" id="type_ClassificationSchemeBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ClassificationSchemeBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ClassificationSchemeBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f29e57011ea84f74a2af74f7a556c097</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-68372efb131a42748b0dc9955aac0fc7</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-bf8e8a08fbfa472aa23129310a3bbe4e</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c8a4015f5bdd4f069ab485f1f214d6e2</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c82844f4d5a9496bb8f2baf14c3f0cf8</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationSchemeBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ClassificationSchemeType">ClassificationSchemeType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <span class="type">
+<a href="#type_ClassificationSchemeBaseType" title="Jump to &quot;ClassificationSchemeBaseType&quot; type definition.">ClassificationSchemeBaseType</a>
+</span> (by extension) &lt; <strong>ClassificationSchemeType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationSchemeType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies the classification scheme used by all the items in the Catalog. Additionally, this also identifies all the classifications within this scheme and their hierarchical representation. The features that are defined in this classification scheme and also the features that are associated with each hierarchical classification representation can also be specified <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationSchemeType_xibox'); return false;" class="control" id="type_ClassificationSchemeType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ClassificationSchemeType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; ... &lt;/<a href="#element_ClassificationDefinition" title="Jump to &quot;ClassificationDefinition&quot; element declaration.">ClassificationDefinition</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ClassificationDefinition', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationSchemeExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationSchemeExtensionType&quot; type definition could not be found.');">ClassificationSchemeExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationSchemeType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationSchemeType_scbox'); return false;" class="control" id="type_ClassificationSchemeType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ClassificationSchemeType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ClassificationSchemeType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-5d383a5c5bcc4ebdbf85eaab2eb426d9</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ClassificationSchemeBaseType" title="Jump to &quot;ClassificationSchemeBaseType&quot; type definition.">ClassificationSchemeBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationSchemeExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationSchemeExtensionType&quot; type definition could not be found.');">ClassificationSchemeExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-71f72cd25ddd4f2cadfba63dacfff03b</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationSchemeType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ClassificationDetailsBaseType">ClassificationDetailsBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <strong>ClassificationDetailsBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_ClassificationDetailsType" title="Jump to &quot;ClassificationDetailsType&quot; type definition.">ClassificationDetailsType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationDetailsBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationDetailsBaseType_xibox'); return false;" class="control" id="type_ClassificationDetailsBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ClassificationDetailsBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationDetailsBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationDetailsBaseType_scbox'); return false;" class="control" id="type_ClassificationDetailsBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ClassificationDetailsBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ClassificationDetailsBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7056a7716802469bac3ee3cd8c915751</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7f8026afdcc444e08f6905ac466081e5</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6e4f99c7555e44ae828a94f1945508be</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationDetailsBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ClassificationDetailsType">ClassificationDetailsType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <span class="type">
+<a href="#type_ClassificationDetailsBaseType" title="Jump to &quot;ClassificationDetailsBaseType&quot; type definition.">ClassificationDetailsBaseType</a>
+</span> (by extension) &lt; <strong>ClassificationDetailsType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ClassificationDetailsType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationDetailsType_xibox'); return false;" class="control" id="type_ClassificationDetailsType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ClassificationDetailsType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Classification&quot; element declaration could not be found." onclick="alert('&quot;Classification&quot; element declaration could not be found.');">Classification</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Classification', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Property&quot; element declaration could not be found." onclick="alert('&quot;Property&quot; element declaration could not be found.');">Property</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Property', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationDetailsExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationDetailsExtensionType&quot; type definition could not be found.');">ClassificationDetailsExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationDetailsType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ClassificationDetailsType_scbox'); return false;" class="control" id="type_ClassificationDetailsType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ClassificationDetailsType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ClassificationDetailsType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-1fe889cdf2fb472388f9dde131e8375e</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ClassificationDetailsBaseType" title="Jump to &quot;ClassificationDetailsBaseType&quot; type definition.">ClassificationDetailsBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ClassificationDetailsExtensionType&quot; type definition could not be found." onclick="alert('&quot;ClassificationDetailsExtensionType&quot; type definition could not be found.');">ClassificationDetailsExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c4f7a4279d0b43de9506bbe924254ffa</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ClassificationDetailsType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CatalogLineBaseType">CatalogLineBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span> &lt; <strong>CatalogLineBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_CatalogLineType" title="Jump to &quot;CatalogLineType&quot; type definition.">CatalogLineType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogLineBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>The CatalogLine represents an item in a Catalog. The SupplierParty in the CatalogItemLine identifies the provider of the item. Depending on the exchange scenario, the provider may be either a Supplier, Manufacturer or a Catalog Party. If no SupplierParty is specified at line level, the header value of the SupplierParty is assumed to hold true for the line <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogLineBaseType_xibox'); return false;" class="control" id="type_CatalogLineBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CatalogLineBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Item', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UOMCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; ... &lt;/<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ItemPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogLineBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogLineBaseType_scbox'); return false;" class="control" id="type_CatalogLineBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CatalogLineBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CatalogLineBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-78a0c35355ec42199960b36d7e9e987e</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-debb2c9b9b294242ab81bd7056fcb344</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-4c2331de3b0f4ea09a6219a1367e55a2</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e61d39ef242c49638e93b625b6df1958</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ebf8545bfb1545fb8de7cb9b032869e6</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e389fbcc248444b883a279c13d092cc7</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c8eed7f278fa460f97f781e0b0d04a4a</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-a30848ae3c08440e9917e470147cca2e</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogLineBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_CatalogLineType">CatalogLineType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_CatalogLineBaseType" title="Jump to &quot;CatalogLineBaseType&quot; type definition.">CatalogLineBaseType</a>
+</span> (by extension) &lt; <strong>CatalogLineType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>CatalogLineType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>The CatalogLine represents an item in a Catalog. The SupplierParty in the CatalogItemLine identifies the provider of the item. Depending on the exchange scenario, the provider may be either a Supplier, Manufacturer or a Catalog Party. If no SupplierParty is specified at line level, the header value of the SupplierParty is assumed to hold true for the line <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogLineType_xibox'); return false;" class="control" id="type_CatalogLineType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_CatalogLineType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;LineBaseType&quot; type definition could not be found." onclick="alert('&quot;LineBaseType&quot; type definition could not be found.');">LineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Item&quot; element declaration could not be found." onclick="alert('&quot;Item&quot; element declaration could not be found.');">Item</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Item', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CommodityClassification&quot; element declaration could not be found." onclick="alert('&quot;CommodityClassification&quot; element declaration could not be found.');">CommodityClassification</a>&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UOMCode&quot; element declaration could not be found." onclick="alert('&quot;UOMCode&quot; element declaration could not be found.');">UOMCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UOMCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierParty&quot; element declaration could not be found." onclick="alert('&quot;SupplierParty&quot; element declaration could not be found.');">SupplierParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; ... &lt;/<a href="#element_ItemPrice" title="Jump to &quot;ItemPrice&quot; element declaration.">ItemPrice</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'ItemPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Quantity&quot; element declaration could not be found." onclick="alert('&quot;Quantity&quot; element declaration could not be found.');">Quantity</a>&gt; <span class="occurs">[0..*]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogLineExtensionType&quot; type definition could not be found.');">CatalogLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogLineType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_CatalogLineType_scbox'); return false;" class="control" id="type_CatalogLineType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_CatalogLineType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">CatalogLineType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-75ae14c721de4399b6ee5e8f980459f1</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_CatalogLineBaseType" title="Jump to &quot;CatalogLineBaseType&quot; type definition.">CatalogLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CatalogLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;CatalogLineExtensionType&quot; type definition could not be found.');">CatalogLineExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f52735c49f8c45a0adb66532f9e0286f</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_CatalogLineType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ItemPriceBaseType">ItemPriceBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <strong>ItemPriceBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_ItemPriceType" title="Jump to &quot;ItemPriceType&quot; type definition.">ItemPriceType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ItemPriceBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies a unit price for  an item<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ItemPriceBaseType_xibox'); return false;" class="control" id="type_ItemPriceBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ItemPriceBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UnitPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CustomerParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BuyerContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PriceBreak', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ItemPriceBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ItemPriceBaseType_scbox'); return false;" class="control" id="type_ItemPriceBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ItemPriceBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ItemPriceBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-4dc9a5a8bfee4f08bd047de8810b8f83</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-54de6026d5cc4a17a74b7ee67199a611</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-22db2cdec6d545589eba59dfea0a8f2e</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e6de12c167c9499dbe836f6ac18706ae</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b2d3bc6644c849ff8b4e902ec5805f17</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c4ad250ebf494c818eccf09e00f7ec3f</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:group</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-0051c5c544844d78b08f1d42eca44eec</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-4576707f3c4d487395d09758e2f74893</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ItemPriceBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_ItemPriceType">ItemPriceType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span> &lt; <span class="type">
+<a href="#type_ItemPriceBaseType" title="Jump to &quot;ItemPriceBaseType&quot; type definition.">ItemPriceBaseType</a>
+</span> (by extension) &lt; <strong>ItemPriceType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>ItemPriceType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>This identifies a unit price for  an item<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_ItemPriceType_xibox'); return false;" class="control" id="type_ItemPriceType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_ItemPriceType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;IdentificationType&quot; type definition could not be found." onclick="alert('&quot;IdentificationType&quot; type definition could not be found.');">IdentificationType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;UnitPrice&quot; element declaration could not be found." onclick="alert('&quot;UnitPrice&quot; element declaration could not be found.');">UnitPrice</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'UnitPrice', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;FreeFormTextGroup&quot; group definition could not be found." onclick="alert('&quot;FreeFormTextGroup&quot; group definition could not be found.');">FreeFormTextGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CustomerParty&quot; element declaration could not be found." onclick="alert('&quot;CustomerParty&quot; element declaration could not be found.');">CustomerParty</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CustomerParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BuyerContractReference&quot; element declaration could not be found." onclick="alert('&quot;BuyerContractReference&quot; element declaration could not be found.');">BuyerContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BuyerContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;SupplierContractReference&quot; element declaration could not be found." onclick="alert('&quot;SupplierContractReference&quot; element declaration could not be found.');">SupplierContractReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'SupplierContractReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="other">Model group reference (not shown): <a href="javascript:void(0)" title="&quot;ReferencesGroup&quot; group definition could not be found." onclick="alert('&quot;ReferencesGroup&quot; group definition could not be found.');">ReferencesGroup</a> <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PriceBreak&quot; element declaration could not be found." onclick="alert('&quot;PriceBreak&quot; element declaration could not be found.');">PriceBreak</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PriceBreak', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;ItemPriceExtensionType&quot; type definition could not be found." onclick="alert('&quot;ItemPriceExtensionType&quot; type definition could not be found.');">ItemPriceExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ItemPriceType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_ItemPriceType_scbox'); return false;" class="control" id="type_ItemPriceType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_ItemPriceType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">ItemPriceType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c5307775e387464ab53475d465df17d4</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_ItemPriceBaseType" title="Jump to &quot;ItemPriceBaseType&quot; type definition.">ItemPriceBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ItemPriceExtensionType&quot; type definition could not be found." onclick="alert('&quot;ItemPriceExtensionType&quot; type definition could not be found.');">ItemPriceExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-064b6ca2e15148158104ccefafe86347</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_ItemPriceType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<p class="footer">Generated by <a href="http://titanium.dstc.edu.au/xml/xs3p">xs3p</a>. Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

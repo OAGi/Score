@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessWarrantyClaim.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarrantyClaim.xsd"/>
+	<xsd:element name="ProcessWarrantyClaim" type="ProcessWarrantyClaimType" id="oagis-id-b4e7a635435a47429495aab1e7752a46">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessWarrantyClaim is to transmit an WarrantyClaim from a supplier to a customer. Indicating that the receiver of the WarrantyClaim is to Process the WarrantyClaim for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessWarrantyClaimType" id="oagis-id-47af23fb5e5e424c82332270f791d2ef">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessWarrantyClaimDataAreaType" id="oagis-id-bc85e66829344b79bd2c5edac44561b6">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessWarrantyClaim. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (WarrantyClaim).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessWarrantyClaimDataAreaType" id="oagis-id-98de5c67f84f4d76a65314e406f01302">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-ac23b5ad4a6843808110d9d70cf59e59"/>
+			<xsd:element ref="WarrantyClaim" maxOccurs="unbounded" id="oagis-id-384514636c8c48a1a031dfb0ffb2fbc5"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

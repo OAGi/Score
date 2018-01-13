@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Location.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyLocation.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelLocation">
+		<part name="Message" element="oa:CancelLocation"/>
+	</message>
+	<message name="CancelAcknowledgeLocation">
+		<part name="Message" element="oa:CancelAcknowledgeLocation"/>
+	</message>
+	<message name="ChangeLocation">
+		<part name="Message" element="oa:ChangeLocation"/>
+	</message>
+	<message name="ChangeAcknowledgeLocation">
+		<part name="Message" element="oa:ChangeAcknowledgeLocation"/>
+	</message>
+	<message name="GetLocation">
+		<part name="Message" element="oa:GetLocation"/>
+	</message>
+	<message name="ShowLocation">
+		<part name="Message" element="oa:ShowLocation"/>
+	</message>
+	<message name="ProcessLocation">
+		<part name="Message" element="oa:ProcessLocation"/>
+	</message>
+	<message name="AcknowledgeLocation">
+		<part name="Message" element="oa:AcknowledgeLocation"/>
+	</message>
+	<message name="SyncLocation">
+		<part name="Message" element="oa:SyncLocation"/>
+	</message>
+	<message name="SyncResponseLocation">
+		<part name="Message" element="oa:SyncResponseLocation"/>
+	</message>
+	<message name="NotifyLocation">
+		<part name="Message" element="oa:NotifyLocation"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestLocationPortType">
+		<operation name="ProcessLocation">
+			<input message="oaws:ProcessLocation"/>
+		</operation>
+		<operation name="ChangeLocation">
+			<input message="oaws:ChangeLocation"/>
+		</operation>
+		<operation name="CancelLocation">
+			<input message="oaws:CancelLocation"/>
+		</operation>
+		<operation name="GetLocation">
+			<input message="oaws:GetLocation"/>
+		</operation>
+		<operation name="SyncLocation">
+			<input message="oaws:SyncLocation"/>
+		</operation>
+		<operation name="NotifyLocation">
+			<input message="oaws:NotifyLocation"/>
+		</operation>
+	</portType>
+	<portType name="ResponseLocationPortType">
+		<operation name="AcknowledgeLocation">
+			<input message="oaws:AcknowledgeLocation"/>
+		</operation>
+		<operation name="ChangeAcknowledgeLocation">
+			<input message="oaws:ChangeAcknowledgeLocation"/>
+		</operation>
+		<operation name="CancelAcknowledgeLocation">
+			<input message="oaws:CancelAcknowledgeLocation"/>
+		</operation>
+		<operation name="ShowLocation">
+			<input message="oaws:ShowLocation"/>
+		</operation>
+		<operation name="SyncResponseLocation">
+			<input message="oaws:SyncResponseLocation"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncLocationPortType">
+		<operation name="ProcessLocation">
+			<input message="oaws:ProcessLocation"/>
+			<output message="oaws:AcknowledgeLocation"/>
+		</operation>
+		<operation name="ChangeLocation">
+			<input message="oaws:ChangeLocation"/>
+			<output message="oaws:ChangeAcknowledgeLocation"/>
+		</operation>
+		<operation name="CancelLocation">
+			<input message="oaws:CancelLocation"/>
+			<output message="oaws:CancelAcknowledgeLocation"/>
+		</operation>
+		<operation name="GetLocation">
+			<input message="oaws:GetLocation"/>
+			<output message="oaws:ShowLocation"/>
+		</operation>
+		<operation name="SyncLocation">
+			<input message="oaws:SyncLocation"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyLocation">
+			<input message="oaws:NotifyLocation"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestLocationBinding" type="oaws:RequestLocationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseLocationBinding" type="oaws:ResponseLocationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncLocationBinding" type="oaws:SyncLocationPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyLocation">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Location.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestLocationService">
+		<port name="RequestLocationBinding" binding="oaws:RequestLocationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestLocation"/>
+		</port>
+	</service>
+	<service name="ResponseLocationService">
+		<port name="ResponseLocationBinding" binding="oaws:ResponseLocationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseLocation"/>
+		</port>
+	</service>
+	<service name="SyncLocationService">
+		<port name="SyncLocationBinding" binding="oaws:SyncLocationBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncLocation"/>
+		</port>
+	</service>
+</definitions>

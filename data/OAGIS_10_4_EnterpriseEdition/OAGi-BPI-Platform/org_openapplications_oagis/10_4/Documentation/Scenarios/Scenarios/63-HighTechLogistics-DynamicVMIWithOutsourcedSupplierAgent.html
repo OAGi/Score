@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>OAGIS 10.4 Scenarios - Scenario 63</title>
+
+  
+
+  
+  <base target="body"></head><body bgproperties="fixed" style="background-color: rgb(255, 255, 255);">
+<table border="1" cellpadding="10" cellspacing="1" height="100%" width="78%">
+
+  <tbody>
+    <tr>
+      <td wrap="" align="left" bgcolor="#ffffff" height="80" valign="top" width="78%">
+      <h1><b><span style="font-family: Arial; font-size: large;">Scenario
+63 - High Tech Logistics - Dynamic VMI With Outsourced Supplier Agent</span></b></h1>
+      <hr>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.0
+Overview</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Scenario #63
+describes the integration for supplier party applications to integrate
+with transportation party (Carrier), distribution center party
+(External Hub) and&nbsp; customer party applications to accomplish a
+process known as dynamic vendor managed inventory with an outsourced
+supplier.<br>
+<br></span><span style="font-family: Arial; font-size: small;">The
+purpose of this scenario is to enable the visualization of the
+participants in the process and the dialogs between them for this
+specific integration. This scenario is not meant to be the only model
+for integrating general ledger applications to a budget
+applications. This is simply one model that may be used to guide one's
+own integration efforts.<br>
+      <br>
+      </span>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.1
+Scenario</span></b></h1>
+      <h1><b><span style="font-family: Arial; font-size: medium;"></span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The scenario
+below contains the participants involved in the
+interaction, the dialog flows or conversation between them, certain
+assumptions about the sequence of events, and assumptions about the
+technical approach, for example, publish and subscribe.<br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">This
+is a model to be used as a design recommendation, not a required
+approach.</span><br>
+      <span style="font-family: Arial; font-size: small;"><br>
+      </span> <img style="width: 965px; height: 732px;" alt="Dynamic Outsourced Vendor Managed Inventory Scenario" src="../OAGIS_Scenarios_GraphicsFiles/63-HTL-DynamicVMI-OutsourcedSupplierAgent.jpg">
+      <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.2
+Assumptions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This
+scenario assumes a loosely coupled, asynchronous approach with
+transaction management required but not
+explicitly defined.<br>
+      <br>
+It also presumes that this scenario can be applied as a B2B interaction
+between enterprises, as an internal A2A exchange within an enterprise
+or as an B2M exchange from a business to a mobile device following the
+same canonical business messaging model.</span> <br>
+      <br>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.3
+Participant Definitions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;"> This
+scenario contains four participants or roles: </span>
+      <ul>
+        <li><span style="font-family: Arial; font-size: small;">Supplier
+party</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Distribution
+center party (External Hub)</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Transportation
+party (Carrier)</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Customer
+party </span></li>
+      </ul>
+      <span style="font-family: Arial; font-size: small;"> </span> <dt><span style="font-family: Arial; font-size: small;">The
+definitions and
+details of these participants are
+left to the designer but are assumed to contain the functionality as
+defined by what is commonly sold in the commercial market place today.
+This
+definition is broadly accepted by the scenario designers and is a
+direct result of the decision not to
+define how the
+processing takes place within any individual application. <br>
+        <br>
+Each
+application must be
+able perform the services defined by the message BOD (business object
+document), but the internals of the application are not
+required or
+desired to be exposed at this level of standardized abstraction. <br>
+        <br>
+The
+most important factors in defining these participants is to ensure
+that an integration designer can communicate the requirements&nbsp;
+precisely
+enough to detail the interfaces needed and their interrelationships. <br>
+        <br>
+        </span></dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.4
+Business Workflow (Sequence)</span></b></h1>
+      <dt><span style="font-family: Arial; font-size: small;">The
+business workflow is graphically represented by starting at the
+Scenario top and reading from top down and from left to right.<br>
+        <br>
+ </span></dt>
+      <span style="font-family: Arial; font-size: small;">This scenario
+contains the following events in the workflow sequence:<br>
+</span>
+      <ol>
+        <li><span style="font-family: Arial; font-size: small;">Communicate a request to process an planning schedule to the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Indicate the acceptance or
+rejection of the planning schedule from the supplier to the customer</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate a request to
+process a purchase order (Blanket PO) to the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Indicate the acceptance or rejection
+of the blanket PO from the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate that the shipment is leaving from the supplier to the distribution center (External
+Hub)</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Goods move from the supplier to the external hub<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate updated to a shipment unit from
+the supplier to the external hub<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate the receipt of the delivery from the external hub</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate a request to pickup a shipment from
+the supplier to the external hub<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Indicate the acceptance or rejection of
+the shipment from the external hub<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate that the shipment is
+leaving from
+the TransportationParty (Carrier)<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate the commercial invoice from
+the supplier to the carrier<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate the shippers letter of instruction to the carrier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate the export declaration from
+the supplier to the carrier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate the hazardous material shipment document from the Supplier to the carrier<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate updates to the shipment unit from
+the carrier to both the customer and the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate updates
+of the inventory balance from the external hub sent
+to the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate updates of the inventory balance from the supplier to the external hub<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate receipt of delivery from the customer to the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate a request to process an invoice to the customer</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Indicate the acceptance or rejection of the
+Iivoice to the supplier</span></li>
+        <li><span style="font-family: Arial; font-size: small;">Communicate that the customer has
+initiated the payment and the supplier will receive payment. </span></li>
+      </ol>
+
+      <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">63.5
+Exception Handling</span></b></h1>
+      <dt><br>
+      </dt>
+      <span style="font-family: Arial; font-size: small;">Exception
+handling is highly localized as the result of an implementation's
+infrastructure, managment and business rules. As such, this section of
+the Scenario is planned to be used as a
+guide to help understand the additional intent of this Scenario
+designers. If no exceptions are noted here, then it can be assumed that
+the Scenario designers agreed that the Scenario is straight forward and
+has no additional neeeds:<br>
+      </span><br>
+      <ul>
+        <li><span style="font-family: Arial; font-size: small;">Note
+that the Confirm BOD is not shown in the scenario and that it is the
+most obvious method for
+providing an application level exception and feedback mechanism between
+business
+software components. Full Confirm BOD use is described in other OAGIS
+documentation in detail, but it should be noted that the specific use
+of the Confirm
+BOD may vary significantly from scenario to scenario and from
+integration to integration.<br>
+          <br>
+The
+Confirm BOD is typically intended to be used by the recieving
+application to communicate to the sending application that the
+information
+it sent in the message BOD was received and understood and can be
+processed.<br>
+          <br>
+If the
+information was not
+received or not understood, or contained errors of any type, it is
+accepted practice for OAGIS to presume that the data was
+not acted on and in the abscense of a Confirm BOD within an agreed to
+time limit to resend.
+As errors and assumptions are the bane of any implementation,
+it is strongly recommended that the Confirm BOD be used to prevent this
+potential problem althought it is not a requirement by OAGIS.<br>
+          <br>
+          <br>
+          </span></li>
+      </ul>
+      <span style="font-family: Arial; font-size: small;"> </span>
+      <hr> <span style="font-family: Arial; font-size: xx-small;">Copyright
+OAGi 2017 - All Rights Reserved  --  
+OAGIS
+release 10.4 - Document Number: 20170501</span><span style="font-family: Arial; font-size: xx-small;">-63</span> </td>
+    </tr>
+  </tbody>
+</table>
+
+</body></html>

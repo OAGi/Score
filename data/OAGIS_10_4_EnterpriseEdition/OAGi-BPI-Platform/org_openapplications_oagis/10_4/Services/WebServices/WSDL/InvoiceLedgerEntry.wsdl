@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/InvoiceLedgerEntry.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgeInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponseInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyInvoiceLedgerEntry.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelInvoiceLedgerEntry">
+		<part name="Message" element="oa:CancelInvoiceLedgerEntry"/>
+	</message>
+	<message name="CancelAcknowledgeInvoiceLedgerEntry">
+		<part name="Message" element="oa:CancelAcknowledgeInvoiceLedgerEntry"/>
+	</message>
+	<message name="ChangeInvoiceLedgerEntry">
+		<part name="Message" element="oa:ChangeInvoiceLedgerEntry"/>
+	</message>
+	<message name="ChangeAcknowledgeInvoiceLedgerEntry">
+		<part name="Message" element="oa:ChangeAcknowledgeInvoiceLedgerEntry"/>
+	</message>
+	<message name="GetInvoiceLedgerEntry">
+		<part name="Message" element="oa:GetInvoiceLedgerEntry"/>
+	</message>
+	<message name="ShowInvoiceLedgerEntry">
+		<part name="Message" element="oa:ShowInvoiceLedgerEntry"/>
+	</message>
+	<message name="PostInvoiceLedgerEntry">
+		<part name="Message" element="oa:PostInvoiceLedgerEntry"/>
+	</message>
+	<message name="PostAcknowledgeInvoiceLedgerEntry">
+		<part name="Message" element="oa:PostAcknowledgeInvoiceLedgerEntry"/>
+	</message>
+	<message name="LoadInvoiceLedgerEntry">
+		<part name="Message" element="oa:LoadInvoiceLedgerEntry"/>
+	</message>
+	<message name="LoadResponseInvoiceLedgerEntry">
+		<part name="Message" element="oa:LoadResponseInvoiceLedgerEntry"/>
+	</message>
+	<message name="NotifyInvoiceLedgerEntry">
+		<part name="Message" element="oa:NotifyInvoiceLedgerEntry"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestInvoiceLedgerEntryPortType">
+		<operation name="PostInvoiceLedgerEntry">
+			<input message="oaws:PostInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="ChangeInvoiceLedgerEntry">
+			<input message="oaws:ChangeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="CancelInvoiceLedgerEntry">
+			<input message="oaws:CancelInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="GetInvoiceLedgerEntry">
+			<input message="oaws:GetInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="LoadInvoiceLedgerEntry">
+			<input message="oaws:LoadInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="NotifyInvoiceLedgerEntry">
+			<input message="oaws:NotifyInvoiceLedgerEntry"/>
+		</operation>
+	</portType>
+	<portType name="ResponseInvoiceLedgerEntryPortType">
+		<operation name="PostAcknowledgeInvoiceLedgerEntry">
+			<input message="oaws:PostAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="ChangeAcknowledgeInvoiceLedgerEntry">
+			<input message="oaws:ChangeAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="CancelAcknowledgeInvoiceLedgerEntry">
+			<input message="oaws:CancelAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="ShowInvoiceLedgerEntry">
+			<input message="oaws:ShowInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="LoadResponseInvoiceLedgerEntry">
+			<input message="oaws:LoadResponseInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadInvoiceLedgerEntryPortType">
+		<operation name="PostInvoiceLedgerEntry">
+			<input message="oaws:PostInvoiceLedgerEntry"/>
+			<output message="oaws:PostAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="ChangeInvoiceLedgerEntry">
+			<input message="oaws:ChangeInvoiceLedgerEntry"/>
+			<output message="oaws:ChangeAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="CancelInvoiceLedgerEntry">
+			<input message="oaws:CancelInvoiceLedgerEntry"/>
+			<output message="oaws:CancelAcknowledgeInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="GetInvoiceLedgerEntry">
+			<input message="oaws:GetInvoiceLedgerEntry"/>
+			<output message="oaws:ShowInvoiceLedgerEntry"/>
+		</operation>
+		<operation name="LoadInvoiceLedgerEntry">
+			<input message="oaws:LoadInvoiceLedgerEntry"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyInvoiceLedgerEntry">
+			<input message="oaws:NotifyInvoiceLedgerEntry"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestInvoiceLedgerEntryBinding" type="oaws:RequestInvoiceLedgerEntryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseInvoiceLedgerEntryBinding" type="oaws:ResponseInvoiceLedgerEntryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgeInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponseInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadInvoiceLedgerEntryBinding" type="oaws:LoadInvoiceLedgerEntryPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyInvoiceLedgerEntry">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/InvoiceLedgerEntry.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestInvoiceLedgerEntryService">
+		<port name="RequestInvoiceLedgerEntryBinding" binding="oaws:RequestInvoiceLedgerEntryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestInvoiceLedgerEntry"/>
+		</port>
+	</service>
+	<service name="ResponseInvoiceLedgerEntryService">
+		<port name="ResponseInvoiceLedgerEntryBinding" binding="oaws:ResponseInvoiceLedgerEntryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseInvoiceLedgerEntry"/>
+		</port>
+	</service>
+	<service name="LoadInvoiceLedgerEntryService">
+		<port name="LoadInvoiceLedgerEntryBinding" binding="oaws:LoadInvoiceLedgerEntryBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/LoadInvoiceLedgerEntry"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ItemMaster.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyItemMaster.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelItemMaster">
+		<part name="Message" element="oa:CancelItemMaster"/>
+	</message>
+	<message name="CancelAcknowledgeItemMaster">
+		<part name="Message" element="oa:CancelAcknowledgeItemMaster"/>
+	</message>
+	<message name="ChangeItemMaster">
+		<part name="Message" element="oa:ChangeItemMaster"/>
+	</message>
+	<message name="ChangeAcknowledgeItemMaster">
+		<part name="Message" element="oa:ChangeAcknowledgeItemMaster"/>
+	</message>
+	<message name="GetItemMaster">
+		<part name="Message" element="oa:GetItemMaster"/>
+	</message>
+	<message name="ShowItemMaster">
+		<part name="Message" element="oa:ShowItemMaster"/>
+	</message>
+	<message name="ProcessItemMaster">
+		<part name="Message" element="oa:ProcessItemMaster"/>
+	</message>
+	<message name="AcknowledgeItemMaster">
+		<part name="Message" element="oa:AcknowledgeItemMaster"/>
+	</message>
+	<message name="SyncItemMaster">
+		<part name="Message" element="oa:SyncItemMaster"/>
+	</message>
+	<message name="SyncResponseItemMaster">
+		<part name="Message" element="oa:SyncResponseItemMaster"/>
+	</message>
+	<message name="NotifyItemMaster">
+		<part name="Message" element="oa:NotifyItemMaster"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestItemMasterPortType">
+		<operation name="ProcessItemMaster">
+			<input message="oaws:ProcessItemMaster"/>
+		</operation>
+		<operation name="ChangeItemMaster">
+			<input message="oaws:ChangeItemMaster"/>
+		</operation>
+		<operation name="CancelItemMaster">
+			<input message="oaws:CancelItemMaster"/>
+		</operation>
+		<operation name="GetItemMaster">
+			<input message="oaws:GetItemMaster"/>
+		</operation>
+		<operation name="SyncItemMaster">
+			<input message="oaws:SyncItemMaster"/>
+		</operation>
+		<operation name="NotifyItemMaster">
+			<input message="oaws:NotifyItemMaster"/>
+		</operation>
+	</portType>
+	<portType name="ResponseItemMasterPortType">
+		<operation name="AcknowledgeItemMaster">
+			<input message="oaws:AcknowledgeItemMaster"/>
+		</operation>
+		<operation name="ChangeAcknowledgeItemMaster">
+			<input message="oaws:ChangeAcknowledgeItemMaster"/>
+		</operation>
+		<operation name="CancelAcknowledgeItemMaster">
+			<input message="oaws:CancelAcknowledgeItemMaster"/>
+		</operation>
+		<operation name="ShowItemMaster">
+			<input message="oaws:ShowItemMaster"/>
+		</operation>
+		<operation name="SyncResponseItemMaster">
+			<input message="oaws:SyncResponseItemMaster"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncItemMasterPortType">
+		<operation name="ProcessItemMaster">
+			<input message="oaws:ProcessItemMaster"/>
+			<output message="oaws:AcknowledgeItemMaster"/>
+		</operation>
+		<operation name="ChangeItemMaster">
+			<input message="oaws:ChangeItemMaster"/>
+			<output message="oaws:ChangeAcknowledgeItemMaster"/>
+		</operation>
+		<operation name="CancelItemMaster">
+			<input message="oaws:CancelItemMaster"/>
+			<output message="oaws:CancelAcknowledgeItemMaster"/>
+		</operation>
+		<operation name="GetItemMaster">
+			<input message="oaws:GetItemMaster"/>
+			<output message="oaws:ShowItemMaster"/>
+		</operation>
+		<operation name="SyncItemMaster">
+			<input message="oaws:SyncItemMaster"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyItemMaster">
+			<input message="oaws:NotifyItemMaster"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestItemMasterBinding" type="oaws:RequestItemMasterPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseItemMasterBinding" type="oaws:ResponseItemMasterPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncItemMasterBinding" type="oaws:SyncItemMasterPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyItemMaster">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ItemMaster.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestItemMasterService">
+		<port name="RequestItemMasterBinding" binding="oaws:RequestItemMasterBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestItemMaster"/>
+		</port>
+	</service>
+	<service name="ResponseItemMasterService">
+		<port name="ResponseItemMasterBinding" binding="oaws:ResponseItemMasterBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseItemMaster"/>
+		</port>
+	</service>
+	<service name="SyncItemMasterService">
+		<port name="SyncItemMasterBinding" binding="oaws:SyncItemMasterBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncItemMaster"/>
+		</port>
+	</service>
+</definitions>

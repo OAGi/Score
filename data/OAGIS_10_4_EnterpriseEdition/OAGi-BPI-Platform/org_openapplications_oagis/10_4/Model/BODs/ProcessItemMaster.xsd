@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessItemMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ItemMaster.xsd"/>
+	<xsd:element name="ProcessItemMaster" type="ProcessItemMasterType" id="oagis-id-8f3998d146804ec1ae2ab7b6e89138fa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessItemMaster is to supply Item information for goods or services to another business application module.  This BOD may also be initiated by the sending system upon some event occurring.
+
+This BOD is not for Processhronizing ITEM quantities at each inventory location.   The ProcessInventoryBalance Business Object Document is used for this purpose.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate item information. 
+
+This BOD can be used to Processhronize items used in finished goods, raw materials, work-in-process or components in a bill of materials.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessItemMasterType" id="oagis-id-0dedc37e104e455d825182af001b7139">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessItemMasterDataAreaType" id="oagis-id-f1a0a114f9df455ca750a97761dd1eb5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessItemMaster. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ItemMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessItemMasterDataAreaType" id="oagis-id-6410fb753b144539b501d35161c143b8">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-2fa7e7ab68b348d7b05abd3569647245"/>
+			<xsd:element ref="ItemMaster" maxOccurs="unbounded" id="oagis-id-c49428baa7864e7799d52ab835b81c34"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               		 05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/ActualLedger.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="ActualLedger" type="ActualLedgerType" id="oagis-id-7febd17f3d9b497f85457c55f84cb7bb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Ledger Actual  represents actual amounts by account within ledger within company or business area.  Actual amounts may be generated in a source application and then loaded to a specific ledger within the enterprise general ledger or budget application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ActualLedgerBaseType" id="oagis-id-cb841acd6a0b4159a437451d3f4e5222">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="LedgerID" id="oagis-id-3801d723b56549be88e0809de716d7b4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the financial ledger to be used when updating balances</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DocumentDateTime" id="oagis-id-7a08c36314ac4d51bb21e6f8f33ce077" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date that document was created within the system of record.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AccountingPeriod" id="oagis-id-cb0248f5b623413480ed97eb5e9a0421" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the date, accounting period and financial year.  It is also known as the effective or post date</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="LedgerAmountGroup" id="oagis-id-f87ef39250e8408494516a705940d4f9"/>
+					<xsd:group ref="LedgerEntryContentGroup" id="oagis-id-5734049897584cea80a92f2b12e2a864"/>
+					<xsd:element ref="GLDestinationEntityID" id="oagis-id-3917a8f87fe34060aaf0cc07a6b75a4e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">If a value is specified for this and the value is different from the GLSourceEntity, it indicates that the entry is an inter-company transaction</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SourceDocumentReference" id="oagis-id-fe7d0f7f35614866b73f89c89cacf2d9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the link that ties back to a sub ledger transaction entry ID.  It is the identifier of an original/ source transaction or document.  The type indicates the type of document i.e. PurchaseOrder, Invoice, Receipt, Credit Memo, Voucher etc. For example, it could be the receipt or the summarized inventory activity.  This is the singular field that refers to an audit record.  Together with the Sender information, this is part of the referencing system, which will enable drill back audit trail functionality.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReasonCode" id="oagis-id-d8e56387c41b461a9e254348f8a2552c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransactionAnalysisCode" id="oagis-id-12a4c78878c44f6bae2d2a64e44c8d9a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a segmenting code used to analyze accounting transactions.  It is commonly used in project accounting applications.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ActualLedgerType" id="oagis-id-043223ae9a17420b976b8a707379c391">
+		<xsd:complexContent>
+			<xsd:extension base="ActualLedgerBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ActualLedgerExtensionType" id="oagis-id-db35e79ec3504298a0019cd76263ca83" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

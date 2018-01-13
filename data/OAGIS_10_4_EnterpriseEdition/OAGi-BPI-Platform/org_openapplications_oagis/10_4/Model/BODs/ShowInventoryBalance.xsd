@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowInventoryBalance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryBalance.xsd"/>
+        <xsd:element name="ShowInventoryBalance" type="ShowInventoryBalanceType" id="oagis-id-6803aa11744540c391ab8c2edf924aff">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowInventoryBalance is to supply InventoryBalance information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowInventoryBalanceType" id="oagis-id-ff312411a4cf4ae0b5bb0479fe0ba7ff">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowInventoryBalanceDataAreaType" id="oagis-id-94a2897ec0a44e6f985c94aeac6b3e0e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInventoryBalance. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InventoryBalance).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowInventoryBalanceDataAreaType" id="oagis-id-74631e52eb6d48eaa41da25d691162ba">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-b6a1b99ea4a44fc099ee5eedd954494a"/>
+                        <xsd:element ref="InventoryBalance" maxOccurs="unbounded" id="oagis-id-26ef765cd2a24429ab22ceeccad6cf40"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Catalog.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCatalog.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCatalog">
+		<part name="Message" element="oa:CancelCatalog"/>
+	</message>
+	<message name="CancelAcknowledgeCatalog">
+		<part name="Message" element="oa:CancelAcknowledgeCatalog"/>
+	</message>
+	<message name="ChangeCatalog">
+		<part name="Message" element="oa:ChangeCatalog"/>
+	</message>
+	<message name="ChangeAcknowledgeCatalog">
+		<part name="Message" element="oa:ChangeAcknowledgeCatalog"/>
+	</message>
+	<message name="GetCatalog">
+		<part name="Message" element="oa:GetCatalog"/>
+	</message>
+	<message name="ShowCatalog">
+		<part name="Message" element="oa:ShowCatalog"/>
+	</message>
+	<message name="ProcessCatalog">
+		<part name="Message" element="oa:ProcessCatalog"/>
+	</message>
+	<message name="AcknowledgeCatalog">
+		<part name="Message" element="oa:AcknowledgeCatalog"/>
+	</message>
+	<message name="SyncCatalog">
+		<part name="Message" element="oa:SyncCatalog"/>
+	</message>
+	<message name="SyncResponseCatalog">
+		<part name="Message" element="oa:SyncResponseCatalog"/>
+	</message>
+	<message name="NotifyCatalog">
+		<part name="Message" element="oa:NotifyCatalog"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCatalogPortType">
+		<operation name="ProcessCatalog">
+			<input message="oaws:ProcessCatalog"/>
+		</operation>
+		<operation name="ChangeCatalog">
+			<input message="oaws:ChangeCatalog"/>
+		</operation>
+		<operation name="CancelCatalog">
+			<input message="oaws:CancelCatalog"/>
+		</operation>
+		<operation name="GetCatalog">
+			<input message="oaws:GetCatalog"/>
+		</operation>
+		<operation name="SyncCatalog">
+			<input message="oaws:SyncCatalog"/>
+		</operation>
+		<operation name="NotifyCatalog">
+			<input message="oaws:NotifyCatalog"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCatalogPortType">
+		<operation name="AcknowledgeCatalog">
+			<input message="oaws:AcknowledgeCatalog"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCatalog">
+			<input message="oaws:ChangeAcknowledgeCatalog"/>
+		</operation>
+		<operation name="CancelAcknowledgeCatalog">
+			<input message="oaws:CancelAcknowledgeCatalog"/>
+		</operation>
+		<operation name="ShowCatalog">
+			<input message="oaws:ShowCatalog"/>
+		</operation>
+		<operation name="SyncResponseCatalog">
+			<input message="oaws:SyncResponseCatalog"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncCatalogPortType">
+		<operation name="ProcessCatalog">
+			<input message="oaws:ProcessCatalog"/>
+			<output message="oaws:AcknowledgeCatalog"/>
+		</operation>
+		<operation name="ChangeCatalog">
+			<input message="oaws:ChangeCatalog"/>
+			<output message="oaws:ChangeAcknowledgeCatalog"/>
+		</operation>
+		<operation name="CancelCatalog">
+			<input message="oaws:CancelCatalog"/>
+			<output message="oaws:CancelAcknowledgeCatalog"/>
+		</operation>
+		<operation name="GetCatalog">
+			<input message="oaws:GetCatalog"/>
+			<output message="oaws:ShowCatalog"/>
+		</operation>
+		<operation name="SyncCatalog">
+			<input message="oaws:SyncCatalog"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCatalog">
+			<input message="oaws:NotifyCatalog"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCatalogBinding" type="oaws:RequestCatalogPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCatalogBinding" type="oaws:ResponseCatalogPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncCatalogBinding" type="oaws:SyncCatalogPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCatalog">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Catalog.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCatalogService">
+		<port name="RequestCatalogBinding" binding="oaws:RequestCatalogBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCatalog"/>
+		</port>
+	</service>
+	<service name="ResponseCatalogService">
+		<port name="ResponseCatalogBinding" binding="oaws:ResponseCatalogBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCatalog"/>
+		</port>
+	</service>
+	<service name="SyncCatalogService">
+		<port name="SyncCatalogBinding" binding="oaws:SyncCatalogBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncCatalog"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,1566 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OAGIS 10_4 -- RemittanceAdvice Noun -- Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array('element_RemittanceAdvice_xibox', 'element_RemittanceAdviceHeader_xibox', 'element_RemittanceAdviceLine_xibox', 'type_RemittanceAdviceType_xibox', 'type_RemittanceAdviceHeaderBaseType_xibox', 'type_RemittanceAdviceHeaderType_xibox', 'type_RemittanceAdviceLineBaseType_xibox', 'type_RemittanceAdviceLineType_xibox');
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox', 'element_RemittanceAdvice_scbox', 'element_RemittanceAdviceHeader_scbox', 'element_RemittanceAdviceLine_scbox', 'type_RemittanceAdviceType_scbox', 'type_RemittanceAdviceHeaderBaseType_scbox', 'type_RemittanceAdviceHeaderType_scbox', 'type_RemittanceAdviceLineBaseType_scbox', 'type_RemittanceAdviceLineType_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">OAGIS 10_4 -- RemittanceAdvice Noun -- Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+<li>
+<a href="#SchemaComponents">Global Schema Components</a>
+<ul>
+<li>
+<a href="#element_RemittanceAdvice">Element: <strong>RemittanceAdvice</strong>
+</a>
+</li>
+<li>
+<a href="#element_RemittanceAdviceHeader">Element: <strong>RemittanceAdviceHeader</strong>
+</a>
+</li>
+<li>
+<a href="#element_RemittanceAdviceLine">Element: <strong>RemittanceAdviceLine</strong>
+</a>
+</li>
+<li>
+<a href="#type_RemittanceAdviceType">Complex Type: <strong>RemittanceAdviceType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RemittanceAdviceHeaderBaseType">Complex Type: <strong>RemittanceAdviceHeaderBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RemittanceAdviceHeaderType">Complex Type: <strong>RemittanceAdviceHeaderType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RemittanceAdviceLineBaseType">Complex Type: <strong>RemittanceAdviceLineBaseType</strong>
+</a>
+</li>
+<li>
+<a href="#type_RemittanceAdviceLineType">Complex Type: <strong>RemittanceAdviceLineType</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>Target Namespace</th>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations have no namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>../Platform/2_4/Common/Components/Components.xsd</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_">Default namespace</a>
+</td>
+<td>
+<span class="targetNS">http://www.openapplications.org/oagis/10</span>
+</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xsd">xsd</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:schema</span> <span class="scTag">targetNamespace</span>="<span class="scContent">http://www.openapplications.org/oagis/10</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">attributeFormDefault</span>="<span class="scContent">unqualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">../Platform/2_4/Common/Components/Components.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xsd:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaComponents">Global Schema Components</a>
+</h2>
+<h3>Element: <a class="name" name="element_RemittanceAdvice">RemittanceAdvice</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdvice</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_RemittanceAdviceType" title="Jump to &quot;RemittanceAdviceType&quot; type definition.">RemittanceAdviceType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>The purpose of the RemittanceAdvice Business Object Document is to provides a detailed breakdown of a payment amount.  It includes all credits, debits, discounts, adjustments taken on an invoice, and adjustment reason codes.  A payment can attach a Remittance Advice Notification.  Payment can be for products only, transportation, or other services.  <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.<br />
+<br />The Process RemittanceAdvice sends the electronic form of a remittance advice document from a payer to a payee. It is usually executed when an outstanding accounts payable balance (credit or debit) exists. <br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdvice_xibox'); return false;" class="control" id="element_RemittanceAdvice_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdvice_xibox">
+<div style="margin-left: 0em">&lt;RemittanceAdvice<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_RemittanceAdviceHeader" title="Jump to &quot;RemittanceAdviceHeader&quot; element declaration.">RemittanceAdviceHeader</a>&gt; ... &lt;/<a href="#element_RemittanceAdviceHeader" title="Jump to &quot;RemittanceAdviceHeader&quot; element declaration.">RemittanceAdviceHeader</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RemittanceAdviceHeader', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_RemittanceAdviceLine" title="Jump to &quot;RemittanceAdviceLine&quot; element declaration.">RemittanceAdviceLine</a>&gt; ... &lt;/<a href="#element_RemittanceAdviceLine" title="Jump to &quot;RemittanceAdviceLine&quot; element declaration.">RemittanceAdviceLine</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RemittanceAdviceLine', docArray);">?</a>
+</div>&lt;/RemittanceAdvice&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdvice_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdvice_scbox'); return false;" class="control" id="element_RemittanceAdvice_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdvice_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdvice</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RemittanceAdviceType" title="Jump to &quot;RemittanceAdviceType&quot; type definition.">RemittanceAdviceType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7c6b08331b1b4f5c94bb69ce01c1cfb4</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdvice_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_RemittanceAdviceHeader">RemittanceAdviceHeader</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceHeader</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_RemittanceAdviceHeaderType" title="Jump to &quot;RemittanceAdviceHeaderType&quot; type definition.">RemittanceAdviceHeaderType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>The Remittance Advice Header contains information that applies to the entire remittance advice.  This Component is required.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdviceHeader_xibox'); return false;" class="control" id="element_RemittanceAdviceHeader_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdviceHeader_xibox">
+<div style="margin-left: 0em">&lt;RemittanceAdviceHeader&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveDate', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InitiatingParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'FinancialParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RemitToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CheckInstruction', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TotalAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransactionID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAuthorization', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'DebitCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CreditCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ElectronicFundsTransfer', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found.');">RemittanceAdviceHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/RemittanceAdviceHeader&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdviceHeader_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdviceHeader_scbox'); return false;" class="control" id="element_RemittanceAdviceHeader_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdviceHeader_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceHeader</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RemittanceAdviceHeaderType" title="Jump to &quot;RemittanceAdviceHeaderType&quot; type definition.">RemittanceAdviceHeaderType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c25b4aed50754195b3a5e95598b02460</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdviceHeader_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Element: <a class="name" name="element_RemittanceAdviceLine">RemittanceAdviceLine</a>
+</h3>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceLine</td>
+</tr>
+<tr>
+<th>Type</th>
+<td>
+<span class="type">
+<a href="#type_RemittanceAdviceLineType" title="Jump to &quot;RemittanceAdviceLineType&quot; type definition.">RemittanceAdviceLineType</a>
+</span>
+</td>
+</tr>
+<tr>
+<th>Nillable</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>To be entered.
+
+At least one occurrence of this Component is required for each occurrence of the Remittance Advice.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdviceLine_xibox'); return false;" class="control" id="element_RemittanceAdviceLine_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdviceLine_xibox">
+<div style="margin-left: 0em">&lt;RemittanceAdviceLine&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InvoiceReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found.');">RemittanceAdviceLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/RemittanceAdviceLine&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdviceLine_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('element_RemittanceAdviceLine_scbox'); return false;" class="control" id="element_RemittanceAdviceLine_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="element_RemittanceAdviceLine_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceLine</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RemittanceAdviceLineType" title="Jump to &quot;RemittanceAdviceLineType&quot; type definition.">RemittanceAdviceLineType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e501b5be4e7047fe93459986eba3af34</span>"/&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('element_RemittanceAdviceLine_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RemittanceAdviceType">RemittanceAdviceType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>None</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>The schema type for RemittanceAdvice. To be entered.<br /> More information at: <a href="http://www.openapplications.org/oagis/10" title="http://www.openapplications.org/oagis/10">http://www.openapplications.org/oagis/10</a>.</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceType_xibox'); return false;" class="control" id="type_RemittanceAdviceType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceType_xibox">
+<div style="margin-left: 0em">&lt;...<br />
+<span style="margin-left: 0.5em"> typeCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span> <span class="occurs">[0..1]</span>"</span>
+<br />
+<span style="margin-left: 0.5em"> actionCode="<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span> <span class="occurs">[0..1]</span>"</span>&gt; <br />
+<div style="margin-left: 1.5em">&lt;<a href="#element_RemittanceAdviceHeader" title="Jump to &quot;RemittanceAdviceHeader&quot; element declaration.">RemittanceAdviceHeader</a>&gt; ... &lt;/<a href="#element_RemittanceAdviceHeader" title="Jump to &quot;RemittanceAdviceHeader&quot; element declaration.">RemittanceAdviceHeader</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RemittanceAdviceHeader', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em">&lt;<a href="#element_RemittanceAdviceLine" title="Jump to &quot;RemittanceAdviceLine&quot; element declaration.">RemittanceAdviceLine</a>&gt; ... &lt;/<a href="#element_RemittanceAdviceLine" title="Jump to &quot;RemittanceAdviceLine&quot; element declaration.">RemittanceAdviceLine</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10.'); viewDocumentation('Element', 'RemittanceAdviceLine', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceType_scbox'); return false;" class="control" id="type_RemittanceAdviceType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6fd24332f3dc4292886f503d54ce8f01</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_RemittanceAdviceHeader" title="Jump to &quot;RemittanceAdviceHeader&quot; element declaration.">RemittanceAdviceHeader</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ea735322b9bd4026aa5dbab59f8853ff</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="#element_RemittanceAdviceLine" title="Jump to &quot;RemittanceAdviceLine&quot; element declaration.">RemittanceAdviceLine</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-dd42b6df61ff44c28098dbae983c4789</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">typeCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;CodeType_1E7368&quot; type definition could not be found." onclick="alert('&quot;CodeType_1E7368&quot; type definition could not be found.');">CodeType_1E7368</a>
+</span>
+</span>" <span class="scTag">use</span>="<span class="scContent">optional</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-8773b725e7534b2e869d80e8063fd7ef</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:attribute</span> <span class="scTag">name</span>="<span class="scContent">actionCode</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;ActionCodeContentType&quot; type definition could not be found." onclick="alert('&quot;ActionCodeContentType&quot; type definition could not be found.');">ActionCodeContentType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-cd7085babea04ca6b2ac51283709fc7f</span>"/&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RemittanceAdviceHeaderBaseType">RemittanceAdviceHeaderBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span> &lt; <strong>RemittanceAdviceHeaderBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_RemittanceAdviceHeaderType" title="Jump to &quot;RemittanceAdviceHeaderType&quot; type definition.">RemittanceAdviceHeaderType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceHeaderBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceHeaderBaseType_xibox'); return false;" class="control" id="type_RemittanceAdviceHeaderBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceHeaderBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveDate', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InitiatingParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'FinancialParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RemitToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CheckInstruction', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TotalAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransactionID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAuthorization', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'DebitCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CreditCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ElectronicFundsTransfer', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceHeaderBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceHeaderBaseType_scbox'); return false;" class="control" id="type_RemittanceAdviceHeaderBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceHeaderBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceHeaderBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-f09f6e05e0cc42d19d9138f928e713d8</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-921e591f032c4ad7af43ecb140fc7072</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7553c2e9df05463280b55e271b4fa4ed</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c682a2e3a30d45819fc71526670a3c45</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-fca58ef1c9d641428f5b32b588f5bf3c</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-4650e937f4fd4018825d59ec130b1b1e</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-190d5f73462a40959c6cb20a3387975d</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-92acc5959d4443b0a404d56ef65debb3</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6e86b678c59a45bfa4b04b75f569899f</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-7bd1d01db1da47a1af286cf09102866a</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ca821e7bc254420b8c8d737ec74f8559</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-462554d2961446c3a3a103d6af8702d1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-97ddbf67fd8146079bb1ad0558443f3b</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-ae44e504ce8f431d87cfff34b1c1d31e</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-256cd1fabb2c4a5bbf8d3cb89bccecba</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceHeaderBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RemittanceAdviceHeaderType">RemittanceAdviceHeaderType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_RemittanceAdviceHeaderBaseType" title="Jump to &quot;RemittanceAdviceHeaderBaseType&quot; type definition.">RemittanceAdviceHeaderBaseType</a>
+</span> (by extension) &lt; <strong>RemittanceAdviceHeaderType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceHeaderType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceHeaderType_xibox'); return false;" class="control" id="type_RemittanceAdviceHeaderType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceHeaderType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusHeaderBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusHeaderBaseType&quot; type definition could not be found.');">StatusHeaderBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;EffectiveDate&quot; element declaration could not be found." onclick="alert('&quot;EffectiveDate&quot; element declaration could not be found.');">EffectiveDate</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'EffectiveDate', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InitiatingParty&quot; element declaration could not be found." onclick="alert('&quot;InitiatingParty&quot; element declaration could not be found.');">InitiatingParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InitiatingParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;BillToParty&quot; element declaration could not be found." onclick="alert('&quot;BillToParty&quot; element declaration could not be found.');">BillToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'BillToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;FinancialParty&quot; element declaration could not be found." onclick="alert('&quot;FinancialParty&quot; element declaration could not be found.');">FinancialParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'FinancialParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;RemitToParty&quot; element declaration could not be found." onclick="alert('&quot;RemitToParty&quot; element declaration could not be found.');">RemitToParty</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'RemitToParty', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;Party&quot; element declaration could not be found." onclick="alert('&quot;Party&quot; element declaration could not be found.');">Party</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Party', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CheckInstruction&quot; element declaration could not be found." onclick="alert('&quot;CheckInstruction&quot; element declaration could not be found.');">CheckInstruction</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CheckInstruction', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentMethodCode&quot; element declaration could not be found." onclick="alert('&quot;PaymentMethodCode&quot; element declaration could not be found.');">PaymentMethodCode</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentMethodCode', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TotalAmount&quot; element declaration could not be found." onclick="alert('&quot;TotalAmount&quot; element declaration could not be found.');">TotalAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TotalAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;TransactionID&quot; element declaration could not be found." onclick="alert('&quot;TransactionID&quot; element declaration could not be found.');">TransactionID</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'TransactionID', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAuthorization&quot; element declaration could not be found." onclick="alert('&quot;PaymentAuthorization&quot; element declaration could not be found.');">PaymentAuthorization</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAuthorization', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;DebitCard&quot; element declaration could not be found." onclick="alert('&quot;DebitCard&quot; element declaration could not be found.');">DebitCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'DebitCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;CreditCard&quot; element declaration could not be found." onclick="alert('&quot;CreditCard&quot; element declaration could not be found.');">CreditCard</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'CreditCard', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;ElectronicFundsTransfer&quot; element declaration could not be found." onclick="alert('&quot;ElectronicFundsTransfer&quot; element declaration could not be found.');">ElectronicFundsTransfer</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'ElectronicFundsTransfer', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found.');">RemittanceAdviceHeaderExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceHeaderType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceHeaderType_scbox'); return false;" class="control" id="type_RemittanceAdviceHeaderType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceHeaderType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceHeaderType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b60c3a6dd5f445cc924fa1e95b3f78ea</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RemittanceAdviceHeaderBaseType" title="Jump to &quot;RemittanceAdviceHeaderBaseType&quot; type definition.">RemittanceAdviceHeaderBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceHeaderExtensionType&quot; type definition could not be found.');">RemittanceAdviceHeaderExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-1b64e58242ad4287874f669b011be7e1</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceHeaderType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RemittanceAdviceLineBaseType">RemittanceAdviceLineBaseType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span> &lt; <strong>RemittanceAdviceLineBaseType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span class="type">
+<a href="#type_RemittanceAdviceLineType" title="Jump to &quot;RemittanceAdviceLineType&quot; type definition.">RemittanceAdviceLineType</a>
+</span> (by extension)</li>
+</ul>
+</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceLineBaseType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceLineBaseType_xibox'); return false;" class="control" id="type_RemittanceAdviceLineBaseType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceLineBaseType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InvoiceReference', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceLineBaseType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceLineBaseType_scbox'); return false;" class="control" id="type_RemittanceAdviceLineBaseType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceLineBaseType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceLineBaseType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-e1ae2d6cff774338af9702c6dae906df</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-c121119d1c584a9080a9dbbaa4d40aeb</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">ref</span>="<span class="scContent">
+<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-6c1a21ff69e94f4584c827dbdc26e7c6</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceLineBaseType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_RemittanceAdviceLineType">RemittanceAdviceLineType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Super-types:</th>
+<td>
+<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span> &lt; <span class="type">
+<a href="#type_RemittanceAdviceLineBaseType" title="Jump to &quot;RemittanceAdviceLineBaseType&quot; type definition.">RemittanceAdviceLineBaseType</a>
+</span> (by extension) &lt; <strong>RemittanceAdviceLineType</strong> (by extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>RemittanceAdviceLineType</td>
+</tr>
+<tr>
+<th>Abstract</th>
+<td>no</td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceLineType_xibox'); return false;" class="control" id="type_RemittanceAdviceLineType_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceLineType_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;StatusLineBaseType&quot; type definition could not be found." onclick="alert('&quot;StatusLineBaseType&quot; type definition could not be found.');">StatusLineBaseType</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;PaymentAmount&quot; element declaration could not be found." onclick="alert('&quot;PaymentAmount&quot; element declaration could not be found.');">PaymentAmount</a>&gt; <span class="occurs">[0..1]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'PaymentAmount', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="inherited">&lt;<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; ... &lt;/<a href="javascript:void(0)" title="&quot;InvoiceReference&quot; element declaration could not be found." onclick="alert('&quot;InvoiceReference&quot; element declaration could not be found.');">InvoiceReference</a>&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'InvoiceReference', docArray);">?</a>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;Extension&gt; <span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found.');">RemittanceAdviceLineExtensionType</a>
+</span> &lt;/Extension&gt; <span class="occurs">[0..*]</span> <a class="documentation" title="View Documentation" href="javascript:void(0)" onclick="docArray = new Array('More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.','More information at: http://www.openapplications.org/oagis/10/platform/2.'); viewDocumentation('Element', 'Extension', docArray);">?</a>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceLineType_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_RemittanceAdviceLineType_scbox'); return false;" class="control" id="type_RemittanceAdviceLineType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_RemittanceAdviceLineType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xsd:complexType</span> <span class="scTag">name</span>="<span class="scContent">RemittanceAdviceLineType</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-bcd2cee54f4843048fb0c299d32df4f5</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a href="#type_RemittanceAdviceLineBaseType" title="Jump to &quot;RemittanceAdviceLineBaseType&quot; type definition.">RemittanceAdviceLineBaseType</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xsd:element</span> <span class="scTag">name</span>="<span class="scContent">Extension</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="javascript:void(0)" title="&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found." onclick="alert('&quot;RemittanceAdviceLineExtensionType&quot; type definition could not be found.');">RemittanceAdviceLineExtensionType</a>
+</span>
+</span>" <span class="scTag">id</span>="<span class="scContent">oagis-id-b0dd259ebe014c86b7cce6fb33ef374f</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>" <span class="scTag">maxOccurs</span>="<span class="scContent">unbounded</span>"/&gt;</div>&lt;/<span class="scTag">xsd:sequence</span>&gt;</div>&lt;/<span class="scTag">xsd:extension</span>&gt;</div>&lt;/<span class="scTag">xsd:complexContent</span>&gt;</div>&lt;/<span class="scTag">xsd:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_RemittanceAdviceLineType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<p class="footer">Generated by <a href="http://titanium.dstc.edu.au/xml/xs3p">xs3p</a>. Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/AcknowledgeCorrectiveActionPlan.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveActionPlan.xsd"/>
+	<xsd:element name="AcknowledgeCorrectiveActionPlan" type="AcknowledgeCorrectiveActionPlanType" id="oagis-id-fc452f3777e44914964c15a3086b0671">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeCorrectiveActionPlan is to communicate to a business application module or system the need to initiate the creation of a CorrectiveActionPlan structure.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeCorrectiveActionPlanType" id="oagis-id-f0507be7489a4e478efe8bf9f8f0ffd1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeCorrectiveActionPlanDataAreaType" id="oagis-id-09d0f592293e4f4599d2518fe3d25d4d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeCorrectiveActionPlan. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (CorrectiveActionPlan).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeCorrectiveActionPlanDataAreaType" id="oagis-id-d4b4076aeb06418ba475d84c846e596d">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-fbf71249f0fa4eb99f33ebad06627f10"/>
+			<xsd:element ref="CorrectiveActionPlan" id="oagis-id-5f99d6a6740e4068a0d6289a1cb713ae"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

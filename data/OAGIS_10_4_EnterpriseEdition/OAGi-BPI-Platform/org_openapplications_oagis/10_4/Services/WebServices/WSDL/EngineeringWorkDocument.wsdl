@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_2  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Services/WebServices/WSDL/EngineeringWorkDocument.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyEngineeringWorkDocument.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelEngineeringWorkDocument">
+		<part name="Message" element="oa:CancelEngineeringWorkDocument"/>
+	</message>
+	<message name="CancelAcknowledgeEngineeringWorkDocument">
+		<part name="Message" element="oa:CancelAcknowledgeEngineeringWorkDocument"/>
+	</message>
+	<message name="ChangeEngineeringWorkDocument">
+		<part name="Message" element="oa:ChangeEngineeringWorkDocument"/>
+	</message>
+	<message name="ChangeAcknowledgeEngineeringWorkDocument">
+		<part name="Message" element="oa:ChangeAcknowledgeEngineeringWorkDocument"/>
+	</message>
+	<message name="GetEngineeringWorkDocument">
+		<part name="Message" element="oa:GetEngineeringWorkDocument"/>
+	</message>
+	<message name="ShowEngineeringWorkDocument">
+		<part name="Message" element="oa:ShowEngineeringWorkDocument"/>
+	</message>
+	<message name="ProcessEngineeringWorkDocument">
+		<part name="Message" element="oa:ProcessEngineeringWorkDocument"/>
+	</message>
+	<message name="AcknowledgeEngineeringWorkDocument">
+		<part name="Message" element="oa:AcknowledgeEngineeringWorkDocument"/>
+	</message>
+	<message name="SyncEngineeringWorkDocument">
+		<part name="Message" element="oa:SyncEngineeringWorkDocument"/>
+	</message>
+	<message name="SyncResponseEngineeringWorkDocument">
+		<part name="Message" element="oa:SyncResponseEngineeringWorkDocument"/>
+	</message>
+	<message name="NotifyEngineeringWorkDocument">
+		<part name="Message" element="oa:NotifyEngineeringWorkDocument"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestEngineeringWorkDocumentPortType">
+		<operation name="ProcessEngineeringWorkDocument">
+			<input message="oaws:ProcessEngineeringWorkDocument"/>
+		</operation>
+		<operation name="ChangeEngineeringWorkDocument">
+			<input message="oaws:ChangeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="CancelEngineeringWorkDocument">
+			<input message="oaws:CancelEngineeringWorkDocument"/>
+		</operation>
+		<operation name="GetEngineeringWorkDocument">
+			<input message="oaws:GetEngineeringWorkDocument"/>
+		</operation>
+		<operation name="SyncEngineeringWorkDocument">
+			<input message="oaws:SyncEngineeringWorkDocument"/>
+		</operation>
+		<operation name="NotifyEngineeringWorkDocument">
+			<input message="oaws:NotifyEngineeringWorkDocument"/>
+		</operation>
+	</portType>
+	<portType name="ResponseEngineeringWorkDocumentPortType">
+		<operation name="AcknowledgeEngineeringWorkDocument">
+			<input message="oaws:AcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="ChangeAcknowledgeEngineeringWorkDocument">
+			<input message="oaws:ChangeAcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="CancelAcknowledgeEngineeringWorkDocument">
+			<input message="oaws:CancelAcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="ShowEngineeringWorkDocument">
+			<input message="oaws:ShowEngineeringWorkDocument"/>
+		</operation>
+		<operation name="SyncResponseEngineeringWorkDocument">
+			<input message="oaws:SyncResponseEngineeringWorkDocument"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncEngineeringWorkDocumentPortType">
+		<operation name="ProcessEngineeringWorkDocument">
+			<input message="oaws:ProcessEngineeringWorkDocument"/>
+			<output message="oaws:AcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="ChangeEngineeringWorkDocument">
+			<input message="oaws:ChangeEngineeringWorkDocument"/>
+			<output message="oaws:ChangeAcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="CancelEngineeringWorkDocument">
+			<input message="oaws:CancelEngineeringWorkDocument"/>
+			<output message="oaws:CancelAcknowledgeEngineeringWorkDocument"/>
+		</operation>
+		<operation name="GetEngineeringWorkDocument">
+			<input message="oaws:GetEngineeringWorkDocument"/>
+			<output message="oaws:ShowEngineeringWorkDocument"/>
+		</operation>
+		<operation name="SyncEngineeringWorkDocument">
+			<input message="oaws:SyncEngineeringWorkDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyEngineeringWorkDocument">
+			<input message="oaws:NotifyEngineeringWorkDocument"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestEngineeringWorkDocumentBinding" type="oaws:RequestEngineeringWorkDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseEngineeringWorkDocumentBinding" type="oaws:ResponseEngineeringWorkDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncEngineeringWorkDocumentBinding" type="oaws:SyncEngineeringWorkDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyEngineeringWorkDocument">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/EngineeringWorkDocument.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestEngineeringWorkDocumentService">
+		<port name="RequestEngineeringWorkDocumentBinding" binding="oaws:RequestEngineeringWorkDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/RequestEngineeringWorkDocument"/>
+		</port>
+	</service>
+	<service name="ResponseEngineeringWorkDocumentService">
+		<port name="ResponseEngineeringWorkDocumentBinding" binding="oaws:ResponseEngineeringWorkDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/ResponseEngineeringWorkDocument"/>
+		</port>
+	</service>
+	<service name="SyncEngineeringWorkDocumentService">
+		<port name="SyncEngineeringWorkDocumentBinding" binding="oaws:SyncEngineeringWorkDocumentBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/SyncEngineeringWorkDocument"/>
+		</port>
+	</service>
+</definitions>

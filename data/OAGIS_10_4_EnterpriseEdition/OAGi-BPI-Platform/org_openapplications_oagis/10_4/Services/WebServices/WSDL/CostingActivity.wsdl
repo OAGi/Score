@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/CostingActivity.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgeCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponseCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCostingActivity.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCostingActivity">
+		<part name="Message" element="oa:CancelCostingActivity"/>
+	</message>
+	<message name="CancelAcknowledgeCostingActivity">
+		<part name="Message" element="oa:CancelAcknowledgeCostingActivity"/>
+	</message>
+	<message name="ChangeCostingActivity">
+		<part name="Message" element="oa:ChangeCostingActivity"/>
+	</message>
+	<message name="ChangeAcknowledgeCostingActivity">
+		<part name="Message" element="oa:ChangeAcknowledgeCostingActivity"/>
+	</message>
+	<message name="GetCostingActivity">
+		<part name="Message" element="oa:GetCostingActivity"/>
+	</message>
+	<message name="ShowCostingActivity">
+		<part name="Message" element="oa:ShowCostingActivity"/>
+	</message>
+	<message name="PostCostingActivity">
+		<part name="Message" element="oa:PostCostingActivity"/>
+	</message>
+	<message name="PostAcknowledgeCostingActivity">
+		<part name="Message" element="oa:PostAcknowledgeCostingActivity"/>
+	</message>
+	<message name="LoadCostingActivity">
+		<part name="Message" element="oa:LoadCostingActivity"/>
+	</message>
+	<message name="LoadResponseCostingActivity">
+		<part name="Message" element="oa:LoadResponseCostingActivity"/>
+	</message>
+	<message name="NotifyCostingActivity">
+		<part name="Message" element="oa:NotifyCostingActivity"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCostingActivityPortType">
+		<operation name="PostCostingActivity">
+			<input message="oaws:PostCostingActivity"/>
+		</operation>
+		<operation name="ChangeCostingActivity">
+			<input message="oaws:ChangeCostingActivity"/>
+		</operation>
+		<operation name="CancelCostingActivity">
+			<input message="oaws:CancelCostingActivity"/>
+		</operation>
+		<operation name="GetCostingActivity">
+			<input message="oaws:GetCostingActivity"/>
+		</operation>
+		<operation name="LoadCostingActivity">
+			<input message="oaws:LoadCostingActivity"/>
+		</operation>
+		<operation name="NotifyCostingActivity">
+			<input message="oaws:NotifyCostingActivity"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCostingActivityPortType">
+		<operation name="PostAcknowledgeCostingActivity">
+			<input message="oaws:PostAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCostingActivity">
+			<input message="oaws:ChangeAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="CancelAcknowledgeCostingActivity">
+			<input message="oaws:CancelAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="ShowCostingActivity">
+			<input message="oaws:ShowCostingActivity"/>
+		</operation>
+		<operation name="LoadResponseCostingActivity">
+			<input message="oaws:LoadResponseCostingActivity"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadCostingActivityPortType">
+		<operation name="PostCostingActivity">
+			<input message="oaws:PostCostingActivity"/>
+			<output message="oaws:PostAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="ChangeCostingActivity">
+			<input message="oaws:ChangeCostingActivity"/>
+			<output message="oaws:ChangeAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="CancelCostingActivity">
+			<input message="oaws:CancelCostingActivity"/>
+			<output message="oaws:CancelAcknowledgeCostingActivity"/>
+		</operation>
+		<operation name="GetCostingActivity">
+			<input message="oaws:GetCostingActivity"/>
+			<output message="oaws:ShowCostingActivity"/>
+		</operation>
+		<operation name="LoadCostingActivity">
+			<input message="oaws:LoadCostingActivity"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCostingActivity">
+			<input message="oaws:NotifyCostingActivity"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCostingActivityBinding" type="oaws:RequestCostingActivityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCostingActivityBinding" type="oaws:ResponseCostingActivityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgeCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponseCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadCostingActivityBinding" type="oaws:LoadCostingActivityPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCostingActivity">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CostingActivity.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCostingActivityService">
+		<port name="RequestCostingActivityBinding" binding="oaws:RequestCostingActivityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCostingActivity"/>
+		</port>
+	</service>
+	<service name="ResponseCostingActivityService">
+		<port name="ResponseCostingActivityBinding" binding="oaws:ResponseCostingActivityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCostingActivity"/>
+		</port>
+	</service>
+	<service name="LoadCostingActivityService">
+		<port name="LoadCostingActivityBinding" binding="oaws:LoadCostingActivityBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/LoadCostingActivity"/>
+		</port>
+	</service>
+</definitions>

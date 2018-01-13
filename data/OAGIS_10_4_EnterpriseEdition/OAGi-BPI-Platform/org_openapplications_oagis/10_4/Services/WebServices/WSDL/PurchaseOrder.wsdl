@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_2  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Services/WebServices/WSDL/PurchaseOrder.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgePurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponsePurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPurchaseOrder.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPurchaseOrder">
+		<part name="Message" element="oa:CancelPurchaseOrder"/>
+	</message>
+	<message name="CancelAcknowledgePurchaseOrder">
+		<part name="Message" element="oa:CancelAcknowledgePurchaseOrder"/>
+	</message>
+	<message name="ChangePurchaseOrder">
+		<part name="Message" element="oa:ChangePurchaseOrder"/>
+	</message>
+	<message name="ChangeAcknowledgePurchaseOrder">
+		<part name="Message" element="oa:ChangeAcknowledgePurchaseOrder"/>
+	</message>
+	<message name="GetPurchaseOrder">
+		<part name="Message" element="oa:GetPurchaseOrder"/>
+	</message>
+	<message name="ShowPurchaseOrder">
+		<part name="Message" element="oa:ShowPurchaseOrder"/>
+	</message>
+	<message name="ProcessPurchaseOrder">
+		<part name="Message" element="oa:ProcessPurchaseOrder"/>
+	</message>
+	<message name="AcknowledgePurchaseOrder">
+		<part name="Message" element="oa:AcknowledgePurchaseOrder"/>
+	</message>
+	<message name="SyncPurchaseOrder">
+		<part name="Message" element="oa:SyncPurchaseOrder"/>
+	</message>
+	<message name="SyncResponsePurchaseOrder">
+		<part name="Message" element="oa:SyncResponsePurchaseOrder"/>
+	</message>
+	<message name="NotifyPurchaseOrder">
+		<part name="Message" element="oa:NotifyPurchaseOrder"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPurchaseOrderPortType">
+		<operation name="ProcessPurchaseOrder">
+			<input message="oaws:ProcessPurchaseOrder"/>
+		</operation>
+		<operation name="ChangePurchaseOrder">
+			<input message="oaws:ChangePurchaseOrder"/>
+		</operation>
+		<operation name="CancelPurchaseOrder">
+			<input message="oaws:CancelPurchaseOrder"/>
+		</operation>
+		<operation name="GetPurchaseOrder">
+			<input message="oaws:GetPurchaseOrder"/>
+		</operation>
+		<operation name="SyncPurchaseOrder">
+			<input message="oaws:SyncPurchaseOrder"/>
+		</operation>
+		<operation name="NotifyPurchaseOrder">
+			<input message="oaws:NotifyPurchaseOrder"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePurchaseOrderPortType">
+		<operation name="AcknowledgePurchaseOrder">
+			<input message="oaws:AcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="ChangeAcknowledgePurchaseOrder">
+			<input message="oaws:ChangeAcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="CancelAcknowledgePurchaseOrder">
+			<input message="oaws:CancelAcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="ShowPurchaseOrder">
+			<input message="oaws:ShowPurchaseOrder"/>
+		</operation>
+		<operation name="SyncResponsePurchaseOrder">
+			<input message="oaws:SyncResponsePurchaseOrder"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncPurchaseOrderPortType">
+		<operation name="ProcessPurchaseOrder">
+			<input message="oaws:ProcessPurchaseOrder"/>
+			<output message="oaws:AcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="ChangePurchaseOrder">
+			<input message="oaws:ChangePurchaseOrder"/>
+			<output message="oaws:ChangeAcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="CancelPurchaseOrder">
+			<input message="oaws:CancelPurchaseOrder"/>
+			<output message="oaws:CancelAcknowledgePurchaseOrder"/>
+		</operation>
+		<operation name="GetPurchaseOrder">
+			<input message="oaws:GetPurchaseOrder"/>
+			<output message="oaws:ShowPurchaseOrder"/>
+		</operation>
+		<operation name="SyncPurchaseOrder">
+			<input message="oaws:SyncPurchaseOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPurchaseOrder">
+			<input message="oaws:NotifyPurchaseOrder"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPurchaseOrderBinding" type="oaws:RequestPurchaseOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePurchaseOrderBinding" type="oaws:ResponsePurchaseOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponsePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncPurchaseOrderBinding" type="oaws:SyncPurchaseOrderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPurchaseOrder">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PurchaseOrder.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPurchaseOrderService">
+		<port name="RequestPurchaseOrderBinding" binding="oaws:RequestPurchaseOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/RequestPurchaseOrder"/>
+		</port>
+	</service>
+	<service name="ResponsePurchaseOrderService">
+		<port name="ResponsePurchaseOrderBinding" binding="oaws:ResponsePurchaseOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/ResponsePurchaseOrder"/>
+		</port>
+	</service>
+	<service name="SyncPurchaseOrderService">
+		<port name="SyncPurchaseOrderBinding" binding="oaws:SyncPurchaseOrderBinding">
+			<soap:address location="http://openapplications.org/oagis/10_2/ws/SyncPurchaseOrder"/>
+		</port>
+	</service>
+</definitions>

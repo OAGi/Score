@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/TestMethod.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyTestMethod.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelTestMethod">
+		<part name="Message" element="oa:CancelTestMethod"/>
+	</message>
+	<message name="CancelAcknowledgeTestMethod">
+		<part name="Message" element="oa:CancelAcknowledgeTestMethod"/>
+	</message>
+	<message name="ChangeTestMethod">
+		<part name="Message" element="oa:ChangeTestMethod"/>
+	</message>
+	<message name="ChangeAcknowledgeTestMethod">
+		<part name="Message" element="oa:ChangeAcknowledgeTestMethod"/>
+	</message>
+	<message name="GetTestMethod">
+		<part name="Message" element="oa:GetTestMethod"/>
+	</message>
+	<message name="ShowTestMethod">
+		<part name="Message" element="oa:ShowTestMethod"/>
+	</message>
+	<message name="ProcessTestMethod">
+		<part name="Message" element="oa:ProcessTestMethod"/>
+	</message>
+	<message name="AcknowledgeTestMethod">
+		<part name="Message" element="oa:AcknowledgeTestMethod"/>
+	</message>
+	<message name="SyncTestMethod">
+		<part name="Message" element="oa:SyncTestMethod"/>
+	</message>
+	<message name="SyncResponseTestMethod">
+		<part name="Message" element="oa:SyncResponseTestMethod"/>
+	</message>
+	<message name="NotifyTestMethod">
+		<part name="Message" element="oa:NotifyTestMethod"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestTestMethodPortType">
+		<operation name="ProcessTestMethod">
+			<input message="oaws:ProcessTestMethod"/>
+		</operation>
+		<operation name="ChangeTestMethod">
+			<input message="oaws:ChangeTestMethod"/>
+		</operation>
+		<operation name="CancelTestMethod">
+			<input message="oaws:CancelTestMethod"/>
+		</operation>
+		<operation name="GetTestMethod">
+			<input message="oaws:GetTestMethod"/>
+		</operation>
+		<operation name="SyncTestMethod">
+			<input message="oaws:SyncTestMethod"/>
+		</operation>
+		<operation name="NotifyTestMethod">
+			<input message="oaws:NotifyTestMethod"/>
+		</operation>
+	</portType>
+	<portType name="ResponseTestMethodPortType">
+		<operation name="AcknowledgeTestMethod">
+			<input message="oaws:AcknowledgeTestMethod"/>
+		</operation>
+		<operation name="ChangeAcknowledgeTestMethod">
+			<input message="oaws:ChangeAcknowledgeTestMethod"/>
+		</operation>
+		<operation name="CancelAcknowledgeTestMethod">
+			<input message="oaws:CancelAcknowledgeTestMethod"/>
+		</operation>
+		<operation name="ShowTestMethod">
+			<input message="oaws:ShowTestMethod"/>
+		</operation>
+		<operation name="SyncResponseTestMethod">
+			<input message="oaws:SyncResponseTestMethod"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncTestMethodPortType">
+		<operation name="ProcessTestMethod">
+			<input message="oaws:ProcessTestMethod"/>
+			<output message="oaws:AcknowledgeTestMethod"/>
+		</operation>
+		<operation name="ChangeTestMethod">
+			<input message="oaws:ChangeTestMethod"/>
+			<output message="oaws:ChangeAcknowledgeTestMethod"/>
+		</operation>
+		<operation name="CancelTestMethod">
+			<input message="oaws:CancelTestMethod"/>
+			<output message="oaws:CancelAcknowledgeTestMethod"/>
+		</operation>
+		<operation name="GetTestMethod">
+			<input message="oaws:GetTestMethod"/>
+			<output message="oaws:ShowTestMethod"/>
+		</operation>
+		<operation name="SyncTestMethod">
+			<input message="oaws:SyncTestMethod"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyTestMethod">
+			<input message="oaws:NotifyTestMethod"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestTestMethodBinding" type="oaws:RequestTestMethodPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseTestMethodBinding" type="oaws:ResponseTestMethodPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncTestMethodBinding" type="oaws:SyncTestMethodPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyTestMethod">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/TestMethod.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestTestMethodService">
+		<port name="RequestTestMethodBinding" binding="oaws:RequestTestMethodBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestTestMethod"/>
+		</port>
+	</service>
+	<service name="ResponseTestMethodService">
+		<port name="ResponseTestMethodBinding" binding="oaws:ResponseTestMethodBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseTestMethod"/>
+		</port>
+	</service>
+	<service name="SyncTestMethodService">
+		<port name="SyncTestMethodBinding" binding="oaws:SyncTestMethodBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncTestMethod"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/CommercialInvoice.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCommercialInvoice.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCommercialInvoice">
+		<part name="Message" element="oa:CancelCommercialInvoice"/>
+	</message>
+	<message name="CancelAcknowledgeCommercialInvoice">
+		<part name="Message" element="oa:CancelAcknowledgeCommercialInvoice"/>
+	</message>
+	<message name="ChangeCommercialInvoice">
+		<part name="Message" element="oa:ChangeCommercialInvoice"/>
+	</message>
+	<message name="ChangeAcknowledgeCommercialInvoice">
+		<part name="Message" element="oa:ChangeAcknowledgeCommercialInvoice"/>
+	</message>
+	<message name="GetCommercialInvoice">
+		<part name="Message" element="oa:GetCommercialInvoice"/>
+	</message>
+	<message name="ShowCommercialInvoice">
+		<part name="Message" element="oa:ShowCommercialInvoice"/>
+	</message>
+	<message name="ProcessCommercialInvoice">
+		<part name="Message" element="oa:ProcessCommercialInvoice"/>
+	</message>
+	<message name="AcknowledgeCommercialInvoice">
+		<part name="Message" element="oa:AcknowledgeCommercialInvoice"/>
+	</message>
+	<message name="SyncCommercialInvoice">
+		<part name="Message" element="oa:SyncCommercialInvoice"/>
+	</message>
+	<message name="SyncResponseCommercialInvoice">
+		<part name="Message" element="oa:SyncResponseCommercialInvoice"/>
+	</message>
+	<message name="NotifyCommercialInvoice">
+		<part name="Message" element="oa:NotifyCommercialInvoice"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCommercialInvoicePortType">
+		<operation name="ProcessCommercialInvoice">
+			<input message="oaws:ProcessCommercialInvoice"/>
+		</operation>
+		<operation name="ChangeCommercialInvoice">
+			<input message="oaws:ChangeCommercialInvoice"/>
+		</operation>
+		<operation name="CancelCommercialInvoice">
+			<input message="oaws:CancelCommercialInvoice"/>
+		</operation>
+		<operation name="GetCommercialInvoice">
+			<input message="oaws:GetCommercialInvoice"/>
+		</operation>
+		<operation name="SyncCommercialInvoice">
+			<input message="oaws:SyncCommercialInvoice"/>
+		</operation>
+		<operation name="NotifyCommercialInvoice">
+			<input message="oaws:NotifyCommercialInvoice"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCommercialInvoicePortType">
+		<operation name="AcknowledgeCommercialInvoice">
+			<input message="oaws:AcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCommercialInvoice">
+			<input message="oaws:ChangeAcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="CancelAcknowledgeCommercialInvoice">
+			<input message="oaws:CancelAcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="ShowCommercialInvoice">
+			<input message="oaws:ShowCommercialInvoice"/>
+		</operation>
+		<operation name="SyncResponseCommercialInvoice">
+			<input message="oaws:SyncResponseCommercialInvoice"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncCommercialInvoicePortType">
+		<operation name="ProcessCommercialInvoice">
+			<input message="oaws:ProcessCommercialInvoice"/>
+			<output message="oaws:AcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="ChangeCommercialInvoice">
+			<input message="oaws:ChangeCommercialInvoice"/>
+			<output message="oaws:ChangeAcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="CancelCommercialInvoice">
+			<input message="oaws:CancelCommercialInvoice"/>
+			<output message="oaws:CancelAcknowledgeCommercialInvoice"/>
+		</operation>
+		<operation name="GetCommercialInvoice">
+			<input message="oaws:GetCommercialInvoice"/>
+			<output message="oaws:ShowCommercialInvoice"/>
+		</operation>
+		<operation name="SyncCommercialInvoice">
+			<input message="oaws:SyncCommercialInvoice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCommercialInvoice">
+			<input message="oaws:NotifyCommercialInvoice"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCommercialInvoiceBinding" type="oaws:RequestCommercialInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCommercialInvoiceBinding" type="oaws:ResponseCommercialInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncCommercialInvoiceBinding" type="oaws:SyncCommercialInvoicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCommercialInvoice">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CommercialInvoice.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCommercialInvoiceService">
+		<port name="RequestCommercialInvoiceBinding" binding="oaws:RequestCommercialInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCommercialInvoice"/>
+		</port>
+	</service>
+	<service name="ResponseCommercialInvoiceService">
+		<port name="ResponseCommercialInvoiceBinding" binding="oaws:ResponseCommercialInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCommercialInvoice"/>
+		</port>
+	</service>
+	<service name="SyncCommercialInvoiceService">
+		<port name="SyncCommercialInvoiceBinding" binding="oaws:SyncCommercialInvoiceBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncCommercialInvoice"/>
+		</port>
+	</service>
+</definitions>

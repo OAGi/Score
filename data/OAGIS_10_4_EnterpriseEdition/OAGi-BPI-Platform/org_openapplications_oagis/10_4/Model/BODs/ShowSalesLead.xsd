@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowSalesLead.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/SalesLead.xsd"/>
+        <xsd:element name="ShowSalesLead" type="ShowSalesLeadType" id="oagis-id-035d087eeaae45f887a5dd62efd27001">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowSalesLead is to enable an application to provide SalesLead information from one business application to another business application. The response to the GetSalesLead is the ShowSalesLead.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowSalesLeadType" id="oagis-id-790961406e164fba94d54af55997adda">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowSalesLeadDataAreaType" id="oagis-id-0d06c4f74fb5495798b4c9f7e1b7deab">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowSalesLeadDataAreaType" id="oagis-id-d9856fd6045b471a9a5b797b88900366">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-39b9ebc858174eeab9ef27d98dd76459"/>
+                        <xsd:element ref="SalesLead" maxOccurs="unbounded" id="oagis-id-74331404c1554297ab869868e2ac4225"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

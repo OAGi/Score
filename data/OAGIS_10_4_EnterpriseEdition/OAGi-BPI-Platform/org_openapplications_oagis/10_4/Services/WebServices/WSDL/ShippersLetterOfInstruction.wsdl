@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ShippersLetterOfInstruction.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyShippersLetterOfInstruction.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelShippersLetterOfInstruction">
+		<part name="Message" element="oa:CancelShippersLetterOfInstruction"/>
+	</message>
+	<message name="CancelAcknowledgeShippersLetterOfInstruction">
+		<part name="Message" element="oa:CancelAcknowledgeShippersLetterOfInstruction"/>
+	</message>
+	<message name="ChangeShippersLetterOfInstruction">
+		<part name="Message" element="oa:ChangeShippersLetterOfInstruction"/>
+	</message>
+	<message name="ChangeAcknowledgeShippersLetterOfInstruction">
+		<part name="Message" element="oa:ChangeAcknowledgeShippersLetterOfInstruction"/>
+	</message>
+	<message name="GetShippersLetterOfInstruction">
+		<part name="Message" element="oa:GetShippersLetterOfInstruction"/>
+	</message>
+	<message name="ShowShippersLetterOfInstruction">
+		<part name="Message" element="oa:ShowShippersLetterOfInstruction"/>
+	</message>
+	<message name="ProcessShippersLetterOfInstruction">
+		<part name="Message" element="oa:ProcessShippersLetterOfInstruction"/>
+	</message>
+	<message name="AcknowledgeShippersLetterOfInstruction">
+		<part name="Message" element="oa:AcknowledgeShippersLetterOfInstruction"/>
+	</message>
+	<message name="SyncShippersLetterOfInstruction">
+		<part name="Message" element="oa:SyncShippersLetterOfInstruction"/>
+	</message>
+	<message name="SyncResponseShippersLetterOfInstruction">
+		<part name="Message" element="oa:SyncResponseShippersLetterOfInstruction"/>
+	</message>
+	<message name="NotifyShippersLetterOfInstruction">
+		<part name="Message" element="oa:NotifyShippersLetterOfInstruction"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestShippersLetterOfInstructionPortType">
+		<operation name="ProcessShippersLetterOfInstruction">
+			<input message="oaws:ProcessShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="ChangeShippersLetterOfInstruction">
+			<input message="oaws:ChangeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="CancelShippersLetterOfInstruction">
+			<input message="oaws:CancelShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="GetShippersLetterOfInstruction">
+			<input message="oaws:GetShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="SyncShippersLetterOfInstruction">
+			<input message="oaws:SyncShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="NotifyShippersLetterOfInstruction">
+			<input message="oaws:NotifyShippersLetterOfInstruction"/>
+		</operation>
+	</portType>
+	<portType name="ResponseShippersLetterOfInstructionPortType">
+		<operation name="AcknowledgeShippersLetterOfInstruction">
+			<input message="oaws:AcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="ChangeAcknowledgeShippersLetterOfInstruction">
+			<input message="oaws:ChangeAcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="CancelAcknowledgeShippersLetterOfInstruction">
+			<input message="oaws:CancelAcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="ShowShippersLetterOfInstruction">
+			<input message="oaws:ShowShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="SyncResponseShippersLetterOfInstruction">
+			<input message="oaws:SyncResponseShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncShippersLetterOfInstructionPortType">
+		<operation name="ProcessShippersLetterOfInstruction">
+			<input message="oaws:ProcessShippersLetterOfInstruction"/>
+			<output message="oaws:AcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="ChangeShippersLetterOfInstruction">
+			<input message="oaws:ChangeShippersLetterOfInstruction"/>
+			<output message="oaws:ChangeAcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="CancelShippersLetterOfInstruction">
+			<input message="oaws:CancelShippersLetterOfInstruction"/>
+			<output message="oaws:CancelAcknowledgeShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="GetShippersLetterOfInstruction">
+			<input message="oaws:GetShippersLetterOfInstruction"/>
+			<output message="oaws:ShowShippersLetterOfInstruction"/>
+		</operation>
+		<operation name="SyncShippersLetterOfInstruction">
+			<input message="oaws:SyncShippersLetterOfInstruction"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyShippersLetterOfInstruction">
+			<input message="oaws:NotifyShippersLetterOfInstruction"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestShippersLetterOfInstructionBinding" type="oaws:RequestShippersLetterOfInstructionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseShippersLetterOfInstructionBinding" type="oaws:ResponseShippersLetterOfInstructionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncShippersLetterOfInstructionBinding" type="oaws:SyncShippersLetterOfInstructionPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyShippersLetterOfInstruction">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ShippersLetterOfInstruction.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestShippersLetterOfInstructionService">
+		<port name="RequestShippersLetterOfInstructionBinding" binding="oaws:RequestShippersLetterOfInstructionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestShippersLetterOfInstruction"/>
+		</port>
+	</service>
+	<service name="ResponseShippersLetterOfInstructionService">
+		<port name="ResponseShippersLetterOfInstructionBinding" binding="oaws:ResponseShippersLetterOfInstructionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseShippersLetterOfInstruction"/>
+		</port>
+	</service>
+	<service name="SyncShippersLetterOfInstructionService">
+		<port name="SyncShippersLetterOfInstructionBinding" binding="oaws:SyncShippersLetterOfInstructionBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncShippersLetterOfInstruction"/>
+		</port>
+	</service>
+</definitions>

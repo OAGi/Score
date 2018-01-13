@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/PartyScreenResponse.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgePartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponsePartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPartyScreenResponse.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPartyScreenResponse">
+		<part name="Message" element="oa:CancelPartyScreenResponse"/>
+	</message>
+	<message name="CancelAcknowledgePartyScreenResponse">
+		<part name="Message" element="oa:CancelAcknowledgePartyScreenResponse"/>
+	</message>
+	<message name="ChangePartyScreenResponse">
+		<part name="Message" element="oa:ChangePartyScreenResponse"/>
+	</message>
+	<message name="ChangeAcknowledgePartyScreenResponse">
+		<part name="Message" element="oa:ChangeAcknowledgePartyScreenResponse"/>
+	</message>
+	<message name="GetPartyScreenResponse">
+		<part name="Message" element="oa:GetPartyScreenResponse"/>
+	</message>
+	<message name="ShowPartyScreenResponse">
+		<part name="Message" element="oa:ShowPartyScreenResponse"/>
+	</message>
+	<message name="ProcessPartyScreenResponse">
+		<part name="Message" element="oa:ProcessPartyScreenResponse"/>
+	</message>
+	<message name="AcknowledgePartyScreenResponse">
+		<part name="Message" element="oa:AcknowledgePartyScreenResponse"/>
+	</message>
+	<message name="SyncPartyScreenResponse">
+		<part name="Message" element="oa:SyncPartyScreenResponse"/>
+	</message>
+	<message name="SyncResponsePartyScreenResponse">
+		<part name="Message" element="oa:SyncResponsePartyScreenResponse"/>
+	</message>
+	<message name="NotifyPartyScreenResponse">
+		<part name="Message" element="oa:NotifyPartyScreenResponse"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPartyScreenResponsePortType">
+		<operation name="ProcessPartyScreenResponse">
+			<input message="oaws:ProcessPartyScreenResponse"/>
+		</operation>
+		<operation name="ChangePartyScreenResponse">
+			<input message="oaws:ChangePartyScreenResponse"/>
+		</operation>
+		<operation name="CancelPartyScreenResponse">
+			<input message="oaws:CancelPartyScreenResponse"/>
+		</operation>
+		<operation name="GetPartyScreenResponse">
+			<input message="oaws:GetPartyScreenResponse"/>
+		</operation>
+		<operation name="SyncPartyScreenResponse">
+			<input message="oaws:SyncPartyScreenResponse"/>
+		</operation>
+		<operation name="NotifyPartyScreenResponse">
+			<input message="oaws:NotifyPartyScreenResponse"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePartyScreenResponsePortType">
+		<operation name="AcknowledgePartyScreenResponse">
+			<input message="oaws:AcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="ChangeAcknowledgePartyScreenResponse">
+			<input message="oaws:ChangeAcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="CancelAcknowledgePartyScreenResponse">
+			<input message="oaws:CancelAcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="ShowPartyScreenResponse">
+			<input message="oaws:ShowPartyScreenResponse"/>
+		</operation>
+		<operation name="SyncResponsePartyScreenResponse">
+			<input message="oaws:SyncResponsePartyScreenResponse"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncPartyScreenResponsePortType">
+		<operation name="ProcessPartyScreenResponse">
+			<input message="oaws:ProcessPartyScreenResponse"/>
+			<output message="oaws:AcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="ChangePartyScreenResponse">
+			<input message="oaws:ChangePartyScreenResponse"/>
+			<output message="oaws:ChangeAcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="CancelPartyScreenResponse">
+			<input message="oaws:CancelPartyScreenResponse"/>
+			<output message="oaws:CancelAcknowledgePartyScreenResponse"/>
+		</operation>
+		<operation name="GetPartyScreenResponse">
+			<input message="oaws:GetPartyScreenResponse"/>
+			<output message="oaws:ShowPartyScreenResponse"/>
+		</operation>
+		<operation name="SyncPartyScreenResponse">
+			<input message="oaws:SyncPartyScreenResponse"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPartyScreenResponse">
+			<input message="oaws:NotifyPartyScreenResponse"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPartyScreenResponseBinding" type="oaws:RequestPartyScreenResponsePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePartyScreenResponseBinding" type="oaws:ResponsePartyScreenResponsePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponsePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncPartyScreenResponseBinding" type="oaws:SyncPartyScreenResponsePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPartyScreenResponse">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/PartyScreenResponse.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPartyScreenResponseService">
+		<port name="RequestPartyScreenResponseBinding" binding="oaws:RequestPartyScreenResponseBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestPartyScreenResponse"/>
+		</port>
+	</service>
+	<service name="ResponsePartyScreenResponseService">
+		<port name="ResponsePartyScreenResponseBinding" binding="oaws:ResponsePartyScreenResponseBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponsePartyScreenResponse"/>
+		</port>
+	</service>
+	<service name="SyncPartyScreenResponseService">
+		<port name="SyncPartyScreenResponseBinding" binding="oaws:SyncPartyScreenResponseBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncPartyScreenResponse"/>
+		</port>
+	</service>
+</definitions>

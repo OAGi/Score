@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>OAGIS 10.4 Scenarios - Scenario 48</title>
+
+
+  
+
+  
+  <base target="body"></head><body bgproperties="fixed" style="background-color: rgb(255, 255, 255);">
+<table border="1" cellpadding="10" cellspacing="1" height="100%" width="78%">
+
+  <tbody>
+    <tr>
+      <td wrap="" align="left" bgcolor="#ffffff" height="80" valign="top" width="78%">
+      <h1><b><span style="font-family: Arial; font-size: large;">Scenario
+48 - Sales Lead</span></b></h1>
+      <hr>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.0
+Overview</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Scenario #48
+describes the integration for partner sales systems with a supplier sales system concerning sales leads. <br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">The
+purpose of this scenario is to enable the visualization of the
+participants in the process and the dialogs between them for this
+specific integration. This scenario is not meant to be the only model
+for integrating general ledger applications to a budget
+applications. This is simply one model that may be used to guide one's
+own integration efforts.</span><br>
+      <br>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.1
+Scenario Diagram</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The scenario
+below contains the participants involved in the
+interaction, the dialog flows or conversation between them, certain
+assumptions about the sequence of events, and assumptions about the
+technical approach, for example, publish and subscribe.<br>
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">This
+is a model to be used as a design recommendation, not a required
+approach.<br>
+      </span><br>
+      <br>
+      <img style="width: 407px; height: 521px;" alt="Sales Lead Exchange Scenario" src="../OAGIS_Scenarios_GraphicsFiles/48-SalesLead.jpg"><br>
+      <br>
+      <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.2
+Assumptions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This
+scenario assumes a loosely coupled, asynchronous approach with
+transaction management required but not
+explicitly defined.<br>
+
+      <br>
+      </span><span style="font-family: Arial; font-size: small;">It is
+assumed that the supplier party is the organization that is
+interested in providing goods or services.</span><br>
+      <br>
+      <span style="font-family: Arial; font-size: small;">The
+environment for this first part of this integration is typically within
+an
+enterprise and within a division. <br>
+      <br>
+The environment for this second
+portion of this
+integration is typically between two enterprises. <br>
+      <br>
+This scenario also assume that one application will maintain the master
+data for integration. </span> <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.3
+Participant Definitions</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">This
+scenario contains two participants or roles: a partner sales system
+which is intended to provide sales leads to a supplier party, and
+the&nbsp; supplier parties system. </span> <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.4
+Business Workflow (Sequence)</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">The
+business workflow is graphically represented by starting at the
+Scenario top and reading from top down and from left to right. </span><br>
+      <span style="font-family: Arial; font-size: small;"><br>
+This scenario
+contains the following events in the workflow sequence:<br>
+      </span>
+      <ol>
+        <li><span style="font-family: Arial; font-size: small;">A sales
+lead is sent to a supplier party for processing including possible
+credit and relationship establishment which is acknowledged by the
+supplier parties system including any adjustments.<br>
+          </span></li>
+        <li><span style="font-family: Arial; font-size: small;">An
+exchange of a possible sales lead relationship initiated by the
+supplier party</span></li>
+        <li><span style="font-family: Arial; font-size: small;">The
+change and adjustment of a sales lead and its associated information
+initiated by the partners system.</span></li>
+      </ol>
+      <dt><br>
+      </dt>
+      <h1><b><span style="font-family: Arial; font-size: medium;">48.5
+Exception Handling</span></b></h1>
+      <span style="font-family: Arial; font-size: small;">Exception
+handling is highly localized as the result of an implementation's
+infrastructure, management and business rules. As such, this section of
+the Scenario documentation is planned to be used as a
+guide to help understand the additional intent of these Scenarios. If no exceptions are noted here, then it can be assumed that
+the Scenario designers agreed that the Scenario is straight forward and
+has no additional needs:</span><br>
+
+
+      
+      <ul><li><span style="font-family: Arial; font-size: small;">Note
+that the Confirm BOD is not shown in the scenario and that it is the
+most obvious method for
+providing an application level exception and feedback mechanism between
+business
+software components. Full Confirm BOD use is described in other OAGIS
+documentation in detail, but it should be noted that the specific use
+of the Confirm
+BOD may vary significantly from scenario to scenario and from
+integration to integration.</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">The
+Confirm BOD is typically intended to be used by the original receiving
+application to communicate to the sending application that the
+information
+it sent in the message BOD (business object document) was received and understood and can be
+processed.</span><span style="font-family: Arial; font-size: small;"> <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">If the
+information was not
+received or nor understood, or contained errors of any type, it is
+accepted practice for the OAGIS users to presume that the data was
+not acted on and in the absence of a Confirm BOD within a partnership previously agreed to
+time limit to resend the original message again. <br>
+          </span></li><li><span style="font-family: Arial; font-size: small;">As errors and assumptions are the bane of any implementation,
+it is strongly recommended that the Confirm BOD be used to prevent any
+potential problem although it is not a requirement by OAGIS use.<br>
+          <br>
+          <br>
+          </span></li>
+      </ul>
+      <span style="font-family: Arial; font-size: small;"> </span>
+      <hr> <span style="font-family: Arial; font-size: xx-small;">Copyright
+OAGi 2017 - All Rights Reserved  --  
+OAGIS
+release 10.4 - Document Number: 20170501</span><span style="font-family: Arial; font-size: xx-small;">-48</span> </td>
+    </tr>
+  </tbody>
+</table>
+
+</body></html>

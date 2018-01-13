@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/ChartOfAccounts.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyChartOfAccounts.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelChartOfAccounts">
+		<part name="Message" element="oa:CancelChartOfAccounts"/>
+	</message>
+	<message name="CancelAcknowledgeChartOfAccounts">
+		<part name="Message" element="oa:CancelAcknowledgeChartOfAccounts"/>
+	</message>
+	<message name="ChangeChartOfAccounts">
+		<part name="Message" element="oa:ChangeChartOfAccounts"/>
+	</message>
+	<message name="ChangeAcknowledgeChartOfAccounts">
+		<part name="Message" element="oa:ChangeAcknowledgeChartOfAccounts"/>
+	</message>
+	<message name="GetChartOfAccounts">
+		<part name="Message" element="oa:GetChartOfAccounts"/>
+	</message>
+	<message name="ShowChartOfAccounts">
+		<part name="Message" element="oa:ShowChartOfAccounts"/>
+	</message>
+	<message name="ProcessChartOfAccounts">
+		<part name="Message" element="oa:ProcessChartOfAccounts"/>
+	</message>
+	<message name="AcknowledgeChartOfAccounts">
+		<part name="Message" element="oa:AcknowledgeChartOfAccounts"/>
+	</message>
+	<message name="SyncChartOfAccounts">
+		<part name="Message" element="oa:SyncChartOfAccounts"/>
+	</message>
+	<message name="SyncResponseChartOfAccounts">
+		<part name="Message" element="oa:SyncResponseChartOfAccounts"/>
+	</message>
+	<message name="NotifyChartOfAccounts">
+		<part name="Message" element="oa:NotifyChartOfAccounts"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestChartOfAccountsPortType">
+		<operation name="ProcessChartOfAccounts">
+			<input message="oaws:ProcessChartOfAccounts"/>
+		</operation>
+		<operation name="ChangeChartOfAccounts">
+			<input message="oaws:ChangeChartOfAccounts"/>
+		</operation>
+		<operation name="CancelChartOfAccounts">
+			<input message="oaws:CancelChartOfAccounts"/>
+		</operation>
+		<operation name="GetChartOfAccounts">
+			<input message="oaws:GetChartOfAccounts"/>
+		</operation>
+		<operation name="SyncChartOfAccounts">
+			<input message="oaws:SyncChartOfAccounts"/>
+		</operation>
+		<operation name="NotifyChartOfAccounts">
+			<input message="oaws:NotifyChartOfAccounts"/>
+		</operation>
+	</portType>
+	<portType name="ResponseChartOfAccountsPortType">
+		<operation name="AcknowledgeChartOfAccounts">
+			<input message="oaws:AcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="ChangeAcknowledgeChartOfAccounts">
+			<input message="oaws:ChangeAcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="CancelAcknowledgeChartOfAccounts">
+			<input message="oaws:CancelAcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="ShowChartOfAccounts">
+			<input message="oaws:ShowChartOfAccounts"/>
+		</operation>
+		<operation name="SyncResponseChartOfAccounts">
+			<input message="oaws:SyncResponseChartOfAccounts"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncChartOfAccountsPortType">
+		<operation name="ProcessChartOfAccounts">
+			<input message="oaws:ProcessChartOfAccounts"/>
+			<output message="oaws:AcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="ChangeChartOfAccounts">
+			<input message="oaws:ChangeChartOfAccounts"/>
+			<output message="oaws:ChangeAcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="CancelChartOfAccounts">
+			<input message="oaws:CancelChartOfAccounts"/>
+			<output message="oaws:CancelAcknowledgeChartOfAccounts"/>
+		</operation>
+		<operation name="GetChartOfAccounts">
+			<input message="oaws:GetChartOfAccounts"/>
+			<output message="oaws:ShowChartOfAccounts"/>
+		</operation>
+		<operation name="SyncChartOfAccounts">
+			<input message="oaws:SyncChartOfAccounts"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyChartOfAccounts">
+			<input message="oaws:NotifyChartOfAccounts"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestChartOfAccountsBinding" type="oaws:RequestChartOfAccountsPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseChartOfAccountsBinding" type="oaws:ResponseChartOfAccountsPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncChartOfAccountsBinding" type="oaws:SyncChartOfAccountsPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyChartOfAccounts">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/ChartOfAccounts.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestChartOfAccountsService">
+		<port name="RequestChartOfAccountsBinding" binding="oaws:RequestChartOfAccountsBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestChartOfAccounts"/>
+		</port>
+	</service>
+	<service name="ResponseChartOfAccountsService">
+		<port name="ResponseChartOfAccountsBinding" binding="oaws:ResponseChartOfAccountsBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseChartOfAccounts"/>
+		</port>
+	</service>
+	<service name="SyncChartOfAccountsService">
+		<port name="SyncChartOfAccountsBinding" binding="oaws:SyncChartOfAccountsBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncChartOfAccounts"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelWIPStatus.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WIPStatus.xsd"/>
+	<xsd:element name="CancelWIPStatus" type="CancelWIPStatusType" id="oagis-id-bcc199ac839c4e939b0616f0ba590b64">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Cancel WIPStatus is to enable an application or component to Cancel a Cancel to the WIPStatus. An AcknowledgeWIPStatus maybe provided as a result of this Canceling to report the results.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelWIPStatusType" id="oagis-id-5ad6ed1013a54ab1b21efa85f0d879ca">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelWIPStatusDataAreaType" id="oagis-id-fcb14cab108242579bb151e81bc6a9e9">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelWIPStatus. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (WIPStatus).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelWIPStatusDataAreaType" id="oagis-id-c1fec7beacdb4991b4e79f1a892b3279">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-22f3ab61b5c74036b6a9844f3e5c90ca"/>
+			<xsd:element ref="WIPStatus" maxOccurs="unbounded" id="oagis-id-6302b4fa27204ebeb91b31adfabd5040"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

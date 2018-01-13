@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/Payable.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/PostAcknowledgePayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgePayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangePayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgePayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/PostPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/LoadResponsePayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyPayable.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelPayable">
+		<part name="Message" element="oa:CancelPayable"/>
+	</message>
+	<message name="CancelAcknowledgePayable">
+		<part name="Message" element="oa:CancelAcknowledgePayable"/>
+	</message>
+	<message name="ChangePayable">
+		<part name="Message" element="oa:ChangePayable"/>
+	</message>
+	<message name="ChangeAcknowledgePayable">
+		<part name="Message" element="oa:ChangeAcknowledgePayable"/>
+	</message>
+	<message name="GetPayable">
+		<part name="Message" element="oa:GetPayable"/>
+	</message>
+	<message name="ShowPayable">
+		<part name="Message" element="oa:ShowPayable"/>
+	</message>
+	<message name="PostPayable">
+		<part name="Message" element="oa:PostPayable"/>
+	</message>
+	<message name="PostAcknowledgePayable">
+		<part name="Message" element="oa:PostAcknowledgePayable"/>
+	</message>
+	<message name="LoadPayable">
+		<part name="Message" element="oa:LoadPayable"/>
+	</message>
+	<message name="LoadResponsePayable">
+		<part name="Message" element="oa:LoadResponsePayable"/>
+	</message>
+	<message name="NotifyPayable">
+		<part name="Message" element="oa:NotifyPayable"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestPayablePortType">
+		<operation name="PostPayable">
+			<input message="oaws:PostPayable"/>
+		</operation>
+		<operation name="ChangePayable">
+			<input message="oaws:ChangePayable"/>
+		</operation>
+		<operation name="CancelPayable">
+			<input message="oaws:CancelPayable"/>
+		</operation>
+		<operation name="GetPayable">
+			<input message="oaws:GetPayable"/>
+		</operation>
+		<operation name="LoadPayable">
+			<input message="oaws:LoadPayable"/>
+		</operation>
+		<operation name="NotifyPayable">
+			<input message="oaws:NotifyPayable"/>
+		</operation>
+	</portType>
+	<portType name="ResponsePayablePortType">
+		<operation name="PostAcknowledgePayable">
+			<input message="oaws:PostAcknowledgePayable"/>
+		</operation>
+		<operation name="ChangeAcknowledgePayable">
+			<input message="oaws:ChangeAcknowledgePayable"/>
+		</operation>
+		<operation name="CancelAcknowledgePayable">
+			<input message="oaws:CancelAcknowledgePayable"/>
+		</operation>
+		<operation name="ShowPayable">
+			<input message="oaws:ShowPayable"/>
+		</operation>
+		<operation name="LoadResponsePayable">
+			<input message="oaws:LoadResponsePayable"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="LoadPayablePortType">
+		<operation name="PostPayable">
+			<input message="oaws:PostPayable"/>
+			<output message="oaws:PostAcknowledgePayable"/>
+		</operation>
+		<operation name="ChangePayable">
+			<input message="oaws:ChangePayable"/>
+			<output message="oaws:ChangeAcknowledgePayable"/>
+		</operation>
+		<operation name="CancelPayable">
+			<input message="oaws:CancelPayable"/>
+			<output message="oaws:CancelAcknowledgePayable"/>
+		</operation>
+		<operation name="GetPayable">
+			<input message="oaws:GetPayable"/>
+			<output message="oaws:ShowPayable"/>
+		</operation>
+		<operation name="LoadPayable">
+			<input message="oaws:LoadPayable"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyPayable">
+			<input message="oaws:NotifyPayable"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestPayableBinding" type="oaws:RequestPayablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponsePayableBinding" type="oaws:ResponsePayablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostAcknowledgePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="LoadResponsePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="LoadPayableBinding" type="oaws:LoadPayablePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="PostPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangePayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="LoadPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyPayable">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/Payable.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestPayableService">
+		<port name="RequestPayableBinding" binding="oaws:RequestPayableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestPayable"/>
+		</port>
+	</service>
+	<service name="ResponsePayableService">
+		<port name="ResponsePayableBinding" binding="oaws:ResponsePayableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponsePayable"/>
+		</port>
+	</service>
+	<service name="LoadPayableService">
+		<port name="LoadPayableBinding" binding="oaws:LoadPayableBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/LoadPayable"/>
+		</port>
+	</service>
+</definitions>

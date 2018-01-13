@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:  10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+   OAGIS Example WSDL to be used with OAGIS release 
+    
+   For more information about the Open Applications Group please see 
+   www.openapplicaitons.org
+     
+    
+   WSDL Example
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Services/WebServices/WSDL/CarrierRoute.wsdl
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oa="http://www.openapplications.org/oagis/10" xmlns:oaws="http://www.openapplications.org/oagis/10/ws" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10/ws">
+			<xs:include schemaLocation="../xsd/MessageResponse.xsd"/>
+		</xs:schema>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://www.openapplications.org/oagis/10">
+			<xs:include schemaLocation="../../../Model/BODs/AcknowledgeCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/CancelAcknowledgeCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ChangeAcknowledgeCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/GetCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ShowCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/ProcessCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/SyncResponseCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/BODs/NotifyCarrierRoute.xsd"/>
+			<xs:include schemaLocation="../../../Model/Platform/2_4/BODs/ConfirmBOD.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="CancelCarrierRoute">
+		<part name="Message" element="oa:CancelCarrierRoute"/>
+	</message>
+	<message name="CancelAcknowledgeCarrierRoute">
+		<part name="Message" element="oa:CancelAcknowledgeCarrierRoute"/>
+	</message>
+	<message name="ChangeCarrierRoute">
+		<part name="Message" element="oa:ChangeCarrierRoute"/>
+	</message>
+	<message name="ChangeAcknowledgeCarrierRoute">
+		<part name="Message" element="oa:ChangeAcknowledgeCarrierRoute"/>
+	</message>
+	<message name="GetCarrierRoute">
+		<part name="Message" element="oa:GetCarrierRoute"/>
+	</message>
+	<message name="ShowCarrierRoute">
+		<part name="Message" element="oa:ShowCarrierRoute"/>
+	</message>
+	<message name="ProcessCarrierRoute">
+		<part name="Message" element="oa:ProcessCarrierRoute"/>
+	</message>
+	<message name="AcknowledgeCarrierRoute">
+		<part name="Message" element="oa:AcknowledgeCarrierRoute"/>
+	</message>
+	<message name="SyncCarrierRoute">
+		<part name="Message" element="oa:SyncCarrierRoute"/>
+	</message>
+	<message name="SyncResponseCarrierRoute">
+		<part name="Message" element="oa:SyncResponseCarrierRoute"/>
+	</message>
+	<message name="NotifyCarrierRoute">
+		<part name="Message" element="oa:NotifyCarrierRoute"/>
+	</message>
+	<message name="ConfirmBOD">
+		<part name="Message" element="oa:ConfirmBOD"/>
+	</message>
+	<message name="MessageResponse">
+		<part name="Message" element="oaws:MessageResponse"/>
+	</message>
+	<portType name="RequestCarrierRoutePortType">
+		<operation name="ProcessCarrierRoute">
+			<input message="oaws:ProcessCarrierRoute"/>
+		</operation>
+		<operation name="ChangeCarrierRoute">
+			<input message="oaws:ChangeCarrierRoute"/>
+		</operation>
+		<operation name="CancelCarrierRoute">
+			<input message="oaws:CancelCarrierRoute"/>
+		</operation>
+		<operation name="GetCarrierRoute">
+			<input message="oaws:GetCarrierRoute"/>
+		</operation>
+		<operation name="SyncCarrierRoute">
+			<input message="oaws:SyncCarrierRoute"/>
+		</operation>
+		<operation name="NotifyCarrierRoute">
+			<input message="oaws:NotifyCarrierRoute"/>
+		</operation>
+	</portType>
+	<portType name="ResponseCarrierRoutePortType">
+		<operation name="AcknowledgeCarrierRoute">
+			<input message="oaws:AcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="ChangeAcknowledgeCarrierRoute">
+			<input message="oaws:ChangeAcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="CancelAcknowledgeCarrierRoute">
+			<input message="oaws:CancelAcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="ShowCarrierRoute">
+			<input message="oaws:ShowCarrierRoute"/>
+		</operation>
+		<operation name="SyncResponseCarrierRoute">
+			<input message="oaws:SyncResponseCarrierRoute"/>
+		</operation>
+		<operation name="ConfirmBOD">
+			<input message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<portType name="SyncCarrierRoutePortType">
+		<operation name="ProcessCarrierRoute">
+			<input message="oaws:ProcessCarrierRoute"/>
+			<output message="oaws:AcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="ChangeCarrierRoute">
+			<input message="oaws:ChangeCarrierRoute"/>
+			<output message="oaws:ChangeAcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="CancelCarrierRoute">
+			<input message="oaws:CancelCarrierRoute"/>
+			<output message="oaws:CancelAcknowledgeCarrierRoute"/>
+		</operation>
+		<operation name="GetCarrierRoute">
+			<input message="oaws:GetCarrierRoute"/>
+			<output message="oaws:ShowCarrierRoute"/>
+		</operation>
+		<operation name="SyncCarrierRoute">
+			<input message="oaws:SyncCarrierRoute"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+		<operation name="NotifyCarrierRoute">
+			<input message="oaws:NotifyCarrierRoute"/>
+			<output message="oaws:ConfirmBOD"/>
+		</operation>
+	</portType>
+	<binding name="RequestCarrierRouteBinding" type="oaws:RequestCarrierRoutePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="GetCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="NotifyCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="ResponseCarrierRouteBinding" type="oaws:ResponseCarrierRoutePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AcknowledgeCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ChangeAcknowledgeCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="CancelAcknowledgeCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ShowCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="SyncResponseCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+		<operation name="ConfirmBOD">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+		</operation>
+	</binding>
+	<binding name="SyncCarrierRouteBinding" type="oaws:SyncCarrierRoutePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ProcessCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="ChangeCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SyncCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="NotifyCarrierRoute">
+			<soap:operation soapAction="http://www.openapplications.org/oagis/10/ws/wsdl/CarrierRoute.wsdl" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="RequestCarrierRouteService">
+		<port name="RequestCarrierRouteBinding" binding="oaws:RequestCarrierRouteBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/RequestCarrierRoute"/>
+		</port>
+	</service>
+	<service name="ResponseCarrierRouteService">
+		<port name="ResponseCarrierRouteBinding" binding="oaws:ResponseCarrierRouteBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/ResponseCarrierRoute"/>
+		</port>
+	</service>
+	<service name="SyncCarrierRouteService">
+		<port name="SyncCarrierRouteBinding" binding="oaws:SyncCarrierRouteBinding">
+			<soap:address location="http://openapplications.org/oagis/10_4/ws/SyncCarrierRoute"/>
+		</port>
+	</service>
+</definitions>
