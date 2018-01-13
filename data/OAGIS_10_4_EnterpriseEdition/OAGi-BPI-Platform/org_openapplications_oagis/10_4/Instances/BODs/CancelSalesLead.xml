@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CancelSalesLead xmlns="http://www.openapplications.org/oagis/10"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://www.openapplications.org/oagis/10 file:D:\clouds\oagi\svn2\oagis\trunk\OAGi-BPI-Platform\org_openapplications_oagis\10_4\Model\BODs\CancelSalesLead.xsd">
-</CancelSalesLead>

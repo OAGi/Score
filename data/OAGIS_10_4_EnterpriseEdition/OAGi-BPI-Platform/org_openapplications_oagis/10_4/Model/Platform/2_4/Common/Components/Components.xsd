@@ -16167,7 +16167,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
-	<xsd:complexType name="PartyReferenceBaseType" abstract="true">
+	<xsd:complexType name="PartyReferenceBaseType" abstract="true" id="oagis-id-87263b1f2a3f4a3fbbcb508acfbefed9">
 		<xsd:complexContent>
 			<xsd:extension base="PartyIdentificationType">
 				<xsd:sequence>
@@ -16183,7 +16183,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="PartyReferenceType" abstract="true">
+	<xsd:complexType name="PartyReferenceType" abstract="true" id="oagis-id-6d39f1438df54642a02ac789c5690ecf">
 		<xsd:complexContent>
 			<xsd:extension base="PartyReferenceBaseType">
 				<xsd:sequence>
@@ -16192,7 +16192,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="PayeePartyReference" type="PartyReferenceType">
+	<xsd:element name="PayeePartyReference" type="PartyReferenceType" id="oagis-id-3ea993ce5aa64694ac9d7c4961104a72">
 		<xsd:annotation>
 			<xsd:documentation>Party to whom a bill of exchange (such as a check or draft) is made payable</xsd:documentation>
 		</xsd:annotation>
