@@ -108,9 +108,11 @@ This is a critical success factor to enable software developers to use the Globa
 				<xsd:sequence>
 					<xsd:element name="Extension" type="ApplicationAreaExtensionType" id="oagis-id-6443b29c5765421e8ef1b7f840e55e4e" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -350,8 +352,9 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 	<!---->
 	<xsd:complexType name="IDSetType" id="oagis-id-8537e396814a488087b71496eaec6563">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">A set of IDs to identify an object.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Communicates a composite key.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A set of IDs to identify an object.
+
+Communicates a composite key.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-59fccca73c224f96a9ae7ea4138c28cf" maxOccurs="unbounded"/>
@@ -471,9 +474,11 @@ Examples of a valid TRACKINGID include:
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SuccessMessageExtensionType" id="oagis-id-abc305ed560d4b0b8201d796ec133111" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -529,9 +534,11 @@ Examples of a valid TRACKINGID include:
 				<xsd:sequence>
 					<xsd:element name="Extension" type="FailureMessageExtensionType" id="oagis-id-b09d22306ba241e792b6f75a351140c4" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -597,9 +604,11 @@ Examples of a valid TRACKINGID include:
 				<xsd:sequence>
 					<xsd:element name="Extension" type="BODFailureMessageExtensionType" id="oagis-id-087c5daebc02416b824080428a85b9d5" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -670,9 +679,11 @@ The SourceLocationExpression should not be expressed for the BOD, but only on th
 				<xsd:sequence>
 					<xsd:element name="Extension" type="BODSuccessMessageExtensionType" id="oagis-id-2db58645d71e4a9b962559fc82cd7ded" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -712,9 +723,11 @@ Use the ProcessResultCode on the BOD to indicate the overall ProcessingResultCod
 				<xsd:sequence>
 					<xsd:element name="Extension" type="MessageExtensionType" id="oagis-id-8fcb4ec0be6f40dfb3bbbae5b0e273ad" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -869,22 +882,22 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Acknowledge" type="AcknowledgeType" id="oagis-id-d9589936aace44f5bd890ec462888263">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Acknowledge verb is used to acknowledge the application receipt of a Process request.  This function conveys the result of the original request.  An example of this is Acknowledge PO, where a Process PO has been issued and the corresponding business application acknowledges the receipt of the PO and responds with an acceptance or a counter offer.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Acknowledge verb is used to acknowledge the application receipt of a Process request.  This function conveys the result of the original request.  An example of this is Acknowledge PO, where a Process PO has been issued and the corresponding business application acknowledges the receipt of the PO and responds with an acceptance or a counter offer.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CancelAcknowledge" type="AcknowledgeType" id="oagis-id-4e48dafb00c24d14b15b1e5cc8bcf0be">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The CancelAcknowledge verb is used to acknowledge the application results of a Cancel request.  This function conveys the result of the original request.  </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The CancelAcknowledge verb is used to acknowledge the application results of a Cancel request.  This function conveys the result of the original request.  </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ChangeAcknowledge" type="AcknowledgeType" id="oagis-id-883678de97ea4691b5e0204a63a75285">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The ChangeAcknowledge verb is used to acknowledge the application results of a Change request.  This function conveys the result of the original request.  </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The ChangeAcknowledge verb is used to acknowledge the application results of a Change request.  This function conveys the result of the original request.  </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="PostAcknowledge" type="AcknowledgeType" id="oagis-id-9cec947668a44cd5a76bcd6285c03072">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The PostAcknowledge verb is used to acknowledge the application results of a Post request.  This function conveys the result of the original request.  </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The PostAcknowledge verb is used to acknowledge the application results of a Post request.  This function conveys the result of the original request.  </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -895,12 +908,12 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="LoadResponse" type="RespondType" id="oagis-id-01703396350b4a61a79a73a9d013dea4">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The LoadResponse verb is used to communicate the results of a Sync BOD.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The LoadResponse verb is used to communicate the results of a Sync BOD.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="SyncResponse" type="RespondType" id="oagis-id-804e190ec09145b1872717b0a7af2866">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The SyncResponse verb is used to communicate the results of a Sync BOD.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SyncResponse verb is used to communicate the results of a Sync BOD.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -917,7 +930,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Show" type="ShowType" id="oagis-id-b43875f89e364487997308fb0bffa3be">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Show verb is used when sending the information about a specific instance of a business document or entity.  The Show verb may be used to respond to a Get request or it can be used in a publish scenario, where it pushes information to other applications based on a business event.Although BODs based on this verb do not commonly cause updates to occur, there may be times when the component receiving the Show decides to use the information it receives to update.  This is entirely the decision of the receiving software component and is not forbidden.The behavior of the Show verb is quite straight forward with one exception.  The Show response to any Get request needs to read the request carefully to ensure the response is returning the requested Data Types.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Show verb is used when sending the information about a specific instance of a business document or entity.  The Show verb may be used to respond to a Get request or it can be used in a publish scenario, where it pushes information to other applications based on a business event.Although BODs based on this verb do not commonly cause updates to occur, there may be times when the component receiving the Show decides to use the information it receives to update.  This is entirely the decision of the receiving software component and is not forbidden.The behavior of the Show verb is quite straight forward with one exception.  The Show response to any Get request needs to read the request carefully to ensure the response is returning the requested Data Types.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -952,7 +965,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Confirm" type="ConfirmType" id="oagis-id-07c963a2660d4742921b12ec18552aa5">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Confirm verb is used to respond to a request to confirm the receipt of information by the receiving system. The request for confirmation is set by the sending application in the ApplicationArea\Sender\Confirmation field of the original BOD.  The Confirm conveys the result of the original request i.e. whether or not the message was understood and was successfully processed.  An example of this is Confirm BOD.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Confirm verb is used to respond to a request to confirm the receipt of information by the receiving system. The request for confirmation is set by the sending application in the ApplicationArea\Sender\Confirmation field of the original BOD.  The Confirm conveys the result of the original request i.e. whether or not the message was understood and was successfully processed.  An example of this is Confirm BOD.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -963,7 +976,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Notify" type="NotifyType" id="oagis-id-11842f0bf32d4e92a441167927bd210e">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">Notify is used to inform the receiving party that an event has occurred or document has been created. For example, a supplier may have a proposed order that is sent to a trading partner. The noun will contain the data that has been proposed. An optional ConfirmBOD can be sent as a response.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Notify is used to inform the receiving party that an event has occurred or document has been created. For example, a supplier may have a proposed order that is sent to a trading partner. The noun will contain the data that has been proposed. An optional ConfirmBOD can be sent as a response.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -976,12 +989,12 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Load" type="SyncType" id="oagis-id-da5dd179ea3c47ff87ca9c24c984d401">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">This verb is used to initiate the adding of a document or data entity to another business application.  Generally this verb is used when maintenance to the document will then pass to the receiving application permanently.  An example of this is Load Payable or Load Receivable, where once the request is processed, the sending application has no direct control over the document or entity again.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This verb is used to initiate the adding of a document or data entity to another business application.  Generally this verb is used when maintenance to the document will then pass to the receiving application permanently.  An example of this is Load Payable or Load Receivable, where once the request is processed, the sending application has no direct control over the document or entity again.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Sync" type="SyncType" id="oagis-id-0b5970f410a64bea9a9f0547c84c51c9">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Sync verb is used when the owner of the data is passing or publishing that information or change in information to other software components.  This is to be used when the receiver of the SyncBOD does not own the data.  This verb is commonly used when mass changes are necessary or when a publish and subscribe mechanism is used in the integration architecture.The purposes of this verb include application integrity and ease of data entry for the business user by enabling a single point of input.  </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Sync verb is used when the owner of the data is passing or publishing that information or change in information to other software components.  This is to be used when the receiver of the SyncBOD does not own the data.  This verb is commonly used when mass changes are necessary or when a publish and subscribe mechanism is used in the integration architecture.The purposes of this verb include application integrity and ease of data entry for the business user by enabling a single point of input.  </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -994,22 +1007,22 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Cancel" type="ProcessType" id="oagis-id-88b49ded83d94bf3b6f61f97fbb1f279">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Cancel verb is used when the sender of the BOD is not the owner of the data, but is sending a request for the document to be canceled.An example is the Cancel PO where the business implications must be calculated and a simple data processing term such as delete can not fully convey the business meaning and required processing associated with the meaning.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Cancel verb is used when the sender of the BOD is not the owner of the data, but is sending a request for the document to be canceled.An example is the Cancel PO where the business implications must be calculated and a simple data processing term such as delete can not fully convey the business meaning and required processing associated with the meaning.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Change" type="ProcessType" id="oagis-id-802a935a83f840699deb49bc79b6d423">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Change verb is used when the sender of the BOD is not the owner of the data, but is sending a request for the document to be changed.An example of this is Change REQUISITN, where the original document needs to be changed based on a specific business event.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Change verb is used when the sender of the BOD is not the owner of the data, but is sending a request for the document to be changed.An example of this is Change REQUISITN, where the original document needs to be changed based on a specific business event.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Post" type="ProcessType" id="oagis-id-80c6fc8106764599aee3f6e3c0c5bd33">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Post verb is used to describe specific processing in a more fine grained manner beyond add, change or delete processing.  An example is Post JOURNAL, where information is posted to a general ledger set of financial records.  The business use of the word is used instead of the data processing term for the sake of clarity.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Post verb is used to describe specific processing in a more fine grained manner beyond add, change or delete processing.  An example is Post JOURNAL, where information is posted to a general ledger set of financial records.  The business use of the word is used instead of the data processing term for the sake of clarity.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Process" type="ProcessType" id="oagis-id-325803d9f1d8493bb87e5b85735680a8">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Process verb is used to request processing of the associated noun by the receiving application or business to party. In a typical external exchange scenario a Process BOD is considered to be a legally binding message. For example, if a customer sends a ProcessPurchaseOrder BOD to a supplier and the supplier acknowlegdes with a positive AcknowledgePurchaseOrder, then the customer is obligated to fullfil the agreement, unless of course other BODs are allowed to cancel or change the original order.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Process verb is used to request processing of the associated noun by the receiving application or business to party. In a typical external exchange scenario a Process BOD is considered to be a legally binding message. For example, if a customer sends a ProcessPurchaseOrder BOD to a supplier and the supplier acknowlegdes with a positive AcknowledgePurchaseOrder, then the customer is obligated to fullfil the agreement, unless of course other BODs are allowed to cancel or change the original order.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -1036,7 +1049,7 @@ The expressionLanguage indicates the expression language being used. In order fo
 	</xsd:complexType>
 	<xsd:element name="Get" type="GetType" id="oagis-id-59db0fdd86fa4928be0f89f3750a2ad2">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10.0">The Get verb is to communicate to a business software component a request for an existing piece or pieces of information to be returned.  The Get may be paired with most of the nouns defined in the OAGIS specification.The response to this request is the Show verb.  The behavior of a BOD with a Get verb is quite predictable across the nouns it is paired with.The Get is designed to retrieval  of information by using that information's primary retrieval field, or key field.  The Get verb may also be used to request several documents at once.  Selection Criteria:There are two types of selection capabilities for most BOD's that use the Get verb.1)  The first selection capability is called Field-Based Selection.  Within a Get-based Business Object Document, the first Data Type that occurs in a specific BOD structure is commonly used to provide the Field-Based Selection criteria.  This is always defined within the specific BOD and is commonly the required fields for that specific Data type.The Field-Based Selection enables the requester to provide a value or values (in the case of multiple required Field Identifiers), in the required fields.  Then the responding component uses those values to find and return the requested information to the originating business software component.2)  The second type of selection capability for Get-based BODs is called Data Type Selection.  Data Type selection enables the requester to identify which Data Types within the noun are requested to be returned in the response.  The use of this capability is described for each corresponding Data Type for all BODs that use the Get verb.  The Data Types are identified for retrieval within the Get instance of a BOD by including the name of the Data Type in the meta data but without any Field Identifiers or Segments identified within the Data Type. This will signify to the responding application that all of the data that corresponds to that Data Type is to be included in the response.If the Data Type is not requested, the Data Type identifier is not included in the Get request and this will signify to the responding component that the Data Type is not to be returned.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Get verb is to communicate to a business software component a request for an existing piece or pieces of information to be returned.  The Get may be paired with most of the nouns defined in the OAGIS specification.The response to this request is the Show verb.  The behavior of a BOD with a Get verb is quite predictable across the nouns it is paired with.The Get is designed to retrieval  of information by using that information's primary retrieval field, or key field.  The Get verb may also be used to request several documents at once.  Selection Criteria:There are two types of selection capabilities for most BOD's that use the Get verb.1)  The first selection capability is called Field-Based Selection.  Within a Get-based Business Object Document, the first Data Type that occurs in a specific BOD structure is commonly used to provide the Field-Based Selection criteria.  This is always defined within the specific BOD and is commonly the required fields for that specific Data type.The Field-Based Selection enables the requester to provide a value or values (in the case of multiple required Field Identifiers), in the required fields.  Then the responding component uses those values to find and return the requested information to the originating business software component.2)  The second type of selection capability for Get-based BODs is called Data Type Selection.  Data Type selection enables the requester to identify which Data Types within the noun are requested to be returned in the response.  The use of this capability is described for each corresponding Data Type for all BODs that use the Get verb.  The Data Types are identified for retrieval within the Get instance of a BOD by including the name of the Data Type in the meta data but without any Field Identifiers or Segments identified within the Data Type. This will signify to the responding application that all of the data that corresponds to that Data Type is to be included in the response.If the Data Type is not requested, the Data Type identifier is not included in the Get request and this will signify to the responding component that the Data Type is not to be returned.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
@@ -1056,9 +1069,11 @@ The expressionLanguage indicates the expression language being used. In order fo
 				<xsd:sequence>
 					<xsd:element name="Extension" type="ChangeStatusExtensionType" id="oagis-id-a23bdd95749e4d79865826893f01f79e" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -1116,9 +1131,11 @@ The expressionLanguage indicates the expression language being used. In order fo
 				<xsd:sequence>
 					<xsd:element name="Extension" type="StateChangeExtensionType" id="oagis-id-6f67f7ec7f7940c197bd62ffad07959c" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

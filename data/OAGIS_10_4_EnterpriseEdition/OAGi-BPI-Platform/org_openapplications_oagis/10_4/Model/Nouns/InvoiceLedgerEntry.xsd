@@ -48,8 +48,9 @@ The Tax element contains any tax information such as the taxable amounts and the
 	</xsd:element>
 	<xsd:complexType name="InvoiceLedgerEntryType" id="oagis-id-e0a783d0861d484b8d037376d0e13294">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">A purchase ledger invoice or debit memo that has not yet  been approved for payment.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Deprecation of VOUCHER, ORIGREF:
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A purchase ledger invoice or debit memo that has not yet  been approved for payment.
+
+Deprecation of VOUCHER, ORIGREF:
 From OAGIS 7.2.1:
 ORIGREF is the link that ties back to a sub ledger transaction entry ID.  It is the identifier of an original transaction or document.  For example, it could be the receipt or the summarized inventory activity.  This is the singular field that refers to an audit record.  Together with the Sender information, the ORIGREF is part of the referencing system, which will enable drill back audit trail functionality.
 PN: The ORIGREF field represents the voucher or unapproved invoice identifier.
@@ -116,9 +117,11 @@ The Tax element contains any tax information such as the taxable amounts and the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="InvoiceLedgerEntryHeaderExtensionType" id="oagis-id-068afd03900a4b7386c4318b5d4dc74a" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -134,9 +137,11 @@ The Tax element contains any tax information such as the taxable amounts and the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="InvoiceLedgerEntryLineExtensionType" id="oagis-id-158d7844cb774e03a10716562f9c0b09" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

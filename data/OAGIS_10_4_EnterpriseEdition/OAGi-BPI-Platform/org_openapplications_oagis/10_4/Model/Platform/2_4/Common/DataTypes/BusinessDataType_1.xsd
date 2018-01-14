@@ -276,7 +276,7 @@
 				<xsd:attribute name="encodingCode" type="xsd:normalizedString" id="oagis-id-2ad3d42d75b945c084c95401aedb6f90"/>
 				<xsd:attribute name="characterSetCode" type="xsd:normalizedString" id="oagis-id-88f2ad0a398a4fd483dda0138310cfbb"/>
 				<xsd:attribute name="uri" type="xsd:anyURI" id="oagis-id-24e9273d51ec4073b83230051bb08b71"/>
-				<xsd:attribute name="filename" type="xsd:string" id="oagis-id-ec12bf0d2cdc47b59c0cee1ec6ea4d6b"/>
+				<xsd:attribute name="filenameName" type="xsd:string" id="oagis-id-ec12bf0d2cdc47b59c0cee1ec6ea4d6b"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -6994,7 +6994,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-        <xsd:union memberTypes="xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType">
+		<xsd:union memberTypes="xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9658,7 +9658,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-        <xsd:union memberTypes="xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
+		<xsd:union memberTypes="xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9765,7 +9765,7 @@
 				<ccts_DataTypeTermName>Date Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-        <xsd:union memberTypes="xbt_DateHourMinuteType xbt_DateHourType xbt_DateTimeType xbt_DayHourMinuteType xbt_DayHourType xbt_DayOfWeekHourMinuteType xbt_DayOfWeekHourType xbt_DayOfWeekTimeType xbt_DayOfYearHourMinuteType xbt_DayOfYearHourType xbt_DayOfYearTimeType xbt_DayTimeType xbt_MonthDayHourMinuteType xbt_MonthDayHourType xbt_MonthDayTimeType xbt_WeekDayHourMinuteType xbt_WeekDayHourType xbt_WeekDayTimeType xbt_YearDayHourMinuteType xbt_YearDayHourType xbt_YearDayTimeType xbt_YearWeekDayHourMinuteType xbt_YearWeekDayHourType xbt_YearWeekDayTimeType xbt_DateType xbt_DayOfWeekType xbt_DayOfYearType xbt_DayType xbt_MonthDayType xbt_WeekDayType xbt_YearDayType xbt_YearWeekDayType xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
+		<xsd:union memberTypes="xbt_DateHourMinuteType xbt_DateHourType xbt_DateTimeType xbt_DayHourMinuteType xbt_DayHourType xbt_DayOfWeekHourMinuteType xbt_DayOfWeekHourType xbt_DayOfWeekTimeType xbt_DayOfYearHourMinuteType xbt_DayOfYearHourType xbt_DayOfYearTimeType xbt_DayTimeType xbt_MonthDayHourMinuteType xbt_MonthDayHourType xbt_MonthDayTimeType xbt_WeekDayHourMinuteType xbt_WeekDayHourType xbt_WeekDayTimeType xbt_YearDayHourMinuteType xbt_YearDayHourType xbt_YearDayTimeType xbt_YearWeekDayHourMinuteType xbt_YearWeekDayHourType xbt_YearWeekDayTimeType xbt_DateType xbt_DayOfWeekType xbt_DayOfYearType xbt_DayType xbt_MonthDayType xbt_WeekDayType xbt_YearDayType xbt_YearWeekDayType xbt_DateHourMinuteUTCType xbt_DateHourUTCType xbt_DateTimeUTCType xbt_DayHourMinuteUTCType xbt_DayHourUTCType xbt_DayOfWeekHourMinuteUTCType xbt_DayOfWeekHourUTCType xbt_DayOfWeekTimeUTCType xbt_DayOfYearHourMinuteUTCType xbt_DayOfYearHourUTCType xbt_DayOfYearTimeUTCType xbt_DayTimeUTCType xbt_MonthDayHourMinuteUTCType xbt_MonthDayHourUTCType xbt_MonthDayTimeUTCType xbt_WeekDayHourMinuteUTCType xbt_WeekDayHourUTCType xbt_WeekDayTimeUTCType xbt_YearDayHourMinuteUTCType xbt_YearDayHourUTCType xbt_YearDayTimeUTCType xbt_YearWeekDayHourMinuteUTCType xbt_YearWeekDayHourUTCType xbt_YearWeekDayTimeUTCType xbt_DateHourMinuteUTCOffsetType xbt_DateHourUTCOffsetType xbt_DateTimeUTCOffsetType xbt_DayHourMinuteUTCOffsetType xbt_DayHourUTCOffsetType xbt_DayOfWeekHourMinuteUTCOffsetType xbt_DayOfWeekHourUTCOffsetType xbt_DayOfWeekTimeUTCOffsetType xbt_DayOfYearHourMinuteUTCOffsetType xbt_DayOfYearHourUTCOffsetType xbt_DayOfYearTimeUTCOffsetType xbt_DayTimeUTCOffsetType xbt_MonthDayHourMinuteUTCOffsetType xbt_MonthDayHourUTCOffsetType xbt_MonthDayTimeUTCOffsetType xbt_WeekDayHourMinuteUTCOffsetType xbt_WeekDayHourUTCOffsetType xbt_WeekDayTimeUTCOffsetType xbt_YearDayHourMinuteUTCOffsetType xbt_YearDayHourUTCOffsetType xbt_YearDayTimeUTCOffsetType xbt_YearWeekDayHourMinuteUTCOffsetType xbt_YearWeekDayHourUTCOffsetType xbt_YearWeekDayTimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -9920,7 +9920,7 @@
 				<xsd:attribute name="encodingCode" type="xsd:normalizedString" id="oagis-id-49d5086ae79949e699ec448276685712"/>
 				<xsd:attribute name="characterSetCode" type="xsd:normalizedString" id="oagis-id-5e3806bad5bb4ef0ba4b8580beece0ce"/>
 				<xsd:attribute name="uri" type="xsd:anyURI" id="oagis-id-50f1815de63e40b593576e8dc9d0f527"/>
-				<xsd:attribute name="filename" type="xsd:string" id="oagis-id-62b7b1fa62ec42179bbf036a162becdf"/>
+				<xsd:attribute name="filenameName" type="xsd:string" id="oagis-id-62b7b1fa62ec42179bbf036a162becdf"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -12892,7 +12892,7 @@
 				<xsd:attribute name="encodingCode" type="xsd:normalizedString" id="oagis-id-a70d37c4b8c145ed8576d4f7dce38ab6"/>
 				<xsd:attribute name="characterSetCode" type="xsd:normalizedString" id="oagis-id-b0d0f79b12204df5a368a13211b2d709"/>
 				<xsd:attribute name="uri" type="xsd:anyURI" id="oagis-id-c74b4f81dd9047388bd9dd3b0dfb76cd"/>
-				<xsd:attribute name="filename" type="xsd:string" id="oagis-id-bcdbc7f80b634864971db41801ae0609"/>
+				<xsd:attribute name="filenameName" type="xsd:string" id="oagis-id-bcdbc7f80b634864971db41801ae0609"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -22127,7 +22127,7 @@
 				<xsd:attribute name="encodingCode" type="xsd:normalizedString" id="oagis-id-e487152ea2eb4c978e7756540cc1c3f0"/>
 				<xsd:attribute name="characterSetCode" type="xsd:normalizedString" id="oagis-id-add79e143ed143ebaea2057da135110a"/>
 				<xsd:attribute name="uri" type="xsd:anyURI" id="oagis-id-dd996bc1151746d7815f565b1602a865"/>
-				<xsd:attribute name="filename" type="xsd:string" id="oagis-id-ab86405091904f7cb999fed854643770"/>
+				<xsd:attribute name="filenameName" type="xsd:string" id="oagis-id-ab86405091904f7cb999fed854643770"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -22856,7 +22856,7 @@
 				<ccts_DataTypeTermName>Time</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-        <xsd:union memberTypes="xbt_HourMinuteType xbt_HourMinuteUTCType xbt_HourMinuteUTCOffsetType xbt_HourType xbt_HourUTCType xbt_HourUTCOffsetType xbt_MinuteType xbt_MinuteSecondType xbt_SecondType xbt_TimeType xbt_TimeUTCType xbt_TimeUTCOffsetType">
+		<xsd:union memberTypes="xbt_HourMinuteType xbt_HourMinuteUTCType xbt_HourMinuteUTCOffsetType xbt_HourType xbt_HourUTCType xbt_HourUTCOffsetType xbt_MinuteType xbt_MinuteSecondType xbt_SecondType xbt_TimeType xbt_TimeUTCType xbt_TimeUTCOffsetType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -23079,7 +23079,7 @@
 				<xsd:attribute name="encodingCode" type="xsd:normalizedString" id="oagis-id-b15afccdbd924df1a3d1892d0bf5e196"/>
 				<xsd:attribute name="characterSetCode" type="xsd:normalizedString" id="oagis-id-0299e04da8494f6b8232ebf1eccf9b30"/>
 				<xsd:attribute name="uri" type="xsd:anyURI" id="oagis-id-177e434371c441148a97ff9815fdae66"/>
-				<xsd:attribute name="filename" type="xsd:string" id="oagis-id-10457a50a85a4c71a1e1f944c79d5532"/>
+				<xsd:attribute name="filenameName" type="xsd:string" id="oagis-id-10457a50a85a4c71a1e1f944c79d5532"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>

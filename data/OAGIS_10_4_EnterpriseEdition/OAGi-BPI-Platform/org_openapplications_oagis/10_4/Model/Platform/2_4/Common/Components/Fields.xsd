@@ -93,8 +93,9 @@
 	</xsd:element>
 	<xsd:element name="CostAmount" type="OpenAmountType" nillable="true" id="oagis-id-cf6a7d6eb3d045f1b4e735e819d945ba">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the cost of the given entity on the General Ledger As such the currency used is the currency of the General Ledger. In the case of an operation it the cost of performing the Operation.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the cost of the operation on the General Ledger As such the currency used is the currency of the General Ledger.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the cost of the given entity on the General Ledger As such the currency used is the currency of the General Ledger. In the case of an operation it the cost of performing the Operation.
+
+Identifies the cost of the operation on the General Ledger As such the currency used is the currency of the General Ledger.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CreditNoteAmount" type="OpenAmountType" nillable="true" id="oagis-id-5ff15cffd5524568ba2a01ee4b922dfb">
@@ -720,7 +721,7 @@ CIF - Cost, Insurance and Freight ... (named port of destination)</xsd:documenta
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="PreferredSalutationCode" type="OpenCodeType" nillable="true" id="oagis-id-47d9a7dc3af84705b1a8e14f4695a49f"/>
-	<xsd:element name="PaymentTermCode" type="OpenCodeType"/>
+	<xsd:element name="PaymentTermCode" type="OpenCodeType" nillable="true" id="oagis-id-bf3033db491d4f9781ffe0f327f9e82d"/>
 	<xsd:element name="PointOfLoadingCode" type="OpenCodeType" nillable="true" id="oagis-id-0c6f24538082425ab18c7f13bb2be5d8">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the location shipped goods are to be loaded.</xsd:documentation>
@@ -990,8 +991,9 @@ Examples are:
 	</xsd:element>
 	<xsd:element name="SpecialPriceAuthorizationCode" type="OpenCodeType" nillable="true" id="oagis-id-ea8532d3ca384fbfb12e424f6b357be9">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the supplier's code to authorize special pricing as a result of an agreement.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">SYNONYMS:	Price Authorization, Price Code</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the supplier's code to authorize special pricing as a result of an agreement.
+
+SYNONYMS:	Price Authorization, Price Code</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ShipmentMethodOfPaymentCode" type="OpenCodeType" nillable="true" id="oagis-id-960c2263531f4182806a010f00be600f"/>
@@ -1069,8 +1071,9 @@ FIFO - first in first out</xsd:documentation>
 	</xsd:element>
 	<xsd:element name="EmployeeTypeCode" type="OpenCodeType" nillable="true" id="oagis-id-d149d0dfddf942bfa31ca9a13a50bc6b">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Code type specifing the type of Employee.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">EmployeeType is used to indicate if the Employee is a Contractor, W2, Full-Time, Part-Time.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Code type specifing the type of Employee.
+
+EmployeeType is used to indicate if the Employee is a Contractor, W2, Full-Time, Part-Time.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="FileTypeCode" type="OpenCodeType" nillable="true" id="oagis-id-71585277232049e9a6853700b461ac5f">
@@ -1703,8 +1706,9 @@ In cases where DownTimeDuratation occurs along with DownTimePeriod. DownTimeDura
 	</xsd:element>
 	<xsd:element name="RequiredDuration" type="OpenDurationMeasureType" nillable="true" id="oagis-id-07811252d2ca4c4d930d678a8e46121d">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The period of time the resource is required.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Note: This is inapplicable for an ItemResource. </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The period of time the resource is required.
+
+Note: This is inapplicable for an ItemResource. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="RunTimeDuration" type="OpenDurationMeasureType" nillable="true" id="oagis-id-6ce6ec2a8c154b35a3acb2323e78db74">
@@ -2423,9 +2427,11 @@ Examples of a valid TRACKINGID include:
 	</xsd:element>
 	<xsd:element name="BeneficialOwnershipFormIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-feba0c50d33449719a48fe783e74b98e">
 		<xsd:annotation>
-			<xsd:documentation>This indicates if a Beneficial Ownership Form exists for a Bank Account or not</xsd:documentation>
-			<xsd:documentation>This form must be completed by the person opening a new account on behalf of a legal entity</xsd:documentation>
-			<xsd:documentation>For the purposes of this form, a legal entity includes a corporation, a limited liability company, a general partnership, a non-profit and any similar business entity formed in the United States</xsd:documentation>
+			<xsd:documentation>This indicates if a Beneficial Ownership Form exists for a Bank Account or not
+
+This form must be completed by the person opening a new account on behalf of a legal entity
+
+For the purposes of this form, a legal entity includes a corporation, a limited liability company, a general partnership, a non-profit and any similar business entity formed in the United States</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CashIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-a3b265a9ec284ba6aa52438c154c8584"/>
@@ -2586,7 +2592,6 @@ In other words if a given Option is choosen another Option out of the same Optio
 	<xsd:element name="MultipleRunSaveTimeIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-06fb8b022b0848dd912607beca6ce3e2">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that time can be saved by running this operation multiple times.  </xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="NetPriceIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-f92ddd8877c24916b18a69b5dcf6bc66"/>

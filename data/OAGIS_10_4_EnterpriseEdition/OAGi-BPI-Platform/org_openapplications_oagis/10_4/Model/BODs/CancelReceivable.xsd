@@ -32,9 +32,10 @@ The scope of the CancelReceiveable is to create a BOD to recognize customer obli
 The CancelReceiveable may also be used for transaction that do not originate from an order management application.
 
 The following two models illustrate that the CancelReceiveable may, in some cases, be adequate to update the financial applications, i.e., Receivables and General Ledger, and in other cases, will also require the CancelJournal Business Object Document (BOD) to assure the General Ledger account balances are updated.
-</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">In the model above, the receivable application is a sub-ledger of the general ledger.  Updates to G/L balances occur via the receivables module, therefore the Cancel Receivable contains both receivable and general ledger transaction information.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">This other model illustrates the environment that sometime exists when General Ledger updates occur directly from the Order Management application.  The reconciliation between the receivable and general ledger is a function within the financial applications and not of the integration space.  This model allows the G/L balances to be updated in either detail or summarized form.
+
+In the model above, the receivable application is a sub-ledger of the general ledger.  Updates to G/L balances occur via the receivables module, therefore the Cancel Receivable contains both receivable and general ledger transaction information.
+
+This other model illustrates the environment that sometime exists when General Ledger updates occur directly from the Order Management application.  The reconciliation between the receivable and general ledger is a function within the financial applications and not of the integration space.  This model allows the G/L balances to be updated in either detail or summarized form.
 
 The scope of the role of the receivable application includes functions such as:
 ·	Allowing Cash Application
