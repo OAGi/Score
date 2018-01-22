@@ -26,7 +26,7 @@ public class SRTConstants {
 	/*
 	 * To choose OAGIS version
 	 */
-	public static final double OAGIS_VERSION = 10.3D;
+	public static final double OAGIS_VERSION = 10.4D;
 
 	public static final String FOREIGNKEY_ERROR_MSG = "a foreign key constraint fails";
 	public static final String CANNOT_DELETE_CONTEXT_CATEGORTY = "Fail to delete. The context category is referenced by the following context schemes: ";

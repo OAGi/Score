@@ -420,6 +420,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     AssociationCoreComponentProperty createASCCP(Declaration declaration,
                                                  AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
+        if (StringUtils.isEmpty(asccpGuid)) {
+            throw new IllegalStateException();
+        }
         Module module = declaration.getModule();
         String propertyTerm = Utility.spaceSeparator(declaration.getName());
         if (acc == null) {

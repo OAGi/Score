@@ -132,17 +132,17 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findXbtMap = findXbtList.stream()
                 .collect(Collectors.toMap(XSDBuiltInType::getXbtId, Function.identity()));
 
-        findACCList = accRepository.findAll(new Sort(Sort.Direction.ASC, "accId"));
+        findACCList = accRepository.findAllByRevisionNum(0);
         findAccMap = findACCList.stream()
                 .collect(Collectors.toMap(AggregateCoreComponent::getAccId, Function.identity()));
 
-        findASCCPList = asccpRepository.findAll(new Sort(Sort.Direction.ASC, "asccpId"));
+        findASCCPList = asccpRepository.findAllByRevisionNum(0);
         findAsccpMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getAsccpId, Function.identity()));
         findAsccpByGuidMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getGuid, Function.identity()));
 
-        findBCCPList = bccpRepository.findAll(new Sort(Sort.Direction.ASC, "bccpId"));
+        findBCCPList = bccpRepository.findAllByRevisionNum(0);
         findBccpMap = findBCCPList.stream()
                 .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
 
