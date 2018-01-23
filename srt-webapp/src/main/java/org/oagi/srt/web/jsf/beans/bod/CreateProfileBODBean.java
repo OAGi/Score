@@ -59,7 +59,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
      */
     @Autowired
     private ReleaseRepository releaseRepository;
-    private Release release = Release.WORKING_RELEASE;
+    private Release release;
 
     private List<TopLevelConcept> allTopLevelConcepts;
     private Map<Long, TopLevelConcept> allTopLevelConceptMap;
@@ -116,7 +116,13 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     public List<TopLevelConcept> getAllTopLevelConcepts() {
         if (allTopLevelConcepts == null) {
-            allTopLevelConcepts = topLevelConceptRepository.findAll(getRelease());
+            Release release = getRelease();
+            if (release == null) {
+                release = getReleases().get(0);
+                setRelease(release);
+            }
+
+            allTopLevelConcepts = topLevelConceptRepository.findAll(release);
             allTopLevelConceptMap = allTopLevelConcepts.stream()
                     .collect(Collectors.toMap(TopLevelConcept::getAsccpId, Function.identity()));
 
@@ -388,10 +394,10 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
-                        AssociationCoreComponentProperty selectedASCCP =
-                                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                        AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                        assert selectedASCCP.getReleaseId() == getRelease().getReleaseId();
 
-                        createTreeNode(selectedASCCP, selectedBusinessContext);
+                        createTreeNode(selectedASCCP, release, selectedBusinessContext);
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");

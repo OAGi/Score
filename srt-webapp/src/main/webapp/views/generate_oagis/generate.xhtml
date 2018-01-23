@@ -35,6 +35,10 @@
                                 <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
                                     <h:outputText value="#{profileBOD.propertyTerm}"/>
                                 </p:column>
+                                <p:column style="width: 100px; text-align: center;" headerText="Release"
+                                          sortBy="#{profileBOD.releaseNum}">
+                                    <h:outputText value="#{profileBOD.releaseNum}"/>
+                                </p:column>
                                 <p:column style="width: 200px; text-align: center;" headerText="Business Context"
                                           sortBy="#{profileBOD.bizCtxName}">
                                     <h:outputText value="#{profileBOD.bizCtxName}"/>

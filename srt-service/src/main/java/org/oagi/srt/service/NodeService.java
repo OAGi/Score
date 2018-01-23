@@ -729,6 +729,7 @@ public class NodeService {
     }
 
     public ASBIEPNode createBusinessInformationEntityTreeNode(AssociationCoreComponentProperty asccp,
+                                                              Release release,
                                                               BusinessContext bizCtx) {
         if (asccp == null) {
             throw new IllegalArgumentException("'asccp' argument must not be null.");
@@ -737,21 +738,21 @@ public class NodeService {
             throw new IllegalArgumentException("'bizCtx' argument must not be null.");
         }
 
-        return new AssociationBIEPropertyNodeImpl(asccp, asccp.getReleaseId(), bizCtx);
+        return new AssociationBIEPropertyNodeImpl(asccp, release.getReleaseId(), bizCtx);
     }
 
     public ASBIEPNode createBusinessInformationEntityTreeNode(
             TopLevelAbie topLevelAbie) {
 
+        long releaseId = topLevelAbie.getReleaseId();
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         BusinessContext bizCtx = businessContextRepository.findOne(abie.getBizCtxId());
         AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
 
-        ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, acc.getReleaseId(), bizCtx);
-
-        return new AssociationBIEPropertyNodeImpl(asbiep, asccp, asccp.getReleaseId(), abieNode);
+        ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, releaseId, bizCtx);
+        return new AssociationBIEPropertyNodeImpl(asbiep, asccp, releaseId, abieNode);
     }
 
     private class ABIENodeImpl

@@ -38,8 +38,8 @@ abstract class AbstractProfileBODBean extends UIHandler {
     private TreeNode selectedTreeNode;
     private String selectedCodeListName;
 
-    TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bixCtx) {
-        ASBIEPNode topLevelNode = nodeService.createBusinessInformationEntityTreeNode(asccp, bixCtx);
+    TreeNode createTreeNode(AssociationCoreComponentProperty asccp, Release release, BusinessContext bixCtx) {
+        ASBIEPNode topLevelNode = nodeService.createBusinessInformationEntityTreeNode(asccp, release, bixCtx);
         return createTreeNode(topLevelNode);
     }
 
