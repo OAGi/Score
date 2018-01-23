@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/CorrectiveActionRequest.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="CorrectiveActionRequest" type="CorrectiveActionRequestType" id="oagis-id-099371e697a04cc48c8b20ac3fe1cc52">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A request to initiate a process to eliminate a reoccurrence of a nonconformity or deviation.  The process will analyze data associated with the identified problem, identify causes, plan corrective action(s), implement corrective action(s), and verify that the action(s) have addressed the problem. AcknowledgeCorrectiveActionRequest acknowledges that the problem exists or not.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CorrectiveActionRequestType" id="oagis-id-840d7e6d31414c1f8d4f23b9cdd9545d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A request to initiate a process to eliminate a reoccurrence of a nonconformity or deviation.  The process will analyze data associated with the identified problem, identify causes, plan corrective action(s), implement corrective action(s), and verify that the action(s) have addressed the problem. AcknowledgeCorrectiveActionRequest acknowledges that the problem exists or not.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CorrectiveActionRequestBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CorrectiveActionRequestExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-60f3213e42da4ed9933814774a5a4186">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CorrectiveActionRequestBaseType" id="oagis-id-25025a304bea44d7ac8fa0ea7fb27e8a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A request to initiate a process to eliminate a reoccurrence of a nonconformity or deviation.  The process will analyze data associated with the identified problem, identify causes, plan corrective action(s), implement corrective action(s), and verify that the action(s) have addressed the problem. AcknowledgeCorrectiveActionRequest acknowledges that the problem exists or not.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="CorrectiveActionRequestDocumentReference" minOccurs="0" id="oagis-id-5fde464f70e44f5296f3202f70ce7990">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A reference to an online document associated with the corrective action request.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LastModificationDateTime" minOccurs="0" id="oagis-id-db34b27cf0f04c47b25bada6149d5326">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date and time this document was last modified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LastModifiedByPersonContact" minOccurs="0" id="oagis-id-f92a94af608a4e949fa2b599089176c5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The person who did the last modification to this document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" minOccurs="0" id="oagis-id-482c51deff6c49409414afb686b624c2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The status of the corrective action request.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ResponsiblePersonReferenceID" minOccurs="0" id="oagis-id-1ee533cd56654b23ba357a51afb3ebe6">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The person who has been given the responsibility to handle this corrective action request.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CorrectiveActionPlanDueDateTime" minOccurs="0" id="oagis-id-ba9b009bf55d4ef4842e28cb9cf10723">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Deadline for submitting the CorrectiveActionPlan.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CorrectiveActionDueDateTime" minOccurs="0" id="oagis-id-07b590eb5249431992f5b8e63af88d60">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Deadline for the correcting the problem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BusinessImpact" minOccurs="0" id="oagis-id-f4fa53c6cc624f6fa6b70d1d3106f7cc">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Description of the cost or impact of the problem on the business or planned endeavors.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlannedTimePeriod" minOccurs="0" id="oagis-id-b2a7c4bc0f6a4a779ca0f255524922e5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Expected information provided on an acknowledge CorrectiveActionRequest that indicates start and end dates for the plan and/or actions to address the problem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PriorityCode" minOccurs="0" id="oagis-id-e5ebf02433064c2aaa7f0e045cc7c110">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Priority or sense of urgency for resolving the problem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProcessStep" minOccurs="0" id="oagis-id-f661c00a252748898bed0af7f8509b25">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Process step where the business problem occurs, such as incoming inspection, in process manufacturing step, or finished goods testing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerParty" minOccurs="0" id="oagis-id-4888cbeec09b4d42a3885a164ba5b1e9">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the customer that purchased the goods or services.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" minOccurs="0" id="oagis-id-d90710936de44611b113c2508dfeb129">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" minOccurs="0" maxOccurs="unbounded" id="oagis-id-d5b1ed2f0a1140b59e06c473db433030">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Other parties involved.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" minOccurs="0" id="oagis-id-96c6a3284385406291a7a6ab21cfed32">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to contract or project affected by the nonconformance problems.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequestedInterimAction" minOccurs="0" maxOccurs="unbounded" id="oagis-id-763c00aab5b342b58d6b68e99e4e486e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Action or actions requested to address the problem until a long term solution is determined and instituted.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Incident" minOccurs="0" maxOccurs="unbounded" id="oagis-id-7010a96d4e324ec1b3bf100b9b69a17a"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequestedInterimActionBaseType" id="oagis-id-70b166ef7e4c489d92e6d090fe439e53">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Action to correct the problem until a long term solution is determined and instituted.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ActionBaseType">
+				<xsd:sequence>
+					<xsd:element ref="InterimActionDueTimePeriod" minOccurs="0" id="oagis-id-96fc1de6487a424f8c545e08165e0a59">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Requested date of completion of interim action.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualTimePeriod" minOccurs="0" id="oagis-id-7ca17c77cde74955a7ae0da653ca3af7">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Actual date of completion of interim action.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequestedInterimActionType" id="oagis-id-452bdec69d73478bbc74e5b53548aca1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Action to correct the problem until a long term solution is determined and instituted.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RequestedInterimActionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RequestedInterimActionExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-10330fd176d045608271d57c8ceb5e7f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RequestedInterimAction" type="RequestedInterimActionType" id="oagis-id-55a78a06f5484475943ea1d4e21f3504"/>
+	<xsd:element name="Incident" type="IncidentType" id="oagis-id-15e14663edc94ebda26948dff0ef1d04">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information specific to nonconformance or other incidents motivating the CorrectiveActionRequest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="IncidentType" id="oagis-id-651e475bcf5c4740a45949191e7369a8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information associated with a particular incident where product or process nonconformance was detected.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IncidentBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="IncidentExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-1ec561d5747b4920a90d1b99829bdfbb">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="IncidentBaseType" id="oagis-id-dc5221c1a523479c8063c79bfa6c009f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information associated with a particular incident where product or process nonconformance was detected.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="IncidentTypeCode" minOccurs="0" id="oagis-id-b8ce4118050e4aeb8e4e0153c2560186">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An enumeration or code identifying the kind of incident such as an ItemNonConformance detection or production process alert.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="IncidentRecordReference" minOccurs="0" maxOccurs="unbounded" id="oagis-id-ab02d3cd281f42eead55595a34582cc4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reference to a record of an item nonconformance, worrisome process trend, or process out of range incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Item" minOccurs="0" id="oagis-id-e2fbed625506477cb7092f4ad5fa56b4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The type of nonconformant item associated with the incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AffectedItemInstanceIdentification" minOccurs="0" maxOccurs="unbounded" id="oagis-id-0becfd2c7ab54e188a71e0d0f0d4031d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Lots, batches, dates, or other information that identify the collection of material associated with the nonconformance incident.
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalAffectedQuantity" minOccurs="0" id="oagis-id-0f9821d079fb4943bcaf4e309d6e2177">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The quantity of material affected by the problem over the period the history covers.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FailureSummaryResults" minOccurs="0" maxOccurs="unbounded" id="oagis-id-9477bcfd67324f01a80b470b34061830">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Test results related to the problem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FailureRatePercent" minOccurs="0" id="oagis-id-64da89c53551440192dc3acd99765be4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The percentage of material that was found to be nonconformant in this incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SpeculatedRootCause" minOccurs="0" id="oagis-id-02c24532f3fc44e3a3e8795f7428c4d4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Root cause speculated for the nonconformance incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Disposition" minOccurs="0" id="oagis-id-62842f24532c41fe9a15cffa7c83f8da">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Code indicating how the nonconformant material was handled.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WorkOrderReference" minOccurs="0" id="oagis-id-c4b40bef5e974b13aeb0154e4f163467">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A reference to the work order for the item instances related to this incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PurchaseOrderReference" minOccurs="0" id="oagis-id-177147fdd873483380cf32b1ba802cf9">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A reference to the purchase order for the item instances related to this incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProblemDescription" minOccurs="0" maxOccurs="unbounded" id="oagis-id-e40fa745cc8d486b937ac12bed04bc6b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Description of the problem or problems  identified with the material in question.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InstanceNonconformanceHistory" minOccurs="0" maxOccurs="unbounded" id="oagis-id-da759db7858a420c8a405064331a0007">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information for select individual  (i.e. discrete) instances that were nonconformant and associated with this incident.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InstanceNonconformanceHistoryType" id="oagis-id-dfbed5dec999418787ebc0dfe60a9c12">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes details of each item instance (or possibly sublot) that did not conform to the specification for the Item.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="InstanceNonconformanceHistoryBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InstanceNonconformanceHistoryExtensionType" minOccurs="0" maxOccurs="unbounded" id="oagis-id-1fd0769a430e4fcc98240b5ca78075fa">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InstanceNonconformanceHistoryBaseType" id="oagis-id-ca45ca7883c345088836dc830896773e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes details of each item instance (or possibly sublot) that did not conform to the specification for the Item.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstanceIdentification" minOccurs="0" id="oagis-id-656c2fc20fd9460092b2f274ae5d63ad">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Serial number, batch, or sublot ID.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FailureSummaryResults" minOccurs="0" maxOccurs="unbounded" id="oagis-id-a772a8918f91446eab61d0e62229ced3">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Key test results showing failures for a nonconforming instance.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Disposition" minOccurs="0" id="oagis-id-121d098e430848ab84252346b8dbfc9e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The final status of the instance with respect to the conformance problem. Example dispositions include reworked, downgraded, and scrapped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SpeculatedRootCause" minOccurs="0" id="oagis-id-1b99df2b454543d79992054eab651ffe">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Root cause speculated for the nonconformance of this instance.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InstanceNonconformanceHistory" type="InstanceNonconformanceHistoryType" id="oagis-id-eb610441a92246dbaec2ff7cd3d6f95b"/>
+</xsd:schema>

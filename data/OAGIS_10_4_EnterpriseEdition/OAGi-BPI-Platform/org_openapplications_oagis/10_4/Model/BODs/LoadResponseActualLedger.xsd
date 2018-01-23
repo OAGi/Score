@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/LoadResponseActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ActualLedger.xsd"/>
+	<xsd:element name="LoadResponseActualLedger" type="LoadResponseActualLedgerType" id="oagis-id-f2fdc2fb873d4332aa1c772f1520b624">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadResponseActualLedger is to communicate to an enterprise application the sending systems representation of ledger information specifically requested.   This may be in response to a GetActualLedger request or to proactively publish a listing of ledger information for a business event.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LoadResponseActualLedgerType" id="oagis-id-6cb89d95272a4a7f8a4845e131b27e3d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="LoadResponseActualLedgerDataAreaType" id="oagis-id-3770c5261f08483cb60b16425e3127e0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadResponseActualLedger. The information consists of a Verb and one or more Nouns. The verb (LoadResponse) indicates the action to be performed on the Noun (ActualLedger).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LoadResponseActualLedgerDataAreaType" id="oagis-id-b7ce9abcfd594fda89078ba9986950e0">
+		<xsd:sequence>
+			<xsd:element ref="LoadResponse" id="oagis-id-0ec31370bfd740d992e192493ad8ba64"/>
+			<xsd:element ref="ActualLedger" maxOccurs="unbounded" id="oagis-id-29597aad630a4eeba25f2a318ebef263"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

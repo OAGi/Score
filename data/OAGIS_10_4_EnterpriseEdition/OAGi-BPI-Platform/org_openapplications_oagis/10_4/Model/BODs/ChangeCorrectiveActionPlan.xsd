@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeCorrectiveActionPlan.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveActionPlan.xsd"/>
+	<xsd:element name="ChangeCorrectiveActionPlan" type="ChangeCorrectiveActionPlanType" id="oagis-id-ea18b8269d4d490e9a439beb36ab0e28">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeCorrectiveActionPlan is to communicate to a business application module or system the need to initiate the creation of a CorrectiveActionPlan structure.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeCorrectiveActionPlanType" id="oagis-id-bd7953cdc8524294a507b0bb56cfa749">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeCorrectiveActionPlanDataAreaType" id="oagis-id-5a6cb0f1f38844668e299c6e6db778aa">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeCorrectiveActionPlan. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (CorrectiveActionPlan).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeCorrectiveActionPlanDataAreaType" id="oagis-id-e8cb488faecc4776b4269b3f6e46e9a2">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-3261e26302da455c9923772b8c76e758"/>
+			<xsd:element ref="CorrectiveActionPlan" id="oagis-id-54c9f6a930784118bcc33fa8e6f692ba"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

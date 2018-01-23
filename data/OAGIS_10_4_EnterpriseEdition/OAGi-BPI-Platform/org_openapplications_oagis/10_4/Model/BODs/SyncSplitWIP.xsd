@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncSplitWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SplitWIP.xsd"/>
+	<xsd:element name="SyncSplitWIP" type="SyncSplitWIPType" id="oagis-id-533b0e9cf71d4a3d9f844fadbd571ffc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncSplitWIP is to Sync a Manufacturing Application of the creation of multiple production lots from a single production lot of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lot, the resulting lots, their quantities, and the Syncing step at which this event occurred, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncSplitWIPType" id="oagis-id-a7f615df395945cf93524c047c84849f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncSplitWIPDataAreaType" id="oagis-id-9e7a5d1bdb6e4cdf9e4c27d3cb20bc8c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncSplitWIP. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (SplitWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncSplitWIPDataAreaType" id="oagis-id-ebfd794ebf694a6faf509d6cc3e73113">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-a5bd09fd8a0c4783bad1d03196af5d53"/>
+			<xsd:element ref="SplitWIP" maxOccurs="unbounded" id="oagis-id-fcdc5a5191134cd7a9e7103a89dd27b2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

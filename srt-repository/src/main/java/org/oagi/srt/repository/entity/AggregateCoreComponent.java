@@ -13,8 +13,8 @@ import java.util.*;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent
-        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, RevisionAware {
+public class AggregateCoreComponent implements
+        CoreComponent, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 

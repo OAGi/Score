@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelAcknowledgeEngineeringWorkDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/EngineeringWorkDocument.xsd"/>
+	<xsd:element name="CancelAcknowledgeEngineeringWorkDocument" type="CancelAcknowledgeEngineeringWorkDocumentType" id="oagis-id-0de40e7e7ccc45caa4ad088f7b19d384">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeEngineeringWorkDocument is to enable an application to provide EngineeringWorkDocument from another business application module. The CancelAcknowledgeEngineeringWorkDocument is provided in response to the ProcessCart in order to request a CancelAcknowledge to process the cart. The Cancel is directed from the owner of the information (the receiver of the Process) the originator of the Process.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeEngineeringWorkDocumentType" id="oagis-id-e0f317950f6d457da533b039a0e963af">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeEngineeringWorkDocumentDataAreaType" id="oagis-id-98e61f10d4ff4c3b95c89d386c054978">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeEngineeringWorkDocument. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (EngineeringWorkDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeEngineeringWorkDocumentDataAreaType" id="oagis-id-4955c913bbdd4c8f96e2c8e082f0c2c7">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-13a06ed57b494aab9f6be2e761b644bb"/>
+			<xsd:element ref="EngineeringWorkDocument" maxOccurs="unbounded" id="oagis-id-850bbfa6f1de4e12b2ebb5ddb66f2656"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

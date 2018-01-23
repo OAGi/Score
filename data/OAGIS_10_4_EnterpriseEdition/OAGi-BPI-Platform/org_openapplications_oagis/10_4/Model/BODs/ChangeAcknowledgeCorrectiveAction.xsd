@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeCorrectiveAction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CorrectiveAction.xsd"/>
+	<xsd:element name="ChangeAcknowledgeCorrectiveAction" type="ChangeAcknowledgeCorrectiveActionType" id="oagis-id-49b52599ee424abb9abb7cc530362b31">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeCorrectiveAction is to communicate to a business application module or system the need to initiate the creation of a CorrectiveAction structure.
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeCorrectiveActionType" id="oagis-id-f9defccaa0ba4e8d82019102415e59b5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeCorrectiveActionDataAreaType" id="oagis-id-09c49d6717834eedaa07d2f088db4f2f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeCorrectiveAction. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (CorrectiveAction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeCorrectiveActionDataAreaType" id="oagis-id-a48839ea8c734cc3b4f82f8dd4a79b5b">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-aa79b626f8b44b77a296ee9483acea8e"/>
+			<xsd:element ref="CorrectiveAction" id="oagis-id-210c5264ce93457c899b00dcca224c5d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

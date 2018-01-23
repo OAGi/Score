@@ -33,8 +33,12 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
+
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<AggregateCoreComponent> accList;
     private String objectClassTerm;
@@ -51,10 +55,21 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     }
 
     private List<AggregateCoreComponent> allACCs() {
-        return accRepository.findAllByRevisionNum(0).stream()
+        List<AggregateCoreComponent> allACCs =
+                accRepository.findAllByRevisionNum(0).stream()
                 .filter(e -> e.getOagisComponentType() != OagisComponentType.UserExtensionGroup)
                 .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allACCs = coreComponentBeanHelper.filterByUser(allACCs, getCurrentUser(), AggregateCoreComponent.class);
+
+        return allACCs;
     }
 
     public List<AggregateCoreComponent> getAccList() {

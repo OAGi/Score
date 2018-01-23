@@ -79,6 +79,7 @@
                                 <p:contextMenu id="cMenu" for="treeTable" nodeType="ACC-Target"
                                                rendered="#{accDetailBean.targetAcc.state == 'Editing'}">
                                     <p:menuitem id="setACCItem" value="Set based ACC" style="width: 100%;"
+                                                actionListener="#{accDetailBean.onClickSetBasedACCButton}"
                                                 action="#{accDetailBean.prepareSetBasedAcc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
@@ -116,16 +117,38 @@
 
                                         <p:panel id="setBasedACCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="accObjectClassTerm" widgetVar="accObjectClassTerm"
-                                                                value="#{accDetailBean.selectedAccObjectClassTerm}"
-                                                                completeMethod="#{accDetailBean.completeInputAcc}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax listener="#{accDetailBean.onSelectAccObjectClassTerm}"
-                                                            update=":form:details"/>
-                                                </p:autoComplete>
-                                                <p:commandButton id="setBasedACCSearchBtn" value="Search" ajax="true"
-                                                                 actionListener="#{accDetailBean.searchAcc}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Object Class Term" style="width: 140px; font-weight: 400;"/>
+                                                        <p:inputText id="accObjectClassTermInputText" widgetVar="accObjectClassTermInputText"
+                                                                     value="#{accDetailBean.selectedAccObjectClassTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 140px; font-weight: 400;"/>
+                                                        <p:inputText id="accDefinitionInputText" widgetVar="accDefinitionInputText"
+                                                                     value="#{accDetailBean.selectedAccDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 140px; font-weight: 400;"/>
+                                                        <p:inputText id="accModuleInputText" widgetVar="accModuleInputText"
+                                                                     value="#{accDetailBean.selectedAccModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="setBasedACCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{accDetailBean.searchAcc}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="setBasedACCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblAcc" var="acc" value="#{accDetailBean.accList}"
@@ -144,8 +167,7 @@
                                                     </p:selectBooleanCheckbox>
                                                 </p:column>
 
-                                                <p:column headerText="ACC Object Class Term"
-                                                          sortBy="#{acc.objectClassTerm}">
+                                                <p:column headerText="Object Class Term" style="width: 350px;" sortBy="#{acc.objectClassTerm}">
                                                     <a href="/core_component/acc/#{acc.accId}"
                                                        target="_new">#{acc.objectClassTerm}</a>
                                                     <div>
@@ -153,13 +175,20 @@
                                                            style="font-size: 12px !important; color: #767676 !important;">GUID: #{acc.guid}</a>
                                                     </div>
                                                 </p:column>
-                                                <p:column style="width: 150px; text-align: center;" headerText="Type"
+
+                                                <p:column style="width: 120px; text-align: center;" headerText="Type"
                                                           sortBy="#{acc.oagisComponentType}">
                                                     <span class="label label-info">#{acc.oagisComponentType}</span>
                                                 </p:column>
+
+                                                <p:column headerText="Module" style="width: 220px;" sortBy="#{acc.module}">
+                                                    <h:outputText value="#{acc.module}"/>
+                                                </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{acc.definition}">
                                                     <h:outputText value="#{acc.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;"
                                                           headerText="Abstract" sortBy="#{acc.isAbstract()}">
                                                     <h:panelGroup rendered="#{acc.isAbstract()}">
@@ -169,6 +198,7 @@
                                                         <i class="fa fa-times" aria-hidden="true"></i>
                                                     </h:panelGroup>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{acc.state}">
                                                     <h:panelGroup rendered="#{acc.state == 'Editing'}">
@@ -204,16 +234,38 @@
 
                                         <p:panel id="appendASCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
-                                                                value="#{accDetailBean.selectedAsccpPropertyTerm}"
-                                                                completeMethod="#{accDetailBean.completeInputAsccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax listener="#{accDetailBean.onSelectAsccpPropertyTerm}"
-                                                            update=":form:details"/>
-                                                </p:autoComplete>
-                                                <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
-                                                                 action="#{accDetailBean.searchAsccp}"
-                                                                 update="appendASCCPanel" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpPropertyTermInputText" widgetVar="asccpPropertyTermInputText"
+                                                                     value="#{accDetailBean.selectedAsccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpDefinitionInputText" widgetVar="asccpDefinitionInputText"
+                                                                     value="#{accDetailBean.selectedAsccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpModuleInputText" widgetVar="asccpModuleInputText"
+                                                                     value="#{accDetailBean.selectedAsccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{accDetailBean.searchAsccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendASCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblAsccp" var="asccp" value="#{accDetailBean.asccpList}"
@@ -232,7 +284,7 @@
                                                     </p:selectBooleanCheckbox>
                                                 </p:column>
 
-                                                <p:column headerText="ASCCP Property Term"
+                                                <p:column headerText="Property Term"
                                                           sortBy="#{asccp.propertyTerm}">
                                                     <a href="/core_component/asccp/#{asccp.asccpId}"
                                                        target="_new">#{asccp.propertyTerm}</a>
@@ -241,9 +293,15 @@
                                                            style="font-size: 12px !important; color: #767676 !important;">GUID: #{asccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
+                                                <p:column headerText="Module" style="width: 220px;" sortBy="#{asccp.module}">
+                                                    <h:outputText value="#{asccp.module}"/>
+                                                </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{asccp.definition}">
                                                     <h:outputText value="#{asccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{asccp.state}">
                                                     <h:panelGroup rendered="#{asccp.state == 'Editing'}">
@@ -279,16 +337,38 @@
 
                                         <p:panel id="appendBCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="bccpPropertyTerm" widgetVar="bccpPropertyTerm"
-                                                                value="#{accDetailBean.selectedBccpPropertyTerm}"
-                                                                completeMethod="#{accDetailBean.completeInputBccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax listener="#{accDetailBean.onSelectBccpPropertyTerm}"
-                                                            update=":form:details"/>
-                                                </p:autoComplete>
-                                                <p:commandButton id="appendBCCSearchBtn" value="Search" ajax="true"
-                                                                 actionListener="#{accDetailBean.searchBccp}"
-                                                                 update="appendBCCPanel" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpPropertyTermInputText" widgetVar="bccpPropertyTermInputText"
+                                                                     value="#{accDetailBean.selectedBccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpDefinitionInputText" widgetVar="bccpDefinitionInputText"
+                                                                     value="#{accDetailBean.selectedBccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpModuleInputText" widgetVar="bccpModuleInputText"
+                                                                     value="#{accDetailBean.selectedBccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendBCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{accDetailBean.searchBccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendBCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblBccp" var="bccp" value="#{accDetailBean.bccpList}"
@@ -315,9 +395,15 @@
                                                            style="font-size: 12px !important; color: #767676 !important;">GUID: #{bccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
+                                                <p:column headerText="Module" style="width: 220px;" sortBy="#{bccp.module}">
+                                                    <h:outputText value="#{bccp.module}"/>
+                                                </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{bccp.definition}">
                                                     <h:outputText value="#{bccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{bccp.state}">
                                                     <h:panelGroup rendered="#{bccp.state == 'Editing'}">
@@ -821,26 +907,27 @@
                                  disabled="#{!accDetailBean.dirty}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{accDetailBean.update()}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
 
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{accDetailBean.updateState('Candidate')}"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
                                  id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
                                  action="#{accDetailBean.updateState('Editing')}"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
                 <p:commandButton rendered="#{accDetailBean.targetAcc.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
                                  onclick="PF('confirmPublish').show();"
                                  disabled="#{accDetailBean.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                                 update=":form:treeTable, :form:leftPanel, :form:details, :form:btnGroup"/>
 
                 <p:commandButton
-                        rendered="#{(accDetailBean.targetAcc.state == 'Editing' or accDetailBean.targetAcc.state == 'Candidate') and accDetailBean.isPreviousRevisionNotInsert(accDetailBean.targetAcc)}"
+                        rendered="#{(accDetailBean.targetAcc.state == 'Editing' or accDetailBean.targetAcc.state == 'Candidate') and
+                                     accDetailBean.isPreviousRevisionNotInsert(accDetailBean.targetAcc)}"
                         id="btnUndo" widgetVar="btnUndo" value="Undo"
                         action="#{accDetailBean.undoLastAction()}"
                         update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"

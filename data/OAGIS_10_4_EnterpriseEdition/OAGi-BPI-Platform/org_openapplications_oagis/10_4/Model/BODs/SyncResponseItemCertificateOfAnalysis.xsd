@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseItemCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ItemCertificateOfAnalysis.xsd"/>
+	<xsd:element name="SyncResponseItemCertificateOfAnalysis" type="SyncResponseItemCertificateOfAnalysisType" id="oagis-id-a47e9932d81a454fa0445563b736ef95">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseItemCertificateOfAnalysis is to communicate the response to a ItemCertificateOfAnalysis message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseItemCertificateOfAnalysisType" id="oagis-id-e17eac1b2ba54c3294ee01327b3a54ac">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseItemCertificateOfAnalysisDataAreaType" id="oagis-id-7e010a3b62f54c66bf39923a255de0af">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseItemCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ItemCertificateOfAnalysis).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseItemCertificateOfAnalysisDataAreaType" id="oagis-id-24ee8a5faf4f4f6dab10c88c0ec4e09a">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-4f2db7882842400a98533d3800c89d9d"/>
+			<xsd:element ref="ItemCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-fa11952b8f3649fbbbb513cbdb429ab0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

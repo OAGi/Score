@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessEmployeeWorkTime.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EmployeeWorkTime.xsd"/>
+        <xsd:element name="ProcessEmployeeWorkTime" type="ProcessEmployeeWorkTimeType" id="oagis-id-2b0f59992cc2483c8601bc1d609602bb">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessEmployeeWorkTime is to Process work time information for an employee from a data collection application to an ERP Human Resource application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessEmployeeWorkTimeType" id="oagis-id-3592afc603a6452aae92b007e115b4ed">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessEmployeeWorkTimeDataAreaType" id="oagis-id-f377fc8f8039434e8f92111eb60cbf3b">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessEmployeeWorkTime. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (EmployeeWorkTime).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessEmployeeWorkTimeDataAreaType" id="oagis-id-d1c167f3eda34386a4139563ba824dfc">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-9bed8a8f79f34e7ca2dcd93f6f066214"/>
+                        <xsd:element ref="EmployeeWorkTime" maxOccurs="unbounded" id="oagis-id-46db666357824133b005960ce8e52f53"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

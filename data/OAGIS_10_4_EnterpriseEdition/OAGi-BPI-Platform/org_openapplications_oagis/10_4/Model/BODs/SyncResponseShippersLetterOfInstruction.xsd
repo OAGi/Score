@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseShippersLetterOfInstruction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:element name="SyncResponseShippersLetterOfInstruction" type="SyncResponseShippersLetterOfInstructionType" id="oagis-id-bbcbd35995764223bab4bf64c7e86c34">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponse ShippersLetterOfInstruction is to communicate ShippersLetterOfInstruction Information from the owner of a ShippersLetterOfInstruction  to another business application module.  The receiver of this BOD does is expected to take the information provided and populate their information on the ShippersLetterOfInstruction from this BOD.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseShippersLetterOfInstructionType" id="oagis-id-c4e940a582d142c397d774ebd62775d3">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseShippersLetterOfInstructionDataAreaType" id="oagis-id-076a6e32f25144e6b527b542431e9fae">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseShippersLetterOfInstruction. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ShippersLetterOfInstruction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseShippersLetterOfInstructionDataAreaType" id="oagis-id-44380a5e001c48ea902bf103f7a37029">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-f5091c9b13d94f7b8961e7141b9f97e8"/>
+			<xsd:element ref="ShippersLetterOfInstruction" maxOccurs="unbounded" id="oagis-id-9119ce84a0114778acfc54a986816d16"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

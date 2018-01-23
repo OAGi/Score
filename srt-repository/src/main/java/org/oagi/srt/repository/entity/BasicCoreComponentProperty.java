@@ -9,13 +9,12 @@ import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, RevisionAware {
+public class BasicCoreComponentProperty implements
+        CoreComponentProperty, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 

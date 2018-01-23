@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncConfirmWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ConfirmWIP.xsd"/>
+	<xsd:element name="SyncConfirmWIP" type="SyncConfirmWIPType" id="oagis-id-6e2a6e53195047fe8e9d2690bd1b4fab">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncConfirmWIP is to respond to a request for the data necessary to perform a confirmation of the movement of WIP (Work in Progress).
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncConfirmWIPType" id="oagis-id-968881f07cb94ea3b3d41655a19cdc0e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncConfirmWIPDataAreaType" id="oagis-id-e6863fc03532415ca50d0ed8f191f38f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncConfirmWIP. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ConfirmWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncConfirmWIPDataAreaType" id="oagis-id-542fb79cebe249208b71c11c60ed16b1">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-900affb686e9497b9daaef0a239ee4a2"/>
+			<xsd:element ref="ConfirmWIP" maxOccurs="unbounded" id="oagis-id-2293d19f88344a3c935ba91a79dac32f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

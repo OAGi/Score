@@ -66,11 +66,11 @@
             </p:panel>
 
             <p:panel id="btnGroup">
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
-                                 action="#{selectBDTBean.back}"/>
                 <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
                                  disabled="#{selectBDTBean.selectedBDT eq null}"
                                  action="#{selectBDTBean.createBCCP()}"/>
+                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
+                                 action="#{selectBDTBean.back}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

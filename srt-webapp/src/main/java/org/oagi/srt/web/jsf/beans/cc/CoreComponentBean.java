@@ -1,9 +1,21 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
+import org.oagi.srt.common.lucene.CaseSensitiveStandardAnalyzer;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.web.jsf.beans.SearchFilter;
 import org.primefaces.event.data.SortEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,10 +33,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.*;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Controller
@@ -51,6 +63,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     private ReleaseRepository releaseRepository;
 
     private Release release;
+
+    private List<CoreComponents> allCoreComponents;
     private List<CoreComponents> coreComponents;
     private List<String> selectedTypes;
     private List<CoreComponentState> selectedStates;
@@ -73,6 +87,8 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         } else {
             setRelease(Release.WORKING_RELEASE);
         }
+
+        searchAllCoreComponents(getRelease());
 
         Object selectedTypes = sessionMap.get(SELECTED_TYPES_KEY);
 
@@ -113,13 +129,93 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         sessionMap.remove(SEARCH_TEXT_MODULE_KEY);
     }
 
-    public Release getRelease() {
-        return release;
+    private void searchAllCoreComponents(Release release) {
+        String sortProperty;
+        switch (sortColumnHeaderText) {
+            case "Type":
+                sortProperty = "type";
+                break;
+            case "DEN":
+                sortProperty = "den";
+                break;
+            case "Owner":
+                sortProperty = "owner";
+                break;
+            case "State":
+                sortProperty = "state";
+                break;
+            case "Last Updated By":
+                sortProperty = "last_updated_user";
+                break;
+            case "Last Updated Timestamp":
+            default:
+                sortProperty = "last_update_timestamp";
+                break;
+        }
+
+        List<String> selectedTypes = Arrays.asList(
+                "ACC", "ASCC", "ASCCP", "BCC", "BCCP"
+        );
+        List<CoreComponentState> selectedStates = Arrays.asList(
+                CoreComponentState.Editing,
+                CoreComponentState.Candidate,
+                CoreComponentState.Published);
+
+        boolean isSortColumnAscending = false;
+
+        List<CoreComponents> coreComponents = coreComponentService.getCoreComponents(
+                selectedTypes, selectedStates, release,
+                new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
+
+        Map<String, CoreComponents> ccMap = new LinkedHashMap();
+        coreComponents.stream().forEachOrdered(e -> {
+            String guid = e.getGuid();
+            if (ccMap.containsKey(guid)) {
+                CoreComponents p = ccMap.get(guid);
+                Long pReleaseId = p.getReleaseId();
+                if (pReleaseId == null) {
+                    pReleaseId = 0L;
+                }
+                Long eReleaseId = e.getReleaseId();
+                if (eReleaseId == null) {
+                    eReleaseId = 0L;
+                }
+
+                if (pReleaseId > eReleaseId) {
+                    return;
+                }
+            }
+
+            ccMap.put(guid, e);
+        });
+
+        coreComponents = new ArrayList(ccMap.values());
+
+        directory = createDirectory(coreComponents,
+                new String[]{DEN_FIELD, MODULE_FIELD},
+                new String[]{" ", Pattern.quote("\\")},
+                CoreComponents::getDen, CoreComponents::getModule);
+        definition_index = createDirectoryForText(coreComponents,
+                new String[]{DEFINITION_FIELD},
+                CoreComponents::getDefinition);
+
+        allCoreComponents = coreComponents;
     }
 
+    private Directory directory, definition_index;
+    private static final String DEN_FIELD = "den";
+    private static final String DEFINITION_FIELD = "definition";
+    private static final String MODULE_FIELD = "module";
+
     public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
-        setRelease(getRelease());
+        Release release = getRelease();
+        setRelease(release);
+        searchAllCoreComponents(release);
         search();
+    }
+
+    public Release getRelease() {
+        return release;
     }
 
     public void setRelease(Release release) {
@@ -195,80 +291,57 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
     }
 
     public List<CoreComponents> findCoreComponents() {
-        String sortProperty;
-        switch (sortColumnHeaderText) {
-            case "Type":
-                sortProperty = "type";
-                break;
-            case "DEN":
-                sortProperty = "den";
-                break;
-            case "Owner":
-                sortProperty = "owner";
-                break;
-            case "State":
-                sortProperty = "state";
-                break;
-            case "Last Updated By":
-                sortProperty = "last_updated_user";
-                break;
-            case "Last Updated Timestamp":
-            default:
-                sortProperty = "last_update_timestamp";
-                break;
+        List<CoreComponents> coreComponents = allCoreComponents;
+
+        String den = getSearchTextForDen();
+        String definition = getSearchTextForDefinition();
+        String module = getSearchTextForModule();
+
+        try {
+            if (!StringUtils.isEmpty(definition)) {
+                IndexReader reader = DirectoryReader.open(definition_index);
+                IndexSearcher searcher = new IndexSearcher(reader);
+
+                Query q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                TopDocs topDocs = searcher.search(q, coreComponents.size());
+                if (topDocs.totalHits == 0L) {
+                    definition = Arrays.stream(definition.split(" "))
+                            .map(e -> suggestWord(e, definition_index, DEFINITION_FIELD))
+                            .collect(Collectors.joining(" "));
+
+                    q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                    topDocs = searcher.search(q, coreComponents.size());
+                }
+
+                List<CoreComponents> l = new ArrayList();
+                for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    Document d = searcher.doc(scoreDoc.doc);
+                    l.add(toObject(d.getBinaryValue("obj").bytes, CoreComponents.class));
+                }
+                coreComponents = l;
+            }
+        } catch (IOException | ParseException e) {
+            throw new IllegalStateException(e);
         }
 
-        List<CoreComponents> coreComponents = coreComponentService.getCoreComponents(
-                selectedTypes, selectedStates, release,
-                new Sort.Order((isSortColumnAscending) ? Sort.Direction.ASC : Sort.Direction.DESC, sortProperty));
-
         coreComponents = coreComponents.stream()
-                .filter(new DenSearchFilter())
-                .filter(new DefinitionSearchFilter())
-                .filter(new ModuleSearchFilter())
+                .filter(e -> selectedTypes.contains(e.getType()))
+                .filter(e -> selectedStates.contains(e.getState()))
+                .filter(new SearchFilter<>(den, directory, DEN_FIELD, " ", CoreComponents::getDen))
+                .filter(new SearchFilter<>(module, directory, MODULE_FIELD, "\\", CoreComponents::getModule))
                 .sorted((a, b) -> {
-                    String den = getSearchTextForDen();
                     if (!StringUtils.isEmpty(den)) {
                         return compareLevenshteinDistance(den, a, b, CoreComponents::getDen);
                     }
 
-                    String definition = getSearchTextForDefinition();
-                    if (!StringUtils.isEmpty(definition)) {
-                        return compareLevenshteinDistance(definition, a, b, CoreComponents::getDefinition);
-                    }
-
-                    String module = getSearchTextForModule();
                     if (!StringUtils.isEmpty(module)) {
-                        return compareLevenshteinDistance(module, a, b, CoreComponents::getModule);
+                        return compareLevenshteinDistance(module, a, b, CoreComponents::getModule, Pattern.quote("\\"));
                     }
 
                     return 0;
                 })
                 .collect(Collectors.toList());
-
-        Map<String, CoreComponents> ccMap = new LinkedHashMap();
-        coreComponents.stream().forEachOrdered(e -> {
-            String guid = e.getGuid();
-            if (ccMap.containsKey(guid)) {
-                CoreComponents p = ccMap.get(guid);
-                Long pReleaseId = p.getReleaseId();
-                if (pReleaseId == null) {
-                    pReleaseId = 0L;
-                }
-                Long eReleaseId = e.getReleaseId();
-                if (eReleaseId == null) {
-                    eReleaseId = 0L;
-                }
-
-                if (pReleaseId > eReleaseId) {
-                    return;
-                }
-            }
-
-            ccMap.put(guid, e);
-        });
-
-        return new ArrayList(ccMap.values());
+        return coreComponents;
     }
 
     public void setCoreComponents(List<CoreComponents> coreComponents) {
@@ -277,77 +350,6 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
     public List<CoreComponents> getCoreComponents() {
         return coreComponents;
-    }
-
-    private interface SearchFilter extends Predicate<CoreComponents> {
-    }
-
-    private class DenSearchFilter implements SearchFilter {
-
-        @Override
-        public boolean test(CoreComponents e) {
-            String q = getSearchTextForDen();
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            String den = e.getDen().toLowerCase();
-            String[] split = q.split(" ");
-            for (String s : split) {
-                if (!den.contains(s.toLowerCase())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    private class DefinitionSearchFilter implements SearchFilter {
-
-        @Override
-        public boolean test(CoreComponents e) {
-            String q = getSearchTextForDefinition();
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            String definition = e.getDefinition();
-            if (StringUtils.isEmpty(definition)) {
-                return false;
-            }
-            definition = definition.toLowerCase();
-            String[] split = q.split(" ");
-            for (String s : split) {
-                if (!definition.contains(s.toLowerCase())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    private class ModuleSearchFilter implements SearchFilter {
-
-        @Override
-        public boolean test(CoreComponents e) {
-            String q = getSearchTextForModule();
-            if (StringUtils.isEmpty(q)) {
-                return true;
-            }
-
-            String module = e.getModule();
-            if (StringUtils.isEmpty(module)) {
-                return false;
-            }
-            module = module.toLowerCase();
-            String[] split = q.split(" ");
-            for (String s : split) {
-                if (!module.contains(s.toLowerCase())) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     public String getSearchTextForDen() {
@@ -451,6 +453,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
             throw t;
         }
 
+        searchAllCoreComponents(getRelease()); // refresh
         search();
     }
 
@@ -494,7 +497,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
         return coreComponentService.hasMultipleRevisions(coreComponents);
     }
 
-    public String getFullRevisionNum (CoreComponents cc) {
+    public String getFullRevisionNum(CoreComponents cc) {
         return coreComponentService.getFullRevisionNum(cc, release);
     }
 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeWarehouseShippingOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarehouseShippingOrder.xsd"/>
+	<xsd:element name="ChangeAcknowledgeWarehouseShippingOrder" type="ChangeAcknowledgeWarehouseShippingOrderType" id="oagis-id-9a6d2a2e25074f559d686cc0cad1a5dd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeWarehouseShippingOrder is to communicate only what has been modified (delta updats) ChangeAcknowledges the WarehouseShippingOrder.  The ChangeAcknowledgeWarehouseShippingOrder will also transmit ChangeAcknowledges to a WarehouseShippingOrder.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeWarehouseShippingOrderType" id="oagis-id-eb356cf423594c7288ea53792a39a478">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeWarehouseShippingOrderDataAreaType" id="oagis-id-a52d647fe2fb40a0863fdc8d67c07bb3">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeWarehouseShippingOrder. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (WarehouseShippingOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeWarehouseShippingOrderDataAreaType" id="oagis-id-1ad6bff1ac464d5baa21c2145ed9f7c7">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-9dde8da7a70043d3bb0097ae431d64da"/>
+			<xsd:element ref="WarehouseShippingOrder" maxOccurs="unbounded" id="oagis-id-4476f896648543baa96a30d9793161cf"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+	<xsd:element name="SyncProductAvailability" type="SyncProductAvailabilityType" id="oagis-id-887dab6371504a2db343e32e62a80f6b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncProductAvailability is to enable an application or component to request the reservations for products from  another business application or component.
+
+The response to the SyncProductAvailability is the ListProductAvailability. The SyncProductAvailability also enables the retrieval of information across several documents by using selection fields.    This type of functionality is limited to the capabilities of the responding application and needs to be determined during the implementation project.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncProductAvailabilityType" id="oagis-id-7011dd45cabd440492c48d7ec01ac970">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncProductAvailabilityDataAreaType" id="oagis-id-3a9cf18b7a3b4e4d868ea927bd90e4ba">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncProductAvailability. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ProductAvailability ).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncProductAvailabilityDataAreaType" id="oagis-id-1f7483f92d3f45e6987310f930783917">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-f49f98145beb45d09e5267a0f0129830"/>
+			<xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-d48e44d4ff144ba799548fbf8816a447"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

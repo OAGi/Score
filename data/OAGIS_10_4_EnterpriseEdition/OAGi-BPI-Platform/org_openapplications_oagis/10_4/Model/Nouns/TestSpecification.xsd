@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               		 05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/ActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="TestSpecification" type="TestSpecificationType" id="oagis-id-22821fd0e00d416e8e82f4ba360b0392">
+		<xsd:annotation>
+			<xsd:documentation>Communicates the test tolerances and related target values for a specific Item or Item class, referencing a set of test methods to be leveraged</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TestSpecificationType" id="oagis-id-356105b9548b4b7f976e5820aef32fbf">
+		<xsd:complexContent>
+			<xsd:extension base="TestSpecificationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestSpecificationExtensionType" id="oagis-id-bfbefe4654c747779f9e37059ae55739" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestSpecificationBaseType" id="oagis-id-3bfccdc50e32431e8edaa0b9387c2ee4">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="RevisionID" id="oagis-id-7ced2c92bab64505a8bac7e2c82aa4f7" minOccurs="0"/>
+					<xsd:element ref="Name" id="oagis-id-ad35330814e34e01a272030b64d9e1c2" minOccurs="0"/>
+					<xsd:element ref="Status" id="oagis-id-ff7faf5cca334cd58c98a405cd98fa16" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestSpecificationDocumentReference" id="oagis-id-53fdfdab44c44c30acd8760f995ae437" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SpecificationAuthorContact" id="oagis-id-224752964fe7483eb992f8761e3814f2" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SpecificationApproverContact" id="oagis-id-7a51ef335bb94ea2a7c72fb08ef6f0f8" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Item" id="oagis-id-e46918f54cd8429ab70f5c15fc7ba3b7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ContextItem" id="oagis-id-7cb8f33b793c4e749f250339e49462d9" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="ReclassifyItem" id="oagis-id-625e9030d1b0496fb391fbc36a0372da" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProcessBlockingMethodCode" id="oagis-id-61ce120796994524a198052a60d10f2e" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="DisplayName" id="oagis-id-e7423d8ef9ea4fda8928ce2f809ba2c0" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="ApprovedForUseEnterpriseUnit" id="oagis-id-6c756435a9574d3f9d5fa9949870c844" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="UOMClassification" id="oagis-id-7a149261825d458e8e36df62fa2f9f39" minOccurs="0"/>
+					<xsd:element ref="DefaultUOMCode" id="oagis-id-72f966ce15e34bc282f7a6969d7b377c" minOccurs="0"/>
+					<xsd:element ref="SamplingProfile" id="oagis-id-78cf5e9c0d024baab75b77675ca35afe" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestSpecificationDetail" id="oagis-id-a1973f2d704e485b8a592e52ab794f32" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TestSpecificationDetail" type="TestSpecificationDetailType" id="oagis-id-77e96c2db49b4783acb15c91aa0b76f1">
+		<xsd:annotation>
+			<xsd:documentation>The detail of a test specification, including test method references, test tolerances, targeted, and expected values.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TestSpecificationDetailBaseType" id="oagis-id-9aa3c57577cf4cbea114a58af7eab1cf">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="MethodDocumentReference" id="oagis-id-e7688323472e44ad86a6e9d9fd9dc660" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="StandardDocumentReference" id="oagis-id-d5073e6c5bc44a21a3340c962b1791ab" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="SamplingProfileDetail" id="oagis-id-01f0ae8136954cffbdfad617d6929d32" minOccurs="0"/>
+					<xsd:element ref="TestProcedureStep" id="oagis-id-cc30fd1f2fb84e3eb41718d7b2872796" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="EnterpriseUnit" id="oagis-id-93d0142491d94320939cd24fa744df6f" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TestSampleQuantity" id="oagis-id-26923b7b3f8442f78fe348283c8e0f1f" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="TestClassification" id="oagis-id-d3a15b5ac58f46beb66cf04d4c38b741" minOccurs="0"/>
+					<xsd:element ref="EnforcementLevelCode" id="oagis-id-85e2f6b0edd748069ffb225cea0f7bc9" minOccurs="0"/>
+					<xsd:element ref="InspectionParty" id="oagis-id-c7cd09133ccb431cb1dc11108f9d72ca" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TestSpecificationDetailType" id="oagis-id-949d39f9194d43b8afe5d46eb1aa8c9b">
+		<xsd:complexContent>
+			<xsd:extension base="TestSpecificationDetailBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="TestSpecificationDetailExtensionType" id="oagis-id-362cf7453e21454d8dca7f119ea0858e" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

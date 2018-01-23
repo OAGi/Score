@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyMergeWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MergeWIP.xsd"/>
+	<xsd:element name="NotifyMergeWIP" type="NotifyMergeWIPType" id="oagis-id-eebbb3e1c3484d5897db142bd2c2d8d4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyMergeWIP BOD is to notify a Manufacturing Application of the creation of a single production lot from multiple production lots of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lots, the resulting lot, lot quantities, and the Notifying step at which this event occurred, along with the time at which this event occurred.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyMergeWIPType" id="oagis-id-5e83fcd76d0e432095253985fbd676a1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyMergeWIPDataAreaType" id="oagis-id-c8a558d01ed6489a8876cb9df24fbfd8">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyMergeWIP. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (MergeWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyMergeWIPDataAreaType" id="oagis-id-d9ec1ffc6b54421eb3d2ddde253b131f">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-230f36b0209c4c3894846f7d5f57780f"/>
+			<xsd:element ref="MergeWIP" maxOccurs="unbounded" id="oagis-id-f13eb918adae4c4bbc2450285709b757"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

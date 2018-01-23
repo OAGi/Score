@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetTestSpecification.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/TestSpecification.xsd"/>
+	<xsd:element name="GetTestSpecification" type="GetTestSpecificationType" id="oagis-id-22a8dc10c5954fd68e4ace41fa436346">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetTestSpecification is to enable an application to request specific Item Bill of Material information from another business application module.  The response to the GetTestSpecification is the ShowTestSpecification.
+
+There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate Item Bill of Material information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GetTestSpecificationType" id="oagis-id-b3129af3eb7c4b9ea03a506f6f24c573">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="GetTestSpecificationDataAreaType" id="oagis-id-1755f8e9c7b34bebb29a82fec357bf86">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetTestSpecification. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (TestSpecification).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GetTestSpecificationDataAreaType" id="oagis-id-b8da52e5536349539b75173ba5b10d05">
+		<xsd:sequence>
+			<xsd:element ref="Get" id="oagis-id-517562cd82714a1789efe7340e1d1aa1"/>
+			<xsd:element ref="TestSpecification" id="oagis-id-7597ae29848740db871e00483927c6fd" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeReceiveItem.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ReceiveItem.xsd"/>
+	<xsd:element name="ChangeAcknowledgeReceiveItem" type="ChangeAcknowledgeReceiveItemType" id="oagis-id-e66b6f7b400c48c49303375fdc5420ca">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeInventoryTransfer is to give the organization the ability to do a quantity movement of materials from one organizational unit to another organizational unit. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeReceiveItemType" id="oagis-id-e76efc27f8ee4dc7be5cfe4542dc13f1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeReceiveItemDataAreaType" id="oagis-id-011a3fae891a4b7588da1751e6726b5b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeReceiveItem. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (ReceiveItem).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeReceiveItemDataAreaType" id="oagis-id-9a277ea2fb1744be85f0913b996a868f">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-8487b402192544b48a14bfb83b0192b4"/>
+			<xsd:element ref="ReceiveItem" maxOccurs="unbounded" id="oagis-id-4c6e8b0ebc544bae9eab90c603b8a5b6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

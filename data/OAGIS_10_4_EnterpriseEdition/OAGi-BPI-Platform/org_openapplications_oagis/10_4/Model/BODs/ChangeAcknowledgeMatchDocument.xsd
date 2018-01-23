@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeMatchDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MatchDocument.xsd"/>
+	<xsd:element name="ChangeAcknowledgeMatchDocument" type="ChangeAcknowledgeMatchDocumentType" id="oagis-id-0dba15da64304f8bb64157faef1bac31">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In certain application suites, purchase order / invoice matching functionality exists in the purchasing application, while in other suites this functionality exists in the accounts payable application.
+
+The invoice matching process may include several document types, including the following:
+
+-	Two way match - Purchase Order and the Invoice
+
+-	Three way match - Purchase Order, Invoice, and the Receipt
+
+-	Four way match - Purchase Order, Invoice, Receipt, and Inspection results 
+
+For the four way match, it is assumed that inspection results have been ChangeAcknowledged on the Purchase Order for visibility in matching.
+
+When matching takes place in the purchasing application, the accounts payable application may have to inform the purchasing application of the supplier invoice to which purchasing transactions (purchase orders, goods receiving notes and inspection tickets) are to be matched if the invoice is initially entered into the accounts payable application. Note that in some situations, invoices are entered directly into the purchase order application or are created by the purchase order application when using evaluated receipt settlement (ERS) and in this instance, it is not necessary to perform the separate integration described in these chapters.
+
+When matching takes place in the accounts payable application, the purchasing application must inform the accounts payable application of the purchasing transactions (purchase orders, goods receiving notes and inspection tickets) to which the invoice (in accounts payable) is to be matched. 
+
+These integration scenarios have been developed for document matching to occur at the line level within the PuchaseOrder document and the Invoice document.  This may be a one to one relationship, or it may be a many to one relationship from Invoice to PuchaseOrder or from the PuchaseOrder to the Invoice.  Charges not associated with a specific Invoice line match be matched individually.
+
+The LoadMatchDocument is for use both by the accounts payable application and the purchasing application in exchanging the transactions that are required to be matched.
+
+The purpose of ChangeAcknowledgeMatchDocument is for the accounts payable application to send successful matching notification or a match fail.notification to a purchasing application. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeMatchDocumentType" id="oagis-id-68445673b5554d2082e639686ca037b2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeMatchDocumentDataAreaType" id="oagis-id-79d7d244819642d388bfb3356a65f0ce">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeMatchDocument. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (MatchDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeMatchDocumentDataAreaType" id="oagis-id-4af55efdfc8f40adb7b8449b6f974bb3">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-6d83cbccbcb447769212671a3b643ec2"/>
+			<xsd:element ref="MatchDocument" maxOccurs="unbounded" id="oagis-id-3ab9cd5b59a44f1583a9cc4a1cdf7fc0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

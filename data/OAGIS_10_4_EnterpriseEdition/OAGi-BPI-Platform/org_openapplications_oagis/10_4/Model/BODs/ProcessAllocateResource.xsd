@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessAllocateResource.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/AllocateResource.xsd"/>
+        <xsd:element name="ProcessAllocateResource" type="ProcessAllocateResourceType" id="oagis-id-6651d9d6543d4ad8beffdb1335d465da">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessAllocateResource is to notify a Manufacturing Application of the use of required labor or machine time on a production order making a product. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what machine was utilized or which person performed the work and their labor skill class, along with the amount of time worked and at what time this event occurred.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessAllocateResourceType" id="oagis-id-9d492807145044daad49132af962d76c">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessAllocateResourceDataAreaType" id="oagis-id-9f7aa0513def47ac8b51312d5ed7b3df">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessAllocateResource. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (AllocateResource).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessAllocateResourceDataAreaType" id="oagis-id-0c5e9097052546c19a98dacb16584754">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-b0ff92c1a03a4179a02408b453722bde"/>
+                        <xsd:element ref="AllocateResource" maxOccurs="unbounded" id="oagis-id-e7a706d8273f4e308d70278e71ae4504"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/ProjectMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="ProjectMaster" type="ProjectMasterType" id="oagis-id-91768c08de76427f8cd7a20a1c05026b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A set of tasks with the following attributes: a singular purpose, a start and end date, those that accumulate costs, and those that may have materials and overhead. SYNONYMS: Job, Process Model, Program, Work Breakdown Structure (WBS) element
+
+This is used to enable all relevant sub-systems that submit transactions to the project accounting application to maintain valid values for the key project fields.  The target applications for this update would include, but not necessarily be limited to:
+Accounts Payable
+Accounts Receivable
+Budget
+Order Management
+Purchasing
+Time and Labor
+Travel and Expense</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProjectActivity" type="ProjectActivityType" id="oagis-id-a149e8f10b944fe8b89997b5d93048cd"/>
+	<xsd:complexType name="ProjectMasterBaseType" id="oagis-id-1a21004597904327823a8d56c64215e3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A set of tasks with the following attributes: a singular purpose, a start and end date, those that accumulate costs, and those that may have materials and overhead. SYNONYMS: Job, Process Model, Program, Work Breakdown Structure (WBS) element</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProjectReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Status" id="oagis-id-007a1add9664470b96f5ea9aec7cba7d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DocumentDateTime" id="oagis-id-af9577a22d114886b95902cac280beb6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date that document was created within the system of record.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-68bc1154ddc54805b4419879ad24540b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AuthorizationID" id="oagis-id-a84cdc60fc85439f944f168291c6089d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifyies the authorization level of the user or application that is sending the Business Object Document Message. This authorization level being recognized be the receiving system indicates what can be done on the receiving system(s).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BudgetedAmount" id="oagis-id-a9832892492b4cb68db6bb3db70eaa5a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The budgeted amount of performing this activity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AccruedAmount" id="oagis-id-9891c481aee946c088acbb12da9ecaf4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Costs incurred against this project activity are recorded in the AccruedAmount for the Activity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalCostAmount" id="oagis-id-8711405467814258b9c3dcccc66d4256" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The total cost of this project, as either an entered amount (no activity costing) or calculated as the sum of the activity costs.
+
+This field is updated by the LoadProjectAccounting BOD.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GLEntityID" id="oagis-id-6858636d7779455cbe80ca68ef68f350" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
+
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProjectActivity" id="oagis-id-4e659817904246b69624c070db053b7c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-7913d972d7e0406b967de8480709048f"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProjectMasterType" id="oagis-id-16a01be34c1d4487907531194fc5a878">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A set of tasks with the following attributes: a singular purpose, a start and end date, those that accumulate costs, and those that may have materials and overhead. SYNONYMS: Job, Process Model, Program, Work Breakdown Structure (WBS) element</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProjectMasterBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProjectMasterExtensionType" id="oagis-id-d6e40ae85f14423c9770e448e37794c7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProjectActivityBaseType" id="oagis-id-b01a8117b7ab4eea96f8aad82f007e90">
+		<xsd:complexContent>
+			<xsd:extension base="ProjectReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Status" id="oagis-id-b800d1f96abd4ebe9db5cc04352b29ca" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AccruedAmount" id="oagis-id-61ca4f1b82184dab9ef9c0ac758329c9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Costs incurred against this project activity are recorded in the AccruedAmount for the Activity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BudgetedAmount" id="oagis-id-7e702d4243fb4635bb098aa9035dd460" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The budgeted amount of performing this activity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProjectActivityType" id="oagis-id-891e63217b3849acbd5ac814432b0f0f">
+		<xsd:complexContent>
+			<xsd:extension base="ProjectActivityBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProjectActivityExtensionType" id="oagis-id-155c9609b71f45a6833e31bafd634511" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

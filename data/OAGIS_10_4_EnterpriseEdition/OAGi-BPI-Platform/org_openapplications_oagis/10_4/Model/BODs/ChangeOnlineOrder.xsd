@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeOnlineOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/OnlineOrder.xsd"/>
+        <xsd:element name="ChangeOnlineOrder" type="ChangeOnlineOrderType" id="oagis-id-673c66d26f3a456da112f3fee33159c4">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeOnlineOrder is to enable an application to provide online shopping OnlineOrders from another business application module.  The ChangeOnlineOrder is provided in response to the ProcessOnlineOrder in order to request a change to process the OnlineOrder. The Chagne is directed from the owner of the information (the receiver of the Process) the originator of the Process.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeOnlineOrderType" id="oagis-id-7cbb0893279044d1abff6d31d328f5fb">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeOnlineOrderDataAreaType" id="oagis-id-808e8ba0304c425185d340d272c77c6c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeOnlineOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (OnlineOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeOnlineOrderDataAreaType" id="oagis-id-0daf551514af4ec9a0abfa96347a1360">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-a480a22239834149ae27ea2f1af60bbf"/>
+                        <xsd:element ref="OnlineOrder" maxOccurs="unbounded" id="oagis-id-7abedc1f9c2f4bff9c0de482e90552db"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

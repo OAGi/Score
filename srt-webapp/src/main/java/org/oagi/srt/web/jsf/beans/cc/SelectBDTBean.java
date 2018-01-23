@@ -36,8 +36,12 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
+
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<DataType> bdtList;
     private String qualifierDataTypeTerm;
@@ -54,10 +58,21 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     }
 
     private List<DataType> allBDTs() {
-        return dataTypeRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
+        List<DataType> allBDTs = dataTypeRepository.findAll(
+                new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
                 .filter(e -> BusinessDataType == e.getType())
                 .filter(e -> Published == e.getState())
                 .collect(Collectors.toList());
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allBDTs = coreComponentBeanHelper.filterByUser(allBDTs, getCurrentUser(), DataType.class);
+
+        return allBDTs;
     }
 
     public List<DataType> getBdtList() {

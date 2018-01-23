@@ -48,10 +48,10 @@
                     <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.ownerName}">
                         <h:outputText value="#{profileBOD.ownerName}"/>
-
-                        <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}">
+                        <h:panelGroup style="display: block;"
+                                      rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}">
                             <a href="/profile_bod/#{profileBOD.topLevelAbieId}/transfer_ownership">
-                                <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
+                                <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
                                     <i class="fa fa-exchange" aria-hidden="true"></i>
                                 </h:panelGroup>
                             </a>

@@ -9,13 +9,12 @@ import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "bcc")
-public class BasicCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, RevisionAware, Serializable {
+public class BasicCoreComponent implements
+        CoreComponentRelation, RevisionAware {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 

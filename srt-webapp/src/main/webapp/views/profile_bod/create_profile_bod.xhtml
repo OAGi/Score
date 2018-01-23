@@ -27,22 +27,39 @@
                     </f:facet>
                     <p:panel>
                         <f:facet name="header">
-                            <h:panelGrid styleClass="option-panel" style="float: left; margin-right: 15px;" class="dropdown-container">
-                                <p:selectOneMenu id="release" value="#{createProfileBODBean.release}"
-                                                 converter="#{releaseConverter}" style="width: 150px">
-                                    <p:ajax listener="#{createProfileBODBean.onReleaseChange}" update=":form" />
-                                    <f:selectItems value="#{createProfileBODBean.releases}" var="release"
-                                                   itemLabel="#{release.releaseNum}"
-                                                   itemValue="#{release}"/>
-                                </p:selectOneMenu>
-                            </h:panelGrid>
-                            <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
-                                            completeMethod="#{createProfileBODBean.completeInput}"
-                                            style="width: 440px; margin-right: 20px;">
-                                <p:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                            </p:autoComplete>
-                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{createProfileBODBean.search}"
-                                             update="tbl1" icon="fa fa-white fa-search"/>
+                            <div class="row">
+                                <div class="col-md-2 dropdown-container">
+                                    <p:selectOneMenu id="release" value="#{createProfileBODBean.release}"
+                                                     converter="#{releaseConverter}" style="width: 150px">
+                                        <p:ajax listener="#{createProfileBODBean.onReleaseChange}" update=":form" />
+                                        <f:selectItems value="#{createProfileBODBean.releases}" var="release"
+                                                       itemLabel="#{release.releaseNum}"
+                                                       itemValue="#{release}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="col-md-10">
+                                    <div style="padding: 3px 0 3px 0;">
+                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                        <p:inputText id="searchTextForPropertyTerm" value="#{createProfileBODBean.searchTextForPropertyTerm}"
+                                                     tabindex="1">
+                                            <f:ajax/>
+                                        </p:inputText>
+                                    </div>
+                                    <div style="padding: 3px 0 3px 0;">
+                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                        <p:inputText id="searchTextForModule" value="#{createProfileBODBean.searchTextForModule}"
+                                                     tabindex="2">
+                                            <f:ajax/>
+                                        </p:inputText>
+
+                                        <p:commandButton id="searchBtn" value="Search" ajax="true" style="margin-left: 10px;"
+                                                         actionListener="#{createProfileBODBean.search}"
+                                                         update="tbl1" icon="fa fa-white fa-search"/>
+                                    </div>
+
+                                    <p:defaultCommand target="searchBtn"/>
+                                </div>
+                            </div>
                         </f:facet>
                         <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -51,7 +68,6 @@
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
                                      selectionMode="single">
-
                             <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="tbl1"/>
                             <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="tbl1"/>
 
@@ -61,7 +77,7 @@
                                 </p:selectBooleanCheckbox>
                             </p:column>
 
-                            <p:column style="width: 40%" headerText="ASCCP Property Term"
+                            <p:column style="width: 40%" headerText="Property Term"
                                       sortBy="#{topLevelConcept.propertyTerm}">
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                             </p:column>

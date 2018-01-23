@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetCatalog.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Catalog.xsd"/>
+        <xsd:element name="GetCatalog" type="GetCatalogType" id="oagis-id-f5d4a05a5ffa46e38bcfd64d34faaf56">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetCatalog is to enable a business application module or system to request catalog information.
+
+The Catalog information that is requested by the GetCatalog may include
+·  Item Identifiers
+·  Specifications
+·  Pricing Information agreed on either
+  ·  Purchase Agreements
+  ·  Price Lists
+·  Availability and Delivery Information
+·  Related Items and accessories
+
+There are many possible business applications in several environments that may use this capability. Some examples of usage scenarios are:
+·  Manufacturer exchanging catalogs with distributors/ suppliers/e-marketplaces
+·  Distributors/ Suppliers/ e-marketplaces exchanging catalogs with Buyers or other trading partners
+
+It may also be necessary to support Component Supplier Management (CSM) scenarios.  In this scenario a company will provide a service of sourcing and codifying the products of many companies and publishing a consolidated catalog. 
+
+The Catalog exchange scenario can be implemented either as a simple scenario using a single BOD, or in the case or large catalogs involving complex pricing scenarios or partner specific details, as multiple BODs.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetCatalogType" id="oagis-id-892c69443f7d4b4993ac11945ae955df">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetCatalogDataAreaType" id="oagis-id-ee15b5a495dc41ad981b9d51208f4399">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetCatalog. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Catalog).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetCatalogDataAreaType" id="oagis-id-f3b6b1ccd2814525a15dce838ed2f667">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-bc552814b16a4a228c604fecf47aadd6"/>
+                        <xsd:element ref="Catalog" maxOccurs="unbounded" id="oagis-id-69c3abd98d2840899474738cdedef45f"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeCurrencyExchangeRate.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CurrencyExchangeRate.xsd"/>
+	<xsd:element name="ChangeCurrencyExchangeRate" type="ChangeCurrencyExchangeRateType" id="oagis-id-4122413c1c904b36a040187b1918f068">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeCurrencyExchangeRate is to enable an application to request specific CurrencyExchangeRate information from another business application module.  The response to the ChangeCurrencyExchangeRate is the ShowCurrencyExchangeRate.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeCurrencyExchangeRateType" id="oagis-id-eb26b4c66b5d49759c3b020a6463a7e4">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeCurrencyExchangeRateDataAreaType" id="oagis-id-37593c1c821b4f68be34ffd99422f967">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeCurrencyExchangeRate. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (CurrencyExchangeRate).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeCurrencyExchangeRateDataAreaType" id="oagis-id-6650ffe37ba74959b7c7a00c6866eeca">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-8b7e927e0cbd4b89865c61efc3c99463"/>
+			<xsd:element ref="CurrencyExchangeRate" maxOccurs="unbounded" id="oagis-id-50499d36a80f4cd3b88162e56655ccf2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

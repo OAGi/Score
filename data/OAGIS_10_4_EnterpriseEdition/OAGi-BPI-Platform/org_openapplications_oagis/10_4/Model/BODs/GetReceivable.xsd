@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetReceivable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Receivable.xsd"/>
+        <xsd:element name="GetReceivable" type="GetReceivableType" id="oagis-id-8a51033d109948758e098d645d61fac7">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetReceivable is to enable an application to request specific Receivable information from another business application module.  The response to the GetReceivable is the ShowReceivable.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetReceivableType" id="oagis-id-028ff4260ae44b9097d27b36e2ede242">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetReceivableDataAreaType" id="oagis-id-57aa0d0cec334f1994fd3bdf2868c896">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetReceivable. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Receivable).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetReceivableDataAreaType" id="oagis-id-82411c936c3549da8d73bcfc7b91ad51">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-cb57e6a1868c48919bb2e3fbae73ddee"/>
+                        <xsd:element ref="Receivable" maxOccurs="unbounded" id="oagis-id-5c1e8f5de07846d386f34c169c81e6ca"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

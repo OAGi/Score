@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/PostAcknowledgeActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ActualLedger.xsd"/>
+	<xsd:element name="PostAcknowledgeActualLedger" type="PostAcknowledgeActualLedgerType" id="oagis-id-9576ce6781d54d31ba5b469b7023078f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PostAcknowledgeActualLedger is to communicate to an enterprise application the sending systems representation of ledger information specifically requested.   This may be in response to a GetActualLedger request or to proactively publish a listing of ledger information for a business event.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PostAcknowledgeActualLedgerType" id="oagis-id-4102b98c40674ffd880649fd464d4a54">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="PostAcknowledgeActualLedgerDataAreaType" id="oagis-id-ece2a147d9b243e2ac20fcb618e90ea1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case PostAcknowledgeActualLedger. The information consists of a Verb and one or more Nouns. The verb (PostAcknowledge) indicates the action to be performed on the Noun (ActualLedger).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PostAcknowledgeActualLedgerDataAreaType" id="oagis-id-d2938e255dea49039711341eaaed3cb6">
+		<xsd:sequence>
+			<xsd:element ref="PostAcknowledge" id="oagis-id-dd3e5d111064415d9d739a73c1c1dfed"/>
+			<xsd:element ref="ActualLedger" maxOccurs="unbounded" id="oagis-id-3166f09e09d8421fba60e6726d15e0b4"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

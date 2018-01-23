@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+        <xsd:element name="ChangeRequireProduct" type="ChangeRequireProductType" id="oagis-id-80229a442183415aa0c7d1dcc4ad54ce">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeRequireProduct is to notify another application about a change in the RequireProduct</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeRequireProductType" id="oagis-id-6b463929d87b4b9a9f09d94366c67661">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeRequireProductDataAreaType" id="oagis-id-71e26dd212664a61accd503d8334037d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeRequireProduct. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeRequireProductDataAreaType" id="oagis-id-bafdadfe9ce54a078ba00b4361f516ed">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-c9dea2b49d8d45acb5b47df5083fcd3b"/>
+                        <xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-c24ffc8c2be44c3697c143cf096bc0cb"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

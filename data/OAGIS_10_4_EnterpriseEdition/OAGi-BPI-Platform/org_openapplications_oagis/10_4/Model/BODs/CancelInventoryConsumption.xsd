@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelInventoryConsumption.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryConsumption.xsd"/>
+	<xsd:element name="CancelInventoryConsumption" type="CancelInventoryConsumptionType" id="oagis-id-7d1b1eab969645eb8c9fd193bfa8acc4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelInventoryConsumption is to inform a seller or provider about InventoryConsumption of items.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelInventoryConsumptionType" id="oagis-id-e5a5c9b429134195994336787015d17b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelInventoryConsumptionDataAreaType" id="oagis-id-0070697befee4610925e9f5783a70303">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelInventoryConsumption. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (InventoryConsumption).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelInventoryConsumptionDataAreaType" id="oagis-id-be7e792806cd41179296ecdae5b5ac95">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-d1c8fae65f58410fb7983c332beba4d1"/>
+			<xsd:element ref="InventoryConsumption" maxOccurs="unbounded" id="oagis-id-fe28a27868854054a47bef9b74c3ef97"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

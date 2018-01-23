@@ -4,7 +4,6 @@ import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSSchema;
 import com.sun.xml.internal.xsom.XSType;
 import com.sun.xml.internal.xsom.parser.SchemaDocument;
-import com.sun.xml.internal.xsom.parser.XSOMParser;
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.SRTConstants;
@@ -33,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Locator;
 
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.File;
@@ -172,7 +170,7 @@ public class P_1_7_PopulateQBDTInDT {
                     ", baseTypeName='" + baseTypeName + '\'' +
                     ", typeElement=" + typeElement +
                     ", uri='" + uri + '\'' +
-                    ", module='" + module + '\'' +
+                    ", module='" + module.getModule() + '\'' +
                     '}';
         }
     }
@@ -180,41 +178,19 @@ public class P_1_7_PopulateQBDTInDT {
     private Map<String, DataTypeInfoHolder> dtiHolderMap;
 
     private void prepareForBCCP(String... systemIds) throws Exception {
+        logger.debug("Loading prepared data for importing BCCPs...");
         dtiHolderMap = new HashMap();
 
-        XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
         for (String systemId : systemIds) {
-            xsomParser.parse(systemId);
-        }
-
-        for (SchemaDocument schemaDocument : xsomParser.getDocuments()) {
-            XSSchema xsSchema = schemaDocument.getSchema();
-            Iterator<XSType> xsTypeIterator = xsSchema.iterateTypes();
-            while (xsTypeIterator.hasNext()) {
-                XSType xsType = xsTypeIterator.next();
-                String typeName = xsType.getName();
-                if (dtiHolderMap.containsKey(typeName)) {
-                    return;
-                }
-
-                Locator locator = xsType.getLocator();
-                if (locator == null) {
-                    return;
-                }
-                String systemId = locator.getSystemId();
-                Document xmlDocument = Context.loadDocument(systemId);
-
-                XPathExpression xPathExpression = Context.xPath.compile("//xsd:complexType[@name='" + typeName + "']");
-                Node node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
-                if (node == null) {
-                    xPathExpression = Context.xPath.compile("//xsd:simpleType[@name='" + typeName + "']");
-                    node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
-                    if (node == null) {
-                        return;
-                    }
-                }
+            Document xmlDocument = Context.loadDocument(systemId);
+            XPathExpression xPathExpression = Context.xPath.compile("//xsd:complexType | //xsd:simpleType");
+            NodeList nodeList = (NodeList) xPathExpression.evaluate(xmlDocument, XPathConstants.NODESET);
+            for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
+                Node node = nodeList.item(i);
+                String typeName = node.getAttributes().getNamedItem("name").getNodeValue();
                 Node idAttribute = node.getAttributes().getNamedItem("id");
                 if (idAttribute == null) {
+                    logger.debug("'" + typeName + "' hasn't have the 'id' attribute at " + systemId);
                     return;
                 }
 
@@ -227,10 +203,6 @@ public class P_1_7_PopulateQBDTInDT {
                     if (definition == null) {
                         definition = ImportUtil.toString(documentationNode.getChildNodes());
                     }
-
-                    if (systemId.contains("Fields.xsd") && definition.contains("ccts_")) {
-                        System.out.println();
-                    }
                     definitionSource = documentationNode.getAttribute("source");
                 }
 
@@ -240,6 +212,8 @@ public class P_1_7_PopulateQBDTInDT {
                 Module module = moduleRepository.findByModule(Utility.extractModuleName(systemId));
                 DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, definitionSource, baseTypeName, (Element) node, systemId, module);
                 dtiHolderMap.put(typeName, dtiHolder);
+
+                logger.debug("Loaded " + dtiHolder);
             }
         }
     }
@@ -288,6 +262,8 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTwithoutElement() throws Exception {
+        logger.debug("Populating BDTs from Fields.xsd...");
+
         NodeList elementList = fields_xsd.getNodeList("/xsd:schema/xsd:complexType | /xsd:schema/xsd:simpleType");
         for (int i = 0; i < elementList.getLength(); i++) {
             Node typeNode = elementList.item(i);
@@ -313,6 +289,8 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTAndBCCP(File file) throws Exception {
+        logger.debug("Populating BDTs and BCCPs from " + file.getName() + "...");
+
         Context context = new Context(file, moduleRepository);
         XPathHandler xHandler = new XPathHandler(file);
         NodeList elements = xHandler.getNodeList("/xsd:schema/xsd:element");
@@ -868,6 +846,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertCodeContentTypeDT() throws Exception {
+        logger.debug("Populating 'CodeContentType' BDTs...");
         String dataType = "CodeContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 
@@ -875,6 +854,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertIDContentTypeDT() throws Exception {
+        logger.debug("Populating 'IDContentType' BDTs...");
         String dataType = "IDContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 

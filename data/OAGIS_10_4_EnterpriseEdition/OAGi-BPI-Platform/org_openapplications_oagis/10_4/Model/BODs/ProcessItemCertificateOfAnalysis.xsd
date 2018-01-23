@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessItemCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ItemCertificateOfAnalysis.xsd"/>
+        <xsd:element name="ProcessItemCertificateOfAnalysis" type="ProcessItemCertificateOfAnalysisType" id="oagis-id-7759794b3c6d4a50bc8b575a111625fc">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Process ItemCertificateOfAnalysis Business Object Document is to transmit a purchase order to a supplier's order management application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessItemCertificateOfAnalysisType" id="oagis-id-9fd77602f6984520976a11354b752e0e">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessItemCertificateOfAnalysisDataAreaType" id="oagis-id-5c76f2fa1d2549f6adcca59d36b1acbb">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessItemCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ItemCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessItemCertificateOfAnalysisDataAreaType" id="oagis-id-06e83c0dc3cf46cd87a25576c8e9c150">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-aafd1b1254054fc4820a91dc5b9f5765"/>
+                        <xsd:element ref="ItemCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-611bb5b9030d4c42bb8df55d1ad938a8"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

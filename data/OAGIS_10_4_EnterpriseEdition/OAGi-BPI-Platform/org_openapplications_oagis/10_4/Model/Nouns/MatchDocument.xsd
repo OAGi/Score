@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/MatchDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="MatchDocument" type="MatchDocumentType" id="oagis-id-081cd1e7a34041f3943c1ffbb8bf39a2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies an internal document containing matching information. Essential it holds cross reference information among the customer Purchase Order and the Suppier Invoice. It supports N-way matching.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MatchDocumentHeader" type="MatchDocumentHeaderType" id="oagis-id-7963e9d82ae143878c8cda78e49b70d3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Header information for the matching document instance.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MatchDocumentLine" type="MatchDocumentLineType" id="oagis-id-40c1e97b3acf41108459c0c7fc95dfcb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Line level infoi\rmatoin for the matching doucment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MatchDocumentType" id="oagis-id-ad9da1b7415242429db6ba784c7c2144">
+		<xsd:sequence>
+			<xsd:element ref="MatchDocumentHeader" id="oagis-id-4420f0a3d4054879b21d4334751efa4e" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Header information for the matching document instance.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MatchDocumentLine" id="oagis-id-5f3f9fccc0c74b4085aad5ae741544d6" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Line level infoi\rmatoin for the matching doucment.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c827323c621a4721b2f9af9874cc415b"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-7d17b78add89469fbcb5505c868870db"/>
+	</xsd:complexType>
+	<xsd:complexType name="MatchDocumentHeaderBaseType" id="oagis-id-19eb502b550e43d7bd70dce9c3f83f36">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="DocumentType" id="oagis-id-1a589be62ce540b19d9db329e60ac828" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Types of Documents involved in a matching process. Typically the document type is one of these values: Invoice, Purchase Order, Receipt, Inspection</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LedgerID" id="oagis-id-6ed5c0fa623d4746a98372733bcb7e5f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the financial ledger to be used when updating balances</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="LedgerAmountGroup" id="oagis-id-0cb2523a3abd4fb3ab7735d6c74132cc"/>
+					<xsd:element ref="AccountingPeriod" id="oagis-id-79ea0c54d57d4c64a30b1fb8f63b8b05" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the date, accounting period and financial year.  It is also known as the effective or post date</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GLEntityID" id="oagis-id-e2eed4e8c0814c5caa0e788f34b656e6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
+
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SourceDocumentReference" id="oagis-id-190b28dd82704ea3b0d23418f76be432" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the link that ties back to a sub ledger transaction entry ID.  It is the identifier of an original/ source transaction or document.  The type indicates the type of document i.e. PurchaseOrder, Invoice, Receipt, Credit Memo, Voucher etc. For example, it could be the receipt or the summarized inventory activity.  This is the singular field that refers to an audit record.  Together with the Sender information, this is part of the referencing system, which will enable drill back audit trail functionality.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemittanceID" id="oagis-id-759e05bf0f954723bf014922f0908822" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Remittance refers to a reference identifier to print on a remittance advice, for example, supplier invoice number.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PaymentMethodCode" id="oagis-id-1e785227757a47d8a2821513b294769c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the payment method code for the associate entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SpecialPriceAuthorizationCode" id="oagis-id-b423d59bf41c4dc2ac889c75527fbbb0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the supplier's code to authorize special pricing as a result of an agreement.
+
+SYNONYMS:	Price Authorization, Price Code</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" id="oagis-id-b965f9cf0820415ca02a43a9a4262a9c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReleaseNumberID" id="oagis-id-8bbf612014214bc891b7e9ea97983cd3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Release Number in the case of Blanket POs</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EntryCreatorUser" id="oagis-id-9c518404096a4716903e69b6a3e40d9a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the user that creates the associated transaction</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-fffa1b82ca2746548d4e709ee4af7217" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PaymentTerm" id="oagis-id-b8ed0d35aefe45ff882afae652cbbe9d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the payment term for an Order or Invoice. Supports the abiility to specify an absolute due date, a number of days from a start daye, a percent discount or an absolute discount. A common term like "Net30Days" is explicitly code as either a calculated DueDateTime or a PaymentTermsDateTime and NumberOfDays.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Charge" id="oagis-id-9f5160335ce14c45a086ada222f4c930" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the different Charges that may be applied to the associated document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-f05031707b2843cabc60b9894c74587e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-deb16ab0726c42b78dcbfc7e6ab3e7a7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-9ff1743f07e74d678f931530137eb845"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-63f6c2142c7a4978a1bd3a008c3bde9e"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MatchDocumentHeaderType" id="oagis-id-91f563033b974c3fa5b2145d634c8f55">
+		<xsd:complexContent>
+			<xsd:extension base="MatchDocumentHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MatchDocumentHeaderExtensionType" id="oagis-id-30b18b9809cf4e39a1d6d5030cc94972" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MatchDocumentLineBaseType" id="oagis-id-63d8a3fb5ff64787837cc94144d5241e">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="FinancialMatchCode" id="oagis-id-23d7089dca9e498ba90b2714cf8de120" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Standard List of Invoice Matching Types. 2 stands for two way matching (Invoice, PO). 3 stands for three way matching (Invoice, PO, Receipt). 4 stands for four way matching (Invoice, PO, Receipt, Invoice)</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="LedgerAmountGroup" id="oagis-id-6c8eeb0e7ab64aa9ab98b85f64992244"/>
+					<xsd:group ref="LedgerEntryContentGroup" id="oagis-id-43bb340f18c84f29b1b155d9c4c46246"/>
+					<xsd:element ref="GLDestinationEntityID" id="oagis-id-a0faeb6efe364592b2806bd66ec58d83" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">If a value is specified for this and the value is different from the GLSourceEntity, it indicates that the entry is an inter-company transaction</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MatchDocumentLineType" id="oagis-id-ac3fde66c3ae47a793552d4857a60782">
+		<xsd:complexContent>
+			<xsd:extension base="MatchDocumentLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MatchDocumentLineExtensionType" id="oagis-id-99ab11786dda4cb6bb6c6a9c2f467ffd" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

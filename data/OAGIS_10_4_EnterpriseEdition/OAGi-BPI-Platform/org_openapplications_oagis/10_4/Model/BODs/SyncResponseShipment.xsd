@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseShipment.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Shipment.xsd"/>
+	<xsd:element name="SyncResponseShipment" type="SyncResponseShipmentType" id="oagis-id-270e490c3af24262931c50643a6292d5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">SyncResponseShipment is used to SyncResponsehronize Shipment information with other applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseShipmentType" id="oagis-id-8e3f6e44f57d4348b7ef195689d7082a">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseShipmentDataAreaType" id="oagis-id-604d0ee4c7db46feb0b658751a96621e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseShipment. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (Shipment).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseShipmentDataAreaType" id="oagis-id-f76225a2f8a34c4ba812013ff065d2d8">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-8eb88db4955f4a4bab305ca3252358ce"/>
+			<xsd:element ref="Shipment" maxOccurs="unbounded" id="oagis-id-8484e386ad244fcc8094502fba73c34e"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

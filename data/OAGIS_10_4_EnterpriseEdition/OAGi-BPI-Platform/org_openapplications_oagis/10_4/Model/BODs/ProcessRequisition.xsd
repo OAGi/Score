@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessRequisition.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Requisition.xsd"/>
+        <xsd:element name="ProcessRequisition" type="ProcessRequisitionType" id="oagis-id-6a629bcaa54d4ecf8a1e82fe160508ac">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessRequisition provides the ability to request an application/ system to create a Requisition</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessRequisitionType" id="oagis-id-1ecda75570544b0cae3de278b3802bba">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessRequisitionDataAreaType" id="oagis-id-711d3b21f65d46a78c1a92beb29d216f">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessRequisition. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Requisition).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessRequisitionDataAreaType" id="oagis-id-4f2e60dc6dcc45eda296839f0ec5502a">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-2276133d778f4b5ca5dc11dc5593cda9"/>
+                        <xsd:element ref="Requisition" maxOccurs="unbounded" id="oagis-id-ab3f5f21bc0045639fb771b77eab5042"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

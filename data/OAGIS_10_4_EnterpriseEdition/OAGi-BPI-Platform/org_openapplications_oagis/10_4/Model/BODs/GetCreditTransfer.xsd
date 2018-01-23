@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetCreditTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CreditTransfer.xsd"/>
+        <xsd:element name="GetCreditTransfer" type="GetCreditTransferType" id="oagis-id-bcb21e375da64fe98734a0d861d075ad">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetCreditTransfer is to enable an application to request specific CreditTransfer information from another business application module.  The response to the GetCreditTransfer is the ShowCreditTransfer.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetCreditTransferType" id="oagis-id-309199ef01b444b99bd4e3e9e0ac18df">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetCreditTransferDataAreaType" id="oagis-id-6d94f88c22014123884c70a582441db1">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetCreditTransfer. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (CreditTransfer).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetCreditTransferDataAreaType" id="oagis-id-f54dfc7cd684474b9600c02041baf1d2">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-9d353fdd115243f3b9f8cf613acdd094"/>
+                        <xsd:element ref="CreditTransfer" maxOccurs="unbounded" id="oagis-id-c9af8c5040d04a1ea553c0ae679aaa56"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

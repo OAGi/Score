@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+        <xsd:element name="ProcessReceiveDelivery" type="ProcessReceiveDeliveryType" id="oagis-id-7ef3d3ca05f14b9d973361aedcc56f75">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessReceiveDelivery provides the ability to request an application/ system to create a ReceiveDelivery</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessReceiveDeliveryType" id="oagis-id-8ad3898d4a3f41b8afd99d765b23f251">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessReceiveDeliveryDataAreaType" id="oagis-id-aed48cf23bd5425bb293619f54669024">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessReceiveDeliveryDataAreaType" id="oagis-id-a9fad167cd284fb0a9e283350fc376e1">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-396aaa2ca8fe42c18c6e616a08446397"/>
+                        <xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-d76af0c2cb884d2e9920a902d0164bed"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

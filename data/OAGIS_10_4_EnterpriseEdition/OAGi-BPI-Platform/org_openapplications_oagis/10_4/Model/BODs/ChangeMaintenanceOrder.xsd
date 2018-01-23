@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeMaintenanceOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MaintenanceOrder.xsd"/>
+        <xsd:element name="ChangeMaintenanceOrder" type="ChangeMaintenanceOrderType" id="oagis-id-a067a368285943ea804e900d9c6effaf">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeMaintenanceOrder is to notify another application about a change in the MaintenanceOrder</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeMaintenanceOrderType" id="oagis-id-fe5b619ef42f461a9d6c33e8e2f662d8">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeMaintenanceOrderDataAreaType" id="oagis-id-bdc7889c7edc4b2ea8e060f1050381e8">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeMaintenanceOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (MaintenanceOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeMaintenanceOrderDataAreaType" id="oagis-id-041112594c654ef0afc7880952511d3b">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-4b2e66a5c06a408989b76cc57c4ae305"/>
+                        <xsd:element ref="MaintenanceOrder" maxOccurs="unbounded" id="oagis-id-47a93a2eb5fb402e82ef8ef25e588cff"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>
