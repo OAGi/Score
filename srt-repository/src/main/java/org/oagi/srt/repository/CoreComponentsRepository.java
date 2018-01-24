@@ -28,7 +28,7 @@ public class CoreComponentsRepository {
                 "SELECT 'ACC' as type, acc.acc_id AS id, acc.guid, acc.den, acc.owner_user_id, u.login_id AS owner, acc.release_id, acc.state, " +
                 "acc.oagis_component_type, acc.last_updated_by, acc.last_update_timestamp, m.module, acc.definition " +
                 "FROM acc JOIN app_user u ON acc.owner_user_id = u.app_user_id LEFT JOIN module m ON acc.module_id = m.module_id " +
-                "WHERE acc.revision_num = 0 AND acc.release_id IS NULL");
+                "WHERE acc.revision_num = 0 AND acc.release_id IS NULL AND acc.oagis_component_type <> " + OagisComponentType.UserExtensionGroup.getValue());
         FIND_STATEMENT_FOR_CURRENT_RELEASE_MAP_BY_TYPES.put("ASCC",
                 "SELECT 'ASCC' as type, ascc.ascc_id AS id, ascc.guid, ascc.den, ascc.owner_user_id, u.login_id AS owner, ascc.release_id, ascc.state, " +
                 "0 AS oagis_component_type, ascc.last_updated_by, ascc.last_update_timestamp, null AS module, ascc.definition " +
@@ -63,7 +63,7 @@ public class CoreComponentsRepository {
                 "SELECT 'ACC' as type, acc.acc_id AS id, acc.guid, acc.den, acc.owner_user_id, u.login_id AS owner, acc.release_id, acc.state, " +
                 "acc.oagis_component_type, acc.last_updated_by, acc.last_update_timestamp, m.module, acc.definition " +
                 "FROM acc JOIN app_user u ON acc.owner_user_id = u.app_user_id LEFT JOIN module m ON acc.module_id = m.module_id " +
-                "WHERE acc.revision_num > 0 AND acc.release_id <= :releaseId");
+                "WHERE acc.revision_num > 0 AND acc.release_id <= :releaseId AND acc.oagis_component_type <> " + OagisComponentType.UserExtensionGroup.getValue());
         FIND_STATEMENT_FOR_FIXED_RELEASE_MAP_BY_TYPES.put("ASCC",
                 "SELECT 'ASCC' as type, ascc.ascc_id AS id, ascc.guid, ascc.den, ascc.owner_user_id, u.login_id AS owner, ascc.release_id, ascc.state, " +
                 "0 AS oagis_component_type, ascc.last_updated_by, ascc.last_update_timestamp, null AS module, ascc.definition " +

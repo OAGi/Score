@@ -51,7 +51,7 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
-                                                      AssociationCoreComponentProperty asccp, User user) {
+                                                      AssociationCoreComponentProperty asccp, long releaseId, User user) {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
@@ -59,38 +59,38 @@ public class ExtensionService {
         if (ueAcc != null) {
             updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, user);
         } else {
-            createNewUserExtensionGroupACC(eAcc, user);
+            createNewUserExtensionGroupACC(eAcc, releaseId, user);
         }
 
-        return eAcc;
+        return ueAcc;
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(
-            AssociationCoreComponentProperty asccp, User user, boolean isLocally) {
+            AssociationCoreComponentProperty asccp, long releaseId, User user, boolean isLocally) {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
 
-        AggregateCoreComponent eAcc = getExtensionAcc(asccp, isLocally);
-        AggregateCoreComponent ueAcc = getExistsUserExtension(eAcc);
+        AggregateCoreComponent eAcc = getExtensionAcc(asccp, releaseId, isLocally);
+        AggregateCoreComponent ueAcc = getExistsUserExtension(eAcc, releaseId);
 
-        return appendUserExtension(eAcc, ueAcc, asccp, user);
+        return appendUserExtension(eAcc, ueAcc, asccp, releaseId, user);
     }
 
-    public AggregateCoreComponent getExtensionAcc(AssociationCoreComponentProperty asccp, boolean isLocally) {
-        AggregateCoreComponent eAcc = accRepository.findOne(asccp.getRoleOfAccId());
+    public AggregateCoreComponent getExtensionAcc(AssociationCoreComponentProperty asccp, long releaseId, boolean isLocally) {
+        AggregateCoreComponent eAcc = coreComponentService.findRoleOfAcc(asccp, releaseId);
         if (!isLocally) { // isGlobally
-            eAcc = getAllExtensionAcc(eAcc);
+            eAcc = getAllExtensionAcc(eAcc, releaseId);
         }
         return eAcc;
     }
 
-    private AggregateCoreComponent getAllExtensionAcc(AggregateCoreComponent eAcc) {
+    private AggregateCoreComponent getAllExtensionAcc(AggregateCoreComponent eAcc, long releaseId) {
         while (!"All Extension".equals(eAcc.getObjectClassTerm())) {
             long basedAccId = eAcc.getBasedAccId();
             if (basedAccId > 0L) {
-                eAcc = accRepository.findOne(basedAccId);
+                eAcc = coreComponentService.findBasedAcc(eAcc, releaseId, Published);
             } else {
                 throw new IllegalStateException();
             }
@@ -98,9 +98,25 @@ public class ExtensionService {
         return eAcc;
     }
 
-    public AggregateCoreComponent getExistsUserExtension(AggregateCoreComponent eAcc) {
-        for (AssociationCoreComponent ascc : asccRepository.findByFromAccIdAndRevisionNum(eAcc.getAccId(), 0)) {
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+    public AggregateCoreComponent getExistsUserExtension(AggregateCoreComponent eAcc, long releaseId) {
+        List<AssociationCoreComponent> asccList =
+                coreComponentService.findAscc(eAcc, releaseId, Published).stream()
+                        .filter(e -> e.getReleaseId() == releaseId)
+                        .collect(Collectors.toList());
+
+        for (AssociationCoreComponent ascc : asccList) {
+            List<AssociationCoreComponentProperty> asccpList =
+                    asccpRepository.findByCurrentAsccpIdAndReleaseId(ascc.getToAsccpId(), releaseId).stream()
+                            .filter(e -> e.getReleaseId() == releaseId)
+                            .collect(Collectors.toList());
+
+            if (asccpList.isEmpty()) {
+                continue;
+            }
+
+            assert asccpList.size() == 1;
+
+            AssociationCoreComponentProperty asccp = asccpList.get(0);
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
             if (acc.getOagisComponentType() == UserExtensionGroup) {
                 return acc;
@@ -111,15 +127,15 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent createNewUserExtensionGroupACC(
-            AggregateCoreComponent eAcc, User currentLoginUser) {
+            AggregateCoreComponent eAcc, long releaseId, User currentLoginUser) {
         AggregateCoreComponent ueAcc = createACCForExtension(eAcc, currentLoginUser);
         createACCHistoryForExtension(ueAcc, 1);
 
         AssociationCoreComponentProperty ueAsccp = createASCCPForExtension(eAcc, currentLoginUser, ueAcc);
-        createASCCPHistoryForExtension(ueAsccp, 1);
+        createASCCPHistoryForExtension(ueAsccp, 1, releaseId);
 
         AssociationCoreComponent ueAscc = createASCCForExtension(eAcc, currentLoginUser, ueAcc, ueAsccp);
-        createASCCHistoryForExtension(ueAscc, 1);
+        createASCCHistoryForExtension(ueAscc, 1, releaseId);
 
         return ueAcc;
     }
@@ -165,7 +181,10 @@ public class ExtensionService {
         ueAcc.setState(Editing);
         ueAcc.setRevisionNum(0);
         ueAcc.setRevisionTrackingNum(0);
-        ueAcc.setNamespaceId(namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10"));
+
+        long namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
+        ueAcc.setNamespaceId(namespaceId);
+
         return ccDAO.save(ueAcc);
     }
 
@@ -178,10 +197,18 @@ public class ExtensionService {
     }
 
     private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum) {
+        createACCHistoryForExtension(ueAcc, revisionNum, 0L);
+    }
+
+    private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum, long releaseId) {
         AggregateCoreComponent accHistory = ueAcc.clone();
         accHistory.setRevisionNum(revisionNum);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(Insert);
+        accHistory.setCurrentAccId(ueAcc.getAccId());
+        if (releaseId > 0L) {
+            accHistory.setReleaseId(releaseId);
+        }
         ccDAO.save(accHistory);
     }
 
@@ -208,7 +235,15 @@ public class ExtensionService {
     }
 
     private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum) {
+        createASCCPHistoryForExtension(ueAsccp, revisionNum, 0L);
+    }
+
+    private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum, long releaseId) {
         AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp, revisionNum);
+        asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
+        if (releaseId > 0L) {
+            asccpHistory.setReleaseId(releaseId);
+        }
         ccDAO.save(asccpHistory);
     }
 
@@ -216,7 +251,9 @@ public class ExtensionService {
                                                             User currentLoginUser,
                                                             AggregateCoreComponent ueAcc,
                                                             AssociationCoreComponentProperty ueAsccp) {
-        AssociationCoreComponent ueAscc = createASCC(eAcc, ueAsccp, currentLoginUser, 1);
+
+        AggregateCoreComponent fromAcc = accRepository.findOne(eAcc.getCurrentAccId());
+        AssociationCoreComponent ueAscc = createASCC(fromAcc, ueAsccp, currentLoginUser, 1);
         ueAscc.setCardinalityMin(1);
         ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
         ueAscc.setState(Published);
@@ -236,7 +273,15 @@ public class ExtensionService {
     }
 
     private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum) {
+        createASCCHistoryForExtension(ueAscc, revisionNum, 0L);
+    }
+
+    private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum, long releaseId) {
         AssociationCoreComponent asccHistory = createASCCHistory(ueAscc, revisionNum);
+        asccHistory.setCurrentAsccId(ueAscc.getAsccId());
+        if (releaseId > 0L) {
+            asccHistory.setReleaseId(releaseId);
+        }
         ccDAO.save(asccHistory);
     }
 

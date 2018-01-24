@@ -864,7 +864,7 @@ public class TopLevelABIEHandler implements Serializable {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
 
-            extensionService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
+            extensionService.createNewUserExtensionGroupACC(eAcc, 0L, currentLoginUser);
         }
     }
 
@@ -1448,12 +1448,12 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void createABIEExtensionLocally() {
         User currentLoginUser = getCurrentLoginUser();
-        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), 0L, currentLoginUser);
     }
 
     public void createABIEExtensionGlobally() {
         User currentLoginUser = getCurrentLoginUser();
-        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), 0L, currentLoginUser);
     }
 
     private User getCurrentLoginUser() {

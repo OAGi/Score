@@ -220,9 +220,10 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         ASBIEPNode asbieNode = (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
+        long releaseId = topLevelAbie.getReleaseId();
 
-        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, releaseId, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc, releaseId);
         if (ueAcc != null) {
             CoreComponentState ueAccState = ueAcc.getState();
 
@@ -237,13 +238,13 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             }
 
             if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Candidate) {
-                redirectABIEExtension(isLocally, eAcc);
+                redirectABIEExtension(ueAcc);
                 return;
             }
         }
 
         try {
-            eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
+            ueAcc = extensionService.appendUserExtension(asccp, releaseId, user, isLocally);
         } catch (PermissionDeniedDataAccessException e) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
@@ -254,7 +255,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             throw t;
         }
 
-        redirectABIEExtension(isLocally, eAcc);
+        redirectABIEExtension(ueAcc);
     }
 
     public CoreComponentState getABIEExtensionState(boolean isLocally) {
@@ -265,27 +266,15 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         ASBIEPNode asbieNode =
                 (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
+        long releaseId = topLevelAbie.getReleaseId();
 
-        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, releaseId, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc, releaseId);
         return (ueAcc != null) ? ueAcc.getState() : null;
     }
 
-    public void redirectABIEExtension(boolean isLocally) throws IOException {
-        redirectABIEExtension(isLocally, null);
-    }
-
-    public void redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) throws IOException {
-        TreeNode treeNode = getSelectedTreeNode();
-        ASBIEPNode asbieNode =
-                (ASBIEPNode) treeNode.getData();
-        AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
-
-        if (eAcc == null) {
-            eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        }
-
+    public void redirectABIEExtension(AggregateCoreComponent ueAcc) throws IOException {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        externalContext.redirect("/core_component/extension/" + eAcc.getAccId());
+        externalContext.redirect("/core_component/extension/" + ueAcc.getAccId());
     }
 }

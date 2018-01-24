@@ -1,8 +1,11 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.*;
+import org.oagi.srt.model.node.ASCCPNode;
+import org.oagi.srt.model.node.BCCPNode;
+import org.oagi.srt.model.node.CCNode;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.AssociationCoreComponentRepository;
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
@@ -26,7 +29,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
@@ -52,6 +58,8 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
 
     private AggregateCoreComponent targetAcc;
     private AggregateCoreComponent userExtensionAcc;
@@ -67,13 +75,25 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
+        AggregateCoreComponent ueAcc = accRepository.findOne(Long.parseLong(accId));
+        setUserExtensionAcc(ueAcc);
+
+        List<AssociationCoreComponentProperty> asccpList =
+                asccpRepository.findByRoleOfAccId(ueAcc.getAccId()).stream()
+                        .filter(e -> e.getReleaseId() == 0L)
+                        .collect(Collectors.toList());
+        assert asccpList.size() == 1;
+
+        List<AssociationCoreComponent> asccList =
+                asccRepository.findByToAsccpIdAndRevisionNumAndState(asccpList.get(0).getAsccpId(), 1, Published);
+        assert asccList.size() == 1;
+
+        AssociationCoreComponent ascc = asccList.get(0);
+        AggregateCoreComponent targetAcc = coreComponentService.findAcc(ascc.getFromAccId(), ascc.getReleaseId());
         setTargetAcc(targetAcc);
 
         TreeNode treeNode = createTreeNode(targetAcc, false);
         setTreeNode(treeNode);
-
-        setUserExtensionAcc(extensionService.findUserExtensionAcc(targetAcc));
     }
 
     @Override

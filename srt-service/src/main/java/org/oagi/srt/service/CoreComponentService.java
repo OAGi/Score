@@ -1514,11 +1514,27 @@ public class CoreComponentService {
 
     public AggregateCoreComponent findBasedAcc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
         long basedAccId = acc.getBasedAccId();
+        return findAcc(basedAccId, releaseId, state);
+    }
+
+    public AggregateCoreComponent findAcc(long accId, long releaseId) {
+        return findAcc(accId, releaseId, null);
+    }
+
+    public AggregateCoreComponent findAcc(long accId, long releaseId, CoreComponentState state) {
         if (releaseId <= 0L) {
-            return accRepository.findOneByAccIdAndRevisionNumAndState(basedAccId, 0, state);
+            if (state == null) {
+                return accRepository.findOne(accId);
+            } else {
+                return accRepository.findOneByAccIdAndRevisionNumAndState(accId, 0, state);
+            }
         } else {
-            List<AggregateCoreComponent> accList =
-                    accRepository.findByCurrentAccIdAndReleaseIdAndState(basedAccId, releaseId, state);
+            List<AggregateCoreComponent> accList;
+            if (state == null) {
+                accList = accRepository.findByCurrentAccIdAndReleaseId(accId, releaseId);
+            } else {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdAndState(accId, releaseId, state);
+            }
             if (accList.isEmpty()) {
                 return null;
             }
@@ -1535,14 +1551,13 @@ public class CoreComponentService {
 
             for (AggregateCoreComponent e : accList) {
                 if (e.getReleaseId() == maxReleaseId &&
-                    e.getRevisionNum() == maxRevisionNum &&
-                    e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                        e.getRevisionNum() == maxRevisionNum &&
+                        e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
                     return e;
                 }
             }
 
             throw new IllegalStateException();
-
         }
     }
 
