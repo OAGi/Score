@@ -4,10 +4,12 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "module")
-public class Module implements Serializable {
+public class Module implements NamespaceAware, TimestampAware, CreatorModifierAware, Serializable {
 
     public static final String SEQUENCE_NAME = "MODULE_ID_SEQ";
 
@@ -37,6 +39,23 @@ public class Module implements Serializable {
 
     @Column(length = 45)
     private String versionNum;
+
+    @Column(nullable = false, updatable = false)
+    private long createdBy;
+
+    @Column(nullable = false)
+    private long lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
+    private long ownerUserId;
 
     public long getModuleId() {
         return moduleId;
@@ -79,6 +98,70 @@ public class Module implements Serializable {
     }
 
     @Override
+    public long getCreatedBy() {
+        return createdBy;
+    }
+
+    @Override
+    public void setCreatedBy(long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    @Override
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    @Override
+    public Date getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    @Override
+    public void setCreationTimestamp(Date creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }
+
+    @Override
+    public Date getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    @Override
+    public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    public long getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(long ownerUserId) {
+        this.ownerUserId = ownerUserId;
+    }
+
+    @Override
+    public long getNamespaceId() {
+        if (getNamespace() != null) {
+            return getNamespace().getNamespaceId();
+        } else {
+            return 0L;
+        }
+    }
+
+    @Override
+    public void setNamespaceId(Long namespaceId) {
+        Namespace n = new Namespace();
+        n.setNamespaceId(namespaceId);
+        setNamespace(n);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -91,12 +174,7 @@ public class Module implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = (int) (moduleId ^ (moduleId >>> 32));
-        result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + (release != null ? release.hashCode() : 0);
-        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
-        result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
-        return result;
+        return Objects.hash(moduleId, module, release, namespace, versionNum, createdBy, lastUpdatedBy, creationTimestamp, lastUpdateTimestamp, ownerUserId);
     }
 
     @Override
