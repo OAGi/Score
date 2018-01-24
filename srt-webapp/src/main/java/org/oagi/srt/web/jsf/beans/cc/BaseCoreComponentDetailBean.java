@@ -53,6 +53,13 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         return root;
     }
 
+    public TreeNode createTreeNode(AggregateCoreComponent acc, long releaseId, boolean enableShowingGroup) {
+        ACCNode accNode = nodeService.createCoreComponentTreeNode(acc, releaseId, enableShowingGroup);
+        TreeNode root = new DefaultTreeNode();
+        toTreeNode(accNode, root);
+        return root;
+    }
+
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, boolean enableShowingGroup) {
         ASCCPNode asccpNode = nodeService.createCoreComponentTreeNode(asccp, enableShowingGroup);
         TreeNode root = new DefaultTreeNode();
@@ -205,31 +212,15 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
 
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-        CCNode ccNode = (CCNode) treeNode.getData();
-        Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
-        if (expanded == null || expanded == false) {
-            if (ccNode.hasChild() || ((ccNode instanceof ACCNode) && ((ACCNode) ccNode).getBase() != null)) {
-                clearChildren(treeNode);
-            }
-
-            if (ccNode instanceof ACCNode) {
-                ACCNode accNode = (ACCNode) ccNode;
-                ACCNode baseAccNode = accNode.getBase();
-                if (baseAccNode != null) {
-                    toTreeNode(baseAccNode, treeNode);
-                }
-            }
-            if (ccNode.hasChild()) {
-                for (CCNode child : ccNode.getChildren()) {
-                    toTreeNode(child, treeNode);
-                }
-            }
-            ccNode.setAttribute("expanded", true);
-        }
+        expand(treeNode);
     }
 
     public void expand(TreeNode node) {
         DefaultTreeNode treeNode = (DefaultTreeNode) node;
+        expand(treeNode);
+    }
+
+    private void expand(DefaultTreeNode treeNode) {
         CCNode ccNode = (CCNode) treeNode.getData();
         Boolean expanded = (Boolean) ccNode.getAttribute("expanded");
         if (expanded == null || expanded == false) {

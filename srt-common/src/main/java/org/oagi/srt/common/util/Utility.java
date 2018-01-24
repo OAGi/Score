@@ -628,7 +628,8 @@ public class Utility {
             }
 
             SpellChecker spellChecker = new SpellChecker(directory, new LuceneLevenshteinDistance());
-            spellChecker.indexDictionary(new LuceneDictionary(reader, field), new IndexWriterConfig(), true);
+            spellChecker.indexDictionary(new LuceneDictionary(reader, field),
+                    new IndexWriterConfig(new CaseSensitiveStandardAnalyzer()), true);
             return Arrays.asList(spellChecker.suggestSimilar(word, 10));
         } catch (IOException | ParseException e) {
             throw new IllegalStateException(e);
@@ -673,7 +674,7 @@ public class Utility {
 
         Directory directory = new RAMDirectory();
 
-        IndexWriterConfig conf = new IndexWriterConfig();
+        IndexWriterConfig conf = new IndexWriterConfig(new CaseSensitiveStandardAnalyzer());
         IndexWriter indexWriter = null;
         try {
             indexWriter = new IndexWriter(directory, conf);
@@ -702,7 +703,7 @@ public class Utility {
             Function<T, String>... functions) {
 
         Directory directory = new RAMDirectory();
-        IndexWriterConfig conf = new IndexWriterConfig();
+        IndexWriterConfig conf = new IndexWriterConfig(new CaseSensitiveStandardAnalyzer());
         IndexWriter indexWriter = null;
         try {
             indexWriter = new IndexWriter(directory, conf);

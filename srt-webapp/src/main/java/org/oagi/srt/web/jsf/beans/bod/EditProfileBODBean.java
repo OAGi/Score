@@ -71,7 +71,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             return;
         }
         setTopLevelAbie(topLevelAbie);
-
         createTreeNode(topLevelAbie);
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =

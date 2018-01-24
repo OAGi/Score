@@ -7,35 +7,14 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 public class CaseSensitiveStandardAnalyzer extends StopwordAnalyzerBase {
 
-    /** An unmodifiable set containing some common English words that are not usually useful
-     for searching.*/
-    public static final CharArraySet ENGLISH_STOP_WORDS_SET;
-
-    static {
-        final List<String> stopWords = Arrays.asList(
-                "a", "an", "and", "are", "as", "at", "be", "but", "by",
-                "for", "if", "in", "into", "is", "it",
-                "no", "not", "of", "on", "or", "such",
-                "that", "the", "their", "then", "there", "these",
-                "they", "this", "to", "was", "will", "with"
-        );
-        final CharArraySet stopSet = new CharArraySet(stopWords, false);
-        ENGLISH_STOP_WORDS_SET = CharArraySet.unmodifiableSet(stopSet);
-    }
-
     /** Default maximum allowed token length */
-    public static final int DEFAULT_MAX_TOKEN_LENGTH = 255;
+    public static final int DEFAULT_MAX_TOKEN_LENGTH = 65535;
 
     private int maxTokenLength = DEFAULT_MAX_TOKEN_LENGTH;
-
-    /** An unmodifiable set containing some common English words that are usually not
-     useful for searching. */
-    public static final CharArraySet STOP_WORDS_SET = ENGLISH_STOP_WORDS_SET;
 
     /** Builds an analyzer with the given stop words.
      * @param stopWords stop words */
@@ -43,10 +22,8 @@ public class CaseSensitiveStandardAnalyzer extends StopwordAnalyzerBase {
         super(stopWords);
     }
 
-    /** Builds an analyzer with the default stop words ({@link #STOP_WORDS_SET}).
-     */
     public CaseSensitiveStandardAnalyzer() {
-        this(STOP_WORDS_SET);
+        this(new CharArraySet(Collections.emptyList(), false));
     }
 
     /** Builds an analyzer with the stop words from the given reader.

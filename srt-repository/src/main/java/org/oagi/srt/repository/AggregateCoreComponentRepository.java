@@ -109,11 +109,17 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select a from AggregateCoreComponent a where a.releaseId = ?1")
     List<AggregateCoreComponent> findByReleaseId(long releaseId);
 
-    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2")
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId = ?2")
     List<AggregateCoreComponent> findByCurrentAccIdAndReleaseId(long currentAccId, long releaseId);
 
-    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2 and a.state = ?3")
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2")
+    List<AggregateCoreComponent> findByCurrentAccIdAndReleaseIdLessThanEqual(long currentAccId, long releaseId);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId = ?2 and a.state = ?3")
     List<AggregateCoreComponent> findByCurrentAccIdAndReleaseIdAndState(long currentAccId, long releaseId, CoreComponentState state);
+
+    @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1 and a.releaseId <= ?2 and a.state = ?3")
+    List<AggregateCoreComponent> findByCurrentAccIdAndReleaseIdLessThanEqualAndState(long currentAccId, long releaseId, CoreComponentState state);
 
     @Query("select a from AggregateCoreComponent a where a.currentAccId = ?1")
     List<AggregateCoreComponent> findByCurrentAccId(long currentAccId);

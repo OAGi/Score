@@ -1018,7 +1018,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
 
         User user = getCurrentUser();
-        ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
+        ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, 0L, user);
 
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
@@ -1265,7 +1265,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         }
 
         User user = getCurrentUser();
-        ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
+        ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, 0L, user);
 
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();

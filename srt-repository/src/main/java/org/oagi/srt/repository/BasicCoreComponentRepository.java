@@ -21,8 +21,11 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
-    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId <= ?2")
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId = ?2")
     public List<BasicCoreComponent> findByFromAccIdAndReleaseId(long fromAccId, long releaseId);
+
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId <= ?2")
+    public List<BasicCoreComponent> findByFromAccIdAndReleaseIdLessThanEqual(long fromAccId, long releaseId);
 
     @Query("select count(b) from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
     public int countByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
@@ -30,8 +33,11 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2 and b.state = ?3")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
 
-    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId <= ?2 and b.state = ?3")
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId = ?2 and b.state = ?3")
     public List<BasicCoreComponent> findByFromAccIdAndReleaseIdAndState(long fromAccId, long releaseId, CoreComponentState state);
+
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum > 0 and b.releaseId <= ?2 and b.state = ?3")
+    public List<BasicCoreComponent> findByFromAccIdAndReleaseIdLessThanEqualAndState(long fromAccId, long releaseId, CoreComponentState state);
 
     @Query("select count(b) from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2 and b.state = ?3")
     public int countByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
@@ -85,13 +91,13 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     public Integer findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseId(long fromAccId, long toBccpId, long releaseId);
 
     @Query("select COALESCE(MAX(b.revisionNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.releaseId <= ?3")
-    public Integer findMaxRevisionNumByFromAccIdAndToBccpIdAndLessThanReleaseId(long fromAccId, long toBccpId, long releaseId);
+    public Integer findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseIdLessThanEqual(long fromAccId, long toBccpId, long releaseId);
 
     @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3 and b.releaseId = ?4")
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseId(long fromAccId, long toBccpId, int revisionNum, long releaseId);
 
     @Query("select COALESCE(MAX(b.revisionTrackingNum), 0) from BasicCoreComponent b where b.fromAccId = ?1 and b.toBccpId = ?2 and b.revisionNum = ?3 and b.releaseId <= ?4")
-    public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndLessThanReleaseId(long fromAccId, long toBccpId, int revisionNum, long releaseId);
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseIdLessThanEqual(long fromAccId, long toBccpId, int revisionNum, long releaseId);
 
     @Modifying
     @Query("update BasicCoreComponent b set b.state = ?2 where b.fromAccId = ?1")

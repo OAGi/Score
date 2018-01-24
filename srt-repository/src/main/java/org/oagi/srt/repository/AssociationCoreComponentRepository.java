@@ -25,8 +25,11 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2")
     public List<AssociationCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
-    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId <= ?2")
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId = ?2")
     public List<AssociationCoreComponent> findByFromAccIdAndReleaseId(long fromAccId, long releaseId);
+
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId <= ?2")
+    public List<AssociationCoreComponent> findByFromAccIdAndReleaseIdLessThanEqual(long fromAccId, long releaseId);
 
     @Query("select count(a) from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2")
     public int countByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
@@ -34,8 +37,11 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2 and a.state = ?3")
     public List<AssociationCoreComponent> findByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
 
-    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId <= ?2 and a.state = ?3")
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId = ?2 and a.state = ?3")
     public List<AssociationCoreComponent> findByFromAccIdAndReleaseIdAndState(long fromAccId, long releaseId, CoreComponentState state);
+
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum > 0 and a.releaseId <= ?2 and a.state = ?3")
+    public List<AssociationCoreComponent> findByFromAccIdAndReleaseIdLessThanEqualAndState(long fromAccId, long releaseId, CoreComponentState state);
 
     @Query("select count(a) from AssociationCoreComponent a where a.fromAccId = ?1 and a.revisionNum = ?2 and a.state = ?3")
     public int countByFromAccIdAndRevisionNumAndState(long fromAccId, int revisionNum, CoreComponentState state);
@@ -91,13 +97,13 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public Integer findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseId(long fromAccId, long toAsccpId, long releaseId);
 
     @Query("select COALESCE(MAX(a.revisionNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.releaseId <= ?3")
-    public Integer findMaxRevisionNumByFromAccIdAndToAsccpIdAndLessThanReleaseId(long fromAccId, long toAsccpId, long releaseId);
+    public Integer findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseIdLessThanEqual(long fromAccId, long toAsccpId, long releaseId);
 
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.releaseId = ?4")
     public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseId(long fromAccId, long toAsccpId, int revisionNum,  long releaseId);
 
     @Query("select COALESCE(MAX(a.revisionTrackingNum), 0) from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3 and a.releaseId <= ?4")
-    public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndLessThanReleaseId(long fromAccId, long toAsccpId, int revisionNum,  long releaseId);
+    public Integer findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseIdLessThanEqual(long fromAccId, long toAsccpId, int revisionNum, long releaseId);
 
     @Modifying
     @Query("delete from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2 and a.revisionNum = ?3")

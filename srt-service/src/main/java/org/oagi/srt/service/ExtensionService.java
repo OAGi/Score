@@ -57,9 +57,10 @@ public class ExtensionService {
         }
 
         if (ueAcc != null) {
-            updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, user);
+            eAcc = accRepository.findOne(eAcc.getCurrentAccId());
+            updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, releaseId, user);
         } else {
-            createNewUserExtensionGroupACC(eAcc, releaseId, user);
+            ueAcc = createNewUserExtensionGroupACC(eAcc, releaseId, user);
         }
 
         return ueAcc;
@@ -106,9 +107,7 @@ public class ExtensionService {
 
         for (AssociationCoreComponent ascc : asccList) {
             List<AssociationCoreComponentProperty> asccpList =
-                    asccpRepository.findByCurrentAsccpIdAndReleaseId(ascc.getToAsccpId(), releaseId).stream()
-                            .filter(e -> e.getReleaseId() == releaseId)
-                            .collect(Collectors.toList());
+                    asccpRepository.findByCurrentAsccpIdAndReleaseId(ascc.getToAsccpId(), releaseId);
 
             if (asccpList.isEmpty()) {
                 continue;
@@ -129,7 +128,7 @@ public class ExtensionService {
     public AggregateCoreComponent createNewUserExtensionGroupACC(
             AggregateCoreComponent eAcc, long releaseId, User currentLoginUser) {
         AggregateCoreComponent ueAcc = createACCForExtension(eAcc, currentLoginUser);
-        createACCHistoryForExtension(ueAcc, 1);
+        createACCHistoryForExtension(ueAcc, 1, releaseId);
 
         AssociationCoreComponentProperty ueAsccp = createASCCPForExtension(eAcc, currentLoginUser, ueAcc);
         createASCCPHistoryForExtension(ueAsccp, 1, releaseId);
@@ -142,13 +141,14 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent updateRevisionNumberOfUserExtensionGroupACC(
-            AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc, User currentLoginUser) {
+            AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc, long releaseId, User currentLoginUser) {
+
         updateStateACCForException(ueAcc, currentLoginUser);
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(ueAcc.getAccId());
         int latestRevisionNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionNum())
                 .max().orElse(0);
-        createACCHistoryForExtension(ueAcc, latestRevisionNum + 1);
+        createACCHistoryForExtension(ueAcc, latestRevisionNum + 1, releaseId);
 
         AssociationCoreComponentProperty ueAsccp = updateASCCPForExtension(ueAcc, currentLoginUser);
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
@@ -156,14 +156,14 @@ public class ExtensionService {
         latestRevisionNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionNum())
                 .max().orElse(0);
-        createASCCPHistoryForExtension(ueAsccp, latestRevisionNum + 1);
+        createASCCPHistoryForExtension(ueAsccp, latestRevisionNum + 1, releaseId);
 
         AssociationCoreComponent ueAscc = updateASCCForException(eAcc, ueAsccp, currentLoginUser);
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(ueAscc.getAsccId());
         latestRevisionNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionNum())
                 .max().orElse(0);
-        createASCCHistoryForExtension(ueAscc, latestRevisionNum + 1);
+        createASCCHistoryForExtension(ueAscc, latestRevisionNum + 1, releaseId);
 
         return ueAcc;
     }
@@ -194,10 +194,6 @@ public class ExtensionService {
         ueAcc.setOwnerUserId(currentLoginUser.getAppUserId());
         ccDAO.save(ueAcc);
         return ueAcc;
-    }
-
-    private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum) {
-        createACCHistoryForExtension(ueAcc, revisionNum, 0L);
     }
 
     private void createACCHistoryForExtension(AggregateCoreComponent ueAcc, int revisionNum, long releaseId) {
@@ -234,10 +230,6 @@ public class ExtensionService {
         return ccDAO.save(asccp);
     }
 
-    private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum) {
-        createASCCPHistoryForExtension(ueAsccp, revisionNum, 0L);
-    }
-
     private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp, int revisionNum, long releaseId) {
         AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp, revisionNum);
         asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
@@ -270,10 +262,6 @@ public class ExtensionService {
         ascc.addUpdateEventListener(new CreatorModifierAwareEventListener(currentLoginUser));
         ascc.setOwnerUserId(currentLoginUser.getAppUserId());
         return ccDAO.save(ascc);
-    }
-
-    private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum) {
-        createASCCHistoryForExtension(ueAscc, revisionNum, 0L);
     }
 
     private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc, int revisionNum, long releaseId) {
@@ -450,13 +438,16 @@ public class ExtensionService {
     @Transactional(rollbackFor = Throwable.class)
     public AppendAsccResult appendAsccTo(AggregateCoreComponent pAcc,
                                          AssociationCoreComponentProperty tAsccp,
-                                         User user) {
+                                         long releaseId, User user) {
 
         int seqKey = nextSeqKey(pAcc);
         AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
         ccDAO.save(tAscc);
 
         AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc, tAscc.getRevisionNum() + 1);
+        if (releaseId > 0L) {
+            tAsccHistory.setReleaseId(releaseId);
+        }
         ccDAO.save(tAsccHistory);
 
         return new AppendAsccResult(tAscc, tAsccHistory);
@@ -542,12 +533,15 @@ public class ExtensionService {
     @Transactional(rollbackFor = Throwable.class)
     public AppendBccResult appendBccTo(AggregateCoreComponent pAcc,
                                        BasicCoreComponentProperty tBccp,
-                                       User user) {
+                                       long releaseId, User user) {
         int seqKey = nextSeqKey(pAcc);
         BasicCoreComponent tBcc = createBCC(pAcc, tBccp, user, seqKey);
         ccDAO.save(tBcc);
 
         BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
+        if (releaseId > 0L) {
+            tBccHistory.setReleaseId(releaseId);
+        }
         ccDAO.save(tBccHistory);
 
         return new AppendBccResult(tBcc, tBccHistory);

@@ -130,11 +130,17 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.releaseId = ?1")
     List<AssociationCoreComponentProperty> findByReleaseId(long releaseId);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId <= ?2")
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId = ?2")
     List<AssociationCoreComponentProperty> findByCurrentAsccpIdAndReleaseId(long currentAsccpId, long releaseId);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId <= ?2 and a.state = ?3")
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId <= ?2")
+    List<AssociationCoreComponentProperty> findByCurrentAsccpIdAndReleaseIdLessThanEqual(long currentAsccpId, long releaseId);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId = ?2 and a.state = ?3")
     List<AssociationCoreComponentProperty> findByCurrentAsccpIdAndReleaseIdAndState(long currentAsccpId, long releaseId, CoreComponentState state);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1 and a.releaseId <= ?2 and a.state = ?3")
+    List<AssociationCoreComponentProperty> findByCurrentAsccpIdAndReleaseIdLessThanEqualAndState(long currentAsccpId, long releaseId, CoreComponentState state);
 
     @Query("select a from AssociationCoreComponentProperty a where a.currentAsccpId = ?1")
     List<AssociationCoreComponentProperty> findByCurrentAsccpId(long currentAsccpId);

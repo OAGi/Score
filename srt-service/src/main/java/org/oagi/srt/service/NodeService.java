@@ -348,7 +348,7 @@ public class NodeService {
             CoreComponentRelation relation = associationsWithoutRecursive.get(i);
             if (relation instanceof AssociationCoreComponent) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
-                AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc);
+                AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc, releaseId);
                 if (isGroup(roleOfAcc)) {
                     if (enableShowingGroup) {
                         associations.add(ascc);
@@ -378,11 +378,9 @@ public class NodeService {
         return coreComponentRelations;
     }
 
-    private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent associationCoreComponent) {
-        long toAsccpId = associationCoreComponent.getToAsccpId();
-        AssociationCoreComponentProperty asccp = asccpRepository.findOne(toAsccpId);
-        long roleOfAccId = asccp.getRoleOfAccId();
-        AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
+    private AggregateCoreComponent getRoleOfAcc(AssociationCoreComponent ascc, long releaseId) {
+        AssociationCoreComponentProperty asccp = coreComponentService.findAsccp(ascc, releaseId);
+        AggregateCoreComponent acc = coreComponentService.findRoleOfAcc(asccp, releaseId);
         return acc;
     }
 
@@ -559,6 +557,7 @@ public class NodeService {
             this.parent = parent;
             this.bcc = bcc;
             this.releaseId = releaseId;
+            
             this.enableShowingGroup = enableShowingGroup;
             this.bccp = coreComponentService.findBccp(bcc, releaseId);
         }
@@ -569,6 +568,7 @@ public class NodeService {
             this.parent = parent;
             this.bccp = bccp;
             this.releaseId = releaseId;
+            
             this.enableShowingGroup = enableShowingGroup;
         }
 

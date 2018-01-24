@@ -42,11 +42,13 @@
 
                                 <p:contextMenu id="cMenu" for="treeTable" nodeType="ACC-Target" rendered="#{extensionBean.userExtensionAcc.state == 'Editing'}">
                                     <p:menuitem id="appendASCCItem" value="Append ASCC" style="width: 100%;"
-                                                actionListener="#{extensionBean.prepareAppendAscc}"
+                                                actionListener="#{extensionBean.onClickAppendASCCButton}"
+                                                action="#{extensionBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
                                     <p:menuitem id="appendBCCItem" value="Append BCC" style="width: 100%;"
-                                                actionListener="#{extensionBean.prepareAppendBcc}"
+                                                actionListener="#{extensionBean.onClickAppendBCCButton}"
+                                                action="#{extensionBean.prepareAppendBcc}"
                                                 onclick="PF('leftBlockUI').show()"
                                                 update=":form"/>
                                 </p:contextMenu>
@@ -61,19 +63,42 @@
                                         To append ASCC
                                     -->
                                     <h:panelGroup rendered="#{extensionBean.preparedAppendAscc}">
+                                        <p:defaultCommand target="appendASCCSearchBtn"/>
+
                                         <p:panel id="appendASCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
-                                                                value="#{extensionBean.selectedAsccpPropertyTerm}"
-                                                                completeMethod="#{extensionBean.completeInputAsccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{extensionBean.onSelectAsccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                                                </p:autoComplete>
-                                                <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
-                                                                 action="#{extensionBean.searchAsccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpPropertyTermInputText" widgetVar="asccpPropertyTermInputText"
+                                                                     value="#{extensionBean.selectedAsccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpDefinitionInputText" widgetVar="asccpDefinitionInputText"
+                                                                     value="#{extensionBean.selectedAsccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="asccpModuleInputText" widgetVar="asccpModuleInputText"
+                                                                     value="#{extensionBean.selectedAsccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendASCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{extensionBean.searchAsccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendASCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblAsccp" var="asccp" value="#{extensionBean.asccpList}"
@@ -83,21 +108,33 @@
                                                          rowKey="#{asccp.asccpId}"
                                                          selection="#{extensionBean.selectedAsccp}"
                                                          selectionMode="single">
-                                                <p:ajax event="rowSelect" listener="#{extensionBean.onAsccpRowSelect}"/>
-                                                <p:ajax event="rowUnselect"
-                                                        listener="#{extensionBean.onAsccpRowUnselect}"/>
+                                                <p:ajax event="rowSelect" listener="#{extensionBean.onAsccpRowSelect}" update="tblAsccp"/>
+                                                <p:ajax event="rowUnselect" listener="#{extensionBean.onAsccpRowUnselect}" update="tblAsccp"/>
 
-                                                <p:column headerText="ASCCP Property Term"
+                                                <p:column style="width: 50px; text-align: center;">
+                                                    <p:selectBooleanCheckbox value="#{extensionBean.getAsccpCheckBox(asccp.asccpId).checked}">
+                                                        <p:ajax update="tblAsccp"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </p:column>
+
+                                                <p:column headerText="Property Term"
                                                           sortBy="#{asccp.propertyTerm}">
-                                                    <h:outputText value="#{asccp.propertyTerm}"/>
+                                                    <a href="/core_component/asccp/#{asccp.asccpId}"
+                                                       target="_new">#{asccp.propertyTerm}</a>
                                                     <div>
-                                                        <h:outputText value="GUID: #{asccp.guid}"
-                                                                      style="font-size: 12px !important; color: #767676 !important;"/>
+                                                        <a href="/core_component/asccp/#{asccp.asccpId}" target="_new"
+                                                           style="font-size: 12px !important; color: #767676 !important;">GUID: #{asccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
+                                                <p:column headerText="Module" style="width: 220px;" sortBy="#{asccp.module}">
+                                                    <h:outputText value="#{asccp.module}"/>
+                                                </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{asccp.definition}">
                                                     <h:outputText value="#{asccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{asccp.state}">
                                                     <h:panelGroup rendered="#{asccp.state == 'Editing'}">
@@ -129,19 +166,42 @@
                                         To append BCC
                                     -->
                                     <h:panelGroup rendered="#{extensionBean.preparedAppendBcc}">
+                                        <p:defaultCommand target="appendBCCSearchBtn"/>
+
                                         <p:panel id="appendBCCPanel">
                                             <f:facet name="header">
-                                                <p:autoComplete id="bccpPropertyTerm" widgetVar="bccpPropertyTerm"
-                                                                value="#{extensionBean.selectedBccpPropertyTerm}"
-                                                                completeMethod="#{extensionBean.completeInputBccp}"
-                                                                style="width: 440px; margin-right: 20px;">
-                                                    <p:ajax event="itemSelect"
-                                                            listener="#{extensionBean.onSelectBccpPropertyTerm}"/>
-                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                                                </p:autoComplete>
-                                                <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                                                 actionListener="#{extensionBean.searchBccp}"
-                                                                 update=":form:details" icon="fa fa-white fa-search"/>
+                                                <h:panelGroup>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpPropertyTermInputText" widgetVar="bccpPropertyTermInputText"
+                                                                     value="#{extensionBean.selectedBccpPropertyTerm}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpDefinitionInputText" widgetVar="bccpDefinitionInputText"
+                                                                     value="#{extensionBean.selectedBccpDefinition}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+                                                    </div>
+                                                    <div style="padding: 3px 0 3px 0;">
+                                                        <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                        <p:inputText id="bccpModuleInputText" widgetVar="bccpModuleInputText"
+                                                                     value="#{extensionBean.selectedBccpModule}"
+                                                                     style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                                            <f:ajax/>
+                                                        </p:inputText>
+
+                                                        <p:commandButton id="appendBCCSearchBtn" value="Search" ajax="true"
+                                                                         actionListener="#{extensionBean.searchBccp}"
+                                                                         update=":form:details" icon="fa fa-white fa-search"/>
+                                                    </div>
+
+                                                    <p:defaultCommand target="appendBCCSearchBtn"/>
+                                                </h:panelGroup>
                                             </f:facet>
 
                                             <p:dataTable id="tblBccp" var="bccp" value="#{extensionBean.bccpList}"
@@ -151,19 +211,32 @@
                                                          rowKey="#{bccp.bccpId}"
                                                          selection="#{extensionBean.selectedBccp}"
                                                          selectionMode="single">
-                                                <p:ajax event="rowSelect" listener="#{extensionBean.onBccpRowSelect}"/>
-                                                <p:ajax event="rowUnselect"
-                                                        listener="#{extensionBean.onBccpRowUnselect}"/>
+                                                <p:ajax event="rowSelect" listener="#{extensionBean.onBccpRowSelect}" update="tblBccp"/>
+                                                <p:ajax event="rowUnselect" listener="#{extensionBean.onBccpRowUnselect}" update="tblBccp"/>
+
+                                                <p:column style="width: 50px; text-align: center;">
+                                                    <p:selectBooleanCheckbox value="#{extensionBean.getBccpCheckBox(bccp.bccpId).checked}">
+                                                        <p:ajax update="tblBccp"/>
+                                                    </p:selectBooleanCheckbox>
+                                                </p:column>
+
                                                 <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
-                                                    <h:outputText value="#{bccp.propertyTerm}"/>
+                                                    <a href="/core_component/bccp/#{bccp.bccpId}"
+                                                       target="_new">#{bccp.propertyTerm}</a>
                                                     <div>
-                                                        <h:outputText value="GUID: #{bccp.guid}"
-                                                                      style="font-size: 12px !important; color: #767676 !important;"/>
+                                                        <a href="/core_component/bccp/#{bccp.bccpId}" target="_new"
+                                                           style="font-size: 12px !important; color: #767676 !important;">GUID: #{bccp.guid}</a>
                                                     </div>
                                                 </p:column>
+
+                                                <p:column headerText="Module" style="width: 220px;" sortBy="#{bccp.module}">
+                                                    <h:outputText value="#{bccp.module}"/>
+                                                </p:column>
+
                                                 <p:column headerText="Definition" sortBy="#{bccp.definition}">
                                                     <h:outputText value="#{bccp.definition}"/>
                                                 </p:column>
+
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{bccp.state}">
                                                     <h:panelGroup rendered="#{bccp.state == 'Editing'}">

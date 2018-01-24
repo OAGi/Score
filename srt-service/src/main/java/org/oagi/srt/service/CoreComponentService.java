@@ -1311,8 +1311,8 @@ public class CoreComponentService {
                 break;
             case "ASCC":
                 AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
-                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndLessThanReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
-                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndLessThanReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
+                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
+                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
                 break;
             case "ASCCP":
                 maxRevisionNum = asccpRepository.findMaxRevisionNumByAsccpIdAndLessThanReleaseId(cc.getId(), releaseId);
@@ -1320,8 +1320,8 @@ public class CoreComponentService {
                 break;
             case "BCC":
                 BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
-                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndLessThanReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
-                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndLessThanReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
+                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
+                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
                 break;
             case "BCCP":
                 maxRevisionNum = bccpRepository.findMaxRevisionNumByBccpIdAndLessThanReleaseId(cc.getId(), releaseId);
@@ -1392,9 +1392,9 @@ public class CoreComponentService {
         } else {
             List<AggregateCoreComponent> accList;
             if (state == null) {
-                accList = accRepository.findByCurrentAccIdAndReleaseId(roleOfAccId, releaseId);
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqual(roleOfAccId, releaseId);
             } else {
-                accList = accRepository.findByCurrentAccIdAndReleaseIdAndState(roleOfAccId, releaseId, state);
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqualAndState(roleOfAccId, releaseId, state);
             }
             if (accList.isEmpty()) {
                 return null;
@@ -1437,9 +1437,9 @@ public class CoreComponentService {
         } else {
             List<AssociationCoreComponentProperty> asccpList;
             if (state == null) {
-                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseId(asccpId, releaseId);
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdLessThanEqual(asccpId, releaseId);
             } else {
-                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdAndState(asccpId, releaseId, state);
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdLessThanEqualAndState(asccpId, releaseId, state);
             }
             if (asccpList.isEmpty()) {
                 return null;
@@ -1531,9 +1531,9 @@ public class CoreComponentService {
         } else {
             List<AggregateCoreComponent> accList;
             if (state == null) {
-                accList = accRepository.findByCurrentAccIdAndReleaseId(accId, releaseId);
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqual(accId, releaseId);
             } else {
-                accList = accRepository.findByCurrentAccIdAndReleaseIdAndState(accId, releaseId, state);
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
             }
             if (accList.isEmpty()) {
                 return null;
@@ -1551,8 +1551,8 @@ public class CoreComponentService {
 
             for (AggregateCoreComponent e : accList) {
                 if (e.getReleaseId() == maxReleaseId &&
-                        e.getRevisionNum() == maxRevisionNum &&
-                        e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    e.getRevisionNum() == maxRevisionNum &&
+                    e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
                     return e;
                 }
             }
@@ -1571,11 +1571,34 @@ public class CoreComponentService {
             }
         } else {
             long accId = acc.getCurrentAccId();
+            if (accId == 0L) {
+                throw new IllegalStateException();
+            }
+
+            OagisComponentType oagisComponentType = acc.getOagisComponentType();
+            /*
+             * Issue #467
+             */
+            boolean releaseExactlyMatch;
+            if (oagisComponentType == OagisComponentType.Extension) {
+                releaseExactlyMatch = true;
+            } else {
+                releaseExactlyMatch = false;
+            }
+
             List<AssociationCoreComponent> asccList;
             if (state == null) {
-                asccList = asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                if (releaseExactlyMatch) {
+                    asccList = asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                } else {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdLessThanEqual(accId, releaseId);
+                }
             } else {
-                asccList = asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                if (releaseExactlyMatch) {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                } else {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
+                }
             }
             if (asccList.isEmpty()) {
                 return Collections.emptyList();
@@ -1610,11 +1633,14 @@ public class CoreComponentService {
             }
         } else {
             long accId = acc.getCurrentAccId();
+            if (accId == 0L) {
+                throw new IllegalStateException();
+            }
             List<BasicCoreComponent> bccList;
             if (state == null) {
-                bccList = bccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                bccList = bccRepository.findByFromAccIdAndReleaseIdLessThanEqual(accId, releaseId);
             } else {
-                bccList = bccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                bccList = bccRepository.findByFromAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
             }
             if (bccList.isEmpty()) {
                 return Collections.emptyList();
