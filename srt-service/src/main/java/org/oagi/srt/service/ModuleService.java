@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,4 +29,15 @@ public class ModuleService {
         return moduleRepository.findAll(new Sort(new Sort.Order(direction, property)));
     }
 
+    public Module update(Module module) {
+        return moduleRepository.saveAndFlush(module);
+    }
+
+    public void delete(Module module) {
+        moduleRepository.delete(module);
+    }
+
+    public boolean isExistsModule(String moduleFilePath) {
+       return Objects.nonNull(moduleRepository.findByModule(moduleFilePath));
+    }
 }
