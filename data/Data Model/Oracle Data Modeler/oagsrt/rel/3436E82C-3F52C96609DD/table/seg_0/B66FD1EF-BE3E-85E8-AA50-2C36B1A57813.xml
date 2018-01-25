@@ -113,6 +113,16 @@
 <colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="68EAB670-E12C-55AB-1870-D56ED9879E28" name="TOP_LEVEL_ABIE_APP_USER_FKv1">
+<createdBy>hno2</createdBy>
+<createdTime>2017-11-30 22:01:53 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:05:54 UTC</createdTime>
@@ -123,16 +133,6 @@
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="68EAB670-E12C-55AB-1870-D56ED9879E28" name="TOP_LEVEL_ABIE_APP_USER_FK">
-<createdBy>hno2</createdBy>
-<createdTime>2017-11-30 22:01:53 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
-</indexColumnUsage>
-</ind_PK_UK>
 <ind_PK_UK id="7DC0D099-F355-6680-4123-B10E8A708829" name="TOP_LEVEL_ABIE_RELEASE_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2017-11-30 22:03:22 UTC</createdTime>
@@ -141,6 +141,16 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="9B4DD1FD-4C58-8A79-DC03-6030191827D6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0CC382DE-CF5F-D199-C113-83CA0E6B6E55" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2018-01-25 14:32:31 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>
