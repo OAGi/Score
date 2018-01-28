@@ -23,8 +23,14 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Controller
 @Scope("view")
@@ -108,7 +114,23 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
         AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
-        traverseToFindTargetAcc(asccpStack, acc, eAcc);
+
+        Map<Long, AggregateCoreComponent> accMap =
+                accRepository.findAllByRevisionNum(0).stream()
+                        .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
+
+        Map<Long, List<AssociationCoreComponent>> asccFromAccIdMap =
+                asccRepository.findAllByRevisionNum(0).stream()
+                        .collect(groupingBy(AssociationCoreComponent::getFromAccId));
+
+        Map<Long, AssociationCoreComponentProperty> asccpMap =
+                asccpRepository.findAllByRevisionNum(0).stream()
+                        .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
+
+        traverseToFindTargetAcc(
+                accMap, asccFromAccIdMap, asccpMap,
+                asccpStack, acc, eAcc
+        );
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0, len = asccpStack.size(); i < len; ++i) {
@@ -135,17 +157,42 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         return asccp;
     }
 
-    private boolean traverseToFindTargetAcc(Stack<AssociationCoreComponentProperty> asccpStack,
-                                            AggregateCoreComponent sourceAcc,
-                                            AggregateCoreComponent targetAcc) {
+    private boolean traverseToFindTargetAcc(
+            Map<Long, AggregateCoreComponent> accMap,
+            Map<Long, List<AssociationCoreComponent>> asccFromAccIdMap,
+            Map<Long, AssociationCoreComponentProperty> asccpMap,
 
-        long targetAccId = targetAcc.getAccId();
-        long fromAccId = sourceAcc.getAccId();
+            Stack<AssociationCoreComponentProperty> asccpStack,
+            AggregateCoreComponent sourceAcc,
+            AggregateCoreComponent targetAcc) {
 
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccId);
+        long targetAccId = (targetAcc.getReleaseId() > 0L) ? targetAcc.getCurrentAccId() : targetAcc.getAccId();
+
+        List<AggregateCoreComponent> sourceAccList = new ArrayList();
+        sourceAccList.add(sourceAcc);
+
+        while (sourceAcc != null && sourceAcc.getBasedAccId() > 0L) {
+            sourceAcc = accRepository.findOne(sourceAcc.getBasedAccId());
+            sourceAccList.add(sourceAcc);
+        }
+
+        List<AssociationCoreComponent> asccList = new ArrayList();
+        List<Long> fromAccIds = sourceAccList.stream()
+                .map(e -> (e.getReleaseId() > 0L) ? e.getCurrentAccId() : e.getAccId())
+                .collect(Collectors.toList());
+        for (Long fromAccId : fromAccIds) {
+            List<AssociationCoreComponent> l = asccFromAccIdMap.get(fromAccId);
+            if (l != null && !l.isEmpty()) {
+                asccList.addAll(l);
+            }
+        }
+        if (asccList.isEmpty()) {
+            return false;
+        }
+
         for (AssociationCoreComponent ascc : asccList) {
             long toAsccpId = ascc.getToAsccpId();
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(toAsccpId);
+            AssociationCoreComponentProperty asccp = asccpMap.get(toAsccpId);
             asccpStack.push(asccp);
 
             long roleOfAccId = asccp.getRoleOfAccId();
@@ -154,9 +201,12 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
                 return true;
 
             } else {
-                fromAccId = asccp.getRoleOfAccId();
-                sourceAcc = accRepository.findOne(fromAccId);
-                boolean result = traverseToFindTargetAcc(asccpStack, sourceAcc, targetAcc);
+                long fromAccId = asccp.getRoleOfAccId();
+                sourceAcc = accMap.get(fromAccId);
+
+                boolean result = traverseToFindTargetAcc(
+                        accMap, asccFromAccIdMap, asccpMap,
+                        asccpStack, sourceAcc, targetAcc);
                 if (result) {
                     return true;
                 } else {

@@ -12,6 +12,9 @@ import java.util.List;
 
 public interface AggregateCoreComponentRepository extends JpaRepository<AggregateCoreComponent, Long> {
 
+    @Query("select a from AggregateCoreComponent a where a.accId in ?1")
+    public List<AggregateCoreComponent> findByAccIdIn(List<Long> accIds);
+
     @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1")
     public List<AggregateCoreComponent> findAllWithRevisionNum(int revisionNum);
 

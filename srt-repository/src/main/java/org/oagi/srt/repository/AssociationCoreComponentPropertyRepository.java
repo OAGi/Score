@@ -13,6 +13,9 @@ import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
 
 public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Long> {
 
+    @Query("select a from AssociationCoreComponentProperty a where a.asccpId in ?1")
+    public List<AssociationCoreComponentProperty> findByAsccpIdIn(List<Long> asccpIds);
+
     @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = ?1")
     public List<AssociationCoreComponentProperty> findAllWithRevisionNum(int revisionNum);
 

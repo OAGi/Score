@@ -1151,7 +1151,18 @@ public class CoreComponentService {
     private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         long basedAccId = abie.getBasedAccId();
-        long eAccId = eAcc.getAccId();
+
+        AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+        if (basedAcc.getReleaseId() > 0L) {
+            basedAccId = basedAcc.getCurrentAccId();
+        }
+
+        long eAccId;
+        if (eAcc.getReleaseId() > 0L) {
+            eAccId = eAcc.getCurrentAccId();
+        } else {
+            eAccId = eAcc.getAccId();
+        }
 
         return existsASCCPRecursivelyByRoleOfAccId(basedAccId, eAccId);
     }
