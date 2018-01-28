@@ -13,8 +13,8 @@
             </div>
         </div>
         <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
-                        closable="true"/>
+            <p:growl id="growl" showDetail="true" life="3000"/>
+
             <p:wizard flowListener="#{createProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
                       showNavBar="false" onback="onBack();" onnext="onNext();">
                 <!--
@@ -31,7 +31,7 @@
                                 <div class="col-md-2 dropdown-container">
                                     <p:selectOneMenu id="release" value="#{createProfileBODBean.release}"
                                                      converter="#{releaseConverter}" style="width: 150px">
-                                        <p:ajax listener="#{createProfileBODBean.onReleaseChange}" update=":form" />
+                                        <p:ajax listener="#{createProfileBODBean.onReleaseChange}" update="growl, :form" />
                                         <f:selectItems value="#{createProfileBODBean.releases}" var="release"
                                                        itemLabel="#{release.releaseNum}"
                                                        itemValue="#{release}"/>
@@ -54,7 +54,7 @@
 
                                         <p:commandButton id="searchBtn" value="Search" ajax="true" style="margin-left: 10px;"
                                                          actionListener="#{createProfileBODBean.search}"
-                                                         update="tbl1" icon="fa fa-white fa-search"/>
+                                                         update="growl, tbl1" icon="fa fa-white fa-search"/>
                                     </div>
 
                                     <p:defaultCommand target="searchBtn"/>
@@ -68,12 +68,12 @@
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
                                      selectionMode="single">
-                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="tbl1"/>
-                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="tbl1"/>
+                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="growl, tbl1"/>
+                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="growl, tbl1"/>
 
                             <p:column style="width: 50px; text-align: center;">
                                 <p:selectBooleanCheckbox value="#{createProfileBODBean.getTopLevelConceptCheckBox(topLevelConcept.asccpId).checked}">
-                                    <p:ajax update="tbl1"/>
+                                    <p:ajax update="growl, tbl1"/>
                                 </p:selectBooleanCheckbox>
                             </p:column>
 
@@ -132,12 +132,12 @@
                                      selectionMode="single"
                                      rowKey="#{businessContext.bizCtxId}">
 
-                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onBusinessContextSelect}" update="tbl2"/>
-                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onBusinessContextUnselect}" update="tbl2"/>
+                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onBusinessContextSelect}" update="growl, tbl2"/>
+                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onBusinessContextUnselect}" update="growl, tbl2"/>
 
                             <p:column style="width: 50px; text-align: center;">
                                 <p:selectBooleanCheckbox value="#{createProfileBODBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
-                                    <p:ajax update="tbl2"/>
+                                    <p:ajax update="growl, tbl2"/>
                                 </p:selectBooleanCheckbox>
                             </p:column>
 
@@ -168,14 +168,14 @@
                                                  selection="#{createProfileBODBean.selectedTreeNode}"
                                                  selectionMode="single">
                                         <p:ajax event="expand" listener="#{createProfileBODBean.expand}"
-                                                update=":form:treeTable"/>
+                                                update="growl, :form:treeTable"/>
                                         <p:ajax event="collapse"
-                                                update=":form:treeTable"/>
-                                        <p:ajax event="select" update=":form:details"/>
+                                                update="growl, :form:treeTable"/>
+                                        <p:ajax event="select" update="growl, :form:details"/>
                                         <p:column headerText="#{createProfileBODBean.getModule(createProfileBODBean.topLevelNode.asccp.moduleId)}">
                                             <h:selectBooleanCheckbox rendered="#{createProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
                                                                      value="${node.used}" style="margin-right: 5px;">
-                                                <p:ajax update=":form:treeTable, :form:details"/>
+                                                <p:ajax update="growl, :form:treeTable, :form:details"/>
                                             </h:selectBooleanCheckbox>
                                             <h:outputText value="#{createProfileBODBean.getTreeNodeTypeNameResolver(node).name}"/>
                                         </p:column>
@@ -259,7 +259,7 @@
                                                         <h:selectBooleanCheckbox id="asbieusedCB"
                                                                 value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
-                                                            <p:ajax update=":form:treeTable, :form:details"/>
+                                                            <p:ajax update="growl, :form:treeTable, :form:details"/>
                                                         </h:selectBooleanCheckbox>
                                                     </h:panelGrid>
                                                 </p:panel>
@@ -389,7 +389,7 @@
                                                         <h:selectBooleanCheckbox
                                                                 value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
-                                                            <p:ajax update=":form:treeTable, :form:details"/>
+                                                            <p:ajax update="growl, :form:treeTable, :form:details"/>
                                                         </h:selectBooleanCheckbox>
                                                     </h:panelGrid>
                                                 </p:panel>
@@ -487,7 +487,7 @@
                                                                          style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                          value="#{createProfileBODBean.selectedTreeNode.data.restrictionType}"
                                                                          disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <p:ajax update="bdtPriRestriPanel"/>
+                                                            <p:ajax update="growl, bdtPriRestriPanel"/>
                                                             <f:selectItems
                                                                     value="#{createProfileBODBean.getAvailablePrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
                                                         </h:selectOneMenu>
@@ -561,7 +561,7 @@
                                                         <h:selectBooleanCheckbox id="bbieScUsedCB"
                                                                 value="${createProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
-                                                            <p:ajax update=":form:treeTable, :form:details"/>
+                                                            <p:ajax update="growl, :form:treeTable, :form:details"/>
                                                         </h:selectBooleanCheckbox>
                                                     </h:panelGrid>
                                                 </p:panel>
@@ -638,7 +638,7 @@
                                                                          style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                          value="#{createProfileBODBean.selectedTreeNode.data.restrictionType}"
                                                                          disabled="${createProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                            <p:ajax update="bdtScPriRestriPanel"/>
+                                                            <p:ajax update="growl, bdtScPriRestriPanel"/>
                                                             <f:selectItems
                                                                     value="#{createProfileBODBean.getAvailableScPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
                                                         </h:selectOneMenu>
