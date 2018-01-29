@@ -56,7 +56,7 @@ SalesLead -&gt; Opportunity -&gt; Quote -&gt; PurchaseOrder -&gt; SalesOrder</xs
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-851875a040114754a4daabb5dd31c319"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-851875a040114754a4daabb5dd31c319"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-83d5ec18f30d42dc884af91d6493e0fc"/>
 	</xsd:complexType>
 	<xsd:complexType name="SalesLeadHeaderBaseType" id="oagis-id-36465f1cced742eaaf60d2f333453597">
@@ -103,9 +103,11 @@ SalesLead -&gt; Opportunity -&gt; Quote -&gt; PurchaseOrder -&gt; SalesOrder</xs
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SalesLeadHeaderExtensionType" id="oagis-id-4d918663e7af481b943d3951fe93f880" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -134,9 +136,11 @@ SalesLead -&gt; Opportunity -&gt; Quote -&gt; PurchaseOrder -&gt; SalesOrder</xs
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SalesLeadDetailExtensionType" id="oagis-id-3e9046db76024e3a805950c709a3e4ba" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

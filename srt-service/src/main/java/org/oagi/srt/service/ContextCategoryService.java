@@ -55,6 +55,10 @@ public class ContextCategoryService {
         return contextCategoryRepository.findOne(ctxCategoryId);
     }
 
+    public ContextCategory findOneByGuid(String ctxCategoryGuid) {
+        return contextCategoryRepository.findOneByGuid(ctxCategoryGuid);
+    }
+
     public ContextCategoryBuilder newContextCategoryBuilder() {
         return new ContextCategoryBuilder();
     }

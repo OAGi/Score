@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessRouting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Routing.xsd"/>
+	<xsd:element name="ProcessRouting" type="ProcessRoutingType" id="oagis-id-942e8ae36fbc4ec4812a6524ed0e3e6e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessRouting is to communicate to a business application component or system the need to create a new Routing or to update an existing Routing structure.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, and Finished Goods business ordering scenarios in a Logistics to Manufacturing application integration scenario.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessRoutingType" id="oagis-id-172ae24e6acd45b28d58af29c6d7dee4">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessRoutingDataAreaType" id="oagis-id-c3d8ea1368b847fdb1efe0206677a0ba">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessRouting. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Routing).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessRoutingDataAreaType" id="oagis-id-1b6f145a6f5d41c5b7b74d5e5caa7a4d">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-9f5f1904b293450187d547a1131b07a6"/>
+			<xsd:element ref="Routing" maxOccurs="unbounded" id="oagis-id-dfdbe84898664efaa129cfb290b389c7"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

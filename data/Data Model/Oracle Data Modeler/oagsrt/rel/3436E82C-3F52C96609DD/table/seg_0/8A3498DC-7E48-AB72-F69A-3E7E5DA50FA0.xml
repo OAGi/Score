@@ -1,0 +1,152 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="8A3498DC-7E48-AB72-F69A-3E7E5DA50FA0" name="DT_USAGE_RULE">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:31:09 UTC</createdTime>
+<commentInRDBMS>This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_45</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="DT_USAGE_RULE_ID" id="F684591F-4778-EB50-0D39-27D0E0CBF19E">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:32:04 UTC</createdTime>
+<commentInRDBMS>Primary key of the table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ASSIGNED_USAGE_RULE_ID" id="4AD74244-0C5C-18C8-4FD4-8DC3C951C80A">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:33:27 UTC</createdTime>
+<commentInRDBMS>Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="978D6156-E9FD-7A9D-2393-46C7B9CF2771" referredColumn="D3DC6B1C-213B-2973-AAD0-243B23D9166A"/>
+</associations>
+</Column>
+<Column name="TARGET_DT_ID" id="680FBCF9-F36A-77C9-332D-3E61F3570B83">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:32:34 UTC</createdTime>
+<commentInRDBMS>Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="0F5504A4-6D2C-568A-6821-30826372A757" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="TARGET_DT_SC_ID" id="AFF6B767-1097-3E9D-7145-861640DF9F2E">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:33:27 UTC</createdTime>
+<commentInRDBMS>Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="15200DB8-1221-82D6-E842-3F2E552AEDEC" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7C903881-24F2-25E6-5B33-FB7E1470C51E" name="DT_USAGE_RULE_PK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:32:04 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F684591F-4778-EB50-0D39-27D0E0CBF19E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="72435B4E-8662-9868-BC0B-766988923034" name="DUR_DT_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F684591F-4778-EB50-0D39-27D0E0CBF19E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="11832337-BE7B-1196-ECB0-BF94DAD811F6" name="DUR_TARGET_DT_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="680FBCF9-F36A-77C9-332D-3E61F3570B83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="69418584-ECBD-277D-E28C-3D3C6A8154DC" name="DUR_TARGET_DT_SC_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AFF6B767-1097-3E9D-7145-861640DF9F2E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="90281543-A847-AD01-5CE5-C4628D66D78B" name="DUR_ASSIGNED_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4AD74244-0C5C-18C8-4FD4-8DC3C951C80A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D8BCCA42-4274-0C88-CC2B-3FA67E682DE5" name="DT_USAGE_RULE_DT_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:45:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="680FBCF9-F36A-77C9-332D-3E61F3570B83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2B78BF07-1140-E1A5-27DD-33A78E8903B9" name="DT_USAGE_RULE_DT_SC_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:45:56 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AFF6B767-1097-3E9D-7145-861640DF9F2E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BD94AADA-310E-6AAA-AE71-FB46B0DE3D59" name="DT_USAGE_RULE_USAGE_RULE_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:45:56 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4AD74244-0C5C-18C8-4FD4-8DC3C951C80A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

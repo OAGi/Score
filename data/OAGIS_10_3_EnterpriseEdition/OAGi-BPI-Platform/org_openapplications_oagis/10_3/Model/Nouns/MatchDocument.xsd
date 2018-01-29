@@ -53,7 +53,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-c827323c621a4721b2f9af9874cc415b"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c827323c621a4721b2f9af9874cc415b"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-7d17b78add89469fbcb5505c868870db"/>
 	</xsd:complexType>
 	<xsd:complexType name="MatchDocumentHeaderBaseType" id="oagis-id-19eb502b550e43d7bd70dce9c3f83f36">
@@ -102,8 +102,9 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 					</xsd:element>
 					<xsd:element ref="SpecialPriceAuthorizationCode" id="oagis-id-b423d59bf41c4dc2ac889c75527fbbb0" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the supplier's code to authorize special pricing as a result of an agreement.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">SYNONYMS:	Price Authorization, Price Code</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the supplier's code to authorize special pricing as a result of an agreement.
+
+SYNONYMS:	Price Authorization, Price Code</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ContractReference" id="oagis-id-b965f9cf0820415ca02a43a9a4262a9c" minOccurs="0">
@@ -150,7 +151,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-9ff1743f07e74d678f931530137eb845"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-9ff1743f07e74d678f931530137eb845"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-63f6c2142c7a4978a1bd3a008c3bde9e"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -161,9 +162,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="MatchDocumentHeaderExtensionType" id="oagis-id-30b18b9809cf4e39a1d6d5030cc94972" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -196,9 +199,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="MatchDocumentLineExtensionType" id="oagis-id-99ab11786dda4cb6bb6c6a9c2f467ffd" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

@@ -4,17 +4,19 @@ import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSSchema;
 import com.sun.xml.internal.xsom.XSType;
 import com.sun.xml.internal.xsom.parser.SchemaDocument;
-import com.sun.xml.internal.xsom.parser.XSOMParser;
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
+import org.oagi.srt.persistence.populate.backup.P_1_5_PopulateDefaultAndUnqualifiedBDT;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.persistence.populate.helper.ElementDecl;
 import org.oagi.srt.persistence.populate.helper.TypeDecl;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentDAO;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Locator;
 
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.File;
@@ -38,8 +39,11 @@ import java.util.*;
 
 import static org.oagi.srt.common.ImportConstants.AGENCY_IDENTIFICATION_NAME;
 import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
 
 /**
  * @author Yunsu Lee
@@ -93,10 +97,20 @@ public class P_1_7_PopulateQBDTInDT {
     private ModuleRepository moduleRepository;
 
     @Autowired
+    private ReleaseRepository releaseRepository;
+    private Release release;
+
+    @Autowired
     private ImportUtil importUtil;
 
     @Autowired
     private P_1_5_PopulateDefaultAndUnqualifiedBDT populateDefaultAndUnqualifiedBDT;
+
+    @Autowired
+    private CoreComponentDAO ccDAO;
+
+    @Autowired
+    private DataTypeDAO dtDAO;
 
     private XPathHandler fields_xsd;
 
@@ -104,16 +118,18 @@ public class P_1_7_PopulateQBDTInDT {
         private String typeName;
         private String guid;
         private String definition;
+        private String definitionSource;
         private String baseTypeName;
         private Element typeElement;
         private String uri;
         private Module module;
 
-        public DataTypeInfoHolder(String typeName, String guid, String definition,
+        public DataTypeInfoHolder(String typeName, String guid, String definition, String definitionSource,
                                   String baseTypeName, Element typeElement, String uri, Module module) {
             this.typeName = typeName;
             this.guid = guid;
             this.definition = definition;
+            this.definitionSource = definitionSource;
             this.baseTypeName = baseTypeName;
             this.typeElement = typeElement;
             this.uri = uri;
@@ -132,6 +148,10 @@ public class P_1_7_PopulateQBDTInDT {
             return definition;
         }
 
+        public String getDefinitionSource() {
+            return definitionSource;
+        }
+
         public String getBaseTypeName() {
             return baseTypeName;
         }
@@ -146,10 +166,11 @@ public class P_1_7_PopulateQBDTInDT {
                     "typeName='" + typeName + '\'' +
                     ", guid='" + guid + '\'' +
                     ", definition='" + definition + '\'' +
+                    ", definitionSource='" + definitionSource + '\'' +
                     ", baseTypeName='" + baseTypeName + '\'' +
                     ", typeElement=" + typeElement +
                     ", uri='" + uri + '\'' +
-                    ", module='" + module + '\'' +
+                    ", module='" + module.getModule() + '\'' +
                     '}';
         }
     }
@@ -157,76 +178,60 @@ public class P_1_7_PopulateQBDTInDT {
     private Map<String, DataTypeInfoHolder> dtiHolderMap;
 
     private void prepareForBCCP(String... systemIds) throws Exception {
+        logger.debug("Loading prepared data for importing BCCPs...");
         dtiHolderMap = new HashMap();
 
-        XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
         for (String systemId : systemIds) {
-            xsomParser.parse(systemId);
-        }
-
-        for (SchemaDocument schemaDocument : xsomParser.getDocuments()) {
-            XSSchema xsSchema = schemaDocument.getSchema();
-            Iterator<XSType> xsTypeIterator = xsSchema.iterateTypes();
-            while (xsTypeIterator.hasNext()) {
-                XSType xsType = xsTypeIterator.next();
-                String typeName = xsType.getName();
-                if (dtiHolderMap.containsKey(typeName)) {
-                    return;
-                }
-
-                Locator locator = xsType.getLocator();
-                if (locator == null) {
-                    return;
-                }
-                String systemId = locator.getSystemId();
-                Document xmlDocument = Context.loadDocument(systemId);
-
-                XPathExpression xPathExpression = Context.xPath.compile("//xsd:complexType[@name='" + typeName + "']");
-                Node node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
-                if (node == null) {
-                    xPathExpression = Context.xPath.compile("//xsd:simpleType[@name='" + typeName + "']");
-                    node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
-                    if (node == null) {
-                        return;
-                    }
-                }
+            Document xmlDocument = Context.loadDocument(systemId);
+            XPathExpression xPathExpression = Context.xPath.compile("//xsd:complexType | //xsd:simpleType");
+            NodeList nodeList = (NodeList) xPathExpression.evaluate(xmlDocument, XPathConstants.NODESET);
+            for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
+                Node node = nodeList.item(i);
+                String typeName = node.getAttributes().getNamedItem("name").getNodeValue();
                 Node idAttribute = node.getAttributes().getNamedItem("id");
                 if (idAttribute == null) {
+                    logger.debug("'" + typeName + "' hasn't have the 'id' attribute at " + systemId);
                     return;
                 }
 
                 String dtGuid = idAttribute.getNodeValue();
-
-                Node definitionNode = (Node) Context.xPath.compile(
-                        "./xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]")
-                        .evaluate(node, XPathConstants.NODE);
-                String definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
-                if (definition == null) {
-                    definitionNode = (Node) Context.xPath.compile("./xsd:annotation/xsd:documentation")
-                            .evaluate(node, XPathConstants.NODE);
-                    definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
-                }
-                if (StringUtils.isEmpty(definition)) {
-                    definition = null;
+                Element documentationNode = (Element) Context.xPath.compile("./xsd:annotation/xsd:documentation").evaluate(node, XPathConstants.NODE);
+                String definition = null;
+                String definitionSource = null;
+                if (documentationNode != null) {
+                    definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+                    definitionSource = documentationNode.getAttribute("source");
                 }
 
                 Node baseTypeNode = (Node) Context.xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
 
                 Module module = moduleRepository.findByModule(Utility.extractModuleName(systemId));
-                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, baseTypeName, (Element) node, systemId, module);
+                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, definitionSource, baseTypeName, (Element) node, systemId, module);
                 dtiHolderMap.put(typeName, dtiHolder);
+
+                logger.debug("Loaded " + dtiHolder);
             }
         }
+    }
+
+    private boolean isPrepared() {
+        // Sometimes, some of elements such as 'ActionCodeContentType' couldn't load into dtiHolderMap.
+        return (dtiHolderMap != null && dtiHolderMap.containsKey("ActionCodeContentType"));
     }
 
     private void populate() throws Exception {
         fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
 
-        prepareForBCCP(ImportConstants.FIELDS_XSD_FILE_PATH,
-                ImportConstants.META_XSD_FILE_PATH,
-                ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
-                ImportConstants.COMPONENTS_XSD_FILE_PATH);
+        while (!isPrepared()) {
+            prepareForBCCP(ImportConstants.FIELDS_XSD_FILE_PATH,
+                    ImportConstants.META_XSD_FILE_PATH,
+                    ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
+                    ImportConstants.COMPONENTS_XSD_FILE_PATH);
+        }
 
         insertCodeContentTypeDT();
         insertIDContentTypeDT();
@@ -257,9 +262,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTwithoutElement() throws Exception {
-        NodeList complexTypesFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:complexType");
-        for (int i = 0; i < complexTypesFromFieldsXSD.getLength(); i++) {
-            Node typeNode = complexTypesFromFieldsXSD.item(i);
+        logger.debug("Populating BDTs from Fields.xsd...");
+
+        NodeList elementList = fields_xsd.getNodeList("/xsd:schema/xsd:complexType | /xsd:schema/xsd:simpleType");
+        for (int i = 0; i < elementList.getLength(); i++) {
+            Node typeNode = elementList.item(i);
 
             String type = ((Element) typeNode).getAttribute("name");
             DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(type);
@@ -282,6 +289,8 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTAndBCCP(File file) throws Exception {
+        logger.debug("Populating BDTs and BCCPs from " + file.getName() + "...");
+
         Context context = new Context(file, moduleRepository);
         XPathHandler xHandler = new XPathHandler(file);
         NodeList elements = xHandler.getNodeList("/xsd:schema/xsd:element");
@@ -295,6 +304,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (StringUtils.isEmpty(guid)) {
                 continue;
             }
+
             XSElementDecl xsElementDecl = context.getXSElementDecl(SRTConstants.OAGI_NS, bccp);
             if (xsElementDecl == null) {
                 throw new IllegalStateException("Could not find " + bccp + ", GUID " + guid + " BCCP");
@@ -310,7 +320,8 @@ public class P_1_7_PopulateQBDTInDT {
                     throw new IllegalStateException("Unknown QBDT: " + typeName);
                 }
 
-                DataType dataType = dataTypeRepository.findOneByGuid(dataTypeInfoHolder.getGuid());
+                String dtGuid = dataTypeInfoHolder.getGuid();
+                DataType dataType = dataTypeRepository.findOneByGuid(dtGuid);
                 if (dataType == null) {
                     /*
                      * @TODO
@@ -332,39 +343,49 @@ public class P_1_7_PopulateQBDTInDT {
                     addToDTSC(typeXPathHandler, typeName, dataType);
                 }
 
-                Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
-                String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
+                Element documentationNode = (Element) xHandler.getNode(element, ".//xsd:documentation");
+                String definition = null;
+                String definitionSource = null;
+                if (documentationNode != null) {
+                    definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+
+                    definitionSource = documentationNode.getAttribute("source");
+                }
 
                 // add BCCP
-                addToBCCP(guid, bccp, dataType, definition, elementDecl);
+                addToBCCP(guid, bccp, dataType, definition, definitionSource, elementDecl);
             }
         }
     }
 
-    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO) throws Exception {
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtScPriRestriRepository.findByBdtScId(dtscVO.getBasedDtScId());
-        if (bdtscs.isEmpty()) {
-            if (dtscVO.getBasedDtScId() == 0) {
+    private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtSc) throws Exception {
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestiList =
+                bdtScPriRestriRepository.findByBdtScId(dtSc.getBasedDtScId());
+        if (bdtScPriRestiList.isEmpty()) {
+            if (dtSc.getBasedDtScId() == 0) {
                 return Collections.emptyList();
             }
-            DataTypeSupplementaryComponent vo = dtScRepository.findOne(dtscVO.getBasedDtScId());
-            bdtscs = getBDTSCPrimitiveRestriction(vo);
+            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findOne(dtSc.getBasedDtScId());
+            bdtScPriRestiList = getBDTSCPrimitiveRestriction(basedDtSc);
         }
-        return bdtscs;
+        return bdtScPriRestiList;
     }
 
-    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO,
+    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtSc,
                                                  int mode, String name, String type) throws Exception {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriListForSaving =
                 new ArrayList();
 
         // if (SC = inherit from the base BDT)
         if (mode == 1) {
-            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtscVO);
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtSc);
             for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction parent : bdtscs) {
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
                         new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                bdtScPriRestri.setBdtScId(dtSc.getDtScId());
                 bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(parent.getCdtScAwdPriXpsTypeMapId());
                 bdtScPriRestri.setCodeListId(parent.getCodeListId());
                 bdtScPriRestri.setDefault(parent.isDefault());
@@ -373,10 +394,13 @@ public class P_1_7_PopulateQBDTInDT {
             }
 
         } else { // else if (new SC)
-            populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtscVO, type);
+            populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtSc, type);
         }
 
         if (!bdtScPriRestriListForSaving.isEmpty()) {
+            if (bdtScPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+                throw new IllegalStateException("BDT_SC_ID['" + dtSc.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
+            }
             bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
         }
     }
@@ -390,20 +414,11 @@ public class P_1_7_PopulateQBDTInDT {
         DataType dataType = new DataType();
         String guid = dataTypeInfoHolder.getGuid();
         dataType.setGuid(guid);
-        dataType.setType(1);
+        dataType.setType(BusinessDataType);
         dataType.setVersionNum("1.0");
 
-        DataType baseDataType;
-
-        if (xHandler != null) {
-            Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='" + type + "']/xsd:simpleContent");
-            if (simpleContentNode == null) {
-                return null;
-            }
-        }
-
         String baseDen = Utility.typeToDen(base);
-        baseDataType = getDataTypeWithDen(baseDen);
+        DataType baseDataType = getDataTypeWithDen(baseDen);
 
         if (baseDataType == null) {
             DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
@@ -427,7 +442,7 @@ public class P_1_7_PopulateQBDTInDT {
 
         String qualifier = Utility.qualifier(type, baseDataType.getDen(), baseDataType.getDataTypeTerm());
         if (StringUtils.isEmpty(qualifier)) {
-            throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den:" + baseDataType.getDen());
+            logger.warn("The based data type[" + baseDataType.getDen() + "] of '" + type + "' has no qualifier.");
         }
 
         dataType.setQualifier(qualifier);
@@ -435,8 +450,8 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setDen(den);
         dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
 
-        String definition = dataTypeInfoHolder.getDefinition();
-        dataType.setDefinition(definition);
+        dataType.setDefinition(dataTypeInfoHolder.getDefinition());
+        dataType.setDefinitionSource(dataTypeInfoHolder.getDefinitionSource());
         dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
@@ -447,7 +462,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
-        dataTypeRepository.saveAndFlush(dataType);
+        dataType = dtDAO.save(dataType);
 
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(dataType, base);
@@ -457,11 +472,11 @@ public class P_1_7_PopulateQBDTInDT {
 
     private void insertBDTPrimitiveRestriction(DataType dataType, String base) throws Exception {
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(dataType.getBasedDtId());
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriListForSaving = new ArrayList();
+        Set<BusinessDataTypePrimitiveRestriction> bdtPriRestriListForSaving = new LinkedHashSet();
 
         String dataTypeTerm = dataType.getDataTypeTerm();
 
-        //we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
+        // we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
         if (base.endsWith("CodeContentType") && base.startsWith("oacl")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
@@ -476,13 +491,13 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
-            }//For inherited
+            } // For inherited
         } else if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             bdtPriRestri.setAgencyIdListId(getAgencyListID());
             bdtPriRestri.setDefault(false);
-            bdtPriRestriListForSaving.add(bdtPriRestri); //For AgencyIdList
+            bdtPriRestriListForSaving.add(bdtPriRestri); // For AgencyIdList
 
             for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
@@ -490,7 +505,7 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
-            }//For inherited
+            } // For inherited
         } else {
             for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
@@ -503,11 +518,14 @@ public class P_1_7_PopulateQBDTInDT {
         }
 
         if (!bdtPriRestriListForSaving.isEmpty()) {
+            if (bdtPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
+                throw new IllegalStateException("BDT_ID['" + dataType.getDtId() + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
+            }
             bdtPriRestriRepository.save(bdtPriRestriListForSaving);
         }
     }
 
-    private void addToBCCP(String guid, String name, DataType dataType, String definition, ElementDecl elementDecl) throws Exception {
+    private void addToBCCP(String guid, String name, DataType dataType, String definition, String definitionSource, ElementDecl elementDecl) throws Exception {
         if (bccpRepository.existsByGuid(guid)) {
             return;
         }
@@ -521,18 +539,32 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setBdtId(dataType.getDtId());
         bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dataType.getDataTypeTerm());
         bccp.setDefinition(definition);
+        bccp.setDefinitionSource(definitionSource);
         bccp.setState(Published);
         bccp.setCreatedBy(importUtil.getUserId());
         bccp.setLastUpdatedBy(importUtil.getUserId());
         bccp.setOwnerUserId(importUtil.getUserId());
         bccp.setDeprecated(false);
-        bccp.setReleaseId(importUtil.getReleaseId());
         Module module = elementDecl.getModule();
         bccp.setModuleId((module != null) ? module.getModuleId() : 0L);
         bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());
-        bccpRepository.saveAndFlush(bccp);
+        bccp = ccDAO.save(bccp);
+        saveHistory(bccp, release);
+    }
+
+    private void saveHistory(BasicCoreComponentProperty bccp, Release release) {
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        int revisionNum = 1;
+        bccpHistory.setRevisionNum(revisionNum);
+        int revisionTrackingNum = 1;
+        bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setReleaseId(release.getReleaseId());
+        bccpHistory.setCurrentBccpId(bccp.getBccpId());
+
+        ccDAO.save(bccpHistory);
     }
 
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
@@ -540,7 +572,7 @@ public class P_1_7_PopulateQBDTInDT {
         // inherit from the base BDT
         long ownerDtId = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> dtScList = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
 
         // new SC
         NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -549,7 +581,6 @@ public class P_1_7_PopulateQBDTInDT {
             String property_term = "";
             String representation_term = "";
 
-            String definition;
             int min_cardinality = 0;
             int max_cardinality = 1;
 
@@ -601,31 +632,40 @@ public class P_1_7_PopulateQBDTInDT {
                     representation_term = "Name";
                 } else {
                     String attrType = attrElement.getAttribute("type");
-                    if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
-                        representation_term = "Text";
-                    else if (attrType.equals("xbt_BooleanType"))
+                    if (attrName.equals("preferred") || attrName.equals("preferredIndicator")) {
                         representation_term = "Indicator";
-                    else if (attrName.equals("preferred") || attrName.equals("preferredIndicator")) {
-                        representation_term = "Indicator";
+                    } else {
+                        attrType = populateDefaultAndUnqualifiedBDT.findPrimitiveTypeName(attrType);
+                        if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
+                            representation_term = "Text";
+                        else if (attrType.equals("xbt_BooleanType"))
+                            representation_term = "Indicator";
                     }
                 }
 
-                Node documentationNode = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
-                if (documentationNode != null) {
-                    Node documentationFromCCTS = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
-                    if (documentationFromCCTS != null)
-                        definition = documentationFromCCTS.getTextContent();
-                    else
-                        definition = documentationNode.getTextContent();
-                } else {
-                    definition = null;
+                if (StringUtils.isEmpty(representation_term)) {
+                    throw new IllegalStateException("Not defined REPRESENTATION_TERM.");
                 }
 
                 DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
                 dtSc.setGuid(dt_sc_guid);
                 dtSc.setPropertyTerm(Utility.spaceSeparator(property_term));
                 dtSc.setRepresentationTerm(representation_term);
-                dtSc.setDefinition(definition);
+
+                Element documentationNode = (Element) xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
+                if (documentationNode != null) {
+                    String definition = ImportUtil.getCctsDefinition(documentationNode);
+                    if (definition == null) {
+                        definition = ImportUtil.toString(documentationNode.getChildNodes());
+                    }
+                    dtSc.setDefinition(definition);
+
+                    String definitionSource = documentationNode.getAttribute("source");
+                    if (!StringUtils.isEmpty(definitionSource)) {
+                        dtSc.setDefinitionSource(definitionSource);
+                    }
+                }
+
                 dtSc.setOwnerDtId(ownerDtId);
 
                 dtSc.setCardinalityMin(min_cardinality);
@@ -638,17 +678,17 @@ public class P_1_7_PopulateQBDTInDT {
 
                 logger.trace(attrName + " " + representation_term);
 
-                for (int j = 0; j < dtsc_vos.size(); j++) {
-                    if (dtSc.getPropertyTerm().equals(dtsc_vos.get(j).getPropertyTerm()) &&
-                            dtSc.getRepresentationTerm().equals(dtsc_vos.get(j).getRepresentationTerm())) {
-                        dtSc.setBasedDtScId(dtsc_vos.get(j).getDtScId());
+                for (int j = 0; j < dtScList.size(); j++) {
+                    if (dtSc.getPropertyTerm().equals(dtScList.get(j).getPropertyTerm()) &&
+                            dtSc.getRepresentationTerm().equals(dtScList.get(j).getRepresentationTerm())) {
+                        dtSc.setBasedDtScId(dtScList.get(j).getDtScId());
                         isNew = false;
                         break;
                     }
                 }
 
                 if (isNew) {
-                    dtScRepository.saveAndFlush(dtSc);
+                    dtDAO.save(dtSc);
 
                     // populate CDT_SC_Allowed_Primitives
                     String representationTerm = dtSc.getRepresentationTerm();
@@ -664,7 +704,7 @@ public class P_1_7_PopulateQBDTInDT {
                         cdtScAwdPri.setCdtScId(dtSc.getDtScId());
                         cdtScAwdPri.setCdtPriId(svo.getCdtPriId());
                         cdtScAwdPri.setDefault(svo.isDefault());
-                        cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
+                        cdtScAwdPriRepository.save(cdtScAwdPri);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
                         long cdtScAwdPriId =
@@ -685,37 +725,37 @@ public class P_1_7_PopulateQBDTInDT {
 
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 } else {
-                    dtScRepository.saveAndFlush(dtSc);
+                    dtDAO.save(dtSc);
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 }
             }
         }
 
-        for (DataTypeSupplementaryComponent baseDtsc : dtsc_vos) {
+        for (DataTypeSupplementaryComponent basedDtSc : dtScList) {
             DataTypeSupplementaryComponent inheritedDtSc = new DataTypeSupplementaryComponent();
             inheritedDtSc.setGuid(Utility.generateGUID());
-            inheritedDtSc.setPropertyTerm(baseDtsc.getPropertyTerm());
-            inheritedDtSc.setRepresentationTerm(baseDtsc.getRepresentationTerm());
+            inheritedDtSc.setPropertyTerm(basedDtSc.getPropertyTerm());
+            inheritedDtSc.setRepresentationTerm(basedDtSc.getRepresentationTerm());
             inheritedDtSc.setOwnerDtId(ownerDtId);
 
             DataTypeSupplementaryComponent duplicate = checkDuplicate(inheritedDtSc);
 
             if (duplicate == null) {
 
-                inheritedDtSc.setCardinalityMin(baseDtsc.getCardinalityMin());
-                inheritedDtSc.setCardinalityMax(baseDtsc.getCardinalityMax());
-                inheritedDtSc.setBasedDtScId(baseDtsc.getDtScId());
+                inheritedDtSc.setCardinalityMin(basedDtSc.getCardinalityMin());
+                inheritedDtSc.setCardinalityMax(basedDtSc.getCardinalityMax());
+                inheritedDtSc.setBasedDtScId(basedDtSc.getDtScId());
 
-                dtScRepository.saveAndFlush(inheritedDtSc);
+                dtDAO.save(inheritedDtSc);
 
                 insertBDTSCPrimitiveRestriction(inheritedDtSc, 1, "", "");
             }
         }
     }
 
-    private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) throws Exception {
+    private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtSc) throws Exception {
         return dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
-                dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
+                dtSc.getOwnerDtId(), dtSc.getPropertyTerm(), dtSc.getRepresentationTerm());
     }
 
 
@@ -744,20 +784,20 @@ public class P_1_7_PopulateQBDTInDT {
         return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
-    public long getDtId(String DataTypeTerm) throws Exception {
-        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
-        long id = dtVO.getDtId();
+    public long getDtId(String dataTypeTerm) throws Exception {
+        DataType dataType = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, DataTypeType.CoreDataType);
+        long id = dataType.getDtId();
         return id;
     }
 
     public String getRepresentationTerm(String Guid) throws Exception {
-        DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuid(Guid);
-        String term = dtscVO.getRepresentationTerm();
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findOneByGuid(Guid);
+        String term = dtSc.getRepresentationTerm();
         return term;
     }
 
-    public String getPrimitiveName(long CdtPriId) throws Exception {
-        return cdtPriRepository.findOne(CdtPriId).getName();
+    public String getPrimitiveName(long cdtPriId) throws Exception {
+        return cdtPriRepository.findOne(cdtPriId).getName();
     }
 
 
@@ -765,15 +805,15 @@ public class P_1_7_PopulateQBDTInDT {
         return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
-    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(long cdt_id) throws Exception {
-        return cdtAwdPriRepository.findByCdtId(cdt_id);
+    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(long cdtId) throws Exception {
+        return cdtAwdPriRepository.findByCdtId(cdtId);
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) throws Exception {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
-            res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());
+            DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dt_sc_id);
+            res = getCdtSCAllowedPrimitiveID(dtSc.getBasedDtScId());
         }
         return res;
     }
@@ -782,23 +822,23 @@ public class P_1_7_PopulateQBDTInDT {
         return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
-    public boolean checkTokenofXBT(long cdt_awd_pri_xps_type_map_id) throws Exception {
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
-                cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
-        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(
-                aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId());
-        if (aXSDBuiltInType.getName().equalsIgnoreCase("token"))
+    public boolean isTokenXBT(long cdtAwdPriXpsTypeMapId) throws Exception {
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId);
+        XSDBuiltInType xbt = xbtRepository.findOne(cdtAwdPriXpsTypeMap.getXbtId());
+        if (xbt.getName().equalsIgnoreCase("token")) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     private DataType getDataTypeWithDen(String den) throws Exception {
-        return dataTypeRepository.findOneByTypeAndDen(1, den);
+        return dataTypeRepository.findOneByTypeAndDen(DataTypeType.BusinessDataType, den);
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) throws Exception {
-        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
+        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, DataTypeType.CoreDataType);
     }
 
     private DataType getDataTypeWithGUID(String guid) throws Exception {
@@ -806,6 +846,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertCodeContentTypeDT() throws Exception {
+        logger.debug("Populating 'CodeContentType' BDTs...");
         String dataType = "CodeContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 
@@ -813,6 +854,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertIDContentTypeDT() throws Exception {
+        logger.debug("Populating 'IDContentType' BDTs...");
         String dataType = "IDContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 
@@ -844,7 +886,7 @@ public class P_1_7_PopulateQBDTInDT {
         DataType dataType = new DataType();
         String guid = dataTypeInfoHolder.getGuid();
         dataType.setGuid(guid);
-        dataType.setType(1);
+        dataType.setType(BusinessDataType);
         dataType.setVersionNum("1.0");
 
         String base = dataTypeInfoHolder.getBaseTypeName();
@@ -855,6 +897,10 @@ public class P_1_7_PopulateQBDTInDT {
         } else {
             dVO = getDataTypeWithDen("Identifier Content. Type");
             base = "IDContentType";
+        }
+
+        if (dVO == null) {
+            throw new IllegalStateException();
         }
 
         dataType.setBasedDtId(dVO.getDtId());
@@ -870,8 +916,8 @@ public class P_1_7_PopulateQBDTInDT {
         String den = Utility.denWithQualifier(qualifier, dVO.getDen());
         dataType.setDen(den);
         dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
-        String definition = dataTypeInfoHolder.getDefinition();
-        dataType.setDefinition(definition);
+        dataType.setDefinition(dataTypeInfoHolder.getDefinition());
+        dataType.setDefinitionSource(dataTypeInfoHolder.getDefinitionSource());
         dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
@@ -882,7 +928,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
-        dataType = dataTypeRepository.saveAndFlush(dataType);
+        dataType = dtDAO.save(dataType);
 
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(dataType, base);
@@ -903,11 +949,12 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
             vo.setOwnerDtId(owner_dT_iD);
             vo.setDefinition(dtsc_vo.getDefinition());
+            vo.setDefinitionSource(dtsc_vo.getDefinitionSource());
             vo.setCardinalityMin(dtsc_vo.getCardinalityMin());
             vo.setCardinalityMax(0);
             vo.setBasedDtScId(dtsc_vo.getDtScId());
 
-            dtScRepository.saveAndFlush(vo);
+            dtDAO.save(vo);
 
             insertBDTSCPrimitiveRestriction(vo, 1, "", "");
         }
@@ -918,6 +965,7 @@ public class P_1_7_PopulateQBDTInDT {
         logger.info("### 1.7 Start");
         printTitle("Populate Qualified BDTs");
 
+        release = releaseRepository.findOneByReleaseNum(Double.toString(OAGIS_VERSION));
         populate();
 
         logger.info("### 1.7 End");

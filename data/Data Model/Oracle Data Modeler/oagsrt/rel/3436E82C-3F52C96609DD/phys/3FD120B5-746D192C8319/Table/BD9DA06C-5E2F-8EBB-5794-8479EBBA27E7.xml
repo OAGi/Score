@@ -1,0 +1,95 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="BDT_PRI_RESTRI" directorySegmentName="seg_0" id="BD9DA06C-5E2F-8EBB-5794-8479EBBA27E7">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="IS_DEFAULT" id="02C505F8-B909-9BB2-EB8D-F54F8C02AE49">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CODE_LIST_ID" id="4727F60C-35C1-9F50-9271-EA46F51D3560">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CDT_AWD_PRI_XPS_TYPE_MAP_ID" id="7DA71C6E-CE8A-AD9B-F118-9CE4FDA15BDE">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BDT_ID" id="BB37F50F-FAA2-BA29-F3E4-FF3B5C884768">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="AGENCY_ID_LIST_ID" id="C4F7AD34-EA75-B017-F4F1-53A4D5BFA556">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BDT_PRI_RESTRI_ID" id="E93CA0B2-79D7-C7C2-B8E1-FB41781335D8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BDT_PR_PK_IDX" id="118F6AEF-E38B-1B92-1F0C-23B1A38E2C21">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BDT_PR_CODE_LIST_ID_IDX" id="4177B3A8-233A-F88D-5542-78994F41E9A3">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BDT_PR_CAPXTM_ID_IDX" id="8DB4862B-B5FF-9978-B4D6-F7CF2109E146">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="BDT_PR_AGENCY_ID_LIST_ID_IDX" id="C27C384E-8D46-2A12-3076-6E7EC6CEA31A">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BPR_CODE_LIST_ID_FK" id="706EFA4F-3939-3443-A8C5-E95086C829C8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BPR_CAPXTM_ID_FK" id="932FA735-1026-3361-286C-39143CCC486D">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BPR_BDT_ID_FK" id="BF21EF98-159A-399A-D270-B8CEF06AAB8E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="BPR_AGENCY_ID_LIST_ID_FK" id="E95AB7C0-5425-25B6-AA85-92D1C645930E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="BPR_PK" id="EDA6A4DE-0D45-FDDA-D799-BDDB93F7963C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev12c>

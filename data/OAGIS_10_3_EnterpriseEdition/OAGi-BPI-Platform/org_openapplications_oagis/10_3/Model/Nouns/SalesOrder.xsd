@@ -52,8 +52,9 @@
 	</xsd:element>
 	<xsd:complexType name="SalesOrderType" id="oagis-id-2c248af32baa4c059942e33b7785d9bd">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The schema type for SaleOrder.  SalesOrder's  base abstract type, Order, is shared between PurchaseOrder and SalesOrder. SalesOrder is essentially an extension of PurchaseOrder, but in order to use the local-global design pattern, each of PO and SO needs to instantiate its own Header and Line elements.To do this, we factored out the PO content models, instantiated both PO and SO from Order.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">Sees an order from end to end...</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The schema type for SaleOrder.  SalesOrder's  base abstract type, Order, is shared between PurchaseOrder and SalesOrder. SalesOrder is essentially an extension of PurchaseOrder, but in order to use the local-global design pattern, each of PO and SO needs to instantiate its own Header and Line elements.To do this, we factored out the PO content models, instantiated both PO and SO from Order.
+
+Sees an order from end to end...</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="SalesOrderHeader" id="oagis-id-68700e6f100e4f70ab20296aeeaaff8c" minOccurs="0">
@@ -67,7 +68,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-7bc708f6e7234485860ca4e3fe2becf9"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7bc708f6e7234485860ca4e3fe2becf9"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-c26488602f874d87b4d4c3094bf00822"/>
 	</xsd:complexType>
 	<xsd:complexType name="SalesOrderHeaderBaseType" id="oagis-id-0cb10eb0973d4f96b52f61bc82d08267">
@@ -105,9 +106,11 @@
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SalesOrderHeaderExtensionType" id="oagis-id-c2b1f453fc7b4bd3917da89b466b80a4" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -197,9 +200,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 					</xsd:element>
 					<xsd:element name="Extension" type="SalesOrderLineExtensionType" id="oagis-id-cd9bcf6de27649bd892b1b7eefc55cd1" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -212,9 +217,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SalesOrderSubLineExtensionType" id="oagis-id-e0585e37980c4d15a8e967eef9c1f419" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -250,9 +257,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="SalesOrderScheduleExtensionType" id="oagis-id-a3d49cd26c6c470ea5d4082c36c4462d" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

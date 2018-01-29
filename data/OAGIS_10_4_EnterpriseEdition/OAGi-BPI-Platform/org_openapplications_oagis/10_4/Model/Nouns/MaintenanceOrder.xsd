@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/MaintenanceOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="MaintenanceOrder" type="MaintenanceOrderType" id="oagis-id-daf4d121dfe54551b704c04cebbf4d48">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A Maintenance Order is an order for a machine, building, tooling or fixed asset to be repaired or for preventitive maintenance to be performed.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MaintenanceOrderHeader" type="MaintenanceOrderHeaderType" id="oagis-id-defee27f5a25491ba6579817e6960f4b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the maintenance order</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MaintenanceOrderLine" type="MaintenanceOrderLineType" id="oagis-id-6e250f47775f4278bb9626991f5085ca"/>
+	<xsd:element name="MeterRecording" type="MeterRecordingType" id="oagis-id-69d1018f3a57446dafa1af3e7ccf6fe1"/>
+	<xsd:complexType name="MaintenanceOrderType" id="oagis-id-508ac8bf45c04a10aaff03c6a81f5c31">
+		<xsd:sequence>
+			<xsd:element ref="MaintenanceOrderHeader" id="oagis-id-3eef530a08dd4dbc9e1ee39fd12f60a8" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the maintenance order</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MaintenanceOrderLine" id="oagis-id-a71c67971d1c48f5bacdfb924c3e9408" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-a90880b22e8c45a1a6bf497a0116c5d2"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-1079921ec01f46e9bd94256c79426134"/>
+	</xsd:complexType>
+	<xsd:complexType name="MaintenanceOrderHeaderBaseType" id="oagis-id-711ad11873004712921f58c08eb7a5de">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-6dc2aaa90f2341618181877561bb2480" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PriorityCode" id="oagis-id-128fd9214fd24bd5b9e4534e3136ff32" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ParentMaintenanceOrderID" id="oagis-id-76b4acf76f0c4314b57d1b4fa6fd4007" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the maintenance order that proceeded this order or from which this maintenance order originated after further investigation or work was performed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReportedDateTime" id="oagis-id-58db26a16ba1483e8d2d70de7ee27c77" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies when the work to be done in this work order was reported</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RespondByDateTime" id="oagis-id-6d29e9846ea24a8ebf1672edf4b49025" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date by which a response is expected for this maintenance order</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ChangeDateTime" id="oagis-id-8e306762efb240ad91097f18012e920b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates when the status change occured.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FailureDateTime" id="oagis-id-16e2b42d1d774fedb41d90ceec4c8642" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the timestamp when the machine failed or broke down such that it was no longer useable.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-eeb2b2f0395640dd8f4b8a6c12cbf272" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlannedTimePeriod" id="oagis-id-6169de908cb64e8ba1c44fd35e59fdca" minOccurs="0"/>
+					<xsd:element ref="ScheduledTimePeriod" id="oagis-id-747b5205773943f4bd3fd64b4ff08e06" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the TimePeriod in which the work is Scheduled to be performed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualTimePeriod" id="oagis-id-f5fb21cafe794a66a3b5e0efc66d8e2a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time period in which the actual event(s) occurred.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BudgetedAmount" id="oagis-id-d3e0cc9fd9854da1891d757429983251" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The budgeted amount of performing this activity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedAmount" id="oagis-id-89a799c122a94cc39da8fdffd9b54b58" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the EstimatedAmount of the MaintenanceOrder.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualAmount" id="oagis-id-76ce5e0bf7534e228f0bab44c6000818" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the ActualAmount of the MaintenanceOrder.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedDuration" id="oagis-id-a5bbe90f30f349afb78123d2f0c1c1c9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The duration of time estimated for performing an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualDuration" id="oagis-id-3903b111ad914979affc0cb771ae5036" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The actual duration of time taken for carrying out an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemainingDuration" id="oagis-id-3bf47227cb894a2cac2395dba4860389" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The dutation of time remaining to carry out an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Machine" id="oagis-id-54b42685b18342f09c0b9f4c6cd38540" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Idenitifies a machine.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Facility" id="oagis-id-342e444699344079bcfa204133b28aad" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A Facility identifies a location within an entity. The facility may have sub-locators identified using a sequenced identification notation e.g. Warehouse A100 Sub-Location 11, Row R10 would be represented as an array of three Facility elements with values as A100, 11, R10, name attribute as Warehouse, Sub-Location and Row and sequence attribute as 1,2 and 3 respectively.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="JobPlanID" id="oagis-id-e69494178ae4421d82152a79105760a2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a identifier that describes the specific type of job sequence being performed/requested.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PreventiveMaintenanceID" id="oagis-id-ba112205b81d4a3dbc6d0180743737b1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Describes the specific type of preventive maintenance sequence being performed/requested.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CalendarID" id="oagis-id-6c910150b9c24bc897af19987b564177" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the maintenance calendar used when scheduling this maintenance order</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SplitOperationsIndicator" id="oagis-id-61674d1895594cbd84e7001d783d5522" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether an operation in a maintenance order have to be performed all at once or can be split into non-contiguous work segments.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlannerID" id="oagis-id-e7f80729b84d417b9add640c33a4b89b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the planner of the Maintenance Order.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupervisorID" id="oagis-id-9e0ecfeb2ef8493e9f9e69efebdd0b67" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the person supervising/managing the maintenance work being performed/requested.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequesterID" id="oagis-id-82b0a7afc9094c31991f26f415f67484" minOccurs="0"/>
+					<xsd:element ref="ProjectReference" id="oagis-id-da768e49238f45d4a2053e8f1aa13c4d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a project that is associated with the given component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-0b8dc62500784151a41b3cc9f576a6bf" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedAllocateResources" id="oagis-id-bb0fe22503974033bea10ae733848da8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies resources that are required to perform the maintenance operation. Resource Requirements can be specified for the entire maintenance order or for each operation within the order</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualResources" id="oagis-id-2d84b264795248cfb7b18bdd84cf3c2a" minOccurs="0"/>
+					<xsd:element ref="Safety" id="oagis-id-4956483bd41a4002b92dfcf616d16ca2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the safety related information associated with a machine, location or any other entity, or with performing an activity on any of the above entities</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Failure" id="oagis-id-ba1ddb6212aa4b76b69764eb0b65ecf3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information on the problem, possible symptoms that may lead to the problem, and the cause and remedy for the problem.
+
+Causes and/or remedies could be reported against a failure in a multi-level hierarchical reporting. For example, failure analysis could be recorded as follows; for failure A, causes P and Q are the factors and remedies X, Y and Z are to be taken.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MaintenanceOrderHeaderType" id="oagis-id-1e280b9532014cabad9c56e86b1a5ea6">
+		<xsd:complexContent>
+			<xsd:extension base="MaintenanceOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MaintenanceOrderHeaderExtensionType" id="oagis-id-b8c7e6fa69ce48bf817d49be00cbafd5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MaintenanceOrderLineBaseType" id="oagis-id-1070797126ac49d7a6d0db18a21d0da7">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-65d7af7d3c664f748a288e61d28562bf" minOccurs="0"/>
+					<xsd:element ref="OperationDocumentIdentification" id="oagis-id-821108431dbc4fb7ba1067464a4f3b17" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the identifier of a specific operation.  Possible examples of use are in the Manufacturing Routing or the Maintenance Order. or WorkINProcessOperation. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualDuration" id="oagis-id-c7398983d0eb41c2930a9e4a910fdce8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The actual duration of time taken for carrying out an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemainingDuration" id="oagis-id-757d2f23dcb447efaca28a6dabdaf8ec" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The dutation of time remaining to carry out an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedDuration" id="oagis-id-420b5011363842a684a3bc27d49e7ee7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The duration of time estimated for performing an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CompletionDateTime" id="oagis-id-d84b43539a0041cd9953b70a6e0ffe95" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the timestamp that indicates when the MaintenanceOrder was completed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-397f63de811c4844b6c69621a99d1ccf" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MeterRecording" id="oagis-id-dc58ace190c34d6dbb827fdcb62e2084" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Safety" id="oagis-id-213a60a82ea244c7887dddbccefab632" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the safety related information associated with a machine, location or any other entity, or with performing an activity on any of the above entities</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Failure" id="oagis-id-a4e37c6575ed461393ee4c963ab99ce0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information on the problem, possible symptoms that may lead to the problem, and the cause and remedy for the problem.
+
+Causes and/or remedies could be reported against a failure in a multi-level hierarchical reporting. For example, failure analysis could be recorded as follows; for failure A, causes P and Q are the factors and remedies X, Y and Z are to be taken.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-50f358013a2b45579dbad78654face6e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedAllocateResources" id="oagis-id-cd929e39cdb04854a07ca13d59765099" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies resources that are required to perform the maintenance operation. Resource Requirements can be specified for the entire maintenance order or for each operation within the order</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualResources" id="oagis-id-c683754034e24cdab738e14e93b7d8e8" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MaintenanceOrderLineType" id="oagis-id-747a8baa7eee4bc3a3a1be26edfa822e">
+		<xsd:complexContent>
+			<xsd:extension base="MaintenanceOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MaintenanceOrderLineExtensionType" id="oagis-id-fa966d7bd724461d975a737ae825df0e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MeterRecordingBaseType" id="oagis-id-01a3050ccdff47c6b1974fb4deb84681">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="MeterID" id="oagis-id-54cf3434bb4941bcbcc9782bea64bd37" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Unique Identifier for a meter  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RecordedMeasure" id="oagis-id-12e82402d0054484b058ec0d9df78c90" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies  the value recorded for the meter at a specific point of time</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RecordingDateTime" id="oagis-id-18f477adfc5042b6a485f27cea5345d8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the timestamp at which an event or measurement is recorded</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectorID" id="oagis-id-e276b97dfc8f4bf99f0169209cb0ef63" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the person that carried out the measurement </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MeterRecordingType" id="oagis-id-b0cf930a9a454babbb1b5c1e62b4a238">
+		<xsd:complexContent>
+			<xsd:extension base="MeterRecordingBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MeterRecordingExtensionType" id="oagis-id-a130391b79df490487f0c20c79b952cf" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

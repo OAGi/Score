@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -10,13 +9,12 @@ import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "asccp")
-public class AssociationCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
+public class AssociationCoreComponentProperty implements
+        CoreComponentProperty, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
@@ -42,6 +40,9 @@ public class AssociationCoreComponentProperty
     @Lob
     @Column(length = 10 * 1024)
     private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long roleOfAccId;
@@ -75,8 +76,8 @@ public class AssociationCoreComponentProperty
     @Column
     private Long moduleId;
 
-    @Column(nullable = false)
-    private long namespaceId;
+    @Column
+    private Long namespaceId;
 
     @Column(nullable = false)
     private boolean reusableIndicator;
@@ -107,19 +108,19 @@ public class AssociationCoreComponentProperty
         init();
     }
 
-    public AssociationCoreComponentProperty(long asccpId, String den) {
-        init();
-
-        this.asccpId = asccpId;
-        this.den = den;
+    @Override
+    public long getId() {
+        return getAsccpId();
     }
 
-    public AssociationCoreComponentProperty(long asccpId, long roleOfAccId, String definition) {
-        init();
+    @Override
+    public void setId(long id) {
+        setAsccpId(id);
+    }
 
-        this.asccpId = asccpId;
-        this.roleOfAccId = roleOfAccId;
-        this.definition = definition;
+    @Override
+    public String tableName() {
+        return "ASCCP";
     }
 
     public long getAsccpId() {
@@ -159,9 +160,15 @@ public class AssociationCoreComponentProperty
     }
 
     public void setDefinition(String definition) {
-        if (!StringUtils.isEmpty(definition)) {
-            this.definition = definition;
-        }
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public long getRoleOfAccId() {
@@ -249,10 +256,10 @@ public class AssociationCoreComponentProperty
     }
 
     public long getNamespaceId() {
-        return namespaceId;
+        return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
+    public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -300,7 +307,7 @@ public class AssociationCoreComponentProperty
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -320,12 +327,12 @@ public class AssociationCoreComponentProperty
         this.nillable = nillable;
     }
 
-    @Override
     public AssociationCoreComponentProperty clone() {
         AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
         clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setRoleOfAccId(this.roleOfAccId);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
@@ -351,6 +358,7 @@ public class AssociationCoreComponentProperty
             clone.setCurrentAsccpId(this.currentAsccpId);
         }
         clone.setNillable(this.nillable);
+        clone.afterLoaded();
         return clone;
     }
 
@@ -376,6 +384,7 @@ public class AssociationCoreComponentProperty
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (int) (roleOfAccId ^ (roleOfAccId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -385,7 +394,7 @@ public class AssociationCoreComponentProperty
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
-        result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
+        result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (reusableIndicator ? 1 : 0);
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + revisionNum;
@@ -404,6 +413,7 @@ public class AssociationCoreComponentProperty
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", roleOfAccId=" + roleOfAccId +
                 ", den='" + den + '\'' +
                 ", createdBy=" + createdBy +
@@ -434,6 +444,18 @@ public class AssociationCoreComponentProperty
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) object;
+                asccp.afterLoaded();
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

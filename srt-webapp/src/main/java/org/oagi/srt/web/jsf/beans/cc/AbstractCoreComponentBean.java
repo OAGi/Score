@@ -9,17 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
-
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public abstract class AbstractCoreComponentBean extends UIHandler {
 
@@ -59,9 +57,13 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
     }
 
     public Long getParentAccIdOfUserExtensionGroupAcc(Long ueAccId) {
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(ueAccId);
+        List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(ueAccId);
+        if (asccpList.size() != 1) {
+            throw new IllegalStateException();
+        }
+        AssociationCoreComponentProperty asccp = asccpList.get(0);
         List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccp.getAsccpId(), 0);
-        if (asccList.isEmpty() || asccList.size() > 1) {
+        if (asccList.size() != 1) {
             throw new IllegalStateException();
         }
         AssociationCoreComponent ascc = asccList.get(0);

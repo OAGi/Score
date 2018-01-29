@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AssociationBusinessInformationEntityRepository
-        extends JpaRepository<AssociationBusinessInformationEntity, Integer> {
+        extends JpaRepository<AssociationBusinessInformationEntity, Long> {
 
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(long fromAbieId);
@@ -23,7 +23,8 @@ public interface AssociationBusinessInformationEntityRepository
     public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 
     @Query("select a from AssociationBusinessInformationEntity a where a.basedAsccId = ?1 and a.fromAbieId = ?2 and a.ownerTopLevelAbieId = ?3")
-    public AssociationBusinessInformationEntity findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(long basedAsccId, long fromAbieId, long ownerTopLevelAbieId);
+    public AssociationBusinessInformationEntity findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(
+            long basedAsccId, long fromAbieId, long ownerTopLevelAbieId);
 
     @Modifying
     @Query("delete from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")

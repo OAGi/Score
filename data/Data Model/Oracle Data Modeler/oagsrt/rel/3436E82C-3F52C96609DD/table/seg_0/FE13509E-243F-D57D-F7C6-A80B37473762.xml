@@ -55,7 +55,7 @@
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
-<logicalDatatype>LOGDT040</logicalDatatype>
+<logicalDatatype>LOGDT028</logicalDatatype>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
@@ -80,7 +80,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="9A2A16EF-652B-1A36-6F9D-1ECC19962ED3" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -95,7 +95,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="7B91CDCD-59A1-B09F-1D11-02618F629D2C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -110,7 +110,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="07ECC5B2-531D-CFFA-F5D2-0B46695CEE05" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>

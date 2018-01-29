@@ -10,6 +10,7 @@ public interface Declaration {
     public String getName();
     public String getId();
     public String getDefinition();
+    public String getDefinitionSource();
     public Module getModule();
     public File getModuleAsFile();
     public int getMinOccur();

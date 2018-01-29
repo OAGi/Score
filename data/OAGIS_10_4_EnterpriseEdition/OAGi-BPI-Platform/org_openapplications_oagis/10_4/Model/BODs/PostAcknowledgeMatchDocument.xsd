@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/PostAcknowledgeMatchDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MatchDocument.xsd"/>
+	<xsd:element name="PostAcknowledgeMatchDocument" type="PostAcknowledgeMatchDocumentType" id="oagis-id-70e809149b7844eb932ea82b146d2370">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The PostAcknowledgeMatchDocument provides the ability to request an application/ system to create a MatchDocument</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PostAcknowledgeMatchDocumentType" id="oagis-id-78f2d610bd4b462da5c5e12fa820d6d8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="PostAcknowledgeMatchDocumentDataAreaType" id="oagis-id-c8e2e74b97714a038ebc6c378ef37e7c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case PostAcknowledgeMatchDocument. The information consists of a Verb and one or more Nouns. The verb (PostAcknowledge) indicates the action to be performed on the Noun (MatchDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PostAcknowledgeMatchDocumentDataAreaType" id="oagis-id-d6243808554c47f4bfb01730cb49dea9">
+		<xsd:sequence>
+			<xsd:element ref="PostAcknowledge" id="oagis-id-f8095280c1db423795fa7e0addfb4ee3"/>
+			<xsd:element ref="MatchDocument" maxOccurs="unbounded" id="oagis-id-80879a119bf24c2c81716ba52cd82226"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

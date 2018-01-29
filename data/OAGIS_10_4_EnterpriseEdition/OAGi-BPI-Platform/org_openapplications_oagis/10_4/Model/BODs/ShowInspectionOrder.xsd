@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowInspectionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InspectionOrder.xsd"/>
+	<xsd:element name="ShowInspectionOrder" type="ShowInspectionOrderType" id="oagis-id-324eb3b91b3a4afebf0c97f9db3fae78">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowInspectionOrder is to supply Item Bill of Material information to another business application module.  This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate Item Bill of Material information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowInspectionOrderType" id="oagis-id-b366738e909a4133a6f990ccc615053e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowInspectionOrderDataAreaType" id="oagis-id-dc2345a62ff2433c93f574a0671e9d31">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInspectionOrder. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InspectionOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowInspectionOrderDataAreaType" id="oagis-id-829c0e1ee44849dfb38654237c08e3a6">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-32dfdd8ebabc48a5ab310314aad58361"/>
+			<xsd:element ref="InspectionOrder" id="oagis-id-77f6f11721db43a7b9384068d03a3d6c" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

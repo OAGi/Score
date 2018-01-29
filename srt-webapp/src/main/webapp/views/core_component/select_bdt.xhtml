@@ -13,16 +13,16 @@
         <h:form id="form">
             <p:panel>
                 <f:facet name="header">
-                    <p:autoComplete id="dataTypeTermQualifier" value="#{selectBDTBean.dataTypeTermQualifier}"
+                    <p:autoComplete id="qualifierDataTypeTerm" value="#{selectBDTBean.qualifierDataTypeTerm}"
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
                                     completeMethod="#{selectBDTBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true"
                                      actionListener="#{selectBDTBean.search}"
                                      update="tblBDT"
-                                     icon="ui-icon-search"/>
+                                     icon="fa fa-white fa-search"/>
                 </f:facet>
                 <p:dataTable id="tblBDT" var="bdt" selectionMode="single" selection="#{selectBDTBean.selectedBDT}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -34,12 +34,16 @@
                     <p:ajax event="rowUnselect" update=":form:btnGroup"
                             listener="#{selectBDTBean.onBDTUnselect}"/>
 
+                    <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
+                        <h:outputText value="#{bdt.qualifier}"/>
+                    </p:column>
+
                     <p:column headerText="Data Type Term" sortBy="#{bdt.dataTypeTerm}">
                         <h:outputText value="#{bdt.dataTypeTerm}"/>
                     </p:column>
 
-                    <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
-                        <h:outputText value="#{bdt.qualifier}"/>
+                    <p:column headerText="DEN" sortBy="#{bdt.den}">
+                        <h:outputText value="#{bdt.den}"/>
                     </p:column>
 
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
@@ -65,6 +69,8 @@
                 <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
                                  disabled="#{selectBDTBean.selectedBDT eq null}"
                                  action="#{selectBDTBean.createBCCP()}"/>
+                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
+                                 action="#{selectBDTBean.back}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

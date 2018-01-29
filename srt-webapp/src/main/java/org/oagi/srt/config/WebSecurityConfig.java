@@ -34,17 +34,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .invalidateHttpSession(true)
-                .logoutSuccessUrl(
-                        "/views/user/login.jsf");
+                .logoutSuccessUrl("/signin");
 
         http.authorizeRequests()
-                .antMatchers("/javax.faces.resource/**", "/views/user/join.jsf").permitAll()
+                .antMatchers("/javax.faces.resource/**", "/signup").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .loginPage("/views/user/login.jsf").permitAll()
+                .loginPage("/signin").permitAll()
                 .and()
                 .logout().permitAll();
     }

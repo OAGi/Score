@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
    Schema agency: 	Open Applications Group 
 
@@ -20,7 +22,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/BODs/AcknowledgeInspectionOrder.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/InspectionOrder.xsd"/>
 	<xsd:element name="AcknowledgeInspectionOrder" type="AcknowledgeInspectionOrderType" id="oagis-id-aa85cbac2ead47dca0d10ed3f11947ed">
 		<xsd:annotation>
@@ -46,7 +49,7 @@ There are many possible business applications in several environments that may u
 	</xsd:complexType>
 	<xsd:complexType name="AcknowledgeInspectionOrderDataAreaType" id="oagis-id-7445129a99df4df6abdb7966e167294d">
 		<xsd:sequence>
-			<xsd:element ref="Acknowledge" id="oagis-id-f8b4f55ad21d471dbbe204a156e520f7"/>
+			<xsd:element ref="Acknowledge" id="oagis-id-96a1d46e6cb349c4a484aa9b9ce84d80"/>
 			<xsd:element ref="InspectionOrder" id="oagis-id-a48e2050a2c14357a7fad31e619576e5" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>

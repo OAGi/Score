@@ -14,7 +14,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,14 +33,23 @@ public class ContextCategoryDetailBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        String paramCtxCategoryId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ctxCategoryId");
-        if (StringUtils.isEmpty(paramCtxCategoryId)) {
-            setContextCategory(new ContextCategory());
-        } else {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+
+        String paramCtxCategoryId = requestParameterMap.get("ctxCategoryId");
+        if (!StringUtils.isEmpty(paramCtxCategoryId)) {
             Long ctxCategoryId = Long.parseLong(paramCtxCategoryId);
             if (ctxCategoryId != null) {
                 ContextCategory contextCategory = contextCategoryService.findById(ctxCategoryId);
                 setContextCategory(contextCategory);
+            }
+        } else {
+            String paramCtxCategoryGuid = requestParameterMap.get("ctxCategoryGuid");
+            if (!StringUtils.isEmpty(paramCtxCategoryGuid)) {
+                ContextCategory contextCategory = contextCategoryService.findOneByGuid(paramCtxCategoryGuid);
+                setContextCategory(contextCategory);
+            } else {
+                setContextCategory(new ContextCategory());
             }
         }
     }
@@ -66,7 +77,7 @@ public class ContextCategoryDetailBean extends UIHandler {
 
         contextCategoryService.update(contextCategory);
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        return "/views/context_category/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -83,6 +94,6 @@ public class ContextCategoryDetailBean extends UIHandler {
 
         contextCategoryService.deleteById(ctxCategoryId);
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        return "/views/context_category/list.jsf?faces-redirect=true";
     }
 }

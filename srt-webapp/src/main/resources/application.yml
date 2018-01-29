@@ -33,8 +33,7 @@ jsf:
   datetimeconverter-default-timezone-is-system-timezone: true
 
   primefaces:
-    theme: home
-    uploader: common
+    uploader: commons
     client-side-validation: true
     public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu
     private-captcha-key: 6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR
@@ -47,7 +46,7 @@ spring:
 # DataSource
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
+    url: jdbc:oracle:thin:@docker:1521/xe
     username: oagi
     password: oagi
     platform: oracle
@@ -60,6 +59,7 @@ logging:
 
 jsf:
   project-stage: Development
+  facelets-refresh-period: 0
 
 server:
   session:
@@ -93,8 +93,6 @@ server:
 ---
 spring:
   profiles: production
-  main:
-    banner-mode: off
 
 # DataSource
   datasource:

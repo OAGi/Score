@@ -1,16 +1,11 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.ACCNode;
-import org.oagi.srt.model.node.ASCCPNode;
-import org.oagi.srt.model.node.BCCPNode;
-import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.CoreComponentState;
-import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.UndoService;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -26,6 +21,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.*;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
@@ -40,6 +36,9 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
+    private UndoService undoService;
+
+    @Autowired
     private CoreComponentService coreComponentService;
 
     @Autowired
@@ -50,9 +49,10 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
 
     private AssociationCoreComponentProperty targetAsccp;
 
-    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
-    private int treeNodeLinkedListIndex = -1;
+    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
+    private boolean setSelectedTreeNodeAfterRefresh = false;
+    private TreeNode selectedNodeAfterRefresh;
 
     @PostConstruct
     public void init() {
@@ -76,7 +76,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
 
         setTargetAsccp(targetAsccp);
 
-        TreeNode treeNode = createTreeNode(targetAsccp);
+        TreeNode treeNode = createTreeNode(targetAsccp, true);
         setTreeNode(treeNode);
     }
 
@@ -89,39 +89,15 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public TreeNode getTreeNode() {
-        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
+        return treeNode;
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
-            treeNodeLinkedList.removeLast();
-        }
-        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
-    }
-
-    public boolean canBack() {
-        return (treeNodeLinkedListIndex > 0);
-    }
-
-    public boolean canForward() {
-        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
-    }
-
-    public void navigateBack() {
-        treeNodeLinkedListIndex--;
-    }
-
-    public void navigateForward() {
-        treeNodeLinkedListIndex++;
-    }
-
-    public void navigateForward(AggregateCoreComponent acc) {
-        TreeNode treeNode = createTreeNode(acc);
-        setTreeNode(treeNode);
+        this.treeNode = treeNode;
     }
 
     public TreeNode getRootNode() {
-        return treeNodeLinkedList.get(0).getChildren().get(0);
+        return (treeNode.getChildCount() > 0) ? treeNode.getChildren().get(0) : null;
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -129,7 +105,12 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
-        this.selectedTreeNode = selectedTreeNode;
+        if (treeNode != null && selectedTreeNode == null && setSelectedTreeNodeAfterRefresh) {
+            this.selectedTreeNode = selectedNodeAfterRefresh;
+            setSelectedTreeNodeAfterRefresh = false;
+        } else {
+            this.selectedTreeNode = selectedTreeNode;
+        }
     }
 
     public AggregateCoreComponent getSelectedAggregateCoreComponent() {
@@ -167,53 +148,12 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         setNodeName(asccpNode);
     }
 
-    private void reorderTreeNode(TreeNode treeNode) {
-        List<TreeNode> children = treeNode.getChildren();
-        Collections.sort(children, (a, b) -> {
-            int s1 = getSeqKey(a);
-            int s2 = getSeqKey(b);
-            int compareTo = s1 - s2;
-            if (compareTo != 0) {
-                return compareTo;
-            } else {
-                return getCreationTimestamp(a).compareTo(getCreationTimestamp(b));
-            }
-        });
-        /*
-         * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
-         * to clarify children's order for node selection
-         */
-        for (int i = 0, len = children.size(); i < len; ++i) {
-            TreeNode child = children.get(i);
-            String childRowKey = (treeNode.getParent() == null) ? String.valueOf(i) : treeNode.getRowKey() + "_" + i;
-            child.setRowKey(childRowKey);
+    public boolean isDisabled(AssociationCoreComponentProperty asccp) {
+        User currentUser = getCurrentUser();
+        if (asccp.getOwnerUserId() != currentUser.getAppUserId() || asccp.getState() != Editing) {
+            return true;
         }
-
-        for (TreeNode child : children) {
-            reorderTreeNode(child);
-        }
-    }
-
-    private int getSeqKey(TreeNode treeNode) {
-        Object data = treeNode.getData();
-        if (data instanceof ASCCPNode) {
-            return ((ASCCPNode) data).getAscc().getSeqKey();
-        } else if (data instanceof BCCPNode) {
-            return ((BCCPNode) data).getBcc().getSeqKey();
-        }
-        return -1;
-    }
-
-    private Date getCreationTimestamp(TreeNode treeNode) {
-        Object data = treeNode.getData();
-        if (data instanceof ASCCPNode) {
-            return ((ASCCPNode) data).getAsccp().getCreationTimestamp();
-        } else if (data instanceof BCCPNode) {
-            return ((BCCPNode) data).getBccp().getCreationTimestamp();
-        } else if (data instanceof ACCNode) {
-            return ((ACCNode) data).getAcc().getCreationTimestamp();
-        }
-        return null;
+        return false;
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -236,8 +176,8 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateAsccp(TreeNode treeNode) {
-        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+    public void updateAsccp() {
+        ASCCPNode asccpNode = (ASCCPNode) getRootNode().getData();
         AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
         User requester = getCurrentUser();
 
@@ -252,7 +192,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String discardAsccp(TreeNode treeNode) {
+    public void discardAsccp(TreeNode treeNode) throws IOException {
         ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
         User requester = getCurrentUser();
@@ -265,7 +205,49 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
             throw t;
         }
 
-        return "/views/core_component/list.xhtml?faces-redirect=true";
+        back();
+    }
+
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
+    }
+
+    /*
+     * Create New Revision
+     */
+    public boolean hasPreviousRevision(AssociationCoreComponentProperty asccp) {
+        Long asccpId = asccp.getAsccpId();
+        List<AssociationCoreComponentProperty> latestRevisionNumAsccps =
+                asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(asccpId);
+        return !latestRevisionNumAsccps.isEmpty();
+    }
+
+    public boolean isPreviousRevisionNotInsert(AssociationCoreComponentProperty asccp) {
+        return undoService.isPreviousRevisionNotInsert(asccp);
+    }
+
+    @Transactional
+    public void createNewRevision(AssociationCoreComponentProperty asccp) throws IOException {
+        User requester = getCurrentUser();
+        asccp = coreComponentService.newAssociationCoreComponentPropertyRevision(requester, asccp);
+        setTargetAsccp(asccp);
+
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/asccp/" + asccp.getAsccpId());
+    }
+
+    public void undoLastAction() {
+        undoService.undoLastAction(getTargetAsccp());
+        refreshTreeNode();
+    }
+
+    private void refreshTreeNode() {
+        TreeNode treeNode = createTreeNode(targetAsccp, true);
+        copyExpandedState(this.treeNode, treeNode);
+        setTreeNode(treeNode);
+        setSelectedTreeNodeAfterRefresh = true;
+        selectedNodeAfterRefresh = findChildNodeAnywhereById(treeNode,((SRTNode)getSelectedTreeNode().getData()).getId());
     }
 }
 

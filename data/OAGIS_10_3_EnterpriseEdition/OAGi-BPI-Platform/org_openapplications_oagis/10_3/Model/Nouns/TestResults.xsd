@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 Reviewed with group... Outside of the commented out RelativeLocation is good to go forward
 
 
@@ -20,7 +22,8 @@ Reviewed with group... Outside of the commented out RelativeLocation is good to 
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Nouns/TestResults.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
 	<xsd:element name="TestResults" type="TestResultsType" id="oagis-id-c9c4dcb3507f4e69a42020145fba39c8">
 		<xsd:annotation>
@@ -103,9 +106,11 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="TestResultsHeaderExtensionType" id="oagis-id-a915e45c9e274757b3ca100b019bdd4b" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -142,11 +147,12 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element name="Extension" type="TestResultsLineExtensionType" id="oagis-id-a85cfa33fc0c4ca5a9ce9de1206dbaca" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
-						
 					</xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
@@ -180,7 +186,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 					<xsd:element ref="MethodDocumentReference" id="oagis-id-37036206da6b40c7b3f2fd49b5042e8f" minOccurs="0"/>
 					<xsd:element ref="TestEnvironmentCondition" id="oagis-id-b8bde97287fe4d6d871d5220188ee448" minOccurs="0" maxOccurs="unbounded"/>
 					<!-- new in 10.3 -->
-					<xsd:element ref="TestEquipmentClass" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c0040e86d76c43ceba5e33d55d6b5bfe"/>
+					<xsd:element ref="TestEquipmentClass" id="oagis-id-c0040e86d76c43ceba5e33d55d6b5bfe" minOccurs="0" maxOccurs="unbounded"/>
 					<!-- end 10.3 -->
 					<xsd:element ref="TestQuantitativeMeasurement" id="oagis-id-572ab4a4ba934f27930ed10f345432b0" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="TestQualitativeMeasurement" id="oagis-id-e9eb86259aaf4515a1ae6bc842204613" minOccurs="0" maxOccurs="unbounded"/>
@@ -198,11 +204,13 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 		<xsd:complexContent>
 			<xsd:extension base="TestResultsDetailBaseType">
 				<xsd:sequence>
-					<xsd:element name="Extension" type="TestResultsDetailExtensionType" id="oagis-id-00599d451c70443dadf3ef304ffaf69b" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="Extension" type="TestResultsDetailExtensionType" id="oagis-id-30da1f6463d34bb79314c6bb672c6789" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

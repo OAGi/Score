@@ -11,6 +11,9 @@ public interface BusinessContextRepository extends JpaRepository<BusinessContext
     @Query("select b from BusinessContext b where b.createdBy = ?1")
     public List<BusinessContext> findAllByCreatedBy(long createdBy);
 
+    @Query("select b from BusinessContext b where b.guid = ?1")
+    public BusinessContext findOneByGuid(String guid);
+
     @Query("select b from BusinessContext b where b.name = ?1")
     public List<BusinessContext> findByName(String name);
 }

@@ -10,5 +10,5 @@
 <mandatory>true</mandatory>
 <transferable>true</transferable>
 <rely>false</rely>
-<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+<columnDependencyConstraintGenerateInDDL>false</columnDependencyConstraintGenerateInDDL>
 </FKIndexAssociation>

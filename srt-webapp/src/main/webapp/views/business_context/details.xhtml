@@ -17,24 +17,20 @@
             </div>
         </div>
         <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
+            <p:growl id="growl" showDetail="true" life="3000"/>
+
             <p:panel>
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="GUID" styleClass="section-label"
                                   rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"/>
-                    <h:inputText value="#{businessContextDetailBean.businessContext.guid}"
+                    <h:inputText id="guid" value="#{businessContextDetailBean.businessContext.guid}"
                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
                                  styleClass="section-content input-section disabled" disabled="true"/>
 
                     <h:outputText value="Name" styleClass="section-label"/>
                     <h:inputText id="name" value="#{businessContextDetailBean.businessContext.name}"
-                                 required="true"
-                                 requiredMessage="Please fill out 'Name' field."
-                                 maxlength="255"
                                  label="Name" styleClass="section-content input-section">
-                        <f:validateLength maximum="255"/>
+                        <p:ajax update="form"/>
                     </h:inputText>
                 </h:panelGrid>
             </p:panel>
@@ -42,7 +38,7 @@
             <p:panel>
                 <f:facet name="header">
                     <h:outputText value="Business Context Values"/>
-                    <p:commandButton value="Add" style="float: right;"
+                    <p:commandButton id="addBtn" value="Add" style="float: right;"
                                      actionListener="#{businessContextDetailBean.addBusinessContextValue}"
                                      update="tbl"/>
                 </f:facet>
@@ -56,7 +52,7 @@
 
                     <p:column style="width: 30%; height: 30px;" headerText="Context Category"
                               sortBy="#{businessContextValue.contextCategory.name}">
-                        <p:autoComplete
+                        <p:autoComplete id="ctxCategoryAuto"
                                 value="#{businessContextValue.contextCategory}"
                                 completeMethod="#{businessContextDetailBean.completeContextCategory}"
                                 var="contextCategory" style="width: 100%" dropdown="true"
@@ -71,7 +67,7 @@
 
                     <p:column style="width: 30%" headerText="Context Scheme Name"
                               sortBy="#{businessContextValue.contextScheme.schemeName}">
-                        <p:autoComplete rendered="#{businessContextValue.contextCategory != null}"
+                        <p:autoComplete id="ctxSchemeAuto" rendered="#{businessContextValue.contextCategory != null}"
                                         value="#{businessContextValue.contextScheme}"
                                         completeMethod="#{businessContextDetailBean.completeContextScheme}"
                                         var="contextScheme" style="width: 100%" dropdown="true"
@@ -82,14 +78,20 @@
                             <f:attribute name="businessContextValue" value="#{businessContextValue}"/>
                             <f:facet name="itemtip">
                                 <h:panelGrid columns="2" cellpadding="2" styleClass="itemtip">
-                                    <h:outputText value="Agency ID" style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
-                                    <h:outputText value="#{contextScheme.schemeAgencyId}" style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
+                                    <h:outputText value="Agency ID"
+                                                  style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
+                                    <h:outputText value="#{contextScheme.schemeAgencyId}"
+                                                  style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
 
-                                    <h:outputText value="Scheme ID" style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
-                                    <h:outputText value="#{contextScheme.schemeId}" style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
+                                    <h:outputText value="Scheme ID"
+                                                  style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
+                                    <h:outputText value="#{contextScheme.schemeId}"
+                                                  style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
 
-                                    <h:outputText value="Version ID" style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
-                                    <h:outputText value="#{contextScheme.schemeVersionId}" style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
+                                    <h:outputText value="Version ID"
+                                                  style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
+                                    <h:outputText value="#{contextScheme.schemeVersionId}"
+                                                  style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
                                 </h:panelGrid>
                             </f:facet>
                             <p:ajax event="itemSelect" update="tbl"
@@ -101,7 +103,7 @@
 
                     <p:column style="width: 30%" headerText="Context Scheme Value"
                               sortBy="#{businessContextValue.contextSchemeValue.value}">
-                        <p:autoComplete rendered="#{businessContextValue.contextScheme != null}"
+                        <p:autoComplete id="ctxSchemeValueAuto" rendered="#{businessContextValue.contextScheme != null}"
                                         value="#{businessContextValue.contextSchemeValue}"
                                         completeMethod="#{businessContextDetailBean.completeContextSchemeValue}"
                                         var="contextSchemeValue" style="width: 100%" dropdown="true"
@@ -113,8 +115,10 @@
                             </f:attribute>
                             <f:facet name="itemtip">
                                 <h:panelGrid columns="2" cellpadding="2" styleClass="itemtip">
-                                    <h:outputText value="Meaning" style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
-                                    <h:outputText value="#{contextSchemeValue.meaning}" style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
+                                    <h:outputText value="Meaning"
+                                                  style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
+                                    <h:outputText value="#{contextSchemeValue.meaning}"
+                                                  style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
                                 </h:panelGrid>
                             </f:facet>
                             <p:ajax event="itemSelect" update="tbl"
@@ -124,7 +128,7 @@
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
-                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{businessContextDetailBean.deleteBusinessContextValue}"
                                          update="tbl">
                             <f:setPropertyActionListener value="#{businessContextValue}"
@@ -135,29 +139,29 @@
 
                 <p:separator/>
 
-                <p:commandButton ajax="true" value="Create"
+                <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.guid == null}"
                                  action="#{businessContextDetailBean.update()}"/>
 
-                <p:commandButton ajax="true" value="Update"
+                <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.guid != null}"
                                  action="#{businessContextDetailBean.update()}"/>
 
-                <p:commandButton ajax="true" value="Discard"
+                <p:commandButton id="discardBtn" ajax="true" value="Discard" update="growl"
                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
                                  styleClass="danger"
                                  onclick="PF('confirmDiscard').show()"/>
 
-                <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+                <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
                                  hideEffect="fade" closable="false" header="Warning">
                     <f:facet name="message">
                         The business context will be permanently removed.
                     </f:facet>
                     <div style="text-align: center;">
-                        <p:commandButton value="Accept" icon="ui-icon-check"
+                        <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                          action="#{businessContextDetailBean.delete()}"
                                          oncomplete="PF('confirmDiscard').hide()"/>
-                        <p:commandButton value="Cancel" icon="ui-icon-close"
+                        <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                          onclick="PF('confirmDiscard').hide()"/>
                     </div>
                 </p:confirmDialog>

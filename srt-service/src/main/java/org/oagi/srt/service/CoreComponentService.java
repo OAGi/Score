@@ -6,7 +6,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,13 @@ import static org.oagi.srt.repository.entity.RevisionAction.Update;
 public class CoreComponentService {
 
     @Autowired
+    private UndoService undoService;
+
+    @Autowired
     private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
 
     @Autowired
     private AssociationCoreComponentRepository asccRepository;
@@ -44,6 +50,20 @@ public class CoreComponentService {
 
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
+
+    @Autowired
+    private CoreComponentsRepository coreComponentsRepository;
+
+    @Autowired
+    private CoreComponentDAO coreComponentDAO;
+
+    public List<CoreComponents> getCoreComponents(
+            List<String> types, List<CoreComponentState> states, Release release, Sort.Order order) {
+        if (release == null) {
+            release = Release.WORKING_RELEASE;
+        }
+        return coreComponentsRepository.findAll(types, states, release, order);
+    }
 
     public List<CoreComponentRelation> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
@@ -136,16 +156,54 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent newAggregateCoreComponentRevision(User user, AggregateCoreComponent acc) {
+        long requesterId = user.getAppUserId();
+        if (acc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        acc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        acc.addPersistEventListener(eventListener);
+
+        acc = accRepository.saveAndFlush(acc);
+
+        AggregateCoreComponent accHistory = acc.clone();
+        Long currentAccId = acc.getAccId();
+        List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
+        if (latestHistoryAccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        accHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        accHistory.setRevisionTrackingNum(revisionTrackingNum);
+        accHistory.setRevisionAction(Insert);
+        accHistory.setCurrentAccId(acc.getAccId());
+        accHistory.setReleaseId(null);
+
+        accRepository.save(accHistory);
+
+        return acc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public AssociationCoreComponentProperty newAssociationCoreComponentProperty(User user, AggregateCoreComponent roleOfAcc) {
         long requesterId = user.getAppUserId();
 
         AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
         asccp.setGuid(Utility.generateGUID());
-        asccp.setPropertyTerm("A new ASCCP property");
-        asccp.setRoleOfAccId(roleOfAcc.getAccId());
+        asccp.setPropertyTerm("A new ASCCP property", roleOfAcc);
         asccp.setState(CoreComponentState.Editing);
+        asccp.setReusableIndicator(true); // Default value should be true.
         asccp.setOwnerUserId(requesterId);
-        asccp.setNamespaceId(roleOfAcc.getNamespaceId());
+        long namespaceId = roleOfAcc.getNamespaceId();
+        if (namespaceId > 0L) {
+            asccp.setNamespaceId(namespaceId);
+        }
 
         CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
         asccp.addPersistEventListener(eventListener);
@@ -159,6 +217,41 @@ public class CoreComponentService {
         asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
         asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+
+        asccpRepository.save(asccpHistory);
+
+        return asccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponentProperty newAssociationCoreComponentPropertyRevision(User user, AssociationCoreComponentProperty asccp) {
+        long requesterId = user.getAppUserId();
+        if (asccp.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        asccp.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        asccp.addPersistEventListener(eventListener);
+
+        asccp = asccpRepository.saveAndFlush(asccp);
+
+        AssociationCoreComponentProperty asccpHistory = asccp.clone();
+        Long currentAsccpId = asccp.getAsccpId();
+        List<AssociationCoreComponentProperty> latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
+        if (latestHistoryAsccpList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAsccpList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        asccpHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        asccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        asccpHistory.setRevisionAction(Insert);
+        asccpHistory.setCurrentAsccpId(asccp.getAsccpId());
+        asccpHistory.setReleaseId(null);
 
         asccpRepository.save(asccpHistory);
 
@@ -198,12 +291,116 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponentProperty newBasicCoreComponentPropertyRevision(User user, BasicCoreComponentProperty bccp) {
+        long requesterId = user.getAppUserId();
+        if (bccp.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        bccp.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        bccp.addPersistEventListener(eventListener);
+
+        bccp = bccpRepository.saveAndFlush(bccp);
+
+        BasicCoreComponentProperty bccpHistory = bccp.clone();
+        Long currentBccpId = bccp.getBccpId();
+        List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
+        if (latestHistoryBccpList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryBccpList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        bccpHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        bccpHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setCurrentBccpId(bccp.getBccpId());
+        bccpHistory.setReleaseId(null);
+
+        bccpRepository.save(bccpHistory);
+
+        return bccp;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponent newAssociationCoreComponentRevision(User user, AssociationCoreComponent ascc) {
+        long requesterId = user.getAppUserId();
+        if (ascc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        ascc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        ascc.addPersistEventListener(eventListener);
+
+        ascc = asccRepository.saveAndFlush(ascc);
+
+        AssociationCoreComponent asccHistory = ascc.clone();
+        Long currentAsccId = ascc.getAsccId();
+        List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
+        if (latestHistoryAsccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryAsccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        asccHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        asccHistory.setRevisionTrackingNum(revisionTrackingNum);
+        asccHistory.setRevisionAction(Insert);
+        asccHistory.setCurrentAsccId(ascc.getAsccId());
+        asccHistory.setReleaseId(null);
+
+        asccRepository.save(asccHistory);
+
+        return ascc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponent newBasicCoreComponentRevision(User user, BasicCoreComponent bcc) {
+        long requesterId = user.getAppUserId();
+        if (bcc.getOwnerUserId() != requesterId) {
+            throw new IllegalArgumentException("Only allowed this operation by owner.");
+        }
+        bcc.setState(CoreComponentState.Editing);
+
+        CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(user);
+        bcc.addPersistEventListener(eventListener);
+
+        bcc = bccRepository.saveAndFlush(bcc);
+
+        BasicCoreComponent bccHistory = bcc.clone();
+        Long currentBccId = bcc.getBccId();
+        List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
+        if (latestHistoryBccList.isEmpty()) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        int latestRevisionNum = latestHistoryBccList.stream()
+                .mapToInt(e -> e.getRevisionNum())
+                .max().orElse(0);
+        bccHistory.setRevisionNum(latestRevisionNum + 1);
+        int revisionTrackingNum = 1;
+        bccHistory.setRevisionTrackingNum(revisionTrackingNum);
+        bccHistory.setRevisionAction(Insert);
+        bccHistory.setCurrentBccId(bcc.getBccId());
+        bccHistory.setReleaseId(null);
+
+        bccRepository.save(bccHistory);
+
+        return bcc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void update(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = acc.getCreatedBy();
+        long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAccId = acc.getAccId();
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
@@ -211,11 +408,11 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        accRepository.save(acc);
+        acc = coreComponentDAO.save(acc);
 
         int latestRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AggregateCoreComponent accHistory = acc.clone();
         accHistory.setRevisionNum(latestHistoryAccList.get(0).getRevisionNum());
@@ -223,16 +420,67 @@ public class CoreComponentService {
         accHistory.setRevisionAction(Update);
         accHistory.setLastUpdatedBy(requesterId);
         accHistory.setCurrentAccId(currentAccId);
+        accHistory.setReleaseId(null);
 
         accRepository.saveAndFlush(accHistory);
+
+        long accId = acc.getAccId();
+        // update ascc DEN
+        List<AssociationCoreComponent> dirtyAsccList = new ArrayList();
+        for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(accId)) {
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            ascc.setDen(acc, asccp);
+            if (ascc.isDirty()) {
+                dirtyAsccList.add(ascc);
+            }
+        }
+        if (!dirtyAsccList.isEmpty()) {
+            asccRepository.save(dirtyAsccList);
+        }
+
+        // update asccp DEN
+        List<AssociationCoreComponentProperty> dirtyAsccpList = new ArrayList();
+        for (AssociationCoreComponentProperty asccp : asccpRepository.findByRoleOfAccId(accId)) {
+            asccp.setRoleOfAcc(acc);
+            if (asccp.isDirty()) {
+                dirtyAsccpList.add(asccp);
+            }
+        }
+        if (!dirtyAsccpList.isEmpty()) {
+            asccpRepository.save(dirtyAsccpList);
+        }
+
+        // update bcc DEN
+        List<BasicCoreComponent> dirtyBccList = new ArrayList();
+        for (BasicCoreComponent bcc : bccRepository.findByFromAccId(accId)) {
+            BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+            bcc.setDen(acc, bccp);
+            if (bcc.isDirty()) {
+                dirtyBccList.add(bcc);
+            }
+        }
+        if (!dirtyBccList.isEmpty()) {
+            bccRepository.save(dirtyBccList);
+        }
 
         // to check RevisionTrackingNum
         latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
         int actualRevisionTrackingNum = latestHistoryAccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AggregateCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isBasedAccIdOnlyChange(AggregateCoreComponent oldAcc, AggregateCoreComponent newAcc) {
+        oldAcc.setBasedAccId(null);
+        newAcc.setBasedAccId(null);
+
+        if (oldAcc.hashCode() == newAcc.hashCode()) { // everything else is the same, only change was basedAccId
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
@@ -240,12 +488,10 @@ public class CoreComponentService {
     public void updateState(AggregateCoreComponent acc,
                             CoreComponentState state,
                             User requester) {
-        if (acc.getCreatedBy() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        if (acc.getOwnerUserId() != requester.getAppUserId()) {
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
-        updateChildrenState(acc, state, requester);
         updateAccState(acc, state, requester);
     }
 
@@ -253,9 +499,16 @@ public class CoreComponentService {
     public void updateState(AssociationCoreComponentProperty asccp,
                             CoreComponentState state,
                             User requester) {
-        if (asccp.getCreatedBy() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        if (asccp.getOwnerUserId() != requester.getAppUserId()) {
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
+        }
+
+        // #Issue 437
+        if (state == Published) {
+            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+            if (acc.getState() != Published) {
+                throw new IllegalStateException("This state cannot be updated until the associated ACC is in Publish state.");
+            }
         }
 
         updateAsccpState(asccp, state, requester);
@@ -265,9 +518,8 @@ public class CoreComponentService {
     public void updateState(BasicCoreComponentProperty bccp,
                             CoreComponentState state,
                             User requester) {
-        if (bccp.getCreatedBy() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        if (bccp.getOwnerUserId() != requester.getAppUserId()) {
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
         updateBccpState(bccp, state, requester);
@@ -276,10 +528,9 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AggregateCoreComponent acc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = acc.getCreatedBy();
+        long ownerId = acc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAccId = acc.getAccId();
         List<AggregateCoreComponent> latestHistoryAccList = accRepository.findAllWithLatestRevisionNumByCurrentAccId(currentAccId);
@@ -287,18 +538,22 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        long accId = acc.getAccId();
-        accRepository.deleteByCurrentAccId(accId); // To remove history
-        accRepository.delete(acc);
+        if (!asccpRepository.findByRoleOfAccId(currentAccId).isEmpty()) {
+            throw new IllegalStateException("Not allowed to discard the ACC which has related with ASCCP");
+        }
+        if (!abieRepository.findByBasedAccId(currentAccId).isEmpty()) {
+            throw new IllegalStateException("Not allowed to discard the ACC which has related with ABIE");
+        }
+
+        coreComponentDAO.delete(acc);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void update(AssociationCoreComponent ascc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = ascc.getCreatedBy();
+        long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccId = ascc.getAsccId();
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
@@ -306,11 +561,25 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        asccRepository.save(ascc);
+        AssociationCoreComponent oldAscc = asccRepository.findOne(ascc.getId()).clone();
+        int oldSeqKey = oldAscc.getSeqKey();
+        AssociationCoreComponent newAscc = ascc.clone();
+
+        ascc = coreComponentDAO.save(ascc);
+
+        if (isSeqKeyOnlyChange(oldAscc, newAscc)) { // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+            int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                asccRepository.updateSeqKeyByCurrentAsccIdAndRevisionNumAndRevisionTrackingNum(ascc.getAsccId(), revisionNum, revisionTrackingNum, ascc.getSeqKey());
+            }
+            return;
+        }
 
         int latestRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponent asccHistory = ascc.clone();
         asccHistory.setRevisionNum(latestHistoryAsccList.get(0).getRevisionNum());
@@ -318,6 +587,7 @@ public class CoreComponentService {
         asccHistory.setRevisionAction(Update);
         asccHistory.setLastUpdatedBy(requesterId);
         asccHistory.setCurrentAsccId(currentAsccId);
+        asccHistory.setReleaseId(null);
 
         asccRepository.saveAndFlush(asccHistory);
 
@@ -325,19 +595,29 @@ public class CoreComponentService {
         latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
         int actualRevisionTrackingNum = latestHistoryAsccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isSeqKeyOnlyChange(AssociationCoreComponent oldAscc, AssociationCoreComponent newAscc) {
+        oldAscc.setSeqKey(0);
+        newAscc.setSeqKey(0);
+
+        if (oldAscc.hashCode() == newAscc.hashCode()) { // everything else is the same, only change was seqkey
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AssociationCoreComponent ascc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = ascc.getCreatedBy();
+        long ownerId = ascc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccId = ascc.getAsccId();
         List<AssociationCoreComponent> latestHistoryAsccList = asccRepository.findAllWithLatestRevisionNumByCurrentAsccId(currentAsccId);
@@ -346,9 +626,9 @@ public class CoreComponentService {
         }
 
         long asccId = ascc.getAsccId();
-        asccRepository.deleteByCurrentAsccId(asccId); // To remove history
+        coreComponentDAO.deleteByCurrentAsccId(asccId); // To remove history
         int seqKey = ascc.getSeqKey();
-        asccRepository.delete(ascc);
+        coreComponentDAO.delete(ascc);
 
         long fromAccId = ascc.getFromAccId();
         decreaseSeqKeyGreaterThan(fromAccId, seqKey);
@@ -357,10 +637,9 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(BasicCoreComponent bcc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bcc.getCreatedBy();
+        long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccId = bcc.getBccId();
         List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
@@ -371,26 +650,48 @@ public class CoreComponentService {
         int seqKey;
         long fromAccId = bcc.getFromAccId();
 
+        // Only if EntityType property would be changed
         switch (bcc.getEntityType()) {
             case Element:
-                seqKey = findAppropriateSeqKey(bcc);
-                bcc.setSeqKey(seqKey);
+                if (bcc.getSeqKey() == 0) {
+                    seqKey = findAppropriateSeqKey(bcc);
+                    bcc.setSeqKey(seqKey);
 
-                increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
+                    increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
+                }
+
                 break;
             case Attribute:
-                seqKey = bcc.getSeqKey();
-                bcc.setSeqKey(0);
+                if (bcc.getSeqKey() > 0) {
+                    seqKey = bcc.getSeqKey();
+                    bcc.setSeqKey(0);
 
-                decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+                    decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+                }
+
                 break;
         }
 
-        bccRepository.save(bcc);
+        BasicCoreComponent oldBcc = bccRepository.findOne(bcc.getId()).clone();
+        int oldSeqKey = oldBcc.getSeqKey();
+        BasicCoreComponent newBcc = bcc.clone();
+
+        bcc = coreComponentDAO.save(bcc);
+
+        if (isSeqKeyOnlyChange(oldBcc, newBcc)) {  // do not create new history records if seq key is the only change, just update the latest history record
+            int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+            int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), revisionNum);
+
+            if (revisionNum > 0 && revisionTrackingNum > 0) {
+                bccRepository.updateSeqKeyByCurrentBccIdAndRevisionNumAndRevisionTrackingNum(bcc.getBccId(), revisionNum, revisionTrackingNum, bcc.getSeqKey());
+            }
+
+            return;
+        }
 
         int latestRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponent bccHistory = bcc.clone();
         bccHistory.setRevisionNum(latestHistoryBccList.get(0).getRevisionNum());
@@ -398,6 +699,7 @@ public class CoreComponentService {
         bccHistory.setRevisionAction(Update);
         bccHistory.setLastUpdatedBy(requesterId);
         bccHistory.setCurrentBccId(currentBccId);
+        bccHistory.setReleaseId(null);
 
         bccRepository.saveAndFlush(bccHistory);
 
@@ -405,19 +707,29 @@ public class CoreComponentService {
         latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
         int actualRevisionTrackingNum = latestHistoryBccList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
+        }
+    }
+
+    private boolean isSeqKeyOnlyChange(BasicCoreComponent oldBcc, BasicCoreComponent newBcc) {
+        oldBcc.setSeqKey(0);
+        newBcc.setSeqKey(0);
+
+        if (oldBcc.hashCode() == newBcc.hashCode()) { // everything else is the same, only change was seqkey
+            return true;
+        } else { // difference is in some other field
+            return false;
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void discard(BasicCoreComponent bcc, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bcc.getCreatedBy();
+        long ownerId = bcc.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccId = bcc.getBccId();
         List<BasicCoreComponent> latestHistoryBccList = bccRepository.findAllWithLatestRevisionNumByCurrentBccId(currentBccId);
@@ -426,9 +738,9 @@ public class CoreComponentService {
         }
 
         long bccId = bcc.getBccId();
-        bccRepository.deleteByCurrentBccId(bccId); // To remove history
+        coreComponentDAO.deleteByCurrentBccId(bccId); // To remove history
         int seqKey = bcc.getSeqKey();
-        bccRepository.delete(bcc);
+        coreComponentDAO.delete(bcc);
 
         if (seqKey > 0) {
             long fromAccId = bcc.getFromAccId();
@@ -439,10 +751,9 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void update(AssociationCoreComponentProperty asccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = asccp.getCreatedBy();
+        long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
@@ -451,11 +762,16 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        asccpRepository.save(asccp);
+        coreComponentDAO.save(asccp);
+        asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, asccp);
+            coreComponentDAO.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         AssociationCoreComponentProperty asccpHistory = asccp.clone();
         asccpHistory.setRevisionNum(latestHistoryAsccpList.get(0).getRevisionNum());
@@ -463,6 +779,7 @@ public class CoreComponentService {
         asccpHistory.setRevisionAction(Update);
         asccpHistory.setLastUpdatedBy(requesterId);
         asccpHistory.setCurrentAsccpId(currentAsccpId);
+        asccpHistory.setReleaseId(null);
 
         asccpRepository.saveAndFlush(asccpHistory);
 
@@ -470,7 +787,7 @@ public class CoreComponentService {
         latestHistoryAsccpList = asccpRepository.findAllWithLatestRevisionNumByCurrentAsccpId(currentAsccpId);
         int actualRevisionTrackingNum = latestHistoryAsccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("AssociationCoreComponentProperty was modified outside of this operation");
         }
@@ -479,10 +796,9 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(AssociationCoreComponentProperty asccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = asccp.getCreatedBy();
+        long ownerId = asccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentAsccpId = asccp.getAsccpId();
         List<AssociationCoreComponentProperty> latestHistoryAsccpList =
@@ -492,17 +808,16 @@ public class CoreComponentService {
         }
 
         long asccpId = asccp.getAsccpId();
-        asccpRepository.deleteByCurrentAsccpId(asccpId); // To remove history
-        asccpRepository.delete(asccp);
+        coreComponentDAO.deleteByCurrentAsccpId(asccpId); // To remove history
+        coreComponentDAO.delete(asccp);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void update(BasicCoreComponentProperty bccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bccp.getCreatedBy();
+        long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList =
@@ -511,11 +826,16 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        bccpRepository.save(bccp);
+        coreComponentDAO.save(bccp);
+        bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
+            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            e.setDen(acc, bccp);
+            coreComponentDAO.save(e);
+        });
 
         int latestRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         int nextRevisionTrackingNum = latestRevisionTrackingNum + 1;
         BasicCoreComponentProperty bccpHistory = bccp.clone();
         bccpHistory.setRevisionNum(latestHistoryBccpList.get(0).getRevisionNum());
@@ -523,6 +843,7 @@ public class CoreComponentService {
         bccpHistory.setRevisionAction(Update);
         bccpHistory.setLastUpdatedBy(requesterId);
         bccpHistory.setCurrentBccpId(currentBccpId);
+        bccpHistory.setReleaseId(null);
 
         bccpRepository.saveAndFlush(bccpHistory);
 
@@ -530,7 +851,7 @@ public class CoreComponentService {
         latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
         int actualRevisionTrackingNum = latestHistoryBccpList.stream()
                 .mapToInt(e -> e.getRevisionTrackingNum())
-                .max().getAsInt();
+                .max().orElse(0);
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponentProperty was modified outside of this operation");
         }
@@ -539,10 +860,9 @@ public class CoreComponentService {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(BasicCoreComponentProperty bccp, User requester) {
         long requesterId = requester.getAppUserId();
-        long ownerId = bccp.getCreatedBy();
+        long ownerId = bccp.getOwnerUserId();
         if (requesterId != ownerId) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
         long currentBccpId = bccp.getBccpId();
         List<BasicCoreComponentProperty> latestHistoryBccpList = bccpRepository.findAllWithLatestRevisionNumByCurrentBccpId(currentBccpId);
@@ -551,8 +871,43 @@ public class CoreComponentService {
         }
 
         long bccpId = bccp.getBccpId();
-        bccpRepository.deleteByCurrentBccpId(bccpId); // To remove history
-        bccpRepository.delete(bccp);
+        coreComponentDAO.deleteByCurrentBccpId(bccpId); // To remove history
+        coreComponentDAO.delete(bccp);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(CoreComponents coreComponents, User requester) {
+        switch (coreComponents.getType()) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                if (undoService.hasMultipleRevisions(acc)) {
+                    undoService.revertToPreviousRevision(acc);
+                } else {
+                    discard(acc, requester);
+                }
+                break;
+
+            case "ASCCP":
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                if (undoService.hasMultipleRevisions(asccp)) {
+                    undoService.revertToPreviousRevision(asccp);
+                } else {
+                    discard(asccp, requester);
+                }
+                break;
+
+            case "BCCP":
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                if (undoService.hasMultipleRevisions(bccp)) {
+                    undoService.revertToPreviousRevision(bccp);
+                } else {
+                    discard(bccp, requester);
+                }
+                break;
+
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
@@ -579,11 +934,9 @@ public class CoreComponentService {
                             CoreComponentState state,
                             User requester) {
         if (ueAcc.getOwnerUserId() != requester.getAppUserId()) {
-            throw new PermissionDeniedDataAccessException(
-                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
         }
 
-        updateChildrenState(ueAcc, state, requester);
         updateAccState(ueAcc, state, requester);
 
         if (state == Published) {
@@ -598,50 +951,48 @@ public class CoreComponentService {
         long lastUpdatedBy = requester.getAppUserId();
 
         List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
-        List<AssociationCoreComponentProperty> asccpList = new ArrayList();
         for (AssociationCoreComponent ascc : asccList) {
             if (ascc.getState() != Published) {
                 ascc.setState(state);
                 ascc.setLastUpdatedBy(lastUpdatedBy);
             }
-
-            long toAsccpId = ascc.getToAsccpId();
-            AssociationCoreComponentProperty toAsccp = asccpRepository.findOne(toAsccpId);
-            if (toAsccp.getState() != Published) {
-                toAsccp.setState(state);
-                toAsccp.setLastUpdatedBy(lastUpdatedBy);
-                asccpList.add(toAsccp);
-            }
         }
         asccRepository.save(asccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
-        asccpRepository.save(asccpList);
 
         List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
-        List<BasicCoreComponentProperty> bccpList = new ArrayList();
         for (BasicCoreComponent bcc : bccList) {
             if (bcc.getState() != Published) {
                 bcc.setState(state);
                 bcc.setLastUpdatedBy(lastUpdatedBy);
             }
-
-            long toBccpId = bcc.getToBccpId();
-            BasicCoreComponentProperty toBccp = bccpRepository.findOne(toBccpId);
-            if (toBccp.getState() != Published) {
-                toBccp.setState(state);
-                toBccp.setLastUpdatedBy(lastUpdatedBy);
-                bccpList.add(toBccp);
-            }
         }
         bccRepository.save(bccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
-        bccpRepository.save(bccpList);
+
+        if (state == Published) {
+            for (AssociationCoreComponent ascc : asccList) {
+                deleteAsccHistoryRecords(fromAccId, ascc.getToAsccpId());
+            }
+
+            for (BasicCoreComponent bcc : bccList) {
+                deleteBccHistoryRecords(fromAccId, bcc.getToBccpId());
+                updateBccHistoryRecordState(fromAccId, bcc.getToBccpId(), state);
+            }
+        }
+
+        for (AssociationCoreComponent ascc : asccList) {
+            updateAsccHistoryRecordState(fromAccId, ascc.getToAsccpId(), state);
+        }
+
+        for (BasicCoreComponent bcc : bccList) {
+            updateBccHistoryRecordState(fromAccId, bcc.getToBccpId(), state);
+        }
     }
 
     private void updateAccState(AggregateCoreComponent acc,
                                 CoreComponentState state,
                                 User requester) {
-        long roleOfAccId = acc.getAccId();
         long lastUpdatedBy = requester.getAppUserId();
 
         if (acc.getState() != Published) {
@@ -650,8 +1001,12 @@ public class CoreComponentService {
             accRepository.save(acc);
         }
 
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
-        updateAsccpState(asccp, state, requester);
+        updateChildrenState(acc, state, requester);
+
+        if (state == Published) {
+            deleteAccHistoryRecords(acc.getAccId());
+        }
+        updateAccHistoryRecordState(acc.getAccId(), state);
     }
 
     private void updateAsccpState(AssociationCoreComponentProperty asccp,
@@ -669,17 +1024,11 @@ public class CoreComponentService {
             asccpRepository.save(asccp);
         }
 
-        long asccpId = asccp.getAsccpId();
-        List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccpId, 0);
-        for (AssociationCoreComponent ascc : asccList) {
-            if (ascc.getState() != Published) {
-                ascc.setState(state);
-                ascc.setLastUpdatedBy(lastUpdatedBy);
-            }
+        if (state == Published) {
+            deleteAsccpHistoryRecords(asccp.getAsccpId());
         }
+        updateAsccpHistoryRecordState(asccp.getAsccpId(), state);
 
-        asccRepository.save(asccList.stream()
-                .filter(e -> e.isDirty()).collect(Collectors.toList()));
     }
 
     private void updateBccpState(BasicCoreComponentProperty bccp,
@@ -697,17 +1046,80 @@ public class CoreComponentService {
             bccpRepository.save(bccp);
         }
 
-        long bccpId = bccp.getBccpId();
-        List<BasicCoreComponent> bccList = bccRepository.findByToBccpIdAndRevisionNum(bccpId, 0);
-        for (BasicCoreComponent bcc : bccList) {
-            if (bcc.getState() != Published) {
-                bcc.setState(state);
-                bcc.setLastUpdatedBy(lastUpdatedBy);
-            }
+        if (state == Published) {
+            deleteBccpHistoryRecords(bccp.getBccpId());
         }
+        updateBccpHistoryRecordState(bccp.getBccpId(), state);
+    }
 
-        bccRepository.save(bccList.stream()
-                .filter(e -> e.isDirty()).collect(Collectors.toList()));
+    private void deleteAccHistoryRecords(long currentAccId) {
+        int revisionNum = accRepository.findMaxRevisionNumByCurrentAccId(currentAccId);
+        int revisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(currentAccId, revisionNum);
+
+        accRepository.deleteByCurrentAccIdAndRevisionNumAndNotRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateAccHistoryRecordState(long currentAccId, CoreComponentState state) {
+        int revisionNum = accRepository.findMaxRevisionNumByCurrentAccId(currentAccId);
+        int revisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(currentAccId, revisionNum);
+
+        accRepository.updateStateByCurrentAccIdAndRevisionNumAndRevisionTrackingNum(currentAccId, revisionNum, revisionTrackingNum, state);
+    }
+
+    private void deleteAsccHistoryRecords(long fromAccId, long toAsccpid) {
+        int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(fromAccId, toAsccpid);
+        int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(fromAccId, toAsccpid, revisionNum);
+
+        asccRepository.deleteByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toAsccpid, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateAsccHistoryRecordState(long fromAccId, long toAsccpid, CoreComponentState state) {
+        int revisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(fromAccId, toAsccpid);
+        int revisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(fromAccId, toAsccpid, revisionNum);
+
+        asccRepository.updateStateByFromAccIdAndToAsccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toAsccpid, revisionNum, revisionTrackingNum, state);
+    }
+
+    private void deleteBccHistoryRecords(long fromAccId, long toBccpId) {
+        int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(fromAccId, toBccpId);
+        int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(fromAccId, toBccpId, revisionNum);
+
+        bccRepository.deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toBccpId, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateBccHistoryRecordState(long fromAccId, long toBccpId, CoreComponentState state) {
+        int revisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(fromAccId, toBccpId);
+        int revisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(fromAccId, toBccpId, revisionNum);
+
+        bccRepository.deleteByFromAccIdAndToBccpIdAndRevisionNumAndNotRevisionTrackingNum(fromAccId, toBccpId, revisionNum, revisionTrackingNum, state);
+    }
+
+    private void deleteAsccpHistoryRecords(long currentAsccpId) {
+        int revisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(currentAsccpId);
+        int revisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(currentAsccpId, revisionNum);
+
+        asccpRepository.deleteByCurrentAsccpIdAndRevisionNumAndNotRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateAsccpHistoryRecordState(long currentAsccpId, CoreComponentState state) {
+        int revisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(currentAsccpId);
+        int revisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(currentAsccpId, revisionNum);
+
+        asccpRepository.updateStateByCurrentAsccpIdAndRevisionNumAndRevisionTrackingNum(currentAsccpId, revisionNum, revisionTrackingNum, state);
+    }
+
+    private void deleteBccpHistoryRecords(long currentBccpId) {
+        int revisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(currentBccpId);
+        int revisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(currentBccpId, revisionNum);
+
+        bccpRepository.deleteByCurrentBccpIdAndRevisionNumAndNotRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum);
+    }
+
+    private void updateBccpHistoryRecordState(long currentBccpId, CoreComponentState state) {
+        int revisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(currentBccpId);
+        int revisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(currentBccpId, revisionNum);
+
+        bccpRepository.updateStateByCurrentBccpIdAndRevisionNumAndRevisionTrackingNum(currentBccpId, revisionNum, revisionTrackingNum, state);
     }
 
     private void storeBieUserExtRevisions(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc) {
@@ -739,33 +1151,57 @@ public class CoreComponentService {
     private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         long basedAccId = abie.getBasedAccId();
-        long eAccId = eAcc.getAccId();
 
-        AssociationCoreComponentProperty asccp = findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(basedAccId, eAccId);
-        return (asccp != null) ? true : false;
+        AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+        if (basedAcc.getReleaseId() > 0L) {
+            basedAccId = basedAcc.getCurrentAccId();
+        }
+
+        long eAccId;
+        if (eAcc.getReleaseId() > 0L) {
+            eAccId = eAcc.getCurrentAccId();
+        } else {
+            eAccId = eAcc.getAccId();
+        }
+
+        return existsASCCPRecursivelyByRoleOfAccId(basedAccId, eAccId);
     }
 
-    private AssociationCoreComponentProperty findAssociationCoreComponentPropertyRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
+    private boolean existsASCCPRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
         Collection<Long> fromAccIds = Arrays.asList(basedAccId);
 
         while (true) {
-            List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccIds);
-            List<AssociationCoreComponentProperty> asccpList =
-                    !asccList.isEmpty()
-                            ? asccpRepository.findByAsccpId(asccList.stream().map(AssociationCoreComponent::getToAsccpId).collect(Collectors.toList()))
-                            : Collections.emptyList();
-            if (asccpList.isEmpty()) {
-                return null;
+            List<Long> toAsccpId = asccRepository.findToAsccpIdByFromAccId(fromAccIds);
+            List<Long> roleOfAccIdList =
+                    !toAsccpId.isEmpty() ? asccpRepository.findRoleOfAccIdByAsccpId(toAsccpId) : Collections.emptyList();
+            if (roleOfAccIdList.isEmpty()) {
+                return false;
             }
 
-            for (AssociationCoreComponentProperty asccp : asccpList) {
-                if (asccp.getRoleOfAccId() == eAccId) {
-                    return asccp;
+            if (roleOfAccIdList.contains(eAccId)) {
+                return true;
+            }
+
+            List<Long> tempAccIds = new ArrayList();
+            roleOfAccIdList.forEach(accId -> {
+                while (accId != null && accId > 0L) {
+                    tempAccIds.add(accId);
+                    accId = accRepository.findBasedAccIdByAccId(accId);
                 }
-            }
-
-            fromAccIds = asccpList.stream().map(AssociationCoreComponentProperty::getRoleOfAccId).collect(Collectors.toList());
+            });
+            fromAccIds = tempAccIds;
         }
+    }
+
+    public int getMaxSeqKeyOfChildren(AggregateCoreComponent acc) {
+        long accId = acc.getAccId();
+
+        return Math.max(
+                asccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                        .mapToInt(e -> e.getSeqKey()).max().orElse(0),
+                bccRepository.findByFromAccIdAndRevisionNum(accId, 0).stream()
+                        .mapToInt(e -> e.getSeqKey()).max().orElse(0)
+        );
     }
 
     public int findOriginalCardinalityMin(AssociationBusinessInformationEntity asbie) {
@@ -802,5 +1238,441 @@ public class CoreComponentService {
         long dtScId = bbieSc.getDtScId();
         DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
         return dtSc.getCardinalityMax();
+    }
+
+    @Transactional
+    public void transferOwner(Long ccId, String type, User newOwner) {
+        if (ccId == null || ccId <= 0L) {
+            throw new IllegalArgumentException();
+        }
+        long newOwnerId = newOwner.getAppUserId();
+        long oldOwnerId;
+        switch (type) {
+            case "ACC":
+                AggregateCoreComponent acc = accRepository.findOne(ccId);
+                oldOwnerId = acc.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
+
+                acc.setOwnerUserId(newOwnerId);
+                accRepository.save(acc);
+
+                for (AssociationCoreComponent ascc :
+                        asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0)) {
+                    ascc.setOwnerUserId(newOwnerId);
+                    asccRepository.save(ascc);
+                }
+                for (BasicCoreComponent bcc :
+                        bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0)) {
+                    bcc.setOwnerUserId(newOwnerId);
+                    bccRepository.save(bcc);
+                }
+
+                break;
+            case "ASCCP":
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ccId);
+                oldOwnerId = asccp.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
+
+                asccp.setOwnerUserId(newOwnerId);
+                asccpRepository.save(asccp);
+
+                break;
+            case "BCCP":
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(ccId);
+                oldOwnerId = bccp.getOwnerUserId();
+                if (oldOwnerId == newOwnerId) {
+                    return;
+                }
+
+                bccp.setOwnerUserId(newOwnerId);
+                bccpRepository.save(bccp);
+
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    public boolean hasMultipleRevisions(CoreComponents coreComponents) {
+        return undoService.hasMultipleRevisions(coreComponents);
+    }
+
+    public String getFullRevisionNum(CoreComponents cc, Release release) {
+        StringBuilder sb = new StringBuilder("");
+        int maxRevisionNum = 0;
+        int maxRevisionTrackingNum = 0;
+        long releaseId = 0L;
+
+        if (release != null) {
+            releaseId = release.getReleaseId();
+        }
+
+        if (releaseId == 0L) {
+            return getFullRevisionNum(cc);
+        }
+
+        switch (cc.getType()) {
+            case "ACC":
+                maxRevisionNum = accRepository.findMaxRevisionNumByAccIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByAccIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                break;
+            case "ASCC":
+                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
+                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
+                break;
+            case "ASCCP":
+                maxRevisionNum = asccpRepository.findMaxRevisionNumByAsccpIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                break;
+            case "BCC":
+                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
+                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
+                break;
+            case "BCCP":
+                maxRevisionNum = bccpRepository.findMaxRevisionNumByBccpIdAndLessThanReleaseId(cc.getId(), releaseId);
+                maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByBccpIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
+                break;
+        }
+
+        if (maxRevisionNum > 0) {
+            sb.append(maxRevisionNum);
+            sb.append(".");
+            sb.append(maxRevisionTrackingNum);
+        }
+
+        return sb.toString();
+    }
+
+    public String getFullRevisionNum(CoreComponents cc) {
+        StringBuilder sb = new StringBuilder("");
+        int maxRevisionNum = 0;
+        int maxRevisionTrackingNum = 0;
+
+        switch (cc.getType()) {
+            case "ACC":
+                maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccId(cc.getId());
+                maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+            case "ASCC":
+                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
+                maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
+                break;
+            case "ASCCP":
+                maxRevisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(cc.getId());
+                maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+            case "BCC":
+                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
+                maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
+                break;
+            case "BCCP":
+                maxRevisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(cc.getId());
+                maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
+                break;
+        }
+
+        if (maxRevisionNum > 0) {
+            sb.append(maxRevisionNum);
+            sb.append(".");
+            sb.append(maxRevisionTrackingNum);
+        }
+
+        return sb.toString();
+    }
+
+    public AggregateCoreComponent findRoleOfAcc(AssociationCoreComponentProperty asccp, long releaseId) {
+        return findRoleOfAcc(asccp, releaseId, null);
+    }
+
+    public AggregateCoreComponent findRoleOfAcc(AssociationCoreComponentProperty asccp, long releaseId, CoreComponentState state) {
+        long roleOfAccId = asccp.getRoleOfAccId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return accRepository.findOne(roleOfAccId);
+            } else {
+                return accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, state);
+            }
+        } else {
+            List<AggregateCoreComponent> accList;
+            if (state == null) {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqual(roleOfAccId, releaseId);
+            } else {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqualAndState(roleOfAccId, releaseId, state);
+            }
+            if (accList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = accList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AggregateCoreComponent acc : accList) {
+                if (acc.getReleaseId() == maxReleaseId &&
+                    acc.getRevisionNum() == maxRevisionNum &&
+                    acc.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return acc;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public AssociationCoreComponentProperty findAsccp(AssociationCoreComponent ascc, long releaseId) {
+        return findAsccp(ascc, releaseId, null);
+    }
+
+    public AssociationCoreComponentProperty findAsccp(AssociationCoreComponent ascc, long releaseId, CoreComponentState state) {
+        long asccpId = ascc.getToAsccpId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return asccpRepository.findOne(asccpId);
+            } else {
+                return asccpRepository.findOneByAsccpIdAndRevisionNumAndState(asccpId, 0, state);
+            }
+        } else {
+            List<AssociationCoreComponentProperty> asccpList;
+            if (state == null) {
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdLessThanEqual(asccpId, releaseId);
+            } else {
+                asccpList = asccpRepository.findByCurrentAsccpIdAndReleaseIdLessThanEqualAndState(asccpId, releaseId, state);
+            }
+            if (asccpList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = asccpList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = asccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = asccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AssociationCoreComponentProperty asccp : asccpList) {
+                if (asccp.getReleaseId() == maxReleaseId &&
+                    asccp.getRevisionNum() == maxRevisionNum &&
+                    asccp.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return asccp;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public BasicCoreComponentProperty findBccp(BasicCoreComponent bcc, long releaseId) {
+        return findBccp(bcc, releaseId, null);
+    }
+
+    public BasicCoreComponentProperty findBccp(BasicCoreComponent bcc, long releaseId, CoreComponentState state) {
+        long bccpId = bcc.getToBccpId();
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return bccpRepository.findOne(bccpId);
+            } else {
+                return bccpRepository.findOneByBccpIdAndRevisionNumAndState(bccpId, 0, state);
+            }
+        } else {
+            List<BasicCoreComponentProperty> bccpList;
+            if (state == null) {
+                bccpList = bccpRepository.findByCurrentBccpIdAndReleaseId(bccpId, releaseId);
+            } else {
+                bccpList = bccpRepository.findByCurrentBccpIdAndReleaseIdAndState(bccpId, releaseId, state);
+            }
+            if (bccpList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = bccpList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = bccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = bccpList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (BasicCoreComponentProperty bccp : bccpList) {
+                if (bccp.getReleaseId() == maxReleaseId &&
+                    bccp.getRevisionNum() == maxRevisionNum &&
+                    bccp.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return bccp;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public AggregateCoreComponent findBasedAcc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        long basedAccId = acc.getBasedAccId();
+        return findAcc(basedAccId, releaseId, state);
+    }
+
+    public AggregateCoreComponent findAcc(long accId, long releaseId) {
+        return findAcc(accId, releaseId, null);
+    }
+
+    public AggregateCoreComponent findAcc(long accId, long releaseId, CoreComponentState state) {
+        if (releaseId <= 0L) {
+            if (state == null) {
+                return accRepository.findOne(accId);
+            } else {
+                return accRepository.findOneByAccIdAndRevisionNumAndState(accId, 0, state);
+            }
+        } else {
+            List<AggregateCoreComponent> accList;
+            if (state == null) {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqual(accId, releaseId);
+            } else {
+                accList = accRepository.findByCurrentAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
+            }
+            if (accList.isEmpty()) {
+                return null;
+            }
+
+            long maxReleaseId = accList.stream()
+                    .mapToLong(e -> e.getReleaseId()).max().getAsLong();
+            int maxRevisionNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .mapToInt(e -> e.getRevisionNum()).max().getAsInt();
+            int maxRevisionTrackingNum = accList.stream()
+                    .filter(e -> e.getReleaseId() == maxReleaseId)
+                    .filter(e -> e.getRevisionNum() == maxRevisionNum)
+                    .mapToInt(e -> e.getRevisionTrackingNum()).max().getAsInt();
+
+            for (AggregateCoreComponent e : accList) {
+                if (e.getReleaseId() == maxReleaseId &&
+                    e.getRevisionNum() == maxRevisionNum &&
+                    e.getRevisionTrackingNum() == maxRevisionTrackingNum) {
+                    return e;
+                }
+            }
+
+            throw new IllegalStateException();
+        }
+    }
+
+    public List<AssociationCoreComponent> findAscc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        if (releaseId <= 0L) {
+            long accId = acc.getAccId();
+            if (state == null) {
+                return asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            } else {
+                return asccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            }
+        } else {
+            long accId = acc.getCurrentAccId();
+            if (accId == 0L) {
+                throw new IllegalStateException();
+            }
+
+            OagisComponentType oagisComponentType = acc.getOagisComponentType();
+            /*
+             * Issue #467
+             */
+            boolean releaseExactlyMatch;
+            if (oagisComponentType == OagisComponentType.Extension) {
+                releaseExactlyMatch = true;
+            } else {
+                releaseExactlyMatch = false;
+            }
+
+            List<AssociationCoreComponent> asccList;
+            if (state == null) {
+                if (releaseExactlyMatch) {
+                    asccList = asccRepository.findByFromAccIdAndReleaseId(accId, releaseId);
+                } else {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdLessThanEqual(accId, releaseId);
+                }
+            } else {
+                if (releaseExactlyMatch) {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdAndState(accId, releaseId, state);
+                } else {
+                    asccList = asccRepository.findByFromAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
+                }
+            }
+            if (asccList.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Map<String, AssociationCoreComponent> map = new LinkedHashMap();
+            asccList.stream().forEachOrdered(e -> {
+                String guid = e.getGuid();
+                if (map.containsKey(guid)) {
+                    CoreComponentRelation p = map.get(guid);
+                    long pReleaseId = p.getReleaseId();
+                    long eReleaseId = e.getReleaseId();
+                    if (pReleaseId > eReleaseId) {
+                        return;
+                    }
+                }
+
+                map.put(guid, e);
+            });
+
+            return new ArrayList(map.values());
+        }
+    }
+
+    public List<BasicCoreComponent> findBcc(AggregateCoreComponent acc, long releaseId, CoreComponentState state) {
+        if (releaseId <= 0L) {
+            long accId = acc.getAccId();
+            if (state == null) {
+                return bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
+            } else {
+                return bccRepository.findByFromAccIdAndRevisionNumAndState(accId, 0, state);
+            }
+        } else {
+            long accId = acc.getCurrentAccId();
+            if (accId == 0L) {
+                throw new IllegalStateException();
+            }
+            List<BasicCoreComponent> bccList;
+            if (state == null) {
+                bccList = bccRepository.findByFromAccIdAndReleaseIdLessThanEqual(accId, releaseId);
+            } else {
+                bccList = bccRepository.findByFromAccIdAndReleaseIdLessThanEqualAndState(accId, releaseId, state);
+            }
+            if (bccList.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Map<String, BasicCoreComponent> map = new LinkedHashMap();
+            bccList.stream().forEachOrdered(e -> {
+                String guid = e.getGuid();
+                if (map.containsKey(guid)) {
+                    CoreComponentRelation p = map.get(guid);
+                    long pReleaseId = p.getReleaseId();
+                    long eReleaseId = e.getReleaseId();
+                    if (pReleaseId > eReleaseId) {
+                        return;
+                    }
+                }
+
+                map.put(guid, e);
+            });
+
+            return new ArrayList(map.values());
+        }
     }
 }

@@ -62,7 +62,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-de72790ff3844024afeca1218bbc9660"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-de72790ff3844024afeca1218bbc9660"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-84413cd3b7a44c2a9d7bbab8433b12e8"/>
 	</xsd:complexType>
 	<xsd:complexType name="RequisitionHeaderBaseType" id="oagis-id-961682b453bb42a188c1ac7f0e2229a6">
@@ -99,9 +99,11 @@
 				<xsd:sequence>
 					<xsd:element name="Extension" type="RequisitionHeaderExtensionType" id="oagis-id-928f57bb2914457d8c55de7f342ff7f2" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -134,9 +136,11 @@
 					</xsd:element>
 					<xsd:element name="Extension" type="RequisitionLineExtensionType" id="oagis-id-01d5085539214247a66b10429dd4b2de" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -149,9 +153,11 @@
 				<xsd:sequence>
 					<xsd:element name="Extension" type="RequisitionSubLineExtensionType" id="oagis-id-e38746c15fee4620b4a50ef424799beb" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

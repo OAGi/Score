@@ -26,6 +26,6 @@ public interface BasicBusinessInformationEntitySupplementaryComponentRepository
     public BasicBusinessInformationEntitySupplementaryComponent findOneByBbieIdAndDtScIdAndOwnerTopLevelAbieId(long bbieId, long dtScId, long ownerTopLevelAbieId);
 
     @Modifying
-    @Query("delete from BasicBusinessInformationEntitySupplementaryComponent a where a.ownerTopLevelAbieId = ?1")
+    @Query("delete from BasicBusinessInformationEntitySupplementaryComponent b where b.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 }

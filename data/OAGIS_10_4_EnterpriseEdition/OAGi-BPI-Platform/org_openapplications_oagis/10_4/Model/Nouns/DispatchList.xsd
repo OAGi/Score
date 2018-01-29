@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/DispatchList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="DispatchList" type="DispatchListType" id="oagis-id-19a07c34e67b4638b61c040760aca53e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A dispatch list shows the manufacturing or production supervisor or foreman a prioritized detail status of orders and operations scheduled or in-process at a specific work center.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DispatchListHeader" type="DispatchListHeaderType" id="oagis-id-8bfd2c8dfe4c402d997d6788d07b885b"/>
+	<xsd:element name="DispatchListLine" type="DispatchListLineType" id="oagis-id-68f47e7404fa437e99dc1ccc7ef933ce"/>
+	<xsd:element name="DispatchResource" type="DispatchResourceType" id="oagis-id-68f93ab8cd0548788494bdb4656a9d53">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies information concerning the resources associated with a particular WIP operation</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DispatchListType" id="oagis-id-342dc736c6014fa2954c70204a7506e4">
+		<xsd:sequence>
+			<xsd:element ref="DispatchListHeader" id="oagis-id-b7dd391cad5b4e2aad3f7fc8ebe7c498" minOccurs="0"/>
+			<xsd:element ref="DispatchListLine" id="oagis-id-c393d2b16f51475e99513022c5fc2dae" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-7fa130a6fa8345198bf2a3303a9c4439"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-d4acea4a54f645c6835b104d531fd5e0"/>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchListHeaderBaseType" id="oagis-id-5da0cb4ac2724f2ab78f4c3a3a5e44b8">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Machine" id="oagis-id-c3b1bb3fd34e41e69765ffac28e3367c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Idenitifies a machine.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Resource" id="oagis-id-172ce2b58722479cb1248403b3dd011c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="WorkCenterID" id="oagis-id-d01c9e693d0b4c69a67322cc08920c45" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies an area consisting of one or more resources where production takes place.  It is used to identify a specific Work Center on a Shop Floor or other manufacturing facility</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SiteLocation" id="oagis-id-476b20abfdf64331b16d632c644b26ad" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-a6ab8bd3260346718b664267bf8b26da" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchListHeaderType" id="oagis-id-c2ee31dd83f547ce9df20757524e0617">
+		<xsd:complexContent>
+			<xsd:extension base="DispatchListHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="DispatchListHeaderExtensionType" id="oagis-id-858dd98a007c4378b22cf7e3c7d04bc6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchListLineBaseType" id="oagis-id-5cb32b9c7dbd40c3a7a54cc2128716f9">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-12fd120499d8492a8a2da35aca2909a3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="OperationReference" id="oagis-id-64d7f7177f6c4f61b43ca468251aea9f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-3118e00d9dc9457588a6c87af768cba7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemQuantity" id="oagis-id-cc6e498eda8049ec899ddf257590b52f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ResourceCodes" id="oagis-id-d1e57a49ecc44ef7b72af1a9d93ee5e9" minOccurs="0"/>
+					<xsd:element ref="ForecastedTimePeriod" id="oagis-id-a14857295372476eaa3c5f82d809cd03" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating the forecasted start and finish datetimes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SetupTimePeriod" id="oagis-id-cb2f102c5aa94c41a50099621ca4def3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating setup time for the resource.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TearDownTimePeriod" id="oagis-id-c6be895f22a94e22b1d15a793fba4bdf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Timestamp indicating that teardown of the resource.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Lot" id="oagis-id-2c97874642bd4328a04f1e48adf82787" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Lot that a given Item Instance belongs to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DispatchResource" id="oagis-id-9660022a7b484468b3801ac081cf5a59" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies information concerning the resources associated with a particular WIP operation</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-0221ba60e35a4061891f6d3801e35f4e" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchListLineType" id="oagis-id-6b77707710ee4b1e846d94d32f1f361f">
+		<xsd:complexContent>
+			<xsd:extension base="DispatchListLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="DispatchListLineExtensionType" id="oagis-id-6f23712fe3de423292de830db223febc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchResourceBaseType" id="oagis-id-905b82ebd3684c09a3d1321b9831b8ab">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ActivityCode" id="oagis-id-9fed6970fc24438baeb124d1e7b96046" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This describes the type of activity produced by a cost center in an operation. In this context, it indicates that the resources being reported here are performing one of the following types of activities: Setup, Execution or Teardown</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ForecastedTimePeriod" id="oagis-id-19048a06bd87438795782dcc0c0fec25" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating the forecasted start and finish datetimes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SetupTimePeriod" id="oagis-id-69b23c8766c94abc9561df21fca22d6f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TimePeriod indicating setup time for the resource.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TearDownTimePeriod" id="oagis-id-39d9ce7be84340689ea0edda080161a4" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Timestamp indicating that teardown of the resource.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ResourceCodes" id="oagis-id-d114754eb4e44869837c44471bfc8966" minOccurs="0"/>
+					<xsd:element ref="Resources" id="oagis-id-12744e3868014785bc92f09834c9b83e" minOccurs="0"/>
+					<xsd:element ref="ResourcesNeededQuantity" id="oagis-id-3a10ded59cf3443d882a8001bd2cf0a6" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DispatchResourceType" id="oagis-id-e81c00b80e5846ec9fee938604ea4ae1">
+		<xsd:complexContent>
+			<xsd:extension base="DispatchResourceBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="DispatchResourceExtensionType" id="oagis-id-9f5f50e19c7145b7988feeab1656d040" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

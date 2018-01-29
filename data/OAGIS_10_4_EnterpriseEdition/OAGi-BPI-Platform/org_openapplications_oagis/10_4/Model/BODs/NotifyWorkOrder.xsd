@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyWorkOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WorkOrder.xsd"/>
+	<xsd:element name="NotifyWorkOrder" type="NotifyWorkOrderType" id="oagis-id-ec688cf433594de9a87c94cdca356fe9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyWorkOrder is to communicate to a business application module or system the need to initiate the creation of a WorkOrder structure.
+  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyWorkOrderType" id="oagis-id-84126f5177b64b25a517a786bfb4e425">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyWorkOrderDataAreaType" id="oagis-id-8873d0ecdd874e1cac3eb4f7399b7290">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyWorkOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (WorkOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyWorkOrderDataAreaType" id="oagis-id-5405a94daa6549e2ad55210a9558f49d">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-281c14cf4742435abf00415b9e19ed25"/>
+			<xsd:element ref="WorkOrder" id="oagis-id-a540e218d27a4411b0aa9121e5407f2a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

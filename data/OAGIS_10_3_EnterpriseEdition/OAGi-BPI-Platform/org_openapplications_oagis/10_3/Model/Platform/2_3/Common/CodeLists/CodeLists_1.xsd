@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
    Schema agency: 	Open Applications Group 
 
 
@@ -19,7 +21,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_3/Model/Platform/2_3/CodeLists/CodeLists_1.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="CodeList_CurrencyCode_ISO_7_04.xsd"/>
 	<xsd:include schemaLocation="CodeList_LanguageCode_ISO_7_04.xsd"/>
 	<xsd:include schemaLocation="CodeList_CharacterSetCode_IANA_20131220.xsd"/>
@@ -881,12 +884,17 @@ borne by the beneficiary customer.</xsd:documentation>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ProcessCategoryCodeEnumerationType" id="oagis-id-87ad6a845d3349528d261df0517bf2aa">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Routine Process is recording costs of goods sold.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Non-Routine Process is recording Inventory Adjustments.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of an Estimating Process is determining Inventory Obsolsence.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Estimating Processes give wide lattitude to move the profit figure and attract a high degree of scrutiny.</xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Non Routine Processes tend to have fewer controls in place and are exposed to more risks.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.
+
+An example of a Routine Process is recording costs of goods sold.
+
+An example of a Non-Routine Process is recording Inventory Adjustments.
+
+An example of an Estimating Process is determining Inventory Obsolsence.
+
+Estimating Processes give wide lattitude to move the profit figure and attract a high degree of scrutiny.
+
+Non Routine Processes tend to have fewer controls in place and are exposed to more risks.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Routine"/>

@@ -32,8 +32,8 @@
                                             style="width: 440px; margin-right: 20px;">
                                 <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
-                            <p:commandButton value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
-                                             update="tbl1" icon="ui-icon-search"/>
+                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
+                                             update="tbl1" icon="fa fa-white fa-search"/>
                         </f:facet>
                         <p:dataTable id="tbl1" var="profileBOD" value="#{copyProfileBODBean.profileBODs}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -160,7 +160,7 @@
                                                 update=":form:treeTable"/>
                                         <p:ajax event="select" update=":form:details"/>
                                         <p:column headerText="#{copyProfileBODBean.getModule(copyProfileBODBean.topLevelNode.asccp.moduleId)}">
-                                            <h:selectBooleanCheckbox rendered="#{copyProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
+                                            <h:selectBooleanCheckbox id="selectCB" rendered="#{copyProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
                                                                      value="${node.used}" style="margin-right: 5px;">
                                                 <p:ajax update=":form:treeTable, :form:details"/>
                                             </h:selectBooleanCheckbox>
@@ -191,21 +191,21 @@
                                                 <p:panel id="topLevelBiePanel" header="Top-Level BIE Info">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="topLevelBieTerm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="topLevelBieRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="topLevelBieDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
@@ -228,7 +228,7 @@
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
-                                                        <h:selectBooleanCheckbox
+                                                        <h:selectBooleanCheckbox id="asbieUsedCB"
                                                                 value="${copyProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <p:ajax update=":form:treeTable, :form:details"/>
@@ -238,7 +238,7 @@
                                                 <p:panel id="asbiePanel" header="ASBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                        <h:inputText id="asbieMin" value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -248,7 +248,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                        <h:inputText id="asbieMax" value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -258,7 +258,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <h:selectBooleanCheckbox
+                                                        <h:selectBooleanCheckbox id="asbieNillableCB"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -266,7 +266,7 @@
                                                         </h:selectBooleanCheckbox>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="asbieRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbie.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -274,7 +274,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="asbieDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbie.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -286,7 +286,7 @@
                                                 <p:panel id="asbiepPanel" header="ASBIEP">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="asbiepTerm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -294,7 +294,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="asbiepRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -302,7 +302,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="asbiepDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbiep.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -314,7 +314,7 @@
                                                 <p:panel id="abiePanel" header="Target ABIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="abieTerm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.bizTerm}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -322,7 +322,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="abieRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -330,7 +330,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="abieDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.type.abie.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -355,7 +355,7 @@
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
-                                                        <h:selectBooleanCheckbox
+                                                        <h:selectBooleanCheckbox id="bbieUsedCB"
                                                                 value="${copyProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <p:ajax update=":form:treeTable, :form:details"/>
@@ -365,7 +365,8 @@
                                                 <p:panel id="bbiePanel" header="BBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+
+                                                        <h:inputText id="bbieMin" value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -375,7 +376,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                        <h:inputText id="bbieMax" value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -385,7 +386,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <h:selectBooleanCheckbox
+                                                        <h:selectBooleanCheckbox id="bbieNillableCB"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -393,7 +394,7 @@
                                                         </h:selectBooleanCheckbox>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieFixedValue"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -401,7 +402,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -409,7 +410,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="bbieDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -421,7 +422,7 @@
                                                 <p:panel id="bbiepPanel" header="BBIEP">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbiepTerm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -429,7 +430,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbiepRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -437,7 +438,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="bbiepDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbiep.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -470,7 +471,7 @@
                                                                  rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
 
-                                                        <p:autoComplete value="#{copyProfileBODBean.bbieXbtName}"
+                                                        <p:autoComplete id="bdtPriRestriPrimitiveAuto" value="#{copyProfileBODBean.bbieXbtName}"
                                                                         completeMethod="#{copyProfileBODBean.completeInputForBbieXbt}"
                                                                         dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                         style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
@@ -484,7 +485,7 @@
                                                                  rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
 
-                                                        <p:autoComplete value="#{copyProfileBODBean.bbieCodeListName}"
+                                                        <p:autoComplete id="bdtPriRestriCodeListAuto" value="#{copyProfileBODBean.bbieCodeListName}"
                                                                         completeMethod="#{copyProfileBODBean.completeInputForBbieCodeList}"
                                                                         dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                         style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
@@ -499,7 +500,7 @@
                                                         <h:outputText value="Agency ID List"
                                                                       styleClass="section-label"/>
 
-                                                        <p:autoComplete
+                                                        <p:autoComplete id="bdtPriRestriAgencyAuto"
                                                                 value="#{copyProfileBODBean.bbieAgencyIdListName}"
                                                                 completeMethod="#{copyProfileBODBean.completeInputForBbieAgencyIdList}"
                                                                 dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -525,7 +526,7 @@
                                                                 styleClass="section-content"/>
 
                                                         <h:outputText value="Used" styleClass="section-label"/>
-                                                        <h:selectBooleanCheckbox
+                                                        <h:selectBooleanCheckbox id="usedCB"
                                                                 value="${copyProfileBODBean.selectedTreeNode.data.used}"
                                                                 styleClass="section-content">
                                                             <p:ajax update=":form:treeTable, :form:details"/>
@@ -535,7 +536,7 @@
                                                 <p:panel id="bbieScPanel" header="BBIE SC">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                        <h:inputText id="bbieScMin" value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMinConverter}"/>
@@ -545,7 +546,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                        <h:inputText id="bbieScMax" value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
                                                                      styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                      disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                             <f:converter binding="#{cardinalityMaxConverter}"/>
@@ -555,7 +556,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieScFixedValue"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -563,7 +564,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Default" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieScDefault"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.defaultValue}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -571,7 +572,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Business Term" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieScTerm"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.bizTerm}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -579,7 +580,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
-                                                        <h:inputText
+                                                        <h:inputText id="bbieScRemark"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.remark}"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                 disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
@@ -587,7 +588,7 @@
                                                         </h:inputText>
 
                                                         <h:outputText value="Definition" styleClass="section-label"/>
-                                                        <h:inputTextarea
+                                                        <h:inputTextarea id="bbieScDefinition"
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
                                                                 rows="6" autoResize="false" a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section ${copyProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
@@ -620,7 +621,7 @@
                                                                  rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
 
-                                                        <p:autoComplete value="#{copyProfileBODBean.bbieScXbtName}"
+                                                        <p:autoComplete id="primitiveAuto" value="#{copyProfileBODBean.bbieScXbtName}"
                                                                         completeMethod="#{copyProfileBODBean.completeInputForBbieScXbt}"
                                                                         dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                         style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
@@ -634,7 +635,7 @@
                                                                  rendered="#{copyProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
 
-                                                        <p:autoComplete
+                                                        <p:autoComplete id="codeListAuto"
                                                                 value="#{copyProfileBODBean.bbieScCodeListName}"
                                                                 completeMethod="#{copyProfileBODBean.completeInputForBbieScCodeList}"
                                                                 dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -650,7 +651,7 @@
                                                         <h:outputText value="Agency ID List"
                                                                       styleClass="section-label"/>
 
-                                                        <p:autoComplete
+                                                        <p:autoComplete id="agencyAuto"
                                                                 value="#{copyProfileBODBean.bbieScAgencyIdListName}"
                                                                 completeMethod="#{copyProfileBODBean.completeInputForBbieScAgencyIdList}"
                                                                 dropdown="true" disabled="${copyProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
@@ -673,11 +674,11 @@
 
             <p:panel id="btnGroup" style="margin-top: 40px;">
                 <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
-                                 value="Back" icon="ui-icon-arrowthick-1-w" oncomplete="PF('wizard').back();"/>
+                                 value="Back" icon="fa fa-white fa-arrow-left" oncomplete="PF('wizard').back();"/>
                 <p:commandButton id="btnNext" widgetVar="btnNext" style=""
-                                 value="Next" icon="ui-icon-arrowthick-1-e" oncomplete="PF('wizard').next();"/>
+                                 value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
                 <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
-                                 value="Copy" icon="ui-icon-check" action="#{copyProfileBODBean.copy()}"/>
+                                 value="Copy" icon="fa fa-white fa-check" action="#{copyProfileBODBean.copy()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

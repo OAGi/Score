@@ -1,0 +1,60 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CDT_SC_AWD_PRI" directorySegmentName="seg_0" id="6A4EEAE6-B521-BC54-EF2C-E78D0695693C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="CDT_SC_ID" id="05A0F3D6-B3EF-BD90-0F5E-1AFA37205EE4">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CDT_PRI_ID" id="3C675BC9-9CF3-0B0E-90AA-C307C23FB8C0">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CDT_SC_AWD_PRI_ID" id="A35CF947-883C-9067-FB85-9436FDE1643C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="IS_DEFAULT" id="AD6E0F07-6FEE-8D01-E0F8-DBDEFCF61A2A">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CDT_SC_AWD_PRI_PK_IDX" id="BCB1C5E6-04B4-7E2E-56BB-2F33114A6AD9">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_SC_AWD_PRI_CDT_SC_ID_FK" id="4099C304-A0A9-D518-629F-DBA3316AF536">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_SC_AWD_PRI_CDT_PRI_ID_FK" id="BAB57F51-F419-4CE0-14DA-153354455200">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CDT_SC_AWD_PRI_PK" id="C11F8A9E-4DC9-5ED6-1BD3-0D796837369E">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev12c>

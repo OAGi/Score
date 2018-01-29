@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowProductionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductionOrder.xsd"/>
+        <xsd:element name="ShowProductionOrder" type="ShowProductionOrderType" id="oagis-id-d975c29b99824dcc93e1eb4dc0de02fe">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowProductionOrder is to supply Production Order information to another business application module.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowProductionOrderType" id="oagis-id-ab736a1879fb480ca882cc0098ad4584">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowProductionOrderDataAreaType" id="oagis-id-ce9011695fbd4b718d79c4081fe8fed8">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowProductionOrder. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ProductionOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowProductionOrderDataAreaType" id="oagis-id-fb3061e00c154e7593b238a013632aeb">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-d4f8455713644be5b32d7855a195a84d"/>
+                        <xsd:element ref="ProductionOrder" maxOccurs="unbounded" id="oagis-id-f3f55c6d035042799ae8ae4501688261"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

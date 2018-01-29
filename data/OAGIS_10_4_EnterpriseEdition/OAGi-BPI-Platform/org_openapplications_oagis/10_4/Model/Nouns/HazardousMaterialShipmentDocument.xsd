@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    9.4-RC-1  
+   Date:               02 March 2009 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/9_4-RC-1/Developer/Nouns/HazardousMaterial.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="HazardousMaterialShipmentDocument" type="HazardousMaterialShipmentDocumentType" id="oagis-id-5731ec1035d74c03a41b64c291ac50e4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A HazardousMaterialShipmentDocument identifies the hazardous material on a shipment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="HazardousMaterialShipmentDocumentHeader" type="HazardousMaterialShipmentDocumentHeaderType" id="oagis-id-df620acf99fe4999a3a077c898b5accd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the document that is used to transport a specific quantity of material goods from a supplier to a single customer business partner destination.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="HazardousMaterialShipmentDocumentLine" type="HazardousMaterialShipmentDocumentLineType" id="oagis-id-c2ea7bcaab6640b39264a79443df2f99">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the planned and actual quantities.  This information usually directly references a line item or shipment schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="HazardousMaterialShipmentDocumentType" id="oagis-id-4f656f813e584d32a647be5ab20b0ff0">
+		<xsd:sequence>
+			<xsd:element ref="HazardousMaterialShipmentDocumentHeader" id="oagis-id-a9c415a02c4849a7b24a5f6aa7d6ee00" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the document that is used to transport a specific quantity of material goods from a supplier to a single customer business partner destination.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="HazardousMaterialShipmentDocumentLine" id="oagis-id-77b704e2e2fe4a5a8fcc8f0d511d858b" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the planned and actual quantities.  This information usually directly references a line item or shipment schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-06e0db6c7eba497690217b7adee6295c"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-65240590a8fc4bd28fff42cbe250f342"/>
+	</xsd:complexType>
+	<xsd:complexType name="HazardousMaterialShipmentDocumentHeaderBaseType" abstract="false" id="oagis-id-8d68bc8ac43945ecb19413e2dc5688d5" mixed="false">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Hazardous Material Base Type for detailing the minimum applicable details of a hazardous material Noun</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ContainerQuantity" id="oagis-id-d0662ba7995b4df4a089a3345aee0e53" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A numeric expression of the number of outer containers for product shipping.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Port" id="oagis-id-39199e0dcdbe492c90064b7cc88d0124" minOccurs="0"/>
+					<xsd:element ref="ActualShipDate" id="oagis-id-4631a79071994ac6a43ec1f4f8c69144" minOccurs="0"/>
+					<xsd:element ref="GrossWeightMeasure" id="oagis-id-e527d827dbc74005be7540cd83e6fbe1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Gross weight of the associated entity. The total weight of the entity without reduction of packaging or container. I.e The Gross weight of a pallet of goods includes the weight of the pallet.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalVolumeMeasure" id="oagis-id-9ea1adae54f44f459c40a88970b94f4d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Quantifies the volume, or amount of space, that is occupied by an item, container or shipment.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="IntraCompanyTransferIndicator" id="oagis-id-4ec70cbab0b34857a475145a6713bc3d" minOccurs="0"/>
+					<xsd:element ref="ShippingRoute" id="oagis-id-290b4d3fcdf945018d777e7673d28196" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ShipFromParty" id="oagis-id-c28b6753abf4487eac9ff418358ae1c0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the goods or services are being shipped or sent from.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-b5b1b804be094f3d8e7dcc7adf4e8cce" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the ShipToParty for the document or the line. In a lot of cases, this is the same as the CustomerParty. In multi-organization purchasing, the CustomerParty may be different from the BuyerParty</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipperParty" id="oagis-id-bacf038a48674b5d8d0a71ad54c18d99" minOccurs="0"/>
+					<xsd:element ref="DeclarantParty" id="oagis-id-16bd758c7c314a329ae519c79cca5835" minOccurs="0"/>
+					<xsd:element ref="TransportID" id="oagis-id-412c0d8cefa1403d85e1afd681ff3305" minOccurs="0"/>
+					<xsd:element ref="EmergencyContact" id="oagis-id-e3ffc533ce104095805e6402babf5216" minOccurs="0"/>
+					<xsd:element ref="Party" id="oagis-id-b5c4669911eb4c75949e13100804ea14" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Event" id="oagis-id-95160b4fc1694d9caa6952afa02de7fc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="HazardousMaterialShipmentDocumentHeaderType" id="oagis-id-56952a0032a34ad49560ec08274f885b">
+		<xsd:complexContent>
+			<xsd:extension base="HazardousMaterialShipmentDocumentHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="HazardousMaterialShipmentDocumentHeaderExtensionType" id="oagis-id-bac3340975434caf9c97ae32e2691edb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="HazardousMaterialShipmentLineBaseType" abstract="false" id="oagis-id-2b37c856189e4e85aec858043af003df" mixed="false">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ContainsHazardousMaterialIndicator" id="oagis-id-7eda9019bca94c0694cc6578ee9dfae3" minOccurs="0"/>
+					<xsd:element ref="HazardousMaterialCodes" id="oagis-id-f06e12ed5a9a4312a0070b03ed2a0d72" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the hazardous material codes that are associated with the given instance of the item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Item" id="oagis-id-5538885df3184eabbf96532c0902074e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-c2b62a12d3f14358a2e6cc1dc03a76aa" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="CountryOfOriginCode" id="oagis-id-29334e962b174fa5a903aa5521acd55e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the identifier of the country of origin of an item, service or shipment </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="HazardousMaterialShipmentContainer" id="oagis-id-2797008063974f3ca4eb66a47b7fe5bd" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Quantity" id="oagis-id-4bffce5b4f334a1e93776a880d7fd03c" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="HazardousMaterialShipmentDocumentLineType" id="oagis-id-754da65a7a174d6b93168ef5be5cf389">
+		<xsd:complexContent>
+			<xsd:extension base="HazardousMaterialShipmentLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="HazardousMaterialShipmentDocumentLineExtensionType" id="oagis-id-c5063b361b304435950d41cc8b0b6ecc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

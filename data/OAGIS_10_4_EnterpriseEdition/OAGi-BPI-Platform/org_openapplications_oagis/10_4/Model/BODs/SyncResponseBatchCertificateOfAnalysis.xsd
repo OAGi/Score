@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+	<xsd:element name="SyncResponseBatchCertificateOfAnalysis" type="SyncResponseBatchCertificateOfAnalysisType" id="oagis-id-e7d9d2a170624d499dd4464e38e50aed">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseBatchCertificateOfAnalysis is to communicate the response to a BatchCertificateOfAnalysis message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseBatchCertificateOfAnalysisType" id="oagis-id-3b74c26b36fd4f038350fb53d62147ac">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseBatchCertificateOfAnalysisDataAreaType" id="oagis-id-4d322fc850514acda47e7e31c70be6d4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseBatchCertificateOfAnalysisDataAreaType" id="oagis-id-6e5cba9fb6d747f09bcb626013a85bcc">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-aab8371f3551469dbc3547e7720701cf"/>
+			<xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-a0006336863b4493a3c00834bdf46007"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

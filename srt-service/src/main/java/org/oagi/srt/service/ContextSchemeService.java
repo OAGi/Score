@@ -53,6 +53,10 @@ public class ContextSchemeService {
         return contextSchemeRepository.findOne(ctxSchemeId);
     }
 
+    public ContextScheme findContextSchemeByGuid(String guid) {
+        return contextSchemeRepository.findOneByGuid(guid);
+    }
+
     public ContextSchemeValue findContextSchemeValueById(long ctxSchemeValueId) {
         return contextSchemeValueRepository.findOne(ctxSchemeValueId);
     }

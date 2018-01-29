@@ -15,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.transaction.Transactional;
 
 @Controller
 @Scope("view")
@@ -49,6 +50,7 @@ public class NamespaceDetailBean extends UIHandler {
         this.namespace = namespace;
     }
 
+    @Transactional
     public String update() {
         String uri = namespace.getUri();
         if (namespaceService.isExistsUri(uri, namespace.getNamespaceId())) {
@@ -81,6 +83,6 @@ public class NamespaceDetailBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
-        return "/views/namespace/list.xhtml?faces-redirect=true";
+        return "/views/namespace/list.jsf?faces-redirect=true";
     }
 }

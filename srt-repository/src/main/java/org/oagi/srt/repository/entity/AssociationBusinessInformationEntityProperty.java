@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -83,6 +82,11 @@ public class AssociationBusinessInformationEntityProperty
         setAsbiepId(id);
     }
 
+    @Override
+    public String tableName() {
+        return "ASBIEP";
+    }
+
     public long getAsbiepId() {
         return asbiepId;
     }
@@ -132,12 +136,6 @@ public class AssociationBusinessInformationEntityProperty
     }
 
     public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            definition = null;
-        }
         this.definition = definition;
     }
 
@@ -215,6 +213,43 @@ public class AssociationBusinessInformationEntityProperty
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (asbiepId ^ (asbiepId >>> 32));
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
+        result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntityProperty{" +
+                "asbiepId=" + asbiepId +
+                ", guid='" + guid + '\'' +
+                ", basedAsccpId=" + basedAsccpId +
+                ", roleOfAbieId=" + roleOfAbieId +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                '}';
     }
 
     @Transient
@@ -329,10 +364,9 @@ public class AssociationBusinessInformationEntityProperty
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
     public AssociationBusinessInformationEntityProperty clone() {
         AssociationBusinessInformationEntityProperty clone = new AssociationBusinessInformationEntityProperty();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedAsccpId = this.basedAsccpId;
         clone.roleOfAbieId = this.roleOfAbieId;
         clone.definition = this.definition;

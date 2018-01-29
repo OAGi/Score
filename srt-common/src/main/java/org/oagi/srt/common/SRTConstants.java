@@ -12,6 +12,7 @@ public class SRTConstants {
 
 	public static final String NS_CCTS_PREFIX = "ccts";
 	public static final String NS_XSD_PREFIX = "xsd";
+	public static final String NS_XS_PREFIX = "xs";
 	public static final String NS_CCTS = "urn:un:unece:uncefact:documentation:1.1";
 	public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
 
@@ -25,7 +26,7 @@ public class SRTConstants {
 	/*
 	 * To choose OAGIS version
 	 */
-	public static final double OAGIS_VERSION = 10.3D;
+	public static final double OAGIS_VERSION = 10.4D;
 
 	public static final String FOREIGNKEY_ERROR_MSG = "a foreign key constraint fails";
 	public static final String CANNOT_DELETE_CONTEXT_CATEGORTY = "Fail to delete. The context category is referenced by the following context schemes: ";

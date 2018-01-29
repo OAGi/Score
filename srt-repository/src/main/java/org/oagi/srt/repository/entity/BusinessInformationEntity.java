@@ -6,7 +6,7 @@ import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 /*
  * Marker interface
  */
-public interface BusinessInformationEntity extends IdEntity, IGuidEntity {
+public interface BusinessInformationEntity extends IEntity, IGuidEntity {
 
     public long getOwnerTopLevelAbieId();
 

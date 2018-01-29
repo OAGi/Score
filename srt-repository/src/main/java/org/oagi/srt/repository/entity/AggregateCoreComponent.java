@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
@@ -10,13 +9,12 @@ import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "acc")
-public class AggregateCoreComponent
-        implements CoreComponent, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
+public class AggregateCoreComponent implements
+        CoreComponent, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
@@ -45,6 +43,9 @@ public class AggregateCoreComponent
     @Lob
     @Column(length = 10 * 1024)
     private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long basedAccId;
@@ -116,15 +117,19 @@ public class AggregateCoreComponent
         this.den = den;
     }
 
-    public AggregateCoreComponent(long accId, Long basedAccId, String definition) {
-        init();
+    @Override
+    public long getId() {
+        return getAccId();
+    }
 
-        this.accId = accId;
-        if (basedAccId != null) {
+    @Override
+    public void setId(long id) {
+        setAccId(id);
+    }
 
-        }
-        this.basedAccId = basedAccId;
-        this.definition = definition;
+    @Override
+    public String tableName() {
+        return "ACC";
     }
 
     public long getAccId() {
@@ -168,14 +173,20 @@ public class AggregateCoreComponent
         this.definition = definition;
     }
 
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public long getBasedAccId() {
         return (basedAccId == null) ? 0L : basedAccId;
     }
 
-    public void setBasedAccId(long basedAccId) {
-        if (basedAccId > 0) {
-            this.basedAccId = basedAccId;
-        }
+    public void setBasedAccId(Long basedAccId) {
+        this.basedAccId = basedAccId;
     }
 
     public String getObjectClassQualifier() {
@@ -208,10 +219,8 @@ public class AggregateCoreComponent
         return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
-        if (namespaceId > 0L) {
-            this.namespaceId = namespaceId;
-        }
+    public void setNamespaceId(Long namespaceId) {
+        this.namespaceId = namespaceId;
     }
 
     public long getCreatedBy() {
@@ -290,7 +299,7 @@ public class AggregateCoreComponent
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -339,13 +348,13 @@ public class AggregateCoreComponent
         return isExtension() && "All Extension".equals(getObjectClassTerm());
     }
 
-    @Override
     public AggregateCoreComponent clone() {
         AggregateCoreComponent clone = new AggregateCoreComponent();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setObjectClassTerm(this.objectClassTerm);
         clone.setDen(this.den);
         clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         if (this.basedAccId != null) {
             clone.setBasedAccId(this.basedAccId);
         }
@@ -375,6 +384,7 @@ public class AggregateCoreComponent
         }
         clone.setDeprecated(this.deprecated);
         clone.setAbstract(this.isAbstract);
+        clone.afterLoaded();
         return clone;
     }
 
@@ -401,6 +411,7 @@ public class AggregateCoreComponent
         result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
@@ -430,6 +441,7 @@ public class AggregateCoreComponent
                 ", objectClassTerm='" + objectClassTerm + '\'' +
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", basedAccId=" + basedAccId +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
                 ", oagisComponentType=" + oagisComponentType +
@@ -460,6 +472,17 @@ public class AggregateCoreComponent
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                AggregateCoreComponent acc = (AggregateCoreComponent) object;
+                acc.afterLoaded();
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

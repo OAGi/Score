@@ -16,37 +16,63 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.DataTypeType.BusinessDataType;
 
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public class SelectBDTBean extends AbstractCoreComponentBean {
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
+
     @Autowired
     private CoreComponentService coreComponentService;
 
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
+
     private List<DataType> bdtList;
-    private String dataTypeTermQualifier;
+    private String qualifierDataTypeTerm;
     private DataType selectedBDT;
 
     @PostConstruct
     public void init() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+        types = requestParameterMap.get("types");
+        states = requestParameterMap.get("states");
+
         setBdtList(allBDTs());
     }
 
     private List<DataType> allBDTs() {
-        return dataTypeRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
+        List<DataType> allBDTs = dataTypeRepository.findAll(
+                new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
+                .filter(e -> BusinessDataType == e.getType())
                 .filter(e -> Published == e.getState())
                 .collect(Collectors.toList());
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allBDTs = coreComponentBeanHelper.filterByUser(allBDTs, getCurrentUser(), DataType.class);
+
+        return allBDTs;
     }
 
     public List<DataType> getBdtList() {
@@ -57,12 +83,12 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
         this.bdtList = bdtList;
     }
 
-    public String getDataTypeTermQualifier() {
-        return dataTypeTermQualifier;
+    public String getQualifierDataTypeTerm() {
+        return qualifierDataTypeTerm;
     }
 
-    public void setDataTypeTermQualifier(String dataTypeTermQualifier) {
-        this.dataTypeTermQualifier = dataTypeTermQualifier;
+    public void setQualifierDataTypeTerm(String qualifierDataTypeTerm) {
+        this.qualifierDataTypeTerm = qualifierDataTypeTerm;
     }
 
     public DataType getSelectedBDT() {
@@ -86,13 +112,13 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
         if (StringUtils.isEmpty(q)) {
             return allBDTs().stream()
-                    .map(e -> e.getDataTypeTerm() + " " + e.getQualifier())
+                    .map(e -> toCompleteInputString(e))
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
             return allBDTs().stream()
-                    .map(e -> e.getDataTypeTerm() + " " + e.getQualifier())
+                    .map(e -> toCompleteInputString(e))
                     .distinct()
                     .filter(e -> {
                         e = e.toLowerCase();
@@ -108,24 +134,46 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     }
 
     public void search() {
-        String dataTypeTermQualifier = getDataTypeTermQualifier();
-        if (StringUtils.isEmpty(dataTypeTermQualifier)) {
+        String qualifierDataTypeTerm = getQualifierDataTypeTerm();
+        if (StringUtils.isEmpty(qualifierDataTypeTerm)) {
             setBdtList(allBDTs());
         } else {
             setBdtList(
                     allBDTs().stream()
-                            .filter(e -> (e.getDataTypeTerm() + " " + e.getQualifier()).toLowerCase().contains(dataTypeTermQualifier.toLowerCase()))
+                            .filter(e -> (toCompleteInputString(e)).toLowerCase().contains(qualifierDataTypeTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
         }
     }
 
+    private String toCompleteInputString(DataType dataType) {
+        StringBuilder sb = new StringBuilder();
+        String qualifier = dataType.getQualifier();
+        if (!StringUtils.isEmpty(qualifier)) {
+            sb.append(qualifier).append(" ");
+        }
+        String dataTypeTerm = dataType.getDataTypeTerm();
+        sb.append(dataTypeTerm);
+        return sb.toString();
+    }
+
+    // To support 'back' button to go back 'list' page.
+    private String types;
+    private String states;
+
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
+    }
+
     @Transactional
-    public String createBCCP() {
+    public void createBCCP() throws IOException {
         User requester = getCurrentUser();
         DataType bdt = getSelectedBDT();
         BasicCoreComponentProperty bccp = coreComponentService.newBasicCoreComponentProperty(requester, bdt);
 
-        return "/views/core_component/bccp_details.xhtml?bccpId=" + bccp.getBccpId() + "&faces-redirect=true";
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/bccp/" + bccp.getBccpId());
     }
+
 }

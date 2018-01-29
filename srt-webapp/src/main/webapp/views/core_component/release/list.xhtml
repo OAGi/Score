@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui" template="../../../template.xhtml">
+
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Release</h2>
+            </div>
+        </div>
+        <h:form id="listForm">
+            <p:panel id="pPanel">
+                <f:facet name="header">
+                    <p:autoComplete id="releaseNum" value="#{releaseBean.releaseNum}"
+                                    style="min-width: 440px; margin-right: 20px;"
+                                    maxResults="10"
+                                    completeMethod="#{releaseBean.completeInput}">
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                    </p:autoComplete>
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{releaseBean.search}"
+                                     update="tbl"
+                                     icon="fa fa-white fa-search"/>
+                    <p:button id="createBtn" value="Create Release"
+                              style="float: right; padding: 3px 0 3px 0;"
+                              outcome="/views/core_component/release/details.jsf"/>
+                </f:facet>
+                <p:dataTable id="tbl" var="releases" value="#{releaseBean.allReleases}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px" rowKey="#{releases.releaseId}">
+
+                    <p:column style="width: 75px; text-align: center;" headerText="Release"
+                              sortBy="#{releases.releaseNum}">
+                        <a href="/release/#{releases.releaseId}">#{releases.releaseNum}</a>
+                    </p:column>
+
+                    <p:column style="width: 75px; text-align: center;" headerText="State" sortBy="#{releases.state}">
+                        <h:panelGroup rendered="#{releases.state == 'Final'}">
+                            <span class="label label-default">#{releases.state}</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{releases.state == 'Draft'}">
+                            <span class="label label-primary">#{releases.state}</span>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column style="width: 200px; text-align: center;" styleClass="ellipsis" headerText="Namespace"
+                              sortBy="#{releases.uri}">
+                        <h:outputText value="#{releases.uri}"/>
+                    </p:column>
+
+                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis"
+                              headerText="Last Updated By"
+                              sortBy="#{releases.loginId}">
+                        <h:outputText value="#{releases.loginId}"/>
+                    </p:column>
+
+                    <p:column style="width: 150px; text-align: center;" headerText="Last Updated Timestamp"
+                              sortBy="#{releases.lastUpdateTimestamp}">
+                        <h:outputText value="#{releases.lastUpdateTimestamp}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 100px;"
+                              rendered="#{releaseBean.allReleases.isEmpty() == false}">
+                        <p:commandButton id="finalizeBtn" value="Finalize" styleClass="revise"
+                                         rendered="#{releases.state == 'Draft'}"
+                                         onclick="PF('confirmFinalize').show()"
+                                         update="tbl" ajax="true">
+                            <p:tooltip id="tooltipDelete" for="finalizeBtn" value="Make release final"
+                                       position="right"/>
+                            <f:setPropertyActionListener value="#{releases}" target="#{releaseBean.selectedReleases}" />
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </p:panel>
+
+            <p:confirmDialog id="confirmFinalizeDlg" widgetVar="confirmFinalize" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    Release cannot be updated after it is made final. <br/>
+                    If necessary, please go back and update it now.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton id="acceptBtn" value="Make it final" icon="fa fa-white fa-check"
+                                     onclick="PF('confirmPurge').show()"
+                                     oncomplete="PF('confirmFinalize').hide()" update="tbl"/>
+                    <p:commandButton id="cancelBtn" value="Go back" icon="fa fa-white fa-times"
+                                     onclick="PF('confirmFinalize').hide()"/>
+                </div>
+            </p:confirmDialog>
+
+            <p:confirmDialog id="confirmPurgeDlg" widgetVar="confirmPurge" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    All draft releases older than the final release will be merged into the final release and candidate components will be published. <br/>
+                    All other draft releases will be discarded. <br/>
+                    Do you want to keep or purge components from discarded draft releases?
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton id="keepBtn" value="Keep components" icon="fa fa-white fa-check"
+                                     action="#{releaseBean.makeReleaseFinal(false)}"
+                                     oncomplete="PF('confirmPurge').hide()" update="tbl"/>
+                    <p:commandButton id="purgeBtn" value="Purge components" icon="fa fa-white fa-times"
+                                     action="#{releaseBean.makeReleaseFinal(true)}"
+                                     oncomplete="PF('confirmPurge').hide()" update="tbl"/>
+                </div>
+            </p:confirmDialog>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+        <ui:include src="../../dialog/global_confirm_non_undo_dialog.xhtml"/>
+    </ui:define>
+</ui:composition>

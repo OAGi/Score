@@ -1,12 +1,32 @@
 package org.oagi.srt.common.util;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.spell.LuceneDictionary;
+import org.apache.lucene.search.spell.LuceneLevenshteinDistance;
+import org.apache.lucene.search.spell.SpellChecker;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
+import org.oagi.srt.common.lucene.CaseSensitiveStandardAnalyzer;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang.StringUtils.getLevenshteinDistance;
 
 public class Utility {
 
@@ -155,7 +175,8 @@ public class Utility {
         String result = sb.toString();
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).replaceAll(" ", "").concat(" Code Type");
-        return result.substring(result.lastIndexOf(" ") + 1);
+        result = result.substring(result.lastIndexOf(" ") + 1);
+        return IDtoIdentifier(result);
     }
 
     public static final String allowed_Representation_Term_List[] = {
@@ -223,6 +244,9 @@ public class Utility {
         if (str.equals("mimeCode")) {
             return "MIME Code";
         }
+        if (str.equals("uri")) {
+            return "URI";
+        }
 
         String result = sparcing(str);
         return result;
@@ -238,7 +262,7 @@ public class Utility {
         return result;
     }
 
-    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "UPC", "BOD", "IST");
+    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "BOD", "IST", "MSDS");
 
     private static String sparcing(String str) {
         for (String abbr : ABBR_LIST) {
@@ -246,6 +270,7 @@ public class Utility {
                 str = str.replace(abbr, abbr + " ");
             }
         }
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             if (Character.isUpperCase(str.charAt(i)) && i != 0) {
@@ -262,7 +287,13 @@ public class Utility {
                 sb.append(str.charAt(i));
             }
         }
+
         String result = sb.toString();
+        // #Issue 435: Exceptional Case
+        result = result.replace("E Mail", "EMail")
+                .replace("Co A", "CoA")
+                .replace("GLDestination", "GL Destination");
+
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
         result = result.replaceAll("\\s{2,}", " ");
@@ -275,8 +306,8 @@ public class Utility {
         String[] delim = space_separated_str.split(" ");
         String ret = "";
         for (int i = 0; i < delim.length; i++) {
-            if (delim[i].equals("ID")) {
-                delim[i] = "Identifier";
+            if (delim[i].startsWith("ID")) {
+                delim[i] = delim[i].replace("ID", "Identifier");
             }
             ret = ret + " " + delim[i];
         }
@@ -338,6 +369,17 @@ public class Utility {
     }
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
+        /*
+         * [exception in Fields.xsd at line 4081]
+         *
+         * <xsd:simpleType name="DurationMeasureType" id="oagis-id-10ef9f34e0504a71880c967c82ac039f">
+         *     <xsd:restriction base="DurationType_JJ5401"/>
+         * </xsd:simpleType>
+         */
+        if ("DurationMeasureType".equals(type)) {
+            return "Measure";
+        }
+
         String qualifier = "";
         if (dataTypeTerm.equals("Text")) {
             if (type.contains("Text")) {
@@ -347,7 +389,7 @@ public class Utility {
             }
 
             String baseType = baseDen.replace(" ", "").replace("_", "").replace(".", "");
-            if (type.contains (baseType)) {
+            if (type.contains(baseType)) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, baseType);
             }
 
@@ -547,10 +589,177 @@ public class Utility {
         return out.trim();
     }
 
+    private static String sortedStr(String s, String regex) {
+        return Arrays.asList(s.split(regex)).stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+    }
+
+    public static <T> int compareLevenshteinDistance(String source, T a, T b, Function<T, String> function) {
+        return compareLevenshteinDistance(source, a, b, function, " ");
+    }
+
+    public static <T> int compareLevenshteinDistance(String source, T a, T b, Function<T, String> function, String regex) {
+        source = sortedStr(source, regex);
+        String aStr = sortedStr(function.apply(a), regex);
+        String bStr = sortedStr(function.apply(b), regex);
+
+        int aDist = getLevenshteinDistance(source, aStr);
+        int bDist = getLevenshteinDistance(source, bStr);
+        if (aDist == bDist) {
+            return aStr.compareTo(bStr);
+        }
+        return aDist - bDist;
+    }
+
+    public static List<String> suggestWords(String word, Directory directory, String field) {
+        if (StringUtils.isEmpty(word)) {
+            return Collections.emptyList();
+        }
+
+        try {
+            IndexReader reader = DirectoryReader.open(directory);
+            IndexSearcher searcher = new IndexSearcher(reader);
+
+            Query q = new QueryParser(field, new CaseSensitiveStandardAnalyzer()).parse(word);
+            TopDocs topDocs = searcher.search(q, 1);
+            if (topDocs.totalHits > 0L) {
+                return Arrays.asList(word);
+            }
+
+            SpellChecker spellChecker = new SpellChecker(directory, new LuceneLevenshteinDistance());
+            spellChecker.indexDictionary(new LuceneDictionary(reader, field),
+                    new IndexWriterConfig(new CaseSensitiveStandardAnalyzer()), true);
+            return Arrays.asList(spellChecker.suggestSimilar(word, 10));
+        } catch (IOException | ParseException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String suggestWord(String word, Directory directory, String field) {
+        List<String> suggestWords = suggestWords(word, directory, field);
+        if (suggestWords.size() > 0) {
+            if (!suggestWords.contains(word)) {
+                return suggestWords.get(0);
+            }
+        }
+        return word;
+    }
+
+    public static <T> Directory createDirectory(Collection<T> list,
+                                                String[] fields,
+                                                String[] delims,
+                                                Function<T, String>... functions) {
+
+        Map<String, Set<String>> tokenSet = new HashMap();
+        for (String field : fields) {
+            tokenSet.put(field, new HashSet());
+        }
+
+        for (T e : list) {
+            for (int i = 0, len = functions.length; i < len; ++i) {
+                Function<T, String> func = functions[i];
+                String field = fields[i];
+                String delim = delims[i];
+
+                String str = func.apply(e);
+                if (!StringUtils.isEmpty(str)) {
+                    for (String token : str.split(delim)) {
+                        token = token.replaceAll("[.]", "");
+                        tokenSet.get(field).add(token);
+                    }
+                }
+            }
+        }
+
+        Directory directory = new RAMDirectory();
+
+        IndexWriterConfig conf = new IndexWriterConfig(new CaseSensitiveStandardAnalyzer());
+        IndexWriter indexWriter = null;
+        try {
+            indexWriter = new IndexWriter(directory, conf);
+            Document doc = new Document();
+            for (Map.Entry<String, Set<String>> entry : tokenSet.entrySet()) {
+                String field = entry.getKey();
+                for (String token : entry.getValue()) {
+                    doc.add(new StringField(field, token, Field.Store.YES));
+                }
+            }
+            indexWriter.addDocument(doc);
+
+            indexWriter.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeQuietly(indexWriter);
+        }
+
+        return directory;
+    }
+
+    public static <T extends Serializable> Directory createDirectoryForText(
+            Collection<T> list,
+            String[] fields,
+            Function<T, String>... functions) {
+
+        Directory directory = new RAMDirectory();
+        IndexWriterConfig conf = new IndexWriterConfig(new CaseSensitiveStandardAnalyzer());
+        IndexWriter indexWriter = null;
+        try {
+            indexWriter = new IndexWriter(directory, conf);
+
+            for (T e : list) {
+                Document doc = new Document();
+                for (int i = 0, len = functions.length; i < len; ++i) {
+                    String field = fields[i];
+                    Function<T, String> func = functions[i];
+
+                    String text = func.apply(e);
+                    if (!StringUtils.isEmpty(text)) {
+                        doc.add(new TextField(field, text, Field.Store.NO));
+                    }
+                }
+                doc.add(new StoredField("obj", toByteArray(e)));
+                indexWriter.addDocument(doc);
+            }
+
+            indexWriter.flush();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeQuietly(indexWriter);
+        }
+
+        return directory;
+    }
+
+    public static <T> T toObject(byte[] bytes, Class<T> clazz) throws IOException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        try {
+            return clazz.cast(objectInputStream.readObject());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            objectInputStream.close();
+        }
+    }
+
+    public static byte[] toByteArray(Serializable serializable) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        try {
+            objectOutputStream.writeObject(serializable);
+            objectOutputStream.flush();
+        } finally {
+            objectOutputStream.close();
+        }
+        return byteArrayOutputStream.toByteArray();
+    }
+
     public static void main(String args[]) {
-        String name = "OAGIS10BODs";
-        int idx = name.lastIndexOf("Type");
-        String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
-        System.out.println(objectClassTerm);
+        String term = spaceSeparator("BBANID");
+
+        System.out.println(term);
     }
 }

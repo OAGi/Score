@@ -1,0 +1,257 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="769EC2C7-0F4B-2BC1-93DC-450C860872AC" name="BIE_USAGE_RULE">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:10:30 UTC</createdTime>
+<commentInRDBMS>This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_43</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BIE_USAGE_RULE_ID" id="F8BD3328-38AB-C19B-EB87-C885806231BF">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Primary key of the table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ASSIGNED_USAGE_RULE_ID" id="9A95D88C-776F-5BAF-88E7-4666F295902F">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:15:35 UTC</createdTime>
+<commentInRDBMS>Foreign key to the USAGE_RULE table indicating the usage rule assigned to a BIE.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="40136075-A7EF-F0F1-6D44-202A7324FAA8" referredColumn="D3DC6B1C-213B-2973-AAD0-243B23D9166A"/>
+</associations>
+</Column>
+<Column name="TARGET_ABIE_ID" id="89291EC0-7C45-BF69-239D-618DB129874C">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Foreign key to the ABIE table indicating the ABIE, to which the usage rule is applied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="EEE0082A-2658-A747-2204-CD29C1761D6F" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+<Column name="TARGET_ASBIE_ID" id="7228B96D-6152-6506-F210-C916845A04FB">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E8D0C09F-D742-6998-CF38-C6F74D55E5AF" referredColumn="C31F2E9E-8473-96BF-90D0-F96ACC1CE325"/>
+</associations>
+</Column>
+<Column name="TARGET_ASBIEP_ID" id="BA276C9A-2663-D435-FD0A-BC786E8CFBC4">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="2190BAEB-AF3B-B9F9-225F-60A4BA0A3009" referredColumn="DED39440-6579-847B-FCCE-72A73CB3A55D"/>
+</associations>
+</Column>
+<Column name="TARGET_BBIE_ID" id="A230864E-5308-EFC4-3218-1AA59798AA03">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AFFDAFBA-7679-9F26-ABC4-6992320EB97B" referredColumn="2C7ADB03-0523-5076-F3AB-BB20525308D9"/>
+</associations>
+</Column>
+<Column name="TARGET_BBIEP_ID" id="5DC3D397-9312-EB48-4C0E-18C8FD474D5C">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<commentInRDBMS>Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="20AB6206-B8DE-D655-2CDD-CCABBA7EAF94" referredColumn="41CF0414-D5DF-91F3-717A-4B119F9BC9F4"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="53684F1B-C93C-5076-2E13-319EB7469EDB" name="BIE_USAGE_RULE_PK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:14:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F8BD3328-38AB-C19B-EB87-C885806231BF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="50C5566F-3DB5-890F-F962-0A215FC1E3F5" name="BUR_BIE_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F8BD3328-38AB-C19B-EB87-C885806231BF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E50B196A-7D77-705E-0B3C-35735A1C3A35" name="BUR_ASSIGNED_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9A95D88C-776F-5BAF-88E7-4666F295902F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="07D9BCE8-EA9B-F4BB-76FA-920E92DA51B3" name="BUR_TARGET_ABIE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="89291EC0-7C45-BF69-239D-618DB129874C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="18E67E92-ABCA-1553-1D83-76E4D19BD2D0" name="BUR_TARGET_ASBIE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7228B96D-6152-6506-F210-C916845A04FB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B4569352-A932-7701-4A9C-A2720C030497" name="BUR_TARGET_ASBIEP_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BA276C9A-2663-D435-FD0A-BC786E8CFBC4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7B0BAA7E-929D-1C7E-945E-A2ADF664452B" name="BUR_TARGET_BBIE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A230864E-5308-EFC4-3218-1AA59798AA03"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E06074B0-3D1D-2BD6-0EF7-7F80D3476716" name="BUR_TARGET_BBIEP_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:40:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5DC3D397-9312-EB48-4C0E-18C8FD474D5C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9FF3AF2C-C7A2-F781-3CEF-D1D6E7F279C4" name="BUR_USAGE_RULE_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:16:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9A95D88C-776F-5BAF-88E7-4666F295902F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="714C8166-0741-618D-E806-42DFFC0FD70B" name="BUR_ABIE_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:16:49 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="89291EC0-7C45-BF69-239D-618DB129874C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D7DF1CC2-6B4A-DE46-60E4-0FCA5CE43C8A" name="BUR_ASBIE_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:17:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7228B96D-6152-6506-F210-C916845A04FB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6F56CBE2-B0D3-A614-C2A6-BC233B3498C3" name="BUR_ASBIEP_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:17:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BA276C9A-2663-D435-FD0A-BC786E8CFBC4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B066C8CE-0B00-BE93-1FB6-C492A1A92801" name="BUR_BBIE_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:17:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A230864E-5308-EFC4-3218-1AA59798AA03"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="23D19367-8E4C-2842-04B5-3B90963B2385" name="BUR_BBIEP_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 17:17:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5DC3D397-9312-EB48-4C0E-18C8FD474D5C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

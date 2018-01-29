@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -13,7 +12,7 @@ import java.util.*;
 @Entity
 @Table(name = "asbie")
 public class AssociationBusinessInformationEntity
-        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable, Serializable {
+        implements BusinessInformationEntity, CreatorModifierAware, TimestampAware, Usable {
 
     public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
 
@@ -97,6 +96,11 @@ public class AssociationBusinessInformationEntity
     @Override
     public void setId(long id) {
         setAsbieId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "ASBIE";
     }
 
     public long getAsbieId() {
@@ -302,6 +306,30 @@ public class AssociationBusinessInformationEntity
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntity{" +
+                "asbieId=" + asbieId +
+                ", guid='" + guid + '\'' +
+                ", fromAbieId=" + fromAbieId +
+                ", toAsbiepId=" + toAsbiepId +
+                ", basedAsccId=" + basedAsccId +
+                ", definition='" + definition + '\'' +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", nillable=" + nillable +
+                ", remark='" + remark + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", seqKey=" + seqKey +
+                ", used=" + used +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                '}';
+    }
+
     @Transient
     private transient List<PersistEventListener> persistEventListeners;
 
@@ -413,10 +441,9 @@ public class AssociationBusinessInformationEntity
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
     public AssociationBusinessInformationEntity clone() {
         AssociationBusinessInformationEntity clone = new AssociationBusinessInformationEntity();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.fromAbieId = this.fromAbieId;
         clone.toAsbiepId = this.toAsbiepId;
         clone.basedAsccId = this.basedAsccId;
@@ -427,6 +454,7 @@ public class AssociationBusinessInformationEntity
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }

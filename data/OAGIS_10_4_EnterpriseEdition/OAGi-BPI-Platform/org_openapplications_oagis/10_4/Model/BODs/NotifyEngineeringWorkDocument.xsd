@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyEngineeringWorkDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EngineeringWorkDocument.xsd"/>
+        <xsd:element name="NotifyEngineeringWorkDocument" type="NotifyEngineeringWorkDocumentType" id="oagis-id-1c384fed28ea429c81a7c7bd356b2ba0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyEngineeringWorkDocument is to enable an application to provide EngineeringWorkDocument from another business application module. The NotifyEngineeringWorkDocument is typically provided in a a publish/subscribe or broadcast buiness exchange where the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyEngineeringWorkDocumentType" id="oagis-id-1833a7af9e854f4288da0dfda9db8514">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyEngineeringWorkDocumentDataAreaType" id="oagis-id-dc90302418e04f6abd4f9b74fde2ea6b">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyEngineeringWorkDocument. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (EngineeringWorkDocument).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyEngineeringWorkDocumentDataAreaType" id="oagis-id-d7bac7efe027404693b8c4d43b0253ea">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-078618e417af4e9999c686051f877656"/>
+                        <xsd:element ref="EngineeringWorkDocument" maxOccurs="unbounded" id="oagis-id-0031eda3e61b4d009ed4b5344ddf8b8a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

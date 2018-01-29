@@ -36,6 +36,7 @@ import java.util.Date;
                         fields = {
                                 @FieldResult(name = "asccpId", column = "asccp_id"),
                                 @FieldResult(name = "propertyTerm", column = "property_term"),
+                                @FieldResult(name = "releaseId", column = "release_id"),
                         }
                 ),
                 @EntityResult(
@@ -49,6 +50,12 @@ import java.util.Date;
                         entityClass = User.class,
                         fields = {
                                 @FieldResult(name = "ownerName", column = "owner_name"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = Release.class,
+                        fields = {
+                                @FieldResult(name = "releaseNum", column = "releaseNum"),
                         }
                 )
         }
@@ -74,6 +81,9 @@ public class ProfileBOD {
     @Column(nullable = false)
     private long asccpId;
 
+    @Column
+    private Long releaseId;
+
     @Column(nullable = false)
     private String propertyTerm;
 
@@ -82,6 +92,9 @@ public class ProfileBOD {
 
     @Column(length = 100)
     private String bizCtxName;
+
+    @Column(length = 45)
+    private String releaseNum;
 
     @Column
     @Convert(attributeName = "state", converter = AggregateBusinessInformationEntityStateConverter.class)
@@ -145,6 +158,14 @@ public class ProfileBOD {
         this.asccpId = asccpId;
     }
 
+    public long getReleaseId() {
+        return (releaseId != null) ? releaseId : 0L;
+    }
+
+    public void setReleaseId(Long releaseId) {
+        this.releaseId = releaseId;
+    }
+
     public String getPropertyTerm() {
         return propertyTerm;
     }
@@ -167,6 +188,14 @@ public class ProfileBOD {
 
     public void setBizCtxName(String bizCtxName) {
         this.bizCtxName = bizCtxName;
+    }
+
+    public String getReleaseNum() {
+        return releaseNum;
+    }
+
+    public void setReleaseNum(String releaseNum) {
+        this.releaseNum = releaseNum;
     }
 
     public AggregateBusinessInformationEntityState getState() {
@@ -220,9 +249,11 @@ public class ProfileBOD {
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (int) (asbiepId ^ (asbiepId >>> 32));
         result = 31 * result + (int) (asccpId ^ (asccpId >>> 32));
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
+        result = 31 * result + (releaseNum != null ? releaseNum.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (ownerName != null ? ownerName.hashCode() : 0);
@@ -239,9 +270,11 @@ public class ProfileBOD {
                 ", status='" + status + '\'' +
                 ", asbiepId=" + asbiepId +
                 ", asccpId=" + asccpId +
+                ", releaseId=" + releaseId +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
+                ", releaseNum='" + releaseNum + '\'' +
                 ", state=" + state +
                 ", ownerUserId=" + ownerUserId +
                 ", ownerName='" + ownerName + '\'' +

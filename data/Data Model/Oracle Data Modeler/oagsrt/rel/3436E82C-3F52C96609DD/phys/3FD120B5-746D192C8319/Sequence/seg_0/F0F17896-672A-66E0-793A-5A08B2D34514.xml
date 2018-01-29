@@ -1,0 +1,10 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<SequenceOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" name="TOP_LEVEL_ABIE_ID_SEQ" directorySegmentName="seg_0" id="F0F17896-672A-66E0-793A-5A08B2D34514">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:54:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<incrementBy>1</incrementBy>
+<maxValue>9999999999999999999999999999</maxValue>
+<minValue>1</minValue>
+<startWith>1</startWith>
+</SequenceOraclev10g>

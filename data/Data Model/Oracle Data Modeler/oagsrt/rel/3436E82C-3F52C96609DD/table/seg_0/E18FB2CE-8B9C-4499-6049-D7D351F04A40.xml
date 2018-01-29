@@ -85,9 +85,9 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="EBA69A3E-28B0-529E-C3AD-14D7070CD757">
+<Column name="DEFINITION" id="FB49F3FB-6C11-6F74-BB63-A649D08FFBCB">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:16:59 UTC</createdTime>
+<createdTime>2017-07-27 20:14:52 UTC</createdTime>
 <commentInRDBMS>Description of the BCCP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -95,6 +95,19 @@
 <use>1</use>
 <logicalDatatype>LOGDT028</logicalDatatype>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="2CE17569-9E47-7BE5-7D0F-68B1250DFCEB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:52 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="MODULE_ID" id="327FBA50-3512-D695-7EC7-3A1026417607">
@@ -327,27 +340,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="2820686A-A020-3DC6-EF01-78792C666327"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="A9375DB8-2D62-D106-8A13-267CA0D31F7E" name="BCCP_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:19:18 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="EF4BCD1A-2B61-D907-6B0D-A8BBAA1BE39C"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="B44931AD-543F-BCE3-EA23-3054E7B1804B" name="BCCP_UK2">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:19:18 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="FCD88E1A-C19D-D99F-8304-E849FCF903E6"/>
-<colUsage columnID="EF4BCD1A-2B61-D907-6B0D-A8BBAA1BE39C"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="F284F8AA-D3E0-0EE9-52CB-1FD90E9EBF5A" name="BCCP_BDT_ID_FK">

@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface ContextCategoryRepository extends JpaRepository<ContextCategory, Long> {
 
+    @Query("select c from ContextCategory c where c.guid = ?1")
+    public ContextCategory findOneByGuid(String guid);
+
     @Query("select c from ContextCategory c where c.name = ?1")
     public List<ContextCategory> findByName(String name);
 

@@ -4,6 +4,7 @@ import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 
 @Component
 public class P_1_2_PopulateCDTandCDTSC {
@@ -44,6 +49,13 @@ public class P_1_2_PopulateCDTandCDTSC {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
+    @Autowired
+    private DataTypeDAO dtDAO;
+
+    private Map<String, XSDBuiltInType> xbtBuiltInTypeMap;
+    private Map<Long, XSDBuiltInType> xbtIdMap;
+    private Map<String, List<XSDBuiltInType>> cdtAwdPriXpsTypeMapppingMap = new HashMap();
+
     public static void main(String args[]) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_2_PopulateCDTandCDTSC populateCDTandCDTSC = ctx.getBean(P_1_2_PopulateCDTandCDTSC.class);
@@ -55,6 +67,7 @@ public class P_1_2_PopulateCDTandCDTSC {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.2 Start");
 
+        init();
         populateCdtAwdPri();
         populateCdtAwdPriXpsTypeMap();
         populateDtSc();
@@ -62,6 +75,64 @@ public class P_1_2_PopulateCDTandCDTSC {
         populateCdtScAwdPriXpsTypeMap();
 
         logger.info("### 1.2 End");
+    }
+
+    public void init() {
+        List<XSDBuiltInType> xbtList = xbtRepository.findAll();
+        Collections.sort(xbtList, Comparator.comparing(XSDBuiltInType::getXbtId));
+
+        xbtBuiltInTypeMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getBuiltInType, Function.identity()));
+        xbtIdMap = xbtList.stream().collect(Collectors.toMap(XSDBuiltInType::getXbtId, Function.identity()));
+
+        cdtAwdPriXpsTypeMapppingMap.put("Binary",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:base64Binary"), xbtBuiltInTypeMap.get("xsd:hexBinary")));
+        cdtAwdPriXpsTypeMapppingMap.put("Boolean",
+                Arrays.asList(xbtBuiltInTypeMap.get("xbt_BooleanType")));
+        cdtAwdPriXpsTypeMapppingMap.put("Decimal",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:decimal")));
+        cdtAwdPriXpsTypeMapppingMap.put("Double",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:double"), xbtBuiltInTypeMap.get("xsd:float")));
+        cdtAwdPriXpsTypeMapppingMap.put("Float",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:float")));
+        cdtAwdPriXpsTypeMapppingMap.put("Integer",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:integer"), xbtBuiltInTypeMap.get("xsd:positiveInteger"), xbtBuiltInTypeMap.get("xsd:nonNegativeInteger")));
+        cdtAwdPriXpsTypeMapppingMap.put("NormalizedString",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString"), xbtBuiltInTypeMap.get("xsd:anyURI")));
+        cdtAwdPriXpsTypeMapppingMap.put("String",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:string")));
+        cdtAwdPriXpsTypeMapppingMap.put("TimeDuration",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token"), xbtBuiltInTypeMap.get("xsd:duration"), xbtBuiltInTypeMap.get("xbt_WeekDurationType")));
+        cdtAwdPriXpsTypeMapppingMap.put("TimePoint",
+                xbtList.stream().filter(e -> {
+                    String builtInType = e.getBuiltInType();
+                    if (Arrays.asList("xsd:token", "xsd:dateTime", "xsd:time").contains(builtInType)) {
+                        return true;
+                    }
+                    if (builtInType.startsWith("xsd:g")) {
+                        return true;
+                    }
+                    if (builtInType.startsWith("xbt_")) {
+                        if (!builtInType.equals("xbt_BooleanType") && !builtInType.equals("xbt_WeekDurationType")) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).collect(Collectors.toList()));
+        cdtAwdPriXpsTypeMapppingMap.put("Token",
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:token"), xbtBuiltInTypeMap.get("xsd:language")));
+    }
+
+    public List<XSDBuiltInType> findXSDBuiltInTypesByCdtPri(CoreDataTypePrimitive cdtPri) {
+        return findXSDBuiltInTypesByCdtPriName(cdtPri.getName());
+    }
+
+    public List<XSDBuiltInType> findXSDBuiltInTypesByCdtPriName(String cdtPriName) {
+        List<XSDBuiltInType> xbtList = cdtAwdPriXpsTypeMapppingMap.get(cdtPriName);
+        if (xbtList != null) {
+            Collections.sort(xbtList, Comparator.comparingLong(XSDBuiltInType::getXbtId));
+            return xbtList;
+        }
+        return Collections.emptyList();
     }
 
     public void populateCdtAwdPri() {
@@ -131,7 +202,7 @@ public class P_1_2_PopulateCDTandCDTSC {
     private CoreDataTypeAllowedPrimitive cdtAwdPri(String cdtTerm, String cdtPriName, boolean isDefault) {
         CoreDataTypeAllowedPrimitive cdtAwdPri = new CoreDataTypeAllowedPrimitive();
 
-        cdtAwdPri.setCdtId(dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId());
+        cdtAwdPri.setCdtId(dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId());
         cdtAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtAwdPri.setDefault(isDefault);
 
@@ -141,128 +212,136 @@ public class P_1_2_PopulateCDTandCDTSC {
     public void populateCdtAwdPriXpsTypeMap() {
         printTitle("Populate CDT Allowed Primitive Expression Type Map");
 
-        cdtAwdPriXpsTypeMap("Amount", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Amount", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Amount", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Amount", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Amount", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Amount", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Amount", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Binary Object", "Binary", "xsd:base64Binary");
-        cdtAwdPriXpsTypeMap("Binary Object", "Binary", "xsd:hexBinary");
-        cdtAwdPriXpsTypeMap("Code", "NormalizedString", "xsd:normalizedString");
-        cdtAwdPriXpsTypeMap("Code", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Code", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:token");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:date");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:time");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:gYearMonth");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:gYear");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:gMonthDay");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:gDay");
-        cdtAwdPriXpsTypeMap("Date", "TimePoint", "xsd:gMonth");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:token");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:dateTime");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:date");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:time");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:gYearMonth");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:gYear");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:gMonthDay");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:gDay");
-        cdtAwdPriXpsTypeMap("Date Time", "TimePoint", "xsd:gMonth");
-        cdtAwdPriXpsTypeMap("Duration", "TimeDuration", "xsd:token");
-        cdtAwdPriXpsTypeMap("Duration", "TimeDuration", "xsd:duration");
-        cdtAwdPriXpsTypeMap("Graphic", "Binary", "xsd:base64Binary");
-        cdtAwdPriXpsTypeMap("Graphic", "Binary", "xsd:hexBinary");
-        cdtAwdPriXpsTypeMap("Identifier", "NormalizedString", "xsd:normalizedString");
-        cdtAwdPriXpsTypeMap("Identifier", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Identifier", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Indicator", "Boolean", "xbt_BooleanType");
-        cdtAwdPriXpsTypeMap("Measure", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Measure", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Measure", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Measure", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Measure", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Measure", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Measure", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Name", "NormalizedString", "xsd:normalizedString");
-        cdtAwdPriXpsTypeMap("Name", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Name", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Number", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Number", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Number", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Number", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Number", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Number", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Number", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Ordinal", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Ordinal", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Ordinal", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Percent", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Percent", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Percent", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Percent", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Percent", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Percent", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Percent", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Picture", "Binary", "xsd:base64Binary");
-        cdtAwdPriXpsTypeMap("Picture", "Binary", "xsd:hexBinary");
-        cdtAwdPriXpsTypeMap("Quantity", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Quantity", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Quantity", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Quantity", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Quantity", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Quantity", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Quantity", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Rate", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Rate", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Rate", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Rate", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Rate", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Rate", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Rate", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Ratio", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Ratio", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Ratio", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Ratio", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Ratio", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Ratio", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Ratio", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Ratio", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Sound", "Binary", "xsd:base64Binary");
-        cdtAwdPriXpsTypeMap("Sound", "Binary", "xsd:hexBinary");
-        cdtAwdPriXpsTypeMap("Text", "NormalizedString", "xsd:normalizedString");
-        cdtAwdPriXpsTypeMap("Text", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Text", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Time", "TimePoint", "xsd:token");
-        cdtAwdPriXpsTypeMap("Time", "TimePoint", "xsd:time");
-        cdtAwdPriXpsTypeMap("Value", "Decimal", "xsd:decimal");
-        cdtAwdPriXpsTypeMap("Value", "Double", "xsd:double");
-        cdtAwdPriXpsTypeMap("Value", "Double", "xsd:float");
-        cdtAwdPriXpsTypeMap("Value", "Float", "xsd:float");
-        cdtAwdPriXpsTypeMap("Value", "Integer", "xsd:integer");
-        cdtAwdPriXpsTypeMap("Value", "Integer", "xsd:positiveInteger");
-        cdtAwdPriXpsTypeMap("Value", "Integer", "xsd:nonNegativeInteger");
-        cdtAwdPriXpsTypeMap("Value", "NormalizedString", "xsd:normalizedString");
-        cdtAwdPriXpsTypeMap("Value", "String", "xsd:string");
-        cdtAwdPriXpsTypeMap("Value", "Token", "xsd:token");
-        cdtAwdPriXpsTypeMap("Video", "Binary", "xsd:base64Binary");
-        cdtAwdPriXpsTypeMap("Video", "Binary", "xsd:hexBinary");
+        cdtAwdPriXpsTypeMap("Amount", "Decimal");
+        cdtAwdPriXpsTypeMap("Amount", "Double");
+        cdtAwdPriXpsTypeMap("Amount", "Float");
+        cdtAwdPriXpsTypeMap("Amount", "Integer");
+        cdtAwdPriXpsTypeMap("Binary Object", "Binary");
+        cdtAwdPriXpsTypeMap("Code", "NormalizedString");
+        cdtAwdPriXpsTypeMap("Code", "String");
+        cdtAwdPriXpsTypeMap("Code", "Token");
+        cdtAwdPriXpsTypeMap("Date", "TimePoint",
+                cdtAwdPriXpsTypeMapppingMap.get("TimePoint").stream()
+                        .filter(e -> {
+                            String builtInType = e.getBuiltInType();
+                            if ("xsd:dateTime".equals(builtInType) || "xsd:time".equals(builtInType)) {
+                                return false;
+                            }
+
+                            long subTypeOfXbtId = e.getSubtypeOfXbtId();
+                            if (subTypeOfXbtId > 0L) {
+                                builtInType = xbtIdMap.get(subTypeOfXbtId).getBuiltInType();
+                                if ("xsd:dateTime".equals(builtInType) || "xsd:time".equals(builtInType)) {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        })
+                        .collect(Collectors.toList())
+        );
+        cdtAwdPriXpsTypeMap("Date Time", "TimePoint");
+        cdtAwdPriXpsTypeMap("Duration", "TimeDuration");
+        cdtAwdPriXpsTypeMap("Graphic", "Binary");
+        cdtAwdPriXpsTypeMap("Identifier", "NormalizedString");
+        cdtAwdPriXpsTypeMap("Identifier", "String");
+        cdtAwdPriXpsTypeMap("Identifier", "Token");
+        cdtAwdPriXpsTypeMap("Indicator", "Boolean");
+        cdtAwdPriXpsTypeMap("Measure", "Decimal");
+        cdtAwdPriXpsTypeMap("Measure", "Double");
+        cdtAwdPriXpsTypeMap("Measure", "Float");
+        cdtAwdPriXpsTypeMap("Measure", "Integer");
+        cdtAwdPriXpsTypeMap("Name", "NormalizedString");
+        cdtAwdPriXpsTypeMap("Name", "String");
+        cdtAwdPriXpsTypeMap("Name", "Token");
+        cdtAwdPriXpsTypeMap("Number", "Decimal");
+        cdtAwdPriXpsTypeMap("Number", "Double");
+        cdtAwdPriXpsTypeMap("Number", "Float");
+        cdtAwdPriXpsTypeMap("Number", "Integer");
+        cdtAwdPriXpsTypeMap("Ordinal", "Integer");
+        cdtAwdPriXpsTypeMap("Percent", "Decimal");
+        cdtAwdPriXpsTypeMap("Percent", "Double");
+        cdtAwdPriXpsTypeMap("Percent", "Float");
+        cdtAwdPriXpsTypeMap("Percent", "Integer");
+        cdtAwdPriXpsTypeMap("Picture", "Binary");
+        cdtAwdPriXpsTypeMap("Quantity", "Decimal");
+        cdtAwdPriXpsTypeMap("Quantity", "Double");
+        cdtAwdPriXpsTypeMap("Quantity", "Float");
+        cdtAwdPriXpsTypeMap("Quantity", "Integer");
+        cdtAwdPriXpsTypeMap("Rate", "Decimal");
+        cdtAwdPriXpsTypeMap("Rate", "Double");
+        cdtAwdPriXpsTypeMap("Rate", "Float");
+        cdtAwdPriXpsTypeMap("Rate", "Integer");
+        cdtAwdPriXpsTypeMap("Ratio", "Decimal");
+        cdtAwdPriXpsTypeMap("Ratio", "Double");
+        cdtAwdPriXpsTypeMap("Ratio", "Float");
+        cdtAwdPriXpsTypeMap("Ratio", "Integer");
+        cdtAwdPriXpsTypeMap("Ratio", "String");
+        cdtAwdPriXpsTypeMap("Sound", "Binary");
+        cdtAwdPriXpsTypeMap("Text", "NormalizedString");
+        cdtAwdPriXpsTypeMap("Text", "String");
+        cdtAwdPriXpsTypeMap("Text", "Token");
+
+        List<XSDBuiltInType> xsdBuiltInTypesForTime =
+                cdtAwdPriXpsTypeMapppingMap.get("TimePoint").stream()
+                        .filter(e -> {
+                            String builtInType = e.getBuiltInType();
+                            if ("xsd:time".equals(builtInType)) {
+                                return true;
+                            }
+
+                            long subTypeOfXbtId = e.getSubtypeOfXbtId();
+                            if (subTypeOfXbtId > 0L) {
+                                builtInType = xbtIdMap.get(subTypeOfXbtId).getBuiltInType();
+                                if ("xsd:time".equals(builtInType)) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+        xsdBuiltInTypesForTime.add(xbtBuiltInTypeMap.get("xsd:token"));
+        cdtAwdPriXpsTypeMap("Time", "TimePoint", xsdBuiltInTypesForTime);
+
+        cdtAwdPriXpsTypeMap("Value", "Decimal");
+        cdtAwdPriXpsTypeMap("Value", "Double");
+        cdtAwdPriXpsTypeMap("Value", "Float");
+        cdtAwdPriXpsTypeMap("Value", "Integer");
+        cdtAwdPriXpsTypeMap("Value", "NormalizedString");
+        cdtAwdPriXpsTypeMap("Value", "String");
+        cdtAwdPriXpsTypeMap("Value", "Token");
+        cdtAwdPriXpsTypeMap("Video", "Binary");
+    }
+
+    private void cdtAwdPriXpsTypeMap(
+            String cdtTerm, String cdtPriName) {
+        List<XSDBuiltInType> xsdBuiltInTypes = cdtAwdPriXpsTypeMapppingMap.get(cdtPriName);
+        cdtAwdPriXpsTypeMap(cdtTerm, cdtPriName, xsdBuiltInTypes);
+    }
+
+    private void cdtAwdPriXpsTypeMap(
+            String cdtTerm, String cdtPriName, List<XSDBuiltInType> xbtBuiltInTypes) {
+        for (XSDBuiltInType xsdBuiltInType : xbtBuiltInTypes) {
+            cdtAwdPriXpsTypeMap(cdtTerm, cdtPriName, xsdBuiltInType);
+        }
     }
 
     private CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap(
-            String cdtTerm, String cdtPriName, String xbtBuiltInType) {
+            String cdtTerm, String cdtPriName, XSDBuiltInType xbtBuiltInType) {
+        if (xbtBuiltInType == null) {
+            throw new IllegalArgumentException();
+        }
+
         CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
                 new CoreDataTypeAllowedPrimitiveExpressionTypeMap();
 
         cdtAwdPriXpsTypeMap.setCdtAwdPriId(
                 cdtAwdPriRepository.findOneByCdtIdAndCdtPriId(
-                        dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId(),
+                        dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId(),
                         cdtPriRepository.findOneByName(cdtPriName).getCdtPriId()).getCdtAwdPriId()
         );
-        cdtAwdPriXpsTypeMap.setXbtId(
-                xbtRepository.findOneByBuiltInType(xbtBuiltInType).getXbtId()
-        );
+        cdtAwdPriXpsTypeMap.setXbtId(xbtBuiltInType.getXbtId());
 
         return cdtAwdPriXpsTypeMapRepository.saveAndFlush(cdtAwdPriXpsTypeMap);
     }
@@ -319,10 +398,10 @@ public class P_1_2_PopulateCDTandCDTSC {
         dtSc.setCardinalityMin(0);
         dtSc.setCardinalityMax(1);
         dtSc.setOwnerDtId(
-                dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId()
+                dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, DataTypeType.CoreDataType).getDtId()
         );
 
-        return dtScRepository.saveAndFlush(dtSc);
+        return dtDAO.save(dtSc);
     }
 
     public void populateCdtScAwdPri() {
@@ -444,7 +523,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPri.setCdtPriId(cdtPriRepository.findOneByName(cdtPriName).getCdtPriId());
         cdtScAwdPri.setDefault(isDefault);
 
-        return cdtScAwdPriRepository.saveAndFlush(cdtScAwdPri);
+        return cdtScAwdPriRepository.save(cdtScAwdPri);
     }
 
     public void populateCdtScAwdPriXpsTypeMap() {
@@ -474,7 +553,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "NormalizedString", "normalized string");
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "String", "string");
         cdtScAwdPriXpsTypeMap("Date Time", "Time Zone", "Token", "token");
-        cdtScAwdPriXpsTypeMap("Date Time", "Daylight Saving", "Boolean", "xbt boolean true or false");
+        cdtScAwdPriXpsTypeMap("Date Time", "Daylight Saving", "Boolean", "xbt boolean");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "NormalizedString", "normalized string");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "String", "string");
         cdtScAwdPriXpsTypeMap("Graphic", "MIME", "Token", "token");

@@ -1,21 +1,20 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty
-        implements CoreComponentProperty, CreatorModifierAware, TimestampAware, NamespaceAware, Serializable, Cloneable {
+public class BasicCoreComponentProperty implements
+        CoreComponentProperty, NamespaceAware, RevisionAware {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 
@@ -52,6 +51,9 @@ public class BasicCoreComponentProperty
     @Lob
     @Column(length = 10 * 1024)
     private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column
     private Long moduleId;
@@ -116,14 +118,6 @@ public class BasicCoreComponentProperty
         this.den = den;
     }
 
-    public BasicCoreComponentProperty(long bccpId, long bdtId, String definition) {
-        init();
-
-        this.bccpId = bccpId;
-        this.bdtId = bdtId;
-        this.definition = definition;
-    }
-
     /*
      * Copy constructor
      */
@@ -135,6 +129,7 @@ public class BasicCoreComponentProperty
         this.bdtId = bccp.getBdtId();
         this.den = bccp.getDen();
         this.definition = bccp.getDefinition();
+        this.definitionSource = bccp.getDefinitionSource();
         this.moduleId = bccp.getModuleId();
         this.namespaceId = bccp.getNamespaceId();
         this.deprecated = bccp.isDeprecated();
@@ -151,6 +146,21 @@ public class BasicCoreComponentProperty
         this.currentBccpId = bccp.getCurrentBccpId();
         this.nillable = bccp.isNillable();
         this.defaultValue = bccp.getDefaultValue();
+    }
+
+    @Override
+    public long getId() {
+        return getBccpId();
+    }
+
+    @Override
+    public void setId(long id) {
+        setBccpId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BCCP";
     }
 
     public long getBccpId() {
@@ -175,6 +185,14 @@ public class BasicCoreComponentProperty
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
+        if (bdt != null && !StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + bdt.getDataTypeTerm());
+        }
+    }
+
+    public void setPropertyTerm(String propertyTerm, DataType bdt) {
+        setPropertyTerm(propertyTerm);
+        setBdt(bdt);
     }
 
     public String getRepresentationTerm() {
@@ -198,6 +216,9 @@ public class BasicCoreComponentProperty
         if (bdt != null) {
             setRepresentationTerm(bdt.getDataTypeTerm());
         }
+        if (!StringUtils.isEmpty(propertyTerm)) {
+            setDen(propertyTerm + ". " + bdt.getDataTypeTerm());
+        }
     }
 
     public String getDen() {
@@ -216,6 +237,14 @@ public class BasicCoreComponentProperty
         this.definition = definition;
     }
 
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
+    }
+
     public long getModuleId() {
         return (moduleId == null) ? 0L : moduleId;
     }
@@ -230,7 +259,7 @@ public class BasicCoreComponentProperty
         return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(long namespaceId) {
+    public void setNamespaceId(Long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -318,7 +347,7 @@ public class BasicCoreComponentProperty
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -346,14 +375,14 @@ public class BasicCoreComponentProperty
         this.defaultValue = defaultValue;
     }
 
-    @Override
     public BasicCoreComponentProperty clone() {
         BasicCoreComponentProperty clone = new BasicCoreComponentProperty();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setPropertyTerm(this.propertyTerm);
         clone.setRepresentationTerm(this.representationTerm);
         clone.setBdtId(this.bdtId);
         clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setDen(this.den);
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
@@ -380,6 +409,7 @@ public class BasicCoreComponentProperty
         }
         clone.setNillable(this.nillable);
         clone.setDefaultValue(this.defaultValue);
+        clone.afterLoaded();
         return clone;
     }
 
@@ -408,6 +438,7 @@ public class BasicCoreComponentProperty
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (moduleId != null ? moduleId.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
@@ -437,6 +468,7 @@ public class BasicCoreComponentProperty
                 ", bdtId=" + bdtId +
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", moduleId=" + moduleId +
                 ", namespaceId=" + namespaceId +
                 ", deprecated=" + deprecated +
@@ -465,6 +497,17 @@ public class BasicCoreComponentProperty
     private void init() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                BasicCoreComponentProperty bccp = (BasicCoreComponentProperty) object;
+                bccp.afterLoaded();
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

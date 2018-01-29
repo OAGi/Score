@@ -58,9 +58,9 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="A7F8145C-9EEA-C668-C32E-FD13BFF757C4">
+<Column name="DEFINITION" id="4C716DDD-3CA6-8D83-8EBE-41382BFC628E">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:23:21 UTC</createdTime>
+<createdTime>2017-07-27 20:09:42 UTC</createdTime>
 <commentInRDBMS>This is a documentation or description of the ACC. Since ACC is business context independent, this is a business context independent description of the ACC concept.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -68,6 +68,19 @@
 <use>1</use>
 <logicalDatatype>LOGDT028</logicalDatatype>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="DB351CFD-6B09-E0DE-713B-4A7FF835BA12">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:09:42 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BASED_ACC_ID" id="8EC069EA-39D3-1A01-A284-3398347BD4FA">
@@ -331,16 +344,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="F9D15F1A-0722-828B-738F-D5C2F57C349C"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="A2E81D1C-A467-596B-EB15-676B0A9745DC" name="ACC_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:25:16 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="61BEF519-ED3D-32CC-9946-E23F3BDB5816"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="A1C6FE64-EFBF-77CC-9658-439EB2C87E13" name="ACC_BASED_ACC_ID_FK">

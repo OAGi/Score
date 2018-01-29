@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowInventoryCount.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryCount.xsd"/>
+        <xsd:element name="ShowInventoryCount" type="ShowInventoryCountType" id="oagis-id-269257361ef54ea7b40a507a11003e62">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowInventoryCount is to response to the Get request an occurrences of a Inventory Count information from an ERP system. This count may be a cycle count or a physical count.  This BOD may also apply to planned or unplanned inventory counts.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowInventoryCountType" id="oagis-id-89c2475971f245618d326a22ef71bc10">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowInventoryCountDataAreaType" id="oagis-id-01f7d671a01748b78d1d9fffe14bce24">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInventoryCount. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InventoryCount).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowInventoryCountDataAreaType" id="oagis-id-4e4d488da7fa463b9a59342d2ad04abc">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-9604ffea0151493ca3bbe1f8fa967bda"/>
+                        <xsd:element ref="InventoryCount" maxOccurs="unbounded" id="oagis-id-37e1ec12bb1d49ac868a2aabb8356c92"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

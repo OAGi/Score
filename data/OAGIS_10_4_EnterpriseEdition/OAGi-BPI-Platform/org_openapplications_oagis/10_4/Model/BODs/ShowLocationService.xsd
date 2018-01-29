@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowLocationService.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/LocationService.xsd"/>
+        <xsd:element name="ShowLocationService" type="ShowLocationServiceType" id="oagis-id-a61e065a12014095acb9e9e53c3ea53e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of  ShowLocationService is to enable a mechanism to ensure that the physical locations owned by the business applications are validated, geocoded, and standardized based on information returned by location service providers.
+
+This BOD may be initiated by the sending system upon some event occurring, such as receiving a request submitted by another system for certain location service.
+
+There are many possible business applications in several environments that may use this capability. For example, the customer management, the supplier management, or HRMS business applications could use this to receive processed location information from location service providers.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowLocationServiceType" id="oagis-id-c2b7c3bf387a47c0ab08b50ddbe0d980">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of  ReceiveLocationService is to enable a mechanism to ensure that the physical location owned by the business applications are validated, geocoded, and standardized by the location service providers.                                                                       This BOD may also be initiated by the service provider in response to receiving a request for a particular service such as geocoding, address validation, etc.                                                                                      There are many possible business applications in several environments that may use this capability. For example, the customer management, the supplier management, or HRMS business applications could use this to communicate Location information to location service providers.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowLocationServiceDataAreaType" id="oagis-id-b60d80e1218e4ecb9029381cf74d1d53">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ReceiveLocationService.                                             The information consists of a Verb and one or more Nouns. The verb (Receive) indicates the action to be performed on the Noun (LocationService).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowLocationServiceDataAreaType" id="oagis-id-596e31a72fc045f1b08a87c315e66f62">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-949278d96e9b4423a6bd09c31438659b"/>
+                        <xsd:element ref="LocationService" maxOccurs="unbounded" id="oagis-id-39377bb30f0647b4abc251a1bea5ccc7"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

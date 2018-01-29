@@ -5,6 +5,8 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="../../template.xhtml">
 
+    <p:importConstants type="org.oagi.srt.web.jsf.converters.ReleaseConverter" var="ReleaseConverter"/>
+
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
@@ -12,297 +14,203 @@
             </div>
         </div>
         <h:form id="listForm">
-            <p:panel id="pPanel">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
 
+            <p:panel id="pPanel">
                 <f:facet name="header">
                     <div class="row" style="margin-bottom: 15px;">
-                        <div class="col-md-6 col-sm-6">
-                            <h:outputText value="Type" styleClass="option-header"/>
-                            <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
-                                <h:selectOneRadio styleClass="option-radio-grid"
-                                                  value="#{coreComponentBean.type}">
-                                    <f:selectItem itemLabel="ACC" itemValue="ACC" />
-                                    <f:selectItem itemLabel="ASCC" itemValue="ASCC" />
-                                    <f:selectItem itemLabel="ASCCP" itemValue="ASCCP" />
-                                    <f:selectItem itemLabel="BCC" itemValue="BCC" />
-                                    <f:selectItem itemLabel="BCCP" itemValue="BCCP" />
-                                    <f:ajax render="pPanel" listener="#{coreComponentBean.onTypeChange}"/>
-                                </h:selectOneRadio>
+                        <div class="col-md-2 col-sm-2">
+                            <h:outputText value="Release" styleClass="option-header"/>
+                            <h:panelGrid styleClass="option-panel" style="margin-top: 15px;" class="dropdown-container">
+                                <p:selectOneMenu id="release" value="#{coreComponentBean.release}"
+                                                 converter="#{releaseConverter}" style="width: 150px">
+                                    <p:ajax listener="#{coreComponentBean.onReleaseChange}" update="listForm"/>
+                                    <f:selectItems value="#{coreComponentBean.releases}" var="release"
+                                                   itemLabel="#{release.releaseNum}"
+                                                   itemValue="#{release}"/>
+                                </p:selectOneMenu>
                             </h:panelGrid>
                         </div>
-                        <div class="col-md-6 col-sm-6">
+
+                        <div class="col-md-5 col-sm-5">
+                            <h:outputText value="Type" styleClass="option-header"/>
+                            <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
+                                <h:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
+                                                      value="#{coreComponentBean.selectedTypes}">
+                                    <f:selectItem itemLabel="ACC" itemValue="ACC"/>
+                                    <f:selectItem itemLabel="ASCC" itemValue="ASCC"/>
+                                    <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
+                                    <f:selectItem itemLabel="BCC" itemValue="BCC"/>
+                                    <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
+                                    <p:ajax update="listForm" listener="#{coreComponentBean.onTypeChange}"/>
+                                </h:selectManyCheckbox>
+                            </h:panelGrid>
+                        </div>
+                        <div class="col-md-5 col-sm-5">
                             <h:outputText value="State" styleClass="option-header"/>
                             <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
                                 <h:selectManyCheckbox id="state" styleClass="option-radio-grid"
                                                       value="#{coreComponentBean.selectedStates}">
-                                    <f:selectItem itemLabel="Editing" itemValue="Editing" />
-                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate" />
-                                    <f:selectItem itemLabel="Published" itemValue="Published" />
-                                    <f:ajax render="pPanel" listener="#{coreComponentBean.onStateChange}"/>
+                                    <f:selectItem itemLabel="Editing" itemValue="Editing"/>
+                                    <f:selectItem itemLabel="Candidate" itemValue="Candidate"/>
+                                    <f:selectItem itemLabel="Published" itemValue="Published"/>
+                                    <p:ajax update="listForm" listener="#{coreComponentBean.onStateChange}"/>
                                 </h:selectManyCheckbox>
                             </h:panelGrid>
                         </div>
                     </div>
 
                     <h:panelGroup>
-                        <p:autoComplete id="searchText" value="#{coreComponentBean.searchText}"
-                                        style="min-width: 440px; margin-right: 20px;"
-                                        maxResults="10"
-                                        completeMethod="#{coreComponentBean.completeInput}">
-                            <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                        </p:autoComplete>
-                        <p:commandButton value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
-                                         update="pPanel"
-                                         icon="ui-icon-search"/>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="1">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
+                            <p:commandButton id="createACCBtn" value="Create ACC"
+                                             action="#{coreComponentBean.createACC}" tabindex="5"
+                                             style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        </div>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForDefinition"
+                                         value="#{coreComponentBean.searchTextForDefinition}"
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="2">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
+                            <p:commandButton id="createASCCPBtn" value="Create ASCCP"
+                                             action="#{coreComponentBean.createASCCP}" tabindex="6"
+                                             style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        </div>
+                        <div style="padding: 3px 0 3px 0;">
+                            <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
+                            <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
+                                         style="min-width: 440px; margin-right: 20px;" tabindex="3">
+                                <p:ajax update="pPanel"/>
+                            </p:inputText>
 
-                        <p:commandButton value="Create ACC" rendered="#{coreComponentBean.type == 'ACC'}"
-                                         action="#{coreComponentBean.createACC}"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
-                        <p:commandButton value="Create ASCCP" rendered="#{coreComponentBean.type == 'ASCCP'}"
-                                         action="/views/core_component/select_acc.xhtml?faces-redirect=true"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
-                        <p:commandButton value="Create BCCP" rendered="#{coreComponentBean.type == 'BCCP'}"
-                                         action="/views/core_component/select_bdt.xhtml?faces-redirect=true"
-                                         style="float: right; padding: 3px 0 3px 0;"/>
+                            <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                             action="#{coreComponentBean.search}"
+                                             update="tbl" tabindex="4" icon="fa fa-white fa-search"/>
+
+                            <p:commandButton id="createBCCPBtn" value="Create BCCP"
+                                             action="#{coreComponentBean.createBCCP}" tabindex="7"
+                                             style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        </div>
+
+                        <p:defaultCommand target="searchBtn"/>
                     </h:panelGroup>
                 </f:facet>
 
-                <p:dataTable id="tblAcc" var="acc" value="#{coreComponentBean.accList}" rendered="#{coreComponentBean.type == 'ACC'}"
+                <p:dataTable id="tbl" var="cc" value="#{coreComponentBean.coreComponents}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{acc.guid}">
-                    <p:column headerText="Object Class Term" sortBy="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}">
-                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                rendered="#{acc.oagisComponentType eq 'UserExtensionGroup' and
-                                          ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
-                                outcome="/views/core_component/extension.jsf">
-                            <f:param name="accId" value="#{coreComponentBean.getParentAccIdOfUserExtensionGroupAcc(acc.accId)}"/>
-                        </h:link>
+                             styleClass="core-components-table" rowKey="#{cc.id}" tableStyle="width: auto">
+                    <p:ajax event="sort" listener="#{coreComponentBean.onSortEvent}"/>
 
-                        <h:link value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                rendered="#{acc.oagisComponentType ne 'UserExtensionGroup' and
-                                          ((coreComponentBean.getCurrentUser().appUserId eq acc.ownerUserId) or acc.state ne 'Editing')}"
-                                outcome="/views/core_component/acc_details.jsf">
-                            <f:param name="accId" value="#{acc.accId}"/>
-                        </h:link>
-
-                        <h:outputText value="#{coreComponentBean.getObjectClassTermByAccId(acc.accId)}"
-                                      rendered="#{coreComponentBean.getCurrentUser().appUserId ne acc.ownerUserId and acc.state eq 'Editing'}"/>
+                    <p:column styleClass="type text-align-center" headerText="Type" sortBy="#{cc.type}">
+                        <span class="label label-info">${cc.type}</span>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" headerText="Type">
-                        <span class="label label-info">#{acc.oagisComponentType}</span>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{coreComponentBean.getUserName(acc.ownerUserId)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(acc.ownerUserId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{acc.state}">
-                        <h:panelGroup rendered="#{acc.state == 'Published'}">
-                            <span class="label label-default">#{acc.state}</span>
+                    <p:column headerText="DEN" styleClass="den" sortBy="#{cc.den}">
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and
+                                          ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{acc.state == 'Editing'}">
-                            <span class="label label-primary">#{acc.state}</span>
+
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and
+                                ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing') }">
+                            <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{acc.state == 'Candidate'}">
-                            <span class="label label-warning">#{acc.state}</span>
+
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'ASCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
-                    </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{coreComponentBean.getUserName(acc.lastUpdatedBy)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(acc.lastUpdatedBy)}"/>
-                    </p:column>
-
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{acc.lastUpdateTimestamp}">
-                        <h:outputText value="#{acc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-
-                <p:dataTable id="tblAscc" var="ascc" value="#{coreComponentBean.asccList}" rendered="#{coreComponentBean.type == 'ASCC'}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{ascc.guid}">
-
-                    <p:column headerText="Owner ACC" styleClass="ellipsis"
-                              sortBy="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}">
-                        <h:outputText id="objectClassTermOfAccOnAscc" value="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}"/>
-                        <p:tooltip for="objectClassTermOfAccOnAscc" value="#{coreComponentBean.getObjectClassTermByAccId(ascc.fromAccId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 200px" headerText="ASCCP" styleClass="ellipsis"
-                              sortBy="#{coreComponentBean.getPropertyTermByAsccpId(ascc.toAsccpId)}">
-                        <h:outputText value="#{coreComponentBean.getPropertyTermByAsccpId(ascc.toAsccpId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{coreComponentBean.getUserName(ascc.ownerUserId)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(ascc.ownerUserId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{ascc.state}">
-                        <h:panelGroup rendered="#{ascc.state == 'Published'}">
-                            <span class="label label-default">#{ascc.state}</span>
+                        <h:panelGroup
+                                rendered="#{cc.type eq 'BCCP' and ((coreComponentBean.getCurrentUser().appUserId eq cc.ownerUserId) or cc.state ne 'Editing')}">
+                            <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{ascc.state == 'Editing'}">
-                            <span class="label label-primary">#{ascc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{ascc.state == 'Candidate'}">
-                            <span class="label label-warning">#{ascc.state}</span>
+
+                        <h:outputText value="${cc.den}"
+                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC' or
+                                                 (coreComponentBean.getCurrentUser().appUserId ne cc.ownerUserId) and cc.state eq 'Editing'}"/>
+                        <div>
+                            <span class="guid">#{cc.guid}</span>
+                        </div>
+                    </p:column>
+
+                    <p:column styleClass="owner text-align-center ellipsis" headerText="Owner"
+                              sortBy="#{cc.owner}">
+                        <h:outputText value="#{cc.owner}"/>
+                        <h:panelGroup styleClass="ownership-transfer"
+                                      rendered="#{ (cc.type eq 'ACC' or cc.type eq 'BCCP' or cc.type eq 'ASCCP')
+                                         and coreComponentBean.currentUser.appUserId eq cc.ownerUserId and cc.state eq 'Editing'}">
+                            <h:link outcome="/views/core_component/transfer_ownership.jsf">
+                                <f:param name="ccId" value="#{cc.id}"/>
+                                <f:param name="type" value="#{cc.type}"/>
+
+                                <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
+                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                </h:panelGroup>
+                            </h:link>
+                            <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner"
+                                       value="Click to transfer the ownership." position="bottom"/>
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{coreComponentBean.getUserName(ascc.lastUpdatedBy)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(ascc.lastUpdatedBy)}"/>
-                    </p:column>
-
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{ascc.lastUpdateTimestamp}">
-                        <h:outputText value="#{ascc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-
-                <p:dataTable id="tblAsccp" var="asccp" value="#{coreComponentBean.asccpList}" rendered="#{coreComponentBean.type == 'ASCCP'}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{asccp.guid}">
-
-                    <p:column headerText="Property Term" sortBy="#{asccp.propertyTerm}">
-                        <h:link value="#{asccp.propertyTerm}"
-                                rendered="#{(coreComponentBean.getCurrentUser().appUserId eq asccp.ownerUserId) or asccp.state ne 'Editing'}"
-                                outcome="/views/core_component/asccp_details.jsf">
-                            <f:param name="asccpId" value="#{asccp.asccpId}"/>
-                        </h:link>
-
-                        <h:outputText value="#{asccp.propertyTerm}"
-                                      rendered="#{(coreComponentBean.getCurrentUser().appUserId ne asccp.ownerUserId) and asccp.state eq 'Editing'}"/>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{coreComponentBean.getUserName(asccp.ownerUserId)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(asccp.ownerUserId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{asccp.state}">
-                        <h:panelGroup rendered="#{asccp.state == 'Published'}">
-                            <span class="label label-default">#{asccp.state}</span>
+                    <p:column styleClass="state text-align-center" headerText="State" sortBy="#{cc.state}">
+                        <h:panelGroup rendered="#{cc.state == 'Published'}">
+                            <span class="label label-default">#{cc.state}</span>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{asccp.state == 'Editing'}">
-                            <span class="label label-primary">#{asccp.state}</span>
+                        <h:panelGroup rendered="#{cc.state == 'Editing'}">
+                            <span class="label label-primary">#{cc.state}</span>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{asccp.state == 'Candidate'}">
-                            <span class="label label-warning">#{asccp.state}</span>
+                        <h:panelGroup rendered="#{cc.state == 'Candidate'}">
+                            <span class="label label-warning">#{cc.state}</span>
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{coreComponentBean.getUserName(asccp.lastUpdatedBy)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(asccp.lastUpdatedBy)}"/>
+                    <p:column styleClass="revision text-align-center ellipsis" headerText="Revision"
+                              sortBy="#{coreComponentBean.getFullRevisionNum(cc)}">
+                        <h:outputText value="#{coreComponentBean.getFullRevisionNum(cc)}"/>
                     </p:column>
 
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{asccp.lastUpdateTimestamp}">
-                        <h:outputText value="#{asccp.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-
-                <p:dataTable id="tblBcc" var="bcc" value="#{coreComponentBean.bccList}" rendered="#{coreComponentBean.type == 'BCC'}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{bcc.guid}">
-
-                    <p:column headerText="Owner ACC" styleClass="ellipsis"
-                              sortBy="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}">
-                        <h:outputText id="objectClassTermOfAccOnBcc" value="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}"/>
-                        <p:tooltip for="objectClassTermOfAccOnBcc" value="#{coreComponentBean.getObjectClassTermByAccId(bcc.fromAccId)}"/>
+                    <p:column styleClass="last-updated-by text-align-center ellipsis"
+                              headerText="Last Updated By"
+                              sortBy="#{cc.lastUpdatedUser}">
+                        <h:outputText value="#{cc.lastUpdatedUser}"/>
                     </p:column>
 
-                    <p:column style="width: 200px" headerText="BCCP" styleClass="ellipsis"
-                              sortBy="#{coreComponentBean.getPropertyTermByBccpId(bcc.toBccpId)}">
-                        <h:outputText value="#{coreComponentBean.getPropertyTermByBccpId(bcc.toBccpId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{coreComponentBean.getUserName(bcc.ownerUserId)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(bcc.ownerUserId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{bcc.state}">
-                        <h:panelGroup rendered="#{bcc.state == 'Published'}">
-                            <span class="label label-default">#{bcc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{bcc.state == 'Editing'}">
-                            <span class="label label-primary">#{bcc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{bcc.state == 'Candidate'}">
-                            <span class="label label-warning">#{bcc.state}</span>
-                        </h:panelGroup>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{coreComponentBean.getUserName(bcc.lastUpdatedBy)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(bcc.lastUpdatedBy)}"/>
-                    </p:column>
-
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{bcc.lastUpdateTimestamp}">
-                        <h:outputText value="#{bcc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-
-                <p:dataTable id="tblBccp" var="bccp" value="#{coreComponentBean.bccpList}" rendered="#{coreComponentBean.type == 'BCCP'}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{bccp.guid}">
-                    <p:column headerText="Property Term" sortBy="#{bccp.propertyTerm}">
-                        <h:outputText value="#{bccp.propertyTerm}"/>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{coreComponentBean.getUserName(bccp.ownerUserId)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(bccp.ownerUserId)}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{bccp.state}">
-                        <h:panelGroup rendered="#{bccp.state == 'Published'}">
-                            <span class="label label-default">#{bccp.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{bccp.state == 'Editing'}">
-                            <span class="label label-primary">#{bccp.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{bccp.state == 'Candidate'}">
-                            <span class="label label-warning">#{bccp.state}</span>
-                        </h:panelGroup>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{coreComponentBean.getUserName(bccp.lastUpdatedBy)}">
-                        <h:outputText value="#{coreComponentBean.getUserName(bccp.lastUpdatedBy)}"/>
-                    </p:column>
-
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{bccp.lastUpdateTimestamp}">
-                        <h:outputText value="#{bccp.lastUpdateTimestamp}">
+                    <p:column styleClass="last-updated-timestamp text-align-center" headerText="Last Updated Timestamp"
+                              sortBy="#{cc.lastUpdateTimestamp}">
+                        <h:outputText value="#{cc.lastUpdateTimestamp}">
                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                         </h:outputText>
                     </p:column>
 
+                    <p:column styleClass="action-btn text-align-center">
+                        <p:commandButton id="deleteBtn" icon="#{coreComponentBean.getDiscardIcon(cc)}"
+                                         styleClass="delete"
+                                         rendered="#{coreComponentBean.canBeDiscarded(cc)}"
+                                         action="#{coreComponentBean.discard(cc)}" update="tbl" ajax="true">
+                            <p:confirm header="Confirmation"
+                                       message="#{coreComponentBean.hasMultipleRevisions(cc) ?'Reverting component to its previous revision cannot be undone. Proceed?' : 'Deleting component cannot be undone. Proceed?'}"
+                                       icon="fa fa-exclamation-triangle"/>
+                            <p:tooltip id="tooltipDelete" for="deleteBtn"
+                                       value="#{coreComponentBean.hasMultipleRevisions(cc) ? 'Revert to previous revision' : 'Delete'}"
+                                       position="right"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
+        <ui:include src="../dialog/global_confirm_non_undo_dialog.xhtml"/>
     </ui:define>
 </ui:composition>

@@ -15,6 +15,7 @@ public class SchemaModule {
 
     private List<AgencyId> agencyIdList = new ArrayList();
     private List<SchemaCodeList> schemaCodeLists = new ArrayList();
+    private List<XBTSimpleType> xbtSimples = new ArrayList();
     private List<BDTSimple> bdtSimples = new ArrayList();
 
     private List<BCCP> bccpList = new ArrayList();
@@ -63,6 +64,10 @@ public class SchemaModule {
         this.schemaCodeLists.add(schemaCodeList);
     }
 
+    public void addXBTSimpleType(XBTSimpleType xbtSimple) {
+        this.xbtSimples.add(xbtSimple);
+    }
+
     public void addBDTSimple(BDTSimple bdtSimple) {
         this.bdtSimples.add(bdtSimple);
     }
@@ -103,6 +108,10 @@ public class SchemaModule {
 
             for (SchemaCodeList codeList : schemaCodeLists) {
                 schemaModuleVisitor.visitCodeList(codeList);
+            }
+
+            for (XBTSimpleType xbtSimple : xbtSimples) {
+                schemaModuleVisitor.visitXBTSimpleType(xbtSimple);
             }
 
             for (BDTSimple bdtSimple : bdtSimples) {

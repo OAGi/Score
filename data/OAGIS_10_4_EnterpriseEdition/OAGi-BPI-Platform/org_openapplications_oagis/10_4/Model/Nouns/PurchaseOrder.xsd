@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/PurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="PurchaseOrder" type="PurchaseOrderType" id="oagis-id-ed296a22b7984415bf63fa40811c467a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PurchaseOrder Business Object Document is to communicate an order to purchase goods from a buyer to a supplier. The PurchaseOrder carries information to and from the buyer and supplier. The PurchaseOrder is a legally binding document once both Parties agree to the contents and the specified terms and conditions of the order.
+
+The Process PurchaseOrder sends the electronic form of a purchase order document from a customer to a supplier in order to purchase n-number of Lines each of which containes an Ordered Item. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PurchaseOrderHeader" type="PurchaseOrderHeaderType" id="oagis-id-c99ce855f5734be39ff0447bdb1fae48">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Purchase Order Header contains information that applies to the entire purchase order.  This Component is required.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PurchaseOrderLine" type="PurchaseOrderLineType" id="oagis-id-3edbbb7a3aea4ac2a26dc3d946b74b24">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Purchase Order Line indicates the ordered item or product ordered along with the quantity, price and other descriptive information. It is also possible to provide additional Parties, PaymentTerms, Charge, and Attachment information as needed at the line level.
+
+At least one occurrence of this Component is required for each occurrence of the Purchase Order.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PurchaseOrderSubLine" type="PurchaseOrderSubLineType" id="oagis-id-88d7c89d26474acca8adf9c5dc9595f2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Subline represents any additional information concerning the product on the Line.  The Subline can be used to describe a specific configuration of the ordered item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PurchaseOrderSchedule" type="PurchaseOrderScheduleType" id="oagis-id-b5dbd27904034d3db698832f3394a75c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Schedule  represents the requested ship or delivery dates for goods ordered.  The Schedule is an optional Component.  The Schedule can not be associated with a Subline.  It is only associated with a Line.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PurchaseOrderType" id="oagis-id-4f24db09088b49c88ba90b03dd0825c4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The schema type for PurchaseOrder. PurchaseOrder's  base abstract type, Order, is shared between PurchaseOrder and SalesOrder. SalesOrder is essentially an extension of PurchaseOrder, but in order to use the local-global design pattern, each of PO and SO needs to instantiate its own Header and Line elements.To do this, we factored out the PO content models, instantiated both PO and SO from Order.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PurchaseOrderHeader" id="oagis-id-c86870c2ec154672905da8f12cbb60ef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The Purchase Order Header contains information that applies to the entire purchase order.  This Component is required.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PurchaseOrderLine" id="oagis-id-2e4117a9223746b5b6cf3af77d89ac4a" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The Purchase Order Line indicates the ordered item or product ordered along with the quantity, price and other descriptive information. It is also possible to provide additional Parties, PaymentTerms, Charge, and Attachment information as needed at the line level.
+
+At least one occurrence of this Component is required for each occurrence of the Purchase Order.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-ec34c7efb6024d19907c0522b9503917"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-56bc8a05c2064710ab5ce812661ac3f7"/>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderHeaderBaseType" id="oagis-id-e6c48757028646a48fdff33269f93284">
+		<xsd:complexContent>
+			<xsd:extension base="OrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="TaxExemptCodes" id="oagis-id-88d4f84711a345158714b5d395d37c4c" minOccurs="0"/>
+					<xsd:element ref="Event" id="oagis-id-bf8e5f376b964c20b972a8da8a82b94c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10"/>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Classification" id="oagis-id-53747ee50ede470fa203249131d0d7d9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the classification of an entity. An entity may be classified into mulitple groups for different reasons. Examples of Classification include Commodity Codes, Freight Classifications, Product Line classifications and so on. Suggested Values are COMMODITY, FREIGHT, PRODUCTLINE</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OrderDateTime" id="oagis-id-b56453472492453eade0ef3936991c26" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Datetime the order was placed</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BuyerParty" id="oagis-id-9e8df30b9efa490584ee7b2f98cc0a9f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The entity that is responsible for Buying the document or element in which it is associacted. Additionally, the contact  may be a person or a group or department.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipFromParty" id="oagis-id-dfc49afff8cb49ae9d9c3602196d0e7d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the goods or services are being shipped or sent from.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AcceptByDateTime" id="oagis-id-e00770ffd07548ba8bafcf39cc1767b5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Date by which the vendor is expected to accept the PO</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReleaseNumberID" id="oagis-id-f0c7c464f8954b048522bf116a72b281" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Release Number in the case of Blanket POs</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequisitionReference" id="oagis-id-7d2f19679de146549965e4ffb1805587" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Requisition</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="QuoteReference" id="oagis-id-2b028fa9409b4abe91fb4caa70805c6f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Quote</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesOrderReference" id="oagis-id-1923f9cc6b9a4e6e984330c4531f8acf" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a SalesOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderHeaderType" id="oagis-id-1d4e2f146ce943ac9cf81867def9735d">
+		<xsd:complexContent>
+			<xsd:extension base="PurchaseOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PurchaseOrderHeaderExtensionType" id="oagis-id-995fea6cc9464426b701bc73b99164c9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderLineBaseType" id="oagis-id-ebb718e7504247518191efcc7459ac47">
+		<xsd:complexContent>
+			<xsd:extension base="OrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseOrderSchedule" id="oagis-id-609f6414d550424e875801b45c8f0490" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Schedule  represents the requested ship or delivery dates for goods ordered.  The Schedule is an optional Component.  The Schedule can not be associated with a Subline.  It is only associated with a Line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderLineType" id="oagis-id-8575848a972c47fbbfe49d15458a26d0">
+		<xsd:complexContent>
+			<xsd:extension base="PurchaseOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseOrderSubLine" id="oagis-id-c369001a9b2540b88371aa8ec0af098c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Subline represents any additional information concerning the product on the Line.  The Subline can be used to describe a specific configuration of the ordered item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Extension" type="PurchaseOrderLineExtensionType" id="oagis-id-4caf1b67d4954514a25087c416bd4f87" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderSubLineBaseType" id="oagis-id-9193c6d24b974a4b80b984771df0050f">
+		<xsd:complexContent>
+			<xsd:extension base="OrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseOrderSchedule" id="oagis-id-4e9fb1e9355e47248b397904df844d89" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The Component Schedule  represents the requested ship or delivery dates for goods ordered.  The Schedule is an optional Component.  The Schedule can not be associated with a Subline.  It is only associated with a Line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderSubLineType" id="oagis-id-35499910318f4bb891b9b097440e9c18">
+		<xsd:complexContent>
+			<xsd:extension base="PurchaseOrderSubLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PurchaseOrderSubLineExtensionType" id="oagis-id-3221ac9e18ac4ec182c70c0ca589c851" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PurchaseOrderScheduleType" id="oagis-id-5f98e111f58240eca05ec2f56346dbc7">
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PurchaseOrderScheduleExtensionType" id="oagis-id-1bbf8447e8d448c0a5660a2c0efec4ef" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

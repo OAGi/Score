@@ -1,21 +1,20 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.apache.lucene.store.Directory;
 import org.oagi.srt.model.node.ASBIEPNode;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BusinessContextRepository;
-import org.oagi.srt.repository.ModuleRepository;
-import org.oagi.srt.repository.TopLevelConceptRepository;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.entity.TopLevelConcept;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
+import org.oagi.srt.web.jsf.beans.SearchFilter;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -24,8 +23,17 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.common.util.Utility.compareLevenshteinDistance;
+import static org.oagi.srt.common.util.Utility.createDirectory;
 
 @Controller
 @Scope("view")
@@ -49,9 +57,16 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     /*
      * for 'Select Top-Level Concept' Step
      */
+    @Autowired
+    private ReleaseRepository releaseRepository;
+    private Release release;
+
     private List<TopLevelConcept> allTopLevelConcepts;
+    private Map<Long, TopLevelConcept> allTopLevelConceptMap;
     private String selectedPropertyTerm;
     private List<TopLevelConcept> topLevelConcepts;
+    private String searchTextForPropertyTerm;
+    private String searchTextForModule;
     private TopLevelConcept selectedTopLevelConcept;
 
     /*
@@ -60,6 +75,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private BusinessContextRepository businessContextRepository;
     private List<BusinessContext> businessContexts;
+    private Map<Long, BusinessContext> businessContextMap;
     private BusinessContext selectedBusinessContext;
 
     /*
@@ -72,9 +88,48 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    public Release getRelease() {
+        return release;
+    }
+
+    public void setRelease(Release release) {
+        this.release = release;
+    }
+
+    public void onReleaseChange(AjaxBehaviorEvent behaviorEvent) {
+        reset();
+    }
+
+    public List<Release> getReleases() {
+        List<Release> releases = new ArrayList();
+        releases.addAll(
+                releaseRepository.findAll(new Sort(Sort.Direction.ASC, "releaseId")).stream()
+                        .filter(e -> e.getState() == ReleaseState.Final)
+                        .collect(Collectors.toList())
+        );
+        return releases;
+    }
+
+    private Directory directory;
+    private static final String PROPERTY_TERM_FIELD = "property_term";
+    private static final String MODULE_FIELD = "module";
+
     public List<TopLevelConcept> getAllTopLevelConcepts() {
         if (allTopLevelConcepts == null) {
-            allTopLevelConcepts = topLevelConceptRepository.findAll();
+            Release release = getRelease();
+            if (release == null) {
+                release = getReleases().get(0);
+                setRelease(release);
+            }
+
+            allTopLevelConcepts = topLevelConceptRepository.findAll(release);
+            allTopLevelConceptMap = allTopLevelConcepts.stream()
+                    .collect(Collectors.toMap(TopLevelConcept::getAsccpId, Function.identity()));
+
+            directory = createDirectory(allTopLevelConcepts,
+                    new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
+                    new String[]{" ", Pattern.quote("\\")},
+                    TopLevelConcept::getPropertyTerm, TopLevelConcept::getModule);
         }
         return allTopLevelConcepts;
     }
@@ -107,21 +162,44 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         this.btnNextDisable = btnNextDisable;
     }
 
-    public String getSelectedPropertyTerm() {
-        return selectedPropertyTerm;
+    public String getSearchTextForPropertyTerm() {
+        return searchTextForPropertyTerm;
     }
 
-    public void setSelectedPropertyTerm(String selectedPropertyTerm) {
-        this.selectedPropertyTerm = selectedPropertyTerm;
+    public void setSearchTextForPropertyTerm(String searchTextForPropertyTerm) {
+        if (StringUtils.isEmpty(searchTextForPropertyTerm)) {
+            this.searchTextForPropertyTerm = null;
+        } else {
+            this.searchTextForPropertyTerm = StringUtils.trimWhitespace(searchTextForPropertyTerm);
+        }
+    }
+
+    public String getSearchTextForModule() {
+        return searchTextForModule;
+    }
+
+    public void setSearchTextForModule(String searchTextForModule) {
+        if (StringUtils.isEmpty(searchTextForModule)) {
+            this.searchTextForModule = null;
+        } else {
+            this.searchTextForModule = StringUtils.trimWhitespace(searchTextForModule);
+        }
     }
 
     public List<TopLevelConcept> getTopLevelConcepts() {
         if (topLevelConcepts == null) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
+            search();
         }
         return topLevelConcepts;
+    }
+
+    private void reset() {
+        allTopLevelConcepts = null;
+        topLevelConcepts = null;
+        setSearchTextForPropertyTerm(null);
+        setSearchTextForModule(null);
+        setSelectedTopLevelConcept(null);
+        topLevelConceptCheckBoxes = new HashMap();
     }
 
     public void setTopLevelConcepts(List<TopLevelConcept> topLevelConcepts) {
@@ -133,48 +211,73 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void setSelectedTopLevelConcept(TopLevelConcept selectedTopLevelConcept) {
-        this.selectedTopLevelConcept = selectedTopLevelConcept;
+        if (selectedTopLevelConcept != null) {
+            getTopLevelConceptCheckBox(selectedTopLevelConcept.getAsccpId()).setChecked(true);
+        }
     }
 
-    public List<String> completeInput(String query) {
-        String q = (query != null) ? query.trim() : null;
+    public void onTopLevelConceptSelect(SelectEvent event) {
+        getTopLevelConceptCheckBox(((TopLevelConcept) event.getObject()).getAsccpId()).setChecked(true);
+    }
 
-        if (StringUtils.isEmpty(q)) {
-            return getAllTopLevelConcepts().stream()
-                    .map(e -> e.getPropertyTerm())
-                    .collect(Collectors.toList());
-        } else {
-            String[] split = q.split(" ");
+    public void onTopLevelConceptUnselect(SelectEvent event) {
+        getTopLevelConceptCheckBox(((TopLevelConcept) event.getObject()).getAsccpId()).setChecked(false);
+    }
 
-            return getAllTopLevelConcepts().stream()
-                    .map(e -> e.getPropertyTerm())
-                    .distinct()
-                    .filter(e -> {
-                        e = e.toLowerCase();
-                        for (String s : split) {
-                            if (!e.contains(s.toLowerCase())) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
-                    .collect(Collectors.toList());
+    private Map<Long, Boolean> topLevelConceptCheckBoxes = new HashMap();
+    public class TopLevelConceptCheckBox {
+        private Long asccpId;
+
+        public TopLevelConceptCheckBox(Long asccpId) {
+            this.asccpId = asccpId;
         }
+
+        public boolean isChecked() {
+            return topLevelConceptCheckBoxes.getOrDefault(asccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            topLevelConceptCheckBoxes = new HashMap();
+
+            if (value) {
+                TopLevelConcept previousOne = getSelectedTopLevelConcept();
+                if (previousOne != null) {
+                    topLevelConceptCheckBoxes.put(previousOne.getAsccpId(), false);
+                }
+
+                selectedTopLevelConcept = allTopLevelConceptMap.get(asccpId);
+            } else {
+                selectedTopLevelConcept = null;
+            }
+
+            topLevelConceptCheckBoxes.put(asccpId, value);
+        }
+    }
+
+    public TopLevelConceptCheckBox getTopLevelConceptCheckBox(Long asccpId) {
+        return new TopLevelConceptCheckBox(asccpId);
     }
 
     public void search() {
-        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
-        if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
-        } else {
-            setTopLevelConcepts(
-                    getAllTopLevelConcepts().stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
-                            .collect(Collectors.toList())
-            );
-        }
+        String propertyTerm = getSearchTextForPropertyTerm();
+        String module = getSearchTextForModule();
+
+        List<TopLevelConcept> topLevelConcepts = getAllTopLevelConcepts().stream()
+                .filter(new SearchFilter<>(propertyTerm, directory, PROPERTY_TERM_FIELD, " ", TopLevelConcept::getPropertyTerm))
+                .filter(new SearchFilter<>(module, directory, MODULE_FIELD, "\\", TopLevelConcept::getModule))
+                .sorted((a, b) -> {
+                    if (!StringUtils.isEmpty(propertyTerm)) {
+                        return compareLevenshteinDistance(propertyTerm, a, b, TopLevelConcept::getPropertyTerm);
+                    }
+                    if (!StringUtils.isEmpty(module)) {
+                        return compareLevenshteinDistance(module, a, b, TopLevelConcept::getModule, Pattern.quote("\\"));
+                    }
+
+                    return 0;
+                })
+                .collect(Collectors.toList());
+
+        setTopLevelConcepts(topLevelConcepts);
     }
 
     public List<BusinessContext> getBusinessContexts() {
@@ -186,6 +289,8 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
     public void setBusinessContexts(List<BusinessContext> businessContexts) {
         this.businessContexts = businessContexts;
+        this.businessContextMap = businessContexts.stream()
+                .collect(Collectors.toMap(BusinessContext::getBizCtxId, Function.identity()));
     }
 
     public BusinessContext getSelectedBusinessContext() {
@@ -193,7 +298,51 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void setSelectedBusinessContext(BusinessContext selectedBusinessContext) {
-        this.selectedBusinessContext = selectedBusinessContext;
+        if (selectedBusinessContext != null) {
+            getBusinessContextCheckBox(selectedBusinessContext.getBizCtxId()).setChecked(true);
+        }
+    }
+
+    public void onBusinessContextSelect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(true);
+    }
+
+    public void onBusinessContextUnselect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> bizCtxCheckBoxes = new HashMap();
+    public class BusinessContextCheckBox {
+        private Long bizCtxId;
+
+        public BusinessContextCheckBox(Long bizCtxId) {
+            this.bizCtxId = bizCtxId;
+        }
+
+        public boolean isChecked() {
+            return bizCtxCheckBoxes.getOrDefault(bizCtxId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bizCtxCheckBoxes = new HashMap();
+
+            if (value) {
+                BusinessContext previousOne = getSelectedBusinessContext();
+                if (previousOne != null) {
+                    bizCtxCheckBoxes.put(previousOne.getBizCtxId(), false);
+                }
+
+                selectedBusinessContext = businessContextMap.get(bizCtxId);
+            } else {
+                selectedBusinessContext = null;
+            }
+
+            bizCtxCheckBoxes.put(bizCtxId, value);
+        }
+    }
+
+    public BusinessContextCheckBox getBusinessContextCheckBox(Long bizCtxId) {
+        return new BusinessContextCheckBox(bizCtxId);
     }
 
     public String getModule(long moduleId) {
@@ -222,7 +371,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Top-Level Concept' must be selected."));
+                        requestContext.update("growl");
                         nextStep = event.getOldStep();
+
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
@@ -239,16 +390,17 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Business Context' must be selected."));
+                        requestContext.update("growl");
                         nextStep = event.getOldStep();
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
-                        AssociationCoreComponentProperty selectedASCCP =
-                                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                        AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                        assert selectedASCCP.getReleaseId() == getRelease().getReleaseId();
 
-                        createTreeNode(selectedASCCP, selectedBusinessContext);
+                        createTreeNode(selectedASCCP, release, selectedBusinessContext);
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -297,9 +449,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
             ASBIEPNode topLevelNode = getTopLevelNode();
             nodeService.validate(topLevelNode);
-            nodeService.submit(topLevelNode, getCurrentUser(), progressListener);
+            nodeService.submit(topLevelNode, release, getCurrentUser(), progressListener);
 
-            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            return "/views/profile_bod/list.jsf?faces-redirect=true";
         } finally {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("PF('loadingBlock').hide()");

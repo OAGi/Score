@@ -121,6 +121,15 @@ public abstract class AbstractDeclaration implements Declaration {
         return null;
     }
 
+    public String getDefinitionSource() {
+        Element element = context.evaluateElement(
+                "./xsd:annotation/xsd:documentation", this.element);
+        if (element != null) {
+            return element.getAttribute("source");
+        }
+        return null;
+    }
+
     private String removeDocumentationNode(String s) {
         if (StringUtils.isEmpty(s)) {
             return null;

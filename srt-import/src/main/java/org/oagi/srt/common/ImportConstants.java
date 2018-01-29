@@ -62,6 +62,15 @@ public class ImportConstants {
             AGENCY_IDENTIFICATION_NAME = "clm63055D16B_AgencyIdentification";
             AGENCY_IDENTIFICATION_LIST_ID = "3055";
             AGENCY_IDENTIFICATION_VERSION_ID = "D16B";
+        } else if (OAGIS_VERSION == 10.4D) {
+            BASE_DATA_PATH = new File(DATA_PATH, "OAGIS_10_4_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_4").getPath();
+            PLATFORM_PATH = "/Platform/2_4";
+            CODELIST_CHARACTER_SET_CODE_IANA_FILENAME = "CodeList_CharacterSetCode_IANA_20131220";
+
+            IDENTIFIER_SCHEME_AGENCY_IDENTIFICATION_FILENAME = "IdentifierScheme_AgencyIdentification_3055_D16B";
+            AGENCY_IDENTIFICATION_NAME = "clm63055D16B_AgencyIdentification";
+            AGENCY_IDENTIFICATION_LIST_ID = "3055";
+            AGENCY_IDENTIFICATION_VERSION_ID = "D16B";
         } else {
             throw new UnsupportedOperationException("Unsupported version: " + OAGIS_VERSION);
         }
@@ -77,7 +86,8 @@ public class ImportConstants {
     public static final String META_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Meta.xsd";
     public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes/BusinessDataType_1.xsd";
     public static final String COMPONENTS_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Components.xsd";
-    public static final String XBT_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
+    public static final String DATA_TYPES_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/DataTypes";
+    public static final String XBT_FILE_PATH = DATA_TYPES_PATH + "/XMLSchemaBuiltinType_1.xsd";
 
     public static String filepath(String list) {
         String prefix_filepath = MODEL_FOLDER_PATH;
@@ -234,6 +244,63 @@ public class ImportConstants {
                     "    further qualify the use of the given use.\n" +
                     "  - Update the IANACharacterSetCode Code List to include the last version \n" +
                     "    from 20 Dec 2013.\n" +
+                    "\n" +
+                    "\n" +
+                    "NOTICE: We recommend that you install on your root directory drive as the \n" +
+                    "paths may be too long otherwise.\n" +
+                    "\t\n" +
+                    "As with all OAGIS releases OAGIS Release 10_2 contains XML Schema. To view \n" +
+                    "XML Schema it is recommended that you use an XML IDE, as the complete structure \n" +
+                    "of the Business Object Documents are not viewable from a single file.\n" +
+                    "\n" +
+                    "Note that the sample files were used to verify the XMLSchema \n" +
+                    "development, and do not necessarily reflect actual business \n" +
+                    "transactions.  In many cases,the data entered in the XML files are just \n" +
+                    "placeholder text.  Real-world examples for each transaction will be \n" +
+                    "provided as they become available. If you are interested in providing \n" +
+                    "real-world examples please contact oagis@openapplications.org\n" +
+                    "\n" +
+                    "Please send suggestions or bug reports to oagis@openapplications.org\n" +
+                    "\n" +
+                    "Thank you for your interest and support.\n" +
+                    "\n" +
+                    "Best Regards,\n" +
+                    "The Open Applications Group Architecture Council\n";
+        } else if (OAGIS_VERSION == 10.4D) {
+            OAGIS_RELEASE_NOTE = "Open Applications Group\n" +
+                    "Interface Specification XMLSchemas and Sample XML Files\n" +
+                    "\n" +
+                    "OAGIS Release 10_4  \n" +
+                    "\n" +
+                    "05 Jan 2018\n" +
+                    "\n" +
+                    "\n" +
+                    "OAGIS Release 10_4 is a general availability release of OAGIS the release\n" +
+                    "date is 05 Jan 2018. \n" +
+                    "\n" +
+                    "This release is the continuation of the focus on enabling integration that \n" +
+                    "the Open Applications Group and its members are known.\n" +
+                    "\n" +
+                    "Please provide all feedback to the OAGI Architecture Team via the Feedback \n" +
+                    "Forum at: oagis@openapplications.org\n" +
+                    "\n" +
+                    "These XML reference files continue to evolve.  Please feel\n" +
+                    "free to use them, but check www.openapplications.org for the most \n" +
+                    "recent updates.\n" +
+                    "\n" +
+                    "OAGIS Release 10_4 includes:\n" +
+                    "\n" +
+                    "  New Scenario:\n" +
+                    "  - 74 Check Inspection Order Status\n" +
+                    "\n" +
+                    "  Changes to PartyMaster including CustomerPartyMaster and SupplierPartyMaster:\n" +
+                    "  - Party profiles for tax, selling, organization, purchasing, payment and item.\n" +
+                    "  - PartyVerfication\n" +
+                    "\n" +
+                    "  Change to Components:\n" +
+                    "  - Addition of Invoice Adjustments, Payment Reference, Invoice Dispute.\n" +
+                    "  - Addition to Communication Telephone, EMail and Interner of Status.\n" +
+                    "  - Addition to Preference of UsageConsentIndicator\n" +
                     "\n" +
                     "\n" +
                     "NOTICE: We recommend that you install on your root directory drive as the \n" +

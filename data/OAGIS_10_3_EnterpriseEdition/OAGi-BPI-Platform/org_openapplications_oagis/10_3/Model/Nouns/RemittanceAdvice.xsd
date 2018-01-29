@@ -23,8 +23,9 @@
 	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
 	<xsd:element name="RemittanceAdvice" type="RemittanceAdviceType" id="oagis-id-7c6b08331b1b4f5c94bb69ce01c1cfb4">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the RemittanceAdvice Business Object Document is to provides a detailed breakdown of a payment amount.  It includes all credits, debits, discounts, adjustments taken on an invoice, and adjustment reason codes.  A payment can attach a Remittance Advice Notification.  Payment can be for products only, transportation, or other services.  </xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Process RemittanceAdvice sends the electronic form of a remittance advice document from a payer to a payee. It is usually executed when an outstanding accounts payable balance (credit or debit) exists. </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the RemittanceAdvice Business Object Document is to provides a detailed breakdown of a payment amount.  It includes all credits, debits, discounts, adjustments taken on an invoice, and adjustment reason codes.  A payment can attach a Remittance Advice Notification.  Payment can be for products only, transportation, or other services.
+
+The Process RemittanceAdvice sends the electronic form of a remittance advice document from a payer to a payee. It is usually executed when an outstanding accounts payable balance (credit or debit) exists. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="RemittanceAdviceHeader" type="RemittanceAdviceHeaderType" id="oagis-id-c25b4aed50754195b3a5e95598b02460">
@@ -57,7 +58,7 @@ At least one occurrence of this Component is required for each occurrence of the
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-8773b725e7534b2e869d80e8063fd7ef"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-8773b725e7534b2e869d80e8063fd7ef"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-cd7085babea04ca6b2ac51283709fc7f"/>
 	</xsd:complexType>
 	<xsd:complexType name="RemittanceAdviceHeaderBaseType" id="oagis-id-f09f6e05e0cc42d19d9138f928e713d8">
@@ -124,9 +125,11 @@ At least one occurrence of this Component is required for each occurrence of the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="RemittanceAdviceHeaderExtensionType" id="oagis-id-1b64e58242ad4287874f669b011be7e1" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -152,9 +155,11 @@ At least one occurrence of this Component is required for each occurrence of the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="RemittanceAdviceLineExtensionType" id="oagis-id-b0dd259ebe014c86b7cce6fb33ef374f" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

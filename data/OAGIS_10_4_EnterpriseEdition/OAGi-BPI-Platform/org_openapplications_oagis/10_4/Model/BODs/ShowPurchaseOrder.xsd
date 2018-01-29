@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ShowPurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+        <xsd:element name="ShowPurchaseOrder" type="ShowPurchaseOrderType" id="oagis-id-adfc490df60246a88152a4949a1dd14d">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Show PurchaseOrder is to supply Purchase Order Information to another business application module.  This request may be used as a response to a Get PurchaseOrder request or as a push notification of an event.
+
+There are many possible business applications in several environments that may use this capability.  Examples include:
+
+1. A Order Management application could use this BOD to send information to a Plant Data Collection application.
+
+2. An MRP, Inventory or Manufacturing business application could use this to obtain order information.
+
+3. The Order Management application can notify the MRP/Inventory application when a vendor gives or changes a promise day.
+
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowPurchaseOrderType" id="oagis-id-711228f246de4d0b95bc0b269bf825e2">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowPurchaseOrderDataAreaType" id="oagis-id-f32cd2bb181245bc8313c3234116b07d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowPurchaseOrderDataAreaType" id="oagis-id-e67600fd9235411981f9fd9c3c267aa4">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-cafcd744fdab46718c0ae9880fb468cd"/>
+                        <xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-6fa62a333fbb4494bd4d6d8cb3fba767"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

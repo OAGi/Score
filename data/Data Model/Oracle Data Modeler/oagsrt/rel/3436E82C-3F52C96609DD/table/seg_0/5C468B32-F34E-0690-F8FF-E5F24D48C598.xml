@@ -200,9 +200,9 @@
 <ownDataTypeParameters>1,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="B7C1B4D0-F2EC-0B35-2C1A-523085C02281">
+<Column name="DEFINITION" id="42CE482D-584B-BE4E-D54B-83720F2A542B">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:34:07 UTC</createdTime>
+<createdTime>2017-07-27 20:12:58 UTC</createdTime>
 <commentInRDBMS>Description to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -332,18 +332,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="2C7ADB03-0523-5076-F3AB-BB20525308D9"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="587E340D-A7CC-6A23-04DB-5FCDF8C62618" name="BBIE_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:37:26 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="5C770334-E7DF-68CD-110E-85F069D3A790"/>
-<colUsage columnID="293C7D1F-AD94-BE64-1421-1D64B3741709"/>
-<colUsage columnID="6BFCE1E9-130D-FEEF-E893-BD0D7AFF5776"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="17152859-92FC-26A6-DA50-8CD4AFAC0DD9" name="BBIE_OWNER_TLVL_ABIE_ID_IDX">

@@ -1,0 +1,13 @@
+FROM tomcat:8-jre8
+
+ENV JAVA_OPTS "-Dspring.profiles.active=production -Ddatasource.jndi-name=java:comp/env/jdbc/oagiDB"
+
+RUN ["rm", "-f", "/usr/local/tomcat/conf/context.xml"]
+ADD context.xml /usr/local/tomcat/conf/context.xml
+
+RUN ["rm", "-rf", "/usr/local/tomcat/webapps/ROOT"]
+ADD srt-webapp-1.0.0.war /usr/local/tomcat/webapps/ROOT.war
+
+ADD ojdbc6.jar /usr/local/tomcat/lib/ojdbc6.jar
+
+CMD ["catalina.sh", "run"]

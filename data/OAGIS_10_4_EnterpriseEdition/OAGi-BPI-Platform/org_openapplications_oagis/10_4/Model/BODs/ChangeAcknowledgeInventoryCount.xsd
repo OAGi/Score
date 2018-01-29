@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeInventoryCount.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryCount.xsd"/>
+	<xsd:element name="ChangeAcknowledgeInventoryCount" type="ChangeAcknowledgeInventoryCountType" id="oagis-id-4c513c6a3fae4896bed0ebe6dc774b55">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeInventoryCount is to transmit an inventory count to ERP from the actual physical inventory location. This count may be a cycle count or a physical count.  This BOD may also apply to planned or unplanned inventory counts.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeInventoryCountType" id="oagis-id-2ff1ec950ad144d39cb756cd4a34a378">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeInventoryCountDataAreaType" id="oagis-id-5b2bbd719bf04bb8910121d21afbf56e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeInventoryCount. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (InventoryCount).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeInventoryCountDataAreaType" id="oagis-id-0c982b8f4c01425aab745a7900215be7">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-0afccd469a6c4c7bb1f7393c651e6c88"/>
+			<xsd:element ref="InventoryCount" maxOccurs="unbounded" id="oagis-id-ad87a2d7f2994d3184747f35c8aff19f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

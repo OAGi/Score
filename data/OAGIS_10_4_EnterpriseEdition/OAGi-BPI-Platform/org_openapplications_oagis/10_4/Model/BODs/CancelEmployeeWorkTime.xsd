@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/CancelEmployeeWorkTime.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EmployeeWorkTime.xsd"/>
+        <xsd:element name="CancelEmployeeWorkTime" type="CancelEmployeeWorkTimeType" id="oagis-id-48251b904795474dbb2b4fcc6fc7f7ff">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelEmployeeWorkTime is to Cancel work time information for an employee from a data collection application to an ERP Human Resource application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="CancelEmployeeWorkTimeType" id="oagis-id-2dc567c0dbc3461f98c7b7633d6050cf">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="CancelEmployeeWorkTimeDataAreaType" id="oagis-id-2bc9eabfca9140938aef1d193e436eb8">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelEmployeeWorkTime. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (EmployeeWorkTime).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="CancelEmployeeWorkTimeDataAreaType" id="oagis-id-01523e6e04f145b2b733b47bccef280f">
+                <xsd:sequence>
+                        <xsd:element ref="Cancel" id="oagis-id-87f0fa9cc31b461c8720d545556db277"/>
+                        <xsd:element ref="EmployeeWorkTime" maxOccurs="unbounded" id="oagis-id-1c1ba1d0eced42f4a2d8aa88e0651c39"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

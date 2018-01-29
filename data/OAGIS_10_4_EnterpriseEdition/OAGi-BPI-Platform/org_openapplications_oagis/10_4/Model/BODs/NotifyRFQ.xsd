@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyRFQ.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RFQ.xsd"/>
+        <xsd:element name="NotifyRFQ" type="NotifyRFQType" id="oagis-id-ea7eaefaa8184ca7a9040d63cd0acac1">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyRFQ is to ensure that all business software components in a specific integration instance have the current Request for Quote information. This BOD is commonly used to publish the need to create or update a Request for Quote in a publish and subscribe integration environment.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyRFQType" id="oagis-id-6338ae6d396442bd95f0b276cbd5a68d">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyRFQDataAreaType" id="oagis-id-bb8e0a41703e441fbef9637a078164b2">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyRFQ. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (RFQ).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyRFQDataAreaType" id="oagis-id-1c58c81547224028b4d88d072f1617d7">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-691e6f6f864b431dbb10e1dd198c6f8f"/>
+                        <xsd:element ref="RFQ" maxOccurs="unbounded" id="oagis-id-443cd38b16c54aedad2d2b505fa1ae0c"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

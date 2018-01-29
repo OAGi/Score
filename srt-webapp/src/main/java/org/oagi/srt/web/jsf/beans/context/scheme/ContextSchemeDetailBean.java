@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -48,19 +49,25 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        String paramCtxSchemeId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ctxSchemeId");
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+
+        String paramCtxSchemeId = requestParameterMap.get("ctxSchemeId");
         if (!StringUtils.isEmpty(paramCtxSchemeId)) {
             Long ctxSchemeId = Long.parseLong(paramCtxSchemeId);
-            if (ctxSchemeId != null && ctxSchemeId > 0L) {
-                ContextScheme contextScheme = contextSchemeService.findContextSchemeById(ctxSchemeId);
+            ContextScheme contextScheme = contextSchemeService.findContextSchemeById(ctxSchemeId);
+            setContextScheme(contextScheme);
+        } else {
+            String paramCtxSchemeGuid = requestParameterMap.get("ctxSchemeGuid");
+            if (!StringUtils.isEmpty(paramCtxSchemeGuid)) {
+                ContextScheme contextScheme = contextSchemeService.findContextSchemeByGuid(paramCtxSchemeGuid);
                 setContextScheme(contextScheme);
+            } else {
+                setContextScheme(new ContextScheme());
             }
         }
-        if (getContextScheme() == null) {
-            setContextScheme(new ContextScheme());
-        }
 
-        String paramCtxCategoryId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ctxCategoryId");
+        String paramCtxCategoryId = requestParameterMap.get("ctxCategoryId");
         if (!StringUtils.isEmpty(paramCtxCategoryId)) {
             Long ctxCategoryId = Long.parseLong(paramCtxCategoryId);
             ContextCategory contextCategory = contextCategoryService.findById(ctxCategoryId);
@@ -233,7 +240,7 @@ public class ContextSchemeDetailBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "/views/context_scheme/list.xhtml?faces-redirect=true";
+        return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 
     private boolean validateContextSchemeValues() {
@@ -323,6 +330,6 @@ public class ContextSchemeDetailBean extends UIHandler {
     public String delete() {
         contextSchemeService.delete(contextScheme);
 
-        return "/views/context_scheme/list.xhtml?faces-redirect=true";
+        return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 }

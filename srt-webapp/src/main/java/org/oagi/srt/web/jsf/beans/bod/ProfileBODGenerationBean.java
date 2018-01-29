@@ -2,8 +2,11 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.ProfileBODRepository;
+import org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState;
 import org.oagi.srt.repository.entity.ProfileBOD;
-import org.oagi.srt.standalone.StandaloneXMLSchema;
+import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.service.ProfileBODGenerateService;
+import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -31,14 +34,14 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODGenerationBean {
+public class ProfileBODGenerationBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ProfileBODRepository profileBODRepository;
     @Autowired
-    private StandaloneXMLSchema standaloneXMLSchema;
+    private ProfileBODGenerateService standaloneXMLSchema;
 
     private ProfileBODGenerationOption option = new ProfileBODGenerationOption();
 
@@ -49,7 +52,16 @@ public class ProfileBODGenerationBean {
 
     @PostConstruct
     public void init() {
+        User currentUser = getCurrentUser();
         allProfileBODs = profileBODRepository.findAll();
+        allProfileBODs = allProfileBODs.stream()
+                .filter(e -> {
+                    long ownerUserId = e.getOwnerUserId();
+                    if (ownerUserId != currentUser.getAppUserId() && e.getState() != AggregateBusinessInformationEntityState.Published) {
+                        return false;
+                    }
+                    return true;
+                }).collect(Collectors.toList());
         search();
     }
 
@@ -137,23 +149,25 @@ public class ProfileBODGenerationBean {
         setProfileBODs(profileBODs);
     }
 
-    private String filePath;
+    private File generateSchemaFile;
 
     public void generate() throws Exception {
-        List<Long> al = new ArrayList();
+        List<Long> topLevelAbieIds = new ArrayList();
         for (ProfileBOD selectedProfileBOD : getSelectedProfileBODs()) {
-            al.add(selectedProfileBOD.getTopLevelAbieId());
+            topLevelAbieIds.add(selectedProfileBOD.getTopLevelAbieId());
         }
 
-        filePath = standaloneXMLSchema.generateXMLSchema(al, true);
+        ProfileBODGenerationOption option = getOption();
+        generateSchemaFile = standaloneXMLSchema.generateXMLSchema(topLevelAbieIds, option);
     }
 
     public StreamedContent getFile() throws Exception {
-        return toStreamedContent(filePath);
+        return toStreamedContent(generateSchemaFile);
     }
 
-    public StreamedContent toStreamedContent(String filePath) throws IOException {
-        InputStream stream = new FileInputStream(new File(filePath));
+    public StreamedContent toStreamedContent(File file) throws IOException {
+        InputStream stream = new FileInputStream(file);
+        String filePath = file.getCanonicalPath();
         return new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
     }
 }

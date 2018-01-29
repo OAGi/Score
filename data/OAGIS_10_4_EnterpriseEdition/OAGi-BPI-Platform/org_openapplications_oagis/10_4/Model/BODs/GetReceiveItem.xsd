@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/GetReceiveItem.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ReceiveItem.xsd"/>
+        <xsd:element name="GetReceiveItem" type="GetReceiveItemType" id="oagis-id-8e8a71f8f6064ee9a32fbee353aaa2de">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetReceiveItem is to enable an application or component to request an ReceiveItem document from another business application or component.
+
+The response to the GetReceiveItem is is the ListReceiveItem. The GetReceiveItem also enables the retrieval of information across several documents by using selection fields.    This type of functionality is limited to the capabilities of the responding application and needs to be determined during the implementation project.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetReceiveItemType" id="oagis-id-b9060888ea094084b41d6ef4e9c32d04">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetReceiveItemDataAreaType" id="oagis-id-ad6ad729a4d64f39afbeec9e8ce8c142">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetLocation. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ReceiveItem).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetReceiveItemDataAreaType" id="oagis-id-efa5c9c670f34244a2ffa8023b9aaa27">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-5c71fe41682a449f808316b2f1330d91"/>
+                        <xsd:element ref="ReceiveItem" minOccurs="0" maxOccurs="unbounded" id="oagis-id-89975fd6c53f4bf9b36172fa352e2615"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

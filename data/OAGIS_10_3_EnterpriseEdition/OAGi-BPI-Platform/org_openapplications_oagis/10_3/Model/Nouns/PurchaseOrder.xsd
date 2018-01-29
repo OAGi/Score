@@ -27,8 +27,9 @@
 	<xsd:include schemaLocation="../Platform/2_3/Common/Components/Components.xsd"/>
 	<xsd:element name="PurchaseOrder" type="PurchaseOrderType" id="oagis-id-ed296a22b7984415bf63fa40811c467a">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PurchaseOrder Business Object Document is to communicate an order to purchase goods from a buyer to a supplier. The PurchaseOrder carries information to and from the buyer and supplier. The PurchaseOrder is a legally binding document once both Parties agree to the contents and the specified terms and conditions of the order.  </xsd:documentation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Process PurchaseOrder sends the electronic form of a purchase order document from a customer to a supplier in order to purchase n-number of Lines each of which containes an Ordered Item. </xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PurchaseOrder Business Object Document is to communicate an order to purchase goods from a buyer to a supplier. The PurchaseOrder carries information to and from the buyer and supplier. The PurchaseOrder is a legally binding document once both Parties agree to the contents and the specified terms and conditions of the order.
+
+The Process PurchaseOrder sends the electronic form of a purchase order document from a customer to a supplier in order to purchase n-number of Lines each of which containes an Ordered Item. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="PurchaseOrderHeader" type="PurchaseOrderHeaderType" id="oagis-id-c99ce855f5734be39ff0447bdb1fae48">
@@ -71,7 +72,7 @@ At least one occurrence of this Component is required for each occurrence of the
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-ec34c7efb6024d19907c0522b9503917"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-ec34c7efb6024d19907c0522b9503917"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-56bc8a05c2064710ab5ce812661ac3f7"/>
 	</xsd:complexType>
 	<xsd:complexType name="PurchaseOrderHeaderBaseType" id="oagis-id-e6c48757028646a48fdff33269f93284">
@@ -139,9 +140,11 @@ At least one occurrence of this Component is required for each occurrence of the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="PurchaseOrderHeaderExtensionType" id="oagis-id-995fea6cc9464426b701bc73b99164c9" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -172,9 +175,11 @@ At least one occurrence of this Component is required for each occurrence of the
 					</xsd:element>
 					<xsd:element name="Extension" type="PurchaseOrderLineExtensionType" id="oagis-id-4caf1b67d4954514a25087c416bd4f87" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -200,9 +205,11 @@ At least one occurrence of this Component is required for each occurrence of the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="PurchaseOrderSubLineExtensionType" id="oagis-id-3221ac9e18ac4ec182c70c0ca589c851" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -215,9 +222,11 @@ At least one occurrence of this Component is required for each occurrence of the
 				<xsd:sequence>
 					<xsd:element name="Extension" type="PurchaseOrderScheduleExtensionType" id="oagis-id-1bbf8447e8d448c0a5660a2c0efec4ef" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

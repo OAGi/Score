@@ -25,12 +25,20 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
     public User findByAuthentication(Authentication authentication) {
         return userRepository.findOneByLoginId(authentication.getName());
     }
 
     public User findByUserId(long userId) {
         return userRepository.findOne(userId);
+    }
+
+    public User findByLoginId(String loginId) {
+        return userRepository.findOneByLoginId(loginId);
     }
 
     public Map<Long, User> findByUserIds(Collection<Long> userIds) {
@@ -61,11 +69,18 @@ public class UserService {
     public long register(String username, String rawPassword) {
         User user = new User();
         user.setLoginId(username);
+        user.setPassword(rawPassword);
         user.setName(username);
-        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setOagisDeveloperIndicator(false);
         user.setOrganization(null);
-        user = userRepository.save(user);
+        user = update(user);
         return user.getAppUserId();
+    }
+
+    @Transactional
+    public User update(User user) {
+        String rawPassword = user.getPassword();
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        return userRepository.save(user);
     }
 }

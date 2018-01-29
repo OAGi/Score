@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.oagi.srt.common.ImportConstants.CODELIST_CHARACTER_SET_CODE_IANA_FILENAME;
-import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.printTitle;
 
 /**
  * @author Jaehun Lee

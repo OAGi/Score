@@ -19,10 +19,10 @@
                                     completeMethod="#{namespaceBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true" actionListener="#{namespaceBean.search}"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{namespaceBean.search}"
                                      update="tbl"
-                                     icon="ui-icon-search"/>
-                    <p:button value="Create Namespace"
+                                     icon="fa fa-white fa-search"/>
+                    <p:button id="createBtn" value="Create Namespace"
                               style="float: right; padding: 3px 0 3px 0;"
                               outcome="/views/namespace/details.jsf"/>
                 </f:facet>
@@ -31,9 +31,7 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{namespace.namespaceId}">
                     <p:column style="width: 40%" headerText="URI" sortBy="#{namespace.uri}">
-                        <h:link value="#{namespace.uri}" outcome="/views/namespace/details.jsf">
-                            <f:param name="namespaceId" value="#{namespace.namespaceId}"/>
-                        </h:link>
+                        <a href="/namespace/#{namespace.namespaceId}">#{namespace.uri}</a>
                     </p:column>
                     <p:column style="width: 100px; text-align: center;" headerText="Prefix" sortBy="#{namespace.prefix}">
                         <h:outputText value="#{namespace.prefix}"/>

@@ -20,9 +20,17 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Controller
 @Scope("view")
@@ -69,7 +77,6 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             return;
         }
         setTopLevelAbie(topLevelAbie);
-
         createTreeNode(topLevelAbie);
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
@@ -107,7 +114,23 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
         AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
-        traverseToFindTargetAcc(asccpStack, acc, eAcc);
+
+        Map<Long, AggregateCoreComponent> accMap =
+                accRepository.findAllByRevisionNum(0).stream()
+                        .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
+
+        Map<Long, List<AssociationCoreComponent>> asccFromAccIdMap =
+                asccRepository.findAllByRevisionNum(0).stream()
+                        .collect(groupingBy(AssociationCoreComponent::getFromAccId));
+
+        Map<Long, AssociationCoreComponentProperty> asccpMap =
+                asccpRepository.findAllByRevisionNum(0).stream()
+                        .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
+
+        traverseToFindTargetAcc(
+                accMap, asccFromAccIdMap, asccpMap,
+                asccpStack, acc, eAcc
+        );
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0, len = asccpStack.size(); i < len; ++i) {
@@ -134,17 +157,42 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         return asccp;
     }
 
-    private boolean traverseToFindTargetAcc(Stack<AssociationCoreComponentProperty> asccpStack,
-                                            AggregateCoreComponent sourceAcc,
-                                            AggregateCoreComponent targetAcc) {
+    private boolean traverseToFindTargetAcc(
+            Map<Long, AggregateCoreComponent> accMap,
+            Map<Long, List<AssociationCoreComponent>> asccFromAccIdMap,
+            Map<Long, AssociationCoreComponentProperty> asccpMap,
 
-        long targetAccId = targetAcc.getAccId();
-        long fromAccId = sourceAcc.getAccId();
+            Stack<AssociationCoreComponentProperty> asccpStack,
+            AggregateCoreComponent sourceAcc,
+            AggregateCoreComponent targetAcc) {
 
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(fromAccId);
+        long targetAccId = (targetAcc.getReleaseId() > 0L) ? targetAcc.getCurrentAccId() : targetAcc.getAccId();
+
+        List<AggregateCoreComponent> sourceAccList = new ArrayList();
+        sourceAccList.add(sourceAcc);
+
+        while (sourceAcc != null && sourceAcc.getBasedAccId() > 0L) {
+            sourceAcc = accRepository.findOne(sourceAcc.getBasedAccId());
+            sourceAccList.add(sourceAcc);
+        }
+
+        List<AssociationCoreComponent> asccList = new ArrayList();
+        List<Long> fromAccIds = sourceAccList.stream()
+                .map(e -> (e.getReleaseId() > 0L) ? e.getCurrentAccId() : e.getAccId())
+                .collect(Collectors.toList());
+        for (Long fromAccId : fromAccIds) {
+            List<AssociationCoreComponent> l = asccFromAccIdMap.get(fromAccId);
+            if (l != null && !l.isEmpty()) {
+                asccList.addAll(l);
+            }
+        }
+        if (asccList.isEmpty()) {
+            return false;
+        }
+
         for (AssociationCoreComponent ascc : asccList) {
             long toAsccpId = ascc.getToAsccpId();
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(toAsccpId);
+            AssociationCoreComponentProperty asccp = asccpMap.get(toAsccpId);
             asccpStack.push(asccp);
 
             long roleOfAccId = asccp.getRoleOfAccId();
@@ -153,9 +201,12 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
                 return true;
 
             } else {
-                fromAccId = asccp.getRoleOfAccId();
-                sourceAcc = accRepository.findOne(fromAccId);
-                boolean result = traverseToFindTargetAcc(asccpStack, sourceAcc, targetAcc);
+                long fromAccId = asccp.getRoleOfAccId();
+                sourceAcc = accMap.get(fromAccId);
+
+                boolean result = traverseToFindTargetAcc(
+                        accMap, asccFromAccIdMap, asccpMap,
+                        asccpStack, sourceAcc, targetAcc);
                 if (result) {
                     return true;
                 } else {
@@ -195,29 +246,33 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String updateState(AggregateBusinessInformationEntityState state) {
+    public String updateState(AggregateBusinessInformationEntityState state) throws IOException {
         try {
             ASBIEPNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getType().getAbie().getOwnerTopLevelAbieId();
             bieService.updateState(topLevelAbieId, state);
 
-            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            // Issue #439: To update the screen status.
+            setTopLevelAbie(topLevelAbieRepository.findOne(topLevelAbieId));
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        return "/views/profile_bod/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String createABIEExtension(boolean isLocally) {
+    public void createABIEExtension(boolean isLocally) throws IOException {
         TreeNode treeNode = getSelectedTreeNode();
         ASBIEPNode asbieNode = (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
+        long releaseId = topLevelAbie.getReleaseId();
 
-        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, releaseId, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc, releaseId);
         if (ueAcc != null) {
             CoreComponentState ueAccState = ueAcc.getState();
 
@@ -227,17 +282,18 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
                     User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
-                    return null;
+                    return;
                 }
             }
 
             if (ueAccState == CoreComponentState.Editing || ueAccState == CoreComponentState.Candidate) {
-                return redirectABIEExtension(isLocally, eAcc);
+                redirectABIEExtension(ueAcc);
+                return;
             }
         }
 
         try {
-            eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
+            ueAcc = extensionService.appendUserExtension(asccp, releaseId, user, isLocally);
         } catch (PermissionDeniedDataAccessException e) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
@@ -248,7 +304,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
             throw t;
         }
 
-        return redirectABIEExtension(isLocally, eAcc);
+        redirectABIEExtension(ueAcc);
     }
 
     public CoreComponentState getABIEExtensionState(boolean isLocally) {
@@ -259,26 +315,15 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         ASBIEPNode asbieNode =
                 (ASBIEPNode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
+        long releaseId = topLevelAbie.getReleaseId();
 
-        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, releaseId, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc, releaseId);
         return (ueAcc != null) ? ueAcc.getState() : null;
     }
 
-    public String redirectABIEExtension(boolean isLocally) {
-        return redirectABIEExtension(isLocally, null);
-    }
-
-    public String redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) {
-        TreeNode treeNode = getSelectedTreeNode();
-        ASBIEPNode asbieNode =
-                (ASBIEPNode) treeNode.getData();
-        AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
-
-        if (eAcc == null) {
-            eAcc = extensionService.getExtensionAcc(asccp, isLocally);
-        }
-
-        return "/views/core_component/extension.jsf?accId=" + eAcc.getAccId() + "&faces-redirect=true";
+    public void redirectABIEExtension(AggregateCoreComponent ueAcc) throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/extension/" + ueAcc.getAccId());
     }
 }

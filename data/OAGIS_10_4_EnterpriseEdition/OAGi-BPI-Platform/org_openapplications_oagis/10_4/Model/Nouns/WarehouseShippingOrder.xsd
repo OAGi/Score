@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               		05 Jan 2018 
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2_1/Mode/Common/Components/Fields.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<!---->
+	<xsd:element name="WarehouseShippingOrder" type="WarehouseShippingOrderType" id="oagis-id-7ca8f4b89dca40e7a7a4a29c31b4d64e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">EDI 940</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="WarehouseShippingOrderHeader" type="WarehouseShippingOrderHeaderType" id="oagis-id-913268dc6cc94f438665fdf59e597c80"/>
+	<xsd:element name="WarehouseShippingOrderLine" type="WarehouseShippingOrderLineType" id="oagis-id-7433aac91afa463aa1a54ba8246ab255"/>
+	<xsd:complexType name="WarehouseShippingOrderType" id="oagis-id-9e30b5523ae44908857cb53a1b80682b">
+		<xsd:sequence>
+			<xsd:element ref="WarehouseShippingOrderHeader" id="oagis-id-87d9f7d2c1f6467cb770e4b7a2d0be0d" minOccurs="0"/>
+			<xsd:element ref="WarehouseShippingOrderLine" id="oagis-id-2281596eca5f4fa98d403b01932defae" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-10b96be9cc6144e7a80014b90c1fc6c9"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-6b0d5a4035764e128f674873bdb7f6b4"/>
+	</xsd:complexType>
+	<xsd:complexType name="WarehouseShippingOrderHeaderBaseType" id="oagis-id-778acb0fad7a49b5ad2ddfe71bbb3757">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ShipFromParty" id="oagis-id-da180aa5157e480889dca6efd8a0e350" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the goods or services are being shipped or sent from.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-508ba48b01df4b56b83fab9f14acdeec" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the ShipToParty for the document or the line. In a lot of cases, this is the same as the CustomerParty. In multi-organization purchasing, the CustomerParty may be different from the BuyerParty</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="VendorParty" id="oagis-id-27f8d6c0f8544dfd8d6b48c6c5e6e84a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DepositorParty" id="oagis-id-72fc0912b46e4c4fbe7132b7e7e154fb" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="WarehouseParty" id="oagis-id-856a14f346b74870b7450eb4f187e1d4" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Party" id="oagis-id-ae783ddd976946758ed4699e471ba419" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequestedDeliveryDate" id="oagis-id-c21f1632608b4b868000ea71ede74381" minOccurs="0"/>
+					<xsd:element ref="RequestedShipDateTime" id="oagis-id-d8fd1139b7524a82ae72df1692722613" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the buyer/customer requests the order to be shipped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WarehouseCarrier" id="oagis-id-680cce804de042058503cc5ae27cdf4f" minOccurs="0"/>
+					<xsd:element ref="TotalQuantity" id="oagis-id-a17ff0cd480b480b99158632338df572" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Total number of associated entities. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalDimensions" id="oagis-id-41aea0b4c54f46258114a739b0020ac0" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarehouseShippingOrderHeaderType" id="oagis-id-e2514ddf2c0f4a0abc4fdb964cc3f3db">
+		<xsd:complexContent>
+			<xsd:extension base="WarehouseShippingOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WarehouseShippingOrderHeaderExtensionType" id="oagis-id-815d9455d7774890ae3bc49eec82d0c9" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarehouseShippingOrderLineBaseType" id="oagis-id-1c0af518b352435482b5669c82b7a87c">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="MarksNumbersProperty" id="oagis-id-d861321512bd429d89f97df3044a3942" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="OrderQuantity" id="oagis-id-3e211fa283714c6aa3b13aea341d01aa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of a material or product ordered by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-191b684cee274641b004355591319ba3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Amount" id="oagis-id-200a470100bc4f09aef97103c08f2b5b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The monetary value of the object in which the amount is associated</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-0e3ea12e765245359f9db10980b05632" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-afa615d7863d42e383a7d475d9a6c15a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Item definition and the identification of given Item Instances as identified by the RFID, SerialNumber or Lot and SerialNumber.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShippingInstructions" id="oagis-id-ea112d9e9a534c1da36d25d6b74cb084" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is information about the shipping of an item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarehouseShippingOrderLineType" id="oagis-id-c7c44b545e00432eb684b739e30cb7cc">
+		<xsd:complexContent>
+			<xsd:extension base="WarehouseShippingOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WarehouseShippingOrderLineExtensionType" id="oagis-id-030d23c3c1aa47cb8c2a28a04aff05e3" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

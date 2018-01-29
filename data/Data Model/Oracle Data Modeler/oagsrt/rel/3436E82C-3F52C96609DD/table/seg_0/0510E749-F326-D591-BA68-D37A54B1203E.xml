@@ -69,7 +69,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="A144692D-AE8C-4237-D83C-053F462368EC" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
@@ -111,7 +111,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="C9F1DB45-BEC7-740B-CD9B-C8F9F9291C08" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
@@ -142,9 +142,9 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
+<Column name="DEFINITION" id="86FC8573-807C-608D-949E-BAAEA44028D2">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<createdTime>2017-07-27 20:15:43 UTC</createdTime>
 <commentInRDBMS>Description of the data type.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -154,9 +154,22 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="CONTENT_COMPONENT_DEFINITION" id="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6">
+<Column name="DEFINITION_SOURCE" id="EF8821A8-1F32-BD13-C96A-28DFDF817BFD">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<createdTime>2017-07-27 20:16:37 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 CHAR</dataTypeSize>
+<ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONTENT_COMPONENT_DEFINITION" id="D386ABFE-1A6F-F2AE-486A-57D77D06FB98">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 21:25:05 UTC</createdTime>
 <commentInRDBMS>Description of the content component of the data type.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -201,7 +214,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="7D93D711-E98C-B77D-1DB7-6B9725B19077" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
@@ -216,7 +229,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="9DF05911-6408-C4E2-A9BE-7F170BA293F9" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -231,7 +244,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="3046D12D-901E-EE64-5827-3EEFFB2B4E13" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -246,7 +259,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="5A8EBDB8-7CFA-16F7-260E-71B9B9C2EC4D" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -323,7 +336,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="DB4F2CE5-71EC-3619-4EBF-EACC1B88330C" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
@@ -339,7 +352,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="88C357BA-A514-D3F0-D384-B484CE977AA5" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
@@ -353,8 +366,7 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT006</logicalDatatype>
-<dataTypeSize>1</dataTypeSize>
-<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>

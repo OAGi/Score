@@ -46,14 +46,13 @@
                         </button>
                         <a class="navbar-brand" href="/">
                             <p:graphicImage name="images/oagi.png" width="126" height="38"
-                                            style="border: 0; padding: 0; margin: -4px 0 0 15px; !important"/>
+                                            style="border: 0; padding: 0; margin: -4px 15px 0 15px; !important"/>
                         </a>
                     </div>
 
                     <h:panelGroup rendered="#{request.userPrincipal != null}">
-                        <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                        <div id="navbar-collapse-1">
                             <ul class="nav navbar-nav">
-                                <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
                                 <li class="dropdown menu-first">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Profile BODs <span
@@ -69,8 +68,7 @@
                                         </li>
                                     </ul>
                                 </li>
-                                </h:panelGroup>
-                                <li class="dropdown #{authenticationBean.oagisDeveloper ? 'menu-first' : ''}">
+                                <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Profile BOD Expression <span
                                             class="caret"></span></a>
@@ -98,6 +96,24 @@
                                 </li>
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                       aria-haspopup="true" aria-expanded="false">CC Management <span
+                                            class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="/core_component">Core Component</a>
+                                        </li>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                            <li>
+                                                <a href="/namespace">Namespace</a>
+                                            </li>
+                                            <li>
+                                                <a href="/release">Release Management</a>
+                                            </li>
+                                        </h:panelGroup>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Code List <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><h:link outcome="/views/code_list/list.jsf">View Code List</h:link></li>
@@ -118,6 +134,11 @@
                                     <ul class="dropdown-menu">
                                         <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
                                         </li>
+                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                            <li role="separator" class="divider"></li>
+                                            <li><h:link outcome="/views/user/manage_account.jsf">Manage Account</h:link>
+                                            </li>
+                                        </h:panelGroup>
                                         <li role="separator" class="divider"></li>
                                         <li><h:link outcome="/views/user/settings.jsf">Settings</h:link></li>
                                         <li><a href="/logout">Sign out</a></li>

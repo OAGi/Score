@@ -127,9 +127,9 @@
 <ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="DEFINITION" id="2B2C2B10-BD8F-C752-B55C-411C59D2054D">
+<Column name="DEFINITION" id="2D525BCA-B2E0-9BF0-FD63-69C5D7DE4808">
 <createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:29:27 UTC</createdTime>
+<createdTime>2017-07-27 20:14:27 UTC</createdTime>
 <commentInRDBMS>This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
@@ -137,6 +137,19 @@
 <use>1</use>
 <logicalDatatype>LOGDT028</logicalDatatype>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION_SOURCE" id="4AF2496F-5A7E-2501-5748-C1DE8A5AB3C8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-07-27 20:14:27 UTC</createdTime>
+<commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CREATED_BY" id="D8E04933-D95D-8CDC-D2A4-2AE87F0BEBAB">
@@ -336,18 +349,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="6E215D1D-333A-D2D4-4E12-57C38E41DD9B"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="081FE96D-5C09-553D-D5F8-D49897F748C0" name="BCC_UK1">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 19:30:53 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Unique Constraint</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="F91DC696-55CB-B99B-AE5E-BBA72FD7A23F"/>
-<colUsage columnID="02205EB9-8D83-BC01-91C9-32F2501E615D"/>
-<colUsage columnID="67C1B6DF-FB43-10CA-8F8C-A18EC3A2FED7"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="C4364018-B460-789E-B222-03833A956086" name="BCC_TO_BCCP_ID_FK">

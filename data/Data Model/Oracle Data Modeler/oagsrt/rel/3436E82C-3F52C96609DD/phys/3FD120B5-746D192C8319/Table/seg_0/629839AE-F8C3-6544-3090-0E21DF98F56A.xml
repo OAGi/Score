@@ -1,0 +1,59 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="APP_USER" directorySegmentName="seg_0" id="629839AE-F8C3-6544-3090-0E21DF98F56A">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="APP_USER_ID" id="0F407506-2FE3-AC47-2F58-3B1949647DAD">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NAME" id="1232C853-4D5B-F9FA-027A-A058A7677D88">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OAGIS_DEVELOPER_INDICATOR" id="2A655C40-C4A8-A17C-9ABD-FC4561E9E235">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="PASSWORD" id="407F1B8D-0D40-8E04-8F63-056D3FA86A17">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="LOGIN_ID" id="651FA698-F3F8-3D21-D3C0-518C3F8BF129">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ORGANIZATION" id="791DFCC6-8783-2B0E-032F-FBEAA375B256">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="APP_USER_PK" id="5B77DA46-5F43-A0AA-6527-00937076EE5C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="APP_USER_UK1" id="199215DA-E444-CE97-64BD-AB768C24EAEB">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-28 15:49:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev12c>

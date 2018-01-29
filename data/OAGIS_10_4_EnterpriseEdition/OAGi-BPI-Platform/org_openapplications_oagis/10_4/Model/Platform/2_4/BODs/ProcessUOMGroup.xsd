@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ProcessUOMGroup.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/UOMGroup.xsd"/>
+	<xsd:element name="ProcessUOMGroup" type="ProcessUOMGroupType" id="oagis-id-b38bf906c71245d397b199e0b1c8411e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessUOMGroup is to supply a set of Unit-Of-Measure relationships to another business application module.
+
+This BOD addresses the need for applications to exchange item-independent alternative UOM information beyond the stocking UOM. See the Item UOM Integration Scenario for more detailed information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessUOMGroupType" id="oagis-id-3ea226ea77a34336816a44789dffca09">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessUOMGroupDataAreaType" id="oagis-id-88cad3e2322942b7bd6e97e342aa2526">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessUOMGroup. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (UOMGroup).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessUOMGroupDataAreaType" id="oagis-id-b6f8ae78ab2c40489e701bee158f7aa9">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-2bdf381a7b0040d39c8ea0362374accd"/>
+			<xsd:element ref="UOMGroup" maxOccurs="unbounded" id="oagis-id-552dbd929a92498caff4c0718ecfb498"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

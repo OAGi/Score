@@ -2,16 +2,19 @@ package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.DataTypeTypeConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "dt")
-public class DataType implements TimestampAware, Serializable {
+public class DataType implements CoreComponent {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 
@@ -32,7 +35,8 @@ public class DataType implements TimestampAware, Serializable {
     private String guid;
 
     @Column(nullable = false)
-    private int type;
+    @Convert(attributeName = "type", converter = DataTypeTypeConverter.class)
+    private DataTypeType type;
 
     @Column(nullable = false, length = 45)
     private String versionNum;
@@ -58,6 +62,9 @@ public class DataType implements TimestampAware, Serializable {
     @Lob
     @Column(length = 10 * 1024)
     private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -112,22 +119,29 @@ public class DataType implements TimestampAware, Serializable {
     private boolean deprecated;
 
     public DataType() {
+        init();
     }
 
     public DataType(long dtId, String dataTypeTerm) {
+        init();
+
         this.dtId = dtId;
         this.dataTypeTerm = dataTypeTerm;
     }
 
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
+    @Override
+    public long getId() {
+        return getDtId();
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
+    @Override
+    public void setId(long id) {
+        setDtId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "DT";
     }
 
     public long getDtId() {
@@ -146,11 +160,11 @@ public class DataType implements TimestampAware, Serializable {
         this.guid = guid;
     }
 
-    public int getType() {
+    public DataTypeType getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(DataTypeType type) {
         this.type = type;
     }
 
@@ -216,6 +230,14 @@ public class DataType implements TimestampAware, Serializable {
 
     public void setDefinition(String definition) {
         this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public String getContentComponentDefinition() {
@@ -360,7 +382,7 @@ public class DataType implements TimestampAware, Serializable {
     public int hashCode() {
         int result = (int) (dtId ^ (dtId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + type;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
         result = 31 * result + (previousVersionDtId != null ? previousVersionDtId.hashCode() : 0);
         result = 31 * result + (dataTypeTerm != null ? dataTypeTerm.hashCode() : 0);
@@ -369,6 +391,7 @@ public class DataType implements TimestampAware, Serializable {
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (contentComponentDen != null ? contentComponentDen.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
@@ -401,9 +424,10 @@ public class DataType implements TimestampAware, Serializable {
                 ", den='" + den + '\'' +
                 ", contentComponentDen='" + contentComponentDen + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
-                ", module=" + module +
+                ", module=" + ((module != null) ? module.getModuleId() : null) +
                 ", state=" + state +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
@@ -417,5 +441,96 @@ public class DataType implements TimestampAware, Serializable {
                 ", currentBdtId=" + currentBdtId +
                 ", deprecated=" + deprecated +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    private void init() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                DataType dt = (DataType) object;
+                dt.afterLoaded();
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

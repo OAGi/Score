@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/NotifyPurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+        <xsd:element name="NotifyPurchaseOrder" type="NotifyPurchaseOrderType" id="oagis-id-590b31107bdb4b8ca2c82343a0ed1df1">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Notify PurchaseOrder is to facilitate keeping purchase order information synchronized on separate data bases throughout an enterprise.  The Notify PurchaseOrder allows the adding of new purchase orders and the modification of previously established purchase orders.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyPurchaseOrderType" id="oagis-id-0f17d87741b14dcaab4f28c393d90329">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyPurchaseOrderDataAreaType" id="oagis-id-9998de4606db4a4ca5107e1c7f0f843e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyPurchaseOrderDataAreaType" id="oagis-id-3e4aac6f8fff4f7b9b70cdefbbf1baea">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-7b32d6c0bc624f8d8076558d26619c0f"/>
+                        <xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-9872f8b05e8d4a07ba03d00108d45406"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

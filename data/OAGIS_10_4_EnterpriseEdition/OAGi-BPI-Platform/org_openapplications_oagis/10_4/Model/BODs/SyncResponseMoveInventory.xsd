@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncResponseMoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MoveInventory.xsd"/>
+	<xsd:element name="SyncResponseMoveInventory" type="SyncResponseMoveInventoryType" id="oagis-id-7cc063995aff4fb6923a81bf7c6d9e30">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseMoveInventory is to give the organization the ability to do a quantity movement of materials from one organizational unit to another organizational unit. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseMoveInventoryType" id="oagis-id-103dfba69b3745979555e74e8557761d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseMoveInventoryDataAreaType" id="oagis-id-0e424bfbeb5540b483e3b3daa7f1e943">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseMoveInventory. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (MoveInventory).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseMoveInventoryDataAreaType" id="oagis-id-0288a01b062d450e8e66252004dc8dc2">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-6581dcc2fb5f4fbaa2f9af691e7b25b3"/>
+			<xsd:element ref="MoveInventory" maxOccurs="unbounded" id="oagis-id-1508f4c42297406f91e51313d44538ab"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

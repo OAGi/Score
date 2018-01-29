@@ -104,6 +104,9 @@ public class BusinessInformationEntityService {
     @Autowired
     private CoreComponentService coreComponentService;
 
+    @Autowired
+    private BusinessInformationEntityDAO bieDAO;
+
     public class CreateBIEsResult {
 
         private int abieCount = 0;
@@ -198,7 +201,7 @@ public class BusinessInformationEntityService {
         abie.setState(Editing);
         abie.setOwnerTopLevelAbie(topLevelAbie);
 
-        abieRepository.saveAndFlush(abie);
+        bieDAO.save(abie);
         createBIEsResult.abieCount++;
 
         return abie;
@@ -223,7 +226,7 @@ public class BusinessInformationEntityService {
         asbiep.setDefinition(asccp.getDefinition());
         asbiep.setOwnerTopLevelAbie(topLevelAbie);
 
-        asbiepRepository.saveAndFlush(asbiep);
+        bieDAO.save(asbiep);
         createBIEsResult.asbiepCount++;
 
         return asbiep;
@@ -511,10 +514,10 @@ public class BusinessInformationEntityService {
             return abie;
         }
 
-        public void save(TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
+        public void  save(TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
             aggregateBusinessInformationEntitys.stream()
                     .forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            abieRepository.save(aggregateBusinessInformationEntitys);
+            bieDAO.saveAbieList(aggregateBusinessInformationEntitys);
             createBIEsResult.abieCount += aggregateBusinessInformationEntitys.size();
         }
 
@@ -533,7 +536,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getBbiep())
                             .collect(Collectors.toList());
             bbiepList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbiepRepository.save(bbiepList);
+            bieDAO.saveBbiepList(bbiepList);
             createBIEsResult.bbiepCount += createBBIETreeTasks.size();
 
             List<BasicBusinessInformationEntity> bbieList =
@@ -541,7 +544,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getBbie())
                             .collect(Collectors.toList());
             bbieList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbieRepository.save(bbieList);
+            bieDAO.saveBbieList(bbieList);
             createBIEsResult.bbieCount += createBBIETreeTasks.size();
 
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new ArrayList();
@@ -550,7 +553,7 @@ public class BusinessInformationEntityService {
                         bbieScList.addAll(task.getBbieScList());
                     });
             bbieScList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            bbiescRepository.save(bbieScList);
+            bieDAO.saveBbieScList(bbieScList);
             createBIEsResult.bbiescCount += bbieScList.size();
         }
     }
@@ -736,7 +739,7 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getAsbiep())
                             .collect(Collectors.toList());
             asbiepList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            asbiepRepository.save(asbiepList);
+            bieDAO.saveAsbiepList(asbiepList);
             createBIEsResult.asbiepCount += createASBIETreeTasks.size();
 
             List<AssociationBusinessInformationEntity> asbieList =
@@ -744,23 +747,14 @@ public class BusinessInformationEntityService {
                             .map(task -> task.getAsbie())
                             .collect(Collectors.toList());
             asbieList.stream().forEach(e -> e.setOwnerTopLevelAbie(topLevelAbie));
-            asbieRepository.save(asbieList);
+            bieDAO.saveAsbieList(asbieList);
             createBIEsResult.asbieCount += createASBIETreeTasks.size();
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void deleteProfileBOD(long topLevelAbieId) {
-        asbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        asbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbiescRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-        bbiepRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        topLevelAbieRepository.updateAbieToNull(topLevelAbieId);
-        abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
-
-        topLevelAbieRepository.delete(topLevelAbieId);
+        bieDAO.deleteProfileBOD(topLevelAbieId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -768,7 +762,6 @@ public class BusinessInformationEntityService {
         topLevelAbieRepository.updateState(toplevelAbieId, state);
         abieRepository.updateState(toplevelAbieId, state);
     }
-
 
     /*
      * for BBIE Primitive Restriction

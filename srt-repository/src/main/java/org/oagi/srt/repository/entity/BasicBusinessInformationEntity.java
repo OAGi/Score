@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -120,6 +119,11 @@ public class BasicBusinessInformationEntity
         setBbieId(id);
     }
 
+    @Override
+    public String tableName() {
+        return "BBIE";
+    }
+
     public long getBbieId() {
         return bbieId;
     }
@@ -191,6 +195,9 @@ public class BasicBusinessInformationEntity
     public void setBdtPriRestriId(Long bdtPriRestriId) {
         if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
             this.bdtPriRestriId = bdtPriRestriId;
+            if (codeListId == null && agencyIdListId == null) {
+                setRestrictionType(Primitive);
+            }
         } else {
             this.bdtPriRestriId = null;
         }
@@ -209,6 +216,9 @@ public class BasicBusinessInformationEntity
     public void setCodeListId(Long codeListId) {
         if (codeListId != null && codeListId > 0L) {
             this.codeListId = codeListId;
+            if (bdtPriRestriId == null && agencyIdListId == null) {
+                setRestrictionType(Code);
+            }
         } else {
             this.codeListId = null;
         }
@@ -227,6 +237,9 @@ public class BasicBusinessInformationEntity
     public void setAgencyIdListId(Long agencyIdListId) {
         if (agencyIdListId != null && agencyIdListId > 0L) {
             this.agencyIdListId = agencyIdListId;
+            if (bdtPriRestriId == null && codeListId == null) {
+                setRestrictionType(Agency);
+            }
         } else {
             this.agencyIdListId = null;
         }
@@ -613,11 +626,11 @@ public class BasicBusinessInformationEntity
 
     @PostLoad
     public void afterLoaded() {
-        if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
+        if (bdtPriRestriId != null && bdtPriRestriId > 0L && (codeListId == null && agencyIdListId == null)) {
             setRestrictionType(Primitive);
-        } else if (codeListId != null && codeListId > 0L) {
+        } else if (codeListId != null && codeListId > 0L && (bdtPriRestriId == null && agencyIdListId == null)) {
             setRestrictionType(Code);
-        } else if (agencyIdListId != null && agencyIdListId > 0L) {
+        } else if (agencyIdListId != null && agencyIdListId > 0L && (bdtPriRestriId == null && codeListId == null)) {
             setRestrictionType(Agency);
         } else {
             throw new IllegalStateException();
@@ -630,10 +643,9 @@ public class BasicBusinessInformationEntity
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
     public BasicBusinessInformationEntity clone() {
         BasicBusinessInformationEntity clone = new BasicBusinessInformationEntity();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedBccId = this.basedBccId;
         clone.fromAbieId = this.fromAbieId;
         clone.toBbiepId = this.toBbiepId;
@@ -650,6 +662,7 @@ public class BasicBusinessInformationEntity
         clone.remark = this.remark;
         clone.seqKey = this.seqKey;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }

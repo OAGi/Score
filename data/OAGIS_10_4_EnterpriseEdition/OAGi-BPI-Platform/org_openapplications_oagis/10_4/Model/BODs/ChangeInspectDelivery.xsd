@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeInspectDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InspectDelivery.xsd"/>
+        <xsd:element name="ChangeInspectDelivery" type="ChangeInspectDeliveryType" id="oagis-id-15986237fbf0470ba732b31d81c64104">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeInspectDelivery is to supply InspectDelivery information for goods or services to another business application module.  This BOD may is initiated by the sending system upon some event occurring.  There are many possible business applications in several environments that may use this capability.
+
+For example;
+1.  A PurchaseOrder application could use this to send information to a Plant Data Collection application, or vice versa. 
+2.  An MRP, Inventory, Purchasing or Manufacturing business application could use this to communicate InspectDelivery information.
+3.  A Laboratory Information System could send quality information to an Inventory application,
+4.  A Quality Control application could send information to an MRP, Inventory, or Purchasing application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeInspectDeliveryType" id="oagis-id-a6443f3e0f8745cab5ea8c6caffe0f44">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeInspectDeliveryDataAreaType" id="oagis-id-92e664d87b7f4288aeff84be94a9c7c9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeInspectDelivery. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (InspectDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeInspectDeliveryDataAreaType" id="oagis-id-23030fd1f02b41efa7ab4c6858a7ca05">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-5440b51073a9437e92d01525fba7f86f"/>
+                        <xsd:element ref="InspectDelivery" maxOccurs="unbounded" id="oagis-id-567f3cf44705437fa551976d243092ab"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

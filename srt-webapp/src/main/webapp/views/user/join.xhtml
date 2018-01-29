@@ -2,23 +2,26 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="../../template.xhtml">
 
     <ui:define name="content">
         <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
                     closable="true"/>
 
-        <h:form id="sign_up_form">
+        <h:form id="sign_up_form" pt:autocomplete="false">
             <p:panel header="Create your personal account">
                 <h:panelGrid columns="1" styleClass="boxed-group-inner">
                     <label for="username">Username</label>
                     <p:inputText id="username" name="username" style="padding-left: 10px !important;"
-                                 value="#{signUpBean.username}" required="true"
+                                 value="#{signUpBean.username}" required="true" pt:autocomplete="nope"
                                  styleClass="form-control" requiredMessage="Please fill out 'Username' field."/>
 
                     <label for="user_password">Password</label>
                     <p:password id="user_password" name="user[password]" style="padding-left: 10px !important;"
-                                value="#{signUpBean.password}" required="true" styleClass="form-control"
+                                value="#{signUpBean.password}" required="true" pt:autocomplete="new-password"
+                                styleClass="form-control"
                                 requiredMessage="Please fill out 'Password' field."
                                 validatorMessage="Password is too short (minimum is 5 characters)">
                         <f:validateLength minimum="5"/>
@@ -27,7 +30,7 @@
                     <label for="user_confirm_password">Confirm password</label>
                     <p:password id="user_confirm_password" name="user[password_confirmation]"
                                 style="padding-left: 10px !important;"
-                                value="#{signUpBean.confirmPassword}" required="true"
+                                value="#{signUpBean.confirmPassword}" required="true" pt:autocomplete="new-password"
                                 styleClass="form-control"
                                 requiredMessage="Please fill out 'Confirm password' field."/>
 

@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -14,9 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Agency;
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Code;
-import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.Primitive;
+import static org.oagi.srt.repository.entity.BasicBusinessInformationEntityRestrictionType.*;
 
 @Entity
 @Table(name = "bbie_sc")
@@ -67,10 +64,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     @Column
     private int cardinalityMax;
 
-    @Column
+    @Lob
+    @Column(length = 10 * 1024)
     private String defaultValue;
 
-    @Column
+    @Lob
+    @Column(length = 10 * 1024)
     private String fixedValue;
 
     @Lob
@@ -99,6 +98,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     @Override
     public void setId(long id) {
         setBbieScId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BBIE_SC";
     }
 
     public long getBbieScId() {
@@ -238,12 +242,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent
     }
 
     public void setDefinition(String definition) {
-        if (definition != null) {
-            definition = definition.trim();
-        }
-        if (StringUtils.isEmpty(definition)) {
-            definition = null;
-        }
         this.definition = definition;
     }
 
@@ -532,11 +530,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
     public BasicBusinessInformationEntitySupplementaryComponent clone() {
         BasicBusinessInformationEntitySupplementaryComponent clone =
                 new BasicBusinessInformationEntitySupplementaryComponent();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.bbieId = this.bbieId;
         clone.dtScId = this.dtScId;
         clone.dtScPriRestriId = this.dtScPriRestriId;
@@ -550,6 +547,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
         clone.used = this.used;
+        clone.afterLoaded();
         return clone;
     }
 }

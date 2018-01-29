@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+	<xsd:element name="ChangeAcknowledgeRequireProduct" type="ChangeAcknowledgeRequireProductType" id="oagis-id-52c0f290d50342339c158b70bb87c67f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeRequireProduct is to enable a business application such as Order Management to reserve a quantity of goods or services for a specific date and time. The business process scenario is the Order Management application interacting with the Available to Promise or Production application in order to determine availability of a product for the customer.
+
+This scenario is commonly referred to as Make to Order or Build to Order.
+The ChangeAcknowledgeRequireProduct accomplishes this task in a two step process within this one request:
+1.  First the receiving business application checks to see if an item is available in sufficient quantity by a specific date and time.
+2.  The receiving business application then reserves that quantity of inventory for that specific date and time combination if the product is available.
+If the product requested is not available, 
+
+The responding application may send one of two responses:
+1.  A ConfirmBOD to confirm the denial of the request.
+2.  A ShowProductAvailability  to communicate an alternative product availability.  This may be OrderItem, Date, or Quantity, or a combination of these.  This may also be accompanied with a message in the Note field Identifier stating that this is an alternative.
+
+If the product requested is available:
+The responding application may send a ConfirmBOD to confirm the execution of the request.
+
+This BOD will likely cause ChangeAcknowledges to occur.
+
+This BOD may be used individually, or as part of a larger interface scenario.  The GetProductAvailability and ShowProductAvailability may be used before an ChangeAcknowledgeRequireProduct, but they are not required. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeRequireProductType" id="oagis-id-40c158db30e8491194af7b636076f230">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeRequireProductDataAreaType" id="oagis-id-587f9e03dac64e579afd5c6641501371">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeRequireProduct. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeRequireProductDataAreaType" id="oagis-id-41bda727364c4dcfb003799681a809af">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-b0c3341564594e4098b7d4ad3fc7e423"/>
+			<xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-64684e2c793647f0a4bae476c48b28b1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -4,9 +4,7 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.BusinessInformationEntityService;
-import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.ExtensionService;
+import org.oagi.srt.service.*;
 import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
 import org.oagi.srt.web.jsf.beans.context.business.BusinessContextHandler;
 import org.primefaces.context.RequestContext;
@@ -131,6 +129,12 @@ public class TopLevelABIEHandler implements Serializable {
     @Autowired
     private CoreComponentService coreComponentService;
 
+    @Autowired
+    private CoreComponentDAO ccDAO;
+
+    @Autowired
+    private BusinessInformationEntityDAO bieDAO;
+
     private int abieCount = 0;
     private int bbiescCount = 0;
     private int asbiepCount = 0;
@@ -162,7 +166,7 @@ public class TopLevelABIEHandler implements Serializable {
         maxBIEID = bbieRepository.count();
         maxBBIESCID = bbiescRepository.count();
 
-        asccpVOs = topLevelConceptRepository.findAll().stream()
+        asccpVOs = topLevelConceptRepository.findAll(Release.WORKING_RELEASE).stream()
                 .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                 .collect(Collectors.toList());
     }
@@ -346,7 +350,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void search() {
-        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(getPropertyTerm());
+        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(Release.WORKING_RELEASE, getPropertyTerm());
     }
 
     public void addMessage(String summary) {
@@ -483,8 +487,12 @@ public class TopLevelABIEHandler implements Serializable {
             TopLevelAbie selectedTopLevelAbie = topLevelAbieRepository.findByAbieId(selectedAbie.getAbieId());
             AggregateCoreComponent aggregateCoreComponent =
                     accRepository.findOne(selectedAbie.getBasedAccId());
-            AssociationCoreComponentProperty asccp =
-                    asccpRepository.findOneByRoleOfAccId(aggregateCoreComponent.getAccId());
+
+            List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(aggregateCoreComponent.getAccId());
+            if (asccpList.size() != 1) {
+                throw new IllegalStateException();
+            }
+            AssociationCoreComponentProperty asccp = asccpList.get(0);
 
             int userId = userRepository.findAppUserIdByLoginId("oagis");
             TopLevelAbie copiedBod = copyTopLevelAbie(selectedTopLevelAbie);
@@ -657,7 +665,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAbie.setState(Editing);
         cloneAbie.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        abieRepository.saveAndFlush(cloneAbie);
+        bieDAO.save(cloneAbie);
         abieCount++;
 
         return cloneAbie;
@@ -676,7 +684,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAsbiep.setDefinition(sourceAsbiep.getDefinition());
         cloneAsbiep.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        asbiepRepository.saveAndFlush(cloneAsbiep);
+        bieDAO.save(cloneAsbiep);
         asbiepCount++;
 
         return cloneAsbiep;
@@ -697,7 +705,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbieVO.setSeqKey(oasbieVO.getSeqKey());
         asbieVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        asbieRepository.saveAndFlush(asbieVO);
+        bieDAO.save(asbieVO);
         asbieCount++;
 
         return asbieVO;
@@ -716,7 +724,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiepVO.setLastUpdatedBy(userId);
         nbbiepVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        bbiepRepository.saveAndFlush(nbbiepVO);
+        bieDAO.save(nbbiepVO);
         bbiepCount++;
 
         return nbbiepVO;
@@ -750,7 +758,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbieVO.setLastUpdatedBy(userId);
         nbbieVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        bbieRepository.saveAndFlush(nbbieVO);
+        bieDAO.save(nbbieVO);
         bbieCount++;
 
         return nbbieVO;
@@ -774,7 +782,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiescVO.setBbieId(bbie);
         nbbiescVO.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
-        bbiescRepository.saveAndFlush(nbbiescVO);
+        bieDAO.save(nbbiescVO);
         bbiescCount++;
 
         DataTypeSupplementaryComponent dtscvo = dtScRepository.findOne(nbbiescVO.getDtScId());
@@ -840,8 +848,8 @@ public class TopLevelABIEHandler implements Serializable {
             ascc.setState(CoreComponentState.Editing);
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             asccp.setState(CoreComponentState.Editing);//Editing
-            asccRepository.save(ascc);
-            asccpRepository.save(asccp);
+            ccDAO.save(ascc);
+            ccDAO.save(asccp);
         }
     }
 
@@ -856,7 +864,7 @@ public class TopLevelABIEHandler implements Serializable {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
 
-            extensionService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
+            extensionService.createNewUserExtensionGroupACC(eAcc, 0L, currentLoginUser);
         }
     }
 
@@ -876,7 +884,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public List<String> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
-        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll();
+        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll(Release.WORKING_RELEASE);
 
         if (StringUtils.isEmpty(q)) {
             return topLevelConcepts.stream()
@@ -1114,7 +1122,7 @@ public class TopLevelABIEHandler implements Serializable {
 //			selectedBod
 //			DefaultTreeNode node = new DefaultTreeNode(av1, root);
 //			context.setRequest(root);
-//			context.redirect(context.getRequestContextPath() + "/top_level_abie_edit.xhtml");
+//			context.redirect(context.getRequestContextPath() + "/top_level_abie_edit.jsf");
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
@@ -1269,8 +1277,8 @@ public class TopLevelABIEHandler implements Serializable {
             }
         }
 
-        bbieRepository.saveAndFlush(bbieVO);
-        bbiepRepository.saveAndFlush(bbiepVO);
+        bieDAO.save(bbieVO);
+        bieDAO.save(bbiepVO);
     }
 
     public void chooseCodeForTLBIE() {
@@ -1416,7 +1424,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private void saveBBIESCChanges(ABIEView aABIEView) {
         BasicBusinessInformationEntitySupplementaryComponent bbiescVO = aABIEView.getBbiesc();
-        bbiescRepository.saveAndFlush(bbiescVO);
+        bieDAO.save(bbiescVO);
     }
 
     public void closeDialog() {
@@ -1428,24 +1436,24 @@ public class TopLevelABIEHandler implements Serializable {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         AssociationBusinessInformationEntityProperty asbiepVO = aABIEView.getAsbiep();
 
-        asbieRepository.saveAndFlush(asbieVO);
-        asbiepRepository.saveAndFlush(asbiepVO);
-        abieRepository.saveAndFlush(abieVO);
+        bieDAO.save(asbieVO);
+        bieDAO.save(asbiepVO);
+        bieDAO.save(abieVO);
     }
 
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
-        abieRepository.saveAndFlush(abieVO);
+        bieDAO.save(abieVO);
     }
 
     public void createABIEExtensionLocally() {
         User currentLoginUser = getCurrentLoginUser();
-        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), 0L, currentLoginUser);
     }
 
     public void createABIEExtensionGlobally() {
         User currentLoginUser = getCurrentLoginUser();
-        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), 0L, currentLoginUser);
     }
 
     private User getCurrentLoginUser() {

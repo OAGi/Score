@@ -58,11 +58,196 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="030A3F7D-6971-4DB1-8640-3B6AC8E1FA3D" referredColumn="4A95D01F-E877-E0DC-220C-F82AD8677B6F"/>
 </associations>
+</Column>
+<Column name="SCHEMA_DEFINITION" id="A590C8A4-A144-7407-AB81-FA0BCDFB105F">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MODULE_ID" id="47BDA518-1002-CE04-A769-21578A76E1C8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BD89C6A5-C246-9BC1-7738-C8F73534605B" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</associations>
+</Column>
+<Column name="RELEASE_ID" id="05469C26-D17A-1BB7-5744-446B586431E0">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5242EFDE-2A6F-C6F6-0C66-7910FF89CEAA" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
+</associations>
+</Column>
+<Column name="REVISION_DOC" id="F363BDD3-022A-64BC-62D0-EDACD3AB195D">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STATE" id="9ECAC4BC-39A3-5FCA-F28C-D05035188135">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CREATED_BY" id="34127FB4-775C-2FDF-84D2-86B24F92C654">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C7F665DF-D82F-B685-988F-892A98FB460C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="OWNER_USER_ID" id="459018A3-6C05-9DD0-8764-E42BE3222BAE">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8F5275C5-64AE-560D-54D7-01C1D40F27C9" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="54A3DB96-BCD6-0F97-E104-AD617642A230">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="00074476-47BA-FD47-87A8-81C764644E7D" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="1E203852-60B3-B3A7-C709-D892C6529582">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="525A5502-100B-53B3-B42A-11B64F3B0AB0">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_NUM" id="AC7ED823-D567-6C75-EADD-1AA887583EBE">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_TRACKING_NUM" id="A31D2492-A481-D573-C834-C9BFFD62FD00">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_ACTION" id="9BA7A555-647F-E4ED-DFA7-CEDE481C0732">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,3,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CURRENT_XBT_ID" id="461144BE-B64A-FED4-8F8B-DA0190F5A6FC">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_DEPRECATED" id="91A93932-C9FB-59FA-5C17-4DF20B14FBD6">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:02:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
@@ -105,6 +290,56 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="DF5262D9-1BBE-A3D5-2014-8D548EF9788F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D547D707-7E30-FAF4-EAFF-0AC79A28EF4D" name="XBT_MODULE_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:04:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="47BDA518-1002-CE04-A769-21578A76E1C8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="1D00CF6B-1FA8-0196-5C61-B160C6448471" name="XBT_RELEASE_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:04:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="05469C26-D17A-1BB7-5744-446B586431E0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="47042EAC-EA0B-05D4-B436-E55ED992761E" name="XBT_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:04:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="34127FB4-775C-2FDF-84D2-86B24F92C654"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6D23B1B2-83F5-D329-8A2D-8EEB14E9CAF1" name="XBT_OWNER_USER_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:04:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="459018A3-6C05-9DD0-8764-E42BE3222BAE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0557B502-1A99-3F8E-42E1-78115E06AA32" name="XBT_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-06-14 21:04:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="54A3DB96-BCD6-0F97-E104-AD617642A230"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/SyncRiskControlLibrary.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RiskControlLibrary.xsd"/>
+        <xsd:element name="SyncRiskControlLibrary" type="SyncRiskControlLibraryType" id="oagis-id-064cad86da774fbb89b55ed390e40799">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncRiskControlLibrary is to supply RiskControlLibrary information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncRiskControlLibraryType" id="oagis-id-eb90ea7493ef45ba9d100d2661dbb53a">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncRiskControlLibraryDataAreaType" id="oagis-id-1291391bee6a4e87b6485c03bbfbded9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncRiskControlLibrary. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (RiskControlLibrary).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncRiskControlLibraryDataAreaType" id="oagis-id-94a9b82a89d14c2c9cf05d1657b17af7">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-22c03fa2ef2c47298a99298404b19c89"/>
+                        <xsd:element ref="RiskControlLibrary" maxOccurs="unbounded" id="oagis-id-d21568fddb3b4add94b40375613c2c1e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

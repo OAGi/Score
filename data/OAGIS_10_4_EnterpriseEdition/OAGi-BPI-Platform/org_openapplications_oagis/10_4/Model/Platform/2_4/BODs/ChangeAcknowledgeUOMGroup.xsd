@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeAcknowledgeUOMGroup.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/UOMGroup.xsd"/>
+	<xsd:element name="ChangeAcknowledgeUOMGroup" type="ChangeAcknowledgeUOMGroupType" id="oagis-id-311c00a387fa45d9920be80aba27aac6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeUOMGroup is to supply a set of Unit-Of-Measure relationships to another business application module.
+
+This BOD addresses the need for applications to exchange item-independent alternative UOM information beyond the stocking UOM. See the Item UOM Integration Scenario for more detailed information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeUOMGroupType" id="oagis-id-01a9982571d84795b7739eb22be1d75f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeUOMGroupDataAreaType" id="oagis-id-5a14b5dfe2594f00a49498dd8a8ba247">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeUOMGroup. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (UOMGroup).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeUOMGroupDataAreaType" id="oagis-id-41a7f7d28f704af0b83c6b71348117a1">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-fec7f721e8314a328e656cedb13c325a"/>
+			<xsd:element ref="UOMGroup" maxOccurs="unbounded" id="oagis-id-21dcb6a374b8452f98d91f87bb734a24"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

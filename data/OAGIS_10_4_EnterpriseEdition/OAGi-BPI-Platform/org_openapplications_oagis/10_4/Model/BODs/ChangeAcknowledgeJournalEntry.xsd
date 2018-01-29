@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10rc2  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10rc2/Model/BODs/ChangeAcknowledgeJournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/JournalEntry.xsd"/>
+	<xsd:element name="ChangeAcknowledgeJournalEntry" type="ChangeAcknowledgeJournalEntryType" id="oagis-id-9b2f2509316e401c8dae84a8baf1ef44">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeJournalEntry is to enable an application or component to respond to a ProcessJournalEntry.
+
+The response to the ChangeAcknowledgeJournalEntry is the response to the ProcessJournalEntry. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeJournalEntryType" id="oagis-id-ab62965d889c4544bfd0109f98e9c49f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeJournalEntryDataAreaType" id="oagis-id-93f66058e55245548e909eb1f8bbc22c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeJournalEntry. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (JournalEntry). In response to the PostJournalEntry.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeJournalEntryDataAreaType" id="oagis-id-6a18e2a4c7664ebe96c9c8ee51c9fa0c">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-1b3294adaa3d42f8b0f58aeda9b011bf"/>
+			<xsd:element ref="JournalEntry" maxOccurs="unbounded" id="oagis-id-a650b5dd216e4932b8b7d202864a459d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

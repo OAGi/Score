@@ -17,6 +17,6 @@ public interface BasicBusinessInformationEntityPropertyRepository
     public BasicBusinessInformationEntityProperty findOneByBasedBccpIdAndOwnerTopLevelAbieId(long basedBccpId, long ownerTopLevelAbieId);
 
     @Modifying
-    @Query("delete from BasicBusinessInformationEntityProperty a where a.ownerTopLevelAbieId = ?1")
+    @Query("delete from BasicBusinessInformationEntityProperty b where b.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 }

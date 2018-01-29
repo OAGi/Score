@@ -1,18 +1,28 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.node.*;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
+import org.oagi.srt.common.lucene.CaseSensitiveStandardAnalyzer;
+import org.oagi.srt.model.node.ASCCPNode;
+import org.oagi.srt.model.node.BCCPNode;
+import org.oagi.srt.model.node.CCNode;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
-import org.primefaces.event.NodeExpandEvent;
+import org.oagi.srt.web.jsf.beans.SearchFilter;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +38,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.common.util.Utility.*;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -53,15 +68,24 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
 
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
+
+    private long releaseId;
     private AggregateCoreComponent targetAcc;
     private AggregateCoreComponent userExtensionAcc;
 
-    private LinkedList<TreeNode> treeNodeLinkedList = new LinkedList();
-    private int treeNodeLinkedListIndex = -1;
+    private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
     private DataType selectedBdt;
+
+    private static final String PROPERTY_TERM_FIELD = "property_term";
+    private static final String MODULE_FIELD = "module";
+    private static final String DEFINITION_FIELD = "definition";
 
     @PostConstruct
     public void init() {
@@ -69,13 +93,28 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
+        AggregateCoreComponent ueAcc = accRepository.findOne(Long.parseLong(accId));
+        setUserExtensionAcc(ueAcc);
+
+        List<AssociationCoreComponentProperty> asccpList =
+                asccpRepository.findByRoleOfAccId(ueAcc.getAccId()).stream()
+                        .filter(e -> e.getReleaseId() == 0L)
+                        .collect(Collectors.toList());
+        assert asccpList.size() == 1;
+
+        List<AssociationCoreComponent> asccList =
+                asccRepository.findByToAsccpIdAndRevisionNumAndState(asccpList.get(0).getAsccpId(), 1, Published);
+        assert asccList.size() == 1;
+
+        AssociationCoreComponent ascc = asccList.get(0);
+        releaseId = ascc.getReleaseId();
+
+        AggregateCoreComponent targetAcc = coreComponentService.findAcc(ascc.getFromAccId(), releaseId);
         setTargetAcc(targetAcc);
 
-        TreeNode treeNode = createTreeNode(targetAcc);
+        boolean enableShowingGroup = false;
+        TreeNode treeNode = createTreeNode(targetAcc, releaseId, enableShowingGroup);
         setTreeNode(treeNode);
-
-        setUserExtensionAcc(extensionService.findUserExtensionAcc(targetAcc));
     }
 
     @Override
@@ -96,40 +135,15 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
     }
 
     public TreeNode getTreeNode() {
-        return treeNodeLinkedList.get(treeNodeLinkedListIndex);
+        return treeNode;
     }
 
     public void setTreeNode(TreeNode treeNode) {
-        while (treeNodeLinkedListIndex + 1 < treeNodeLinkedList.size()) {
-            treeNodeLinkedList.removeLast();
-        }
-        treeNodeLinkedList.add(++treeNodeLinkedListIndex, treeNode);
-
-    }
-
-    public boolean canBack() {
-        return (treeNodeLinkedListIndex > 0);
-    }
-
-    public boolean canForward() {
-        return (treeNodeLinkedListIndex + 1) < treeNodeLinkedList.size();
-    }
-
-    public void navigateBack() {
-        treeNodeLinkedListIndex--;
-    }
-
-    public void navigateForward() {
-        treeNodeLinkedListIndex++;
-    }
-
-    public void navigateForward(AggregateCoreComponent acc) {
-        TreeNode treeNode = createTreeNode(acc);
-        setTreeNode(treeNode);
+        this.treeNode = treeNode;
     }
 
     public TreeNode getRootNode() {
-        return treeNodeLinkedList.get(0).getChildren().get(0);
+        return (treeNode.getChildCount() > 0) ? treeNode.getChildren().get(0) : null;
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -176,11 +190,26 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
+    @Autowired
+    private SimpleASCCPRepository simpleASCCPRepository;
+
     private boolean preparedAppendAscc;
-    private List<AssociationCoreComponentProperty> allAsccpList;
-    private List<AssociationCoreComponentProperty> asccpList;
+    private List<SimpleASCCP> allAsccpList;
+    private Map<Long, SimpleASCCP> allAsccpMap;
+    private List<SimpleASCCP> asccpList;
+
     private String selectedAsccpPropertyTerm;
-    private AssociationCoreComponentProperty selectedAsccp;
+    private String selectedAsccpDefinition;
+    private String selectedAsccpModule;
+
+    private SimpleASCCP selectedAsccp;
+
+    private Directory asccp_directory, asccp_definition_index;
+
+    private void resetAsccpStates() {
+        this.selectedAsccp = null;
+        this.asccpCheckBoxes = new HashMap();
+    }
 
     public boolean isPreparedAppendAscc() {
         return preparedAppendAscc;
@@ -191,11 +220,11 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         setPreparedAppend(preparedAppendAscc);
     }
 
-    public List<AssociationCoreComponentProperty> getAsccpList() {
+    public List<SimpleASCCP> getAsccpList() {
         return asccpList;
     }
 
-    public void setAsccpList(List<AssociationCoreComponentProperty> asccpList) {
+    public void setAsccpList(List<SimpleASCCP> asccpList) {
         this.asccpList = asccpList;
     }
 
@@ -207,66 +236,164 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         this.selectedAsccpPropertyTerm = selectedAsccpPropertyTerm;
     }
 
-    public AssociationCoreComponentProperty getSelectedAsccp() {
+    public String getSelectedAsccpDefinition() {
+        return selectedAsccpDefinition;
+    }
+
+    public void setSelectedAsccpDefinition(String selectedAsccpDefinition) {
+        this.selectedAsccpDefinition = selectedAsccpDefinition;
+    }
+
+    public String getSelectedAsccpModule() {
+        return selectedAsccpModule;
+    }
+
+    public void setSelectedAsccpModule(String selectedAsccpModule) {
+        this.selectedAsccpModule = selectedAsccpModule;
+    }
+
+    public SimpleASCCP getSelectedAsccp() {
         return selectedAsccp;
     }
 
-    public void setSelectedAsccp(AssociationCoreComponentProperty selectedAsccp) {
-        this.selectedAsccp = selectedAsccp;
+    public void setSelectedAsccp(SimpleASCCP selectedAsccp) {
+        if (selectedAsccp != null) {
+            getAsccpCheckBox(selectedAsccp.getAsccpId()).setChecked(true);
+        }
     }
 
     public void onAsccpRowSelect(SelectEvent event) {
-        setSelectedAsccp((AssociationCoreComponentProperty) event.getObject());
+        getAsccpCheckBox(((SimpleASCCP) event.getObject()).getAsccpId()).setChecked(true);
     }
 
     public void onAsccpRowUnselect(UnselectEvent event) {
-        setSelectedAsccp(null);
+        getAsccpCheckBox(((SimpleASCCP) event.getObject()).getAsccpId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> asccpCheckBoxes = new HashMap();
+    public class AsccpCheckBox {
+        private Long asccpId;
+
+        public AsccpCheckBox(Long asccpId) {
+            this.asccpId = asccpId;
+        }
+
+        public boolean isChecked() {
+            return asccpCheckBoxes.getOrDefault(asccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            asccpCheckBoxes = new HashMap();
+
+            if (value) {
+                SimpleASCCP previousOne = getSelectedAsccp();
+                if (previousOne != null) {
+                    asccpCheckBoxes.put(previousOne.getAsccpId(), false);
+                }
+
+                selectedAsccp = allAsccpMap.get(asccpId);
+            } else {
+                selectedAsccp = null;
+            }
+
+            asccpCheckBoxes.put(asccpId, value);
+        }
+    }
+
+    public AsccpCheckBox getAsccpCheckBox(Long asccpId) {
+        return new AsccpCheckBox(asccpId);
     }
 
     public void prepareAppendAscc() {
-        allAsccpList = asccpRepository.findAll().stream()
-                .filter(e -> !e.isDeprecated())
-                .filter(e -> e.isReusableIndicator())
-                .collect(Collectors.toList());
-        setAsccpList(
-                allAsccpList.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                        .collect(Collectors.toList())
-        );
+        allAsccpList = simpleASCCPRepository.findAll();
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allAsccpList = coreComponentBeanHelper.filterByUser(allAsccpList, getCurrentUser(), SimpleASCCP.class);
+        allAsccpMap = allAsccpList.stream()
+                .collect(Collectors.toMap(SimpleASCCP::getAsccpId, Function.identity()));
+
+        asccp_directory = createDirectory(allAsccpList,
+                new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
+                new String[]{" ", Pattern.quote("\\")},
+                SimpleASCCP::getPropertyTerm, SimpleASCCP::getModule);
+        asccp_definition_index = createDirectoryForText(allAsccpList,
+                new String[]{DEFINITION_FIELD},
+                SimpleASCCP::getDefinition);
+
+        searchAsccp();
         setPreparedAppendAscc(true);
     }
 
-    public List<String> completeInputAsccp(String query) {
-        return allAsccpList.stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
-    }
+    public void onClickAppendASCCButton() {
+        setSelectedAsccpPropertyTerm(null);
+        setSelectedAsccpDefinition(null);
+        setSelectedAsccpModule(null);
 
-    public void onSelectAsccpPropertyTerm(SelectEvent event) {
-        setSelectedAsccpPropertyTerm(event.getObject().toString());
+        resetAsccpStates();
     }
 
     public void searchAsccp() {
-        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedAsccpPropertyTerm());
-        if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setAsccpList(allAsccpList.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
-        } else {
-            setAsccpList(
-                    allAsccpList.stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
-                            .collect(Collectors.toList())
-            );
+        String propertyTerm = getSelectedAsccpPropertyTerm();
+        String definition = getSelectedAsccpDefinition();
+        String module = getSelectedAsccpModule();
+
+        List<SimpleASCCP> asccpList = allAsccpList;
+        try {
+            if (!StringUtils.isEmpty(definition)) {
+                IndexReader reader = DirectoryReader.open(asccp_definition_index);
+                IndexSearcher searcher = new IndexSearcher(reader);
+
+                Query q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                TopDocs topDocs = searcher.search(q, asccpList.size());
+                if (topDocs.totalHits == 0L) {
+                    definition = Arrays.stream(definition.split(" "))
+                            .map(e -> suggestWord(e, asccp_definition_index, DEFINITION_FIELD))
+                            .collect(Collectors.joining(" "));
+
+                    q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                    topDocs = searcher.search(q, asccpList.size());
+                }
+
+                List<SimpleASCCP> l = new ArrayList();
+                for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    Document d = searcher.doc(scoreDoc.doc);
+                    l.add(toObject(d.getBinaryValue("obj").bytes, SimpleASCCP.class));
+                }
+                asccpList = l;
+            }
+        } catch (IOException | ParseException e) {
+            throw new IllegalStateException(e);
         }
+
+        asccpList = asccpList.stream()
+                .filter(new SearchFilter<>(propertyTerm, asccp_directory, PROPERTY_TERM_FIELD, " ", SimpleASCCP::getPropertyTerm))
+                .filter(new SearchFilter<>(module, asccp_directory, MODULE_FIELD, "\\", SimpleASCCP::getModule))
+                .sorted((a, b) -> {
+                    if (!StringUtils.isEmpty(propertyTerm)) {
+                        return compareLevenshteinDistance(propertyTerm, a, b, SimpleASCCP::getPropertyTerm);
+                    }
+                    if (!StringUtils.isEmpty(module)) {
+                        return compareLevenshteinDistance(module, a, b, SimpleASCCP::getModule, Pattern.quote("\\"));
+                    }
+
+                    return 0;
+                })
+                .collect(Collectors.toList());
+
+        setAsccpList(asccpList);
+
         setPreparedAppendAscc(true);
+        resetAsccpStates();
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void appendAscc() {
-        AssociationCoreComponentProperty selectedAsccpLookup = getSelectedAsccp();
+        SimpleASCCP selectedAsccpLookup = getSelectedAsccp();
         if (selectedAsccpLookup == null) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
@@ -285,13 +412,13 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         }
 
         User user = getCurrentUser();
-        ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
+        ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, releaseId, user);
 
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
         ASCCPNode asccpNode =
-                nodeService.createCoreComponentTreeNode(result.getAscc());
+                nodeService.createCoreComponentTreeNode(result.getAscc(), true);
         TreeNode child = toTreeNode(asccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -309,11 +436,26 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
     @Autowired
     private BasicCoreComponentPropertyRepository bccpRepository;
+    @Autowired
+    private SimpleBCCPRepository simpleBCCPRepository;
+
     private boolean preparedAppendBcc;
-    private List<BasicCoreComponentProperty> allBccpList;
-    private List<BasicCoreComponentProperty> bccpList;
+    private List<SimpleBCCP> allBccpList;
+    private Map<Long, SimpleBCCP> allBccpMap;
+    private List<SimpleBCCP> bccpList;
+
     private String selectedBccpPropertyTerm;
-    private BasicCoreComponentProperty selectedBccp;
+    private String selectedBccpDefinition;
+    private String selectedBccpModule;
+
+    private SimpleBCCP selectedBccp;
+
+    private Directory bccp_directory, bccp_definition_index;
+
+    private void resetBccpStates() {
+        this.selectedBccp = null;
+        this.bccpCheckBoxes = new HashMap();
+    }
 
     public boolean isPreparedAppendBcc() {
         return preparedAppendBcc;
@@ -324,11 +466,11 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         setPreparedAppend(preparedAppendBcc);
     }
 
-    public List<BasicCoreComponentProperty> getBccpList() {
+    public List<SimpleBCCP> getBccpList() {
         return bccpList;
     }
 
-    public void setBccpList(List<BasicCoreComponentProperty> bccpList) {
+    public void setBccpList(List<SimpleBCCP> bccpList) {
         this.bccpList = bccpList;
     }
 
@@ -340,65 +482,164 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         this.selectedBccpPropertyTerm = selectedBccpPropertyTerm;
     }
 
-    public BasicCoreComponentProperty getSelectedBccp() {
+    public String getSelectedBccpDefinition() {
+        return selectedBccpDefinition;
+    }
+
+    public void setSelectedBccpDefinition(String selectedBccpDefinition) {
+        this.selectedBccpDefinition = selectedBccpDefinition;
+    }
+
+    public String getSelectedBccpModule() {
+        return selectedBccpModule;
+    }
+
+    public void setSelectedBccpModule(String selectedBccpModule) {
+        this.selectedBccpModule = selectedBccpModule;
+    }
+
+    public SimpleBCCP getSelectedBccp() {
         return selectedBccp;
     }
 
-    public void setSelectedBccp(BasicCoreComponentProperty selectedBccp) {
-        this.selectedBccp = selectedBccp;
+    public void setSelectedBccp(SimpleBCCP selectedBccp) {
+        if (selectedBccp != null) {
+            getBccpCheckBox(selectedBccp.getBccpId()).setChecked(true);
+        }
     }
 
     public void onBccpRowSelect(SelectEvent event) {
-        setSelectedBccp((BasicCoreComponentProperty) event.getObject());
+        getBccpCheckBox(((SimpleBCCP) event.getObject()).getBccpId()).setChecked(true);
     }
 
     public void onBccpRowUnselect(UnselectEvent event) {
-        setSelectedBccp(null);
+        getBccpCheckBox(((SimpleBCCP) event.getObject()).getBccpId()).setChecked(false);
     }
 
+    private Map<Long, Boolean> bccpCheckBoxes = new HashMap();
+    public class BccpCheckBox {
+        private Long bccpId;
+
+        public BccpCheckBox(Long bccpId) {
+            this.bccpId = bccpId;
+        }
+
+        public boolean isChecked() {
+            return bccpCheckBoxes.getOrDefault(bccpId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bccpCheckBoxes = new HashMap();
+
+            if (value) {
+                SimpleBCCP previousOne = getSelectedBccp();
+                if (previousOne != null) {
+                    bccpCheckBoxes.put(previousOne.getBccpId(), false);
+                }
+
+                selectedBccp = allBccpMap.get(bccpId);
+            } else {
+                selectedBccp = null;
+            }
+
+            bccpCheckBoxes.put(bccpId, value);
+        }
+    }
+
+    public BccpCheckBox getBccpCheckBox(Long asccpId) {
+        return new BccpCheckBox(asccpId);
+    }
+
+
     public void prepareAppendBcc() {
-        allBccpList = bccpRepository.findAll().stream()
-                .filter(e -> !e.isDeprecated())
-                .collect(Collectors.toList());
-        setBccpList(
-                allBccpList.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                        .collect(Collectors.toList())
-        );
+        allBccpList = simpleBCCPRepository.findAll();
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allBccpList = coreComponentBeanHelper.filterByUser(allBccpList, getCurrentUser(), SimpleBCCP.class);
+        allBccpMap = allBccpList.stream()
+                .collect(Collectors.toMap(SimpleBCCP::getBccpId, Function.identity()));
+
+        bccp_directory = createDirectory(allBccpList,
+                new String[]{PROPERTY_TERM_FIELD, MODULE_FIELD},
+                new String[]{" ", Pattern.quote("\\")},
+                SimpleBCCP::getPropertyTerm, SimpleBCCP::getModule);
+        bccp_definition_index = createDirectoryForText(allBccpList,
+                new String[]{DEFINITION_FIELD},
+                SimpleBCCP::getDefinition);
+
+        searchBccp();
         setPreparedAppendBcc(true);
     }
 
-    public List<String> completeInputBccp(String query) {
-        return allBccpList.stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
-    }
+    public void onClickAppendBCCButton() {
+        setSelectedBccpPropertyTerm(null);
+        setSelectedBccpDefinition(null);
+        setSelectedBccpModule(null);
 
-    public void onSelectBccpPropertyTerm(SelectEvent event) {
-        setSelectedBccpPropertyTerm(event.getObject().toString());
+        resetBccpStates();
     }
 
     public void searchBccp() {
-        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedBccpPropertyTerm());
-        if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setBccpList(allBccpList.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
-        } else {
-            setBccpList(
-                    allBccpList.stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
-                            .collect(Collectors.toList())
-            );
+        String propertyTerm = getSelectedBccpPropertyTerm();
+        String definition = getSelectedBccpDefinition();
+        String module = getSelectedBccpModule();
+
+        List<SimpleBCCP> bccpList = allBccpList;
+        try {
+            if (!StringUtils.isEmpty(definition)) {
+                IndexReader reader = DirectoryReader.open(bccp_definition_index);
+                IndexSearcher searcher = new IndexSearcher(reader);
+
+                Query q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                TopDocs topDocs = searcher.search(q, bccpList.size());
+                if (topDocs.totalHits == 0L) {
+                    definition = Arrays.stream(definition.split(" "))
+                            .map(e -> suggestWord(e, bccp_definition_index, DEFINITION_FIELD))
+                            .collect(Collectors.joining(" "));
+
+                    q = new QueryParser(DEFINITION_FIELD, new CaseSensitiveStandardAnalyzer()).parse(definition);
+                    topDocs = searcher.search(q, bccpList.size());
+                }
+
+                List<SimpleBCCP> l = new ArrayList();
+                for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    Document d = searcher.doc(scoreDoc.doc);
+                    l.add(toObject(d.getBinaryValue("obj").bytes, SimpleBCCP.class));
+                }
+                bccpList = l;
+            }
+        } catch (IOException | ParseException e) {
+            throw new IllegalStateException(e);
         }
+
+        bccpList = bccpList.stream()
+                .filter(new SearchFilter<>(propertyTerm, bccp_directory, PROPERTY_TERM_FIELD, " ", SimpleBCCP::getPropertyTerm))
+                .filter(new SearchFilter<>(module, bccp_directory, MODULE_FIELD, "\\", SimpleBCCP::getModule))
+                .sorted((a, b) -> {
+                    if (!StringUtils.isEmpty(propertyTerm)) {
+                        return compareLevenshteinDistance(propertyTerm, a, b, SimpleBCCP::getPropertyTerm);
+                    }
+                    if (!StringUtils.isEmpty(module)) {
+                        return compareLevenshteinDistance(module, a, b, SimpleBCCP::getModule, Pattern.quote("\\"));
+                    }
+
+                    return 0;
+                })
+                .collect(Collectors.toList());
+
+        setBccpList(bccpList);
         setPreparedAppendBcc(true);
+        resetBccpStates();
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void appendBcc() {
-        BasicCoreComponentProperty selectedBccpLookup = getSelectedBccp();
+        SimpleBCCP selectedBccpLookup = getSelectedBccp();
         if (selectedBccpLookup == null) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
@@ -417,13 +658,13 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         }
 
         User user = getCurrentUser();
-        ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
+        ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, releaseId, user);
 
         TreeNode rootNode = getRootNode();
         ((CCNode) rootNode.getData()).reload();
 
         BCCPNode bccpNode =
-                nodeService.createCoreComponentTreeNode(result.getBcc());
+                nodeService.createCoreComponentTreeNode(result.getBcc(), false);
         TreeNode child = toTreeNode(bccpNode, rootNode);
 
         getSelectedTreeNode().setSelected(false);
@@ -521,62 +762,6 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);
-    }
-
-    private void reorderTreeNode(TreeNode treeNode) {
-        List<TreeNode> children = treeNode.getChildren();
-        Collections.sort(children, (a, b) -> {
-            int s1 = getSeqKey(a);
-            int s2 = getSeqKey(b);
-            int compareTo = s1 - s2;
-            if (compareTo != 0) {
-                return compareTo;
-            } else {
-                if (a instanceof BDTSCNode || b instanceof BDTSCNode) {
-                    return 0;
-                } else {
-                    Date aTs = getCreationTimestamp(a);
-                    Date bTs = getCreationTimestamp(b);
-                    return aTs.compareTo(bTs);
-                }
-            }
-        });
-
-        /*
-         * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
-         * to clarify children's order for node selection
-         */
-        for (int i = 0, len = children.size(); i < len; ++i) {
-            TreeNode child = children.get(i);
-            String childRowKey = (treeNode.getParent() == null) ? String.valueOf(i) : treeNode.getRowKey() + "_" + i;
-            child.setRowKey(childRowKey);
-        }
-
-        for (TreeNode child : children) {
-            reorderTreeNode(child);
-        }
-    }
-
-    private int getSeqKey(TreeNode treeNode) {
-        Object data = treeNode.getData();
-        if (data instanceof ASCCPNode) {
-            return ((ASCCPNode) data).getAscc().getSeqKey();
-        } else if (data instanceof BCCPNode) {
-            return ((BCCPNode) data).getBcc().getSeqKey();
-        }
-        return -1;
-    }
-
-    private Date getCreationTimestamp(TreeNode treeNode) {
-        Object data = treeNode.getData();
-        if (data instanceof ASCCPNode) {
-            return ((ASCCPNode) data).getAsccp().getCreationTimestamp();
-        } else if (data instanceof BCCPNode) {
-            return ((BCCPNode) data).getBccp().getCreationTimestamp();
-        } else if (data instanceof ACCNode) {
-            return ((ACCNode) data).getAcc().getCreationTimestamp();
-        }
-        return null;
     }
 
     @Transactional(rollbackFor = Throwable.class)

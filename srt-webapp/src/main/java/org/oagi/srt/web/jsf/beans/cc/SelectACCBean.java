@@ -3,36 +3,42 @@ package org.oagi.srt.web.jsf.beans.cc;
 import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.OagisComponentType;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.CoreComponentService;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
 @ManagedBean
-@SessionScoped
+@ViewScoped
 @Transactional(readOnly = true)
 public class SelectACCBean extends AbstractCoreComponentBean {
 
     @Autowired
     private AggregateCoreComponentRepository accRepository;
+
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<AggregateCoreComponent> accList;
     private String objectClassTerm;
@@ -40,13 +46,30 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     @PostConstruct
     public void init() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
+        types = requestParameterMap.get("types");
+        states = requestParameterMap.get("states");
+
         setAccList(allACCs());
     }
 
     private List<AggregateCoreComponent> allACCs() {
-        return accRepository.findAll(new Sort(Sort.Direction.DESC, "lastUpdateTimestamp")).stream()
-                .filter(e -> Published == e.getState())
+        List<AggregateCoreComponent> allACCs =
+                accRepository.findAllByRevisionNum(0).stream()
+                .filter(e -> e.getOagisComponentType() != OagisComponentType.UserExtensionGroup)
+                .sorted((a, b) -> b.getLastUpdateTimestamp().compareTo(a.getLastUpdateTimestamp()))
                 .collect(Collectors.toList());
+
+        /*
+         * Issue #477
+         *
+         * The OAGi developers should be able to select only OAGi developers' components
+         * when making a reference to a component
+         */
+        allACCs = coreComponentBeanHelper.filterByUser(allACCs, getCurrentUser(), AggregateCoreComponent.class);
+
+        return allACCs;
     }
 
     public List<AggregateCoreComponent> getAccList() {
@@ -120,12 +143,22 @@ public class SelectACCBean extends AbstractCoreComponentBean {
         }
     }
 
+    // To support 'back' button to go back 'list' page.
+    private String types;
+    private String states;
+
+    public void back() throws IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component");
+    }
+
     @Transactional
-    public String createASCCP() {
+    public void createASCCP() throws IOException {
         User requester = getCurrentUser();
         AggregateCoreComponent roleOfAcc = getSelectedACC();
         AssociationCoreComponentProperty asccp = coreComponentService.newAssociationCoreComponentProperty(requester, roleOfAcc);
 
-        return "/views/core_component/asccp_details.xhtml?asccpId=" + asccp.getAsccpId() + "&faces-redirect=true";
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.redirect("/core_component/asccp/" + asccp.getAsccpId());
     }
 }

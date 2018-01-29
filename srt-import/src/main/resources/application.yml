@@ -27,7 +27,7 @@ spring:
         cache:
           use_second_level_cache: false
         ejb:
-          interceptor: org.oagi.srt.persistence.populate.EntityUpdateInterceptor
+          interceptor: org.oagi.srt.persistence.populate.script.oracle.OracleEntityUpdateInterceptor
 
   batch:
     initializer:
@@ -38,6 +38,19 @@ logging:
     org.oagi.srt: DEBUG
     org.springframework: INFO
     org.hibernate.SQL: INFO
+
+# HSQL environment
+---
+spring:
+  profiles: hsql
+
+  datasource:
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    url: jdbc:oracle:thin:@localhost:1521/OAGISRTDB
+    username: oagi
+    password: oagi
+    platform: oracle
+    auto-commit: false
 
 # Staging environment
 ---

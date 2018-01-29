@@ -1,12 +1,10 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.node.ASBIEPNode;
-import org.oagi.srt.repository.BusinessContextRepository;
-import org.oagi.srt.repository.ModuleRepository;
-import org.oagi.srt.repository.ProfileBODRepository;
-import org.oagi.srt.repository.TopLevelAbieRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.entity.Release;
 import org.oagi.srt.repository.entity.TopLevelAbie;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
@@ -67,6 +65,8 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
      */
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
+    @Autowired
+    private ReleaseRepository releaseRepository;
     @Autowired
     private NodeService nodeService;
     @Autowired
@@ -304,9 +304,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
             ASBIEPNode topLevelNode = getTopLevelNode();
             nodeService.validate(topLevelNode);
-            nodeService.copy(topLevelNode, getCurrentUser(), selectedBusinessContext, progressListener);
 
-            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+            long releaseId = selectedProfileBOD.getReleaseId();
+            Release release = (releaseId > 0L) ? releaseRepository.findOne(releaseId) : Release.WORKING_RELEASE;
+            nodeService.copy(topLevelNode, release, getCurrentUser(), selectedBusinessContext, progressListener);
+
+            return "/views/profile_bod/list.jsf?faces-redirect=true";
         } finally {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("PF('loadingBlock').hide()");

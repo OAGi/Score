@@ -20,9 +20,9 @@
                                     completeMethod="#{codeListBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
-                                     icon="ui-icon-search"/>
-                    <p:button value="Create Code List without Base" style="float: right; padding: 3px 0 3px 0;"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
+                                     icon="fa fa-white fa-search"/>
+                    <p:button id="createCLwithoutBaseBtn" value="Create Code List without Base" style="float: right; padding: 3px 0 3px 0;"
                               outcome="/views/code_list/create_wo_base.xhtml"/>
                 </f:facet>
                 <p:dataTable id="tbl" var="cVO"
@@ -33,9 +33,7 @@
                     <p:ajax event="rowSelect" listener="#{codeListBean.onRowSelect}"/>
                     <p:ajax event="rowUnselect" listener="#{codeListBean.onRowUnselect}"/>
                     <p:column headerText="Name" sortBy="#{cVO.name}">
-                        <h:link value="#{cVO.name}" outcome="/views/code_list/details.xhtml">
-                            <f:param name="codeListId" value="#{cVO.codeListId}"/>
-                        </h:link>
+                        <a href="/code_list/#{cVO.codeListId}">#{cVO.name}</a>
                     </p:column>
                     <p:column headerText="Based Code List" sortBy="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}">
                         <h:link value="#{codeListBean.getBasedCodeListName(cVO.basedCodeListId)}" outcome="/views/code_list/details.xhtml">

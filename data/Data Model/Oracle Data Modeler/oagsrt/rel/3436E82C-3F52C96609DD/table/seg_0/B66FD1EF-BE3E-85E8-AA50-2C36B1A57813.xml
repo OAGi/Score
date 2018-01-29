@@ -32,10 +32,26 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="636F2D66-BBFA-B0D5-0282-7E474A140BED" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+<Column name="RELEASE_ID" id="9B4DD1FD-4C58-8A79-DC03-6030191827D6">
+<createdBy>hno2</createdBy>
+<createdTime>2017-11-30 22:02:30 UTC</createdTime>
+<commentInRDBMS>RELEASE_ID is an incremental integer. It is an unformatted counter part of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. A release ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated RELEASE_ID because some revisions may never be released. USER_EXTENSION_GROUP component type is never part of a release.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="76F0416C-3DFE-8587-5969-42046BEA6DD1" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
 </associations>
 </Column>
 <Column name="OWNER_USER_ID" id="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9">
@@ -46,7 +62,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="5D5A4B99-7A57-0BC9-6D34-A087F466B03C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -97,6 +113,16 @@
 <colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="68EAB670-E12C-55AB-1870-D56ED9879E28" name="TOP_LEVEL_ABIE_APP_USER_FKv1">
+<createdBy>hno2</createdBy>
+<createdTime>2017-11-30 22:01:53 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:05:54 UTC</createdTime>
@@ -105,6 +131,26 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7DC0D099-F355-6680-4123-B10E8A708829" name="TOP_LEVEL_ABIE_RELEASE_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2017-11-30 22:03:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9B4DD1FD-4C58-8A79-DC03-6030191827D6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0CC382DE-CF5F-D199-C113-83CA0E6B6E55" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2018-01-25 14:32:31 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

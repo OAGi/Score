@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/AcknowledgeWarrantyClaim.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarrantyClaim.xsd"/>
+	<xsd:element name="AcknowledgeWarrantyClaim" type="AcknowledgeWarrantyClaimType" id="oagis-id-f67d9bdbaa444f71af4923ca96728e97">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeWarrantyClaim Business Object Document is to acknowledge receipt of the WarrantyClaim</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeWarrantyClaimType" id="oagis-id-d9391821babe473c85722689c4625ac2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeWarrantyClaimDataAreaType" id="oagis-id-7b29d3b7993540b3bbd0e9307657ae2c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeWarrantyClaim. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (WarrantyClaim).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeWarrantyClaimDataAreaType" id="oagis-id-cee8456d772949ce9278d257199acc4f">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-4a3d950607654b67bff810a15c198c7d"/>
+			<xsd:element ref="WarrantyClaim" maxOccurs="unbounded" id="oagis-id-d5418e25da6847729ec01fb2a04187b1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

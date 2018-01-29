@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/LoadBudgetLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BudgetLedger.xsd"/>
+        <xsd:element name="LoadBudgetLedger" type="LoadBudgetLedgerType" id="oagis-id-df61136b385d4d19bc775766f85b144a">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadBudgetLedger is to transmit budget amounts from all possible source applications throughout an enterprise to a general ledger or budget application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="LoadBudgetLedgerType" id="oagis-id-33484a8fd21a47e7897be60ecc31cc08">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="LoadBudgetLedgerDataAreaType" id="oagis-id-eb782b7fabe84acfa4f5630c5e31bd45">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadBudgetLedger. The information consists of a Verb and one or more Nouns. The verb (Load) indicates the action to be performed on the Noun (BudgetLedger).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="LoadBudgetLedgerDataAreaType" id="oagis-id-ed6188549f084e9dbe592ff1ad7d79ce">
+                <xsd:sequence>
+                        <xsd:element ref="Load" id="oagis-id-a6dced423e534763a39c403e06dcc63f"/>
+                        <xsd:element ref="BudgetLedger" maxOccurs="unbounded" id="oagis-id-b327f9b3aa934da4aa60af7b52a1653c"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

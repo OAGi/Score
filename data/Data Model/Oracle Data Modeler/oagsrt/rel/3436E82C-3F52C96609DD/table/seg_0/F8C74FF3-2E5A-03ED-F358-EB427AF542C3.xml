@@ -1,0 +1,105 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F8C74FF3-2E5A-03ED-F358-EB427AF542C3" name="USAGE_RULE_EXPRESSION">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 13:03:16 UTC</createdTime>
+<commentInRDBMS>The USAGE_RULE_EXPRESSION provides a representation of a usage rule in a particular syntax indicated by the CONSTRAINT_TYPE column. One of the syntaxes can be unstructured, which works a description of the usage rule.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_40</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="USAGE_RULE_EXPRESSION_ID" id="1B5BB722-A5C2-727B-0406-5E5D67F02C0D">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 13:05:47 UTC</createdTime>
+<commentInRDBMS>Primary key of the usage rule expression</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONSTRAINT_TYPE" id="44010B91-41A8-A05F-5A56-750734B0DC70">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 13:51:17 UTC</createdTime>
+<commentInRDBMS>Constraint type according to the CC spec. It represents the expression language (syntax) used in the CONSTRAINT column. It is a value list column. 0 = &apos;Unstructured&apos; which is basically a description of the rule, 1 = &apos;Schematron&apos;.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<ownDataTypeParameters>,5,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONSTRAINT_TEXT" id="307552A7-43B8-6EC8-0FC7-F174653ECCFE">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 13:51:18 UTC</createdTime>
+<commentInRDBMS>This column capture the constraint expressing the usage rule. In other words, this is the expression.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REPRESENTED_USAGE_RULE_ID" id="F58400CE-DD1E-86FD-BE49-052F2415559E">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:19:10 UTC</createdTime>
+<commentInRDBMS>The usage rule which the expression represents</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E57BB824-E1A3-E488-334A-2970F3658753" referredColumn="D3DC6B1C-213B-2973-AAD0-243B23D9166A"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="C699C821-B1B3-F8B5-914D-F6C45D28B741" name="USAGE_RULE_EXPRESSION_PK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 13:05:48 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1B5BB722-A5C2-727B-0406-5E5D67F02C0D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="555B642C-301F-7BAC-4231-C1BB036B282B" name="URE_URXPS_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:42:57 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1B5BB722-A5C2-727B-0406-5E5D67F02C0D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4A27EB76-6731-0679-186E-A99B0DBC2259" name="URE_REP_USAGE_RULE_ID_IDX">
+<createdBy>hakju</createdBy>
+<createdTime>2017-06-28 01:44:12 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F58400CE-DD1E-86FD-BE49-052F2415559E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="62095771-32C0-37FD-777F-EFCC3356E16C" name="USAGE_RULE_XPS_REPS_UR_ID_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2017-06-27 14:20:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F58400CE-DD1E-86FD-BE49-052F2415559E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

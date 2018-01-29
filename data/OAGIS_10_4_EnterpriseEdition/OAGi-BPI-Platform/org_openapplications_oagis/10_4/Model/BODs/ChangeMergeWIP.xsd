@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeMergeWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MergeWIP.xsd"/>
+	<xsd:element name="ChangeMergeWIP" type="ChangeMergeWIPType" id="oagis-id-3a1585b163cf4b05a7df1607014b9ab6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeMergeWIP BOD is to Change a Manufacturing Application of the creation of a single production lot from multiple production lots of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lots, the resulting lot, lot quantities, and the Changeing step at which this event occurred, along with the time at which this event occurred.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeMergeWIPType" id="oagis-id-43672c8426a94b698f08bd9b4361c0a6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeMergeWIPDataAreaType" id="oagis-id-05b5caa6ac1248c5abadf95ce4a8c20c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeMergeWIP. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (MergeWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeMergeWIPDataAreaType" id="oagis-id-c7856c19b13c4afdb9de76a9bb3bf782">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-40c3f1aa53ce4af7b425cdaaefbc52f9"/>
+			<xsd:element ref="MergeWIP" maxOccurs="unbounded" id="oagis-id-d15ae93eda3d4ecdb1cfb770c47d8e40"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

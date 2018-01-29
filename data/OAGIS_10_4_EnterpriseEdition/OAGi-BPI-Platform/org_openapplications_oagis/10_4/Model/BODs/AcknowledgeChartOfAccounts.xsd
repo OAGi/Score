@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/AcknowledgeChartOfAccounts.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ChartOfAccounts.xsd"/>
+	<xsd:element name="AcknowledgeChartOfAccounts" type="AcknowledgeChartOfAccountsType" id="oagis-id-5537b5c902704ae38e1119dc19fbbf26">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeChartOfAccounts is to supply ChartOfAccounts information to another business application module. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeChartOfAccountsType" id="oagis-id-1e8e9434a6c5499fb9fa639a13314a7d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeChartOfAccountsDataAreaType" id="oagis-id-5ecd33a786c5442da66aaa548368c933">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeChartOfAccounts. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (ChartOfAccounts).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeChartOfAccountsDataAreaType" id="oagis-id-e1ef1226c6c24806b012d572c74c7f2e">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-1f4cd67c9f55432dbddf454113ccdb23"/>
+			<xsd:element ref="ChartOfAccounts" maxOccurs="unbounded" id="oagis-id-82b8ec0867814d549a63373fd0c5edcc"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

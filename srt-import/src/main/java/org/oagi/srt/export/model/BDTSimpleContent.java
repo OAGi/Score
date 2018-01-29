@@ -8,22 +8,27 @@ import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BDTSimpleContent implements BDTSimple {
+public class BDTSimpleContent extends AbstractBDTSimple {
 
     private DataType dataType;
 
     private DataType baseDataType;
 
+    private boolean isDefaultBDT;
+
     private List<BDTSC> dtScList;
 
     private ImportedDataProvider importedDataProvider;
 
-    public BDTSimpleContent(DataType dataType, DataType baseDataType,
+    public BDTSimpleContent(DataType dataType, DataType baseDataType, boolean isDefaultBDT,
                             List<DataTypeSupplementaryComponent> dtScList,
                             ImportedDataProvider importedDataProvider) {
-        this.importedDataProvider = importedDataProvider;
+        super(importedDataProvider);
+
         this.dataType = dataType;
         this.baseDataType = baseDataType;
+        this.isDefaultBDT = isDefaultBDT;
+        this.importedDataProvider = importedDataProvider;
         this.dtScList = map(dtScList);
     }
 
@@ -36,6 +41,21 @@ public class BDTSimpleContent implements BDTSimple {
     @Override
     public long getBdtId() {
         return dataType.getDtId();
+    }
+
+    @Override
+    public boolean isDefaultBDT() {
+        return isDefaultBDT;
+    }
+
+    @Override
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    @Override
+    public DataType getBaseDataType() {
+        return baseDataType;
     }
 
     public String getName() {

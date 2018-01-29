@@ -81,8 +81,8 @@
                         <p:ajax update="form"/>
                     </h:inputText>
 
-                    <h:outputText for="name" value="Extensible" styleClass="section-label"/>
-                    <h:selectBooleanCheckbox value="#{codeListCreateFromAnotherBean.codeList.extensibleIndicator}"
+                    <h:outputText for="extensibleCB" value="Extensible" styleClass="section-label"/>
+                    <h:selectBooleanCheckbox id="extensibleCB" value="#{codeListCreateFromAnotherBean.codeList.extensibleIndicator}"
                                              styleClass="section-content input-section" style="text-align: left;">
                         <p:ajax update="form"/>
                     </h:selectBooleanCheckbox>
@@ -91,7 +91,7 @@
             <p:panel>
                 <f:facet name="header">
                     <h:outputText value="Code List Values"/>
-                    <p:commandButton value="Add" style="float: right;"
+                    <p:commandButton id="addBtn" value="Add" style="float: right;"
                                      actionListener="#{codeListCreateFromAnotherBean.addCodeListValue}" update="tbl"/>
                 </f:facet>
 
@@ -177,7 +177,7 @@
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
-                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                        <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{codeListCreateFromAnotherBean.deleteCodeListValue}"
                                          update="tbl" rendered="#{codeListValue.color == 'Green'}">
                             <f:setPropertyActionListener value="#{codeListValue}"
@@ -188,16 +188,16 @@
 
                 <p:separator/>
 
-                <p:commandButton ajax="true" value="Save"
+                <p:commandButton id="saveBtn" ajax="true" value="Save"
                                  actionListener="#{codeListCreateFromAnotherBean.setState('Editing')}"
                                  action="#{codeListCreateFromAnotherBean.update()}"/>
 
-                <p:commandButton ajax="true" value="Publish"
+                <p:commandButton id="publishBtn" ajax="true" value="Publish"
                                  actionListener="#{codeListCreateFromAnotherBean.setState('Published')}"
                                  action="#{codeListCreateFromAnotherBean.update()}"/>
             </p:panel>
 
-            <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+            <p:confirmDialog id="confirmDifferentNameButSameIdentityDlg" widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     You are about to create a code list with the different name but same identity
@@ -205,14 +205,14 @@
                     (i.e., same Agency ID and List ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
-            <p:confirmDialog widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
+            <p:confirmDialog id="confirmDifferentListIdButSameIdentityDlg" widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
                     You are about to create a code list with the same List ID but different name and Agency ID
@@ -220,10 +220,10 @@
                     (i.e., same name and Agency ID but different List ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton value="Accept" icon="ui-icon-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmSameListIdButDifferentIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
                                      onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>

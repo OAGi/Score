@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/BODs/ChangeMoveProductForecast.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MoveProductForecast.xsd"/>
+        <xsd:element name="ChangeMoveProductForecast" type="ChangeMoveProductForecastType" id="oagis-id-2658f88cfc504a8fad62dcf255d7047a">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Change Purchaseorder is to request another business application to make changes to an existing Purchase Order.  This change must refer to the original document and/or item ordered.  The change processing assumes replacement of fields sent, with the exception the identifying fields of the Purchase Order.
+
+If any of these key fields require changing, (i.e. the MoveProductForecast Document Id or a LineNumber) that constitutes a cancellation of the request and/or the addition of another Purchase Order.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeMoveProductForecastType" id="oagis-id-65d81364acc54fc58008d2ac2f91ef54">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeMoveProductForecastDataAreaType" id="oagis-id-5dcd8ee2c45848eb99fe16c561263415">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeMoveProductForecast. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (MoveProductForecast).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeMoveProductForecastDataAreaType" id="oagis-id-cbfd5faa171e473c99fb51ff3047c204">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-52d44237eb074c1d89cbf5e4e2508e95"/>
+                        <xsd:element ref="MoveProductForecast" maxOccurs="unbounded" id="oagis-id-1aa9386adfc1440ca1e3187841211140"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

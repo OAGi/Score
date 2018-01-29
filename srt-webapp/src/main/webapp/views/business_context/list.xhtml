@@ -19,10 +19,10 @@
                                     completeMethod="#{businessContextBean.completeInput}">
                         <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
-                    <p:commandButton value="Search" ajax="true" actionListener="#{businessContextBean.search}"
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{businessContextBean.search}"
                                      update="tbl1"
-                                     icon="ui-icon-search"/>
-                    <p:button value="Create Business Context"
+                                     icon="fa fa-white fa-search"/>
+                    <p:button id="createBtn" value="Create Business Context"
                               style="float: right; padding: 3px 0 3px 0;"
                               outcome="/views/business_context/details.xhtml"/>
                 </f:facet>
@@ -31,14 +31,11 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
                     <p:column headerText="Name" sortBy="#{businessContext.name}">
-                        <h:link value="#{businessContext.name}" outcome="/views/business_context/details.xhtml">
-                            <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
-                        </h:link>
+                        <a href="/context_management/business_context/#{businessContext.guid}">#{businessContext.name}</a>
                         <div>
-                            <h:link value="GUID: #{businessContext.guid}" outcome="/views/business_context/details.xhtml"
-                                    style="font-size: 12px !important; color: #767676 !important;">
-                                <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
-                            </h:link>
+                            <a href="/context_management/business_context/#{businessContext.guid}">
+                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{businessContext.guid}</span>
+                            </a>
                         </div>
                     </p:column>
                 </p:dataTable>

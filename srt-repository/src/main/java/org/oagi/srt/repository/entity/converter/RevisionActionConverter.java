@@ -11,7 +11,7 @@ public class RevisionActionConverter
 
     @Override
     public Integer convertToDatabaseColumn(RevisionAction attribute) {
-        return (attribute == null) ? 0 : attribute.getValue();
+        return (attribute == null) ? null : attribute.getValue();
     }
 
     @Override

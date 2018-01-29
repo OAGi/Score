@@ -8,6 +8,7 @@ import org.oagi.srt.model.node.BIENode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BusinessContext;
+import org.oagi.srt.repository.entity.Release;
 import org.oagi.srt.service.NodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -122,7 +123,7 @@ public class BusinessInformationEntityTreeNodeTests {
         BusinessContext bizCtx = new BusinessContext();
 
         ASBIEPNode acknowledgePurchaseOrderTreeNode =
-                treeNodeService.createBusinessInformationEntityTreeNode(acknowledgePurchaseOrderAsccp, bizCtx);
+                treeNodeService.createBusinessInformationEntityTreeNode(acknowledgePurchaseOrderAsccp, Release.WORKING_RELEASE, bizCtx);
         assertThat(acknowledgePurchaseOrderTreeNode).isNotNull();
         assertThat(acknowledgePurchaseOrderTreeNode.hasChild()).isEqualTo(true);
 

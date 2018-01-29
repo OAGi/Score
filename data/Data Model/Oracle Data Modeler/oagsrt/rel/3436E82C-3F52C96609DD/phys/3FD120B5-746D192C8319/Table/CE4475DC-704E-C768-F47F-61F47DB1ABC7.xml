@@ -1,0 +1,128 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CTX_SCHEME" directorySegmentName="seg_0" id="CE4475DC-704E-C768-F47F-61F47DB1ABC7">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="DESCRIPTION" id="1188E690-28E6-4610-B90B-5BFA85573CBF">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCHEME_NAME" id="14F569DC-35B6-6BD8-50D1-25C5A2AEEDFA">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CREATION_TIMESTAMP" id="41FC5702-F5F6-1B25-B827-59B1F7CFC7A9">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCHEME_AGENCY_ID" id="42752C20-2454-2D5F-0A90-DA926510C1E0">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CTX_SCHEME_ID" id="56F2441F-0547-29EE-4E9E-29D73C6AB59B">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="LAST_UPDATED_BY" id="699F45A2-0F52-B118-73FA-35FFECED1EFC">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="GUID" id="9056F459-3815-EC29-0091-55C10D026CA6">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCHEME_ID" id="A3271DB4-9A1F-441D-D83F-8E686729C1D0">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CREATED_BY" id="AAC3CA0B-76EF-32FA-863E-44C99E2B3D04">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCHEME_VERSION_ID" id="B635F10A-B464-446A-6824-68C1CB23D8A8">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="CTX_CATEGORY_ID" id="BDFCC157-254E-A5C4-6527-51729A7DEAE9">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="LAST_UPDATE_TIMESTAMP" id="CEA0929A-4DDC-2C90-9250-60AB8F079188">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CTX_SCH_CREATED_BY_IDX" id="18F2F450-3153-7B21-C4F8-32660E21779C">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CTX_SCH_CTX_CAT_ID_IDX" id="3B963DC2-F707-12D9-3B3F-7073D15B3BED">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CTX_SCH_LAST_UPDATED_BY_IDX" id="C1CD7B77-D977-AB46-ABFF-70D0953BC959">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CTX_SCH_PK_IDX" id="EA378CC0-2F4B-A068-94E0-637ED7D4F62D">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CTX_SCHEME_CREATED_BY_FK" id="7BB2D7F4-A2DD-87A6-158B-47ED2398985D">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CTX_SCHEME_CTX_CAT_ID_FK" id="B6682EF0-70AD-CBBE-1237-3386F41769C2">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CTX_SCHEME_LAST_UPDATED_BY_FK" id="B6BF8C4E-6944-1A64-0531-50BB9BB4484A">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CTX_SCHEME_PK" id="7E6DC314-309E-80A6-D110-3AA32E25DAB7">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="CTX_SCHEME_UK1" id="6CA402C9-9E5C-072C-98CA-26498D1E9119">
+<createdBy>hno2</createdBy>
+<createdTime>2017-10-27 14:57:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev12c>

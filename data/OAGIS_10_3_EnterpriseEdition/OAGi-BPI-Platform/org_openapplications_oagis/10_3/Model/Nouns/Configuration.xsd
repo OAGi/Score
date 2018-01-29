@@ -48,7 +48,7 @@
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="TokenType" use="optional" id="oagis-id-fc050a840f0c4565a90062192e2442dd"/>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fc050a840f0c4565a90062192e2442dd"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-ac54d234db9541f6a7cfe4c68c792962"/>
 	</xsd:complexType>
 	<xsd:complexType name="ConfigurationHeaderBaseType" id="oagis-id-838a9d73486d4fe9932627bde4fec74c">
@@ -73,7 +73,7 @@
 					</xsd:element>
 					<xsd:element ref="Effectivity" id="oagis-id-21c2aa79f318456c8c9aa2a149d481b2" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/9">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="ProductLeadTimeStatus" id="oagis-id-9c8b46725ef74973b4299a567ef7e832" minOccurs="0"/>
@@ -139,9 +139,11 @@ This field is updated by the LoadProjectAccounting BOD.
 				<xsd:sequence>
 					<xsd:element name="Extension" type="ConfigurationHeaderExtensionType" id="oagis-id-8e472c6fd97d4b01aa534901c80709c7" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -173,9 +175,11 @@ This field is updated by the LoadProjectAccounting BOD.
 				<xsd:sequence>
 					<xsd:element name="Extension" type="ConfigurationLineExtensionType" id="oagis-id-270fcec2a125467d85fe82ef393f9988" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -228,9 +232,11 @@ This field is updated by the LoadProjectAccounting BOD.
 				<xsd:sequence>
 					<xsd:element name="Extension" type="ConfiguredItemExtensionType" id="oagis-id-2839e88211564bcd8e49d7ab3bc497b0" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
-							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

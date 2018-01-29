@@ -42,7 +42,7 @@ public class UIHandler {
                 if (facesContext != null) {
                     ExternalContext externalContext = facesContext.getExternalContext();
                     if (externalContext != null) {
-                        externalContext.dispatch("/login.xhtml");
+                        externalContext.dispatch("/login.jsf");
                     }
                 }
             } catch (IOException e) {

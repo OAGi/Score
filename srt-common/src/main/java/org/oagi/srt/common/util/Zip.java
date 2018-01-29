@@ -1,36 +1,48 @@
 package org.oagi.srt.common.util;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Zip {
-	static final int BUFFER = 2048;
 
-	public static String compression (String filename) throws IOException {
-		BufferedInputStream origin = null;
-		File filepath = File.createTempFile(filename, ".zip");
-		FileOutputStream dest = new FileOutputStream(filepath);
-		ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-		// out.setMethod(ZipOutputStream.DEFLATED);
-		byte data[] = new byte[BUFFER];
+    private static final Logger logger = LoggerFactory.getLogger(Zip.class);
+    private static final int BUFFER = 2048;
 
-		File f = new File(filepath.getParentFile(), "package");
-		File files[] = f.listFiles();
-		System.out.println("Compressing files in Zip format...");
-		for (int i = 0; i < files.length; i++) {
-			System.out.println("Adding: " + files[i]);
-			FileInputStream fi = new FileInputStream(files[i]);
-			origin = new BufferedInputStream(fi, BUFFER);
-			ZipEntry entry = new ZipEntry(files[i].getName());
-			out.putNextEntry(entry);
-			int count;
-			while ((count = origin.read(data, 0, BUFFER)) != -1) {
-				out.write(data, 0, count);
-			}
-			origin.close();
-		}
-		out.close();
-		return filepath.getCanonicalPath();
-	}
+    public static File compression(List<File> targetFiles, String filename) throws IOException {
+        File file = File.createTempFile("oagis-", null);
+        FileOutputStream dest = new FileOutputStream(file);
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {
+            // out.setMethod(ZipOutputStream.DEFLATED);
+            byte data[] = new byte[BUFFER];
+
+            logger.info("Compressing files in Zip format...");
+            for (File targetFile : targetFiles) {
+                logger.info("Adding: " + targetFile);
+                FileInputStream fi = new FileInputStream(targetFile);
+                try (BufferedInputStream origin = new BufferedInputStream(fi, BUFFER)) {
+                    ZipEntry entry = new ZipEntry(targetFile.getName());
+                    out.putNextEntry(entry);
+                    int count;
+                    while ((count = origin.read(data, 0, BUFFER)) != -1) {
+                        out.write(data, 0, count);
+                    }
+                    out.flush();
+                }
+            }
+        }
+
+        File renamedFile = new File(file.getParentFile(), filename + ".zip");
+        if (file.renameTo(renamedFile)) {
+            FileUtils.deleteQuietly(file);
+            file = renamedFile;
+        }
+
+        return file;
+    }
 }

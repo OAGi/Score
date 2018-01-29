@@ -18,7 +18,7 @@
     <div class="container">
         <div class="header"></div>
         <div class="row row-centered">
-            <form accept-charset="UTF-8" method="post">
+            <form id="loginForm" accept-charset="UTF-8" method="post">
                 <div class="col-lg-4 col-md-4 col-centered">
                     <h1 class="text-center">Sign in to OAGi SRT Application</h1>
                     <c:if test="${param.error != null}">
@@ -42,12 +42,12 @@
                             </div>
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                            <input class="btn btn-primary btn-block" type="submit" value="Sign in" tabindex="3"></input>
+                            <input id="signInBtn" class="btn btn-primary btn-block" type="submit" value="Sign in" tabindex="3"></input>
                         </div>
                     </div>
                     <div class="create-account-callout" style="line-height: 12px;">
                         <p>New to OAGi SRT Application?</p>
-                        <h:link outcome="/views/user/join.xhtml">Create an account</h:link>
+                        <h:link id="newAccountLink" outcome="/views/user/join.xhtml">Create an account</h:link>
                     </div>
                 </div>
             </form>

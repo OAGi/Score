@@ -1,10 +1,10 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -75,6 +75,11 @@ public class BasicBusinessInformationEntityProperty
     @Override
     public void setId(long id) {
         setBbiepId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BBIEP";
     }
 
     public long getBbiepId() {
@@ -335,14 +340,14 @@ public class BasicBusinessInformationEntityProperty
         return hashCodeAfterLoaded != hashCode();
     }
 
-    @Override
     public BasicBusinessInformationEntityProperty clone() {
         BasicBusinessInformationEntityProperty clone = new BasicBusinessInformationEntityProperty();
-        clone.guid = Utility.generateGUID();
+        clone.guid = this.guid;
         clone.basedBccpId = this.basedBccpId;
         clone.definition = this.definition;
         clone.remark = this.remark;
         clone.bizTerm = this.bizTerm;
+        clone.afterLoaded();
         return clone;
     }
 }

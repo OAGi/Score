@@ -44,10 +44,22 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
 
     @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
+    @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
@@ -92,8 +104,12 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findDtScByOwnerDtIdMap = dtScRepository.findAll().stream()
                 .collect(Collectors.groupingBy(DataTypeSupplementaryComponent::getOwnerDtId));
 
-        findBdtPriRestriListByDtIdMap = bdtPriRestriRepository.findAll().stream()
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
+        findBdtPriRestriListByDtIdMap = bdtPriRestriList.stream()
                 .collect(Collectors.groupingBy(BusinessDataTypePrimitiveRestriction::getBdtId));
+
+        cdtAwdPriXpsTypeMapMap = cdtAwdPriXpsTypeMapRepository.findAll().stream()
+                .collect(Collectors.toMap(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getCdtAwdPriXpsTypeMapId, Function.identity()));
 
         findBdtScPriRestriListByDtScIdMap = bdtScPriRestriRepository.findAll().stream()
                 .collect(Collectors.groupingBy(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId));
@@ -101,20 +117,32 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findCdtScAwdPriXpsTypeMapMap = cdtScAwdPriXpsTypeMapRepository.findAll().stream()
                 .collect(Collectors.toMap(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getCdtScAwdPriXpsTypeMapId, Function.identity()));
 
-        findXbtMap = xbtRepository.findAll().stream()
+        findCdtScAwdPriMap = cdtScAwdPriRepository.findAll().stream()
+                .collect(Collectors.toMap(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId, Function.identity()));
+
+        List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findAll();
+        findCdtAwdPriMap = cdtAwdPriList.stream()
+                .collect(Collectors.toMap(CoreDataTypeAllowedPrimitive::getCdtAwdPriId, Function.identity()));
+
+        List<CoreDataTypePrimitive> cdtPriList = cdtPriRepository.findAll();
+        findCdtPriMap = cdtPriList.stream()
+                .collect(Collectors.toMap(CoreDataTypePrimitive::getCdtPriId, Function.identity()));
+
+        findXbtList = xbtRepository.findAll();
+        findXbtMap = findXbtList.stream()
                 .collect(Collectors.toMap(XSDBuiltInType::getXbtId, Function.identity()));
 
-        findACCList = accRepository.findAll(new Sort(Sort.Direction.ASC, "accId"));
+        findACCList = accRepository.findAllByRevisionNum(0);
         findAccMap = findACCList.stream()
                 .collect(Collectors.toMap(AggregateCoreComponent::getAccId, Function.identity()));
 
-        findASCCPList = asccpRepository.findAll(new Sort(Sort.Direction.ASC, "asccpId"));
+        findASCCPList = asccpRepository.findAllByRevisionNum(0);
         findAsccpMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getAsccpId, Function.identity()));
         findAsccpByGuidMap = findASCCPList.stream()
                 .collect(Collectors.toMap(AssociationCoreComponentProperty::getGuid, Function.identity()));
 
-        findBCCPList = bccpRepository.findAll(new Sort(Sort.Direction.ASC, "bccpId"));
+        findBCCPList = bccpRepository.findAllByRevisionNum(0);
         findBccpMap = findBCCPList.stream()
                 .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
 
@@ -200,6 +228,23 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return (findBdtPriRestriListByDtIdMap.containsKey(dtId)) ? findBdtPriRestriListByDtIdMap.get(dtId) : Collections.emptyList();
     }
 
+    private Map<Long, CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAwdPriXpsTypeMapMap;
+
+    @Override
+    public CoreDataTypeAllowedPrimitiveExpressionTypeMap findCdtAwdPriXpsTypeMapById(long cdtAwdPriXpsTypeMapId) {
+        return cdtAwdPriXpsTypeMapMap.get(cdtAwdPriXpsTypeMapId);
+    }
+
+    @Override
+    public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findCdtAwdPriXpsTypeMapListByDtId(long dtId) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = findBdtPriRestriListByDtId(dtId);
+        List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAwdPriXpsTypeMapList = bdtPriRestriList.stream()
+                .filter(e -> e.getCdtAwdPriXpsTypeMapId() > 0L)
+                .map(e -> cdtAwdPriXpsTypeMapMap.get(e.getCdtAwdPriXpsTypeMapId()))
+                .collect(Collectors.toList());
+        return (cdtAwdPriXpsTypeMapList != null) ? cdtAwdPriXpsTypeMapList : Collections.emptyList();
+    }
+
     private Map<Long, List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction>> findBdtScPriRestriListByDtScIdMap;
 
     @Override
@@ -212,6 +257,33 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
     @Override
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(long cdtScAwdPriXpsTypeMapId) {
         return findCdtScAwdPriXpsTypeMapMap.get(cdtScAwdPriXpsTypeMapId);
+    }
+
+    private Map<Long, CoreDataTypeSupplementaryComponentAllowedPrimitive> findCdtScAwdPriMap;
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive findCdtScAwdPri(long cdtScAwdPriId) {
+        return findCdtScAwdPriMap.get(cdtScAwdPriId);
+    }
+
+    private List<XSDBuiltInType> findXbtList;
+
+    @Override
+    public List<XSDBuiltInType> findXbt() {
+        return findXbtList;
+    }
+
+    private Map<Long, CoreDataTypeAllowedPrimitive> findCdtAwdPriMap;
+
+    @Override
+    public CoreDataTypeAllowedPrimitive findCdtAwdPri(long cdtAwdPriId) {
+        return findCdtAwdPriMap.get(cdtAwdPriId);
+    }
+
+    private Map<Long, CoreDataTypePrimitive> findCdtPriMap;
+
+    public CoreDataTypePrimitive findCdtPri(long cdtPriId) {
+        return findCdtPriMap.get(cdtPriId);
     }
 
     private Map<Long, XSDBuiltInType> findXbtMap;

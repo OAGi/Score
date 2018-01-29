@@ -1,20 +1,20 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.BasicCoreComponentEntityTypeConverter;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
-import org.springframework.util.StringUtils;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "bcc")
-public class BasicCoreComponent
-        implements CoreComponentRelation, CreatorModifierAware, TimestampAware, Serializable, Cloneable {
+public class BasicCoreComponent implements
+        CoreComponentRelation, RevisionAware {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 
@@ -59,6 +59,9 @@ public class BasicCoreComponent
     @Lob
     @Column(length = 10 * 1024)
     private String definition;
+
+    @Column(length = 100)
+    private String definitionSource;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -106,15 +109,23 @@ public class BasicCoreComponent
     @Column
     private String defaultValue;
 
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
+    public BasicCoreComponent() {
+        init();
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
+    @Override
+    public long getId() {
+        return getBccId();
+    }
+
+    @Override
+    public void setId(long id) {
+        setBccId(id);
+    }
+
+    @Override
+    public String tableName() {
+        return "BCC";
     }
 
     public long getBccId() {
@@ -208,9 +219,15 @@ public class BasicCoreComponent
     }
 
     public void setDefinition(String definition) {
-        if (!StringUtils.isEmpty(definition)) {
-            this.definition = definition;
-        }
+        this.definition = definition;
+    }
+
+    public String getDefinitionSource() {
+        return definitionSource;
+    }
+
+    public void setDefinitionSource(String definitionSource) {
+        this.definitionSource = definitionSource;
     }
 
     public long getCreatedBy() {
@@ -289,7 +306,7 @@ public class BasicCoreComponent
         return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(long releaseId) {
+    public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -325,10 +342,9 @@ public class BasicCoreComponent
         this.defaultValue = defaultValue;
     }
 
-    @Override
     public BasicCoreComponent clone() {
         BasicCoreComponent clone = new BasicCoreComponent();
-        clone.setGuid(Utility.generateGUID());
+        clone.setGuid(this.guid);
         clone.setCardinalityMin(this.cardinalityMin);
         clone.setCardinalityMax(this.cardinalityMax);
         clone.setFromAccId(this.fromAccId);
@@ -337,6 +353,7 @@ public class BasicCoreComponent
         clone.setEntityType(this.entityType);
         clone.setDen(this.den);
         clone.setDefinition(this.definition);
+        clone.setDefinitionSource(this.definitionSource);
         clone.setCreatedBy(this.createdBy);
         clone.setLastUpdatedBy(this.lastUpdatedBy);
         clone.setOwnerUserId(this.ownerUserId);
@@ -387,6 +404,7 @@ public class BasicCoreComponent
         result = 31 * result + (entityType != null ? entityType.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
@@ -417,6 +435,7 @@ public class BasicCoreComponent
                 ", entityType=" + entityType +
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
                 ", lastUpdatedBy=" + lastUpdatedBy +
@@ -432,6 +451,85 @@ public class BasicCoreComponent
                 ", nillable=" + nillable +
                 ", defaultValue='" + defaultValue + '\'' +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    private void init() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+                BasicCoreComponent bcc = (BasicCoreComponent) object;
+                bcc.afterLoaded();
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
     }
 
     @Transient

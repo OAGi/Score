@@ -20,6 +20,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -96,23 +97,37 @@ public class BusinessContextDetailBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        String paramBizCtxId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("bizCtxId");
-        if (StringUtils.isEmpty(paramBizCtxId)) {
-            setBusinessContext(new BusinessContext());
-        } else {
-            Long bizCtxId = Long.parseLong(paramBizCtxId);
-            if (bizCtxId != null) {
-                BusinessContext businessContext = businessContextService.findById(bizCtxId);
-                setBusinessContext(businessContext);
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
-                List<BusinessContextValue> businessContextValues =
-                        businessContextService.findByBizCtxId(businessContext.getBizCtxId());
-                setBusinessContextValues(businessContextValues.stream()
-                        .map(e -> new BCV(e)).collect(Collectors.toList()));
+        String paramBizCtxId = requestParameterMap.get("bizCtxId");
+        if (!StringUtils.isEmpty(paramBizCtxId)) {
+            Long bizCtxId = Long.parseLong(paramBizCtxId);
+            BusinessContext businessContext = businessContextService.findById(bizCtxId);
+            initBusinessContext(businessContext);
+        } else {
+            String paramBizCtxGuid = requestParameterMap.get("bizCtxGuid");
+            if (!StringUtils.isEmpty(paramBizCtxGuid)) {
+                BusinessContext businessContext = businessContextService.findOneByGuid(paramBizCtxGuid);
+                initBusinessContext(businessContext);
+            } else {
+                setBusinessContext(new BusinessContext());
             }
         }
 
         businessContextValueModel = new ListDataModel(businessContextValues);
+    }
+
+    private void initBusinessContext(BusinessContext businessContext) {
+        setBusinessContext(businessContext);
+
+        long bizCtxId = businessContext.getBizCtxId();
+        if (bizCtxId > 0L) {
+            List<BusinessContextValue> businessContextValues =
+                    businessContextService.findByBizCtxId(businessContext.getBizCtxId());
+            setBusinessContextValues(businessContextValues.stream()
+                    .map(e -> new BCV(e)).collect(Collectors.toList()));
+        }
     }
 
     private BusinessContext businessContext;
@@ -236,6 +251,12 @@ public class BusinessContextDetailBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String update() {
         String name = businessContext.getName();
+        if (StringUtils.isEmpty(name)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Please fill out 'Name' field."));
+            return null;
+        }
+
         if (!businessContextService.findByName(name).stream()
                 .filter(e -> e.getBizCtxId() != businessContext.getBizCtxId())
                 .collect(Collectors.toList()).isEmpty()) {
@@ -281,7 +302,7 @@ public class BusinessContextDetailBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "/views/business_context/list.xhtml?faces-redirect=true";
+        return "/views/business_context/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -299,6 +320,6 @@ public class BusinessContextDetailBean extends UIHandler {
 
         businessContextService.deleteById(bizCtxId);
 
-        return "/views/business_context/list.xhtml?faces-redirect=true";
+        return "/views/business_context/list.jsf?faces-redirect=true";
     }
 }

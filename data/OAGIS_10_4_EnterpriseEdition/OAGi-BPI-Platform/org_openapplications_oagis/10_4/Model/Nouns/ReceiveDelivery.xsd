@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_4  
+   Date:               05 Jan 2018
+   Copyright 1997-2018, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2018). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_4/Model/Nouns/ReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_4/Common/Components/Components.xsd"/>
+	<xsd:element name="ReceiveDelivery" type="ReceiveDeliveryType" id="oagis-id-a9adbed175374f989c52602c82dafa49">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Represents a transaction for the receiving of goods or services.  It may be used to indicate receipt of goods in conjunction with a purchase order system.
+
+The Delivery document contains CHARGE and DISTRIBUTN elements at various levels to support the assessment of receiving service or compliance penalty charges.  Several large retailers that demand receiving efficiency commonly assess penalty charges for supplier deliveries that are not compliant with the retailer's policies.  Charges may be incurred for deliveries, ship units or items that contain discrepancies from what was ordered or electronically manifested, for improper labeling of items and ship units and the incorrect packing or loading of ship units.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceiveDeliveryHeader" type="ReceiveDeliveryHeaderType" id="oagis-id-862f40de3b6a4bc8b0a41f9198bcc6f8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the ReceiveDelivery receipt document that is used to receive a specific quantity of material goods from a supplier.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceiveDeliveryItem" type="ReceiveDeliveryItemType" id="oagis-id-5075fd02ca1241c1b53016a6430e290d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the requested and actual quantities.  This information usually directly references a line item or Delivery schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceiptDiscrepancy" type="ReceiveDeliveryDiscrepancyType" id="oagis-id-4da930874d4f4b94bfb1c1c5a0c4fe4d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides receiving discrepancy information for the ReceiveDelivery header as a whole, for a particular ReceiptLine, for the receipt of a shipping unit as a whole  ReceiptLine, or to a particular item within the shipping unit (ReceiptUnit).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceiveDeliveryUnit" type="ReceiveDeliveryUnitType" id="oagis-id-527959fec2db4e86b096a0529ab6133e"/>
+	<xsd:element name="ReceiveDeliveryUnitItem" type="ReceiveDeliveryUnitItemType" id="oagis-id-da25067d7e0e4b19a73546c9bcaef84f"/>
+	<xsd:complexType name="ReceiveDeliveryType" id="oagis-id-5976faf802a243c6bab289758993ffba">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ReceiveDelivery typically report on the ReceiveDeliveryItems.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ReceiveDeliveryHeader" id="oagis-id-58daac78fc4944debc803076b1f5c1b2" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the ReceiveDelivery receipt document that is used to receive a specific quantity of material goods from a supplier.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ReceiveDeliveryItem" id="oagis-id-55e2d5d53f1d467987e1e015c1f47a99" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the item inventory being delivered, including the requested and actual quantities.  This information usually directly references a line item or Delivery schedule line on a sales order, purchase order or other inventory transfer document.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ReceiveDeliveryUnit" id="oagis-id-bcb85141aacc43829d8337a8a90d6f7b" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-ea166de2e72d43d780aa17a29ce00b81"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-c0f3da0267934485a0da7ec0ed147b51"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryHeaderBaseType" id="oagis-id-df581b0ad3794e05aeb5b09f97a3f467">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the ReceiveDelivery document that is used to receive a specific quantity of material goods
+
+The EffectiveDateTime is the date/time the received material is posted to other business systems as being available for use.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ShipHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ReceivingServiceChargeAmount" id="oagis-id-dad275587bcc459da49aaeb669b6ba4b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This indicates the receiving service  charge associated with the receiving document either as a whole, or at line level dpending on usage</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveDateTime" id="oagis-id-86ee65ed428a4f05883be556c952b165" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the DateTime the associated object is made effective</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivedDateTime" id="oagis-id-fffe9b5ef5ae4e8f9aa8556a4f18f7b0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The date and time that the associated object was received.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BillOfLadingID" id="oagis-id-5c48e1f40add412bb726e7a9126d495a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">BillOFLadingID where used as a reference to the BillOfLading is deprecated in favor of BillOfLadingReference in 9.2 release.
+
+Is the bill of lading identifier.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Container" id="oagis-id-cc11ba45b85a4979b39112718d015c72" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Uniquely identifies a shipping container</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivedByParty" id="oagis-id-c13d88c2c19640deb6888baf9fbfdbdd" minOccurs="0"/>
+					<xsd:element ref="ContainerQuantity" id="oagis-id-8829ee1391b54619b1a2d21e30df99c2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A numeric expression of the number of outer containers for product shipping.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TrackingID" id="oagis-id-b3096fb3e82e40d29d7153034a445f2a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TRACKINGID is a unique identifier for the purpose of tracking an individual package or shipment
+
+Examples of a valid TRACKINGID include:
+•An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
+•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.  
+•A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
+•The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DeliverToParty" id="oagis-id-7c1c8f6f27764c078aaf1ee48f741325" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the Party (the person or organization) to receive delivery of a the associated entitys.  This can be goods, services, cheques, etc.
+
+Several examples of the value of this field include an office number, a complete address, or a person</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivingLocation" id="oagis-id-306887414a08427da25ff6623cf6e10e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies a physical or logical point of receipt within a receiving organization</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ASNReference" id="oagis-id-cb9b99ad7f5a4e458d88017136cdce2b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies an Advanced Shipment Notice document</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceiptDiscrepancy" id="oagis-id-1cb8e206c3e440f0af215ae9880651da" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides receiving discrepancy information for the ReceiveDelivery header as a whole, for a particular ReceiptLine, for the receipt of a shipping unit as a whole  ReceiptLine, or to a particular item within the shipping unit (ReceiptUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryHeaderType" id="oagis-id-6b638615b1394533a1915aa75fd90b7d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides general information about the ReceiveDelivery document that is used to receive a specific quantity of material goods
+
+The EffectiveDateTime is the date/time the received material is posted to other business systems as being available for use.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveDeliveryHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveDeliveryHeaderExtensionType" id="oagis-id-b4d1fdbffadb4a65a393a5c1ebf56973" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryItemBaseType" id="oagis-id-e036b58f357145eda0310fcc5151ea9b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ReceiptLine represents the goods line item detail of the receipt document. THis can be used by itself for traditional receiving against Purchase Orders or other line-item oriented buisness documents, or in conjunction with the ReceiptUnit element to summarize ship unit item detail at line level</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ShipItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Status" id="oagis-id-eaa1466d184e44b79633a6ac1451b0aa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivingServiceChargeAmount" id="oagis-id-0916f53586834de494d13128ff87464e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This indicates the receiving service  charge associated with the receiving document either as a whole, or at line level dpending on usage</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PackingSlipQuantity" id="oagis-id-f9de7cf150fe4d77bdcacbc3ad352785" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the quantity that is shown on the Packing Slip when goods are received from a supplier. This information is generally obtained from the supplier's Advance Ship Notice (ASN) or manually entered on receipt</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivedQuantity" id="oagis-id-24c88fb7e47949faa6185522c3f4f2d3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the number of items that have been received for the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReturnedQuantity" id="oagis-id-58c170bbf0944f0699742b30af0b2435" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of items returned to inventory. Or when used in logistics: The the quantity of the item for which the customer refused delivery.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceiptRoutingCode" id="oagis-id-d7fe755fc1924b30a8be851e63b56a6a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This  determines the receipt routing of an item or part. Examples of values include:
+
+Customer consignment
+Inspection
+Vendor consignment
+Blocked
+Bonded
+User defined
+
+SYNONYMS
+Material Status
+Material Condition Code</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="CatchWeightGroup" id="oagis-id-903810a27da3444aaae74ce6ba5e48b6"/>
+					<xsd:element ref="AcceptedQuantity" id="oagis-id-680c91560e034468931a5942fc4cbf5d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the quantity accepted.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceiptDiscrepancy" id="oagis-id-fac4945e8b5542b182d1152398a975cd" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides receiving discrepancy information for the ReceiveDelivery header as a whole, for a particular ReceiptLine, for the receipt of a shipping unit as a whole  ReceiptLine, or to a particular item within the shipping unit (ReceiptUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryItemType" id="oagis-id-7d2f2e76b222453abe5db9077bbd7e0e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ReceiptLine represents the goods line item detail of the receipt document. THis can be used by itself for traditional receiving against Purchase Orders or other line-item oriented buisness documents, or in conjunction with the ReceiptUnit element to summarize ship unit item detail at line level</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveDeliveryItemBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveDeliveryItemExtensionType" id="oagis-id-b44ca2dc81614a599d66115f375bc5dc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryDiscrepancyBaseType" id="oagis-id-b477afcad6094c2f8ad281f218f7cc90">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies discrepancy information for the receipt.
+
+The typeCode identifies the type of discrepancy. 
+
+The ReasonCode Identifies the reason for the discrepancy.
+
+If the discrepancy applies to specific quantities of the item, then the quantity can be specified. If no quantity is specified, the discrepancy applies to the inventory occurence as a whole</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ReasonCode" id="oagis-id-19551a3e4c6343efab697afee34abdf9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemQuantity" id="oagis-id-b09e83739360445991adc0b66e080944" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-3b051d1079cc4e59ba7ef8099e33314c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-4f22db2a05de40e5a33c179bdd85ad94"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryDiscrepancyType" id="oagis-id-c04f1325433145faa1c70b8e033e3182">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies discrepancy information for the receipt.
+
+The typeCode identifies the type of discrepancy. 
+
+The ReasonCode Identifies the reason for the discrepancy.
+
+If the discrepancy applies to specific quantities of the item, then the quantity can be specified. If no quantity is specified, the discrepancy applies to the inventory occurence as a whole</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveDeliveryDiscrepancyBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveDeliveryDiscrepancyExtensionType" id="oagis-id-fcc0e1771aa3480dad6b9b1f66bca54e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryUnitBaseType" id="oagis-id-2769e21a02fd41e89b93c6f2f1a159c0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information that identifies and describes a particular shipping unit being received.  This information usually directly references a DeliveryUnit on an OAGIS Delivery message or other shipping   document.  May also be used to provide context to adequately detail inventory discrepancies or compliance charges for a particular shipping unit</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ShipUnitBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Container" id="oagis-id-82b7e692228343f694a9f0d96ce238a7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Uniquely identifies a shipping container</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceiveDeliveryUnitItem" id="oagis-id-4883013bf96041b588dfaf1d4a971e1a" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryUnitType" id="oagis-id-daba0e15d4a64c009b3e474a85bbd9a9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information that identifies and describes a particular shipping unit being received.  This information usually directly references a DeliveryUnit on an OAGIS Delivery message or other shipping   document.  May also be used to provide context to adequately detail inventory discrepancies or compliance charges for a particular shipping unit</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveDeliveryUnitBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveDeliveryUnitExtensionType" id="oagis-id-0937efd15486491992b51212fe6fb5b2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryUnitItemBaseType" id="oagis-id-bed5ac78b9ec461eb8e08cd6d904ef5d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about a specific quantity of goods inventory contained within a shipping unit. RECEIPTITM is used to provide a detailed breakdown of RECEIPTLN inventory for inventory discrepancies or compliance charges for a particular shipping unit</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ShipItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Status" id="oagis-id-2d83b2f6fd6948d1b3d047ca5ffd43b5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PackingSlipQuantity" id="oagis-id-22084afe45194eb7af42bec021bca946" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the quantity that is shown on the Packing Slip when goods are received from a supplier. This information is generally obtained from the supplier's Advance Ship Notice (ASN) or manually entered on receipt</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceivedQuantity" id="oagis-id-0c8d9681821d49e8bb18817dc34015c0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the number of items that have been received for the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReturnedQuantity" id="oagis-id-e5b02ea6f0e94e928d26115ab2b5887e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the quantity of items returned to inventory. Or when used in logistics: The the quantity of the item for which the customer refused delivery.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReceiptRoutingCode" id="oagis-id-0b7b40e9127c4439979052915120d85b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This  determines the receipt routing of an item or part. Examples of values include:
+
+Customer consignment
+Inspection
+Vendor consignment
+Blocked
+Bonded
+User defined
+
+SYNONYMS
+Material Status
+Material Condition Code</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="CatchWeightGroup" id="oagis-id-318b8d21f8a446daba471660ca9f209a"/>
+					<xsd:element ref="ReceiptDiscrepancy" id="oagis-id-0e01d1bbd2574c1aa191531c36b5ae4d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides receiving discrepancy information for the ReceiveDelivery header as a whole, for a particular ReceiptLine, for the receipt of a shipping unit as a whole  ReceiptLine, or to a particular item within the shipping unit (ReceiptUnit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceiveDeliveryUnitItemType" id="oagis-id-195f4a7c12cd4b56a7189e45b17866fe">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides information about a specific quantity of goods inventory contained within a shipping unit. RECEIPTITM is used to provide a detailed breakdown of RECEIPTLN inventory for inventory discrepancies or compliance charges for a particular shipping unit</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ReceiveDeliveryUnitItemBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceiveDeliveryUnitItemExtensionType" id="oagis-id-31bf025cd06649979b292616153792a2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.
+
+This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.
+
+The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>
