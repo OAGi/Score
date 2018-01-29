@@ -15,7 +15,7 @@ public class ProfileBODRepository {
     private EntityManager entityManager;
 
     private static final String FIND_ALL_STATEMENT =
-            "SELECT tla.top_level_abie_id, abie.abie_id, tla.state, tla.owner_user_id, u.name as owner_name, tla.release_id, " +
+            "SELECT tla.top_level_abie_id, abie.abie_id, tla.state, tla.owner_user_id, u.login_id as owner_name, tla.release_id, " +
             "abie.creation_timestamp, abie.version, abie.status, asbiep.asbiep_id, " +
             "asccp.asccp_id, asccp.property_term, " +
             "bc.biz_ctx_id, bc.name as biz_ctx_name, release.release_num " +
