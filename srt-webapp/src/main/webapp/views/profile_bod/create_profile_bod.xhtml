@@ -12,11 +12,13 @@
                 <h2 class="subhead-heading">Create Profile BOD</h2>
             </div>
         </div>
-        <h:form id="form">
-            <p:growl id="growl" showDetail="true" life="3000"/>
 
+        <p:growl id="growl" showDetail="true" life="3000"/>
+
+        <h:form id="form">
             <p:wizard flowListener="#{createProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
                       showNavBar="false" onback="onBack();" onnext="onNext();">
+
                 <!--
                     Step 1: Select Top-Level Concept
                 -->
@@ -54,7 +56,7 @@
 
                                         <p:commandButton id="searchBtn" value="Search" ajax="true" style="margin-left: 10px;"
                                                          actionListener="#{createProfileBODBean.search}"
-                                                         update="growl, tbl1" icon="fa fa-white fa-search"/>
+                                                         update="growl, :form:tbl1" icon="fa fa-white fa-search"/>
                                     </div>
 
                                     <p:defaultCommand target="searchBtn"/>
@@ -68,12 +70,12 @@
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
                                      selectionMode="single">
-                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="growl, tbl1"/>
-                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="growl, tbl1"/>
+                            <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}" update="growl, :form:tbl1"/>
+                            <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}" update="growl, :form:tbl1"/>
 
                             <p:column style="width: 50px; text-align: center;">
                                 <p:selectBooleanCheckbox value="#{createProfileBODBean.getTopLevelConceptCheckBox(topLevelConcept.asccpId).checked}">
-                                    <p:ajax update="growl, tbl1"/>
+                                    <p:ajax update="growl, :form:tbl1"/>
                                 </p:selectBooleanCheckbox>
                             </p:column>
 
@@ -706,11 +708,11 @@
             </p:wizard>
 
             <p:panel id="btnGroup" style="margin-top: 40px;">
-                <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
+                <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;" update="growl"
                                  value="Back" icon="fa fa-white fa-arrow-left" oncomplete="PF('wizard').back();"/>
-                <p:commandButton id="btnNext" widgetVar="btnNext" style=""
+                <p:commandButton id="btnNext" widgetVar="btnNext" style="" update="growl"
                                  value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
-                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
+                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" update="growl" onclick="onSubmit();"
                                  value="Submit" icon="fa fa-white fa-check" action="#{createProfileBODBean.submit()}"/>
             </p:panel>
 

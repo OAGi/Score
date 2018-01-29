@@ -371,7 +371,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Top-Level Concept' must be selected."));
+                        requestContext.update("growl");
                         nextStep = event.getOldStep();
+
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
@@ -388,6 +390,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Business Context' must be selected."));
+                        requestContext.update("growl");
                         nextStep = event.getOldStep();
 
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
