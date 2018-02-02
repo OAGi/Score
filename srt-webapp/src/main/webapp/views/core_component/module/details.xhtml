@@ -2,7 +2,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui"
                 template="../../../template.xhtml">
 
     <ui:define name="content">
@@ -25,7 +25,8 @@
                     <h:outputText value="Module" styleClass="section-label"/>
                     <h:inputText id="module" value="#{moduleDetailBean.module.module}"
                                  maxlength="100"
-                                 label="Module" styleClass="section-content input-section">
+                                 label="Module" styleClass="section-content input-section"
+                                 disabled="#{moduleDetailBean.isModuleEditable() eq false}">
                     </h:inputText>
 
                     <h:outputText value="Namespace" styleClass="section-label"/>
@@ -34,7 +35,8 @@
                                     completeMethod="#{moduleDetailBean.completeInputForNamespace}"
                                     dropdown="true"
                                     required="false" requiredMessage="Please fill out 'Namespace' field."
-                                    styleClass="section-content input-section">
+                                    styleClass="section-content input-section"
+                                    disabled="#{moduleDetailBean.isModuleEditable() eq false}">
                         <p:ajax event="itemSelect" listener="#{moduleDetailBean.onSelectNamespace}"/>
                     </p:autoComplete>
                 </h:panelGrid>
@@ -45,7 +47,7 @@
                     <h:outputText value="Module Dependencies"/>
                     <p:commandButton id="addBtn" value="Add" style="float: right;"
                                      actionListener="#{moduleDetailBean.addModuleDependency}"
-                                     update="tbl"/>
+                                     update="tbl" rendered="#{moduleDetailBean.isModuleEditable() eq true}"/>
                 </f:facet>
                 <p:dataTable id="tbl" var="moduleDep" value="#{moduleDetailBean.dependedModules}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
@@ -58,7 +60,8 @@
                                         value="#{moduleDep.dependencyType}"
                                         completeMethod="#{moduleDetailBean.completeInputForDependencyType}"
                                         var="dependencyType" style="width: 100%" dropdown="true"
-                                        itemLabel="#{dependencyType.toString()}" itemValue="#{dependencyType}">
+                                        itemLabel="#{dependencyType.toString()}" itemValue="#{dependencyType}"
+                                        disabled="#{moduleDetailBean.isModuleEditable() eq false}">
                             <f:converter binding="#{dependencyTypeConverter}"/>
                         </p:autoComplete>
                     </p:column>
@@ -69,12 +72,13 @@
                                         value="#{moduleDep.dependedModule}"
                                         completeMethod="#{moduleDetailBean.completeInputForDependedModule}"
                                         var="dependedModule" style="width: 100%" dropdown="true"
-                                        itemLabel="#{dependedModule.module}" itemValue="#{dependedModule}" maxResults="10">
+                                        itemLabel="#{dependedModule.module}" itemValue="#{dependedModule}" maxResults="10"
+                                        disabled="#{moduleDetailBean.isModuleEditable() eq false}">
                             <f:converter binding="#{moduleConverter}"/>
                         </p:autoComplete>
                     </p:column>
 
-                    <p:column style="text-align: center; width: 65px;">
+                    <p:column style="text-align: center; width: 65px;" rendered="#{moduleDetailBean.isModuleEditable() eq true}">
                         <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{moduleDetailBean.deleteModuleDependency}"
                                          update="tbl">
@@ -86,15 +90,15 @@
             </p:panel>
 
             <p:commandButton id="createBtn" ajax="true" value="Create"
-                             rendered="#{moduleDetailBean.module.moduleId == 0}"
+                             rendered="#{moduleDetailBean.module.moduleId == 0 and moduleDetailBean.isModuleEditable() eq true}"
                              action="#{moduleDetailBean.update()}"/>
 
             <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{moduleDetailBean.module.moduleId != 0}"
+                             rendered="#{moduleDetailBean.module.moduleId != 0 and moduleDetailBean.isModuleEditable() eq true}}"
                              action="#{moduleDetailBean.update()}"/>
 
             <p:commandButton id="discardBtn" ajax="true" value="Discard"
-                             rendered="#{moduleDetailBean.module.moduleId > 0}"
+                             rendered="#{moduleDetailBean.module.moduleId > 0 and moduleDetailBean.isModuleEditable() eq true}}"
                              styleClass="danger"
                              onclick="PF('confirmDiscard').show()"/>
 

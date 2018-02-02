@@ -7,6 +7,7 @@ import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
 import org.oagi.srt.service.ModuleService;
 import org.oagi.srt.service.NamespaceService;
+import org.oagi.srt.service.UserService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import sun.util.calendar.CalendarUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,8 @@ public class ModuleDetailBean extends UIHandler {
     private ModuleService moduleService;
     @Autowired
     private NamespaceService namespaceService;
+    @Autowired
+    private UserService userService;
 
     private Module module;
 
@@ -112,7 +117,7 @@ public class ModuleDetailBean extends UIHandler {
         setSelectedNamespaceUri(event.getObject().toString());
     }
 
-    public List<Module> completeInputForDependedModule(String query){
+    public List<Module> completeInputForDependedModule(String query) {
         if (org.apache.commons.lang3.StringUtils.isEmpty(query)) {
             return allModules;
         }
@@ -121,7 +126,7 @@ public class ModuleDetailBean extends UIHandler {
                 .collect(Collectors.toList());
     }
 
-    public List<ModuleDep.DependencyType> completeInputForDependencyType(String query){
+    public List<ModuleDep.DependencyType> completeInputForDependencyType(String query) {
         List<ModuleDep.DependencyType> types = Arrays.asList(getDependencyTypes());
         return types.stream()
                 .filter(e -> e.toString().contains(query.toLowerCase()))
@@ -168,13 +173,13 @@ public class ModuleDetailBean extends UIHandler {
         this.deletedDependedModules = deletedDependedModules;
     }
 
-    public void deleteModuleDependency(){
+    public void deleteModuleDependency() {
         dependedModules.removeIf(dm -> dm.equals(selectedDependedModule));
         deletedDependedModules.add(selectedDependedModule);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void addModuleDependency(){
+    public void addModuleDependency() {
         ModuleDep md = new ModuleDep();
         md.setDependingModule(module);
 
@@ -185,7 +190,7 @@ public class ModuleDetailBean extends UIHandler {
     public String update() {
         String moduleFilePath = module.getModule();
 
-        if (!isValidModulePath(moduleFilePath)){
+        if (!isValidModulePath(moduleFilePath)) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Module file path is not valid."));
             return null;
@@ -223,9 +228,10 @@ public class ModuleDetailBean extends UIHandler {
     }
 
     private boolean isValidModulePath(String moduleFilePath) {
-        if (moduleFilePath.startsWith("\\") || moduleFilePath.startsWith("-") || moduleFilePath.startsWith("_") ) return false;
+        if (moduleFilePath.startsWith("\\") || moduleFilePath.startsWith("-") || moduleFilePath.startsWith("_"))
+            return false;
 
-        if (moduleFilePath.endsWith("\\") || moduleFilePath.endsWith("-") || moduleFilePath.endsWith("_") ) return false;
+        if (moduleFilePath.endsWith("\\") || moduleFilePath.endsWith("-") || moduleFilePath.endsWith("_")) return false;
 
         if (!moduleFilePath.matches("^[a-zA-Z0-9\\\\_-]*$")) return false;
 
@@ -237,6 +243,17 @@ public class ModuleDetailBean extends UIHandler {
         moduleService.delete(module, dependedModules);
 
         return "/views/core_component/module/list.jsf?faces-redirect=true";
+    }
+
+    public boolean isModuleEditable() {
+        User currentUser = getCurrentUser();
+        User ownerUser = userService.findByUserId(module.getOwnerUserId());
+
+        if (!currentUser.isOagisDeveloperIndicator() && ownerUser.isOagisDeveloperIndicator()) {
+            return false;
+        }
+
+        return true;
     }
 
 }
