@@ -42,79 +42,51 @@
             <p:separator/>
             <p:panel>
                 <f:facet name="header">
-                    <h:outputText value="Core Components - delta from previous release"/>
+                    <h:outputText value="Module Dependencies"/>
+                    <p:commandButton id="addBtn" value="Add" style="float: right;"
+                                     actionListener="#{moduleDetailBean.addModuleDependency}"
+                                     update="tbl"/>
                 </f:facet>
-                <p:dataTable id="tbl" var="cc" value="#{releaseDetailBean.deltaCoreComponents}"
+                <p:dataTable id="tbl" var="moduleDep" value="#{moduleDetailBean.dependedModules}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
-                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
+                             paginator="true" paginatorPosition="bottom" rows="10" editable="true" editMode="cell"
+                             style="width: 100%; margin-bottom:20px">
 
-                    <p:column selectionMode="multiple" styleClass="table-checkbox"
-                              rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="Type" sortBy="#{cc.type}">
-                        <span class="label label-info">${cc.type}</span>
+                    <p:column style="width: 45%; height: 30px;" headerText="Relationship Type"
+                              sortBy="#{moduleDep.dependencyType}">
+                        <p:autoComplete id="dependencyTypeAuto"
+                                        value="#{moduleDep.dependencyType}"
+                                        completeMethod="#{moduleDetailBean.completeInputForDependencyType}"
+                                        var="dependencyType" style="width: 100%" dropdown="true"
+                                        itemLabel="#{dependencyType.toString()}" itemValue="#{dependencyType}">
+                            <f:converter binding="#{dependencyTypeConverter}"/>
+                            <!--<p:ajax event="itemSelect" update="tbl"-->
+                            <!--listener="#{moduleDetailBean.onSelectDependedModule}"/>-->
+                            <!--<f:ajax render="tbl"/>-->
+                        </p:autoComplete>
                     </p:column>
 
-                    <p:column headerText="DEN" sortBy="#{cc.den}">
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and cc.state ne 'Editing'}">
-                            <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
-
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and cc.state ne 'Editing'}">
-                            <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
-
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ASCCP' and cc.state ne 'Editing'}">
-                            <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
-
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'BCCP' and cc.state ne 'Editing'}">
-                            <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
-
-                        <h:outputText value="${cc.den}"
-                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}"/>
+                    <p:column style="width: 45%; height: 30px;" headerText="Module"
+                              sortBy="#{moduleDep.dependedModule.module}">
+                        <p:autoComplete id="dependedModuleAuto"
+                                        value="#{moduleDep.dependedModule}"
+                                        completeMethod="#{moduleDetailBean.completeInputForDependedModule}"
+                                        var="dependedModule" style="width: 100%" dropdown="true"
+                                        itemLabel="#{dependedModule.module}" itemValue="#{dependedModule}" maxResults="10">
+                            <f:converter binding="#{moduleConverter}"/>
+                            <!--<p:ajax event="itemSelect" update="tbl"-->
+                                    <!--listener="#{moduleDetailBean.onSelectDependedModule}"/>-->
+                            <!--<f:ajax render="tbl"/>-->
+                        </p:autoComplete>
                     </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{cc.owner}">
-                        <h:outputText value="#{cc.owner}"/>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cc.state}">
-                        <h:panelGroup rendered="#{cc.state == 'Published'}">
-                            <span class="label label-default">#{cc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{cc.state == 'Editing'}">
-                            <span class="label label-primary">#{cc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{cc.state == 'Candidate'}">
-                            <span class="label label-warning">#{cc.state}</span>
-                        </h:panelGroup>
-                    </p:column>
-
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Revision"
-                              sortBy="#{releaseDetailBean.getFullRevisionNum(cc)}">
-                        <h:outputText value="#{releaseDetailBean.getFullRevisionNum(cc)}"/>
-                    </p:column>
-
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                              headerText="Last Updated By"
-                              sortBy="#{cc.lastUpdatedUser}">
-                        <h:outputText value="#{cc.lastUpdatedUser}"/>
-                    </p:column>
-
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{cc.lastUpdateTimestamp}">
-                        <h:outputText value="#{cc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
+                                         action="#{moduleDetailBean.deleteModuleDependency}"
+                                         update="tbl">
+                            <f:setPropertyActionListener value="#{moduleDep}"
+                                                         target="#{moduleDetailBean.selectedDependedModule}"/>
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
             </p:panel>
