@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import sun.util.calendar.CalendarUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -184,6 +185,12 @@ public class ModuleDetailBean extends UIHandler {
     public String update() {
         String moduleFilePath = module.getModule();
 
+        if (!isValidModulePath(moduleFilePath)){
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Module file path is not valid."));
+            return null;
+        }
+
         if (module.getModuleId() == 0L && moduleService.isExistsModule(moduleFilePath)) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Module file path is already taken."));
@@ -213,6 +220,16 @@ public class ModuleDetailBean extends UIHandler {
             throw t;
         }
         return "/views/core_component/module/list.jsf?faces-redirect=true";
+    }
+
+    private boolean isValidModulePath(String moduleFilePath) {
+        if (moduleFilePath.startsWith("\\") || moduleFilePath.startsWith("-") || moduleFilePath.startsWith("_") ) return false;
+
+        if (moduleFilePath.endsWith("\\") || moduleFilePath.endsWith("-") || moduleFilePath.endsWith("_") ) return false;
+
+        if (!moduleFilePath.matches("^[a-zA-Z0-9\\\\_-]*$")) return false;
+
+        return true;
     }
 
     @Transactional(rollbackFor = Throwable.class)

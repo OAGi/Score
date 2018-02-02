@@ -60,9 +60,6 @@
                                         var="dependencyType" style="width: 100%" dropdown="true"
                                         itemLabel="#{dependencyType.toString()}" itemValue="#{dependencyType}">
                             <f:converter binding="#{dependencyTypeConverter}"/>
-                            <!--<p:ajax event="itemSelect" update="tbl"-->
-                            <!--listener="#{moduleDetailBean.onSelectDependedModule}"/>-->
-                            <!--<f:ajax render="tbl"/>-->
                         </p:autoComplete>
                     </p:column>
 
@@ -74,9 +71,6 @@
                                         var="dependedModule" style="width: 100%" dropdown="true"
                                         itemLabel="#{dependedModule.module}" itemValue="#{dependedModule}" maxResults="10">
                             <f:converter binding="#{moduleConverter}"/>
-                            <!--<p:ajax event="itemSelect" update="tbl"-->
-                                    <!--listener="#{moduleDetailBean.onSelectDependedModule}"/>-->
-                            <!--<f:ajax render="tbl"/>-->
                         </p:autoComplete>
                     </p:column>
 
