@@ -249,7 +249,7 @@ public class ModuleDetailBean extends UIHandler {
         User currentUser = getCurrentUser();
         User ownerUser = userService.findByUserId(module.getOwnerUserId());
 
-        if (!currentUser.isOagisDeveloperIndicator() && ownerUser.isOagisDeveloperIndicator()) {
+        if (ownerUser != null && currentUser.isOagisDeveloperIndicator() != ownerUser.isOagisDeveloperIndicator()) {
             return false;
         }
 

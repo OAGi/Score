@@ -94,11 +94,11 @@
                              action="#{moduleDetailBean.update()}"/>
 
             <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{moduleDetailBean.module.moduleId != 0 and moduleDetailBean.isModuleEditable() eq true}}"
+                             rendered="#{moduleDetailBean.module.moduleId != 0 and moduleDetailBean.isModuleEditable() eq true}"
                              action="#{moduleDetailBean.update()}"/>
 
             <p:commandButton id="discardBtn" ajax="true" value="Discard"
-                             rendered="#{moduleDetailBean.module.moduleId > 0 and moduleDetailBean.isModuleEditable() eq true}}"
+                             rendered="#{moduleDetailBean.module.moduleId > 0 and moduleDetailBean.isModuleEditable() eq true}"
                              styleClass="danger"
                              onclick="PF('confirmDiscard').show()"/>
 
