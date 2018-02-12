@@ -76,6 +76,11 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
         if (topLevelAbie == null) {
             return;
         }
+
+        if (!bieService.canUserSeeThisProfileBOD(topLevelAbieId, getCurrentUser())) {
+            return;
+        }
+
         setTopLevelAbie(topLevelAbie);
         createTreeNode(topLevelAbie);
 

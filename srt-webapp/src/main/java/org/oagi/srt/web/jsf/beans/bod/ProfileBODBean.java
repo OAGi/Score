@@ -4,6 +4,7 @@ import org.oagi.srt.repository.ProfileBODRepository;
 import org.oagi.srt.repository.entity.ProfileBOD;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.service.UserService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,6 +30,9 @@ public class ProfileBODBean extends UIHandler {
 
     @Autowired
     private BusinessInformationEntityService bieService;
+
+    @Autowired
+    private UserService userService;
 
     private List<ProfileBOD> allProfileBODs;
     private String selectedPropertyTerm;
@@ -120,5 +124,9 @@ public class ProfileBODBean extends UIHandler {
 
         bieService.deleteProfileBOD(profileBOD.getTopLevelAbieId());
         init();
+    }
+
+    public boolean canCurrentUserSeeThisProfileBOD(ProfileBOD profileBOD) {
+        return bieService.canUserSeeThisProfileBOD(profileBOD.getTopLevelAbieId(), getCurrentUser());
     }
 }
