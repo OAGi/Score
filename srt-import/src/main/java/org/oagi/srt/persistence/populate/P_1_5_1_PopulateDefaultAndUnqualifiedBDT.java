@@ -344,7 +344,7 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                                 return true;
                             }
                         }
-                        return xbtAwdIds.contains(e.getXbtId());
+                        return true;
                     }).collect(Collectors.toList());
 
             if (isFloat && cdtAwdPriXpsTypeMapList.size() > 1) {
@@ -354,11 +354,6 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                             CoreDataTypePrimitive cdtPri = cdtPriRepository.findOne(cdtPriId);
                             return "Float".equals(cdtPri.getName());
                         }).collect(Collectors.toList());
-            }
-
-            // A default BDT which is must have only one BDT_PRI_RESTRI
-            if (!isUnion && cdtAwdPriXpsTypeMapList.size() != 1) {
-                throw new IllegalStateException();
             }
 
             for (CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap : cdtAwdPriXpsTypeMapList) {
