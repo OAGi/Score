@@ -438,7 +438,7 @@
 
                                                     <p:autoComplete id="bdtPriRestriPrimitiveAuto" value="#{editProfileBODBean.bbieXbtName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieXbt}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieXbtName}"
@@ -452,7 +452,7 @@
 
                                                     <p:autoComplete id="bdtPriRestriCodeListAuto" value="#{editProfileBODBean.bbieCodeListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieCodeList}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieCodeListName}"
@@ -466,7 +466,7 @@
 
                                                     <p:autoComplete id="bdtPriRestriAgencyAuto" value="#{editProfileBODBean.bbieAgencyIdListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieAgencyIdList}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieAgencyIdListName}"
@@ -595,7 +595,7 @@
 
                                                     <p:autoComplete id="bdtScPriRestriPrimitiveAuto" value="#{editProfileBODBean.bbieScXbtName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScXbt}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScXbtName}"
@@ -609,7 +609,7 @@
 
                                                     <p:autoComplete id="bdtScPriRestriCodeListAuto" value="#{editProfileBODBean.bbieScCodeListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScCodeList}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScCodeListName}"
@@ -623,7 +623,7 @@
 
                                                     <p:autoComplete id="bdtScPriRestriAgencyAuto" value="#{editProfileBODBean.bbieScAgencyIdListName}"
                                                                     completeMethod="#{editProfileBODBean.completeInputForBbieScAgencyIdList}"
-                                                                    dropdown="true" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
+                                                                    dropdown="true" maxResults="20" disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}"
                                                                     style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
                                                         <p:ajax event="itemSelect"
                                                                 listener="#{editProfileBODBean.onSelectBbieScAgencyIdListName}"
