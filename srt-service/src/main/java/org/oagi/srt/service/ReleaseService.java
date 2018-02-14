@@ -309,7 +309,7 @@ public class ReleaseService {
     }
 
     @Transactional
-    public void makeReleaseFinal(Releases release, boolean purge) {
+    public void makeReleaseFinal(Releases release, boolean moveToCandidateState) {
         List<Release> currentDraftReleases = releaseRepository.findByState(release.getState());
 
         for (Release r : currentDraftReleases) {
@@ -321,14 +321,14 @@ public class ReleaseService {
             }
 
             if (r.getLastUpdateTimestamp().before(release.getLastUpdateTimestamp())) { // draft is before final release
-                moveCCsBetweenReleases(r, release);
+                moveCCsBetweenReleases(r, release, CoreComponentState.Published);
             }
 
             if (r.getLastUpdateTimestamp().after(release.getLastUpdateTimestamp())) { // draft is after final release
-                if (purge) {
-                    deleteCCsByRelease(r);
+                if (moveToCandidateState) {
+                    moveCCsBetweenReleases(r, null, CoreComponentState.Candidate);
                 } else {
-                    moveCCsBetweenReleases(r, null);
+                    moveCCsBetweenReleases(r, null, CoreComponentState.Published);
                 }
             }
 
@@ -416,6 +416,29 @@ public class ReleaseService {
         return true;
     }
 
+    private void changeCCsStateByRelease(Release release, CoreComponentState state) {
+        List<AggregateCoreComponent> accs = accRepository.findByReleaseId(release.getReleaseId());
+        List<AssociationCoreComponent> asccs = asccRepository.findByReleaseId(release.getReleaseId());
+        List<AssociationCoreComponentProperty> asccps = asccpRepository.findByReleaseId(release.getReleaseId());
+        List<BasicCoreComponent> bccs = bccRepository.findByReleaseId(release.getReleaseId());
+        List<BasicCoreComponentProperty> bccps = bccpRepository.findByReleaseId(release.getReleaseId());
+
+        accs.stream().forEach(acc -> acc.setState(state));
+        accRepository.save(accs);
+
+        asccs.stream().forEach(ascc -> ascc.setState(state));
+        asccRepository.save(asccs);
+
+        asccps.stream().forEach(asccp -> asccp.setState(state));
+        asccpRepository.save(asccps);
+
+        bccs.stream().forEach(bcc -> bcc.setState(state));
+        bccRepository.save(bccs);
+
+        bccps.stream().forEach(bccp -> bccp.setState(state));
+        bccpRepository.save(bccps);
+    }
+
     private void deleteCCsByRelease(Release fromRel) {
         List<AggregateCoreComponent> accs = accRepository.findByReleaseId(fromRel.getReleaseId());
         List<AssociationCoreComponent> asccs = asccRepository.findByReleaseId(fromRel.getReleaseId());
@@ -474,7 +497,7 @@ public class ReleaseService {
         }
     }
 
-    private void moveCCsBetweenReleases(Release fromRel, Releases toRel) {
+    private void moveCCsBetweenReleases(Release fromRel, Releases toRel, CoreComponentState ccState) {
         List<AggregateCoreComponent> accs = accRepository.findByReleaseId(fromRel.getReleaseId());
         List<AssociationCoreComponent> asccs = asccRepository.findByReleaseId(fromRel.getReleaseId());
         List<AssociationCoreComponentProperty> asccps = asccpRepository.findByReleaseId(fromRel.getReleaseId());
@@ -485,12 +508,12 @@ public class ReleaseService {
 
         for (AggregateCoreComponent acc : accs) {
             acc.setReleaseId(releaseId);
-            acc.setState(CoreComponentState.Published);
+            acc.setState(ccState);
             accRepository.saveAndFlush(acc);
 
             AggregateCoreComponent currentACC = accRepository.findOne(acc.getCurrentAccId());
             if (currentACC != null) {
-                currentACC.setState(CoreComponentState.Published);
+                currentACC.setState(ccState);
                 accRepository.saveAndFlush(currentACC);
             }
         }
@@ -502,43 +525,43 @@ public class ReleaseService {
 
             AssociationCoreComponent currentAscc = asccRepository.findOne(ascc.getCurrentAsccId());
             if (currentAscc != null) {
-                currentAscc.setState(CoreComponentState.Published);
+                currentAscc.setState(ccState);
                 asccRepository.saveAndFlush(currentAscc);
             }
         }
 
         for (AssociationCoreComponentProperty asccp : asccps) {
             asccp.setReleaseId(releaseId);
-            asccp.setState(CoreComponentState.Published);
+            asccp.setState(ccState);
             asccpRepository.saveAndFlush(asccp);
 
             AssociationCoreComponentProperty currentAsccp = asccpRepository.findOne(asccp.getCurrentAsccpId());
             if (currentAsccp != null) {
-                currentAsccp.setState(CoreComponentState.Published);
+                currentAsccp.setState(ccState);
                 asccpRepository.saveAndFlush(currentAsccp);
             }
         }
 
         for (BasicCoreComponent bcc : bccs) {
             bcc.setReleaseId(releaseId);
-            bcc.setState(CoreComponentState.Published);
+            bcc.setState(ccState);
             bccRepository.saveAndFlush(bcc);
 
             BasicCoreComponent currentBcc = bccRepository.findOne(bcc.getCurrentBccId());
             if (currentBcc != null) {
-                currentBcc.setState(CoreComponentState.Published);
+                currentBcc.setState(ccState);
                 bccRepository.saveAndFlush(currentBcc);
             }
         }
 
         for (BasicCoreComponentProperty bccp : bccps) {
             bccp.setReleaseId(releaseId);
-            bccp.setState(CoreComponentState.Published);
+            bccp.setState(ccState);
             bccpRepository.saveAndFlush(bccp);
 
             BasicCoreComponentProperty currentBccp = bccpRepository.findOne(bccp.getCurrentBccpId());
             if (currentBccp != null) {
-                currentBccp.setState(CoreComponentState.Published);
+                currentBccp.setState(ccState);
                 bccpRepository.saveAndFlush(currentBccp);
             }
         }
@@ -729,9 +752,9 @@ public class ReleaseService {
         }
 
         if (followingRelease != null) {
-            moveCCsBetweenReleases(releaseToDelete, followingRelease);
+            moveCCsBetweenReleases(releaseToDelete, followingRelease, CoreComponentState.Published);
         } else {
-            moveCCsBetweenReleases(releaseToDelete, null);
+            moveCCsBetweenReleases(releaseToDelete, null, CoreComponentState.Published);
         }
 
         releaseRepository.delete(releaseToDelete);

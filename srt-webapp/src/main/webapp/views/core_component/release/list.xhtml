@@ -99,13 +99,13 @@
                 <f:facet name="message">
                     All draft releases older than the final release will be merged into the final release and candidate components will be published. <br/>
                     All other draft releases will be discarded. <br/>
-                    Do you want to keep or purge components from discarded draft releases?
+                    Do you want to keep components from discarded draft releases in Published state or to move them to Candidate state?
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="keepBtn" value="Keep components" icon="fa fa-white fa-check"
+                    <p:commandButton id="keepBtn" value="Keep in Published state"
                                      action="#{releaseBean.makeReleaseFinal(false)}"
                                      oncomplete="PF('confirmPurge').hide()" update="tbl"/>
-                    <p:commandButton id="purgeBtn" value="Purge components" icon="fa fa-white fa-times"
+                    <p:commandButton id="moveBtn" value="Move to Candidate state"
                                      action="#{releaseBean.makeReleaseFinal(true)}"
                                      oncomplete="PF('confirmPurge').hide()" update="tbl"/>
                 </div>
