@@ -17,9 +17,8 @@
             </div>
         </div>
         <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
+            <p:growl id="growl" showDetail="true"/>
+
             <p:panel>
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="Module" styleClass="section-label"/>
@@ -91,16 +90,16 @@
 
             <p:commandButton id="createBtn" ajax="true" value="Create"
                              rendered="#{moduleDetailBean.module.moduleId == 0 and moduleDetailBean.isModuleEditable() eq true}"
-                             action="#{moduleDetailBean.update()}"/>
+                             action="#{moduleDetailBean.update()}" update="growl"/>
 
             <p:commandButton id="updateBtn" ajax="true" value="Update"
                              rendered="#{moduleDetailBean.module.moduleId != 0 and moduleDetailBean.isModuleEditable() eq true}"
-                             action="#{moduleDetailBean.update()}"/>
+                             action="#{moduleDetailBean.update()}" update="growl"/>
 
             <p:commandButton id="discardBtn" ajax="true" value="Discard"
                              rendered="#{moduleDetailBean.module.moduleId > 0 and moduleDetailBean.isModuleEditable() eq true}"
                              styleClass="danger"
-                             onclick="PF('confirmDiscard').show()"/>
+                             onclick="PF('confirmDiscard').show()" update="growl"/>
 
             <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
@@ -110,9 +109,9 @@
                 <div style="text-align: center;">
                     <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
                                      action="#{moduleDetailBean.delete()}"
-                                     oncomplete="PF('confirmDiscard').hide()"/>
+                                     oncomplete="PF('confirmDiscard').hide()" update="growl"/>
                     <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDiscard').hide()"/>
+                                     onclick="PF('confirmDiscard').hide()" update="growl"/>
                 </div>
             </p:confirmDialog>
 
