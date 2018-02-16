@@ -97,9 +97,9 @@ public class P_1_2_PopulateCDTandCDTSC {
         cdtAwdPriXpsTypeMapppingMap.put("Integer",
                 Arrays.asList(xbtBuiltInTypeMap.get("xsd:integer"), xbtBuiltInTypeMap.get("xsd:positiveInteger"), xbtBuiltInTypeMap.get("xsd:nonNegativeInteger")));
         cdtAwdPriXpsTypeMapppingMap.put("NormalizedString",
-                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString"), xbtBuiltInTypeMap.get("xsd:anyURI")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:normalizedString")));
         cdtAwdPriXpsTypeMapppingMap.put("String",
-                Arrays.asList(xbtBuiltInTypeMap.get("xsd:string")));
+                Arrays.asList(xbtBuiltInTypeMap.get("xsd:string"), xbtBuiltInTypeMap.get("xsd:anyURI")));
         cdtAwdPriXpsTypeMapppingMap.put("TimeDuration",
                 Arrays.asList(xbtBuiltInTypeMap.get("xsd:token"), xbtBuiltInTypeMap.get("xsd:duration"), xbtBuiltInTypeMap.get("xbt_WeekDurationType")));
         cdtAwdPriXpsTypeMapppingMap.put("TimePoint",
