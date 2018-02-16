@@ -30,10 +30,10 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
-                        <h:panelGroup rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId or profileBOD.state ne 'Editing'}">
+                        <h:panelGroup rendered="#{profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}">
                             <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
                         </h:panelGroup>
-                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId and profileBOD.state eq 'Editing'}"
+                        <h:outputText rendered="#{!profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}"
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
                         <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
                     </p:column>
