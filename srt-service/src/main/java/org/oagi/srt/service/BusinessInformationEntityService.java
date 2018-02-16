@@ -99,6 +99,9 @@ public class BusinessInformationEntityService {
     private NamespaceRepository namespaceRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
     @Autowired
@@ -1123,5 +1126,34 @@ public class BusinessInformationEntityService {
 
         topLevelAbie.setOwnerUserId(newOwnerId);
         topLevelAbieRepository.save(topLevelAbie);
+    }
+
+    public boolean canUserSeeThisProfileBOD(long topLevelAbieId, User currentUser) {
+        TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+        if (topLevelAbie == null) {
+            return false;
+        }
+
+        long ownerUserId = topLevelAbie.getOwnerUserId();
+        long userId = currentUser.getAppUserId();
+
+        if (ownerUserId == userId) {
+            return true;
+        }
+
+        User owner = userService.findByUserId(ownerUserId);
+        AggregateBusinessInformationEntityState state = topLevelAbie.getState();
+
+        if (Editing == state) {
+            return false;
+        }
+
+        boolean isOwnerOAGIDev = owner.isOagisDeveloperIndicator();
+        boolean isEndUser = !currentUser.isOagisDeveloperIndicator();
+        if (isEndUser && isOwnerOAGIDev) {
+            return false;
+        }
+
+        return true;
     }
 }
