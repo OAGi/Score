@@ -30,4 +30,10 @@ public class ProfileBODRepository {
         Query query = entityManager.createNativeQuery(FIND_ALL_STATEMENT, ProfileBOD.class);
         return query.getResultList();
     }
+
+    public ProfileBOD findOne(long topLevelAbieId) {
+        Query query = entityManager.createNativeQuery(FIND_ALL_STATEMENT + " WHERE tla.top_level_abie_id = ?", ProfileBOD.class);
+        query.setParameter(1, topLevelAbieId);
+        return (ProfileBOD) query.getSingleResult();
+    }
 }
