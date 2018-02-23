@@ -2,9 +2,9 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.ProfileBODRepository;
-import org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState;
 import org.oagi.srt.repository.entity.ProfileBOD;
 import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ProfileBODGenerateService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.model.DefaultStreamedContent;
@@ -43,6 +43,9 @@ public class ProfileBODGenerationBean extends UIHandler {
     @Autowired
     private ProfileBODGenerateService standaloneXMLSchema;
 
+    @Autowired
+    private BusinessInformationEntityService bieService;
+
     private ProfileBODGenerationOption option = new ProfileBODGenerationOption();
 
     private List<ProfileBOD> allProfileBODs;
@@ -55,13 +58,7 @@ public class ProfileBODGenerationBean extends UIHandler {
         User currentUser = getCurrentUser();
         allProfileBODs = profileBODRepository.findAll();
         allProfileBODs = allProfileBODs.stream()
-                .filter(e -> {
-                    long ownerUserId = e.getOwnerUserId();
-                    if (ownerUserId != currentUser.getAppUserId() && e.getState() != AggregateBusinessInformationEntityState.Published) {
-                        return false;
-                    }
-                    return true;
-                }).collect(Collectors.toList());
+                .filter(e -> bieService.canUserGenerateThisProfileBOD(e, currentUser)).collect(Collectors.toList());
         search();
     }
 

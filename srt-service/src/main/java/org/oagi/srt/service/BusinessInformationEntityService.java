@@ -110,6 +110,9 @@ public class BusinessInformationEntityService {
     @Autowired
     private BusinessInformationEntityDAO bieDAO;
 
+    @Autowired
+    private ProfileBODRepository profileBODRepository;
+
     public class CreateBIEsResult {
 
         private int abieCount = 0;
@@ -1129,28 +1132,45 @@ public class BusinessInformationEntityService {
     }
 
     public boolean canUserSeeThisProfileBOD(long topLevelAbieId, User currentUser) {
-        TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
-        if (topLevelAbie == null) {
+        ProfileBOD profileBOD = profileBODRepository.findOne(topLevelAbieId);
+        return canUserSeeThisProfileBOD(profileBOD, currentUser);
+    }
+
+    public boolean canUserSeeThisProfileBOD(ProfileBOD profileBOD, User currentUser) {
+        if (profileBOD == null) {
             return false;
         }
 
-        long ownerUserId = topLevelAbie.getOwnerUserId();
+        long ownerUserId = profileBOD.getOwnerUserId();
         long userId = currentUser.getAppUserId();
 
         if (ownerUserId == userId) {
             return true;
         }
 
-        User owner = userService.findByUserId(ownerUserId);
-        AggregateBusinessInformationEntityState state = topLevelAbie.getState();
+        AggregateBusinessInformationEntityState state = profileBOD.getState();
 
         if (Editing == state) {
             return false;
         }
 
-        boolean isOwnerOAGIDev = owner.isOagisDeveloperIndicator();
-        boolean isEndUser = !currentUser.isOagisDeveloperIndicator();
-        if (isEndUser && isOwnerOAGIDev) {
+        return true;
+    }
+
+    public boolean canUserGenerateThisProfileBOD(ProfileBOD profileBOD, User currentUser) {
+        if (profileBOD == null) {
+            return false;
+        }
+
+        long ownerUserId = profileBOD.getOwnerUserId();
+        long userId = currentUser.getAppUserId();
+
+        if (ownerUserId == userId) {
+            return true;
+        }
+        AggregateBusinessInformationEntityState state = profileBOD.getState();
+
+        if (Editing == state) {
             return false;
         }
 
