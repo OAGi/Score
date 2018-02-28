@@ -8,6 +8,7 @@ import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,6 +191,11 @@ public class P_1_1_PopulateCommonData {
 
                 String versionNum = getVersion(file);
                 module.setVersionNum(versionNum);
+
+                CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(oagisUser);
+                module.addPersistEventListener(eventListener);
+                module.setOwnerUserId(oagisUser.getAppUserId());
+                module.addPersistEventListener(new TimestampAwareEventListener());
 
                 moduleRepository.saveAndFlush(module);
             }
