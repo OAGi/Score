@@ -123,6 +123,36 @@
 <colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="0CC382DE-CF5F-D199-C113-83CA0E6B6E55" name="TOP_LEVEL_ABIE_APP_USER_FKv2">
+<createdBy>hno2</createdBy>
+<createdTime>2018-01-25 14:32:31 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E65A63FE-6E0F-ED64-DE32-C4275A41F5E5" name="TOP_LEVEL_ABIE_APP_USER_FKv3">
+<createdBy>hno2</createdBy>
+<createdTime>2018-02-28 19:21:45 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="EDE69A21-F4D9-825F-0F7D-4767429151C9" name="TOP_LEVEL_ABIE_APP_USER_FKv4">
+<createdBy>hno2</createdBy>
+<createdTime>2018-02-28 19:30:44 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:05:54 UTC</createdTime>
@@ -143,9 +173,9 @@
 <colUsage columnID="9B4DD1FD-4C58-8A79-DC03-6030191827D6"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="0CC382DE-CF5F-D199-C113-83CA0E6B6E55" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<ind_PK_UK id="1E213B77-BBBF-8496-EE29-C5D13B6DB5A9" name="TOP_LEVEL_ABIE_APP_USER_FK">
 <createdBy>hno2</createdBy>
-<createdTime>2018-01-25 14:32:31 UTC</createdTime>
+<createdTime>2018-02-28 19:31:25 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
