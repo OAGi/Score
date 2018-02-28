@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui" template="../../../template.xhtml">
+
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Module</h2>
+            </div>
+        </div>
+        <h:form id="listForm">
+            <p:panel id="pPanel">
+                <f:facet name="header">
+                    <p:autoComplete id="moduleFilename" value="#{moduleBean.moduleFilename}"
+                                    style="min-width: 440px; margin-right: 20px;"
+                                    maxResults="10"
+                                    completeMethod="#{moduleBean.completeInput}">
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                    </p:autoComplete>
+                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{moduleBean.search}"
+                                     update="tbl"
+                                     icon="fa fa-white fa-search"/>
+                    <p:button id="createBtn" value="Create Module"
+                              style="float: right; padding: 3px 0 3px 0;"
+                              outcome="/views/core_component/module/details.jsf"/>
+                </f:facet>
+                <p:dataTable id="tbl" var="modules" value="#{moduleBean.allModules}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px" rowKey="#{modules.moduleId}">
+
+                    <p:column style="width: 250px; text-align: center;"  headerText="Module"
+                              sortBy="#{modules.module}">
+                        <a href="/module/#{modules.moduleId}">#{modules.module}</a>
+                    </p:column>
+
+                    <p:column style="width: 200px; text-align: center;" styleClass="ellipsis" headerText="Namespace"
+                              sortBy="#{modules.namespace.uri}">
+                        <h:outputText value="#{modules.namespace.uri}"/>
+                    </p:column>
+
+                    <p:column style="width: 75px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                              sortBy="#{modules.ownerUserId}">
+                        <h:outputText value="#{moduleBean.getUser(modules.ownerUserId)}"/>
+                    </p:column>
+
+                    <p:column style="width: 75px; text-align: center;"
+                              headerText="Last Updated By"
+                              sortBy="#{modules.lastUpdatedBy}">
+                        <h:outputText value="#{moduleBean.getUser(modules.lastUpdatedBy)}"/>
+                    </p:column>
+
+                    <p:column style="width: 75px; text-align: center;" headerText="Last Updated Timestamp"
+                              sortBy="#{modules.lastUpdateTimestamp}">
+                        <h:outputText value="#{modules.lastUpdateTimestamp}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="width: 60px; text-align: center;"
+                              headerText="Since Release"
+                              sortBy="#{modules.release.releaseNum}">
+                        <h:outputText value="#{modules.release.releaseNum}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

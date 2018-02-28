@@ -1,13 +1,17 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Table(name = "module")
-public class Module implements Serializable {
+public class Module implements NamespaceAware, TimestampAware, CreatorModifierAware, Serializable {
 
     public static final String SEQUENCE_NAME = "MODULE_ID_SEQ";
 
@@ -28,15 +32,32 @@ public class Module implements Serializable {
     private String module;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "release_id", nullable = false)
+    @JoinColumn(name = "release_id")
     private Release release;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "namespace_id", nullable = false)
+    @JoinColumn(name = "namespace_id")
     private Namespace namespace;
 
     @Column(length = 45)
     private String versionNum;
+
+    @Column(nullable = false, updatable = false)
+    private long createdBy;
+
+    @Column(nullable = false)
+    private long lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
+    private long ownerUserId;
 
     public long getModuleId() {
         return moduleId;
@@ -78,6 +99,76 @@ public class Module implements Serializable {
         this.versionNum = versionNum;
     }
 
+    public Module() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    @Override
+    public long getCreatedBy() {
+        return createdBy;
+    }
+
+    @Override
+    public void setCreatedBy(long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @Override
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    @Override
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    @Override
+    public Date getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    @Override
+    public void setCreationTimestamp(Date creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }
+
+    @Override
+    public Date getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    @Override
+    public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    public long getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(long ownerUserId) {
+        this.ownerUserId = ownerUserId;
+    }
+
+    @Override
+    public long getNamespaceId() {
+        if (getNamespace() != null) {
+            return getNamespace().getNamespaceId();
+        } else {
+            return 0L;
+        }
+    }
+
+    @Override
+    public void setNamespaceId(Long namespaceId) {
+        Namespace n = new Namespace();
+        n.setNamespaceId(namespaceId);
+        setNamespace(n);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,12 +182,7 @@ public class Module implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = (int) (moduleId ^ (moduleId >>> 32));
-        result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + (release != null ? release.hashCode() : 0);
-        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
-        result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
-        return result;
+        return Objects.hash(moduleId, module, release, namespace, versionNum, createdBy, lastUpdatedBy, creationTimestamp, lastUpdateTimestamp, ownerUserId);
     }
 
     @Override
@@ -108,5 +194,67 @@ public class Module implements Serializable {
                 ", namespace=" + namespace +
                 ", versionNum='" + versionNum + '\'' +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
     }
 }
