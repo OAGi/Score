@@ -59,14 +59,11 @@ public class CardinalityMaxConverter implements Converter, Validator {
             return null;
         }
         if ("unbounded".equals(value.toLowerCase())) {
-            return "-1";
+            return -1;
         } else {
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {
-                context.addMessage(component.getClientId(),
-                        new FacesMessage(SEVERITY_ERROR, "Error",
-                                "'CardinalityMax' must be a number between -1 (unbounded) and " + Integer.MAX_VALUE));
                 return null;
             }
         }

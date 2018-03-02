@@ -138,9 +138,6 @@ public class AssociationCoreComponent
     }
 
     public void setCardinalityMin(int cardinalityMin) {
-        if (cardinalityMin < 0) {
-            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
-        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -149,9 +146,6 @@ public class AssociationCoreComponent
     }
 
     public void setCardinalityMax(int cardinalityMax) {
-        if (cardinalityMax < -1) {
-            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
-        }
         this.cardinalityMax = cardinalityMax;
     }
 

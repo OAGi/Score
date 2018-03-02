@@ -24,6 +24,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -430,7 +431,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String submit() {
+    public void submit() throws IOException {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
             AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
@@ -443,7 +444,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
             nodeService.validate(topLevelNode);
             TopLevelAbie topLevelAbie = nodeService.submit(topLevelNode, release, getCurrentUser(), progressListener);
             long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
-            return "/views/profile_bod/edit_profile_bod.jsf?topLevelAbieId=" + topLevelAbieId + "&faces-redirect=true";
+
+            FacesContext.getCurrentInstance().getExternalContext().redirect(
+                    "/profile_bod/" + topLevelAbieId);
         } finally {
             requestContext.execute("PF('loadingBlock').hide()");
         }
