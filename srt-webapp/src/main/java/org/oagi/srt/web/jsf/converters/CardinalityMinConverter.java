@@ -56,9 +56,6 @@ public class CardinalityMinConverter implements Converter, Validator {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            context.addMessage(component.getClientId(),
-                    new FacesMessage(SEVERITY_ERROR, "Error",
-                            "'CardinalityMin' must be a number between 0 and " + Integer.MAX_VALUE));
             return null;
         }
     }

@@ -24,6 +24,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -225,6 +226,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     private Map<Long, Boolean> topLevelConceptCheckBoxes = new HashMap();
+
     public class TopLevelConceptCheckBox {
         private Long asccpId;
 
@@ -312,6 +314,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     private Map<Long, Boolean> bizCtxCheckBoxes = new HashMap();
+
     public class BusinessContextCheckBox {
         private Long bizCtxId;
 
@@ -326,6 +329,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         public void setChecked(boolean value) {
             bizCtxCheckBoxes = new HashMap();
 
+            RequestContext requestContext = RequestContext.getCurrentInstance();
             if (value) {
                 BusinessContext previousOne = getSelectedBusinessContext();
                 if (previousOne != null) {
@@ -333,8 +337,11 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                 }
 
                 selectedBusinessContext = businessContextMap.get(bizCtxId);
+                requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+
             } else {
                 selectedBusinessContext = null;
+                requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", true).addClass('ui-state-disabled');");
             }
 
             bizCtxCheckBoxes.put(bizCtxId, value);
@@ -379,30 +386,6 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
-                    }
-
-                    break;
-
-                case "step_3":
-                    if (selectedBusinessContext == null) {
-                        FacesContext.getCurrentInstance().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                        "'Business Context' must be selected."));
-                        requestContext.update("growl");
-                        nextStep = event.getOldStep();
-
-                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
-                    } else {
-                        AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                        assert selectedASCCP.getReleaseId() == getRelease().getReleaseId();
-
-                        createTreeNode(selectedASCCP, release, selectedBusinessContext);
-
-                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
                     }
@@ -421,7 +404,12 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
         requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
-        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+
+        if ("step_2".equals(getCurrentStep())) {
+            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", true).addClass('ui-state-disabled');");
+        } else {
+            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+        }
     }
 
     private ProgressListener progressListener;
@@ -443,17 +431,23 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String submit() {
+    public void submit() throws IOException {
+        RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
+            AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+            assert selectedASCCP.getReleaseId() == getRelease().getReleaseId();
+
+            createTreeNode(selectedASCCP, release, selectedBusinessContext);
             progressListener = new ProgressListener();
 
             ASBIEPNode topLevelNode = getTopLevelNode();
             nodeService.validate(topLevelNode);
-            nodeService.submit(topLevelNode, release, getCurrentUser(), progressListener);
+            TopLevelAbie topLevelAbie = nodeService.submit(topLevelNode, release, getCurrentUser(), progressListener);
+            long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
 
-            return "/views/profile_bod/list.jsf?faces-redirect=true";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(
+                    "/profile_bod/" + topLevelAbieId);
         } finally {
-            RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("PF('loadingBlock').hide()");
         }
     }
