@@ -1,6 +1,9 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.node.ASBIEPNode;
+import org.oagi.srt.model.node.BBIEPNode;
+import org.oagi.srt.model.node.BBIESCNode;
+import org.oagi.srt.model.node.BIENode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -20,8 +23,12 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.component.html.HtmlInputText;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +44,7 @@ import static java.util.stream.Collectors.groupingBy;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class EditProfileBODBean extends AbstractProfileBODBean {
+public class EditProfileBODBean extends AbstractProfileBODBean implements Validator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -330,5 +337,94 @@ public class EditProfileBODBean extends AbstractProfileBODBean {
     public void redirectABIEExtension(AggregateCoreComponent ueAcc) throws IOException {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         externalContext.redirect("/core_component/extension/" + ueAcc.getAccId());
+    }
+
+    @Override
+    public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+        BIENode bieNode = (BIENode) getSelectedTreeNode().getData();
+        String componentId = component.getId();
+        int oldValue = Integer.MIN_VALUE;
+        switch (componentId) {
+            case "asbieMin":
+                oldValue = ((ASBIEPNode) bieNode).getAsbie().getCardinalityMin();
+                break;
+            case "asbieMax":
+                oldValue = ((ASBIEPNode) bieNode).getAsbie().getCardinalityMax();
+                break;
+            case "bbieMin":
+                oldValue = ((BBIEPNode) bieNode).getBbie().getCardinalityMin();
+                break;
+            case "bbieMax":
+                oldValue = ((BBIEPNode) bieNode).getBbie().getCardinalityMax();
+                break;
+            case "bbieScMin":
+                oldValue = ((BBIESCNode) bieNode).getBbieSc().getCardinalityMin();
+                break;
+            case "bbieScMax":
+                oldValue = ((BBIESCNode) bieNode).getBbieSc().getCardinalityMax();
+                break;
+        }
+
+        try {
+            if (value == null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "Allow only numeric value or 'unbounded'."));
+                throw new NumberFormatException();
+            }
+
+            int newValue = (Integer) value;
+            switch (componentId) {
+                case "asbieMin":
+                    ((ASBIEPNode) bieNode).getAsbie().setCardinalityMin(newValue);
+                    break;
+                case "asbieMax":
+                    ((ASBIEPNode) bieNode).getAsbie().setCardinalityMax(newValue);
+                    break;
+                case "bbieMin":
+                    ((BBIEPNode) bieNode).getBbie().setCardinalityMin(newValue);
+                    break;
+                case "bbieMax":
+                    ((BBIEPNode) bieNode).getBbie().setCardinalityMax(newValue);
+                    break;
+                case "bbieScMin":
+                    ((BBIESCNode) bieNode).getBbieSc().setCardinalityMin(newValue);
+                    break;
+                case "bbieScMax":
+                    ((BBIESCNode) bieNode).getBbieSc().setCardinalityMax(newValue);
+                    break;
+            }
+
+            onChangeData(bieNode);
+        } catch (Throwable t) {
+            if (oldValue > Integer.MIN_VALUE) {
+                ((HtmlInputText) component).setSubmittedValue(oldValue);
+
+                switch (componentId) {
+                    case "asbieMin":
+                        ((ASBIEPNode) bieNode).getAsbie().setCardinalityMin(oldValue);
+                        break;
+                    case "asbieMax":
+                        ((ASBIEPNode) bieNode).getAsbie().setCardinalityMax(oldValue);
+                        break;
+                    case "bbieMin":
+                        ((BBIEPNode) bieNode).getBbie().setCardinalityMin(oldValue);
+                        break;
+                    case "bbieMax":
+                        ((BBIEPNode) bieNode).getBbie().setCardinalityMax(oldValue);
+                        break;
+                    case "bbieScMin":
+                        ((BBIESCNode) bieNode).getBbieSc().setCardinalityMin(oldValue);
+                        break;
+                    case "bbieScMax":
+                        ((BBIESCNode) bieNode).getBbieSc().setCardinalityMax(oldValue);
+                        break;
+                }
+
+                onChangeData(bieNode);
+            }
+
+            throw t;
+        }
     }
 }

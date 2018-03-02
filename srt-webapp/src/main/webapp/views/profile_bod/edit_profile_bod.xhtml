@@ -185,20 +185,17 @@
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, asbiePanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
                                                     <h:inputText id="asbieMax" value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
-                                                        <f:selectItems value="#{editProfileBODBean.availableCardinalityMax(editProfileBODBean.selectedTreeNode.data.asbie)}"/>
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, asbiePanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, asbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -326,9 +323,8 @@
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, bbiePanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -336,9 +332,8 @@
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, bbiePanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, bbiePanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -506,9 +501,8 @@
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, bbieScPanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -516,9 +510,8 @@
                                                                  styleClass="section-content input-section ${editProfileBODBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
                                                                  disabled="${editProfileBODBean.selectedTreeNode.data.used == false ? 'true' : ''}">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                        <p:ajax listener="#{editProfileBODBean.onChangeData(editProfileBODBean.selectedTreeNode.data)}"
-                                                                update="growl, bbieScPanelForEditing, :form:btnGroup"/>
+                                                        <f:validator binding="#{editProfileBODBean}"/>
+                                                        <p:ajax update="growl, bbieScPanelForEditing, :form:btnGroup"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
@@ -715,7 +708,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -723,7 +715,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -819,7 +810,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -827,7 +817,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
@@ -968,7 +957,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMinConverter}"/>
-                                                        <f:validator binding="#{cardinalityMinConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Max" styleClass="section-label"/>
@@ -976,7 +964,6 @@
                                                                  styleClass="section-content input-section disabled"
                                                                  disabled="true">
                                                         <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </h:inputText>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>

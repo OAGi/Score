@@ -557,7 +557,7 @@ public class NodeService {
             this.parent = parent;
             this.bcc = bcc;
             this.releaseId = releaseId;
-            
+
             this.enableShowingGroup = enableShowingGroup;
             this.bccp = coreComponentService.findBccp(bcc, releaseId);
         }
@@ -568,7 +568,7 @@ public class NodeService {
             this.parent = parent;
             this.bccp = bccp;
             this.releaseId = releaseId;
-            
+
             this.enableShowingGroup = enableShowingGroup;
         }
 
@@ -1465,8 +1465,7 @@ public class NodeService {
 
         @Override
         public void validate() {
-            BasicBusinessInformationEntitySupplementaryComponent bbieSc =
-                    getBbieSc();
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = getBbieSc();
             if (bbieSc == null || !bbieSc.isDirty()) {
                 return;
             }
@@ -1503,6 +1502,13 @@ public class NodeService {
     }
 
     private void ensureCardinalityMin(int originalCardinalityMin, int cardinalityMin, int cardinalityMax) {
+        if (cardinalityMin < 0) {
+            throw new IllegalStateException("'Min' must be greater than or equals to " + originalCardinalityMin + ".");
+        }
+        if (cardinalityMax < -1) {
+            throw new IllegalStateException("'Max' must be greater than or equals to -1 (unbounded).");
+        }
+
         if (cardinalityMax == -1) {
             cardinalityMax = Integer.MAX_VALUE;
         }
@@ -1624,7 +1630,7 @@ public class NodeService {
             if (progressListener != null) {
                 progressListener.setMaxCount(
                         abieList.size() + asbiepList.size() + asbieList.size() +
-                        bbiepList.size() + bbieList.size() + bbieScList.size()
+                                bbiepList.size() + bbieList.size() + bbieScList.size()
                 );
             }
 
@@ -1698,8 +1704,8 @@ public class NodeService {
                         abieNode.getAbie();
 
                 if ((asbie != null && asbie.isDirty()) ||
-                    (asbiep != null && asbiep.isDirty()) ||
-                    (abie != null && abie.isDirty())) {
+                        (asbiep != null && asbiep.isDirty()) ||
+                        (abie != null && abie.isDirty())) {
                     if (abie != null) {
                         abieList.add(abie);
                     }
@@ -1725,7 +1731,7 @@ public class NodeService {
                 BasicBusinessInformationEntityProperty bbiep = bbiepNode.getBbiep();
 
                 if ((bbie != null && bbie.isDirty()) ||
-                    (bbiep != null && bbiep.isDirty())) {
+                        (bbiep != null && bbiep.isDirty())) {
                     if (bbie != null) {
                         bbieList.add(bbie);
                     }
@@ -1820,7 +1826,7 @@ public class NodeService {
         Collection<? extends BIENode> children = null;
         if (bieNode instanceof ABIENodeImpl) {
             children = ((ABIENodeImpl) bieNode).children;
-        } else  if (bieNode instanceof AssociationBIEPropertyNodeImpl) {
+        } else if (bieNode instanceof AssociationBIEPropertyNodeImpl) {
             children = ((AssociationBIEPropertyNodeImpl) bieNode).type.children;
         } else if (bieNode instanceof BasicBIEPropertyNodeImpl) {
             children = ((BasicBIEPropertyNodeImpl) bieNode).children;
@@ -2048,7 +2054,7 @@ public class NodeService {
             if (progressListener != null) {
                 progressListener.setMaxCount(
                         abieList.size() + asbiepList.size() + asbieList.size() +
-                        bbiepList.size() + bbieList.size() + bbieScList.size()
+                                bbiepList.size() + bbieList.size() + bbieScList.size()
                 );
             }
 
@@ -2206,8 +2212,8 @@ public class NodeService {
                 AggregateBusinessInformationEntity abie = abieNode.getAbie();
 
                 if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() > 0L)) ||
-                    (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
-                    (abie != null && (abie.isDirty()) || abie.getAbieId() > 0L)) {
+                        (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
+                        (abie != null && (abie.isDirty()) || abie.getAbieId() > 0L)) {
                     if (abie != null) {
                         if (abie.getAbieId() > 0L) {
                             abie = prevAbieIdMap.get(abie.getAbieId());
@@ -2291,7 +2297,7 @@ public class NodeService {
                         bbiepNode.getBbiep();
 
                 if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() > 0L)) ||
-                    (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
+                        (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
                     if (bbie != null) {
                         long bbieId = bbie.getBbieId();
                         if (bbieId > 0L) {
@@ -2394,8 +2400,8 @@ public class NodeService {
                     AggregateBusinessInformationEntity abie = abieNode.getAbie();
 
                     if ((asbie != null && (asbie.isDirty() || asbie.getAsbieId() > 0L)) ||
-                        (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
-                        (abie != null && (abie.isDirty()) || abie.getAbieId() > 0L)) {
+                            (asbiep != null && (asbiep.isDirty() || asbiep.getAsbiepId() > 0L)) ||
+                            (abie != null && (abie.isDirty()) || abie.getAbieId() > 0L)) {
                         return true;
                     }
                 } else if (node instanceof BBIEPNode) {
@@ -2407,7 +2413,7 @@ public class NodeService {
                             bbiepNode.getBbiep();
 
                     if ((bbie != null && (bbie.isDirty() || bbie.getBbieId() > 0L)) ||
-                        (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
+                            (bbiep != null && (bbiep.isDirty() || bbiep.getBbiepId() > 0L))) {
                         return true;
                     }
                 } else if (node instanceof BBIESCNode) {
