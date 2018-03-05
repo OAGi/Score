@@ -22,6 +22,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
 
 	<dependencies>
@@ -57,4 +58,57 @@
 			<version>${lucene.version}</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>maven-central</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>spring-io-plugin-repo</id>
+			<name>Spring.io Plugin Repository</name>
+			<url>http://repo.spring.io/plugins-release/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-io-plugin-repo</id>
+			<name>Spring.io Plugin Repository</name>
+			<url>http://repo.spring.io/plugins-release/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven-site-plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.shared</groupId>
+						<artifactId>maven-shared-jar</artifactId>
+						<version>1.1</version>
+						<exclusions>
+							<exclusion>
+								<groupId>org.apache.bcel</groupId>
+								<artifactId>bcel</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+					<dependency>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>bcel-findbugs</artifactId>
+						<version>6.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
 </project>
