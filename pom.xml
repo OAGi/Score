@@ -1,41 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.oagi</groupId>
-	<artifactId>srt</artifactId>
-	<version>1.0.0</version>
-	<packaging>pom</packaging>
-	<modules>
-		<module>srt-common</module>
-		<module>srt-repository</module>
-		<module>srt-import</module>
-		<module>srt-service</module>
-		<module>srt-webapp</module>
-	</modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.oagi</groupId>
+    <artifactId>srt</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>srt-common</module>
+        <module>srt-repository</module>
+        <module>srt-import</module>
+        <module>srt-service</module>
+        <module>srt-webapp</module>
+    </modules>
 
-	<name>oagi-srt</name>
-	<url>https://github.com/OAGi/OAGi-Semantic-Refinement-and-Tooling</url>
-	<description>OAGi Semantic Refinement and Tooling</description>
+    <name>oagi-srt</name>
+    <url>https://github.com/OAGi/OAGi-Semantic-Refinement-and-Tooling</url>
+    <description>OAGi Semantic Refinement and Tooling</description>
 
-	<properties>
-		<java.version>1.8</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dependency.locations.enabled>false</dependency.locations.enabled>
 
-		<spring.framework.version>4.3.12.RELEASE</spring.framework.version>
-		<spring.boot.version>1.5.8.RELEASE</spring.boot.version>
-		<spring.data.jpa.version>1.11.8.RELEASE</spring.data.jpa.version>
-		<spring.data.commons.version>1.13.8.RELEASE</spring.data.commons.version>
-		<spring.data.rest.version>2.6.8.RELEASE</spring.data.rest.version>
-		<spring.hateoas.version>0.23.0.RELEASE</spring.hateoas.version>
-		<spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
-		<spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
-		<commons.logging.version>1.2</commons.logging.version>
-		<guava.version>19.0</guava.version>
-		<hibernate.version>5.0.12.Final</hibernate.version>
-		<org.ow2.asm.version>5.0.4</org.ow2.asm.version>
-		<xml.apis.version>1.4.01</xml.apis.version>
-		<lucene.version>7.1.0</lucene.version>
-	</properties>
+        <spring.framework.version>4.3.12.RELEASE</spring.framework.version>
+        <spring.boot.version>1.5.8.RELEASE</spring.boot.version>
+        <spring.data.jpa.version>1.11.8.RELEASE</spring.data.jpa.version>
+        <spring.data.commons.version>1.13.8.RELEASE</spring.data.commons.version>
+        <spring.data.rest.version>2.6.8.RELEASE</spring.data.rest.version>
+        <spring.hateoas.version>0.23.0.RELEASE</spring.hateoas.version>
+        <spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
+        <spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
+        <commons.logging.version>1.2</commons.logging.version>
+        <guava.version>19.0</guava.version>
+        <hibernate.version>5.0.12.Final</hibernate.version>
+        <org.ow2.asm.version>5.0.4</org.ow2.asm.version>
+        <xml.apis.version>1.4.01</xml.apis.version>
+        <lucene.version>7.1.0</lucene.version>
+
+        <maven-site-plugin.version>3.6</maven-site-plugin.version>
+        <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>maven-central</id>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>spring-io-plugin-repo</id>
+            <name>Spring.io Plugin Repository</name>
+            <url>http://repo.spring.io/plugins-release/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-io-plugin-repo</id>
+            <name>Spring.io Plugin Repository</name>
+            <url>http://repo.spring.io/plugins-release/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-shared-jar</artifactId>
+                        <version>1.1</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.apache.bcel</groupId>
+                                <artifactId>bcel</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>bcel-findbugs</artifactId>
+                        <version>6.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>
