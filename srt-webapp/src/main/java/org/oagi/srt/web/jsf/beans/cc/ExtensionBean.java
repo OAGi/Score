@@ -112,7 +112,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         AggregateCoreComponent targetAcc = coreComponentService.findAcc(ascc.getFromAccId(), releaseId);
         setTargetAcc(targetAcc);
 
-        boolean enableShowingGroup = false;
+        boolean enableShowingGroup = true;
         TreeNode treeNode = createTreeNode(targetAcc, releaseId, enableShowingGroup);
         setTreeNode(treeNode);
     }

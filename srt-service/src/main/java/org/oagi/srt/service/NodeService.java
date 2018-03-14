@@ -350,10 +350,11 @@ public class NodeService {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
                 AggregateCoreComponent roleOfAcc = getRoleOfAcc(ascc, releaseId);
                 if (isGroup(roleOfAcc)) {
-                    if (enableShowingGroup) {
+                    // User Extension Group should hide.
+                    if (!isUserExetensionGroup(roleOfAcc) && enableShowingGroup) {
                         associations.add(ascc);
                     } else {
-                        associations.addAll(getAssociations(roleOfAcc, releaseId, state));
+                        associations.addAll(getAssociations(roleOfAcc, releaseId, state, enableShowingGroup));
                     }
                 } else {
                     associations.add(ascc);
@@ -387,6 +388,11 @@ public class NodeService {
     public boolean isGroup(AggregateCoreComponent acc) {
         OagisComponentType oagisComponentType = acc.getOagisComponentType();
         return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
+    }
+
+    public boolean isUserExetensionGroup(AggregateCoreComponent acc) {
+        OagisComponentType oagisComponentType = acc.getOagisComponentType();
+        return oagisComponentType == UserExtensionGroup;
     }
 
     private class AssociationCoreComponentPropertyNodeImpl
