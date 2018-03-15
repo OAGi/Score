@@ -1,0 +1,28 @@
+FROM oraclelinux:7-slim
+
+ENV MYSQL_DATABASE=oagi
+ENV MYSQL_USER=oagi
+ENV MYSQL_PASSWORD=oagi
+ENV MYSQL_ROOT_PASSWORD=oagi
+
+ARG PACKAGE_URL=https://repo.mysql.com/yum/mysql-5.7-community/docker/x86_64/mysql-community-server-minimal-5.7.21-1.el7.x86_64.rpm
+ARG PACKAGE_URL_SHELL=https://repo.mysql.com/yum/mysql-tools-community/el/7/x86_64/mysql-shell-1.0.11-1.el7.x86_64.rpm
+
+# Install server
+RUN rpmkeys --import https://repo.mysql.com/RPM-GPG-KEY-mysql \
+  && yum install -y $PACKAGE_URL $PACKAGE_URL_SHELL libpwquality tzdata \
+  && yum clean all \
+  && mkdir /docker-entrypoint-initdb.d
+
+VOLUME /var/lib/mysql
+
+ADD oagi.sql /docker-entrypoint-initdb.d
+RUN chmod 644 /docker-entrypoint-initdb.d/oagi.sql
+
+COPY docker-entrypoint.sh /entrypoint.sh
+COPY healthcheck.sh /healthcheck.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+HEALTHCHECK CMD /healthcheck.sh
+
+CMD ["mysqld"]

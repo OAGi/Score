@@ -15,10 +15,8 @@ logs/*
 
 backup/*
 data/Model
-Dockerfile*
 docker-compose*
 *.zip
 ~$*
 *.bak
 .dockerignore
-entrypoint.sh
