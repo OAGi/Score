@@ -631,6 +631,10 @@ span.ui-button-text {
     background-color: #03645b !important;
 }
 
+.ui-button.delete, .ui-button.revise > .ui-button-text {
+    font-size: 12px;
+}
+
 .ui-inputfield {
     /*min-width: 440px;*/
     border: 0 !important;
