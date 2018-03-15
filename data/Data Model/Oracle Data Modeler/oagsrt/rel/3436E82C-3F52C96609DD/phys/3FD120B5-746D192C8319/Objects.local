@@ -46,49 +46,6 @@
    <object objectType="Table" objectID="F8C74FF3-2E5A-03ED-F358-EB427AF542C3" name="USAGE_RULE_EXPRESSION" seqName="" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>
    <object objectType="Table" objectID="FB064335-457E-E778-7CF3-9488426DD6D3" name="RELEASE" seqName="" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>
    <object objectType="Table" objectID="FE13509E-243F-D57D-F7C6-A80B37473762" name="NAMESPACE" seqName="" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
-   <object/>
    <object objectType="Sequence" objectID="07C6F27B-23C8-29C1-9E65-D8E75748A2FE" name="DT_USAGE_RULE_ID_SEQ" seqName="seg_0" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>
    <object objectType="Sequence" objectID="0970F846-81E7-E711-0AA0-2C8A2F514BBF" name="ABIE_ID_SEQ" seqName="seg_0" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>
    <object objectType="Sequence" objectID="0A2DE05D-9A6D-D03B-63AE-54D4087619D9" name="CLIENT_ID_SEQ" seqName="seg_0" propertyClassName="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" propertyParentId="3FD120B5-746D192C8319" propertySourceId="" propertyTargetId=""/>

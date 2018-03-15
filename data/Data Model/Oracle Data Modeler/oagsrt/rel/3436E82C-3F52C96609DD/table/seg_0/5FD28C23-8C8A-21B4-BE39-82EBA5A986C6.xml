@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="5FD28C23-8C8A-21B4-BE39-82EBA5A986C6" name="BDT_SC_PRI_RESTRI">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:39:26 UTC</createdTime>
 <comment>This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.&lt;br/&gt;&lt;br/&gt;It should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the BDT_SC_PRI_RESTRI key.</comment>
 <commentInRDBMS>This table is similar to the BDT_PRI_RESTRI table but it is for the BDT SC. The allowed primitives are captured by three columns the CDT_SC_AWD_PRI_XPS_TYPE_MAP, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.&lt;br/&gt;&lt;br/&gt;It should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_AWD_PRI_XPS_TYPE_MAP key rather than the BDT_SC_PRI_RESTRI key.</commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="BDT_SC_PRI_RESTRI_ID" id="E26B5231-05C5-B154-F69D-4EE8B9753BEA">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>Primary, internal database key.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BDT_SC_ID" id="B2B96640-B00D-FAAF-8561-392F0556A738">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>Foreign key to the DT_SC table. This column should only refers to a DT_SC that belongs to a BDT (not CDT).</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -38,7 +38,7 @@
 </associations>
 </Column>
 <Column name="CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID" id="E4DD6A54-2FE3-EA24-6550-79DF89CDA0E5">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>This column is a forieng key to the CDT_SC_AWD_PRI_XPS_TYPE_MAP table. It allows for a primitive restriction based on a built-in type of schema expressions.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -54,7 +54,7 @@
 </associations>
 </Column>
 <Column name="CODE_LIST_ID" id="6AD73027-6A11-ACBB-1183-D657EB502040">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>Foreign key to identify a code list. It allows for a primitive restriction based on a code list.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -70,7 +70,7 @@
 </associations>
 </Column>
 <Column name="AGENCY_ID_LIST_ID" id="68B9AE7A-E167-B5A5-B648-0D73F5196955">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -86,7 +86,7 @@
 </associations>
 </Column>
 <Column name="IS_DEFAULT" id="8FA94D07-91D6-3613-1DD1-C873FDDF62CC">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <commentInRDBMS>This column specifies the default primitive for a BDT. It is typically the most generic primitive allowed for the BDT.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -100,7 +100,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="188D9C42-C66C-4822-BB89-1B55A2B16582" name="BSPR_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:15 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -111,7 +111,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="5977F663-C8BA-89F7-B4BB-002A3755C1CD" name="BDT_SPR_PK_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:15:30 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Unique Plain Index</indexState>
@@ -121,7 +121,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="B95E200A-BE58-CCB9-2985-CDFB6DEDF540" name="BDT_SPR_BDT_SC_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:15:30 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -130,7 +130,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="02B39975-7616-39BF-80AE-BC3D5E41832D" name="BDT_SPR_CSAPXTM_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:15:30 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -139,7 +139,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="1CBCA93A-DBFE-EF9B-7EC2-378234E77648" name="BDT_SPR_CODE_LIST_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:15:30 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -148,7 +148,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="498F83EE-A66D-0967-82FA-7735E5231E97" name="BDT_SPR_AGENCY_ID_LIST_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:15:30 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -157,7 +157,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7494F33B-CE86-EABD-896C-BB8988F5B855" name="BSPR_BDT_SC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:59 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -167,7 +167,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="AC8B2F32-9808-9E36-157F-366179EEBB45" name="BSPR_CSAPXTM_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:59 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -177,7 +177,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="BBA9942D-370C-9658-AA54-6C6CF43AC094" name="BSPR_CODE_LIST_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:59 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -187,7 +187,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="8B61CD91-E037-5C30-F964-98E318E91099" name="BSPR_AGENCY_ID_LIST_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:40:59 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

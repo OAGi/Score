@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="BC6B1CE0-0327-5BC9-43CB-6670E8510C7D" name="RELEASE">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>FB064335-457E-E778-7CF3-9488426DD6D3</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -17,7 +17,7 @@
 <normalForm>Third</normalForm>
 <attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
 <Attribute name="RELEASE ID" id="2C45762D-1B45-2CD7-6BEE-8D163A472940">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>61EC25A9-2D77-E657-DCA9-0A16AD8CC65B</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -31,7 +31,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="RELEASE NUM" id="33078AAE-A660-52A2-4289-2BAB242DB538">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>F39FFB99-141E-90FA-F4B4-DC49400D7CA0</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -46,7 +46,7 @@
 <ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="RELEASE NOTE" id="110679EA-23FD-D5CB-21DB-995A9880B860">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>69EB6DC7-3321-AE4C-5F14-95626A3CD603</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -60,7 +60,7 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="NAMESPACE ID" id="CD17AD5B-01F4-D247-51DE-CF10BBE40D28">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>596AC5C4-FF9A-A1BC-C483-277C43177556</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -77,7 +77,7 @@
 </attributes>
 <identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
 <identifier id="EAA88CAB-43BF-548B-1EE6-20C04C30FAFF" name="RELEASE PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>EDDBBA5B-8572-C4D8-FCEF-47742BBA7C1E</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>

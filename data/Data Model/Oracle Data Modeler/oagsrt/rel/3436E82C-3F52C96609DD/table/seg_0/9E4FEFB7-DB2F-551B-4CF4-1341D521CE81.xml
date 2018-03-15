@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="9E4FEFB7-DB2F-551B-4CF4-1341D521CE81" name="BCC">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:25:27 UTC</createdTime>
 <comment>A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. </comment>
 <commentInRDBMS>A BCC represents a relationship/association between an ACC and a BCCP. It creates a data element for an ACC. </commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="BCC_ID" id="6E215D1D-333A-D2D4-4E12-57C38E41DD9B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>A internal, primary database key of an BCC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="GUID" id="F91DC696-55CB-B99B-AE5E-BBA72FD7A23F">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>A globally unique identifier (GUID) of BCC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.&apos;,</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -35,7 +35,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CARDINALITY_MIN" id="707A54A0-330F-D407-BDC7-81ACB15259B4">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Minimum cardinality of the TO_BCCP_ID. The valid values are non-negative integer.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -47,7 +47,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CARDINALITY_MAX" id="DC80AC42-0D5E-9AEC-02C8-07D6F143E7C1">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Maximum cardinality of the TO_BCCP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.&apos;,</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -60,7 +60,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="TO_BCCP_ID" id="67C1B6DF-FB43-10CA-8F8C-A18EC3A2FED7">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>TO_BCCP_ID is a foreign key to an BCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. &lt;br/&gt;&lt;br/&gt;Note that for the BCC history records, this column always points to the BCCP_ID of the current record of a BCCP.&apos;,</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -75,7 +75,7 @@
 </associations>
 </Column>
 <Column name="FROM_ACC_ID" id="02205EB9-8D83-BC01-91C9-32F2501E615D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>FROM_ACC_ID is a foreign key pointing to an ACC record. It is basically pointing to a parent data element (type) of the TO_BCCP_ID. &lt;br/&gt;&lt;br/&gt;Note that for the BCC history records, this column always points to the ACC_ID of the current record of an ACC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -90,7 +90,7 @@
 </associations>
 </Column>
 <Column name="SEQ_KEY" id="B6E20AF6-69E1-1B28-9CD3-6FDE36B22626">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -103,7 +103,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="ENTITY_TYPE" id="1CE4BD8D-9AC1-FDD3-38B0-904F5193863F">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -116,7 +116,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEN" id="44E6B1B4-FCD9-ED00-DA22-74E5D6522690">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + &quot;_ &quot; + OBJECT_CLASS_TERM + &quot;. &quot; + DEN. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -128,7 +128,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEFINITION" id="2D525BCA-B2E0-9BF0-FD63-69C5D7DE4808">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-07-27 20:14:27 UTC</createdTime>
 <commentInRDBMS>This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -140,7 +140,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEFINITION_SOURCE" id="4AF2496F-5A7E-2501-5748-C1DE8A5AB3C8">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-07-27 20:14:27 UTC</createdTime>
 <commentInRDBMS>This is typically a URL identifying the source of the DEFINITION column.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -153,7 +153,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CREATED_BY" id="D8E04933-D95D-8CDC-D2A4-2AE87F0BEBAB">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Foreign key to the APP_USER table referring to the user who creates the entity.&lt;br/&gt;&lt;br/&gt;This column never change between the history and the current record. The history record should have the same value as that of its current record.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -168,7 +168,7 @@
 </associations>
 </Column>
 <Column name="OWNER_USER_ID" id="E1072710-8419-ADE4-E4C5-114395FFCC6B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.&lt;br/&gt;&lt;br/&gt;The ownership can change throughout the history, but undoing shouldn&apos;t rollback the ownership.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -183,7 +183,7 @@
 </associations>
 </Column>
 <Column name="LAST_UPDATED_BY" id="D31A6250-F937-1F55-18D4-BE907A33EB26">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Foreign key to the APP_USER table referring to the last user who has updated the record. &lt;br/&gt;&lt;br/&gt;In the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -198,7 +198,7 @@
 </associations>
 </Column>
 <Column name="CREATION_TIMESTAMP" id="098E784E-0FDE-209D-C1E5-5F481669316A">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Timestamp when the revision of the BCC was created. &lt;br/&gt;&lt;br/&gt;This never change for a revision.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -210,7 +210,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="LAST_UPDATE_TIMESTAMP" id="C906BF96-1652-0712-D4B4-ED72BD35780C">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>The timestamp when the record was last updated.&lt;br/&gt;&lt;br/&gt;The value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the change has occurred.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -222,7 +222,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="STATE" id="C36550E0-0FC6-8BB0-043A-E4D96FDDE390">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>1 = EDITING, 2 = CANDIDATE, 3 = PUBLISHED. This is the revision life cycle state of the entity.&lt;br/&gt;&lt;br/&gt;State change can&apos;t be undone. But the history record can still keep the records of when the state was changed.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -234,7 +234,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REVISION_NUM" id="4B32B5F1-061B-3435-5DFF-6F9A0D062A13">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>REVISION_NUM is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 0, 1, 2, and so on. A record with zero revision number reflects the current record of the component (the identity of a component in this case is its GUID or the primary key).</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -246,7 +246,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REVISION_TRACKING_NUM" id="FCF82C94-6EA2-3655-4D00-B2424FEA6C2C">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>REVISION_TRACKING_NUM supports the ability to undo changes during a revision (life cycle of a revision is from the component&apos;s EDITING state to PUBLISHED state). Once the component has transitioned into the PUBLISHED state for its particular revision, all revision tracking records are deleted except the latest one. REVISION_TRACKING_NUM can be 0, 1, 2, and so on. The zero value is assign to the record with REVISION_NUM = 0 as a default.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -258,7 +258,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REVISION_ACTION" id="1CE9FF0C-AF46-8820-425F-60C138E14105">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This indicates the action associated with the record. The action can be 1 = INSERT, 2 = UPDATE, and 3 = DELETE. This column is null for the current record.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -271,7 +271,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="RELEASE_ID" id="FE1A50F5-66DF-0D25-026D-B023E0242A59">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>RELEASE_ID is an incremental integer. It is an unformatted counterpart of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. RELEASE_ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated RELEASE_ID because some revisions may never be released.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -287,7 +287,7 @@
 </associations>
 </Column>
 <Column name="CURRENT_BCC_ID" id="3A8E6233-2866-D9A7-CD72-7DC338E66D33">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.&lt;br/&gt;&lt;br/&gt;It is noted that although this is a foreign key by definition, we don&apos;t specify a foreign key in the data model. This is because when an entity is deleted the current record won&apos;t exist anymore.&lt;br/&gt;&lt;br/&gt;The value of this column for the current record should be left NULL.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -303,7 +303,7 @@
 </associations>
 </Column>
 <Column name="IS_DEPRECATED" id="26ABF394-01C8-D4E0-CCE1-A86CC8539D9D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -315,7 +315,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="IS_NILLABLE" id="4678CBAB-3951-B489-5238-C68FF22D95E3">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>Indicate whether the field can have a NULL This is corresponding to the nillable flag in the XML schema.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -327,7 +327,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEFAULT_VALUE" id="09653B8D-D5BE-F6A7-EDBD-996F39F96309">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <commentInRDBMS>This set the default value at the association level. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -341,7 +341,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="38274755-57CC-B456-551F-86BBC4995B1C" name="BCC_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -352,7 +352,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="C4364018-B460-789E-B222-03833A956086" name="BCC_TO_BCCP_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:40 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -362,7 +362,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="BC56D5FC-E08A-7850-48AF-E2046A6DBACD" name="BCC_FROM_ACC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:29:50 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -372,7 +372,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="4E2CB801-3927-A4D6-9538-AEC2483A871F" name="BCC_CREATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -382,7 +382,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="3378CB33-B951-9DC6-7B69-C8581170C3F6" name="BCC_OWNER_USER_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -392,7 +392,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="03D765D0-45C0-FC17-C89D-C792A036DD61" name="BCC_LAST_UPDATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -402,7 +402,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="A30F0AEC-C129-EF84-0980-AAFB7B0E474D" name="BCC_RELEASE_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -412,7 +412,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="6227147B-3E69-F80C-4729-52763656CDFA" name="BCC_CURRENT_BCC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:30:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

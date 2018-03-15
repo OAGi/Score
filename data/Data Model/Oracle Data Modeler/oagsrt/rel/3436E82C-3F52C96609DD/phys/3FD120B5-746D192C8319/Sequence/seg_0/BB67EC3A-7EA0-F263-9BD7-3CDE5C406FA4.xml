@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <SequenceOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.SequenceOraclev10g" name="CDT_AWD_PRI_ID_SEQ" directorySegmentName="seg_0" id="BB67EC3A-7EA0-F263-9BD7-3CDE5C406FA4">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-06-28 15:52:28 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <incrementBy>1</incrementBy>

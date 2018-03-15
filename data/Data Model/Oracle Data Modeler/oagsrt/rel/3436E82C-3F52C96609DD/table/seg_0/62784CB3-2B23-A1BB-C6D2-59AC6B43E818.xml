@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="62784CB3-2B23-A1BB-C6D2-59AC6B43E818" name="ABIE">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:13:06 UTC</createdTime>
 <comment>The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.&lt;br/&gt;&lt;br/&gt;It should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE &quot;SEMANTIC_GROUP&quot;, &quot;USER_EXTENSION_GROUP&quot;, etc.</comment>
 <commentInRDBMS>The ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the BUSINESS_CTX_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.&lt;br/&gt;&lt;br/&gt;It should be noted that, per design document, there is no corresponding ABIE created for an ACC which will not show up in the instance document such as ACCs of OAGIS_COMPONENT_TYPE &quot;SEMANTIC_GROUP&quot;, &quot;USER_EXTENSION_GROUP&quot;, etc.</commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="ABIE_ID" id="C59E5D9E-2C77-185D-7AFC-7C43FA943385">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>A internal, primary database key of an ABIE.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="GUID" id="5DD0AC13-AEEE-7F22-8057-82D6914DF9E5">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>A globally unique identifier (GUID) of an ABIE. GUID of an ABIE is different from its based ACC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -35,7 +35,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BASED_ACC_ID" id="31E58E6D-99EE-9141-9031-93D67D0CBD1E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>A foreign key to the ACC table refering to the ACC, on which the business context has been applied to derive this ABIE.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -50,7 +50,7 @@
 </associations>
 </Column>
 <Column name="BIZ_CTX_ID" id="D87C3EDE-41CF-4696-10CD-B167C779F400">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 21:27:17 UTC</createdTime>
 <commentInRDBMS>A foreign key to the BIZ_CTX table. This column stores the business context assigned to the ABIE.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -65,7 +65,7 @@
 </associations>
 </Column>
 <Column name="DEFINITION" id="2467CF6D-50C2-3E8F-5E75-1DC365FD969B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-07-27 20:09:07 UTC</createdTime>
 <commentInRDBMS>Definition to override the ACC&apos;s definition. If NULL, it means that the definition should be inherited from the based CC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -77,7 +77,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CREATED_BY" id="B87AA5AC-6CE3-FC75-E351-559BE67EDE5E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the user who creates the ABIE. The creator of the ABIE is also its owner by default. ABIEs created as children of another ABIE have the same CREATED_BY as its parent.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -92,7 +92,7 @@
 </associations>
 </Column>
 <Column name="LAST_UPDATED_BY" id="10DE0123-E13C-2396-ED54-70CC1C509C40">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the last user who has updated the ABIE record. This may be the user who is in the same group as the creator.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -107,7 +107,7 @@
 </associations>
 </Column>
 <Column name="CREATION_TIMESTAMP" id="E5D9E23A-0BC6-2D0D-41EB-A1B5F21D377D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>Timestamp when the ABIE record was first created. ABIEs created as children of another ABIE have the same CREATION_TIMESTAMP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -119,7 +119,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="LAST_UPDATE_TIMESTAMP" id="27444F28-B37C-26D9-3CA0-39819B2C4E99">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>The timestamp when the ABIE was last updated.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -131,7 +131,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="STATE" id="E1D29F4F-9B32-AEB2-01FB-87B85442E750">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 21:28:55 UTC</createdTime>
 <commentInRDBMS>2 = EDITING, 4 = PUBLISHED. This column is only used with a top-level ABIE, because that is the only entry point for editing. The state value indicates the visibility of the top-level ABIE to users other than the owner. In the user group environment, a logic can apply that other users in the group can see the top-level ABIE only when it is in the &apos;Published&apos; state.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -144,7 +144,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CLIENT_ID" id="6DA327BF-C6A3-A81E-F29F-33B48A571BC1">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>This is a foreign key to the CLIENT table. The use case associated with this column is to indicate the organizational entity for which the profile BOD is created. For example, Boeing may generate a profile BOD for Boeing civilian or Boeing defense. It is more for the documentation purpose. Only an ABIE which is the top-level ABIE can use this column.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -160,7 +160,7 @@
 </associations>
 </Column>
 <Column name="VERSION" id="524E4BE5-70CF-BE30-4C87-DB8086E8E788">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>This column hold a version number assigned by the user. This column is only used by the top-level ABIE. No format of version is enforced.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -173,7 +173,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="STATUS" id="DCC72BDC-6B95-D17B-2FAA-FC0CFC1A6BF7">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>This is different from the STATE column which is CRUD life cycle of an entity. The use case for this is to allow the user to indicate the usage status of a top-level ABIE (a profile BOD). An integration architect can use this column. Example values are ‘Prototype’, ‘Test’, and ‘Production’. Only the top-level ABIE can use this field.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -186,7 +186,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REMARK" id="6F1C55C3-C2B2-B9EB-D36E-02EB4F893ECF">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be &quot;Type of BOM should be recognized in the BOM/typeCode.&quot;</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -199,7 +199,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BIZ_TERM" id="161FD6B8-35E9-D6CA-3796-45EF6FCC17D9">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <commentInRDBMS>To indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -212,7 +212,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="OWNER_TOP_LEVEL_ABIE_ID" id="32BC279F-7BC0-55C4-30D6-FEE4AF40FE20">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:08:03 UTC</createdTime>
 <commentInRDBMS>This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -229,7 +229,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="408A5EA7-DB83-FEE6-910C-A373C48B9DCB" name="ABIE_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -240,7 +240,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="F5959EAE-1050-D39E-7303-1FFC1ABEC099" name="ABIE_OWNER_TOP_LVL_ABIE_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:06:01 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -249,7 +249,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="D1357B45-70CB-E06C-BDD6-D3D22E3A7065" name="ABIE_BASED_ACC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:15:51 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -259,7 +259,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="3BFA9A38-0799-2BB0-CEA2-F0F01C80C0DA" name="ABIE_CREATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:16:35 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -269,7 +269,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="1EFAA121-31AB-D8B7-E039-F7AD056C6E43" name="ABIE_LAST_UPDATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:16:35 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -279,7 +279,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="2EEF8C3E-EB9F-BF7D-87C1-85BED1FE001D" name="ABIE_CLIENT_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:16:35 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -289,7 +289,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="6EB9E5FA-F7B1-5219-65BA-F6C4B73F652E" name="ABIE_BIZ_CTX_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 21:29:32 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -299,7 +299,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="E82CFF3C-1132-859B-6EC0-4090F9166373" name="ABIE_TOP_LEVEL_ABIE_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:08:32 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

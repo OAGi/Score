@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="5C468B32-F34E-0690-F8FF-E5F24D48C598" name="BBIE">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:33:05 UTC</createdTime>
 <comment>A BBIE represents a relationship/association between an ABIE and a BBIEP. It is a contextualization of a BCC. The BBIE table also stores some information about the specific constraints related to the BDT associated with the BBIEP. In particular, the three columns including the BDT_PRI_RESTRI_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID allows for capturing of the specific primitive to be used in the context. Only one column among the three can have a value in a particular record.</comment>
 <commentInRDBMS>A BBIE represents a relationship/association between an ABIE and a BBIEP. It is a contextualization of a BCC. The BBIE table also stores some information about the specific constraints related to the BDT associated with the BBIEP. In particular, the three columns including the BDT_PRI_RESTRI_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID allows for capturing of the specific primitive to be used in the context. Only one column among the three can have a value in a particular record.</commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="BBIE_ID" id="2C7ADB03-0523-5076-F3AB-BB20525308D9">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>A internal, primary database key of a BBIE.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="GUID" id="5C770334-E7DF-68CD-110E-85F069D3A790">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>A globally unique identifier (GUID) of an SC. GUID of a BBIE&apos;s SC is different from the one in the DT_SC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -35,7 +35,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BASED_BCC_ID" id="00FDC17F-FCA9-5EE4-78CF-657812879A2E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>The BASED_BCC_ID column refers to the BCC record, which this BBIE contextualizes.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -50,7 +50,7 @@
 </associations>
 </Column>
 <Column name="FROM_ABIE_ID" id="293C7D1F-AD94-BE64-1421-1D64B3741709">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>FROM_ABIE_ID must be based on the FROM_ACC_ID in the BASED_BCC_ID.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -65,7 +65,7 @@
 </associations>
 </Column>
 <Column name="TO_BBIEP_ID" id="6BFCE1E9-130D-FEEF-E893-BD0D7AFF5776">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>TO_BBIEP_ID is a foreign key to the BBIEP table. TO_BBIEP_ID basically refers to a child data element of the FROM_ABIE_ID. TO_BBIEP_ID must be based on the TO_BCCP_ID in the based BCC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -80,7 +80,7 @@
 </associations>
 </Column>
 <Column name="BDT_PRI_RESTRI_ID" id="3849C732-3C66-E32B-BF1D-5C85E4E4F5F7">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This is the foreign key to the BDT_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -96,7 +96,7 @@
 </associations>
 </Column>
 <Column name="CODE_LIST_ID" id="50B311E5-F91F-8234-0B9D-BC568AFC8743">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This is a foreign key to the CODE_LIST table. If a code list is assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the BDT_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -112,7 +112,7 @@
 </associations>
 </Column>
 <Column name="AGENCY_ID_LIST_ID" id="7AD9411D-61D8-ACCB-F55D-D716AEC5C81A">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:30:09 UTC</createdTime>
 <commentInRDBMS>This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -128,7 +128,7 @@
 </associations>
 </Column>
 <Column name="CARDINALITY_MIN" id="FEF301D6-E5DA-104A-7469-0940B639294B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>The minimum occurrence constraint for the BBIE. A valid value is a non-negative integer.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -140,7 +140,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CARDINALITY_MAX" id="92690CE5-5BD4-E6F5-48A2-FD9989720FD6">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>Maximum occurence constraint of the TO_BBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -153,7 +153,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEFAULT_VALUE" id="022C1799-9D2E-16F2-F681-9D6FB11AA16F">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -165,7 +165,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="IS_NILLABLE" id="B9362FF4-3E04-009D-8493-61D4F17D940E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>Indicate whether the field can have a null  This is corresponding to the nillable flag in the XML schema.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -177,7 +177,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="FIXED_VALUE" id="AF6BEB46-449B-5830-D08B-10D720AF7E65">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -189,7 +189,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="IS_NULL" id="BA0E8D3F-6E81-0964-98AC-68DD3DF21D19">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This column indicates whether the field is fixed to NULL. IS_NULLl can be true only if the IS_NILLABLE is true. If IS_NULL is true then the FIX_VALUE and DEFAULT_VALUE columns cannot have a value.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -201,7 +201,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="DEFINITION" id="42CE482D-584B-BE4E-D54B-83720F2A542B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-07-27 20:12:58 UTC</createdTime>
 <commentInRDBMS>Description to override the BCC definition. If NULL, it means that the definition should be inherited from the based BCC.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -213,7 +213,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REMARK" id="09348972-9A42-9D84-17AD-33249331F8C6">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be &quot;Type of BOM should be recognized in the BOM/typeCode.&quot;</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -226,7 +226,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CREATED_BY" id="4A2E6285-7561-183E-E672-C3BD1A23D174">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the user who creates the BBIE. The creator of the BBIE is also its owner by default. BBIEs created as children of another ABIE have the same CREATED_BY.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -241,7 +241,7 @@
 </associations>
 </Column>
 <Column name="LAST_UPDATED_BY" id="F40D2B0F-D32D-FF1D-8BCB-100ECBE5C387">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the user who has last updated the ASBIE record. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -256,7 +256,7 @@
 </associations>
 </Column>
 <Column name="CREATION_TIMESTAMP" id="154A94FD-1B04-C44C-2801-3234E747BF2D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>Timestamp when the BBIE record was first created. BBIEs created as children of another ABIE have the same CREATION_TIMESTAMP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -268,7 +268,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="LAST_UPDATE_TIMESTAMP" id="DE73B55F-9540-9326-4B57-3066DE72982D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>The timestamp when the ASBIE was last updated.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -280,7 +280,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="SEQ_KEY" id="779BE58B-3DE1-A49A-D957-CB6B7F0AD4F3">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -294,7 +294,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="IS_USED" id="43688740-BC28-FA02-CF4D-7E8168B9FE6E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:34:07 UTC</createdTime>
 <commentInRDBMS>Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated in the expression generation.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -307,7 +307,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="OWNER_TOP_LEVEL_ABIE_ID" id="85240B23-7DEA-10AD-E7DD-CF197E7D2943">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:09:56 UTC</createdTime>
 <commentInRDBMS>This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this BBIE record.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -324,7 +324,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="0B7F3180-0413-9C93-C375-DC04853644A6" name="BBIE_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:35:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -335,7 +335,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="17152859-92FC-26A6-DA50-8CD4AFAC0DD9" name="BBIE_OWNER_TLVL_ABIE_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:09:50 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -344,7 +344,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="9504BD20-9551-A281-65D1-4B59EAB7E79D" name="BBIE_BASED_BCC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:36:06 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -354,7 +354,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7A91A9BB-304B-F89D-C406-D24876721688" name="BBIE_FROM_ABIE_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -364,7 +364,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="C810B2CB-FC0C-79E6-76C0-B7DCD8D81833" name="BBIE_TO_BBIEP_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -374,7 +374,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7380C6D9-624F-4987-74F3-9CA059D84515" name="BBIE_BDT_PRI_RESTRI_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -384,7 +384,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="E921A719-76FE-2487-C581-FFD2460F406F" name="BBIE_CODE_LIST_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -394,7 +394,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="52709530-6205-B200-581D-8F4AA7577F52" name="BBIE_CREATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -404,7 +404,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="4E03D98F-1716-D4CB-4210-B263C7C32E82" name="BBIE_LAST_UPDATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:37:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -414,7 +414,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="EB7EB9C4-0987-5C61-AC51-F877F59F7F4A" name="BBIE_TOP_LEVEL_ABIE_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:10:15 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

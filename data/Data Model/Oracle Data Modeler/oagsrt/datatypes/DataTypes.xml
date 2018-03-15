@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <DataTypesDesign class="oracle.dbtools.crest.model.design.datatypes.DataTypesDesign" name="DataTypes" id="CEF27875-597A-986C-13DF-7D34D09B2A5B" mainViewID="370D6EF8-8ADD-5408-58EA-98C6702AF673">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 17:42:12 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <shouldBeOpen>false</shouldBeOpen>

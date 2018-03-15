@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="NAMESPACE_OWNER_USER_ID_FK" directorySegmentName="seg_0" id="160ABD20-EB3D-734D-8A8A-3EA8E34E3EAB">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>9A2A16EF-652B-1A36-6F9D-1ECC19962ED3</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>

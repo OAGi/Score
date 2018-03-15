@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <TableProxyOraclev12c class="oracle.dbtools.crest.model.design.storage.oracle.v12c.TableProxyOraclev12c" name="CTX_CATEGORY" directorySegmentName="seg_0" id="8B52F465-7FE9-86E2-9B93-0FACD18E7F0A">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <logging>YES</logging>
@@ -10,36 +10,36 @@
 <rejectLimit></rejectLimit>
 <columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
 <ColumnProxy name="CTX_CATEGORY_ID" id="744E4380-A845-ADA1-A484-553049703FEA">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="DESCRIPTION" id="D16B2CBC-5452-1CB9-ED22-9C212C51A0E0">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="GUID" id="F66679E2-A1B1-9EC2-4AA9-CBA2ADD74C6D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 <ColumnProxy name="NAME" id="FC372FBC-D963-779B-22EB-EA4C281071A0">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
 </columnProxies>
 <indexProxies>
 <IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CTX_CATEGORY_PK_IDX" id="04C79F32-2652-E164-FF6F-48CA866E8DAD">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </IndexProxy>
 </indexProxies>
 <primaryKeys>
 <PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CTX_CATEGORY_PK" id="FC8550DB-D68B-A1FF-91CA-7E6A9F06A1F0">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
@@ -47,7 +47,7 @@
 </primaryKeys>
 <uniqueKeys>
 <UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="CTX_CATEGORY_UK1" id="3C15F609-A8BC-98E1-89A7-F710518713A5">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-10-27 14:57:00 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexSort>SORTED</indexSort>
