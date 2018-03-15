@@ -1,6 +1,6 @@
 # ************************************************************
 # Database: oagi
-# Generation Time: 2018-03-15 00:22:29 +0000
+# Generation Time: 2018-03-15 19:45:33 +0000
 # ************************************************************
 
 
@@ -608,6 +608,36 @@ CREATE TABLE `bdt_sc_pri_restri` (
 
 
 
+# Dump of table bie_usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `bie_usage_rule`;
+
+CREATE TABLE `bie_usage_rule` (
+  `bie_usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the table.',
+  `assigned_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the USAGE_RULE table indicating the usage rule assigned to a BIE.',
+  `target_abie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ABIE table indicating the ABIE, to which the usage rule is applied.',
+  `target_asbie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.',
+  `target_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.',
+  `target_bbie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.',
+  `target_bbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.',
+  PRIMARY KEY (`bie_usage_rule_id`),
+  KEY `bie_usage_rule_assigned_usage_rule_id_fk` (`assigned_usage_rule_id`),
+  KEY `bie_usage_rule_target_abie_id_fk` (`target_abie_id`),
+  KEY `bie_usage_rule_target_asbie_id_fk` (`target_asbie_id`),
+  KEY `bie_usage_rule_target_asbiep_id_fk` (`target_asbiep_id`),
+  KEY `bie_usage_rule_target_bbie_id_fk` (`target_bbie_id`),
+  KEY `bie_usage_rule_target_bbiep_id_fk` (`target_bbiep_id`),
+  CONSTRAINT `bie_usage_rule_assigned_usage_rule_id_fk` FOREIGN KEY (`assigned_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`),
+  CONSTRAINT `bie_usage_rule_target_abie_id_fk` FOREIGN KEY (`target_abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `bie_usage_rule_target_asbie_id_fk` FOREIGN KEY (`target_asbie_id`) REFERENCES `asbie` (`asbie_id`),
+  CONSTRAINT `bie_usage_rule_target_asbiep_id_fk` FOREIGN KEY (`target_asbiep_id`) REFERENCES `asbiep` (`asbiep_id`),
+  CONSTRAINT `bie_usage_rule_target_bbie_id_fk` FOREIGN KEY (`target_bbie_id`) REFERENCES `bbie` (`bbie_id`),
+  CONSTRAINT `bie_usage_rule_target_bbiep_id_fk` FOREIGN KEY (`target_bbiep_id`) REFERENCES `bbiep` (`bbiep_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.';
+
+
+
 # Dump of table bie_user_ext_revision
 # ------------------------------------------------------------
 
@@ -1003,6 +1033,27 @@ CREATE TABLE `dt_sc` (
 
 
 
+# Dump of table dt_usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dt_usage_rule`;
+
+CREATE TABLE `dt_usage_rule` (
+  `dt_usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the table.',
+  `assigned_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.',
+  `target_dt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.',
+  `target_dt_sc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.',
+  PRIMARY KEY (`dt_usage_rule_id`),
+  KEY `dt_usage_rule_assigned_usage_rule_id_fk` (`assigned_usage_rule_id`),
+  KEY `dt_usage_rule_target_dt_id_fk` (`target_dt_id`),
+  KEY `dt_usage_rule_target_dt_sc_id_fk` (`target_dt_sc_id`),
+  CONSTRAINT `dt_usage_rule_assigned_usage_rule_id_fk` FOREIGN KEY (`assigned_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`),
+  CONSTRAINT `dt_usage_rule_target_dt_id_fk` FOREIGN KEY (`target_dt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_usage_rule_target_dt_sc_id_fk` FOREIGN KEY (`target_dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both.';
+
+
+
 # Dump of table module
 # ------------------------------------------------------------
 
@@ -1125,6 +1176,37 @@ CREATE TABLE `top_level_abie` (
   CONSTRAINT `top_level_abie_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `top_level_abie_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table indexes the ABIE which is a top-level ABIE. This table and the owner_top_level_abie_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions.';
+
+
+
+# Dump of table usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `usage_rule`;
+
+CREATE TABLE `usage_rule` (
+  `usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the usage rule.',
+  `name` text COMMENT 'Short nmenomic name of the usage rule.',
+  `condition_type` int(11) NOT NULL COMMENT 'Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.',
+  PRIMARY KEY (`usage_rule_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type.';
+
+
+
+# Dump of table usage_rule_expression
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `usage_rule_expression`;
+
+CREATE TABLE `usage_rule_expression` (
+  `usage_rule_expression_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the usage rule expression',
+  `constraint_type` int(11) NOT NULL COMMENT 'Constraint type according to the CC spec. It represents the expression language (syntax) used in the CONSTRAINT column. It is a value list column. 0 = ''Unstructured'' which is basically a description of the rule, 1 = ''Schematron''.',
+  `constraint_text` text NOT NULL COMMENT 'This column capture the constraint expressing the usage rule. In other words, this is the expression.',
+  `represented_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'The usage rule which the expression represents',
+  PRIMARY KEY (`usage_rule_expression_id`),
+  KEY `usage_rule_expression_represented_usage_rule_id_fk` (`represented_usage_rule_id`),
+  CONSTRAINT `usage_rule_expression_represented_usage_rule_id_fk` FOREIGN KEY (`represented_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The USAGE_RULE_EXPRESSION provides a representation of a usage rule in a particular syntax indicated by the CONSTRAINT_TYPE column. One of the syntaxes can be unstructured, which works a description of the usage rule.';
 
 
 
