@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @SqlResultSetMapping(
-        name="releases",
+        name = "releases",
         entities = {
                 @EntityResult(
                         entityClass = Release.class,
@@ -59,6 +59,19 @@ public class Releases {
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    public Releases() {
+    }
+
+    public Releases(long releaseId, String releaseNum, String releaseNote, ReleaseState state, String uri, String loginId, Date lastUpdateTimestamp) {
+        this.releaseId = releaseId;
+        this.releaseNum = releaseNum;
+        this.releaseNote = releaseNote;
+        this.state = state;
+        this.uri = uri;
+        this.loginId = loginId;
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
 
     public long getReleaseId() {
         return releaseId;

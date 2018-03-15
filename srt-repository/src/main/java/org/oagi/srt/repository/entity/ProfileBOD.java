@@ -110,6 +110,29 @@ public class ProfileBOD {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
 
+    public ProfileBOD() {
+    }
+
+    public ProfileBOD(long topLevelAbieId, long abieId, String version, String status, long asbiepId, long asccpId, Long releaseId,
+                      String propertyTerm, long bizCtxId, String bizCtxName, String releaseNum,
+                      AggregateBusinessInformationEntityState state, long ownerUserId, String ownerName, Date creationTimestamp) {
+        this.topLevelAbieId = topLevelAbieId;
+        this.abieId = abieId;
+        this.version = version;
+        this.status = status;
+        this.asbiepId = asbiepId;
+        this.asccpId = asccpId;
+        this.releaseId = releaseId;
+        this.propertyTerm = propertyTerm;
+        this.bizCtxId = bizCtxId;
+        this.bizCtxName = bizCtxName;
+        this.releaseNum = releaseNum;
+        this.state = state;
+        this.ownerUserId = ownerUserId;
+        this.ownerName = ownerName;
+        this.creationTimestamp = creationTimestamp;
+    }
+
     public long getTopLevelAbieId() {
         return topLevelAbieId;
     }

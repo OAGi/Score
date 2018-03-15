@@ -152,11 +152,8 @@ public class ReleaseService {
     }
 
     public List<CoreComponents> getDeltaForRelease(Release release) {
-
-        List<CoreComponents> delta =  coreComponentsRepository.findDeltaForRelease(release);
-
+        List<CoreComponents> delta = coreComponentsRepository.findDeltaForRelease(release);
         delta.removeIf(cc -> !isLatestRevision(cc.getCoreComponentsId()));
-
         return delta;
     }
 
