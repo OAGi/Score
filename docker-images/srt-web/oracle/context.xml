@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource
+        name="jdbc/oagiDB" type="javax.sql.DataSource"
+        url="jdbc:oracle:thin:@srt-repo:1521/xe"
+        driverClassName="oracle.jdbc.driver.OracleDriver"
+        username="oagi" password="oagi"
+    />
+</Context>
