@@ -21,7 +21,7 @@ public class ProfileBODRepository {
             "FROM TopLevelAbie tla, AggregateBusinessInformationEntity abie, AssociationBusinessInformationEntityProperty asbiep, " +
                  "AssociationCoreComponentProperty asccp, BusinessContext bc, User u, Release r " +
             "WHERE tla.abie.abieId = abie.abieId AND abie.abieId = asbiep.roleOfAbieId AND asbiep.basedAsccpId = asccp.asccpId" +
-             " AND abie.bizCtxId = bc.bizCtxId AND tla.ownerUserId = u.appUserId AND (tla.releaseId = r.releaseId OR tla.releaseId IS NULL)";
+             " AND abie.bizCtxId = bc.bizCtxId AND tla.ownerUserId = u.appUserId AND tla.releaseId = r.releaseId";
 
     public List<ProfileBOD> findAll() {
         Query query = entityManager.createQuery(FIND_ALL_STATEMENT, ProfileBOD.class);

@@ -116,6 +116,7 @@ public class ProfileBODBean extends UIHandler {
         }
     }
 
+    @Transactional
     public void deleteProfileBOD() {
         ProfileBOD profileBOD = getSelectedProfileBOD();
         if (profileBOD == null) {
