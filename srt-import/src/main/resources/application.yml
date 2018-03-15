@@ -5,12 +5,6 @@ spring:
 
 # DataSource
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe
-    username: oagi
-    password: oagi
-    platform: oracle
-
     continue-on-error: true
     initialize: false
     auto-commit: false
@@ -21,13 +15,10 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.Oracle12cDialect
         id:
           new_generator_mappings: true
         cache:
           use_second_level_cache: false
-        ejb:
-          interceptor: org.oagi.srt.persistence.populate.script.oracle.OracleEntityUpdateInterceptor
 
   batch:
     initializer:
@@ -38,6 +29,41 @@ logging:
     org.oagi.srt: DEBUG
     org.springframework: INFO
     org.hibernate.SQL: INFO
+
+# Oracle environment
+---
+spring:
+  profiles: oracle
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
+      ejb:
+        interceptor: org.oagi.srt.persistence.populate.script.oracle.OracleEntityUpdateInterceptor
+
+# MySQL environment
+---
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/oagi?useSSL=false
+    username: oagi
+    password: oagi
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        globally_quoted_identifiers: true
 
 # HSQL environment
 ---
