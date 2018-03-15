@@ -367,6 +367,9 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
 
             switch (nextStep) {
                 case "step_1":
+                    selectedBusinessContext = null;
+                    bizCtxCheckBoxes = new HashMap();
+
                     requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                     requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                     requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
