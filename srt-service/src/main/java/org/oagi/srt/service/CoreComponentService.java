@@ -57,6 +57,9 @@ public class CoreComponentService {
     @Autowired
     private CoreComponentDAO coreComponentDAO;
 
+    @Autowired
+    private ReleaseService releaseService;
+
     public List<CoreComponents> getCoreComponents(
             List<String> types, List<CoreComponentState> states, Release release, Sort.Order order) {
         if (release == null) {
@@ -1127,8 +1130,10 @@ public class CoreComponentService {
             return;
         }
 
+        long ueAccReleaseId = accRepository.findByCurrentAccId(ueAcc.getAccId()).get(0).getReleaseId();
         List<TopLevelAbie> topLevelAbies = topLevelAbieRepository.findAll().stream()
                 .filter(e -> e.getState() != AggregateBusinessInformationEntityState.Published)
+                .filter(e -> releaseService.compareRelease(e.getReleaseId(), ueAccReleaseId) == 0)
                 .collect(Collectors.toList());
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList = new ArrayList();
@@ -1150,6 +1155,7 @@ public class CoreComponentService {
 
     private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+        long releaseId = topLevelAbie.getReleaseId();
         long basedAccId = abie.getBasedAccId();
 
         AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
@@ -1168,7 +1174,7 @@ public class CoreComponentService {
     }
 
     private boolean existsASCCPRecursivelyByRoleOfAccId(long basedAccId, long eAccId) {
-        Collection<Long> fromAccIds = Arrays.asList(basedAccId);
+        Collection<Long> fromAccIds = getBasedAccIds(Arrays.asList(basedAccId));
 
         while (true) {
             List<Long> toAsccpId = asccRepository.findToAsccpIdByFromAccId(fromAccIds);
@@ -1177,20 +1183,23 @@ public class CoreComponentService {
             if (roleOfAccIdList.isEmpty()) {
                 return false;
             }
-
             if (roleOfAccIdList.contains(eAccId)) {
                 return true;
             }
 
-            List<Long> tempAccIds = new ArrayList();
-            roleOfAccIdList.forEach(accId -> {
-                while (accId != null && accId > 0L) {
-                    tempAccIds.add(accId);
-                    accId = accRepository.findBasedAccIdByAccId(accId);
-                }
-            });
-            fromAccIds = tempAccIds;
+            fromAccIds = getBasedAccIds(roleOfAccIdList);
         }
+    }
+
+    private List<Long> getBasedAccIds(List<Long> accIds) {
+        List<Long> basedAccIds = new ArrayList();
+        accIds.forEach(accId -> {
+            while (accId != null && accId > 0L) {
+                basedAccIds.add(accId);
+                accId = accRepository.findBasedAccIdByAccId(accId);
+            }
+        });
+        return basedAccIds;
     }
 
     public int getMaxSeqKeyOfChildren(AggregateCoreComponent acc) {

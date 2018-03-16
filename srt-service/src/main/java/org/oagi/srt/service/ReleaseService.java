@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.common.util.VersionStringComparator;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -692,6 +694,20 @@ public class ReleaseService {
 
         releaseRepository.delete(releaseToDelete);
         releaseRepository.flush();
+    }
+
+    public int compareRelease(Long a, Long b) {
+        return new ReleaseComparator().compare(a, b);
+    }
+
+    public class ReleaseComparator implements Comparator<Long> {
+        @Override
+        public int compare(Long a, Long b) {
+            Release aRelease = releaseRepository.findOne(a);
+            Release bRelease = releaseRepository.findOne(b);
+
+            return new VersionStringComparator().compare(aRelease.getReleaseNum(), bRelease.getReleaseNum());
+        }
     }
 }
 
