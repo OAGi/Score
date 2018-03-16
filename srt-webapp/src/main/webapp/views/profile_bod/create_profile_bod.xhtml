@@ -115,6 +115,10 @@
                     <p:panel header="Selected Top-Level Concept">
                         <p:dataTable var="topLevelConcept" value="#{createProfileBODBean.selectedTopLevelConcept}"
                                      style="width: 100%; margin-bottom: 20px;">
+                            <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Release">
+                                <h:outputText value="#{createProfileBODBean.release.releaseNum}"/>
+                            </p:column>
+
                             <p:column style="width: 40%" headerText="ASCCP Property Term">
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                             </p:column>

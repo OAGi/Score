@@ -65,7 +65,12 @@
                                 <p:ajax event="collapse"
                                         update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
-                                <p:column headerText="#{editProfileBODBean.getModule(editProfileBODBean.topLevelNode.asccp.moduleId)}">
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <span style="float: left;">#{editProfileBODBean.release.releaseNum}</span>
+                                        <span style="float: right;">#{editProfileBODBean.getModule(editProfileBODBean.topLevelNode.asccp.moduleId)}</span>
+                                    </f:facet>
                                     <h:selectBooleanCheckbox rendered="#{editProfileBODBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
                                                              disabled="#{editProfileBODBean.topLevelNode.type.abie.state ne 'Editing'}"
                                                              value="${node.used}" style="margin-right: 5px;">

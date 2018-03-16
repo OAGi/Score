@@ -70,8 +70,11 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
     private UserRepository userRepository;
     @Autowired
     private ModuleRepository moduleRepository;
+    @Autowired
+    private ReleaseRepository releaseRepository;
 
     private TopLevelAbie topLevelAbie;
+    private Release release;
     private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
 
     @PostConstruct
@@ -89,6 +92,9 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
         }
 
         setTopLevelAbie(topLevelAbie);
+        Release release = releaseRepository.findOne(topLevelAbie.getReleaseId());
+        setRelease(release);
+
         createTreeNode(topLevelAbie);
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
@@ -106,6 +112,14 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
 
     public void setTopLevelAbie(TopLevelAbie topLevelAbie) {
         this.topLevelAbie = topLevelAbie;
+    }
+
+    public Release getRelease() {
+        return release;
+    }
+
+    public void setRelease(Release release) {
+        this.release = release;
     }
 
     public List<BusinessInformationEntityUserExtensionRevision> getBieUserExtRevisionList() {
