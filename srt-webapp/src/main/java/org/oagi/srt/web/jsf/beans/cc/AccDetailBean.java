@@ -115,6 +115,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void setTargetAcc(AggregateCoreComponent targetAcc) {
         this.targetAcc = targetAcc;
+        this.keepPreviousAbstract = targetAcc.isAbstract();
         onUpdateTargetAccChildCount();
     }
 
@@ -389,17 +390,24 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public boolean canBeAbstract(AggregateCoreComponent acc) {
-        long basedAccId = acc.getBasedAccId();
-        if (basedAccId <= 0L) {
+        if (acc.getOagisComponentType() == OagisComponentType.Base) {
             return false;
         }
 
+        long basedAccId = acc.getBasedAccId();
+        if (basedAccId <= 0L) {
+            return true;
+        }
         AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
         if (basedAcc == null) {
-            return false;
+            return true;
         }
 
         return basedAcc.isAbstract();
+    }
+
+    public int getMaxRevisionNum(AggregateCoreComponent acc) {
+        return accRepository.findMaxRevisionNumByCurrentAccId(acc.getId());
     }
 
     public boolean isDisabled(CoreComponent coreComponent) {
@@ -522,6 +530,23 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 setNodeName(bccpNode);
             }
         }
+    }
+
+    private boolean keepPreviousAbstract;
+
+    public void onAccOagisComponentTypeChange() {
+        AggregateCoreComponent acc = getTargetAcc();
+        if (acc.getOagisComponentType() == OagisComponentType.Base) {
+            keepPreviousAbstract = acc.isAbstract();
+            acc.setAbstract(true);
+        } else {
+            acc.setAbstract(keepPreviousAbstract);
+        }
+    }
+
+    public void onAccAbstractChange() {
+        AggregateCoreComponent acc = getTargetAcc();
+        keepPreviousAbstract = acc.isAbstract();
     }
 
     /*
