@@ -245,22 +245,28 @@ public class CodeListBaseBean extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public String forceUpdate() {
-        codeList = codeListService.newCodeListBuilder(codeList)
-                .userId(getCurrentUser().getAppUserId())
-                .state(state)
-                .build();
-
-        for (CodeListValue codeListValue : codeListValues) {
-            codeListService.newCodeListValueBuilder(codeListValue)
-                    .codeList(codeList)
+        CodeListState previousCodeListState = codeList.getState();
+        if (previousCodeListState == CodeListState.Editing) {
+            codeListService.delete(codeList);
+        } else {
+            codeList = codeListService.newCodeListBuilder(codeList)
+                    .userId(getCurrentUser().getAppUserId())
+                    .state(state)
                     .build();
+
+            for (CodeListValue codeListValue : codeListValues) {
+                codeListService.newCodeListValueBuilder(codeListValue)
+                        .codeList(codeList)
+                        .build();
+            }
+
+            codeListService.delete(
+                    deleteCodeListValues.stream()
+                            .filter(e -> e.getCodeListValueId() > 0L)
+                            .collect(Collectors.toList())
+            );
         }
 
-        codeListService.delete(
-                deleteCodeListValues.stream()
-                        .filter(e -> e.getCodeListValueId() > 0L)
-                        .collect(Collectors.toList())
-        );
 
         return "/views/code_list/list.jsf?faces-redirect=true";
     }
