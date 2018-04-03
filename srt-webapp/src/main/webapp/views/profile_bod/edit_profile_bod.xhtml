@@ -81,7 +81,8 @@
                                 </p:column>
                             </p:treeTable>
 
-                            <p:contextMenu for="treeTable" nodeType="ASBIE-Extension">
+                            <p:contextMenu for="treeTable" nodeType="ASBIE-Extension"
+                                           rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}">
                                 <p:menuitem id="localExtension" value="Create ABIE Extension Locally" style="width: 100%;"
                                             action="#{editProfileBODBean.createABIEExtension(true)}"/>
                                 <p:menuitem id="globalExtension" value="Create ABIE Extension Globally" style="width: 100%;"
