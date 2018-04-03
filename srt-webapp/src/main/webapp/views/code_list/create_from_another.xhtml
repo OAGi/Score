@@ -12,8 +12,8 @@
         </div>
         <h:form id="form">
             <p:panel>
-                <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
-                            closable="true"/>
+                <p:growl id="growl" life="3000"/>
+
                 <h:panelGrid id="grid" columns="2">
                     <h:outputText value="Based Code List" styleClass="section-label"/>
                     <h:link value="#{codeListCreateFromAnotherBean.basedCodeList.name}" styleClass="section-content"
@@ -40,7 +40,8 @@
                     </h:inputText>
 
                     <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
-                    <p:autoComplete id="agencyIdListValueID"
+                    <p:autoComplete id="agencyIdListValueID" required="true"
+                                    requiredMessage="Please fill out 'Agency ID' field."
                                     value="#{codeListCreateFromAnotherBean.agencyIdListValue}"
                                     styleClass="section-content input-section"
                                     completeMethod="#{codeListCreateFromAnotherBean.completeAgencyIdListValue}"
@@ -188,11 +189,11 @@
 
                 <p:separator/>
 
-                <p:commandButton id="saveBtn" ajax="true" value="Save"
+                <p:commandButton id="saveBtn" ajax="true" value="Save" update="growl"
                                  actionListener="#{codeListCreateFromAnotherBean.setState('Editing')}"
                                  action="#{codeListCreateFromAnotherBean.update()}"/>
 
-                <p:commandButton id="publishBtn" ajax="true" value="Publish"
+                <p:commandButton id="publishBtn" ajax="true" value="Publish" update="growl"
                                  actionListener="#{codeListCreateFromAnotherBean.setState('Published')}"
                                  action="#{codeListCreateFromAnotherBean.update()}"/>
             </p:panel>
@@ -205,10 +206,10 @@
                     (i.e., same Agency ID and List ID but different name).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check" update="growl"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times" update="growl"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -220,10 +221,10 @@
                     (i.e., same name and Agency ID but different List ID).
                 </f:facet>
                 <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
+                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check" update="growl"
                                      actionListener="#{codeListCreateFromAnotherBean.setConfirmSameListIdButDifferentIdentity(true)}"
                                      action="#{codeListCreateFromAnotherBean.update()}"/>
-                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
+                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times" update="growl"
                                      onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
