@@ -472,7 +472,6 @@
                                                                  disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc)}">
                                                     <f:selectItems value="#{accDetailBean.availableOagisComponentTypes(accDetailBean.selectedTreeNode.data.acc)}"/>
                                                     <p:ajax event="valueChange"
-                                                            listener="#{accDetailBean.onAccOagisComponentTypeChange}"
                                                             update="accPanel, :form:btnGroup"/>
                                                 </p:selectOneMenu>
 
@@ -484,7 +483,6 @@
                                                                          disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.acc) or
                                                                                      accDetailBean.canBeAbstract(accDetailBean.selectedTreeNode.data.acc) eq false}">
                                                     <p:ajax event="valueChange"
-                                                            listener="#{accDetailBean.onAccAbstractChange}"
                                                             update="accPanel, :form:btnGroup"/>
                                                 </h:selectBooleanCheckbox>
 

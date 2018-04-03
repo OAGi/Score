@@ -115,7 +115,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
 
     public void setTargetAcc(AggregateCoreComponent targetAcc) {
         this.targetAcc = targetAcc;
-        this.keepPreviousAbstract = targetAcc.isAbstract();
         onUpdateTargetAccChildCount();
     }
 
@@ -390,10 +389,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public boolean canBeAbstract(AggregateCoreComponent acc) {
-        if (acc.getOagisComponentType() == OagisComponentType.Base) {
-            return false;
-        }
-
         long basedAccId = acc.getBasedAccId();
         if (basedAccId <= 0L) {
             return true;
@@ -403,7 +398,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             return true;
         }
 
-        return basedAcc.isAbstract();
+        return !basedAcc.isAbstract();
     }
 
     public int getMaxRevisionNum(AggregateCoreComponent acc) {
@@ -530,23 +525,6 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
                 setNodeName(bccpNode);
             }
         }
-    }
-
-    private boolean keepPreviousAbstract;
-
-    public void onAccOagisComponentTypeChange() {
-        AggregateCoreComponent acc = getTargetAcc();
-        if (acc.getOagisComponentType() == OagisComponentType.Base) {
-            keepPreviousAbstract = acc.isAbstract();
-            acc.setAbstract(true);
-        } else {
-            acc.setAbstract(keepPreviousAbstract);
-        }
-    }
-
-    public void onAccAbstractChange() {
-        AggregateCoreComponent acc = getTargetAcc();
-        keepPreviousAbstract = acc.isAbstract();
     }
 
     /*
