@@ -10,6 +10,7 @@ import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -48,6 +53,7 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
      * for 'Select Top-Level ABIE' Step
      */
     private List<ProfileBOD> allProfileBODs;
+    private Map<Long, ProfileBOD> allProfileBODMap;
     private String selectedPropertyTerm;
     private List<ProfileBOD> topLevelConcepts;
     private ProfileBOD selectedProfileBOD;
@@ -58,6 +64,7 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private BusinessContextRepository businessContextRepository;
     private List<BusinessContext> businessContexts;
+    private Map<Long, BusinessContext> businessContextMap;
     private BusinessContext selectedBusinessContext;
 
     /*
@@ -75,12 +82,9 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     public List<ProfileBOD> getAllProfileBODs() {
         if (allProfileBODs == null) {
             allProfileBODs = profileBODRepository.findAll();
+            allProfileBODMap = allProfileBODs.stream().collect(Collectors.toMap(ProfileBOD::getTopLevelAbieId, Function.identity()));
         }
         return allProfileBODs;
-    }
-
-    public void setAllProfileBODs(List<ProfileBOD> allProfileBODs) {
-        this.allProfileBODs = allProfileBODs;
     }
 
     public String getCurrentStep() {
@@ -113,6 +117,51 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
     public void setSelectedPropertyTerm(String selectedPropertyTerm) {
         this.selectedPropertyTerm = selectedPropertyTerm;
+    }
+
+    public void onProfileBODSelect(SelectEvent event) {
+        getProfileBODCheckBox(((ProfileBOD) event.getObject()).getTopLevelAbieId()).setChecked(true);
+    }
+
+    public void onProfileBODUnselect(SelectEvent event) {
+        getProfileBODCheckBox(((ProfileBOD) event.getObject()).getTopLevelAbieId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> profileBODCheckBoxes = new HashMap();
+
+    public class ProfileBODCheckBox {
+        private Long topLevelAbieId;
+
+        public ProfileBODCheckBox(Long bizCtxId) {
+            this.topLevelAbieId = bizCtxId;
+        }
+
+        public boolean isChecked() {
+            return profileBODCheckBoxes.getOrDefault(topLevelAbieId, false);
+        }
+
+        public void setChecked(boolean value) {
+            profileBODCheckBoxes = new HashMap();
+
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            if (value) {
+                BusinessContext previousOne = getSelectedBusinessContext();
+                if (previousOne != null) {
+                    profileBODCheckBoxes.put(previousOne.getBizCtxId(), false);
+                }
+
+                selectedProfileBOD = allProfileBODMap.get(topLevelAbieId);
+
+            } else {
+                selectedProfileBOD = null;
+            }
+
+            profileBODCheckBoxes.put(topLevelAbieId, value);
+        }
+    }
+
+    public ProfileBODCheckBox getProfileBODCheckBox(Long topLevelAbieId) {
+        return new ProfileBODCheckBox(topLevelAbieId);
     }
 
     public List<ProfileBOD> getProfileBODs() {
@@ -186,6 +235,8 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
     public void setBusinessContexts(List<BusinessContext> businessContexts) {
         this.businessContexts = businessContexts;
+        this.businessContextMap = businessContexts.stream()
+                .collect(Collectors.toMap(BusinessContext::getBizCtxId, Function.identity()));
     }
 
     public BusinessContext getSelectedBusinessContext() {
@@ -193,7 +244,56 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     }
 
     public void setSelectedBusinessContext(BusinessContext selectedBusinessContext) {
-        this.selectedBusinessContext = selectedBusinessContext;
+        if (selectedBusinessContext != null) {
+            getBusinessContextCheckBox(selectedBusinessContext.getBizCtxId()).setChecked(true);
+        }
+    }
+
+    public void onBusinessContextSelect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(true);
+    }
+
+    public void onBusinessContextUnselect(SelectEvent event) {
+        getBusinessContextCheckBox(((BusinessContext) event.getObject()).getBizCtxId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> bizCtxCheckBoxes = new HashMap();
+
+    public class BusinessContextCheckBox {
+        private Long bizCtxId;
+
+        public BusinessContextCheckBox(Long bizCtxId) {
+            this.bizCtxId = bizCtxId;
+        }
+
+        public boolean isChecked() {
+            return bizCtxCheckBoxes.getOrDefault(bizCtxId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bizCtxCheckBoxes = new HashMap();
+
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            if (value) {
+                BusinessContext previousOne = getSelectedBusinessContext();
+                if (previousOne != null) {
+                    bizCtxCheckBoxes.put(previousOne.getBizCtxId(), false);
+                }
+
+                selectedBusinessContext = businessContextMap.get(bizCtxId);
+                requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+
+            } else {
+                selectedBusinessContext = null;
+                requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", true).addClass('ui-state-disabled');");
+            }
+
+            bizCtxCheckBoxes.put(bizCtxId, value);
+        }
+    }
+
+    public BusinessContextCheckBox getBusinessContextCheckBox(Long bizCtxId) {
+        return new BusinessContextCheckBox(bizCtxId);
     }
 
     public String getModule(long moduleId) {
@@ -211,6 +311,9 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
             switch (nextStep) {
                 case "step_1":
+                    selectedBusinessContext = null;
+                    bizCtxCheckBoxes = new HashMap();
+
                     requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                     requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                     requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
@@ -222,47 +325,19 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Profile BOD' must be selected."));
+                        requestContext.update("growl");
                         nextStep = event.getOldStep();
+
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                         requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     } else {
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
-                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
+                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
+                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
                     }
 
                     break;
-
-                case "step_3":
-                    try {
-                        if (selectedBusinessContext == null) {
-                            FacesContext.getCurrentInstance().addMessage(null,
-                                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                            "'Business Context' must be selected."));
-                            nextStep = event.getOldStep();
-
-                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
-                        } else {
-                            TopLevelAbie topLevelAbie =
-                                    topLevelAbieRepository.findOne(selectedProfileBOD.getTopLevelAbieId());
-
-                            createTreeNode(topLevelAbie);
-
-                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
-                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
-                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
-                        }
-
-                        break;
-                    } finally {
-                        /*
-                         * Hide loading dialog
-                         */
-                        requestContext.execute("PF('loadingBlock').hide()");
-                    }
             }
 
             setCurrentStep(nextStep);
@@ -276,7 +351,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
         requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
-        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+
+        if ("step_2".equals(getCurrentStep())) {
+            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", true).addClass('ui-state-disabled');");
+        } else {
+            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+        }
     }
 
     private ProgressListener progressListener;
@@ -298,8 +378,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String copy() {
+    public void copy() throws IOException {
+        RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
+            TopLevelAbie sourceTopLevelAbie = topLevelAbieRepository.findOne(selectedProfileBOD.getTopLevelAbieId());
+            createTreeNode(sourceTopLevelAbie);
+
             progressListener = new ProgressListener();
 
             ASBIEPNode topLevelNode = getTopLevelNode();
@@ -307,11 +391,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
 
             long releaseId = selectedProfileBOD.getReleaseId();
             Release release = (releaseId > 0L) ? releaseRepository.findOne(releaseId) : Release.WORKING_RELEASE;
-            nodeService.copy(topLevelNode, release, getCurrentUser(), selectedBusinessContext, progressListener);
+            TopLevelAbie topLevelAbie = nodeService.copy(topLevelNode, release, getCurrentUser(), selectedBusinessContext, progressListener);
+            long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
 
-            return "/views/profile_bod/list.jsf?faces-redirect=true";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(
+                    "/profile_bod/" + topLevelAbieId);
         } finally {
-            RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("PF('loadingBlock').hide()");
         }
     }
