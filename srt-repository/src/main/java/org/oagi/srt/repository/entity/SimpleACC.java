@@ -36,6 +36,15 @@ public class SimpleACC implements OwnerUserAware, Serializable {
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
 
+    @Column(nullable = false)
+    private int revisionNum;
+
+    @Column(nullable = false)
+    private int revisionTrackingNum;
+
+    @Column
+    private Long releaseId;
+
     @Column
     private long ownerUserId;
 
@@ -98,6 +107,34 @@ public class SimpleACC implements OwnerUserAware, Serializable {
         this.state = state;
     }
 
+    public int getRevisionNum() {
+        return revisionNum;
+    }
+
+    public void setRevisionNum(int revisionNum) {
+        this.revisionNum = revisionNum;
+    }
+
+    public int getRevisionTrackingNum() {
+        return revisionTrackingNum;
+    }
+
+    public void setRevisionTrackingNum(int revisionTrackingNum) {
+        this.revisionTrackingNum = revisionTrackingNum;
+    }
+
+    public String getRevision() {
+        return getRevisionNum() + "." + getRevisionTrackingNum();
+    }
+
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
+    }
+
+    public void setReleaseId(Long releaseId) {
+        this.releaseId = releaseId;
+    }
+
     public long getOwnerUserId() {
         return ownerUserId;
     }
@@ -120,6 +157,8 @@ public class SimpleACC implements OwnerUserAware, Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         SimpleACC simpleACC = (SimpleACC) o;
         return accId == simpleACC.accId &&
+                revisionNum == simpleACC.revisionNum &&
+                revisionTrackingNum == simpleACC.revisionTrackingNum &&
                 ownerUserId == simpleACC.ownerUserId &&
                 isAbstract == simpleACC.isAbstract &&
                 Objects.equals(guid, simpleACC.guid) &&
@@ -127,26 +166,13 @@ public class SimpleACC implements OwnerUserAware, Serializable {
                 Objects.equals(module, simpleACC.module) &&
                 Objects.equals(definition, simpleACC.definition) &&
                 oagisComponentType == simpleACC.oagisComponentType &&
-                state == simpleACC.state;
+                state == simpleACC.state &&
+                Objects.equals(releaseId, simpleACC.releaseId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accId, guid, objectClassTerm, module, definition, oagisComponentType, state, ownerUserId, isAbstract);
-    }
 
-    @Override
-    public String toString() {
-        return "SimpleACC{" +
-                "accId=" + accId +
-                ", guid='" + guid + '\'' +
-                ", objectClassTerm='" + objectClassTerm + '\'' +
-                ", module='" + module + '\'' +
-                ", definition='" + definition + '\'' +
-                ", oagisComponentType=" + oagisComponentType +
-                ", state=" + state +
-                ", ownerUserId=" + ownerUserId +
-                ", isAbstract=" + isAbstract +
-                '}';
+        return Objects.hash(accId, guid, objectClassTerm, module, definition, oagisComponentType, state, revisionNum, revisionTrackingNum, releaseId, ownerUserId, isAbstract);
     }
 }
