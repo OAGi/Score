@@ -312,6 +312,15 @@
 <colUsage columnID="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="78222ABC-1E0F-F1E7-3C17-3F9A72C7FD95" name="ASCC_GUID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2018-04-12 19:22:18 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="657C8250-0F04-E6F0-B213-AD1AA6F51AF8"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="3F79586A-E0E0-4361-E506-0961B74FEB85" name="ASCC_FROM_ACC_ID_FK">
 <createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:55:51 UTC</createdTime>

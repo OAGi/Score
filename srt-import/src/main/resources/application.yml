@@ -45,8 +45,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.Oracle12cDialect
-      ejb:
-        interceptor: org.oagi.srt.persistence.populate.script.oracle.OracleEntityUpdateInterceptor
+        ejb:
+          interceptor: org.oagi.srt.persistence.populate.script.oracle.OracleEntityUpdateInterceptor
 
 # MySQL environment
 ---

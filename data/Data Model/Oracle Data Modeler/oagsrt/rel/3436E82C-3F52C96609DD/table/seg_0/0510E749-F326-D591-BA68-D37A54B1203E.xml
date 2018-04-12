@@ -392,6 +392,15 @@
 <colUsage columnID="F87B2607-5EB7-FC12-2F13-231C09B14BB7"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="4218D31A-2378-68BF-18EE-5498F89D289D" name="DT_GUID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2018-04-12 19:23:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F87B2607-5EB7-FC12-2F13-231C09B14BB7"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="8AC69A8D-A3FB-8229-9DA9-65A210475EBF" name="DT_PREVIOUS_VERSION_DT_ID_FK">
 <createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:36:56 UTC</createdTime>

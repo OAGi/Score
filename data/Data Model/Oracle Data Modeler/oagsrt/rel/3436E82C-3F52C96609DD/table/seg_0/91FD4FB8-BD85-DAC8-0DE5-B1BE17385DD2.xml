@@ -48,6 +48,18 @@
 <ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="JBT_DRAFT05_MAP" id="815F76D1-937B-84B0-748C-59D52223CCFE">
+<createdBy>hno2</createdBy>
+<createdTime>2018-04-12 19:21:20 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>500 CHAR</dataTypeSize>
+<ownDataTypeParameters>500 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="SUBTYPE_OF_XBT_ID" id="DF5262D9-1BBE-A3D5-2014-8D548EF9788F">
 <createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:40:22 UTC</createdTime>

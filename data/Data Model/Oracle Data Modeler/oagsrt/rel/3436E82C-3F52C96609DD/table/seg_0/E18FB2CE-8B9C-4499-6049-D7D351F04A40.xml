@@ -342,6 +342,15 @@
 <colUsage columnID="2820686A-A020-3DC6-EF01-78792C666327"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="AF00C8BF-E049-6F97-4385-DA8A68A9C408" name="BCCP_GUID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2018-04-12 19:22:47 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EF4BCD1A-2B61-D907-6B0D-A8BBAA1BE39C"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="F284F8AA-D3E0-0EE9-52CB-1FD90E9EBF5A" name="BCCP_BDT_ID_FK">
 <createdBy>hakju</createdBy>
 <createdTime>2016-08-08 19:17:16 UTC</createdTime>

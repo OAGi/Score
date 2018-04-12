@@ -334,6 +334,15 @@
 <colUsage columnID="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="424FCF47-DB6F-F0CB-7B01-D76670E1DCC0" name="ASCCP_GUID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2018-04-12 19:22:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="309DF4D5-AC90-9E51-17C1-311ADCE08C42"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="A48268A1-E44E-FBC4-4E07-98E6E6DAEFD7" name="ASCCP_ROLE_OF_ACC_ID_FK">
 <createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:45:12 UTC</createdTime>

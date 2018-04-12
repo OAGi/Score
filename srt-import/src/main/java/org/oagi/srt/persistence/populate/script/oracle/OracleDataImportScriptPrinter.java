@@ -46,6 +46,7 @@ public class OracleDataImportScriptPrinter {
     public static void print(String message) {
         if (printWriter != null) {
             printWriter.println(message);
+            printWriter.flush();
         }
     }
 
