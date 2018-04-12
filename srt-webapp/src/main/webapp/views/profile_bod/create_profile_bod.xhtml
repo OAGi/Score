@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Create Profile BOD</h2>
+                <h2 class="subhead-heading">#{resourceBean.term('create_profile_bod.title')}</h2>
             </div>
         </div>
 
@@ -40,7 +40,8 @@
                             </div>
                             <div class="col-md-10">
                                 <div style="padding: 3px 0 3px 0;">
-                                    <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                    <h:outputLabel value="#{resourceBean.term('create_profile_bod.step1.input.property_term')}"
+                                                   style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? 120 : 340}px; font-weight: 400;"/>
                                     <p:inputText id="searchTextForPropertyTerm"
                                                  value="#{createProfileBODBean.searchTextForPropertyTerm}"
                                                  tabindex="1">
@@ -48,7 +49,8 @@
                                     </p:inputText>
                                 </div>
                                 <div style="padding: 3px 0 3px 0;">
-                                    <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                    <h:outputLabel value="#{resourceBean.term('create_profile_bod.step1.input.module')}"
+                                                   style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? 120 : 340}px; font-weight: 400;"/>
                                     <p:inputText id="searchTextForModule"
                                                  value="#{createProfileBODBean.searchTextForModule}"
                                                  tabindex="2">
@@ -118,11 +120,11 @@
                             <h:outputText value="#{createProfileBODBean.release.releaseNum}"/>
                         </p:column>
 
-                        <p:column style="width: 40%" headerText="ASCCP Property Term">
+                        <p:column style="width: 40%" headerText="#{resourceBean.term('create_profile_bod.step2.table.column.asccp_property_term')}">
                             <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                         </p:column>
 
-                        <p:column headerText="Module" styleClass="ellipsis">
+                        <p:column headerText="#{resourceBean.term('create_profile_bod.step2.table.column.module')}" styleClass="ellipsis">
                             <h:outputText value="#{topLevelConcept.module}"/>
                         </p:column>
 
