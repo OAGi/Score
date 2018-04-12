@@ -10,48 +10,45 @@
                 <h2 class="subhead-heading">Namespace</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="uri" value="#{namespaceBean.uri}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{namespaceBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{namespaceBean.search}"
-                                     update="tbl"
-                                     icon="fa fa-white fa-search"/>
-                    <p:button id="createBtn" value="Create Namespace"
-                              style="float: right; padding: 3px 0 3px 0;"
-                              outcome="/views/namespace/details.jsf"/>
-                </f:facet>
-                <p:dataTable id="tbl" var="namespace" value="#{namespaceBean.namespaceList}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{namespace.namespaceId}">
-                    <p:column style="width: 40%" headerText="URI" sortBy="#{namespace.uri}">
-                        <a href="/namespace/#{namespace.namespaceId}">#{namespace.uri}</a>
-                    </p:column>
-                    <p:column style="width: 100px; text-align: center;" headerText="Prefix" sortBy="#{namespace.prefix}">
-                        <h:outputText value="#{namespace.prefix}"/>
-                    </p:column>
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{namespaceBean.getUserName(namespace.ownerUserId)}">
-                        <h:outputText value="#{namespaceBean.getUserName(namespace.ownerUserId)}"/>
-                    </p:column>
-                    <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                              sortBy="#{namespace.creationTimestamp}">
-                        <h:outputText value="#{namespace.creationTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                    <p:column headerText="Description" sortBy="#{namespace.description}">
-                        <h:outputText value="#{namespace.description}"/>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="uri" value="#{namespaceBean.uri}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{namespaceBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{namespaceBean.search}"
+                                 update="tbl"
+                                 icon="fa fa-white fa-search"/>
+                <p:button id="createBtn" value="Create Namespace"
+                          style="float: right; padding: 3px 0 3px 0;"
+                          outcome="/views/namespace/details.jsf"/>
+            </f:facet>
+            <p:dataTable id="tbl" var="namespace" value="#{namespaceBean.namespaceList}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{namespace.namespaceId}">
+                <p:column style="width: 40%" headerText="URI" sortBy="#{namespace.uri}">
+                    <a href="/namespace/#{namespace.namespaceId}">#{namespace.uri}</a>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" headerText="Prefix" sortBy="#{namespace.prefix}">
+                    <h:outputText value="#{namespace.prefix}"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{namespaceBean.getUserName(namespace.ownerUserId)}">
+                    <h:outputText value="#{namespaceBean.getUserName(namespace.ownerUserId)}"/>
+                </p:column>
+                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
+                          sortBy="#{namespace.creationTimestamp}">
+                    <h:outputText value="#{namespace.creationTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Description" sortBy="#{namespace.description}">
+                    <h:outputText value="#{namespace.description}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

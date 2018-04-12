@@ -16,175 +16,171 @@
                 </h:panelGroup>
             </div>
         </div>
-        <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
-            <p:panel>
-                <h:panelGrid columns="2" cellpadding="3">
-                    <h:outputText value="Context Category" styleClass="section-label"/>
-                    <p:autoComplete id="inputContextCategory" widgetVar="inputContextCategory"
-                                    value="#{contextSchemeDetailBean.selectedContextCategoryName}"
-                                    completeMethod="#{contextSchemeDetailBean.completeInputForContextCategory}"
-                                    dropdown="true"
-                                    required="true" requiredMessage="Please fill out 'Content Category' field."
-                                    styleClass="section-content input-section">
-                        <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
-                    </p:autoComplete>
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                    autoUpdate="true"
+                    closable="true"/>
+        <p:panel>
+            <h:panelGrid columns="2" cellpadding="3">
+                <h:outputText value="Context Category" styleClass="section-label"/>
+                <p:autoComplete id="inputContextCategory" widgetVar="inputContextCategory"
+                                value="#{contextSchemeDetailBean.selectedContextCategoryName}"
+                                completeMethod="#{contextSchemeDetailBean.completeInputForContextCategory}"
+                                dropdown="true"
+                                required="true" requiredMessage="Please fill out 'Content Category' field."
+                                styleClass="section-content input-section">
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
+                </p:autoComplete>
 
-                    <h:outputText value="GUID" styleClass="section-label"
-                                  rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"/>
-                    <h:inputText id="guid" value="#{contextSchemeDetailBean.contextScheme.guid}"
-                                 rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
-                                 styleClass="section-content input-section disabled" disabled="true"/>
-
-                    <h:outputText value="Name" styleClass="section-label"/>
-                    <h:inputText id="name" value="#{contextSchemeDetailBean.contextScheme.schemeName}"
-                                 required="true" maxlength="255"
-                                 requiredMessage="Please fill out 'Name' field."
-                                 label="Name" styleClass="section-content input-section">
-                        <f:validateLength maximum="255"/>
-                    </h:inputText>
-
-                    <h:outputText value="Scheme ID" styleClass="section-label"/>
-                    <h:inputText id="schemeId" value="#{contextSchemeDetailBean.contextScheme.schemeId}"
-                                 required="true" maxlength="45"
-                                 requiredMessage="Please fill out 'Scheme ID' field."
-                                 label="Scheme ID" styleClass="section-content input-section">
-                        <f:validateLength maximum="45"/>
-                    </h:inputText>
-
-                    <h:outputText value="Agency ID" styleClass="section-label"/>
-                    <h:inputText id="agencyId" value="#{contextSchemeDetailBean.contextScheme.schemeAgencyId}"
-                                 required="true" maxlength="45"
-                                 requiredMessage="Please fill out 'Agency ID' field."
-                                 label="Agency ID" styleClass="section-content input-section">
-                        <f:validateLength maximum="45"/>
-                    </h:inputText>
-
-                    <h:outputText value="Version" styleClass="section-label"/>
-                    <h:inputText id="version" value="#{contextSchemeDetailBean.contextScheme.schemeVersionId}"
-                                 required="true" maxlength="45"
-                                 requiredMessage="Please fill out 'Version' field."
-                                 label="Version" styleClass="section-content input-section">
-                        <f:validateLength maximum="45"/>
-                    </h:inputText>
-
-                    <h:outputText value="Description" styleClass="section-label"/>
-                    <h:inputTextarea id="description" value="#{contextSchemeDetailBean.contextScheme.description}"
-                                     rows="6" a:placeholder="Leave a description"
-                                     styleClass="section-content input-section"/>
-                </h:panelGrid>
-                <p:separator/>
-                <p:panel>
-                    <f:facet name="header">
-                        <h:outputText value="Context Scheme Values"/>
-                        <p:commandButton id="addBtn" value="Add" style="float: right;"
-                                         actionListener="#{contextSchemeDetailBean.addContextSchemeValue}"
-                                         update=":form:tbl"/>
-                    </f:facet>
-                    <p:dataTable id="tbl" var="contextSchemeValue"
-                                 value="#{contextSchemeDetailBean.contextSchemeValueModels}"
-                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                 paginator="true" paginatorPosition="bottom" rows="10" editable="true" editMode="cell"
-                                 style="width: 100%; margin-bottom: 20px;">
-                        <p:column style="width: 20%" headerText="Value" sortBy="#{contextSchemeValue.value}">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{contextSchemeValue.value}"/>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{contextSchemeValue.value}" label="Value" style="width: 100%"
-                                                 maxlength="45">
-                                        <f:validateLength maximum="45"/>
-                                    </p:inputText>
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>
-
-                        <p:column headerText="Meaning" sortBy="#{contextSchemeValue.meaning}">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{contextSchemeValue.meaning}"/>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{contextSchemeValue.meaning}" label="Meaning"
-                                                 style="width: 100%"/>
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>
-
-                        <p:column style="text-align: center; width: 65px;">
-                            <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
-                                             action="#{contextSchemeDetailBean.deleteContextSchemeValue}"
-                                             update="tbl">
-                                <f:setPropertyActionListener value="#{contextSchemeValue}"
-                                                             target="#{contextSchemeDetailBean.selectedContextSchemeValue}"/>
-                            </p:commandButton>
-                        </p:column>
-                    </p:dataTable>
-                </p:panel>
-            </p:panel>
-
-            <p:commandButton id="createBtn" ajax="true" value="Create"
-                             rendered="#{contextSchemeDetailBean.contextScheme.guid == null}"
-                             action="#{contextSchemeDetailBean.update()}"/>
-
-            <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{contextSchemeDetailBean.contextScheme.guid != null}"
-                             action="#{contextSchemeDetailBean.update()}"/>
-
-            <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                <h:outputText value="GUID" styleClass="section-label"
+                              rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"/>
+                <h:inputText id="guid" value="#{contextSchemeDetailBean.contextScheme.guid}"
                              rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
-                             styleClass="danger"
-                             onclick="PF('confirmDiscard').show()"/>
+                             styleClass="section-content input-section disabled" disabled="true"/>
 
-            <p:confirmDialog id="confirmDifferentNameButSameIdentityDlg" widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    You are about to create a context classification scheme with the different name but same identity
-                    <br/>
-                    (i.e., same ID and Agency ID but different name).
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
-                                     actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
-                                     action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
-                </div>
-            </p:confirmDialog>
-            <p:confirmDialog id="confirmDifferentSchemeIdButSameIdentityDlg" widgetVar="confirmDifferentSchemeIdButSameIdentity" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    You are about to create a context classification scheme with an existing name but different identity
-                    <br/>
-                    (i.e., same Agency ID but different Scheme ID).
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
-                                     actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
-                                     action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
-                </div>
-            </p:confirmDialog>
-            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    The context scheme will be permanently removed.
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn3" value="Accept" icon="fa fa-white fa-check"
-                                     action="#{contextSchemeDetailBean.delete()}"
-                                     oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton id="cancelBtn3" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDiscard').hide()"/>
-                </div>
-            </p:confirmDialog>
+                <h:outputText value="Name" styleClass="section-label"/>
+                <h:inputText id="name" value="#{contextSchemeDetailBean.contextScheme.schemeName}"
+                             required="true" maxlength="255"
+                             requiredMessage="Please fill out 'Name' field."
+                             label="Name" styleClass="section-content input-section">
+                    <f:validateLength maximum="255"/>
+                </h:inputText>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+                <h:outputText value="Scheme ID" styleClass="section-label"/>
+                <h:inputText id="schemeId" value="#{contextSchemeDetailBean.contextScheme.schemeId}"
+                             required="true" maxlength="45"
+                             requiredMessage="Please fill out 'Scheme ID' field."
+                             label="Scheme ID" styleClass="section-content input-section">
+                    <f:validateLength maximum="45"/>
+                </h:inputText>
+
+                <h:outputText value="Agency ID" styleClass="section-label"/>
+                <h:inputText id="agencyId" value="#{contextSchemeDetailBean.contextScheme.schemeAgencyId}"
+                             required="true" maxlength="45"
+                             requiredMessage="Please fill out 'Agency ID' field."
+                             label="Agency ID" styleClass="section-content input-section">
+                    <f:validateLength maximum="45"/>
+                </h:inputText>
+
+                <h:outputText value="Version" styleClass="section-label"/>
+                <h:inputText id="version" value="#{contextSchemeDetailBean.contextScheme.schemeVersionId}"
+                             required="true" maxlength="45"
+                             requiredMessage="Please fill out 'Version' field."
+                             label="Version" styleClass="section-content input-section">
+                    <f:validateLength maximum="45"/>
+                </h:inputText>
+
+                <h:outputText value="Description" styleClass="section-label"/>
+                <h:inputTextarea id="description" value="#{contextSchemeDetailBean.contextScheme.description}"
+                                 rows="6" a:placeholder="Leave a description"
+                                 styleClass="section-content input-section"/>
+            </h:panelGrid>
+            <p:separator/>
+            <p:panel>
+                <f:facet name="header">
+                    <h:outputText value="Context Scheme Values"/>
+                    <p:commandButton id="addBtn" value="Add" style="float: right;"
+                                     actionListener="#{contextSchemeDetailBean.addContextSchemeValue}"
+                                     update=":form:tbl"/>
+                </f:facet>
+                <p:dataTable id="tbl" var="contextSchemeValue"
+                             value="#{contextSchemeDetailBean.contextSchemeValueModels}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10" editable="true" editMode="cell"
+                             style="width: 100%; margin-bottom: 20px;">
+                    <p:column style="width: 20%" headerText="Value" sortBy="#{contextSchemeValue.value}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{contextSchemeValue.value}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{contextSchemeValue.value}" label="Value" style="width: 100%"
+                                             maxlength="45">
+                                    <f:validateLength maximum="45"/>
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Meaning" sortBy="#{contextSchemeValue.meaning}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{contextSchemeValue.meaning}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{contextSchemeValue.meaning}" label="Meaning"
+                                             style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
+                                         action="#{contextSchemeDetailBean.deleteContextSchemeValue}"
+                                         update="tbl">
+                            <f:setPropertyActionListener value="#{contextSchemeValue}"
+                                                         target="#{contextSchemeDetailBean.selectedContextSchemeValue}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </p:panel>
+
+        <p:commandButton id="createBtn" ajax="true" value="Create"
+                         rendered="#{contextSchemeDetailBean.contextScheme.guid == null}"
+                         action="#{contextSchemeDetailBean.update()}"/>
+
+        <p:commandButton id="updateBtn" ajax="true" value="Update"
+                         rendered="#{contextSchemeDetailBean.contextScheme.guid != null}"
+                         action="#{contextSchemeDetailBean.update()}"/>
+
+        <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                         rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
+                         styleClass="danger"
+                         onclick="PF('confirmDiscard').show()"/>
+
+        <p:confirmDialog id="confirmDifferentNameButSameIdentityDlg" widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                You are about to create a context classification scheme with the different name but same identity
+                <br/>
+                (i.e., same ID and Agency ID but different name).
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
+                                 action="#{contextSchemeDetailBean.update()}"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
+            </div>
+        </p:confirmDialog>
+        <p:confirmDialog id="confirmDifferentSchemeIdButSameIdentityDlg" widgetVar="confirmDifferentSchemeIdButSameIdentity" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                You are about to create a context classification scheme with an existing name but different identity
+                <br/>
+                (i.e., same Agency ID but different Scheme ID).
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
+                                 actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
+                                 action="#{contextSchemeDetailBean.update()}"/>
+                <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
+            </div>
+        </p:confirmDialog>
+        <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                The context scheme will be permanently removed.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn3" value="Accept" icon="fa fa-white fa-check"
+                                 action="#{contextSchemeDetailBean.delete()}"
+                                 oncomplete="PF('confirmDiscard').hide()"/>
+                <p:commandButton id="cancelBtn3" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDiscard').hide()"/>
+            </div>
+        </p:confirmDialog>
     </ui:define>
 
 </ui:composition>

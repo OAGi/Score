@@ -17,48 +17,44 @@
                 </h:panelGroup>
             </div>
         </div>
-        <h:form id="form" pt:autocomplete="false">
-            <p:growl id="growl" showDetail="true" life="3000"/>
+        <p:growl id="growl" showDetail="true" life="3000"/>
 
-            <p:panel>
-                <h:panelGrid columns="2" cellpadding="3">
-                    <h:outputText value="Login ID" styleClass="section-label"/>
-                    <h:inputText id="bG9naW5JZA" value="#{userDetailBean.user.loginId}"
-                                 required="true" pt:autocomplete="nope"
-                                 requiredMessage="Please fill out 'Login ID' field."
-                                 maxlength="45"
-                                 label="Login ID" styleClass="section-content input-section">
-                        <f:validateLength maximum="45"/>
-                    </h:inputText>
+        <p:panel>
+            <h:panelGrid columns="2" cellpadding="3">
+                <h:outputText value="Login ID" styleClass="section-label"/>
+                <h:inputText id="bG9naW5JZA" value="#{userDetailBean.user.loginId}"
+                             required="true" pt:autocomplete="nope"
+                             requiredMessage="Please fill out 'Login ID' field."
+                             maxlength="45"
+                             label="Login ID" styleClass="section-content input-section">
+                    <f:validateLength maximum="45"/>
+                </h:inputText>
 
-                    <h:outputText value="Password" styleClass="section-label"/>
-                    <p:password id="cGFzc3dvcmQ" value="#{userDetailBean.user.password}"
-                                label="Password" styleClass="section-content input-section"
-                                required="true" pt:autocomplete="new-password"
-                                requiredMessage="Please fill out 'Password' field."
-                                validatorMessage="Password is too short (minimum is 5 characters)">
-                        <f:validateLength minimum="5"/>
-                    </p:password>
+                <h:outputText value="Password" styleClass="section-label"/>
+                <p:password id="cGFzc3dvcmQ" value="#{userDetailBean.user.password}"
+                            label="Password" styleClass="section-content input-section"
+                            required="true" pt:autocomplete="new-password"
+                            requiredMessage="Please fill out 'Password' field."
+                            validatorMessage="Password is too short (minimum is 5 characters)">
+                    <f:validateLength minimum="5"/>
+                </p:password>
 
-                    <h:panelGroup rendered="#{userDetailBean.user.appUserId == 0}">
-                    <h:outputText for="oagisDeveloper" value="OAGIS Developer" styleClass="section-label"/>
-                    <h:selectBooleanCheckbox id="oagisDeveloper" value="#{userDetailBean.user.oagisDeveloperIndicator}"
-                                             styleClass="section-content input-section" style="text-align: left; margin-left: 158px !important;">
-                    </h:selectBooleanCheckbox>
-                    </h:panelGroup>
-                </h:panelGrid>
-            </p:panel>
+                <h:panelGroup rendered="#{userDetailBean.user.appUserId == 0}">
+                <h:outputText for="oagisDeveloper" value="OAGIS Developer" styleClass="section-label"/>
+                <h:selectBooleanCheckbox id="oagisDeveloper" value="#{userDetailBean.user.oagisDeveloperIndicator}"
+                                         styleClass="section-content input-section" style="text-align: left; margin-left: 158px !important;">
+                </h:selectBooleanCheckbox>
+                </h:panelGroup>
+            </h:panelGrid>
+        </p:panel>
 
-            <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
-                             rendered="#{userDetailBean.user.appUserId == 0}"
-                             action="#{userDetailBean.update()}"/>
+        <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
+                         rendered="#{userDetailBean.user.appUserId == 0}"
+                         action="#{userDetailBean.update()}"/>
 
-            <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
-                             rendered="#{userDetailBean.user.appUserId != 0}"
-                             action="#{userDetailBean.update()}"/>
-
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
+                         rendered="#{userDetailBean.user.appUserId != 0}"
+                         action="#{userDetailBean.update()}"/>
     </ui:define>
 
 </ui:composition>

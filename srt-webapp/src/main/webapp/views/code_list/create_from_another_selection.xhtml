@@ -10,47 +10,44 @@
                 <h2 class="subhead-heading">Select Based Code List to create new Code List</h2>
             </div>
         </div>
-        <h:form id="form">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="ccName" value="#{codeListCreateFromAnotherSelectionBean.codeListName}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{codeListCreateFromAnotherSelectionBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                     actionListener="#{codeListCreateFromAnotherSelectionBean.search}"
-                                     update="tblBasedCodeList"
-                                     icon="fa fa-white fa-search"/>
-                </f:facet>
-                <p:dataTable id="tblBasedCodeList" var="cVO"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom: 20px;"
-                             value="#{codeListCreateFromAnotherSelectionBean.codeLists}" rowKey="#{cVO.codeListId}">
-                    <p:column headerText="Name" sortBy="#{cVO.name}">
-                        <a href="/code_list/create/from_another/#{cVO.codeListId}">#{cVO.name}</a>
-                    </p:column>
-                    <p:column headerText="Based Code List" sortBy="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}">
-                        <h:outputText value="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}"/>
-                    </p:column>
-                    <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
-                        <h:outputText id="agencyId" value="#{cVO.agencyId}" style="float: right;"/>
-                        <p:tooltip id="toolTipAgencyId" for="agencyId" value="#{codeListCreateFromAnotherSelectionBean.getAgencyName(cVO.agencyId)}" position="bottom"/>
-                    </p:column>
-                    <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
-                        <h:outputText value="#{cVO.versionId}" style="float: right;"/>
-                    </p:column>
-                    <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                              sortBy="#{cVO.creationTimestamp}">
-                        <h:outputText value="#{cVO.creationTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="ccName" value="#{codeListCreateFromAnotherSelectionBean.codeListName}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{codeListCreateFromAnotherSelectionBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                 actionListener="#{codeListCreateFromAnotherSelectionBean.search}"
+                                 update="tblBasedCodeList"
+                                 icon="fa fa-white fa-search"/>
+            </f:facet>
+            <p:dataTable id="tblBasedCodeList" var="cVO"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom: 20px;"
+                         value="#{codeListCreateFromAnotherSelectionBean.codeLists}" rowKey="#{cVO.codeListId}">
+                <p:column headerText="Name" sortBy="#{cVO.name}">
+                    <a href="/code_list/create/from_another/#{cVO.codeListId}">#{cVO.name}</a>
+                </p:column>
+                <p:column headerText="Based Code List" sortBy="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}">
+                    <h:outputText value="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}"/>
+                </p:column>
+                <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
+                    <h:outputText id="agencyId" value="#{cVO.agencyId}" style="float: right;"/>
+                    <p:tooltip id="toolTipAgencyId" for="agencyId" value="#{codeListCreateFromAnotherSelectionBean.getAgencyName(cVO.agencyId)}" position="bottom"/>
+                </p:column>
+                <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
+                    <h:outputText value="#{cVO.versionId}" style="float: right;"/>
+                </p:column>
+                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
+                          sortBy="#{cVO.creationTimestamp}">
+                    <h:outputText value="#{cVO.creationTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

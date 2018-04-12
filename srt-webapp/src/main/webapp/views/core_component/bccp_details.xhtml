@@ -14,547 +14,543 @@
                 </h:panelGroup>
             </div>
         </div>
-        <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
-                        closable="true"/>
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                    closable="true"/>
 
-            <p:blockUI block="leftPanel" widgetVar="leftBlockUI"/>
+        <p:blockUI block="leftPanel" widgetVar="leftBlockUI"/>
 
-            <p:panel id="panel">
-                <h:panelGroup style="width: 100%;">
-                    <div class="row">
-                        <div class="col-md-5"
-                             style="max-height: 470px; overflow-y: scroll;">
-                            <p:panel id="leftPanel">
-                                <p:treeTable value="#{bccpDetailBean.treeNode}" var="node" id="treeTable"
-                                             selection="#{bccpDetailBean.selectedTreeNode}"
-                                             selectionMode="single">
-                                    <p:ajax event="expand" listener="#{bccpDetailBean.expand}"
-                                            update=":form:treeTable, :form:details"/>
-                                    <p:ajax event="collapse"
-                                            update=":form:treeTable, :form:details"/>
-                                    <p:ajax event="select" update=":form:details"/>
-                                    <p:column>
+        <p:panel id="panel">
+            <h:panelGroup style="width: 100%;">
+                <div class="row">
+                    <div class="col-md-5"
+                         style="max-height: 470px; overflow-y: scroll;">
+                        <p:panel id="leftPanel">
+                            <p:treeTable value="#{bccpDetailBean.treeNode}" var="node" id="treeTable"
+                                         selection="#{bccpDetailBean.selectedTreeNode}"
+                                         selectionMode="single">
+                                <p:ajax event="expand" listener="#{bccpDetailBean.expand}"
+                                        update=":form:treeTable, :form:details"/>
+                                <p:ajax event="collapse"
+                                        update=":form:treeTable, :form:details"/>
+                                <p:ajax event="select" update=":form:details"/>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{bccpDetailBean.targetBccp.propertyTerm}"/>
+                                    </f:facet>
+                                    <h:outputText value="#{ node.getAttribute('name') }"/>
+                                </p:column>
+                            </p:treeTable>
+                        </p:panel>
+                    </div>
+
+                    <div id="main_panel" class="col-md-7" style="overflow-y: scroll">
+                        <div id="myAffix" style="overflow-y: auto;">
+                            <p:panel id="details">
+                                <!--
+                                    ACC
+                                -->
+                                <h:panelGroup id="accPanelGroup"
+                                              rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'ACC')}">
+                                    <p:panel id="accPanel">
                                         <f:facet name="header">
-                                            <h:outputText value="#{bccpDetailBean.targetBccp.propertyTerm}"/>
+                                            <h:outputText value="ACC"/>
                                         </f:facet>
-                                        <h:outputText value="#{ node.getAttribute('name') }"/>
-                                    </p:column>
-                                </p:treeTable>
-                            </p:panel>
-                        </div>
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="accguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.acc.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                        <div id="main_panel" class="col-md-7" style="overflow-y: scroll">
-                            <div id="myAffix" style="overflow-y: auto;">
-                                <p:panel id="details">
-                                    <!--
-                                        ACC
-                                    -->
-                                    <h:panelGroup id="accPanelGroup"
-                                                  rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'ACC')}">
-                                        <p:panel id="accPanel">
-                                            <f:facet name="header">
-                                                <h:outputText value="ACC"/>
-                                            </f:facet>
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="accguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.acc.guid}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                            <h:outputText value="Object Class Term" styleClass="section-label"/>
+                                            <h:inputText id="accTerm" required="true"
+                                                         requiredMessage="Please fill out 'Object Class Term' field."
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Object Class Term" styleClass="section-label"/>
-                                                <h:inputText id="accTerm" required="true"
-                                                             requiredMessage="Please fill out 'Object Class Term' field."
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.acc.objectClassTerm}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="accDen"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.acc.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="accDen"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.acc.den}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Component Type" styleClass="section-label"/>
-                                                <p:selectOneMenu id="accType"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.acc.oagisComponentType}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                    <f:selectItems
-                                                            value="#{bccpDetailBean.availableOagisComponentTypes(bccpDetailBean.selectedTreeNode.data.acc)}"/>
-                                                    <p:ajax update="accPanel"/>
-                                                </p:selectOneMenu>
-
-                                                <h:outputText value="Abstract" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="abstractCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.acc.abstractComponent}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true">
-                                                    <p:ajax update="accPanel"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="accDeprecatedCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.acc.deprecated}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true">
-                                                    <p:ajax update="accPanel"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="accDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.acc.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.acc.state != 'Editing' and
-                                                                bccpDetailBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true"/>
-                                            </h:panelGrid>
-                                        </p:panel>
-                                    </h:panelGroup>
-
-                                    <!--
-                                        ASCCP
-                                    -->
-                                    <h:panelGroup id="asccpPanelGroup"
-                                                  rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'ASCCP')}">
-                                        <p:panel id="asccPanel"
-                                                 rendered="#{bccpDetailBean.selectedTreeNode.data.ascc != null}">
-                                            <f:facet name="header">
-                                                <h:outputText value="ASCC"/>
-                                            </f:facet>
-
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="asccguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.ascc.guid}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="asccDen"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.ascc.den}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText id="asccMin"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.ascc.cardinalityMin}"
+                                            <h:outputText value="Component Type" styleClass="section-label"/>
+                                            <p:selectOneMenu id="accType"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.acc.oagisComponentType}"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true">
-                                                    <f:selectItem itemLabel="0" itemValue="0"/>
-                                                    <f:selectItem itemLabel="1" itemValue="1"/>
-                                                    <p:ajax update="asccPanel"/>
-                                                </h:inputText>
+                                                <f:selectItems
+                                                        value="#{bccpDetailBean.availableOagisComponentTypes(bccpDetailBean.selectedTreeNode.data.acc)}"/>
+                                                <p:ajax update="accPanel"/>
+                                            </p:selectOneMenu>
 
-                                                <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText id="asccMax" editable="true"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
+                                            <h:outputText value="Abstract" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="abstractCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.acc.abstractComponent}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                <p:ajax update="accPanel"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Deprecated" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="accDeprecatedCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.acc.deprecated}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                <p:ajax update="accPanel"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="accDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.acc.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.acc.state != 'Editing' and
+                                                            bccpDetailBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
+                                                             a:placeholder="#{bccpDetailBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                             styleClass="section-content input-section disabled"
+                                                             disabled="true"/>
+                                        </h:panelGrid>
+                                    </p:panel>
+                                </h:panelGroup>
+
+                                <!--
+                                    ASCCP
+                                -->
+                                <h:panelGroup id="asccpPanelGroup"
+                                              rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'ASCCP')}">
+                                    <p:panel id="asccPanel"
+                                             rendered="#{bccpDetailBean.selectedTreeNode.data.ascc != null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="ASCC"/>
+                                        </f:facet>
+
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="asccguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.ascc.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="asccDen"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.ascc.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Min" styleClass="section-label"/>
+                                            <h:inputText id="asccMin"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.ascc.cardinalityMin}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="0" itemValue="0"/>
+                                                <f:selectItem itemLabel="1" itemValue="1"/>
+                                                <p:ajax update="asccPanel"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:inputText id="asccMax" editable="true"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                <p:ajax update="asccPanel"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Deprecated" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="asccDeprecatedCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.ascc.deprecated}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                <p:ajax update="asccPanel"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="asccDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.ascc.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.ascc.state != 'Editing' and
+                                                            bccpDetailBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
+                                                             a:placeholder="#{bccpDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true">
-                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
-                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                    <p:ajax update="asccPanel"/>
-                                                </h:inputText>
+                                                <p:ajax update="asccPanel"/>
+                                            </h:inputTextarea>
+                                        </h:panelGrid>
+                                    </p:panel>
+                                    <p:panel id="asccpPanel">
+                                        <f:facet name="header">
+                                            <h:outputText value="ASCCP"/>
+                                        </f:facet>
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="asccpguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.asccp.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="asccDeprecatedCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.ascc.deprecated}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true">
-                                                    <p:ajax update="asccPanel"/>
-                                                </h:selectBooleanCheckbox>
+                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:inputText id="asccpTerm"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="asccDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.ascc.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.ascc.state != 'Editing' and
-                                                                bccpDetailBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                    <p:ajax update="asccPanel"/>
-                                                </h:inputTextarea>
-                                            </h:panelGrid>
-                                        </p:panel>
-                                        <p:panel id="asccpPanel">
-                                            <f:facet name="header">
-                                                <h:outputText value="ASCCP"/>
-                                            </f:facet>
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="asccpguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.asccp.guid}"
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="asccpDen"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.asccp.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Reusable" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="asccpReusableCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.asccp.reusableIndicator}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true"/>
+
+                                            <h:outputText value="Deprecated" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="asccpDeprecatedCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.asccp.deprecated}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true"/>
+
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="asccpDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.asccp.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' and
+                                                            bccpDetailBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
+                                                             a:placeholder="#{bccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true"/>
-
-                                                <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText id="asccpTerm"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="asccpDen"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.asccp.den}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Reusable" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="asccpReusableCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.asccp.reusableIndicator}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true"/>
-
-                                                <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="asccpDeprecatedCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.asccp.deprecated}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true"/>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="asccpDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.asccp.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' and
-                                                                bccpDetailBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true"/>
-                                            </h:panelGrid>
-                                        </p:panel>
-                                    </h:panelGroup>
+                                        </h:panelGrid>
+                                    </p:panel>
+                                </h:panelGroup>
 
 
-                                    <!--
-                                        BCCP
-                                    -->
-                                    <h:panelGroup id="bccpPanelGroup"
-                                                  rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'BCCP')}">
-                                        <p:panel id="bccPanel"
-                                                 rendered="#{bccpDetailBean.selectedTreeNode.data.bcc != null}">
-                                            <f:facet name="header">
-                                                <h:outputText value="BCC"/>
-                                            </f:facet>
+                                <!--
+                                    BCCP
+                                -->
+                                <h:panelGroup id="bccpPanelGroup"
+                                              rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'BCCP')}">
+                                    <p:panel id="bccPanel"
+                                             rendered="#{bccpDetailBean.selectedTreeNode.data.bcc != null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="BCC"/>
+                                        </f:facet>
 
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="bccguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.guid}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="bccguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bcc.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="bccDen"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.den}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="bccDen"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bcc.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Entity Type" styleClass="section-label"/>
-                                                <p:selectOneMenu id="type"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bcc.entityType}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                    <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
-                                                    <f:selectItem itemLabel="Element" itemValue="Element"/>
-                                                    <p:ajax update="bccPanel"/>
-                                                </p:selectOneMenu>
-
-                                                <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText id="bccMin"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.cardinalityMin}"
+                                            <h:outputText value="Entity Type" styleClass="section-label"/>
+                                            <p:selectOneMenu id="type"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.entityType}"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true">
-                                                    <f:selectItem itemLabel="0" itemValue="0"/>
-                                                    <f:selectItem itemLabel="1" itemValue="1"/>
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:inputText>
+                                                <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
+                                                <f:selectItem itemLabel="Element" itemValue="Element"/>
+                                                <p:ajax update="bccPanel"/>
+                                            </p:selectOneMenu>
 
-                                                <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText id="bccMax" editable="true"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
+                                            <h:outputText value="Min" styleClass="section-label"/>
+                                            <h:inputText id="bccMin"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bcc.cardinalityMin}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="0" itemValue="0"/>
+                                                <f:selectItem itemLabel="1" itemValue="1"/>
+                                                <p:ajax update="bccPanel"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:inputText id="bccMax" editable="true"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                <p:ajax update="bccPanel"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Nillable" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="bccNillableCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.bcc.nillable}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                <p:ajax update="bccPanel"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Deprecated" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="deprecatedCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.bcc.deprecated}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                <p:ajax update="bccPanel"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Default Value" styleClass="section-label"/>
+                                            <h:inputTextarea id="bccDefault"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.defaultValue}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                            bccpDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
+                                                             autoResize="false"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true">
-                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
-                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:inputText>
+                                                <p:ajax update="bccPanel"/>
+                                            </h:inputTextarea>
 
-                                                <h:outputText value="Nillable" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="bccNillableCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.bcc.nillable}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true">
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="deprecatedCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.bcc.deprecated}"
-                                                                         styleClass="section-content input-section disabled"
-                                                                         disabled="true">
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Default Value" styleClass="section-label"/>
-                                                <h:inputTextarea id="bccDefault"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bcc.defaultValue}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
-                                                                bccpDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:inputTextarea>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="bccDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bcc.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
-                                                                bccpDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                    <p:ajax update="bccPanel"/>
-                                                </h:inputTextarea>
-                                            </h:panelGrid>
-                                        </p:panel>
-
-                                        <p:panel id="bccpPanel">
-                                            <f:facet name="header">
-                                                <h:outputText value="BCCP"/>
-                                            </f:facet>
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="bccpguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bccp.guid}"
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="bccDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bcc.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                            bccpDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
+                                                             a:placeholder="#{bccpDetailBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                              styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                                             disabled="true">
+                                                <p:ajax update="bccPanel"/>
+                                            </h:inputTextarea>
+                                        </h:panelGrid>
+                                    </p:panel>
 
-                                                <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText id="bccpTerm"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
+                                    <p:panel id="bccpPanel">
+                                        <f:facet name="header">
+                                            <h:outputText value="BCCP"/>
+                                        </f:facet>
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="bccpguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bccp.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:inputText id="bccpTerm"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
+                                                         styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                         disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
+                                                <p:ajax listener="#{bccpDetailBean.onChangePropertyTerm(bccpDetailBean.selectedTreeNode.data)}"
+                                                        update="headerMessage, leftPanel, bccpPanel, :form:btnGroup"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="bccpDen"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bccp.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Nillable" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="nillableCB"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.bccp.nillable}"
+                                                                     styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                     disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
+                                                <p:ajax update="bccpPanel, :form:btnGroup"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Deprecated" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox id="deprecated"
+                                                                     value="${bccpDetailBean.selectedTreeNode.data.bccp.deprecated}"
+                                                                     styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                                     disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
+                                                <p:ajax update="bccpPanel, :form:btnGroup"/>
+                                            </h:selectBooleanCheckbox>
+
+                                            <h:outputText value="Default Value" styleClass="section-label"/>
+                                            <h:inputTextarea id="default"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bccp.defaultValue}"
+                                                             rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
+                                                            bccpDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
+                                                             autoResize="false"
                                                              styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
                                                              disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
-                                                    <p:ajax listener="#{bccpDetailBean.onChangePropertyTerm(bccpDetailBean.selectedTreeNode.data)}"
-                                                            update="headerMessage, leftPanel, bccpPanel, :form:btnGroup"/>
-                                                </h:inputText>
+                                                <p:ajax update="bccpPanel, :form:btnGroup"/>
+                                            </h:inputTextarea>
 
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="bccpDen"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bccp.den}"
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="bccpDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bccp.definition}"
+                                                             rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
+                                                            bccpDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
+                                                             a:placeholder="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? '' : 'Leave a definition'}"
+                                                             styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
+                                                             disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
+                                                <p:ajax update="bccpPanel, :form:btnGroup"/>
+                                            </h:inputTextarea>
+                                        </h:panelGrid>
+                                    </p:panel>
+
+                                    <p:panel id="dataTypePanel" header="Data Type">
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="dataTypeguid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdt.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Data Type Term" styleClass="section-label"/>
+                                            <h:inputText id="term"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdt.dataTypeTerm}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Qualifier" styleClass="section-label"/>
+                                            <h:inputText id="qualifier"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdt.qualifier}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:inputText id="den"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdt.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
+
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="dataTypeDefinition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdt.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true"/>
-
-                                                <h:outputText value="Nillable" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="nillableCB"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.bccp.nillable}"
-                                                                         styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
-                                                                         disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
-                                                    <p:ajax update="bccpPanel, :form:btnGroup"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Deprecated" styleClass="section-label"/>
-                                                <h:selectBooleanCheckbox id="deprecated"
-                                                                         value="${bccpDetailBean.selectedTreeNode.data.bccp.deprecated}"
-                                                                         styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
-                                                                         disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
-                                                    <p:ajax update="bccpPanel, :form:btnGroup"/>
-                                                </h:selectBooleanCheckbox>
-
-                                                <h:outputText value="Default Value" styleClass="section-label"/>
-                                                <h:inputTextarea id="default"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bccp.defaultValue}"
-                                                                 rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
-                                                                bccpDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
-                                                                 disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
-                                                    <p:ajax update="bccpPanel, :form:btnGroup"/>
-                                                </h:inputTextarea>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="bccpDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bccp.definition}"
-                                                                 rows="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) and
-                                                                bccpDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 a:placeholder="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? '' : 'Leave a definition'}"
-                                                                 styleClass="section-content input-section #{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
-                                                                 disabled="#{bccpDetailBean.isDisabled(bccpDetailBean.selectedTreeNode.data.bccp)}">
-                                                    <p:ajax update="bccpPanel, :form:btnGroup"/>
-                                                </h:inputTextarea>
-                                            </h:panelGrid>
-                                        </p:panel>
-
-                                        <p:panel id="dataTypePanel" header="Data Type">
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="dataTypeguid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdt.guid}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Data Type Term" styleClass="section-label"/>
-                                                <h:inputText id="term"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdt.dataTypeTerm}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Qualifier" styleClass="section-label"/>
-                                                <h:inputText id="qualifier"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdt.qualifier}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="DEN" styleClass="section-label"/>
-                                                <h:inputText id="den"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdt.den}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="dataTypeDefinition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bdt.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true"/>
-                                            </h:panelGrid>
-                                        </p:panel>
-                                    </h:panelGroup>
+                                        </h:panelGrid>
+                                    </p:panel>
+                                </h:panelGroup>
 
 
-                                    <!--
-                                        BDT SC
-                                    -->
-                                    <h:panelGroup id="bdtScPanelGroup"
-                                                  rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'BDTSC')}">
-                                        <p:panel id="bdtScPanel"
-                                                 rendered="#{bccpDetailBean.selectedTreeNode.data.bdtSc != null}">
-                                            <f:facet name="header">
-                                                <h:outputText value="Data Type Supplementary Component"/>
-                                            </f:facet>
+                                <!--
+                                    BDT SC
+                                -->
+                                <h:panelGroup id="bdtScPanelGroup"
+                                              rendered="#{fn:startsWith(bccpDetailBean.selectedTreeNode.type, 'BDTSC')}">
+                                    <p:panel id="bdtScPanel"
+                                             rendered="#{bccpDetailBean.selectedTreeNode.data.bdtSc != null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Data Type Supplementary Component"/>
+                                        </f:facet>
 
-                                            <h:panelGrid columns="2">
-                                                <h:outputText value="GUID" styleClass="section-label"/>
-                                                <h:inputText id="guid"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.guid}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                        <h:panelGrid columns="2">
+                                            <h:outputText value="GUID" styleClass="section-label"/>
+                                            <h:inputText id="guid"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.guid}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Property Term" styleClass="section-label"/>
-                                                <h:inputText id="propertyTerm"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.propertyTerm}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:inputText id="propertyTerm"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.propertyTerm}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Representation Term" styleClass="section-label"/>
-                                                <h:inputText id="representationTerm"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.representationTerm}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true"/>
+                                            <h:outputText value="Representation Term" styleClass="section-label"/>
+                                            <h:inputText id="representationTerm"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.representationTerm}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
-                                                <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:inputText id="min"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMin}"
+                                            <h:outputText value="Min" styleClass="section-label"/>
+                                            <h:inputText id="min"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMin}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="0" itemValue="0"/>
+                                                <f:selectItem itemLabel="1" itemValue="1"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:inputText id="max" editable="true"
+                                                         value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true">
+                                                <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                <f:validator binding="#{cardinalityMaxConverter}"/>
+                                            </h:inputText>
+
+                                            <h:outputText value="Definition" styleClass="section-label"/>
+                                            <h:inputTextarea id="definition"
+                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.definition}"
+                                                             rows="#{bccpDetailBean.selectedTreeNode.data.bdtSc.definition == null ? '2' : '6'}"
+                                                             autoResize="false"
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true">
-                                                    <f:selectItem itemLabel="0" itemValue="0"/>
-                                                    <f:selectItem itemLabel="1" itemValue="1"/>
-                                                </h:inputText>
-
-                                                <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText id="max" editable="true"
-                                                             value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
-                                                             styleClass="section-content input-section disabled"
-                                                             disabled="true">
-                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
-                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
-                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
-                                                </h:inputText>
-
-                                                <h:outputText value="Definition" styleClass="section-label"/>
-                                                <h:inputTextarea id="definition"
-                                                                 value="#{bccpDetailBean.selectedTreeNode.data.bdtSc.definition}"
-                                                                 rows="#{bccpDetailBean.selectedTreeNode.data.bdtSc.definition == null ? '2' : '6'}"
-                                                                 autoResize="false"
-                                                                 styleClass="section-content input-section disabled"
-                                                                 disabled="true">
-                                                </h:inputTextarea>
-                                            </h:panelGrid>
-                                        </p:panel>
-                                    </h:panelGroup>
-                                </p:panel>
-                            </div>
+                                            </h:inputTextarea>
+                                        </h:panelGrid>
+                                    </p:panel>
+                                </h:panelGroup>
+                            </p:panel>
                         </div>
                     </div>
-                </h:panelGroup>
-            </p:panel>
-
-            <p:panel id="btnGroup"
-                     rendered="#{(bccpDetailBean.currentUser.appUserId eq bccpDetailBean.targetBccp.ownerUserId)}">
-                <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
-                                 disabled="#{!bccpDetailBean.targetBccp.dirty}"
-                                 id="btnUpdate" widgetVar="btnUpdate" value="Update"
-                                 action="#{bccpDetailBean.updateBccp()}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-
-                <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
-                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
-                                 action="#{bccpDetailBean.updateState('Candidate')}"
-                                 disabled="#{bccpDetailBean.targetBccp.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-                <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Candidate'}"
-                                 id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
-                                 action="#{bccpDetailBean.updateState('Editing')}"
-                                 disabled="#{bccpDetailBean.targetBccp.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-                <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Candidate'}"
-                                 id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 onclick="PF('confirmPublish').show();"
-                                 disabled="#{bccpDetailBean.targetBccp.dirty}"
-                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
-
-                <p:commandButton
-                        rendered="#{(bccpDetailBean.targetBccp.state == 'Editing' or bccpDetailBean.targetBccp.state == 'Candidate') and bccpDetailBean.isPreviousRevisionNotInsert(bccpDetailBean.targetBccp)}"
-                        id="btnUndo" widgetVar="btnUndo" value="Undo"
-                        action="#{bccpDetailBean.undoLastAction()}"
-                        update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"
-                        style="float: right;"/>
-
-                <p:commandButton
-                        rendered="#{bccpDetailBean.targetBccp.state == 'Published' and bccpDetailBean.hasPreviousRevision(bccpDetailBean.targetBccp)}"
-                        id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
-                        action="#{bccpDetailBean.createNewRevision(bccpDetailBean.targetBccp)}"
-                        update=":form:treeTable, :form:details, :form:btnGroup"/>
-            </p:panel>
-
-            <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    Do you really want to move this to the Published state?<br/>
-                    Once in the Published state the entity can no longer be changed or discarded.<br/>
-                    A new revision would have to be created.
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
-                                     onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
-                                     oncomplete="PF('loadingBlock').hide();"
-                                     actionListener="#{bccpDetailBean.updateState('Published')}"
-                                     update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmPublish').hide()"/>
                 </div>
-            </p:confirmDialog>
+            </h:panelGroup>
+        </p:panel>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel id="btnGroup"
+                 rendered="#{(bccpDetailBean.currentUser.appUserId eq bccpDetailBean.targetBccp.ownerUserId)}">
+            <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
+                             disabled="#{!bccpDetailBean.targetBccp.dirty}"
+                             id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                             action="#{bccpDetailBean.updateBccp()}"
+                             update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+            <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Editing'}"
+                             id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                             action="#{bccpDetailBean.updateState('Candidate')}"
+                             disabled="#{bccpDetailBean.targetBccp.dirty}"
+                             update=":form:treeTable, :form:details, :form:btnGroup"/>
+            <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Candidate'}"
+                             id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
+                             action="#{bccpDetailBean.updateState('Editing')}"
+                             disabled="#{bccpDetailBean.targetBccp.dirty}"
+                             update=":form:treeTable, :form:details, :form:btnGroup"/>
+            <p:commandButton rendered="#{bccpDetailBean.targetBccp.state == 'Candidate'}"
+                             id="btnPublish" widgetVar="btnPublish" value="Publish"
+                             onclick="PF('confirmPublish').show();"
+                             disabled="#{bccpDetailBean.targetBccp.dirty}"
+                             update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+            <p:commandButton
+                    rendered="#{(bccpDetailBean.targetBccp.state == 'Editing' or bccpDetailBean.targetBccp.state == 'Candidate') and bccpDetailBean.isPreviousRevisionNotInsert(bccpDetailBean.targetBccp)}"
+                    id="btnUndo" widgetVar="btnUndo" value="Undo"
+                    action="#{bccpDetailBean.undoLastAction()}"
+                    update=":headerMessage, :form:leftPanel, :form:treeTable, :form:details, :form:btnGroup"
+                    style="float: right;"/>
+
+            <p:commandButton
+                    rendered="#{bccpDetailBean.targetBccp.state == 'Published' and bccpDetailBean.hasPreviousRevision(bccpDetailBean.targetBccp)}"
+                    id="btnCreateRevision" widgetVar="btnCreateRevision" value="Create New Revision"
+                    action="#{bccpDetailBean.createNewRevision(bccpDetailBean.targetBccp)}"
+                    update=":form:treeTable, :form:details, :form:btnGroup"/>
+        </p:panel>
+
+        <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                Do you really want to move this to the Published state?<br/>
+                Once in the Published state the entity can no longer be changed or discarded.<br/>
+                A new revision would have to be created.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                 oncomplete="PF('loadingBlock').hide();"
+                                 actionListener="#{bccpDetailBean.updateState('Published')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup" ajax="true"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmPublish').hide()"/>
+            </div>
+        </p:confirmDialog>
     </ui:define>
 </ui:composition>

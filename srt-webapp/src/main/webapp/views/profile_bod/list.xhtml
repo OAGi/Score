@@ -10,109 +10,109 @@
                 <h2 class="subhead-heading">Profile BOD</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
-                        closable="true"/>
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                    closable="true"/>
 
-            <p:panel id="pPanel">
-                <f:facet name="header">
-                    <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
-                                    completeMethod="#{profileBODBean.completeInput}" maxResults="20"
-                                    style="width: 440px; margin-right: 20px;">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODBean.search}"
-                                     update="tbl" icon="fa fa-white fa-search"/>
-                </f:facet>
+        <p:panel id="pPanel">
+            <f:facet name="header">
+                <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
+                                completeMethod="#{profileBODBean.completeInput}" maxResults="20"
+                                style="width: 440px; margin-right: 20px;">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODBean.search}"
+                                 update="tbl" icon="fa fa-white fa-search"/>
+            </f:facet>
 
-                <p:dataTable id="tbl" var="profileBOD" value="#{profileBODBean.profileBODs}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
-                    <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
-                        <h:panelGroup rendered="#{profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}">
-                            <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
-                        </h:panelGroup>
-                        <h:outputText rendered="#{!profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}"
-                                      id="focus" value="#{profileBOD.propertyTerm}"/>
-                        <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
-                    </p:column>
-                    <p:column headerText="Release" style="width: 80px; text-align: center;" styleClass="ellipsis" sortBy="#{profileBOD.releaseNum}">
-                        <h:outputText value="#{profileBOD.releaseNum}"/>
-                    </p:column>
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                              headerText="Business Context"
-                              sortBy="#{profileBOD.bizCtxName}">
-                        <a href="/context_management/business_context/#{profileBOD.bizCtxId}">#{profileBOD.bizCtxName}</a>
-                    </p:column>
-                    <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{profileBOD.ownerName}">
-                        <h:outputText value="#{profileBOD.ownerName}"/>
-                        <h:panelGroup style="display: block;"
-                                      rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}">
-                            <a href="/profile_bod/#{profileBOD.topLevelAbieId}/transfer_ownership">
-                                <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
-                                    <i class="fa fa-exchange" aria-hidden="true"></i>
-                                </h:panelGroup>
-                            </a>
-                        </h:panelGroup>
-                        <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
-                    </p:column>
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Version"
-                              sortBy="#{profileBOD.version}">
-                        <h:outputText value="#{profileBOD.version}"/>
-                    </p:column>
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Status"
-                              sortBy="#{profileBOD.status}">
-                        <h:outputText value="#{profileBOD.status}"/>
-                    </p:column>
-                    <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                              sortBy="#{profileBOD.creationTimestamp}">
-                        <h:outputText value="#{profileBOD.creationTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                    <p:column style="width: 80px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
-                        <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
-                            <span class="label label-primary">Editing</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
-                            <span class="label label-warning">Candidate</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
-                            <span class="label label-default">Published</span>
-                        </h:panelGroup>
-                    </p:column>
+            <p:dataTable id="tbl" var="profileBOD" value="#{profileBODBean.profileBODs}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
+                <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis"
+                          sortBy="#{profileBOD.propertyTerm}">
+                    <h:panelGroup rendered="#{profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}">
+                        <a href="/profile_bod/#{profileBOD.topLevelAbieId}">#{profileBOD.propertyTerm}</a>
+                    </h:panelGroup>
+                    <h:outputText rendered="#{!profileBODBean.canCurrentUserSeeThisProfileBOD(profileBOD)}"
+                                  id="focus" value="#{profileBOD.propertyTerm}"/>
+                    <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner."
+                               position="bottom"/>
+                </p:column>
+                <p:column headerText="Release" style="width: 80px; text-align: center;" styleClass="ellipsis"
+                          sortBy="#{profileBOD.releaseNum}">
+                    <h:outputText value="#{profileBOD.releaseNum}"/>
+                </p:column>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                          headerText="Business Context"
+                          sortBy="#{profileBOD.bizCtxName}">
+                    <a href="/context_management/business_context/#{profileBOD.bizCtxId}">#{profileBOD.bizCtxName}</a>
+                </p:column>
+                <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{profileBOD.ownerName}">
+                    <h:outputText value="#{profileBOD.ownerName}"/>
+                    <h:panelGroup style="display: block;"
+                                  rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.ownerUserId and profileBOD.state eq 'Editing'}">
+                        <a href="/profile_bod/#{profileBOD.topLevelAbieId}/transfer_ownership">
+                            <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                            </h:panelGroup>
+                        </a>
+                    </h:panelGroup>
+                    <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership."
+                               position="bottom"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Version"
+                          sortBy="#{profileBOD.version}">
+                    <h:outputText value="#{profileBOD.version}"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Status"
+                          sortBy="#{profileBOD.status}">
+                    <h:outputText value="#{profileBOD.status}"/>
+                </p:column>
+                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
+                          sortBy="#{profileBOD.creationTimestamp}">
+                    <h:outputText value="#{profileBOD.creationTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="width: 80px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
+                    <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
+                </p:column>
 
-                    <p:column style="text-align: center; width: 65px;"
-                              rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
-                        <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
-                                         disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId or profileBOD.state eq 'Published'}"
-                                         onclick="PF('confirmDiscard').show()">
-                            <f:setPropertyActionListener value="#{profileBOD}"
-                                                         target="#{profileBODBean.selectedProfileBOD}"/>
-                        </p:commandButton>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
+                <p:column style="text-align: center; width: 65px;"
+                          rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
+                    <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                                     disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId or profileBOD.state eq 'Published'}"
+                                     onclick="PF('confirmDiscard').show()">
+                        <f:setPropertyActionListener value="#{profileBOD}"
+                                                     target="#{profileBODBean.selectedProfileBOD}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
 
-            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    The profile BOD will be permanently removed.
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
-                                     onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
-                                     oncomplete="PF('loadingBlock').hide();"
-                                     actionListener="#{profileBODBean.deleteProfileBOD()}"
-                                     update="tbl" ajax="true"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDiscard').hide()"/>
-                </div>
-            </p:confirmDialog>
-
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                The profile BOD will be permanently removed.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
+                                 oncomplete="PF('loadingBlock').hide();"
+                                 actionListener="#{profileBODBean.deleteProfileBOD()}"
+                                 update="tbl" ajax="true"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDiscard').hide()"/>
+            </div>
+        </p:confirmDialog>
     </ui:define>
 </ui:composition>

@@ -14,198 +14,195 @@
 
         <p:growl id="growl" showDetail="true" life="3000"/>
 
-        <h:form id="form">
-            <p:wizard flowListener="#{copyProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
-                      showNavBar="false" onback="onBack();" onnext="onNext();">
-                <!--
-                    Step 1: Select Top-Level Concept
-                -->
-                <p:tab id="step_1">
-                    <f:facet name="title">
-                        <strong class="step">Step 1:</strong>
-                        <h:outputText value="Select Profile BOD"/>
+        <p:wizard flowListener="#{copyProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
+                  showNavBar="false" onback="onBack();" onnext="onNext();">
+            <!--
+                Step 1: Select Top-Level Concept
+            -->
+            <p:tab id="step_1">
+                <f:facet name="title">
+                    <strong class="step">Step 1:</strong>
+                    <h:outputText value="Select Profile BOD"/>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <p:autoComplete id="propertyTerm" value="#{copyProfileBODBean.selectedPropertyTerm}"
+                                        completeMethod="#{copyProfileBODBean.completeInput}"
+                                        style="width: 440px; margin-right: 20px;">
+                            <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                        </p:autoComplete>
+                        <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                         actionListener="#{copyProfileBODBean.search}"
+                                         update=":form:tbl1" icon="fa fa-white fa-search"/>
                     </f:facet>
-                    <p:panel>
-                        <f:facet name="header">
-                            <p:autoComplete id="propertyTerm" value="#{copyProfileBODBean.selectedPropertyTerm}"
-                                            completeMethod="#{copyProfileBODBean.completeInput}"
-                                            style="width: 440px; margin-right: 20px;">
-                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                            </p:autoComplete>
-                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
-                                             update="tbl1" icon="fa fa-white fa-search"/>
-                        </f:facet>
-                        <p:dataTable id="tbl1" var="profileBOD" value="#{copyProfileBODBean.profileBODs}"
-                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                     paginator="true" paginatorPosition="bottom" rows="10"
-                                     style="width: 100%; margin-bottom: 20px"
-                                     selection="#{copyProfileBODBean.selectedProfileBOD}"
-                                     rowKey="#{profileBOD.asccpId}"
-                                     selectionMode="single">
+                    <p:dataTable id="tbl1" var="profileBOD" value="#{copyProfileBODBean.profileBODs}"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorPosition="bottom" rows="10"
+                                 style="width: 100%; margin-bottom: 20px"
+                                 selection="#{copyProfileBODBean.selectedProfileBOD}"
+                                 rowKey="#{profileBOD.asccpId}"
+                                 selectionMode="single">
 
-                            <p:ajax event="rowSelect" listener="#{copyProfileBODBean.onProfileBODSelect}"
-                                    update="growl, tbl1"/>
-                            <p:ajax event="rowUnselect" listener="#{copyProfileBODBean.onProfileBODUnselect}"
-                                    update="growl, tbl1"/>
+                        <p:ajax event="rowSelect" listener="#{copyProfileBODBean.onProfileBODSelect}"
+                                update=":form:growl, :form:tbl1"/>
+                        <p:ajax event="rowUnselect" listener="#{copyProfileBODBean.onProfileBODUnselect}"
+                                update=":form:growl, :form:tbl1"/>
 
-                            <p:column style="width: 50px; text-align: center;">
-                                <p:selectBooleanCheckbox
-                                        value="#{copyProfileBODBean.getProfileBODCheckBox(profileBOD.topLevelAbieId).checked}">
-                                    <p:ajax update="growl, tbl1"/>
-                                </p:selectBooleanCheckbox>
-                            </p:column>
+                        <p:column style="width: 50px; text-align: center;">
+                            <p:selectBooleanCheckbox
+                                    value="#{copyProfileBODBean.getProfileBODCheckBox(profileBOD.topLevelAbieId).checked}">
+                                <p:ajax update=":form:growl, :form:tbl1"/>
+                            </p:selectBooleanCheckbox>
+                        </p:column>
 
-                            <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                                <h:outputText value="#{profileBOD.propertyTerm}"/>
-                            </p:column>
-                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                                      headerText="Business Context"
-                                      sortBy="#{profileBOD.bizCtxName}">
-                                <h:outputText value="#{profileBOD.bizCtxName}"/>
-                            </p:column>
-                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                                      sortBy="#{profileBOD.ownerName}">
-                                <h:outputText value="#{profileBOD.ownerName}"/>
-                            </p:column>
-                            <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
-                                      sortBy="#{profileBOD.creationTimestamp}">
-                                <h:outputText value="#{profileBOD.creationTimestamp}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column style="width: 100px; text-align: center;" headerText="State"
-                                      sortBy="#{profileBOD.state}">
-                                <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
-                                    <span class="label label-primary">Editing</span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
-                                    <span class="label label-warning">Candidate</span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
-                                    <span class="label label-default">Published</span>
-                                </h:panelGroup>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>
-                </p:tab>
+                        <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                            <h:outputText value="#{profileBOD.propertyTerm}"/>
+                        </p:column>
+                        <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                  headerText="Business Context"
+                                  sortBy="#{profileBOD.bizCtxName}">
+                            <h:outputText value="#{profileBOD.bizCtxName}"/>
+                        </p:column>
+                        <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                                  sortBy="#{profileBOD.ownerName}">
+                            <h:outputText value="#{profileBOD.ownerName}"/>
+                        </p:column>
+                        <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                                  sortBy="#{profileBOD.creationTimestamp}">
+                            <h:outputText value="#{profileBOD.creationTimestamp}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column style="width: 100px; text-align: center;" headerText="State"
+                                  sortBy="#{profileBOD.state}">
+                            <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                                <span class="label label-primary">Editing</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                <span class="label label-warning">Candidate</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                                <span class="label label-default">Published</span>
+                            </h:panelGroup>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </p:tab>
 
-                <!--
-                    Step 2: Select Business Context
-                -->
-                <p:tab id="step_2">
-                    <f:facet name="title">
-                        <strong class="step">Step 2:</strong>
-                        <h:outputText value="Select Business Context"/>
-                    </f:facet>
-                    <p:panel header="Selected Profile BOD">
-                        <p:dataTable var="profileBOD" value="#{copyProfileBODBean.selectedProfileBOD}"
-                                     style="width: 100%; margin-bottom: 20px;">
-                            <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                                <h:outputText value="#{profileBOD.propertyTerm}"/>
-                            </p:column>
-                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                                      headerText="Business Context"
-                                      sortBy="#{profileBOD.bizCtxName}">
-                                <h:outputText value="#{profileBOD.bizCtxName}"/>
-                            </p:column>
-                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                                      sortBy="#{profileBOD.ownerName}">
-                                <h:outputText value="#{profileBOD.ownerName}"/>
-                            </p:column>
-                            <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
-                                      sortBy="#{profileBOD.creationTimestamp}">
-                                <h:outputText value="#{profileBOD.creationTimestamp}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column style="width: 100px; text-align: center;" headerText="State"
-                                      sortBy="#{profileBOD.state}">
-                                <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
-                                    <span class="label label-primary">Editing</span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
-                                    <span class="label label-warning">Candidate</span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
-                                    <span class="label label-default">Published</span>
-                                </h:panelGroup>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>
-                    <p:panel>
-                        <p:dataTable id="tbl2" var="businessContext"
-                                     value="#{copyProfileBODBean.businessContexts}"
-                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                     paginator="true" paginatorPosition="bottom" rows="10"
-                                     style="width: 100%; margin-bottom:20px"
-                                     selection="#{copyProfileBODBean.selectedBusinessContext}"
-                                     selectionMode="single"
-                                     rowKey="#{businessContext.bizCtxId}">
+            <!--
+                Step 2: Select Business Context
+            -->
+            <p:tab id="step_2">
+                <f:facet name="title">
+                    <strong class="step">Step 2:</strong>
+                    <h:outputText value="Select Business Context"/>
+                </f:facet>
+                <p:panel header="Selected Profile BOD">
+                    <p:dataTable var="profileBOD" value="#{copyProfileBODBean.selectedProfileBOD}"
+                                 style="width: 100%; margin-bottom: 20px;">
+                        <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                            <h:outputText value="#{profileBOD.propertyTerm}"/>
+                        </p:column>
+                        <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                  headerText="Business Context"
+                                  sortBy="#{profileBOD.bizCtxName}">
+                            <h:outputText value="#{profileBOD.bizCtxName}"/>
+                        </p:column>
+                        <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                                  sortBy="#{profileBOD.ownerName}">
+                            <h:outputText value="#{profileBOD.ownerName}"/>
+                        </p:column>
+                        <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                                  sortBy="#{profileBOD.creationTimestamp}">
+                            <h:outputText value="#{profileBOD.creationTimestamp}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column style="width: 100px; text-align: center;" headerText="State"
+                                  sortBy="#{profileBOD.state}">
+                            <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                                <span class="label label-primary">Editing</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                <span class="label label-warning">Candidate</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                                <span class="label label-default">Published</span>
+                            </h:panelGroup>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+                <p:panel>
+                    <p:dataTable id="tbl2" var="businessContext"
+                                 value="#{copyProfileBODBean.businessContexts}"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                 paginator="true" paginatorPosition="bottom" rows="10"
+                                 style="width: 100%; margin-bottom:20px"
+                                 selection="#{copyProfileBODBean.selectedBusinessContext}"
+                                 selectionMode="single"
+                                 rowKey="#{businessContext.bizCtxId}">
 
-                            <p:ajax event="rowSelect" listener="#{copyProfileBODBean.onBusinessContextSelect}"
-                                    update="growl, tbl2"/>
-                            <p:ajax event="rowUnselect" listener="#{copyProfileBODBean.onBusinessContextUnselect}"
-                                    update="growl, tbl2"/>
+                        <p:ajax event="rowSelect" listener="#{copyProfileBODBean.onBusinessContextSelect}"
+                                update=":form:growl, :form:tbl2"/>
+                        <p:ajax event="rowUnselect" listener="#{copyProfileBODBean.onBusinessContextUnselect}"
+                                update=":form:growl, :form:tbl2"/>
 
-                            <p:column style="width: 50px; text-align: center;">
-                                <p:selectBooleanCheckbox
-                                        value="#{copyProfileBODBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
-                                    <p:ajax update="growl, tbl2"/>
-                                </p:selectBooleanCheckbox>
-                            </p:column>
+                        <p:column style="width: 50px; text-align: center;">
+                            <p:selectBooleanCheckbox
+                                    value="#{copyProfileBODBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
+                                <p:ajax update=":form:growl, :form:tbl2"/>
+                            </p:selectBooleanCheckbox>
+                        </p:column>
 
-                            <p:column headerText="Business Context Name" sortBy="#{businessContext.name}">
-                                <h:outputText value="#{businessContext.name}"/>
-                                <div>
-                                    <h:outputText value="GUID: #{businessContext.guid}"
-                                                  style="font-size: 12px !important; color: #767676 !important;"/>
-                                </div>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>
-                </p:tab>
-            </p:wizard>
+                        <p:column headerText="Business Context Name" sortBy="#{businessContext.name}">
+                            <h:outputText value="#{businessContext.name}"/>
+                            <div>
+                                <h:outputText value="GUID: #{businessContext.guid}"
+                                              style="font-size: 12px !important; color: #767676 !important;"/>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </p:tab>
+        </p:wizard>
 
-            <p:panel id="btnGroup" style="margin-top: 40px;">
-                <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;" update="growl"
-                                 value="Back" icon="fa fa-white fa-arrow-left" oncomplete="PF('wizard').back();"/>
-                <p:commandButton id="btnNext" widgetVar="btnNext" style="" update="growl"
-                                 value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
-                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" update="growl"
-                                 onclick="onSubmit();"
-                                 value="Submit" icon="fa fa-white fa-check" action="#{copyProfileBODBean.copy()}"/>
-            </p:panel>
+        <p:panel id="btnGroup" style="margin-top: 40px;">
+            <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;" update=":form:growl"
+                             value="Back" icon="fa fa-white fa-arrow-left" oncomplete="PF('wizard').back();"/>
+            <p:commandButton id="btnNext" widgetVar="btnNext" style="" update=":form:growl"
+                             value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
+            <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" update=":form:growl"
+                             onclick="onSubmit();"
+                             value="Submit" icon="fa fa-white fa-check" action="#{copyProfileBODBean.copy()}"/>
+        </p:panel>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        <script>
+            var disableButtons = function () {
+                var btnBack = $(document.getElementById(PF('btnBack').id));
+                var btnNext = $(document.getElementById(PF('btnNext').id));
+                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
 
-            <script>
-                var disableButtons = function () {
-                    var btnBack = $(document.getElementById(PF('btnBack').id));
-                    var btnNext = $(document.getElementById(PF('btnNext').id));
-                    var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
+                btnBack.prop("disabled", true).addClass('ui-state-disabled');
+                btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
+            };
 
-                    btnBack.prop("disabled", true).addClass('ui-state-disabled');
-                    btnNext.prop("disabled", true).addClass('ui-state-disabled');
-                    btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
-                };
+            var onBack = function () {
+                disableButtons();
+            };
 
-                var onBack = function () {
-                    disableButtons();
-                };
+            var onNext = function () {
+                disableButtons();
 
-                var onNext = function () {
-                    disableButtons();
+                var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
+                var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
+            };
 
-                    var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
-                    var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
-                };
+            var onSubmit = function () {
+                disableButtons();
 
-                var onSubmit = function () {
-                    disableButtons();
-
-                    PF('loadingBlock').show();
-                };
-            </script>
-        </h:form>
+                PF('loadingBlock').show();
+            };
+        </script>
     </ui:define>
 </ui:composition>

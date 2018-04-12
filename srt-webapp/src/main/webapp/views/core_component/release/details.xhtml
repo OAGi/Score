@@ -16,144 +16,141 @@
                 </h:panelGroup>
             </div>
         </div>
-        <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
-            <p:panel>
-                <h:panelGrid columns="2" cellpadding="3">
-                    <h:outputText value="Release Number" styleClass="section-label"/>
-                    <h:inputText id="releaseNum" value="#{releaseDetailBean.release.releaseNum}"
-                                 maxlength="45"
-                                 label="Release Number" styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
-                    </h:inputText>
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                    autoUpdate="true"
+                    closable="true"/>
+        <p:panel>
+            <h:panelGrid columns="2" cellpadding="3">
+                <h:outputText value="Release Number" styleClass="section-label"/>
+                <h:inputText id="releaseNum" value="#{releaseDetailBean.release.releaseNum}"
+                             maxlength="45"
+                             label="Release Number" styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
+                </h:inputText>
 
-                    <h:outputText value="Namespace" styleClass="section-label"/>
-                    <p:autoComplete id="inputNamespace" widgetVar="inputNamespace"
-                                    value="#{releaseDetailBean.selectedNamespaceUri}"
-                                    completeMethod="#{releaseDetailBean.completeInputForNamespace}"
-                                    dropdown="true"
-                                    required="true" requiredMessage="Please fill out 'Namespace' field."
-                                    styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
-                        <p:ajax event="itemSelect" listener="#{releaseDetailBean.onSelectNamespace}"/>
-                    </p:autoComplete>
+                <h:outputText value="Namespace" styleClass="section-label"/>
+                <p:autoComplete id="inputNamespace" widgetVar="inputNamespace"
+                                value="#{releaseDetailBean.selectedNamespaceUri}"
+                                completeMethod="#{releaseDetailBean.completeInputForNamespace}"
+                                dropdown="true"
+                                required="true" requiredMessage="Please fill out 'Namespace' field."
+                                styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}">
+                    <p:ajax event="itemSelect" listener="#{releaseDetailBean.onSelectNamespace}"/>
+                </p:autoComplete>
 
-                    <h:outputText value="Note" styleClass="section-label"/>
-                    <h:inputTextarea id="note" value="#{releaseDetailBean.release.releaseNote}"
-                                     rows="6" a:placeholder="Leave a note"
-                                     styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}"/>
-                </h:panelGrid>
-            </p:panel>
-            <p:separator/>
-            <p:panel>
-                <f:facet name="header">
-                    <h:outputText value="Core Components - delta from previous release"/>
-                </f:facet>
-                <p:dataTable id="tbl" var="cc" value="#{releaseDetailBean.deltaCoreComponents}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
-                             selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
+                <h:outputText value="Note" styleClass="section-label"/>
+                <h:inputTextarea id="note" value="#{releaseDetailBean.release.releaseNote}"
+                                 rows="6" a:placeholder="Leave a note"
+                                 styleClass="section-content input-section" disabled="#{releaseDetailBean.release.state eq 'Final'}"/>
+            </h:panelGrid>
+        </p:panel>
+        <p:separator/>
+        <p:panel>
+            <f:facet name="header">
+                <h:outputText value="Core Components - delta from previous release"/>
+            </f:facet>
+            <p:dataTable id="tbl" var="cc" value="#{releaseDetailBean.deltaCoreComponents}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{cc.id}"
+                         selection="#{releaseDetailBean.selectedDeltaCoreComponents}">
 
-                    <p:column selectionMode="multiple" styleClass="table-checkbox"
-                              rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
+                <p:column selectionMode="multiple" styleClass="table-checkbox"
+                          rendered="#{releaseDetailBean.release.releaseId eq 0}"/>
 
-                    <p:column style="width: 100px; text-align: center;" headerText="Type" sortBy="#{cc.type}">
-                        <span class="label label-info">${cc.type}</span>
-                    </p:column>
+                <p:column style="width: 100px; text-align: center;" headerText="Type" sortBy="#{cc.type}">
+                    <span class="label label-info">${cc.type}</span>
+                </p:column>
 
-                    <p:column headerText="DEN" sortBy="#{cc.den}">
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and cc.state ne 'Editing'}">
-                            <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
+                <p:column headerText="DEN" sortBy="#{cc.den}">
+                    <h:panelGroup
+                            rendered="#{cc.type eq 'ACC' and cc.oagisComponentType eq 'UserExtensionGroup' and cc.state ne 'Editing'}">
+                        <a href="/core_component/extension/#{cc.id}">#{cc.den}</a>
+                    </h:panelGroup>
 
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and cc.state ne 'Editing'}">
-                            <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{cc.type eq 'ACC' and cc.oagisComponentType ne 'UserExtensionGroup' and cc.state ne 'Editing'}">
+                        <a href="/core_component/acc/#{cc.id}">#{cc.den}</a>
+                    </h:panelGroup>
 
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'ASCCP' and cc.state ne 'Editing'}">
-                            <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{cc.type eq 'ASCCP' and cc.state ne 'Editing'}">
+                        <a href="/core_component/asccp/#{cc.id}">#{cc.den}</a>
+                    </h:panelGroup>
 
-                        <h:panelGroup
-                                rendered="#{cc.type eq 'BCCP' and cc.state ne 'Editing'}">
-                            <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
-                        </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{cc.type eq 'BCCP' and cc.state ne 'Editing'}">
+                        <a href="/core_component/bccp/#{cc.id}">#{cc.den}</a>
+                    </h:panelGroup>
 
-                        <h:outputText value="${cc.den}"
-                                      rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}"/>
-                    </p:column>
+                    <h:outputText value="${cc.den}"
+                                  rendered="#{cc.type eq 'ASCC' or cc.type eq 'BCC'}"/>
+                </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{cc.owner}">
-                        <h:outputText value="#{cc.owner}"/>
-                    </p:column>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{cc.owner}">
+                    <h:outputText value="#{cc.owner}"/>
+                </p:column>
 
-                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cc.state}">
-                        <h:panelGroup rendered="#{cc.state == 'Published'}">
-                            <span class="label label-default">#{cc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{cc.state == 'Editing'}">
-                            <span class="label label-primary">#{cc.state}</span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{cc.state == 'Candidate'}">
-                            <span class="label label-warning">#{cc.state}</span>
-                        </h:panelGroup>
-                    </p:column>
+                <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cc.state}">
+                    <h:panelGroup rendered="#{cc.state == 'Published'}">
+                        <span class="label label-default">#{cc.state}</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{cc.state == 'Editing'}">
+                        <span class="label label-primary">#{cc.state}</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{cc.state == 'Candidate'}">
+                        <span class="label label-warning">#{cc.state}</span>
+                    </h:panelGroup>
+                </p:column>
 
-                    <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Revision"
-                              sortBy="#{releaseDetailBean.getFullRevisionNum(cc)}">
-                        <h:outputText value="#{releaseDetailBean.getFullRevisionNum(cc)}"/>
-                    </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Revision"
+                          sortBy="#{releaseDetailBean.getFullRevisionNum(cc)}">
+                    <h:outputText value="#{releaseDetailBean.getFullRevisionNum(cc)}"/>
+                </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                              headerText="Last Updated By"
-                              sortBy="#{cc.lastUpdatedUser}">
-                        <h:outputText value="#{cc.lastUpdatedUser}"/>
-                    </p:column>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                          headerText="Last Updated By"
+                          sortBy="#{cc.lastUpdatedUser}">
+                    <h:outputText value="#{cc.lastUpdatedUser}"/>
+                </p:column>
 
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{cc.lastUpdateTimestamp}">
-                        <h:outputText value="#{cc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
+                <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
+                          sortBy="#{cc.lastUpdateTimestamp}">
+                    <h:outputText value="#{cc.lastUpdateTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
 
-            <p:commandButton id="createBtn" ajax="true" value="Create"
-                             rendered="#{releaseDetailBean.release.releaseId == 0}"
-                             action="#{releaseDetailBean.update()}"/>
+        <p:commandButton id="createBtn" ajax="true" value="Create"
+                         rendered="#{releaseDetailBean.release.releaseId == 0}"
+                         action="#{releaseDetailBean.update()}"/>
 
-            <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{releaseDetailBean.release.releaseId != 0 and releaseDetailBean.release.state eq 'Draft'}"
-                             action="#{releaseDetailBean.update()}"/>
+        <p:commandButton id="updateBtn" ajax="true" value="Update"
+                         rendered="#{releaseDetailBean.release.releaseId != 0 and releaseDetailBean.release.state eq 'Draft'}"
+                         action="#{releaseDetailBean.update()}"/>
 
-            <p:commandButton id="discardBtn" ajax="true" value="Discard"
-                             rendered="#{releaseDetailBean.release.releaseId > 0 and releaseDetailBean.release.state eq 'Draft'}"
-                             styleClass="danger"
-                             onclick="PF('confirmDiscard').show()"/>
+        <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                         rendered="#{releaseDetailBean.release.releaseId > 0 and releaseDetailBean.release.state eq 'Draft'}"
+                         styleClass="danger"
+                         onclick="PF('confirmDiscard').show()"/>
 
-            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    Components belonging to this release will be merged to the next draft release.
-                    If this is the most recent release, components will be kept, but will not belong to any release. Proceed?
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
-                                     action="#{releaseDetailBean.delete()}"
-                                     oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDiscard').hide()"/>
-                </div>
-            </p:confirmDialog>
+        <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                Components belonging to this release will be merged to the next draft release.
+                If this is the most recent release, components will be kept, but will not belong to any release. Proceed?
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 action="#{releaseDetailBean.delete()}"
+                                 oncomplete="PF('confirmDiscard').hide()"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDiscard').hide()"/>
+            </div>
+        </p:confirmDialog>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
         <ui:include src="../../dialog/global_confirm_non_undo_dialog.xhtml"/>
     </ui:define>
 

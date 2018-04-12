@@ -10,37 +10,35 @@
                 <h2 class="subhead-heading">Business Context</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="name" value="#{businessContextBean.name}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{businessContextBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{businessContextBean.search}"
-                                     update="tbl1"
-                                     icon="fa fa-white fa-search"/>
-                    <p:button id="createBtn" value="Create Business Context"
-                              style="float: right; padding: 3px 0 3px 0;"
-                              outcome="/views/business_context/details.xhtml"/>
-                </f:facet>
-                <p:dataTable id="tbl1" var="businessContext" value="#{businessContextBean.businessContexts}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
-                    <p:column headerText="Name" sortBy="#{businessContext.name}">
-                        <a href="/context_management/business_context/#{businessContext.guid}">#{businessContext.name}</a>
-                        <div>
-                            <a href="/context_management/business_context/#{businessContext.guid}">
-                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{businessContext.guid}</span>
-                            </a>
-                        </div>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="name" value="#{businessContextBean.name}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{businessContextBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                 actionListener="#{businessContextBean.search}"
+                                 update="tbl1"
+                                 icon="fa fa-white fa-search"/>
+                <p:button id="createBtn" value="Create Business Context"
+                          style="float: right; padding: 3px 0 3px 0;"
+                          outcome="/views/business_context/details.xhtml"/>
+            </f:facet>
+            <p:dataTable id="tbl1" var="businessContext" value="#{businessContextBean.businessContexts}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
+                <p:column headerText="Name" sortBy="#{businessContext.name}">
+                    <a href="/context_management/business_context/#{businessContext.guid}">#{businessContext.name}</a>
+                    <div>
+                        <a href="/context_management/business_context/#{businessContext.guid}">
+                            <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{businessContext.guid}</span>
+                        </a>
+                    </div>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

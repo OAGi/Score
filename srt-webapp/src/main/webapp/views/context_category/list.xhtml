@@ -10,41 +10,38 @@
                 <h2 class="subhead-heading">Context Category</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="name" value="#{contextCategoryBean.name}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{contextCategoryBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{contextCategoryBean.search}"
-                                     update="tbl"
-                                     icon="fa fa-white fa-search"/>
-                    <p:button id="createBtn" value="Create Context Category"
-                              style="float: right; padding: 3px 0 3px 0;"
-                              outcome="/views/context_category/details.jsf"/>
-                </f:facet>
-                <p:dataTable id="tbl" var="contextCategory" value="#{contextCategoryBean.contextCategories}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{contextCategory.guid}">
-                    <p:column style="width: 40%" headerText="Name" sortBy="#{contextCategory.name}">
-                        <a href="/context_management/context_category/#{contextCategory.guid}">#{contextCategory.name}</a>
-                        <div>
-                            <a href="/context_management/context_category/#{contextCategory.guid}">
-                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextCategory.guid}</span>
-                            </a>
-                        </div>
-                    </p:column>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="name" value="#{contextCategoryBean.name}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{contextCategoryBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{contextCategoryBean.search}"
+                                 update="tbl"
+                                 icon="fa fa-white fa-search"/>
+                <p:button id="createBtn" value="Create Context Category"
+                          style="float: right; padding: 3px 0 3px 0;"
+                          outcome="/views/context_category/details.jsf"/>
+            </f:facet>
+            <p:dataTable id="tbl" var="contextCategory" value="#{contextCategoryBean.contextCategories}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{contextCategory.guid}">
+                <p:column style="width: 40%" headerText="Name" sortBy="#{contextCategory.name}">
+                    <a href="/context_management/context_category/#{contextCategory.guid}">#{contextCategory.name}</a>
+                    <div>
+                        <a href="/context_management/context_category/#{contextCategory.guid}">
+                            <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextCategory.guid}</span>
+                        </a>
+                    </div>
+                </p:column>
 
-                    <p:column headerText="Description" styleClass="ellipsis" sortBy="#{contextCategory.description}">
-                        <h:outputText value="#{contextCategory.description}"/>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+                <p:column headerText="Description" styleClass="ellipsis" sortBy="#{contextCategory.description}">
+                    <h:outputText value="#{contextCategory.description}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

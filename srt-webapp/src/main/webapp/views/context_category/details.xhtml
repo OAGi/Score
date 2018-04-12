@@ -16,63 +16,59 @@
                 </h:panelGroup>
             </div>
         </div>
-        <h:form id="form">
-            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                        autoUpdate="true"
-                        closable="true"/>
-            <p:panel>
-                <h:panelGrid columns="2" cellpadding="3">
-                    <h:outputText value="GUID" styleClass="section-label"
-                                  rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"/>
-                    <h:inputText id="guid" value="#{contextCategoryDetailBean.contextCategory.guid}"
-                                 rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
-                                 styleClass="section-content input-section disabled" disabled="true"/>
-
-                    <h:outputText value="Name" styleClass="section-label"/>
-                    <h:inputText id="name" value="#{contextCategoryDetailBean.contextCategory.name}"
-                                 required="true"
-                                 requiredMessage="Please fill out 'Name' field."
-                                 maxlength="255"
-                                 label="Name" styleClass="section-content input-section">
-                        <f:validateLength maximum="255"/>
-                    </h:inputText>
-
-                    <h:outputText value="Description" styleClass="section-label"/>
-                    <h:inputTextarea id="description" value="#{contextCategoryDetailBean.contextCategory.description}"
-                                     rows="6" a:placeholder="Leave a description"
-                                     styleClass="section-content input-section"/>
-                </h:panelGrid>
-            </p:panel>
-
-            <p:commandButton id="createBtn" ajax="true" value="Create"
-                             rendered="#{contextCategoryDetailBean.contextCategory.guid == null}"
-                             action="#{contextCategoryDetailBean.update()}"/>
-
-            <p:commandButton id="updateBtn" ajax="true" value="Update"
-                             rendered="#{contextCategoryDetailBean.contextCategory.guid != null}"
-                             action="#{contextCategoryDetailBean.update()}"/>
-
-            <p:commandButton id="discardBtn" ajax="true" value="Discard"
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                    autoUpdate="true"
+                    closable="true"/>
+        <p:panel>
+            <h:panelGrid columns="2" cellpadding="3">
+                <h:outputText value="GUID" styleClass="section-label"
+                              rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"/>
+                <h:inputText id="guid" value="#{contextCategoryDetailBean.contextCategory.guid}"
                              rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
-                             styleClass="danger"
-                             onclick="PF('confirmDiscard').show()"/>
+                             styleClass="section-content input-section disabled" disabled="true"/>
 
-            <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Warning">
-                <f:facet name="message">
-                    The context category will be permanently removed.
-                </f:facet>
-                <div style="text-align: center;">
-                    <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
-                                     action="#{contextCategoryDetailBean.delete()}"
-                                     oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
-                                     onclick="PF('confirmDiscard').hide()"/>
-                </div>
-            </p:confirmDialog>
+                <h:outputText value="Name" styleClass="section-label"/>
+                <h:inputText id="name" value="#{contextCategoryDetailBean.contextCategory.name}"
+                             required="true"
+                             requiredMessage="Please fill out 'Name' field."
+                             maxlength="255"
+                             label="Name" styleClass="section-content input-section">
+                    <f:validateLength maximum="255"/>
+                </h:inputText>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+                <h:outputText value="Description" styleClass="section-label"/>
+                <h:inputTextarea id="description" value="#{contextCategoryDetailBean.contextCategory.description}"
+                                 rows="6" a:placeholder="Leave a description"
+                                 styleClass="section-content input-section"/>
+            </h:panelGrid>
+        </p:panel>
+
+        <p:commandButton id="createBtn" ajax="true" value="Create"
+                         rendered="#{contextCategoryDetailBean.contextCategory.guid == null}"
+                         action="#{contextCategoryDetailBean.update()}"/>
+
+        <p:commandButton id="updateBtn" ajax="true" value="Update"
+                         rendered="#{contextCategoryDetailBean.contextCategory.guid != null}"
+                         action="#{contextCategoryDetailBean.update()}"/>
+
+        <p:commandButton id="discardBtn" ajax="true" value="Discard"
+                         rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
+                         styleClass="danger"
+                         onclick="PF('confirmDiscard').show()"/>
+
+        <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                The context category will be permanently removed.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 action="#{contextCategoryDetailBean.delete()}"
+                                 oncomplete="PF('confirmDiscard').hide()"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDiscard').hide()"/>
+            </div>
+        </p:confirmDialog>
     </ui:define>
 
 </ui:composition>
