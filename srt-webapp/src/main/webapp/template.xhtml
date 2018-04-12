@@ -108,63 +108,126 @@
                                         </ul>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-haspopup="true" aria-expanded="false">Profile BOD Expression <span
-                                                class="caret"></span></a>
+                                        <h:outputLink id="menuProfileBODExpression"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.profile_bod_expression')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipProfileBODExpression" for="menuProfileBODExpression"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.profile_bod_expression.tooltip')}"
+                                                   position="right"/>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <h:link outcome="/views/generate_oagis/generate.jsf">Generate Expression</h:link>
+                                                <h:link id="menuGenerateExpression"
+                                                        outcome="/views/generate_oagis/generate.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.generate_expression')}"/>
+                                                </h:link>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-haspopup="true" aria-expanded="false">Context Management <span
-                                                class="caret"></span></a>
+                                        <h:outputLink id="menuContextManagement"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.context_management')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
                                         <ul class="dropdown-menu">
-                                            <li><h:link
-                                                    outcome="/views/context_category/list.jsf">Context Category</h:link>
+                                            <li>
+                                                <h:link id="menuContextCategory"
+                                                        outcome="/views/context_category/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.context_category')}"/>
+                                                </h:link>
                                             </li>
-                                            <li><h:link
-                                                    outcome="/views/context_scheme/list.jsf">Context Scheme</h:link>
+                                            <li>
+                                                <h:link id="menuContextScheme"
+                                                        outcome="/views/context_scheme/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.context_scheme')}"/>
+                                                </h:link>
                                             </li>
-                                            <li><h:link
-                                                    outcome="/views/business_context/list.jsf">Business Context</h:link>
+                                            <li>
+                                                <h:link id="menuBusinessContext"
+                                                        outcome="/views/business_context/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.business_context')}"/>
+                                                </h:link>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-haspopup="true" aria-expanded="false">CC Management <span
-                                                class="caret"></span></a>
+                                        <h:outputLink id="menuCoreComponentManagement"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.core_component_management')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipCoreComponentManagement" for="menuCoreComponentManagement"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.core_component_management.tooltip')}"
+                                                   position="right"/>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a href="/core_component">Core Component</a>
+                                                <h:link id="menuCoreComponent"
+                                                        outcome="/views/core_component/list.jsf?invalidate=true">
+                                                    <h:outputText value="#{resourceBean.term('submenu.core_component')}"/>
+                                                </h:link>
                                             </li>
                                             <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
                                                 <li>
-                                                    <a href="/namespace">Namespace</a>
+                                                    <h:link id="menuNamespace"
+                                                            outcome="/views/namespace/list.jsf">
+                                                        <h:outputText value="#{resourceBean.term('submenu.namespace')}"/>
+                                                    </h:link>
                                                 </li>
                                                 <li>
-                                                    <a href="/release">Release Management</a>
+                                                    <h:link id="menuReleaseManagement"
+                                                            outcome="/views/core_component/release/list.jsf">
+                                                        <h:outputText value="#{resourceBean.term('submenu.release_management')}"/>
+                                                    </h:link>
                                                 </li>
                                             </h:panelGroup>
                                             <li>
-                                                <a href="/module">Module Management</a>
+                                                <h:link id="menuModuleManagement"
+                                                        outcome="/views/core_component/module/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.module_management')}"/>
+                                                </h:link>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                           aria-haspopup="true" aria-expanded="false">Code List <span
-                                                class="caret"></span></a>
+                                        <h:outputLink id="menuCodeList"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.code_list')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipCodeList" for="menuCodeList"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.code_list.tooltip')}"
+                                                   position="right"/>
                                         <ul class="dropdown-menu">
-                                            <li><h:link outcome="/views/code_list/list.jsf">View Code List</h:link></li>
                                             <li>
-                                                <h:link outcome="/views/code_list/create_wo_base.jsf">Create Code List w/o base</h:link>
+                                                <h:link id="menuViewCodeList"
+                                                        outcome="/views/code_list/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.view_code_list')}"/>
+                                                </h:link>
                                             </li>
                                             <li>
-                                                <h:link outcome="/views/code_list/create_from_another_selection.jsf">Create Code List from another</h:link>
+                                                <h:link id="menuCreateCodeListWithoutBase"
+                                                        outcome="/views/code_list/create_wo_base.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.create_code_list_without_base')}"/>
+                                                </h:link>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuCreateCodeListFromAnother"
+                                                        outcome="/views/code_list/create_from_another_selection.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.create_code_list_from_another')}"/>
+                                                </h:link>
                                             </li>
                                         </ul>
                                     </li>
