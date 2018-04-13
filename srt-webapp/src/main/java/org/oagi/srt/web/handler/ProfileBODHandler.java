@@ -1,5 +1,6 @@
 package org.oagi.srt.web.handler;
 
+import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -30,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaExpression.XML;
 
 @Controller
 @Scope("view")
@@ -62,6 +66,12 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private List<ABIEView> abieViewListForSelection = new ArrayList<ABIEView>();
 	private ABIEView selected;
 	private String abieName;
+	private ProfileBODGenerationOption generationOption = new ProfileBODGenerationOption();
+
+	@PostConstruct
+	public void init() {
+		generationOption.setSchemaExpression(XML);
+	}
 	
 	public ABIEView getSelectedABIEView() {
 		return selectedABIEView;
@@ -195,7 +205,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}
 
-		generateSchemaFile = profileBODGenerateService.generateXMLSchema(al, null);
+		generateSchemaFile = profileBODGenerateService.generateXMLSchema(al, generationOption);
 		System.out.println("### " + generateSchemaFile);
 	}
 	

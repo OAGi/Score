@@ -38,6 +38,7 @@
         <org.ow2.asm.version>5.0.4</org.ow2.asm.version>
         <xml.apis.version>1.4.01</xml.apis.version>
         <lucene.version>7.1.0</lucene.version>
+        <com.fasterxml.jackson.version>2.9.5</com.fasterxml.jackson.version>
 
         <maven-site-plugin.version>3.6</maven-site-plugin.version>
         <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>

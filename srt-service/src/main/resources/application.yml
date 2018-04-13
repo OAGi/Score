@@ -26,3 +26,19 @@ logging:
     org.oagi.srt: INFO
     org.springframework: INFO
     org.hibernate.SQL: INFO
+
+# Oracle environment
+---
+spring:
+  profiles: oracle
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
