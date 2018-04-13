@@ -5,6 +5,7 @@ import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
+import org.oagi.srt.web.jsf.beans.resources.ResourceBean;
 import org.oagi.srt.web.jsf.component.treenode.TreeNodeTypeNameResolver;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -27,6 +28,9 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ResourceBean resourceBean;
+
     public User getOwnerUser(AggregateCoreComponent acc) {
         long ownerUserId = acc.getOwnerUserId();
         return userRepository.findOne(ownerUserId);
@@ -36,12 +40,12 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
         User owner = getOwnerUser(acc);
 
         Map<String, OagisComponentType> availableOagisComponentTypes = new LinkedHashMap();
-        availableOagisComponentTypes.put("Base", OagisComponentType.Base);
-        availableOagisComponentTypes.put("Semantics", OagisComponentType.Semantics);
+        availableOagisComponentTypes.put(resourceBean.term("acc_detail.component_type.base"), OagisComponentType.Base);
+        availableOagisComponentTypes.put(resourceBean.term("acc_detail.component_type.semantics"), OagisComponentType.Semantics);
         if (owner.isOagisDeveloperIndicator()) {
-            availableOagisComponentTypes.put("Extension", OagisComponentType.Extension);
+            availableOagisComponentTypes.put(resourceBean.term("acc_detail.component_type.extension"), OagisComponentType.Extension);
         }
-        availableOagisComponentTypes.put("Semantic Group", OagisComponentType.SemanticGroup);
+        availableOagisComponentTypes.put(resourceBean.term("acc_detail.component_type.semantic_group"), OagisComponentType.SemanticGroup);
 
         return availableOagisComponentTypes;
     }

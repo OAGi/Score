@@ -175,6 +175,10 @@
                                                         outcome="/views/core_component/list.jsf">
                                                     <h:outputText value="#{resourceBean.term('submenu.core_component')}"/>
                                                 </h:link>
+                                                <p:tooltip id="toolTipMenuCoreComponent" for="menuCoreComponent"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.core_component.tooltip')}"
+                                                           position="right"/>
                                             </li>
                                             <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
                                                 <li>
@@ -195,6 +199,10 @@
                                                         outcome="/views/core_component/module/list.jsf">
                                                     <h:outputText value="#{resourceBean.term('submenu.module_management')}"/>
                                                 </h:link>
+                                                <p:tooltip id="toolTipMenuModuleManagement" for="menuModuleManagement"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.module_management.tooltip')}"
+                                                           position="right"/>
                                             </li>
                                         </ul>
                                     </li>

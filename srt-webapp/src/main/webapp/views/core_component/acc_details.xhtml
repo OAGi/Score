@@ -82,6 +82,11 @@
                                             action="#{accDetailBean.prepareSetBasedAcc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
+                                <p:tooltip id="toolTipSetACCItem" for="setACCItem"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('acc_detail.context_menu.set_based_acc.tooltip')}"
+                                           position="right"/>
+
                                 <p:menuitem id="discardACCItem" value="Discard based ACC" style="width: 100%;"
                                             rendered="#{accDetailBean.targetAcc.basedAccId gt 0}"
                                             actionListener="#{accDetailBean.discardBasedAcc}"
@@ -90,16 +95,30 @@
                                                message="Discarding based ACC cannot be undone. Proceed?"
                                                icon="fa fa-exclamation-triangle"/>
                                 </p:menuitem>
+                                <p:tooltip id="toolTipDiscardACCItem" for="discardACCItem"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('acc_detail.context_menu.discard_based_acc.tooltip')}"
+                                           position="right"/>
+
                                 <p:menuitem id="appendASCCItem" value="Append ASCC" style="width: 100%;"
                                             actionListener="#{accDetailBean.onClickAppendASCCButton}"
                                             action="#{accDetailBean.prepareAppendAscc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
+                                <p:tooltip id="toolTipAppendASCCItem" for="appendASCCItem"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('acc_detail.context_menu.append_ascc.tooltip')}"
+                                           position="right"/>
+
                                 <p:menuitem id="appendBCCItem" value="Append BCC" style="width: 100%;"
                                             actionListener="#{accDetailBean.onClickAppendBCCButton}"
                                             action="#{accDetailBean.prepareAppendBcc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
+                                <p:tooltip id="toolTipAppendBCCItem" for="appendBCCItem"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('acc_detail.context_menu.append_bcc.tooltip')}"
+                                           position="right"/>
                             </p:contextMenu>
                         </p:panel>
                     </div>
@@ -442,12 +461,12 @@
                                         </f:facet>
                                         <h:panelGrid columns="2">
                                             <h:outputText value="GUID" styleClass="section-label"/>
-                                            <h:inputText id="accguid"
+                                            <h:inputText id="accGuid"
                                                          value="#{accDetailBean.selectedTreeNode.data.acc.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="Object Class Term" styleClass="section-label"/>
+                                            <h:outputText value="Object Class Term" id="labelAccObjectClassTerm" styleClass="section-label"/>
                                             <h:inputText id="accTerm"
                                                          required="true"
                                                          requiredMessage="Please fill out 'Object Class Term' field."
@@ -458,7 +477,7 @@
                                                         update=":form:headerMessage, :form:leftPanel, :form:accPanel, :form:btnGroup"/>
                                             </h:inputText>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelAccDen" styleClass="section-label"/>
                                             <h:inputText id="accDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.acc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -507,6 +526,16 @@
                                                 <p:ajax update=":form:accPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
+
+
+                                        <p:tooltip id="toolTipLabelAccObjectClassTerm" for="labelAccObjectClassTerm"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.object_class_term.tooltip')}"
+                                                   position="left"/>
+                                        <p:tooltip id="toolTipLabelAccDen" for="labelAccDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
 
@@ -529,7 +558,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelAsccDen" styleClass="section-label"/>
                                             <h:inputText id="asccDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.ascc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -579,6 +608,11 @@
                                                 <p:ajax update=":form:asccPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
+
+                                        <p:tooltip id="toolTipLabelAsccDen" for="labelAsccDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
                                     <p:panel id="asccpPanel" header="ASCCP">
                                         <h:panelGrid columns="2">
@@ -594,7 +628,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelAsccpDen" styleClass="section-label"/>
                                             <h:inputText id="asccpDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.asccp.den}"
                                                          styleClass="section-content input-section disabled"
@@ -624,6 +658,11 @@
                                                 <p:ajax update=":form:asccpPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
+
+                                        <p:tooltip id="toolTipLabelAsccpDen" for="labelAsccpDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
 
@@ -647,7 +686,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelBccDen" styleClass="section-label"/>
                                             <h:inputText id="bccDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bcc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -730,6 +769,11 @@
                                                 <p:ajax update=":form:bccPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
+
+                                        <p:tooltip id="toolTipLabelBccDen" for="labelBccDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
 
                                     <p:panel id="bccpPanel" header="BCCP">
@@ -746,7 +790,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelBccpDen" styleClass="section-label"/>
                                             <h:inputText id="bccpDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bccp.den}"
                                                          styleClass="section-content input-section disabled"
@@ -791,6 +835,11 @@
                                                 <p:ajax update=":form:bccpPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
+
+                                        <p:tooltip id="toolTipLabelBccpDen" for="labelBccpDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
 
                                     <p:panel id="dataTypePanel" header="Data Type">
@@ -813,7 +862,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="DEN" id="labelDataTypeDen" styleClass="section-label"/>
                                             <h:inputText id="dataTypeDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bdt.den}"
                                                          styleClass="section-content input-section disabled"
@@ -827,6 +876,11 @@
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true"/>
                                         </h:panelGrid>
+
+                                        <p:tooltip id="toolTipLabelDataTypeDen" for="labelDataTypeDen"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
+                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
 
