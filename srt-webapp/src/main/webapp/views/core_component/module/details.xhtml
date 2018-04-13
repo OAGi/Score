@@ -12,7 +12,7 @@
                     <h2 class="subhead-heading">Module Detail</h2>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{moduleDetailBean.module.moduleId == 0}">
-                    <h2 class="subhead-heading">Create Module</h2>
+                    <h2 class="subhead-heading">#{resourceBean.term('create_module.title')}</h2>
                 </h:panelGroup>
             </div>
         </div>
@@ -20,7 +20,7 @@
 
         <p:panel>
             <h:panelGrid columns="2" cellpadding="3">
-                <h:outputText value="Module" styleClass="section-label"/>
+                <h:outputText value="#{resourceBean.term('create_module.input.module')}" styleClass="section-label"/>
                 <h:inputText id="module" value="#{moduleDetailBean.module.module}"
                              maxlength="100"
                              label="Module" styleClass="section-content input-section"

@@ -76,7 +76,7 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
 
                 // Core Component Management Menu
                 .addRule(Join.path("/core_component")
-                        .to("/views/core_component/list.jsf?invalidate=true"))
+                        .to("/views/core_component/list.jsf"))
                 .addRule(Join.path("/core_component/extension/{acc_id}")
                         .to("/views/core_component/extension.jsf?accId={acc_id}"))
                 .addRule(Join.path("/core_component/acc/{acc_id}")

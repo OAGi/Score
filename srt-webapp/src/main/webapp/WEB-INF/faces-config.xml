@@ -45,6 +45,11 @@
             <renderer-type>org.primefaces.component.AutoCompleteRenderer</renderer-type>
             <renderer-class>org.oagi.srt.web.jsf.component.autocomplete.SRTAutoCompleteRenderer</renderer-class>
         </renderer>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.TooltipRenderer</renderer-type>
+            <renderer-class>org.oagi.srt.web.jsf.component.tooltip.SRTTooltipRenderer</renderer-class>
+        </renderer>
     </render-kit>
 
 </faces-config>

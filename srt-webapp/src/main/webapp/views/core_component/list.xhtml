@@ -3,6 +3,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 template="../../template.xhtml">
 
     <p:importConstants type="org.oagi.srt.web.jsf.converters.ReleaseConverter" var="ReleaseConverter"/>
@@ -10,7 +11,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Core Component</h2>
+                <h2 class="subhead-heading">#{resourceBean.term('list_core_component.title')}</h2>
             </div>
         </div>
         <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
@@ -38,10 +39,30 @@
                             <h:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
                                                   value="#{coreComponentBean.selectedTypes}">
                                 <f:selectItem itemLabel="ACC" itemValue="ACC"/>
+                                <p:tooltip id="toolTipCheckboxACC" for="typeCB[0:label]"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('list_core_component.checkbox.acc.tooltip')}"
+                                           position="top"/>
                                 <f:selectItem itemLabel="ASCC" itemValue="ASCC"/>
+                                <p:tooltip id="toolTipCheckboxASCC" for="typeCB[1:label]"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('list_core_component.checkbox.ascc.tooltip')}"
+                                           position="top"/>
                                 <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
+                                <p:tooltip id="toolTipCheckboxASCCP" for="typeCB[2:label]"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('list_core_component.checkbox.asccp.tooltip')}"
+                                           position="top"/>
                                 <f:selectItem itemLabel="BCC" itemValue="BCC"/>
+                                <p:tooltip id="toolTipCheckboxBCC" for="typeCB[3:label]"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('list_core_component.checkbox.bcc.tooltip')}"
+                                           position="top"/>
                                 <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
+                                <p:tooltip id="toolTipCheckboxBCCP" for="typeCB[4:label]"
+                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                           value="#{resourceBean.term('list_core_component.checkbox.bccp.tooltip')}"
+                                           position="top"/>
                                 <p:ajax update="form" listener="#{coreComponentBean.onTypeChange}"/>
                             </h:selectManyCheckbox>
                         </h:panelGrid>
@@ -62,7 +83,8 @@
 
                 <h:panelGroup>
                     <div style="padding: 3px 0 3px 0;">
-                        <h:outputLabel value="DEN" style="width: 80px; font-weight: 400;"/>
+                        <h:outputLabel value="DEN"
+                                       style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? '80' : '320'}px; font-weight: 400;"/>
                         <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
                                      style="min-width: 440px; margin-right: 20px;" tabindex="1">
                             <p:ajax update=":form:pPanel"/>
@@ -70,9 +92,14 @@
                         <p:commandButton id="createACCBtn" value="Create ACC"
                                          action="#{coreComponentBean.createACC}" tabindex="5"
                                          style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        <p:tooltip id="toolTipCreateACCBtn" for="createACCBtn"
+                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                   value="#{resourceBean.term('list_core_component.button.create_acc.tooltip')}"
+                                   position="left"/>
                     </div>
                     <div style="padding: 3px 0 3px 0;">
-                        <h:outputLabel value="Definition" style="width: 80px; font-weight: 400;"/>
+                        <h:outputLabel value="Definition"
+                                       style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? '80' : '320'}px; font-weight: 400;"/>
                         <p:inputText id="searchTextForDefinition"
                                      value="#{coreComponentBean.searchTextForDefinition}"
                                      style="min-width: 440px; margin-right: 20px;" tabindex="2">
@@ -81,9 +108,14 @@
                         <p:commandButton id="createASCCPBtn" value="Create ASCCP"
                                          action="#{coreComponentBean.createASCCP}" tabindex="6"
                                          style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        <p:tooltip id="toolTipCreateASCCPBtn" for="createASCCPBtn"
+                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                   value="#{resourceBean.term('list_core_component.button.create_asccp.tooltip')}"
+                                   position="left"/>
                     </div>
                     <div style="padding: 3px 0 3px 0;">
-                        <h:outputLabel value="Module" style="width: 80px; font-weight: 400;"/>
+                        <h:outputLabel value="#{resourceBean.term('list_core_component.input.module')}"
+                                       style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? '80' : '320'}px; font-weight: 400;"/>
                         <p:inputText id="searchTextForModule" value="#{coreComponentBean.searchTextForModule}"
                                      style="min-width: 440px; margin-right: 20px;" tabindex="3">
                             <p:ajax update=":form:pPanel"/>
@@ -96,6 +128,10 @@
                         <p:commandButton id="createBCCPBtn" value="Create BCCP"
                                          action="#{coreComponentBean.createBCCP}" tabindex="7"
                                          style="float: right; padding: 3px 0 3px 0; width: 110px;"/>
+                        <p:tooltip id="toolTipCreateBCCPBtn" for="createBCCPBtn"
+                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                   value="#{resourceBean.term('list_core_component.button.create_bccp.tooltip')}"
+                                   position="left"/>
                     </div>
 
                     <p:defaultCommand target="searchBtn"/>
@@ -179,6 +215,15 @@
                     <h:outputText value="#{coreComponentBean.getFullRevisionNum(cc)}"/>
                 </p:column>
 
+                <p:column style="width: 95px; text-align: center;" headerText="Deprecated" sortBy="#{cc.deprecated}">
+                    <h:panelGroup rendered="#{cc.deprecated}">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{!cc.deprecated}">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </h:panelGroup>
+                </p:column>
+
                 <p:column styleClass="last-updated-by text-align-center ellipsis"
                           headerText="Last Updated By"
                           sortBy="#{cc.lastUpdatedUser}">
@@ -209,5 +254,14 @@
         </p:panel>
 
         <ui:include src="../dialog/global_confirm_non_undo_dialog.xhtml"/>
+
+        <script>
+            $('label').each(function () {
+                var val_for = $(this).attr('for');
+                if (val_for !== undefined) {
+                    $(this).attr('id', val_for + ':label');
+                }
+            });
+        </script>
     </ui:define>
 </ui:composition>

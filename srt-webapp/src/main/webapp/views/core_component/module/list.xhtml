@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Module</h2>
+                <h2 class="subhead-heading">#{resourceBean.term('list_module.title')}</h2>
             </div>
         </div>
         <p:panel id="pPanel">
@@ -25,13 +25,17 @@
                 <p:button id="createBtn" value="Create Module"
                           style="float: right; padding: 3px 0 3px 0;"
                           outcome="/views/core_component/module/details.jsf"/>
+                <p:tooltip id="toolTipCreateModuleButton" for="createBtn"
+                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                           value="#{resourceBean.term('list_module.button.create_module.tooltip')}"
+                           position="left"/>
             </f:facet>
             <p:dataTable id="tbl" var="modules" value="#{moduleBean.allModules}"
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                          paginator="true" paginatorPosition="bottom" rows="10"
                          style="width: 100%; margin-bottom:20px" rowKey="#{modules.moduleId}">
 
-                <p:column style="width: 250px; text-align: center;"  headerText="Module"
+                <p:column style="width: 250px; text-align: center;" headerText="#{resourceBean.term('list_module.table.module')}"
                           sortBy="#{modules.module}">
                     <a href="/module/#{modules.moduleId}">#{modules.module}</a>
                 </p:column>
