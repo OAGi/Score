@@ -39,32 +39,42 @@
                             <h:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
                                                   value="#{coreComponentBean.selectedTypes}">
                                 <f:selectItem itemLabel="ACC" itemValue="ACC"/>
-                                <p:tooltip id="toolTipCheckboxACC" for="typeCB[0:label]"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('list_core_component.checkbox.acc.tooltip')}"
-                                           position="top"/>
                                 <f:selectItem itemLabel="ASCC" itemValue="ASCC"/>
-                                <p:tooltip id="toolTipCheckboxASCC" for="typeCB[1:label]"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('list_core_component.checkbox.ascc.tooltip')}"
-                                           position="top"/>
                                 <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
-                                <p:tooltip id="toolTipCheckboxASCCP" for="typeCB[2:label]"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('list_core_component.checkbox.asccp.tooltip')}"
-                                           position="top"/>
                                 <f:selectItem itemLabel="BCC" itemValue="BCC"/>
-                                <p:tooltip id="toolTipCheckboxBCC" for="typeCB[3:label]"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('list_core_component.checkbox.bcc.tooltip')}"
-                                           position="top"/>
                                 <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
-                                <p:tooltip id="toolTipCheckboxBCCP" for="typeCB[4:label]"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('list_core_component.checkbox.bccp.tooltip')}"
-                                           position="top"/>
+
+                                <script>
+                                    $('label').each(function () {
+                                        var val_for = $(this).attr('for');
+                                        if (val_for !== undefined) {
+                                            $(this).attr('id', val_for + ':label');
+                                        }
+                                    });
+                                </script>
                                 <p:ajax update="form" listener="#{coreComponentBean.onTypeChange}"/>
                             </h:selectManyCheckbox>
+
+                            <p:tooltip id="toolTipCheckboxACC" for="typeCB[0:label]"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('list_core_component.checkbox.acc.tooltip')}"
+                                       position="top"/>
+                            <p:tooltip id="toolTipCheckboxASCC" for="typeCB[1:label]"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('list_core_component.checkbox.ascc.tooltip')}"
+                                       position="top"/>
+                            <p:tooltip id="toolTipCheckboxASCCP" for="typeCB[2:label]"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('list_core_component.checkbox.asccp.tooltip')}"
+                                       position="top"/>
+                            <p:tooltip id="toolTipCheckboxBCC" for="typeCB[3:label]"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('list_core_component.checkbox.bcc.tooltip')}"
+                                       position="top"/>
+                            <p:tooltip id="toolTipCheckboxBCCP" for="typeCB[4:label]"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('list_core_component.checkbox.bccp.tooltip')}"
+                                       position="top"/>
                         </h:panelGrid>
                     </div>
                     <div class="col-md-5 col-sm-5">
@@ -83,7 +93,7 @@
 
                 <h:panelGroup>
                     <div style="padding: 3px 0 3px 0;">
-                        <h:outputLabel value="DEN"
+                        <h:outputLabel value="#{resourceBean.term('list_core_component.input.den')}"
                                        style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? '80' : '320'}px; font-weight: 400;"/>
                         <p:inputText id="searchTextForDen" value="#{coreComponentBean.searchTextForDen}"
                                      style="min-width: 440px; margin-right: 20px;" tabindex="1">
@@ -254,14 +264,5 @@
         </p:panel>
 
         <ui:include src="../dialog/global_confirm_non_undo_dialog.xhtml"/>
-
-        <script>
-            $('label').each(function () {
-                var val_for = $(this).attr('for');
-                if (val_for !== undefined) {
-                    $(this).attr('id', val_for + ':label');
-                }
-            });
-        </script>
     </ui:define>
 </ui:composition>

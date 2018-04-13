@@ -68,7 +68,7 @@
                                         <p:tooltip id="toolTipProfileBods" for="menuProfileBods"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.profile_bods.tooltip')}"
-                                                   position="right"/>
+                                                   position="bottom"/>
 
                                         <ul class="dropdown-menu">
                                             <li>
@@ -118,7 +118,7 @@
                                         <p:tooltip id="toolTipProfileBODExpression" for="menuProfileBODExpression"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.profile_bod_expression.tooltip')}"
-                                                   position="right"/>
+                                                   position="bottom"/>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link id="menuGenerateExpression"
@@ -168,7 +168,7 @@
                                         <p:tooltip id="toolTipCoreComponentManagement" for="menuCoreComponentManagement"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.core_component_management.tooltip')}"
-                                                   position="right"/>
+                                                   position="bottom"/>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link id="menuCoreComponent"
@@ -217,7 +217,7 @@
                                         <p:tooltip id="toolTipCodeList" for="menuCodeList"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.code_list.tooltip')}"
-                                                   position="right"/>
+                                                   position="bottom"/>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link id="menuViewCodeList"
@@ -244,8 +244,7 @@
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                            aria-haspopup="true" aria-expanded="false">#{request.userPrincipal.name}
-                                            <span
-                                                    class="caret"></span></a>
+                                            <span class="caret"></span></a>
                                         <ul class="dropdown-menu">
                                             <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
                                             </li>
