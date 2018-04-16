@@ -275,10 +275,10 @@ public class ProfileBODGenerateService {
         return element;
     }
 
-    public Element generateBDT(BasicBusinessInformationEntity gBBIE, Element eNode, Element gSchemaNode,
-                               CodeList gCL, GenerationContext generationContext) {
+    public Element generateBDT(BasicBusinessInformationEntity bbie, Element eNode, Element gSchemaNode,
+                               CodeList codeList, GenerationContext generationContext) {
 
-        DataType bDT = generationContext.queryBDT(gBBIE);
+        DataType bdt = generationContext.queryBDT(bbie);
 //		if(isCCStored(bDT.getGuid()))
 //			return eNode;
 
@@ -287,44 +287,35 @@ public class ProfileBODGenerateService {
         Element extNode = newElement("extension");
         //complexType.setAttribute("name", Utility.DenToName(bDT.getDen())); 
         complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
-        if (bDT.getDefinition() != null) {
+        if (bdt.getDefinition() != null) {
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS);
             //documentation.setTextContent(bDT.getDefinition());
             complexType.addContent(annotation);
         }
-        generationContext.addCCGuidIntoStoredCC(bDT.getGuid());
+        generationContext.addCCGuidIntoStoredCC(bdt.getGuid());
 
         complexType.addContent(simpleContent);
         simpleContent.addContent(extNode);
 
-        extNode.setAttribute("base", getCodeListTypeName(gCL));
+        extNode.setAttribute("base", getCodeListTypeName(codeList));
         eNode.addContent(complexType);
         return eNode;
     }
 
-
-    public String setBDTBase(GenerationContext generationContext, DataType gBDT) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
-                generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-        XSDBuiltInType aXSDBuiltInType =
-                generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-
-        return aXSDBuiltInType.getBuiltInType();
+    public String setBDTBase(GenerationContext generationContext, DataType bdt) {
+        BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+        XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+        return xbt.getBuiltInType();
     }
 
-    public String setBDTBase(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
-                generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-        XSDBuiltInType aXSDBuiltInType =
-                generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-
-        return aXSDBuiltInType.getBuiltInType();
+    public String setBDTBase(GenerationContext generationContext, BasicBusinessInformationEntity bbie) {
+        BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+        XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+        return xbt.getBuiltInType();
     }
 
     public Element setBBIE_Attr_Type(GenerationContext generationContext, DataType gBDT, Element gNode) {
@@ -464,89 +455,89 @@ public class ProfileBODGenerateService {
         return eNode;
     }
 
-    public Element handleBBIE_Attributevalue(BasicBusinessInformationEntity gBBIE,
+    public Element handleBBIE_Attributevalue(BasicBusinessInformationEntity bbie,
                                              Element eNode, GenerationContext generationContext) {
 
-        BasicCoreComponent bccVO = generationContext.queryBasedBCC(gBBIE);
-        eNode.setAttribute("name", Utility.second(bccVO.getDen(), false));
-        eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
-        generationContext.addCCGuidIntoStoredCC(bccVO.getGuid());
-        if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
+        BasicCoreComponent bcc = generationContext.queryBasedBCC(bbie);
+        eNode.setAttribute("name", Utility.second(bcc.getDen(), false));
+        eNode.setAttribute("id", bbie.getGuid()); //eNode.setAttribute("id", bcc.getGuid());
+        generationContext.addCCGuidIntoStoredCC(bcc.getGuid());
+        if (bbie.getDefaultValue() != null && bbie.getFixedValue() != null) {
             System.out.println("Error");
         }
-        if (gBBIE.isNillable()) {
+        if (bbie.isNillable()) {
             eNode.setAttribute("nillable", "true");
         }
-        if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
-            eNode.setAttribute("default", gBBIE.getDefaultValue());
+        if (bbie.getDefaultValue() != null && bbie.getDefaultValue().length() != 0) {
+            eNode.setAttribute("default", bbie.getDefaultValue());
         }
-        if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-            eNode.setAttribute("fixed", gBBIE.getFixedValue());
+        if (bbie.getFixedValue() != null && bbie.getFixedValue().length() != 0) {
+            eNode.setAttribute("fixed", bbie.getFixedValue());
         }
-        if (gBBIE.getCardinalityMin() >= 1)
+        if (bbie.getCardinalityMin() >= 1)
             eNode.setAttribute("use", "required");
         else
             eNode.setAttribute("use", "optional");
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
         documentation.setAttribute("source", OAGI_NS + "/platform/2");
-        //documentation.setTextContent(gBBIE.getDefinition());
+        //documentation.setTextContent(bbie.getDefinition());
         annotation.addContent(documentation);
         eNode.addContent(annotation);
         return eNode;
     }
 
-    public CodeList getCodeList(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, DataType gBDT) {
-        CodeList aCL = null;
+    public CodeList getCodeList(GenerationContext generationContext, BasicBusinessInformationEntity bbie, DataType bdt) {
+        CodeList codeList = null;
 
-        if (gBBIE.getCodeListId() != 0) {
-            aCL = generationContext.findCodeList(gBBIE.getCodeListId());
+        if (bbie.getCodeListId() != 0) {
+            codeList = generationContext.findCodeList(bbie.getCodeListId());
         }
 
-        if (aCL == null) {
-            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                    generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
-            if (aBDTPrimitiveRestriction != null && aBDTPrimitiveRestriction.getCodeListId() != 0) {
-                aCL = generationContext.findCodeList(aBDTPrimitiveRestriction.getCodeListId());
+        if (codeList == null) {
+            BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                    generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+            if (bdtPriRestri != null && bdtPriRestri.getCodeListId() != 0) {
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListId());
             }
         }
 
-        if (aCL == null) {
-            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                    generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
+        if (codeList == null) {
+            BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                    generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
 
-            if (aBDTPrimitiveRestriction.getCodeListId() != 0)
-                aCL = generationContext.findCodeList(aBDTPrimitiveRestriction.getCodeListId());
+            if (bdtPriRestri.getCodeListId() != 0)
+                codeList = generationContext.findCodeList(bdtPriRestri.getCodeListId());
             else
-                aCL = null;
+                codeList = null;
         }
-        return aCL;
+        return codeList;
     }
 
-    public Element setBBIEType(GenerationContext generationContext, DataType gBDT, Element gNode) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
-                generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-        XSDBuiltInType aXSDBuiltInType =
-                generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+    public XSDBuiltInType getXbt(GenerationContext generationContext,
+                                 BusinessDataTypePrimitiveRestriction bdtPriRestri) {
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                generationContext.findCdtAwdPriXpsTypeMap(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
+        XSDBuiltInType xbt = generationContext.findXSDBuiltInType(cdtAwdPriXpsTypeMap.getXbtId());
+        return xbt;
+    }
 
-        if (aXSDBuiltInType.getBuiltInType() != null)
-            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
+    public Element setBBIEType(GenerationContext generationContext, DataType bdt, Element gNode) {
+        BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+        XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+        if (xbt.getBuiltInType() != null)
+            gNode.setAttribute("type", xbt.getBuiltInType());
 
         return gNode;
     }
 
-    public Element setBBIEType(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, Element gNode) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
-                generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-        XSDBuiltInType aXSDBuiltInType =
-                generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-
-        if (aXSDBuiltInType.getBuiltInType() != null)
-            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
+    public Element setBBIEType(GenerationContext generationContext, BasicBusinessInformationEntity bbie, Element gNode) {
+        BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+        XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+        if (xbt.getBuiltInType() != null)
+            gNode.setAttribute("type", xbt.getBuiltInType());
 
         return gNode;
     }
@@ -602,8 +593,6 @@ public class ProfileBODGenerateService {
                     return eNode;
                 }
             }
-
-
         } else {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(bbie);
             CodeList aCL = getCodeList(generationContext, bbie, bdt);
@@ -1290,9 +1279,9 @@ public class ProfileBODGenerateService {
             guidArrayList.add(agencyIdListGuid);
         }
 
-        public boolean isCodeListGenerated(CodeList gCL) {
+        public boolean isCodeListGenerated(CodeList codeList) {
             for (int i = 0; i < guidArrayList.size(); i++) {
-                if (gCL.getGuid().equals(guidArrayList.get(i)))
+                if (codeList.getGuid().equals(guidArrayList.get(i)))
                     return true;
             }
             return false;
@@ -1353,8 +1342,8 @@ public class ProfileBODGenerateService {
         }
 
         // Get only SCs whose is_used is true.
-        public List<BasicBusinessInformationEntitySupplementaryComponent> queryBBIESCs(BasicBusinessInformationEntity gBBIE) {
-            long bbieId = gBBIE.getBbieId();
+        public List<BasicBusinessInformationEntitySupplementaryComponent> queryBBIESCs(BasicBusinessInformationEntity bbie) {
+            long bbieId = bbie.getBbieId();
             return findBbieScByBbieIdAndUsedIsTrue(bbieId);
         }
 
@@ -1362,11 +1351,15 @@ public class ProfileBODGenerateService {
             return findAsbiepByRoleOfAbieId(abieId);
         }
 
-        public DataType queryBDT(BasicBusinessInformationEntity gBBIE) {
-            BasicCoreComponent gBCC = findBCC(gBBIE.getBasedBccId());
-            BasicCoreComponentProperty aBasicCoreComponentProperty = findBCCP(gBCC.getToBccpId());
-            DataType bDT = findDT(aBasicCoreComponentProperty.getBdtId());
-            return bDT;
+        public DataType queryBDT(BasicBusinessInformationEntity bbie) {
+            BasicCoreComponent bcc = findBCC(bbie.getBasedBccId());
+            BasicCoreComponentProperty bccp = findBCCP(bcc.getToBccpId());
+            return queryBDT(bccp);
+        }
+
+        public DataType queryBDT(BasicCoreComponentProperty bccp) {
+            DataType bdt = findDT(bccp.getBdtId());
+            return bdt;
         }
 
         public AssociationCoreComponentProperty queryBasedASCCP(AssociationBusinessInformationEntityProperty gASBIEP) {
@@ -1399,6 +1392,10 @@ public class ProfileBODGenerateService {
         public BasicCoreComponent queryBasedBCC(BasicBusinessInformationEntity gBBIE) {
             BasicCoreComponent bccVO = findBCC(gBBIE.getBasedBccId());
             return bccVO;
+        }
+
+        public BasicCoreComponentProperty queryToBCCP(BasicCoreComponent bcc) {
+            return findBCCP(bcc.getToBccpId());
         }
 
         public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) {
@@ -1449,16 +1446,15 @@ public class ProfileBODGenerateService {
             return findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(gCL.getCodeListId());
         }
 
-        public AssociationBusinessInformationEntityProperty queryAssocToASBIEP(AssociationBusinessInformationEntity gASBIE) {
-            AssociationBusinessInformationEntityProperty asbiepVO = findASBIEP(gASBIE.getToAsbiepId());
+        public AssociationBusinessInformationEntityProperty queryAssocToASBIEP(AssociationBusinessInformationEntity asbie) {
+            AssociationBusinessInformationEntityProperty asbiepVO = findASBIEP(asbie.getToAsbiepId());
             return asbiepVO;
         }
 
-        public DataType queryAssocBDT(BasicBusinessInformationEntity gBBIE) {
-            BasicCoreComponent bccVO = findBCC(gBBIE.getBasedBccId());
-            BasicCoreComponentProperty bccpVO = findBCCP(bccVO.getToBccpId());
-            DataType aBDT = findDT(bccpVO.getBdtId());
-            return aBDT;
+        public DataType queryAssocBDT(BasicBusinessInformationEntity bbie) {
+            BasicCoreComponent bcc = findBCC(bbie.getBasedBccId());
+            BasicCoreComponentProperty bccp = findBCCP(bcc.getToBccpId());
+            return queryBDT(bccp);
         }
     }
 
@@ -1583,16 +1579,18 @@ public class ProfileBODGenerateService {
 
             GenerationContext generationContext = new GenerationContext(topLevelAbie);
             AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+
             AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
+            AggregateBusinessInformationEntity typeAbie = generationContext.queryTargetABIE(asbiep);
 
             AssociationCoreComponentProperty asccp = generationContext.queryBasedASCCP(asbiep);
             root.put("required", Arrays.asList(camelCase(asccp.getPropertyTerm())));
             root.put("additionalProperties", false);
 
             Map<String, Object> properties = new LinkedHashMap();
-            fillProperties(properties, asbiep, generationContext, option);
             root.put("properties", properties);
 
+            fillProperties(properties, asbiep, typeAbie, generationContext, option);
 
             try {
                 String str = mapper.writeValueAsString(root);
@@ -1602,46 +1600,58 @@ public class ProfileBODGenerateService {
             }
         }
 
-        private String camelCase(String term) {
+        private String camelCase(String... terms) {
+            String term = Arrays.stream(terms).filter(e -> !StringUtils.isEmpty(e))
+                    .collect(Collectors.joining());
+            if (StringUtils.isEmpty(term)) {
+                throw new IllegalArgumentException();
+            }
             String s = term.replaceAll(" ", "");
             return Character.toLowerCase(s.charAt(0)) + s.substring(1);
         }
 
-        private void fillProperties(Map<String, Object> properties,
+        private void fillProperties(Map<String, Object> parent,
                                     AssociationBusinessInformationEntityProperty asbiep,
+                                    AggregateBusinessInformationEntity abie,
                                     GenerationContext generationContext,
                                     ProfileBODGenerationOption option) {
             AssociationCoreComponentProperty asccp = generationContext.queryBasedASCCP(asbiep);
             String name = camelCase(asccp.getPropertyTerm());
 
-            Map<String, Object> children = new LinkedHashMap();
-            properties.put(name, children);
+            Map<String, Object> properties = new LinkedHashMap();
+            parent.put(name, properties);
 
-            children.put("type", "object");
-            children.put("additionalProperties", false);
+            properties.put("type", "object");
+            properties.put("additionalProperties", false);
 
-            AggregateBusinessInformationEntity abie = generationContext.queryTargetABIE(asbiep);
-            fillProperties(children, abie, generationContext, option);
+            fillProperties(properties, abie, generationContext, option);
         }
 
-        private void fillProperties(Map<String, Object> properties,
+        private void fillProperties(Map<String, Object> parent,
                                     AggregateBusinessInformationEntity abie,
                                     GenerationContext generationContext,
                                     ProfileBODGenerationOption option) {
             AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
 
+            Map<String, Object> properties = new LinkedHashMap();
+            parent.put("properties", properties);
+
             List<BusinessInformationEntity> childBIEs = generationContext.queryChildBIEs(abie);
             for (BusinessInformationEntity bie : childBIEs) {
+
                 if (bie instanceof BasicBusinessInformationEntity) {
                     BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) bie;
                     fillProperties(properties, bbie, generationContext, option);
-                    // generateBBIE(childBIE, aBDT, gPNode, gSchemaNode, generationContext);
                 } else {
                     AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) bie;
 
                     if (isAnyProperty(asbie, generationContext)) {
                         // generateAnyABIE(childBIE, gPNode, generationContext);
                     } else {
+                        AssociationBusinessInformationEntityProperty asbiep = generationContext.queryAssocToASBIEP(asbie);
+                        AggregateBusinessInformationEntity typeAbie = generationContext.queryTargetABIE2(asbiep);
+
+                        fillProperties(properties, asbiep, typeAbie, generationContext, option);
 //                        Element node = generateASBIE(childBIE, gPNode, generationContext);
 //                        AssociationBusinessInformationEntityProperty anASBIEP = generationContext.queryAssocToASBIEP(childBIE);
 //                        node = generateASBIEP(generationContext, anASBIEP, node);
@@ -1653,17 +1663,40 @@ public class ProfileBODGenerateService {
             }
         }
 
-        private void fillProperties(Map<String, Object> properties,
+        private void fillProperties(Map<String, Object> parent,
                                     BasicBusinessInformationEntity bbie,
                                     GenerationContext generationContext,
                                     ProfileBODGenerationOption option) {
-            DataType bdt = generationContext.queryAssocBDT(bbie);
             BasicCoreComponent bcc = generationContext.queryBasedBCC(bbie);
+            BasicCoreComponentProperty bccp = generationContext.queryToBCCP(bcc);
+            DataType bdt = generationContext.queryBDT(bccp);
+
+            String name = camelCase(bccp.getPropertyTerm());
+            Map<String, Object> properties = new LinkedHashMap();
+            parent.put(name, properties);
+
+            String definition = bbie.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("definition", definition);
+            }
+            properties.put("type", "object");
+            properties.put("additionalProperties", false);
 
             if (bcc.getEntityType() == BasicCoreComponentEntityType.Element) {
 
             } else {
-                List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(bbie);
+
+            }
+
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(bbie);
+            CodeList codeList = getCodeList(generationContext, bbie, bdt);
+            if (codeList == null) {
+                BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                        generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+
+            } else {
+
             }
 
 //            Element eNode;
