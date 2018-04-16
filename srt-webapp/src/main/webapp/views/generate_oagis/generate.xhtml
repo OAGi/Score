@@ -22,7 +22,8 @@
                                             style="width: 440px; margin-right: 20px;">
                                 <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
-                            <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
+                            <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                             actionListener="#{profileBODGenerationBean.search}"
                                              update="tbl" icon="fa fa-white fa-search"/>
                         </f:facet>
                         <p:dataTable id="tbl" var="profileBOD" value="#{profileBODGenerationBean.profileBODs}"
@@ -105,7 +106,8 @@
                                                          disabled="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Inherit if empty" styleClass="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'outputtext-disabled' : ''}"/>
+                                <h:outputText value="Inherit if empty"
+                                              styleClass="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="versionCB" styleClass="boolean-checkbox"
@@ -203,8 +205,8 @@
                         <h:selectOneRadio id="expressionRadio" styleClass="option-radio"
                                           value="#{profileBODGenerationBean.option.schemaExpression}">
                             <f:selectItem itemValue="XML" itemLabel="XML Schema"/>
-                            <f:selectItem itemValue="JSON" itemLabel="JSON Schema" itemDisabled="true"/>
-                            <f:ajax render="schemaExpressionOption"/>
+                            <f:selectItem itemValue="JSON" itemLabel="JSON Schema"/>
+                            <f:ajax render=":form:schemaExpressionOption"/>
                         </h:selectOneRadio>
                     </h:panelGrid>
                 </div>
@@ -216,7 +218,7 @@
                                           value="#{profileBODGenerationBean.option.schemaPackage}">
                             <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
                             <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"/>
-                            <f:ajax render="schemaPackageOption"/>
+                            <f:ajax render=":form:schemaPackageOption"/>
                         </h:selectOneRadio>
                     </h:panelGrid>
                 </div>
