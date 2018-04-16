@@ -205,7 +205,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}
 
-		generateSchemaFile = profileBODGenerateService.generateXMLSchema(al, generationOption);
+		generateSchemaFile = profileBODGenerateService.generateSchema(al, generationOption);
 		System.out.println("### " + generateSchemaFile);
 	}
 	

@@ -1462,7 +1462,7 @@ public class ProfileBODGenerateService {
         }
     }
 
-    public File generateXMLSchema(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
+    public File generateSchema(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
         if (topLevelAbieIds == null || topLevelAbieIds.isEmpty()) {
             throw new IllegalArgumentException();
         }

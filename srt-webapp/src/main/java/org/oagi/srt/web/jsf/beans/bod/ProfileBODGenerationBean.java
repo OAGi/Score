@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class ProfileBODGenerationBean extends UIHandler {
     @Autowired
     private ProfileBODRepository profileBODRepository;
     @Autowired
-    private ProfileBODGenerateService standaloneXMLSchema;
+    private ProfileBODGenerateService profileBODGenerateService;
 
     @Autowired
     private BusinessInformationEntityService bieService;
@@ -133,7 +134,7 @@ public class ProfileBODGenerationBean extends UIHandler {
         List<ProfileBOD> profileBODs;
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             profileBODs = allProfileBODs.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(ProfileBOD::getPropertyTerm))
                     .collect(Collectors.toList());
         } else {
             profileBODs = allProfileBODs.stream()
@@ -155,7 +156,7 @@ public class ProfileBODGenerationBean extends UIHandler {
         }
 
         ProfileBODGenerationOption option = getOption();
-        generateSchemaFile = standaloneXMLSchema.generateXMLSchema(topLevelAbieIds, option);
+        generateSchemaFile = profileBODGenerateService.generateSchema(topLevelAbieIds, option);
     }
 
     public StreamedContent getFile() throws Exception {
@@ -164,7 +165,19 @@ public class ProfileBODGenerationBean extends UIHandler {
 
     public StreamedContent toStreamedContent(File file) throws IOException {
         InputStream stream = new FileInputStream(file);
-        String filePath = file.getCanonicalPath();
-        return new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
+        String fileName = file.getName();
+
+        String contentType;
+        if (fileName.endsWith(".xml")) {
+            contentType = "text/xml";
+        } else if (fileName.endsWith(".json")) {
+            contentType = "application/json";
+        } else if (fileName.endsWith(".zip")) {
+            contentType = "application/zip";
+        } else {
+            contentType = "text/plain";
+        }
+
+        return new DefaultStreamedContent(stream, contentType, fileName);
     }
 }
