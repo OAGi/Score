@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.io.FileUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.oagi.srt.ServiceApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
@@ -18,8 +16,6 @@ import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -1911,8 +1907,7 @@ public class ProfileBODGenerateService {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(bbie);
             if (!bbieScList.isEmpty()) {
                 for (BasicBusinessInformationEntitySupplementaryComponent bbieSc : bbieScList) {
-                    fillProperties((Map<String, Object>) properties.get("properties"), definitions,
-                            bbieSc, generationContext, option);
+                    fillProperties(properties, definitions, bbieSc, generationContext, option);
                 }
             }
         }
@@ -1930,7 +1925,7 @@ public class ProfileBODGenerateService {
             DataTypeSupplementaryComponent dtSc = generationContext.findDtSc(bbieSc.getDtScId());
             String name = camelCase(dtSc.getPropertyTerm(), dtSc.getRepresentationTerm());
             Map<String, Object> properties = new LinkedHashMap();
-            parent.put(name, properties);
+            ((Map<String, Object>) parent.get("properties")).put(name, properties);
 
             if (minVal > 0) {
                 ((List<String>) parent.get("required")).add(name);
@@ -1971,20 +1966,6 @@ public class ProfileBODGenerateService {
             logger.info("JSON Schema is generated: " + tempFile);
 
             return tempFile;
-        }
-    }
-
-    public static void main(String[] args) throws Throwable {
-        try (ConfigurableApplicationContext ctx = SpringApplication.run(ServiceApplication.class, args)) {
-            ProfileBODGenerateService profileBODGenerateService = ctx.getBean(ProfileBODGenerateService.class);
-
-            ProfileBODGenerationOption option = new ProfileBODGenerationOption();
-            option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.JSON);
-            File generatedSchemaExpression = profileBODGenerateService.generateSchemaForAll(Arrays.asList(21L), option);
-
-            for (String line : FileUtils.readLines(generatedSchemaExpression)) {
-                System.out.println(line);
-            }
         }
     }
 }
