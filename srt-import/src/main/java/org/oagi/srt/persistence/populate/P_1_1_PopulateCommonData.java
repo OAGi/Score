@@ -338,7 +338,7 @@ public class P_1_1_PopulateCommonData {
         XSDBuiltInType anyType = xbtName("any type").builtInType("xsd:anyType").jbtDraft05Map("{\"type\":\"string\"}").build();
         XSDBuiltInType anySimpleType = xbtName("any simple type").builtInType("xsd:anySimpleType").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anyType).build();
         xbtName("duration").builtInType("xsd:duration").jbtDraft05Map("{\"type\":\"string\", \"pattern\":\"^[-]?P(?!$)(?:\\\\d+Y)?(?:\\\\d+M)?(?:\\\\d+D)?(?:T(?!$)(?:\\\\d+H)?(?:\\\\d+M)?(?:\\\\d+(?:\\\\.\\\\d+)?S)?)?$\"}").subTypeOfXbt(anySimpleType).build();
-        xbtName("date time").builtInType("xsd:dateTime").jbtDraft05Map("{\"type\":\"string\", \"format\":\"dateTime\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("date time").builtInType("xsd:dateTime").jbtDraft05Map("{\"type\":\"string\", \"format\":\"date-time\"}").subTypeOfXbt(anySimpleType).build();
         xbtName("time").builtInType("xsd:time").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
         xbtName("date").builtInType("xsd:date").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
         xbtName("gregorian year month").builtInType("xsd:gYearMonth").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();

@@ -1584,8 +1584,8 @@ public class ProfileBODGenerateService {
             Map<String, Object> definitions;
             if (root == null) {
                 root = new LinkedHashMap();
-                root.put("$schema", "http://json-schema.org/draft-05/schema#");
-                root.put("$id", "http://www.openapplications.org/oagis/10/");
+                root.put("$schema", "http://json-schema.org/draft-04/schema#");
+                root.put("id", "http://www.openapplications.org/oagis/10/");
 
                 root.put("required", new ArrayList());
                 root.put("additionalProperties", false);
@@ -1650,7 +1650,7 @@ public class ProfileBODGenerateService {
 
             String definition = asbie.getDefinition();
             if (!StringUtils.isEmpty(definition)) {
-                properties.put("definition", definition);
+                properties.put("description", definition);
             }
 
             if (isNillable) {
@@ -1862,7 +1862,7 @@ public class ProfileBODGenerateService {
 
             String definition = bbie.getDefinition();
             if (!StringUtils.isEmpty(definition)) {
-                properties.put("definition", definition);
+                properties.put("description", definition);
             }
 
             if (isNillable) {
@@ -1936,7 +1936,7 @@ public class ProfileBODGenerateService {
 
             String definition = bbieSc.getDefinition();
             if (!StringUtils.isEmpty(definition)) {
-                parent.put("definition", definition);
+                parent.put("description", definition);
             }
 
             CodeList codeList = generationContext.getCodeList(bbieSc);
