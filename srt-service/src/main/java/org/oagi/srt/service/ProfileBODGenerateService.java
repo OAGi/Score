@@ -8,7 +8,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.oagi.srt.ServiceApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
@@ -17,8 +16,6 @@ import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -1565,6 +1562,10 @@ public class ProfileBODGenerateService {
 
     private class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
+        // In schema version draft-04, it used "id" for dereferencing.
+        // However, in draft-06, it changes to "$id".
+        private static final String ID_KEYWORD = "id";
+
         private ObjectMapper mapper;
         private Map<String, Object> root;
 
@@ -1585,7 +1586,7 @@ public class ProfileBODGenerateService {
             if (root == null) {
                 root = new LinkedHashMap();
                 root.put("$schema", "http://json-schema.org/draft-04/schema#");
-                root.put("id", "http://www.openapplications.org/oagis/10/");
+                root.put(ID_KEYWORD, "http://www.openapplications.org/oagis/10/");
 
                 root.put("required", new ArrayList());
                 root.put("additionalProperties", false);
@@ -1960,8 +1961,30 @@ public class ProfileBODGenerateService {
             properties.put("$ref", ref);
         }
 
+        private void ensureRoot() {
+            if (root == null) {
+                throw new IllegalStateException();
+            }
+
+            // The "required" property for the root element of schema should has only one child.
+            if (((List<String>) root.get("required")).size() > 1) {
+                root.remove("required");
+            }
+
+            //
+            Map<String, Object> properties = (Map<String, Object>) root.get("properties");
+            for (String key : properties.keySet()) {
+                Map<String, Object> copied = new LinkedHashMap();
+                copied.put(ID_KEYWORD, "#" + key);
+                copied.putAll(((Map<String, Object>) properties.get(key)));
+                properties.put(key, copied);
+            }
+        }
+
         @Override
         public File asFile(String filename) throws IOException {
+            ensureRoot();
+
             File tempFile = File.createTempFile(Utility.generateGUID(), null);
             tempFile = new File(tempFile.getParentFile(), filename + ".json");
 
@@ -1969,20 +1992,6 @@ public class ProfileBODGenerateService {
             logger.info("JSON Schema is generated: " + tempFile);
 
             return tempFile;
-        }
-    }
-
-    public static void main(String[] args) throws Throwable {
-        try (ConfigurableApplicationContext ctx = SpringApplication.run(ServiceApplication.class, args)) {
-            ProfileBODGenerateService profileBODGenerateService = ctx.getBean(ProfileBODGenerateService.class);
-
-            ProfileBODGenerationOption option = new ProfileBODGenerationOption();
-            option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.JSON);
-            File generatedSchemaExpression = profileBODGenerateService.generateSchemaForAll(Arrays.asList(3L), option);
-            System.out.println(generatedSchemaExpression);
-//            for (String line : FileUtils.readLines(generatedSchemaExpression)) {
-//                System.out.println(line);
-//            }
         }
     }
 }
