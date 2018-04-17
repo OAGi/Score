@@ -38,6 +38,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
 @Controller
 @Scope("view")
@@ -174,6 +175,13 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
     public void discard(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
         bieUserExtRevisionRepository.delete(bieUserExtRevisionList);
         setBieUserExtRevisionList(null);
+    }
+
+    public boolean isDisabled() {
+        if (getTopLevelAbie().getState() != Editing) {
+            return true;
+        }
+        return !((BIENode) getSelectedTreeNode().getData()).isUsed();
     }
 
     private AssociationCoreComponentProperty getAsccpOfTopLevelNode(TopLevelAbie topLevelAbie) {
