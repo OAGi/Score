@@ -173,7 +173,9 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
 
     @Transactional(rollbackFor = Throwable.class)
     public void discard(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
-        bieUserExtRevisionRepository.delete(bieUserExtRevisionList);
+        if (bieUserExtRevisionList != null && !bieUserExtRevisionList.isEmpty()) {
+            bieUserExtRevisionRepository.delete(bieUserExtRevisionList);
+        }
         setBieUserExtRevisionList(null);
     }
 
