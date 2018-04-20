@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.common.SRTConstants.OAGI_NS;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 
 @Component
 public class ProfileBODGenerateService {
@@ -1667,10 +1668,19 @@ public class ProfileBODGenerateService {
                 if (maxVal > 0) {
                     properties.put("maxItems", maxVal);
                 }
+
+                properties.put("additionalItems", false);
+
+                Map<String, Object> items = new LinkedHashMap();
+                properties.put("items", items);
+                items.put("type", "object");
+
+                properties = items;
             }
 
             properties.put("required", new ArrayList());
             properties.put("additionalProperties", false);
+            properties.put("properties", new LinkedHashMap<String, Object>());
 
             fillProperties(properties, definitions, typeAbie, generationContext, option);
 
@@ -1843,7 +1853,17 @@ public class ProfileBODGenerateService {
             boolean isArray = (bcc.getCardinalityMax() != 1);
             int minVal = bbie.getCardinalityMin();
             int maxVal = bbie.getCardinalityMax();
-            boolean isNillable = bbie.isNillable();
+            /*
+             * When a bbie is based on a bcc, whose entity type is 'attribute',
+             * XML schema generation shouldn't generate the nillable="true",
+             * even if the user specified the bbie to be nillable.
+             */
+            boolean isNillable;
+            if (bcc.getEntityType() == Attribute) {
+                isNillable = false;
+            } else {
+                isNillable = bbie.isNillable();
+            }
 
             String name = camelCase(bccp.getPropertyTerm());
 
@@ -1879,6 +1899,14 @@ public class ProfileBODGenerateService {
                 if (maxVal > 0) {
                     properties.put("maxItems", maxVal);
                 }
+
+                properties.put("additionalItems", false);
+
+                Map<String, Object> items = new LinkedHashMap();
+                properties.put("items", items);
+                items.put("type", "object");
+
+                properties = items;
             }
 
             properties.put("required", new ArrayList());
