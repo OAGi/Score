@@ -62,13 +62,13 @@
                                                       pt:href="#" styleClass="dropdown-toggle"
                                                       pt:data-toggle="dropdown" pt:role="button"
                                                       pt:aria-haspopup="true" pt:aria-expanded="false">
-                                            <h:outputText value="#{resourceBean.term('topmenu.profile_bods')}"/>
+                                            <h:outputText value="Manage BIE"/>
                                             <span class="caret"></span>
                                         </h:outputLink>
                                         <p:tooltip id="toolTipProfileBods" for="menuProfileBods"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.profile_bods.tooltip')}"
-                                                   position="bottom"/>
+                                                   position="left"/>
 
                                         <ul class="dropdown-menu">
                                             <li>
@@ -76,7 +76,7 @@
                                                         id="menuCreateProfileBod"
                                                         outcome="/views/profile_bod/create_profile_bod.jsf">
                                                     <h:outputText
-                                                            value="#{resourceBean.term('submenu.create_profile_bod')}"/>
+                                                            value="Create BIE"/>
                                                 </h:link>
                                                 <p:tooltip id="toolTipCreateProfileBod" for="menuCreateProfileBod"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
@@ -87,7 +87,7 @@
                                                 <h:link id="menuProfileBodList"
                                                         outcome="/views/profile_bod/list.jsf">
                                                     <h:outputText
-                                                            value="#{resourceBean.term('submenu.profile_bod_list')}"/>
+                                                            value="BIE List"/>
                                                 </h:link>
                                                 <p:tooltip id="toolTipProfileBodList" for="menuProfileBodList"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
@@ -98,7 +98,7 @@
                                                 <h:link id="menuCopyProfileBod"
                                                         outcome="/views/profile_bod/copy_profile_bod.jsf">
                                                     <h:outputText
-                                                            value="#{resourceBean.term('submenu.copy_profile_bod')}"/>
+                                                            value="Copy BIE"/>
                                                 </h:link>
                                                 <p:tooltip id="toolTipCopyProfileBod" for="menuCopyProfileBod"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
@@ -112,13 +112,13 @@
                                                       pt:href="#" styleClass="dropdown-toggle"
                                                       pt:data-toggle="dropdown" pt:role="button"
                                                       pt:aria-haspopup="true" pt:aria-expanded="false">
-                                            <h:outputText value="#{resourceBean.term('topmenu.profile_bod_expression')}"/>
+                                            <h:outputText value="Profile BIE Expression"/>
                                             <span class="caret"></span>
                                         </h:outputLink>
                                         <p:tooltip id="toolTipProfileBODExpression" for="menuProfileBODExpression"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.profile_bod_expression.tooltip')}"
-                                                   position="bottom"/>
+                                                   position="left"/>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link id="menuGenerateExpression"
@@ -168,7 +168,7 @@
                                         <p:tooltip id="toolTipCoreComponentManagement" for="menuCoreComponentManagement"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
                                                    value="#{resourceBean.term('topmenu.core_component_management.tooltip')}"
-                                                   position="bottom"/>
+                                                   position="right"/>
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link id="menuCoreComponent"

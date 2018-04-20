@@ -48,6 +48,9 @@ public class SimpleACC implements OwnerUserAware, Serializable {
     @Column
     private long ownerUserId;
 
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean deprecated;
+
     @Column(name = "is_abstract", nullable = false)
     private boolean isAbstract;
 
@@ -143,6 +146,14 @@ public class SimpleACC implements OwnerUserAware, Serializable {
         this.ownerUserId = ownerUserId;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
     public boolean isAbstract() {
         return isAbstract;
     }
@@ -160,6 +171,7 @@ public class SimpleACC implements OwnerUserAware, Serializable {
                 revisionNum == simpleACC.revisionNum &&
                 revisionTrackingNum == simpleACC.revisionTrackingNum &&
                 ownerUserId == simpleACC.ownerUserId &&
+                deprecated == simpleACC.deprecated &&
                 isAbstract == simpleACC.isAbstract &&
                 Objects.equals(guid, simpleACC.guid) &&
                 Objects.equals(objectClassTerm, simpleACC.objectClassTerm) &&
@@ -172,7 +184,6 @@ public class SimpleACC implements OwnerUserAware, Serializable {
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(accId, guid, objectClassTerm, module, definition, oagisComponentType, state, revisionNum, revisionTrackingNum, releaseId, ownerUserId, isAbstract);
+        return Objects.hash(accId, guid, objectClassTerm, module, definition, oagisComponentType, state, revisionNum, revisionTrackingNum, releaseId, ownerUserId, deprecated, isAbstract);
     }
 }

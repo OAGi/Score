@@ -31,6 +31,9 @@ public class SimpleBCCP implements OwnerUserAware, Serializable {
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
 
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean deprecated;
+
     @Column
     private long ownerUserId;
 
@@ -82,6 +85,10 @@ public class SimpleBCCP implements OwnerUserAware, Serializable {
         this.state = state;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
     public long getOwnerUserId() {
         return ownerUserId;
     }
@@ -101,12 +108,13 @@ public class SimpleBCCP implements OwnerUserAware, Serializable {
                 Objects.equals(propertyTerm, that.propertyTerm) &&
                 Objects.equals(module, that.module) &&
                 Objects.equals(definition, that.definition) &&
+                deprecated == that.deprecated &&
                 state == that.state;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bccpId, guid, propertyTerm, module, definition, state, ownerUserId);
+        return Objects.hash(bccpId, guid, propertyTerm, module, definition, deprecated, state, ownerUserId);
     }
 
     @Override
@@ -117,6 +125,7 @@ public class SimpleBCCP implements OwnerUserAware, Serializable {
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", module='" + module + '\'' +
                 ", definition='" + definition + '\'' +
+                ", deprecated=" + deprecated +
                 ", state=" + state +
                 ", ownerUserId=" + ownerUserId +
                 '}';

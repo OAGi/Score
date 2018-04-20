@@ -16,7 +16,7 @@ public class SimpleASCCPRepository {
 
     private static final String FIND_ALL_STATEMENT =
             "SELECT asccp.asccp_id, asccp.guid, asccp.property_term, module.module, " +
-            "asccp.definition, asccp.state, asccp.owner_user_id " +
+            "asccp.definition, asccp.is_deprecated, asccp.state, asccp.owner_user_id " +
             "FROM asccp LEFT JOIN module ON asccp.module_id = module.module_id " +
             "WHERE asccp.revision_num = 0 AND asccp.is_deprecated = 0 AND asccp.reusable_indicator = 1";
 

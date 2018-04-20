@@ -16,7 +16,7 @@ public class SimpleBCCPRepository {
 
     private static final String FIND_ALL_STATEMENT =
             "SELECT bccp.bccp_id, bccp.guid, bccp.property_term, module.module, " +
-            "bccp.definition, bccp.state, bccp.owner_user_id " +
+            "bccp.definition, bccp.is_deprecated, bccp.state, bccp.owner_user_id " +
             "FROM bccp LEFT JOIN module ON bccp.module_id = module.module_id " +
             "WHERE bccp.revision_num = 0 AND bccp.is_deprecated = 0";
 

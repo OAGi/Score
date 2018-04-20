@@ -10,7 +10,7 @@
         <div class="settings-next">
             <div class="subhead">
                 <h:panelGroup id="headerMessage">
-                    <h2 class="subhead-heading">#{asccpDetailBean.targetAsccp.propertyTerm}</h2>
+                    <h2 class="subhead-heading">#{resourceBean.term('asccp_detail.title')}</h2>
                 </h:panelGroup>
             </div>
         </div>
@@ -35,7 +35,7 @@
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="#{asccpDetailBean.targetAsccp.propertyTerm}"/>
+                                        <h:outputText value="Structure of #{asccpDetailBean.targetAsccp.propertyTerm} ASCCP"/>
                                     </f:facet>
                                     <h:outputText value="#{ node.getAttribute('name') }"/>
                                 </p:column>
@@ -53,16 +53,16 @@
                                         rendered="#{fn:startsWith(asccpDetailBean.selectedTreeNode.type, 'ACC')}">
                                     <p:panel id="accPanel">
                                         <f:facet name="header">
-                                            <h:outputText value="ACC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.acc.title')}"/>
                                         </f:facet>
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-70' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="accguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.acc.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="Object Class Term" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.object_class_term')}" styleClass="section-label"/>
                                             <h:inputText id="accTerm"
                                                     required="true"
                                                          requiredMessage="Please fill out 'Object Class Term' field."
@@ -70,7 +70,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="accDen"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.acc.den}"
                                                     styleClass="section-content input-section disabled"
@@ -122,17 +122,17 @@
                                     <p:panel id="asccPanel"
                                              rendered="#{asccpDetailBean.selectedTreeNode.data.ascc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="ASCC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.ascc.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="asccguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.ascc.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="asccDen"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.ascc.den}"
                                                     styleClass="section-content input-section disabled"
@@ -148,7 +148,7 @@
                                                 <p:ajax update="asccPanel"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="asccMax" editable="true"
                                                              value="#{asccpDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
                                                              styleClass="section-content input-section disabled"
@@ -180,18 +180,15 @@
                                             </h:inputTextarea>
                                         </h:panelGrid>
                                     </p:panel>
-                                    <p:panel id="asccpPanel">
-                                        <f:facet name="header">
-                                            <h:outputText value="ASCCP"/>
-                                        </f:facet>
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="asccpPanel" header="#{resourceBean.term('acc_detail.right_panel.asccp.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="asccpguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.asccp.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.asccp_property_term')}" styleClass="section-label"/>
                                             <h:inputText id="asccpTerm"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
                                                     styleClass="section-content input-section #{asccpDetailBean.isDisabled(asccpDetailBean.selectedTreeNode.data.asccp) ? 'disabled' : ''}"
@@ -200,7 +197,7 @@
                                                         update="headerMessage, leftPanel, asccpPanel, :form:btnGroup"/>
                                             </h:inputText>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="asccpDen"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.asccp.den}"
                                                     styleClass="section-content input-section disabled"
@@ -237,7 +234,6 @@
                                     </p:panel>
                                 </h:panelGroup>
 
-
                                 <!--
                                     BCCP
                                 -->
@@ -246,17 +242,17 @@
                                     <p:panel id="bccPanel"
                                              rendered="#{asccpDetailBean.selectedTreeNode.data.bcc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="BCC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.bcc.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="bccguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bcc.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" id="labelBccDen" styleClass="section-label"/>
                                             <h:inputText id="bccDen"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bcc.den}"
                                                     styleClass="section-content input-section disabled"
@@ -282,7 +278,7 @@
                                                 <p:ajax update="bccPanel"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="bccMax" editable="true"
                                                              value="#{asccpDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
                                                              styleClass="section-content input-section disabled"
@@ -334,21 +330,21 @@
                                         </h:panelGrid>
                                     </p:panel>
 
-                                    <p:panel id="bccpPanel" header="BCCP">
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="bccpPanel" header="#{resourceBean.term('acc_detail.right_panel.bccp.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="bccpguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bccp.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.bccp_property_term')}" styleClass="section-label"/>
                                             <h:inputText id="bccpTerm"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="bccpDen"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bccp.den}"
                                                     styleClass="section-content input-section disabled"
@@ -395,8 +391,8 @@
                                         </h:panelGrid>
                                     </p:panel>
 
-                                    <p:panel id="dataTypePanel" header="Data Type">
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="dataTypePanel" header="#{resourceBean.term('acc_detail.right_panel.data_type.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,height-0,height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="dataTypeguid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bdt.guid}"
@@ -415,7 +411,7 @@
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="DEN" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="den"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bdt.den}"
                                                     styleClass="section-content input-section disabled"
@@ -441,27 +437,21 @@
                                     <p:panel id="bdtScPanel"
                                              rendered="#{asccpDetailBean.selectedTreeNode.data.bdtSc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="Data Type Supplementary Component"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.data_type_supplementary_component.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="guid"
                                                     value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.guid}"
                                                     styleClass="section-content input-section disabled"
                                                     disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
-                                            <h:inputText id="propertyTerm"
-                                                    value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.propertyTerm}"
-                                                    styleClass="section-content input-section disabled"
-                                                    disabled="true"/>
-
-                                            <h:outputText value="Representation Term" styleClass="section-label"/>
-                                            <h:inputText id="representationTerm"
-                                                    value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.representationTerm}"
-                                                    styleClass="section-content input-section disabled"
-                                                    disabled="true"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
+                                            <h:inputText id="bdtScDen"
+                                                         value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.den}"
+                                                         styleClass="section-content input-section disabled"
+                                                         disabled="true"/>
 
                                             <h:outputText value="Min" styleClass="section-label"/>
                                             <h:inputText id="min"
@@ -472,7 +462,7 @@
                                                 <f:selectItem itemLabel="1" itemValue="1"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="max" editable="true"
                                                              value="#{asccpDetailBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
                                                              styleClass="section-content input-section disabled"

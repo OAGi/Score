@@ -10,7 +10,12 @@
         <div class="settings-next">
             <div class="subhead">
                 <h:panelGroup id="headerMessage">
-                    <h2 class="subhead-heading">#{accDetailBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : accDetailBean.targetAcc.objectClassTerm}</h2>
+                    <h2 class="subhead-heading">
+                        #{accDetailBean.preparedSetBasedAcc ? resourceBean.term('acc_detail.set_based_acc.title') :
+                          accDetailBean.preparedAppendAscc ?  resourceBean.term('acc_detail.append_ascc.title') :
+                          accDetailBean.preparedAppendBcc ?  resourceBean.term('acc_detail.append_bcc.title') :
+                          resourceBean.term('acc_detail.title')}
+                    </h2>
                 </h:panelGroup>
             </div>
         </div>
@@ -35,7 +40,7 @@
                                 <p:ajax event="select" update=":form:treeTable, :form:details"/>
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="#{accDetailBean.targetAcc.objectClassTerm}"/>
+                                        <h:outputText value="Structure of #{accDetailBean.targetAcc.objectClassTerm} ACC"/>
 
                                         <p:commandButton icon="fa fa-white fa-arrow-down" style="float: right;"
                                                          disabled="#{!accDetailBean.canMoveDown(accDetailBean.selectedTreeNode)}"
@@ -82,11 +87,6 @@
                                             action="#{accDetailBean.prepareSetBasedAcc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
-                                <p:tooltip id="toolTipSetACCItem" for="setACCItem"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('acc_detail.context_menu.set_based_acc.tooltip')}"
-                                           position="right"/>
-
                                 <p:menuitem id="discardACCItem" value="Discard based ACC" style="width: 100%;"
                                             rendered="#{accDetailBean.targetAcc.basedAccId gt 0}"
                                             actionListener="#{accDetailBean.discardBasedAcc}"
@@ -95,31 +95,34 @@
                                                message="Discarding based ACC cannot be undone. Proceed?"
                                                icon="fa fa-exclamation-triangle"/>
                                 </p:menuitem>
-                                <p:tooltip id="toolTipDiscardACCItem" for="discardACCItem"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('acc_detail.context_menu.discard_based_acc.tooltip')}"
-                                           position="right"/>
-
                                 <p:menuitem id="appendASCCItem" value="Append ASCC" style="width: 100%;"
                                             actionListener="#{accDetailBean.onClickAppendASCCButton}"
                                             action="#{accDetailBean.prepareAppendAscc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
-                                <p:tooltip id="toolTipAppendASCCItem" for="appendASCCItem"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('acc_detail.context_menu.append_ascc.tooltip')}"
-                                           position="right"/>
-
                                 <p:menuitem id="appendBCCItem" value="Append BCC" style="width: 100%;"
                                             actionListener="#{accDetailBean.onClickAppendBCCButton}"
                                             action="#{accDetailBean.prepareAppendBcc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
-                                <p:tooltip id="toolTipAppendBCCItem" for="appendBCCItem"
-                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                           value="#{resourceBean.term('acc_detail.context_menu.append_bcc.tooltip')}"
-                                           position="right"/>
                             </p:contextMenu>
+
+                            <p:tooltip id="toolTipSetACCItem" for="setACCItem"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('acc_detail.context_menu.set_based_acc.tooltip')}"
+                                       position="right"/>
+                            <p:tooltip id="toolTipDiscardACCItem" for="discardACCItem"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('acc_detail.context_menu.discard_based_acc.tooltip')}"
+                                       position="right"/>
+                            <p:tooltip id="toolTipAppendASCCItem" for="appendASCCItem"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('acc_detail.context_menu.append_ascc.tooltip')}"
+                                       position="right"/>
+                            <p:tooltip id="toolTipAppendBCCItem" for="appendBCCItem"
+                                       rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                       value="#{resourceBean.term('acc_detail.context_menu.append_bcc.tooltip')}"
+                                       position="right"/>
                         </p:panel>
                     </div>
 
@@ -137,7 +140,8 @@
                                         <f:facet name="header">
                                             <h:panelGroup>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Object Class Term" style="width: 140px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.set_based_acc.input.acc')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '140'}px; font-weight: 400;"/>
                                                     <p:inputText id="accObjectClassTermInputText" widgetVar="accObjectClassTermInputText"
                                                                  value="#{accDetailBean.selectedAccObjectClassTerm}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="1">
@@ -145,7 +149,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Definition" style="width: 140px; font-weight: 400;"/>
+                                                    <h:outputLabel value="Definition"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '140'}px; font-weight: 400;"/>
                                                     <p:inputText id="accDefinitionInputText" widgetVar="accDefinitionInputText"
                                                                  value="#{accDetailBean.selectedAccDefinition}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="2">
@@ -153,7 +158,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Module" style="width: 140px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.set_based_acc.input.module')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '140'}px; font-weight: 400;"/>
                                                     <p:inputText id="accModuleInputText" widgetVar="accModuleInputText"
                                                                  value="#{accDetailBean.selectedAccModule}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="3">
@@ -185,12 +191,12 @@
                                                 </p:selectBooleanCheckbox>
                                             </p:column>
 
-                                            <p:column headerText="Object Class Term" style="width: 350px;" sortBy="#{acc.objectClassTerm}">
+                                            <p:column headerText="ACC Name" style="width: 320px;" sortBy="#{acc.objectClassTerm}">
                                                 <a href="/core_component/acc/#{acc.accId}"
                                                    target="_new">#{acc.objectClassTerm}</a>
                                                 <div>
                                                     <a href="/core_component/acc/#{acc.accId}" target="_new"
-                                                       style="font-size: 12px !important; color: #767676 !important;">GUID: #{acc.guid}</a>
+                                                       style="font-size: 12px !important; color: #767676 !important;">#{acc.guid}</a>
                                                 </div>
                                             </p:column>
 
@@ -199,11 +205,11 @@
                                                 <span class="label label-info">#{acc.oagisComponentType}</span>
                                             </p:column>
 
-                                            <p:column headerText="Module" style="width: 220px;" sortBy="#{acc.module}">
+                                            <p:column headerText="Module" sortBy="#{acc.module}">
                                                 <h:outputText value="#{acc.module}"/>
                                             </p:column>
 
-                                            <p:column headerText="Definition" sortBy="#{acc.definition}">
+                                            <p:column headerText="Definition" style="width: 150px;" sortBy="#{acc.definition}">
                                                 <h:outputText value="#{acc.definition}"/>
                                             </p:column>
 
@@ -213,6 +219,16 @@
                                                     <i class="fa fa-check" aria-hidden="true"></i>
                                                 </h:panelGroup>
                                                 <h:panelGroup rendered="#{!acc.isAbstract()}">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                </h:panelGroup>
+                                            </p:column>
+
+                                            <p:column style="width: 120px; text-align: center;"
+                                                      headerText="Deprecated" sortBy="#{acc.isDeprecated()}">
+                                                <h:panelGroup rendered="#{acc.isDeprecated()}">
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{!acc.isDeprecated()}">
                                                     <i class="fa fa-times" aria-hidden="true"></i>
                                                 </h:panelGroup>
                                             </p:column>
@@ -254,7 +270,8 @@
                                         <f:facet name="header">
                                             <h:panelGroup>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.append_ascc.input.asccp')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="asccpPropertyTermInputText" widgetVar="asccpPropertyTermInputText"
                                                                  value="#{accDetailBean.selectedAsccpPropertyTerm}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="1">
@@ -262,7 +279,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="Definition"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="asccpDefinitionInputText" widgetVar="asccpDefinitionInputText"
                                                                  value="#{accDetailBean.selectedAsccpDefinition}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="2">
@@ -270,7 +288,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.set_based_acc.input.module')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="asccpModuleInputText" widgetVar="asccpModuleInputText"
                                                                  value="#{accDetailBean.selectedAsccpModule}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="3">
@@ -302,13 +321,13 @@
                                                 </p:selectBooleanCheckbox>
                                             </p:column>
 
-                                            <p:column headerText="Property Term"
+                                            <p:column headerText="ASCCP Name"
                                                       sortBy="#{asccp.propertyTerm}">
                                                 <a href="/core_component/asccp/#{asccp.asccpId}"
                                                    target="_new">#{asccp.propertyTerm}</a>
                                                 <div>
                                                     <a href="/core_component/asccp/#{asccp.asccpId}" target="_new"
-                                                       style="font-size: 12px !important; color: #767676 !important;">GUID: #{asccp.guid}</a>
+                                                       style="font-size: 12px !important; color: #767676 !important;">#{asccp.guid}</a>
                                                 </div>
                                             </p:column>
 
@@ -318,6 +337,16 @@
 
                                             <p:column headerText="Definition" sortBy="#{asccp.definition}">
                                                 <h:outputText value="#{asccp.definition}"/>
+                                            </p:column>
+
+                                            <p:column style="width: 120px; text-align: center;"
+                                                      headerText="Deprecated" sortBy="#{asccp.isDeprecated()}">
+                                                <h:panelGroup rendered="#{asccp.isDeprecated()}">
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{!asccp.isDeprecated()}">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                </h:panelGroup>
                                             </p:column>
 
                                             <p:column style="width: 100px; text-align: center;" headerText="State"
@@ -357,7 +386,8 @@
                                         <f:facet name="header">
                                             <h:panelGroup>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Property Term" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.append_bcc.input.bccp')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="bccpPropertyTermInputText" widgetVar="bccpPropertyTermInputText"
                                                                  value="#{accDetailBean.selectedBccpPropertyTerm}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="1">
@@ -365,7 +395,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Definition" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="Definition"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="bccpDefinitionInputText" widgetVar="bccpDefinitionInputText"
                                                                  value="#{accDetailBean.selectedBccpDefinition}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="2">
@@ -373,7 +404,8 @@
                                                     </p:inputText>
                                                 </div>
                                                 <div style="padding: 3px 0 3px 0;">
-                                                    <h:outputLabel value="Module" style="width: 120px; font-weight: 400;"/>
+                                                    <h:outputLabel value="#{resourceBean.term('acc_detail.set_based_acc.input.module')}"
+                                                                   style="width: #{resourceBean.termKeyPrefix() ne 'ccts' ? '320' : '120'}px; font-weight: 400;"/>
                                                     <p:inputText id="bccpModuleInputText" widgetVar="bccpModuleInputText"
                                                                  value="#{accDetailBean.selectedBccpModule}"
                                                                  style="min-width: 440px; margin-right: 20px;" tabindex="3">
@@ -405,12 +437,12 @@
                                                 </p:selectBooleanCheckbox>
                                             </p:column>
 
-                                            <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
+                                            <p:column headerText="BCCP Name" sortBy="#{bccp.propertyTerm}">
                                                 <a href="/core_component/bccp/#{bccp.bccpId}"
                                                    target="_new">#{bccp.propertyTerm}</a>
                                                 <div>
                                                     <a href="/core_component/bccp/#{bccp.bccpId}" target="_new"
-                                                       style="font-size: 12px !important; color: #767676 !important;">GUID: #{bccp.guid}</a>
+                                                       style="font-size: 12px !important; color: #767676 !important;">#{bccp.guid}</a>
                                                 </div>
                                             </p:column>
 
@@ -420,6 +452,16 @@
 
                                             <p:column headerText="Definition" sortBy="#{bccp.definition}">
                                                 <h:outputText value="#{bccp.definition}"/>
+                                            </p:column>
+
+                                            <p:column style="width: 120px; text-align: center;"
+                                                      headerText="Deprecated" sortBy="#{bccp.isDeprecated()}">
+                                                <h:panelGroup rendered="#{bccp.isDeprecated()}">
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{!bccp.isDeprecated()}">
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                </h:panelGroup>
                                             </p:column>
 
                                             <p:column style="width: 100px; text-align: center;" headerText="State"
@@ -457,16 +499,16 @@
                                                     fn:startsWith(accDetailBean.selectedTreeNode.type, 'ACC')}">
                                     <p:panel id="accPanel">
                                         <f:facet name="header">
-                                            <h:outputText value="ACC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.acc.title')}"/>
                                         </f:facet>
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-70' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="accGuid"
                                                          value="#{accDetailBean.selectedTreeNode.data.acc.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="Object Class Term" id="labelAccObjectClassTerm" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.object_class_term')}" styleClass="section-label"/>
                                             <h:inputText id="accTerm"
                                                          required="true"
                                                          requiredMessage="Please fill out 'Object Class Term' field."
@@ -477,7 +519,7 @@
                                                         update=":form:headerMessage, :form:leftPanel, :form:accPanel, :form:btnGroup"/>
                                             </h:inputText>
 
-                                            <h:outputText value="DEN" id="labelAccDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="accDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.acc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -526,16 +568,6 @@
                                                 <p:ajax update=":form:accPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
-
-
-                                        <p:tooltip id="toolTipLabelAccObjectClassTerm" for="labelAccObjectClassTerm"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.object_class_term.tooltip')}"
-                                                   position="left"/>
-                                        <p:tooltip id="toolTipLabelAccDen" for="labelAccDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
 
@@ -548,17 +580,17 @@
                                     <p:panel id="asccPanel"
                                              rendered="#{accDetailBean.selectedTreeNode.data.ascc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="ASCC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.ascc.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="asccguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.ascc.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" id="labelAsccDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="asccDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.ascc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -575,7 +607,7 @@
                                                         update=":form:asccPanel, :form:btnGroup"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="asccMax"
                                                          editable="true"
                                                          value="#{accDetailBean.selectedTreeNode.data.ascc.cardinalityMax}"
@@ -608,27 +640,22 @@
                                                 <p:ajax update=":form:asccPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
-
-                                        <p:tooltip id="toolTipLabelAsccDen" for="labelAsccDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
-                                    <p:panel id="asccpPanel" header="ASCCP">
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="asccpPanel" header="#{resourceBean.term('acc_detail.right_panel.asccp.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="asccpguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.asccp.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.asccp_property_term')}" styleClass="section-label"/>
                                             <h:inputText id="asccpTerm"
                                                          value="#{accDetailBean.selectedTreeNode.data.asccp.propertyTerm}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" id="labelAsccpDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="asccpDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.asccp.den}"
                                                          styleClass="section-content input-section disabled"
@@ -658,14 +685,8 @@
                                                 <p:ajax update=":form:asccpPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
-
-                                        <p:tooltip id="toolTipLabelAsccpDen" for="labelAsccpDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
-
 
                                 <!--
                                     BCCP
@@ -676,17 +697,17 @@
                                     <p:panel id="bccPanel"
                                              rendered="#{accDetailBean.selectedTreeNode.data.bcc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="BCC"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.bcc.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="bccguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.bcc.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" id="labelBccDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="bccDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bcc.den}"
                                                          styleClass="section-content input-section disabled"
@@ -717,7 +738,7 @@
                                                         update=":form:bccPanel, :form:btnGroup"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="bccMax"
                                                          editable="true"
                                                          value="#{accDetailBean.selectedTreeNode.data.bcc.cardinalityMax}"
@@ -750,7 +771,7 @@
                                             <h:inputTextarea id="bccDefault"
                                                              value="#{accDetailBean.selectedTreeNode.data.bcc.defaultValue}"
                                                              rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) and
-                                                            accDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
+                                                                     accDetailBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
                                                              autoResize="false"
                                                              styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
                                                              disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc)}">
@@ -761,7 +782,7 @@
                                             <h:inputTextarea id="bccDefinition"
                                                              value="#{accDetailBean.selectedTreeNode.data.bcc.definition}"
                                                              rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) and
-                                                            accDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
+                                                                     accDetailBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
                                                              autoResize="false"
                                                              a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? '' : 'Leave a definition'}"
                                                              styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bcc) ? 'disabled' : ''}"
@@ -769,28 +790,23 @@
                                                 <p:ajax update=":form:bccPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
-
-                                        <p:tooltip id="toolTipLabelBccDen" for="labelBccDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
 
-                                    <p:panel id="bccpPanel" header="BCCP">
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="bccpPanel" header="#{resourceBean.term('acc_detail.right_panel.bccp.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,height-0,height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="bccpguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.bccp.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.bccp_property_term')}" styleClass="section-label"/>
                                             <h:inputText id="bccpTerm"
                                                          value="#{accDetailBean.selectedTreeNode.data.bccp.propertyTerm}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" id="labelBccpDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="bccpDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bccp.den}"
                                                          styleClass="section-content input-section disabled"
@@ -816,7 +832,7 @@
                                             <h:inputTextarea id="default"
                                                              value="#{accDetailBean.selectedTreeNode.data.bccp.defaultValue}"
                                                              rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) and
-                                                            accDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
+                                                                     accDetailBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
                                                              autoResize="false"
                                                              styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
                                                              disabled="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp)}">
@@ -827,7 +843,7 @@
                                             <h:inputTextarea id="bccpDefinition"
                                                              value="#{accDetailBean.selectedTreeNode.data.bccp.definition}"
                                                              rows="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) and
-                                                            accDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
+                                                                     accDetailBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
                                                              autoResize="false"
                                                              a:placeholder="#{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? '' : 'Leave a definition'}"
                                                              styleClass="section-content input-section #{accDetailBean.isDisabled(accDetailBean.selectedTreeNode.data.bccp) ? 'disabled' : ''}"
@@ -835,15 +851,10 @@
                                                 <p:ajax update=":form:bccpPanel, :form:btnGroup"/>
                                             </h:inputTextarea>
                                         </h:panelGrid>
-
-                                        <p:tooltip id="toolTipLabelBccpDen" for="labelBccpDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
 
-                                    <p:panel id="dataTypePanel" header="Data Type">
-                                        <h:panelGrid columns="2">
+                                    <p:panel id="dataTypePanel" header="#{resourceBean.term('acc_detail.right_panel.data_type.title')}">
+                                        <h:panelGrid columns="2" rowClasses="height-0,height-0,height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="dataTypeguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.bdt.guid}"
@@ -862,7 +873,7 @@
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="DEN" id="labelDataTypeDen" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
                                             <h:inputText id="dataTypeDen"
                                                          value="#{accDetailBean.selectedTreeNode.data.bdt.den}"
                                                          styleClass="section-content input-section disabled"
@@ -876,14 +887,8 @@
                                                              styleClass="section-content input-section disabled"
                                                              disabled="true"/>
                                         </h:panelGrid>
-
-                                        <p:tooltip id="toolTipLabelDataTypeDen" for="labelDataTypeDen"
-                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('acc_detail.label.den.tooltip')}"
-                                                   position="left"/>
                                     </p:panel>
                                 </h:panelGroup>
-
 
                                 <!--
                                     BDT SC
@@ -894,25 +899,19 @@
                                     <p:panel id="bdtScPanel"
                                              rendered="#{accDetailBean.selectedTreeNode.data.bdtSc != null}">
                                         <f:facet name="header">
-                                            <h:outputText value="Data Type Supplementary Component"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.data_type_supplementary_component.title')}"/>
                                         </f:facet>
 
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" rowClasses="height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0,#{resourceBean.termKeyPrefix() ne 'ccts' ? 'height-50' : 'height-0'},height-0">
                                             <h:outputText value="GUID" styleClass="section-label"/>
                                             <h:inputText id="bdtScguid"
                                                          value="#{accDetailBean.selectedTreeNode.data.bdtSc.guid}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
-                                            <h:outputText value="Property Term" styleClass="section-label"/>
-                                            <h:inputText id="bdtScPropertyTerm"
-                                                         value="#{accDetailBean.selectedTreeNode.data.bdtSc.propertyTerm}"
-                                                         styleClass="section-content input-section disabled"
-                                                         disabled="true"/>
-
-                                            <h:outputText value="Representation Term" styleClass="section-label"/>
-                                            <h:inputText id="bdtScRepresentationTerm"
-                                                         value="#{accDetailBean.selectedTreeNode.data.bdtSc.representationTerm}"
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.den')}" styleClass="section-label"/>
+                                            <h:inputText id="bdtScDen"
+                                                         value="#{accDetailBean.selectedTreeNode.data.bdtSc.den}"
                                                          styleClass="section-content input-section disabled"
                                                          disabled="true"/>
 
@@ -925,7 +924,7 @@
                                                 <f:selectItem itemLabel="1" itemValue="1"/>
                                             </h:inputText>
 
-                                            <h:outputText value="Max" styleClass="section-label"/>
+                                            <h:outputText value="#{resourceBean.term('acc_detail.right_panel.input.max')}" styleClass="section-label"/>
                                             <h:inputText id="bdtScMax"
                                                          editable="true"
                                                          value="#{accDetailBean.selectedTreeNode.data.bdtSc.cardinalityMax}"

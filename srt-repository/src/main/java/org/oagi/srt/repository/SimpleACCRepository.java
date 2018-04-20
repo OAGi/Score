@@ -19,7 +19,7 @@ public class SimpleACCRepository {
 
     private static final String FIND_ALL_STATEMENT =
             "SELECT acc.acc_id, acc.guid, acc.object_class_term, acc.oagis_component_type, module.module, " +
-                    "acc.definition, acc.state, acc.owner_user_id, acc.is_abstract, " +
+                    "acc.definition, acc.state, acc.owner_user_id, acc.is_deprecated, acc.is_abstract, " +
                     "acc.release_id, acc.revision_num, acc.revision_tracking_num " +
                     "FROM acc LEFT JOIN module ON acc.module_id = module.module_id " +
                     "WHERE acc.is_deprecated = 0";

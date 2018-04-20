@@ -110,6 +110,10 @@ public class DataTypeSupplementaryComponent implements IEntity {
         this.representationTerm = representationTerm;
     }
 
+    public String getDen() {
+        return getPropertyTerm() + ". " + getRepresentationTerm();
+    }
+
     public String getDefinition() {
         return definition;
     }

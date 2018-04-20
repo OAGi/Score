@@ -7,7 +7,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Select BDT to create new BCCP</h2>
+                <h2 class="subhead-heading">${resourceBean.term('select_bdt.title')}</h2>
             </div>
         </div>
         <p:panel>
@@ -33,15 +33,7 @@
                 <p:ajax event="rowUnselect" update=":form:btnGroup"
                         listener="#{selectBDTBean.onBDTUnselect}"/>
 
-                <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
-                    <h:outputText value="#{bdt.qualifier}"/>
-                </p:column>
-
-                <p:column headerText="Data Type Term" sortBy="#{bdt.dataTypeTerm}">
-                    <h:outputText value="#{bdt.dataTypeTerm}"/>
-                </p:column>
-
-                <p:column headerText="DEN" sortBy="#{bdt.den}">
+                <p:column headerText="${resourceBean.term('select_bdt.table.column.den')}" sortBy="#{bdt.den}">
                     <h:outputText value="#{bdt.den}"/>
                 </p:column>
 
@@ -60,6 +52,19 @@
                     <h:outputText value="#{bdt.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                     </h:outputText>
+                </p:column>
+
+                <p:column style="width: 100px; text-align: center;" headerText="State"
+                          sortBy="#{bdt.state}">
+                    <h:panelGroup rendered="#{bdt.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{bdt.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{bdt.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
                 </p:column>
             </p:dataTable>
         </p:panel>

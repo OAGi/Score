@@ -7,7 +7,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Select ACC to create new ASCCP</h2>
+                <h2 class="subhead-heading">${resourceBean.term('select_acc.title')}</h2>
             </div>
         </div>
         <p:panel>
@@ -33,7 +33,7 @@
                 <p:ajax event="rowUnselect" update=":form:btnGroup"
                         listener="#{selectACCBean.onACCUnselect}"/>
 
-                <p:column headerText="Object Class Term" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
+                <p:column headerText="${resourceBean.term('select_acc.table.column.acc_name')}" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
                     <a href="/core_component/acc/${acc.accId}" target="_new">#{selectACCBean.getObjectClassTermByAccId(acc.accId)}</a>
                 </p:column>
 
@@ -57,6 +57,29 @@
                     <h:outputText value="#{acc.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                     </h:outputText>
+                </p:column>
+
+                <p:column style="width: 120px; text-align: center;"
+                          headerText="Deprecated" sortBy="#{acc.isDeprecated()}">
+                    <h:panelGroup rendered="#{acc.isDeprecated()}">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{!acc.isDeprecated()}">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column style="width: 100px; text-align: center;" headerText="State"
+                          sortBy="#{acc.state}">
+                    <h:panelGroup rendered="#{acc.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{acc.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{acc.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
                 </p:column>
             </p:dataTable>
         </p:panel>

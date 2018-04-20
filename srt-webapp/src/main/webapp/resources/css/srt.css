@@ -1123,3 +1123,14 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
     width: 65px;
 }
 
+.height-0 {
+    height: 0px;
+}
+
+.height-50 {
+    height: 50px;
+}
+
+.height-70 {
+    height: 70px;
+}
