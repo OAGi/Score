@@ -35,7 +35,7 @@
                     <div class="col-md-5 col-sm-5">
                         <h:outputText value="Type" styleClass="option-header"/>
                         <h:panelGrid styleClass="option-panel" style="margin-top: 15px;">
-                            <h:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
+                            <p:selectManyCheckbox id="typeCB" styleClass="option-radio-grid"
                                                   value="#{coreComponentBean.selectedTypes}">
                                 <f:selectItem itemLabel="ACC" itemValue="ACC"/>
                                 <f:selectItem itemLabel="ASCC" itemValue="ASCC"/>
@@ -43,7 +43,7 @@
                                 <f:selectItem itemLabel="BCC" itemValue="BCC"/>
                                 <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
                                 <p:ajax update="form" listener="#{coreComponentBean.onTypeChange}"/>
-                            </h:selectManyCheckbox>
+                            </p:selectManyCheckbox>
 
                             <p:tooltip id="toolTipCheckboxACC" for="typeCB[0:label]"
                                        rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
@@ -66,15 +66,6 @@
                                        value="#{resourceBean.term('list_core_component.checkbox.bccp.tooltip')}"
                                        position="top"/>
                         </h:panelGrid>
-
-                        <script>
-                            $('label').each(function () {
-                                var val_for = $(this).attr('for');
-                                if (val_for !== undefined) {
-                                    $(this).attr('id', val_for + ':label');
-                                }
-                            });
-                        </script>
                     </div>
                     <div class="col-md-5 col-sm-5">
                         <h:outputText value="State" styleClass="option-header"/>
