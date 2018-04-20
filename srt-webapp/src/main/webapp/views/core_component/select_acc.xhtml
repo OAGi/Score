@@ -10,6 +10,9 @@
                 <h2 class="subhead-heading">${resourceBean.term('select_acc.title')}</h2>
             </div>
         </div>
+
+        <p:growl id="growl" showDetail="true" life="3000"/>
+
         <p:panel>
             <f:facet name="header">
                 <p:autoComplete id="objectClassTerm" value="#{selectACCBean.objectClassTerm}"
@@ -28,10 +31,17 @@
                          paginator="true" paginatorPosition="bottom" rows="10"
                          style="width: 100%; margin-bottom: 20px;"
                          value="#{selectACCBean.accList}" rowKey="#{acc.accId}">
-                <p:ajax event="rowSelect" update=":form:btnGroup"
+                <p:ajax event="rowSelect" update=":form:tblACC, :form:btnGroup"
                         listener="#{selectACCBean.onACCSelect}"/>
-                <p:ajax event="rowUnselect" update=":form:btnGroup"
+                <p:ajax event="rowUnselect" update=":form:tblACC, :form:btnGroup"
                         listener="#{selectACCBean.onACCUnselect}"/>
+
+                <p:column style="width: 50px; text-align: center;">
+                    <p:selectBooleanCheckbox
+                            value="#{selectACCBean.getAccCheckBox(acc.accId).checked}">
+                        <p:ajax update=":form:tblACC, :form:btnGroup"/>
+                    </p:selectBooleanCheckbox>
+                </p:column>
 
                 <p:column headerText="${resourceBean.term('select_acc.table.column.acc_name')}" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
                     <a href="/core_component/acc/${acc.accId}" target="_new">#{selectACCBean.getObjectClassTermByAccId(acc.accId)}</a>

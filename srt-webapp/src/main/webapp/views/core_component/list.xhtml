@@ -3,7 +3,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 template="../../template.xhtml">
 
     <p:importConstants type="org.oagi.srt.web.jsf.converters.ReleaseConverter" var="ReleaseConverter"/>
@@ -43,15 +42,6 @@
                                 <f:selectItem itemLabel="ASCCP" itemValue="ASCCP"/>
                                 <f:selectItem itemLabel="BCC" itemValue="BCC"/>
                                 <f:selectItem itemLabel="BCCP" itemValue="BCCP"/>
-
-                                <script>
-                                    $('label').each(function () {
-                                        var val_for = $(this).attr('for');
-                                        if (val_for !== undefined) {
-                                            $(this).attr('id', val_for + ':label');
-                                        }
-                                    });
-                                </script>
                                 <p:ajax update="form" listener="#{coreComponentBean.onTypeChange}"/>
                             </h:selectManyCheckbox>
 
@@ -76,6 +66,15 @@
                                        value="#{resourceBean.term('list_core_component.checkbox.bccp.tooltip')}"
                                        position="top"/>
                         </h:panelGrid>
+
+                        <script>
+                            $('label').each(function () {
+                                var val_for = $(this).attr('for');
+                                if (val_for !== undefined) {
+                                    $(this).attr('id', val_for + ':label');
+                                }
+                            });
+                        </script>
                     </div>
                     <div class="col-md-5 col-sm-5">
                         <h:outputText value="State" styleClass="option-header"/>

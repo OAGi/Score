@@ -10,6 +10,9 @@
                 <h2 class="subhead-heading">${resourceBean.term('select_bdt.title')}</h2>
             </div>
         </div>
+
+        <p:growl id="growl" showDetail="true" life="3000"/>
+
         <p:panel>
             <f:facet name="header">
                 <p:autoComplete id="qualifierDataTypeTerm" value="#{selectBDTBean.qualifierDataTypeTerm}"
@@ -28,10 +31,17 @@
                          paginator="true" paginatorPosition="bottom" rows="10"
                          style="width: 100%; margin-bottom: 20px;"
                          value="#{selectBDTBean.bdtList}" rowKey="#{bdt.dtId}">
-                <p:ajax event="rowSelect" update=":form:btnGroup"
+                <p:ajax event="rowSelect" update=":form:tblBDT, :form:btnGroup"
                         listener="#{selectBDTBean.onBDTSelect}"/>
-                <p:ajax event="rowUnselect" update=":form:btnGroup"
+                <p:ajax event="rowUnselect" update=":form:tblBDT, :form:btnGroup"
                         listener="#{selectBDTBean.onBDTUnselect}"/>
+
+                <p:column style="width: 50px; text-align: center;">
+                    <p:selectBooleanCheckbox
+                            value="#{selectBDTBean.getBdtCheckBox(bdt.dtId).checked}">
+                        <p:ajax update=":form:tblBDT, :form:btnGroup"/>
+                    </p:selectBooleanCheckbox>
+                </p:column>
 
                 <p:column headerText="${resourceBean.term('select_bdt.table.column.den')}" sortBy="#{bdt.den}">
                     <h:outputText value="#{bdt.den}"/>

@@ -20,8 +20,10 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -44,6 +46,7 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
     private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<DataType> bdtList;
+    private Map<Long, DataType> allBdtMap;
     private String qualifierDataTypeTerm;
     private DataType selectedBDT;
 
@@ -81,6 +84,8 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
     public void setBdtList(List<DataType> bdtList) {
         this.bdtList = bdtList;
+        this.allBdtMap = bdtList.stream()
+                .collect(Collectors.toMap(DataType::getDtId, Function.identity()));
     }
 
     public String getQualifierDataTypeTerm() {
@@ -97,14 +102,52 @@ public class SelectBDTBean extends AbstractCoreComponentBean {
 
     public void setSelectedBDT(DataType selectedBDT) {
         this.selectedBDT = selectedBDT;
+        getBdtCheckBox(selectedBDT.getDtId()).setChecked(true);
     }
 
     public void onBDTSelect(SelectEvent event) {
         setSelectedBDT((DataType) event.getObject());
+        getBdtCheckBox(((DataType) event.getObject()).getDtId()).setChecked(true);
     }
 
     public void onBDTUnselect(UnselectEvent event) {
         setSelectedBDT(null);
+        getBdtCheckBox(((DataType) event.getObject()).getDtId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> bdtCheckBoxes = new HashMap();
+
+    public class BdtCheckBox {
+        private Long bdtId;
+
+        public BdtCheckBox(Long bdtId) {
+            this.bdtId = bdtId;
+        }
+
+        public boolean isChecked() {
+            return bdtCheckBoxes.getOrDefault(bdtId, false);
+        }
+
+        public void setChecked(boolean value) {
+            bdtCheckBoxes = new HashMap();
+
+            if (value) {
+                DataType previousOne = getSelectedBDT();
+                if (previousOne != null) {
+                    bdtCheckBoxes.put(previousOne.getDtId(), false);
+                }
+
+                selectedBDT = allBdtMap.get(bdtId);
+            } else {
+                selectedBDT = null;
+            }
+
+            bdtCheckBoxes.put(bdtId, value);
+        }
+    }
+
+    public BdtCheckBox getBdtCheckBox(Long bdtId) {
+        return new BdtCheckBox(bdtId);
     }
 
     public List<String> completeInput(String query) {
