@@ -1546,7 +1546,7 @@ public class ProfileBODGenerateService {
         @Override
         public File asFile(String filename) throws IOException {
             File tempFile = File.createTempFile(Utility.generateGUID(), null);
-            tempFile = new File(tempFile.getParentFile(), filename + ".xml");
+            tempFile = new File(tempFile.getParentFile(), filename + ".xsd");
 
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
             try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile))) {

@@ -168,14 +168,14 @@ public class ProfileBODGenerationBean extends UIHandler {
         String fileName = file.getName();
 
         String contentType;
-        if (fileName.endsWith(".xml")) {
+        if (fileName.endsWith(".xsd")) {
             contentType = "text/xml";
         } else if (fileName.endsWith(".json")) {
             contentType = "application/json";
         } else if (fileName.endsWith(".zip")) {
             contentType = "application/zip";
         } else {
-            contentType = "text/plain";
+            contentType = "application/octet-stream";
         }
 
         return new DefaultStreamedContent(stream, contentType, fileName);
