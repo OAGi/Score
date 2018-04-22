@@ -1707,6 +1707,10 @@ public class ProfileBODGenerateService {
             }
             ((Map<String, Object>) parent.get("properties")).put(name, properties);
 
+            String definition = abie.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("description", definition);
+            }
             properties.put("type", "object");
             properties.put("required", new ArrayList());
             properties.put("additionalProperties", false);
@@ -1965,7 +1969,7 @@ public class ProfileBODGenerateService {
 
             String definition = bbieSc.getDefinition();
             if (!StringUtils.isEmpty(definition)) {
-                parent.put("description", definition);
+                properties.put("description", definition);
             }
 
             CodeList codeList = generationContext.getCodeList(bbieSc);
