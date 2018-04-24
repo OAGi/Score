@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.UserRepository;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class TransferProfileBODOwnershipBean extends UIHandler {
+public class TransferBIEOwnershipBean extends UIHandler {
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
@@ -153,6 +153,6 @@ public class TransferProfileBODOwnershipBean extends UIHandler {
 
         bieService.transferOwner(topLevelAbie, selectedUser);
 
-        return "/views/profile_bod/list.jsf?faces-redirect=true";
+        return "/views/profile_bie/list.jsf?faces-redirect=true";
     }
 }

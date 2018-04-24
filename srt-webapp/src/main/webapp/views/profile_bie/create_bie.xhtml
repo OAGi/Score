@@ -8,13 +8,13 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{resourceBean.term('create_profile_bod.title')}</h2>
+                <h2 class="subhead-heading">#{resourceBean.term('create_bie.title')}</h2>
             </div>
         </div>
 
         <p:growl id="growl" showDetail="true" life="3000"/>
 
-        <p:wizard flowListener="#{createProfileBODBean.onFlowProcess}" id="wizard" widgetVar="wizard"
+        <p:wizard flowListener="#{createBIEBean.onFlowProcess}" id="wizard" widgetVar="wizard"
                   showNavBar="false" onback="onBack();" onnext="onNext();">
 
             <!--
@@ -29,37 +29,37 @@
                     <f:facet name="header">
                         <div class="row">
                             <div class="col-md-2 dropdown-container">
-                                <p:selectOneMenu id="release" value="#{createProfileBODBean.release}"
+                                <p:selectOneMenu id="release" value="#{createBIEBean.release}"
                                                  converter="#{releaseConverter}" style="width: 150px">
-                                    <p:ajax listener="#{createProfileBODBean.onReleaseChange}"
+                                    <p:ajax listener="#{createBIEBean.onReleaseChange}"
                                             update=":form:growl, :form"/>
-                                    <f:selectItems value="#{createProfileBODBean.releases}" var="release"
+                                    <f:selectItems value="#{createBIEBean.releases}" var="release"
                                                    itemLabel="#{release.releaseNum}"
                                                    itemValue="#{release}"/>
                                 </p:selectOneMenu>
                             </div>
                             <div class="col-md-10">
                                 <div style="padding: 3px 0 3px 0;">
-                                    <h:outputLabel value="#{resourceBean.term('create_profile_bod.step1.input.property_term')}"
+                                    <h:outputLabel value="#{resourceBean.term('create_bie.step1.input.property_term')}"
                                                    style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? 180 : 340}px; font-weight: 400;"/>
                                     <p:inputText id="searchTextForPropertyTerm"
-                                                 value="#{createProfileBODBean.searchTextForPropertyTerm}"
+                                                 value="#{createBIEBean.searchTextForPropertyTerm}"
                                                  tabindex="1">
                                         <f:ajax/>
                                     </p:inputText>
                                 </div>
                                 <div style="padding: 3px 0 3px 0;">
-                                    <h:outputLabel value="#{resourceBean.term('create_profile_bod.step1.input.module')}"
+                                    <h:outputLabel value="#{resourceBean.term('create_bie.step1.input.module')}"
                                                    style="width: #{resourceBean.termKeyPrefix() eq 'ccts' ? 180 : 340}px; font-weight: 400;"/>
                                     <p:inputText id="searchTextForModule"
-                                                 value="#{createProfileBODBean.searchTextForModule}"
+                                                 value="#{createBIEBean.searchTextForModule}"
                                                  tabindex="2">
                                         <f:ajax/>
                                     </p:inputText>
 
                                     <p:commandButton id="searchBtn" value="Search" ajax="true"
                                                      style="margin-left: 10px;"
-                                                     actionListener="#{createProfileBODBean.search}"
+                                                     actionListener="#{createBIEBean.search}"
                                                      update=":form:growl, :form:tbl1" icon="fa fa-white fa-search"/>
                                 </div>
 
@@ -67,21 +67,21 @@
                             </div>
                         </div>
                     </f:facet>
-                    <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
+                    <p:dataTable id="tbl1" var="topLevelConcept" value="#{createBIEBean.topLevelConcepts}"
                                  paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                  paginator="true" paginatorPosition="bottom" rows="10"
                                  style="width: 100%; margin-bottom: 20px"
-                                 selection="#{createProfileBODBean.selectedTopLevelConcept}"
+                                 selection="#{createBIEBean.selectedTopLevelConcept}"
                                  rowKey="#{topLevelConcept.asccpId}"
                                  selectionMode="single">
-                        <p:ajax event="rowSelect" listener="#{createProfileBODBean.onTopLevelConceptSelect}"
+                        <p:ajax event="rowSelect" listener="#{createBIEBean.onTopLevelConceptSelect}"
                                 update=":form:growl, :form:tbl1"/>
-                        <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onTopLevelConceptUnselect}"
+                        <p:ajax event="rowUnselect" listener="#{createBIEBean.onTopLevelConceptUnselect}"
                                 update=":form:growl, :form:tbl1"/>
 
                         <p:column style="width: 50px; text-align: center;">
                             <p:selectBooleanCheckbox
-                                    value="#{createProfileBODBean.getTopLevelConceptCheckBox(topLevelConcept.asccpId).checked}">
+                                    value="#{createBIEBean.getTopLevelConceptCheckBox(topLevelConcept.asccpId).checked}">
                                 <p:ajax update=":form:growl, :form:tbl1"/>
                             </p:selectBooleanCheckbox>
                         </p:column>
@@ -114,17 +114,17 @@
                     <h:outputText value="Select Business Context"/>
                 </f:facet>
                 <p:panel header="Selected Top-Level Concept">
-                    <p:dataTable var="topLevelConcept" value="#{createProfileBODBean.selectedTopLevelConcept}"
+                    <p:dataTable var="topLevelConcept" value="#{createBIEBean.selectedTopLevelConcept}"
                                  style="width: 100%; margin-bottom: 20px;">
                         <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Release">
-                            <h:outputText value="#{createProfileBODBean.release.releaseNum}"/>
+                            <h:outputText value="#{createBIEBean.release.releaseNum}"/>
                         </p:column>
 
-                        <p:column style="width: 40%" headerText="#{resourceBean.term('create_profile_bod.step2.table.column.asccp_property_term')}">
+                        <p:column style="width: 40%" headerText="#{resourceBean.term('create_bie.step2.table.column.asccp_property_term')}">
                             <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                         </p:column>
 
-                        <p:column headerText="#{resourceBean.term('create_profile_bod.step2.table.column.module')}" styleClass="ellipsis">
+                        <p:column headerText="#{resourceBean.term('create_bie.step2.table.column.module')}" styleClass="ellipsis">
                             <h:outputText value="#{topLevelConcept.module}"/>
                         </p:column>
 
@@ -137,22 +137,22 @@
                 </p:panel>
                 <p:panel>
                     <p:dataTable id="tbl2" var="businessContext"
-                                 value="#{createProfileBODBean.businessContexts}"
+                                 value="#{createBIEBean.businessContexts}"
                                  paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                  paginator="true" paginatorPosition="bottom" rows="10"
                                  style="width: 100%; margin-bottom:20px"
-                                 selection="#{createProfileBODBean.selectedBusinessContext}"
+                                 selection="#{createBIEBean.selectedBusinessContext}"
                                  selectionMode="single"
                                  rowKey="#{businessContext.bizCtxId}">
 
-                        <p:ajax event="rowSelect" listener="#{createProfileBODBean.onBusinessContextSelect}"
+                        <p:ajax event="rowSelect" listener="#{createBIEBean.onBusinessContextSelect}"
                                 update=":form:growl, :form:tbl2"/>
-                        <p:ajax event="rowUnselect" listener="#{createProfileBODBean.onBusinessContextUnselect}"
+                        <p:ajax event="rowUnselect" listener="#{createBIEBean.onBusinessContextUnselect}"
                                 update=":form:growl, :form:tbl2"/>
 
                         <p:column style="width: 50px; text-align: center;">
                             <p:selectBooleanCheckbox
-                                    value="#{createProfileBODBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
+                                    value="#{createBIEBean.getBusinessContextCheckBox(businessContext.bizCtxId).checked}">
                                 <p:ajax update=":form:growl, :form:tbl2"/>
                             </p:selectBooleanCheckbox>
                         </p:column>
@@ -176,7 +176,7 @@
                              value="Next" icon="fa fa-white fa-arrow-right" oncomplete="PF('wizard').next();"/>
             <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" update=":form:growl"
                              onclick="onSubmit();"
-                             value="Submit" icon="fa fa-white fa-check" action="#{createProfileBODBean.submit()}"/>
+                             value="Submit" icon="fa fa-white fa-check" action="#{createBIEBean.submit()}"/>
         </p:panel>
 
         <script>

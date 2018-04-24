@@ -35,15 +35,15 @@
                         </p:column>
                         <p:column>
                             <p:commandButton value="Add" icon="fa fa-white fa-external-link"
-                                             actionListener="#{profileBODHandler.chooseABIE}">
-                                <p:ajax event="dialogReturn" listener="#{profileBODHandler.onABIEChosen}"
+                                             actionListener="#{ProfileBIEHandler.chooseABIE}">
+                                <p:ajax event="dialogReturn" listener="#{ProfileBIEHandler.onABIEChosen}"
                                         update=":form:tbl"/>
                             </p:commandButton>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column colspan="2">
-                            <p:dataTable id="tbl" var="abieView" value="#{profileBODHandler.abieViewList}"
+                            <p:dataTable id="tbl" var="abieView" value="#{ProfileBIEHandler.abieViewList}"
                                          style="width:800px; margin-bottom:20px">
 
                                 <p:column style="width:200px">
@@ -128,11 +128,11 @@
                 <p:separator/>
                 <h:panelGrid id="grid44" cellpadding="5" columns="2" styleClass="companyHeaderGrid">
                     <p:commandButton value="Generate" update="downloadButton" icon="fa fa-white fa-external-link"
-                                     actionListener="#{profileBODHandler.generate}"/>
+                                     actionListener="#{ProfileBIEHandler.generate}"/>
                     <p:commandButton id="downloadButton" value="Download"
-                                     disabled="#{profileBODHandler.filePath eq null ? true : false}" ajax="false"
+                                     disabled="#{ProfileBIEHandler.filePath eq null ? true : false}" ajax="false"
                                      icon="fa fa-white fa-arrow-down">
-                        <p:fileDownload value="#{profileBODHandler.file}"/>
+                        <p:fileDownload value="#{ProfileBIEHandler.file}"/>
                     </p:commandButton>
                 </h:panelGrid>
             </p:panel>

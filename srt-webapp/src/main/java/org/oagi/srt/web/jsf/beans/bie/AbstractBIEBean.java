@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.node.*;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
-abstract class AbstractProfileBODBean extends UIHandler {
+abstract class AbstractBIEBean extends UIHandler {
 
     @Autowired
     private NodeService nodeService;

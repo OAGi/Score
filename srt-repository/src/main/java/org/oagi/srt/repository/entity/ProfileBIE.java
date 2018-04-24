@@ -61,7 +61,7 @@ import java.util.Date;
         }
 )
 @Entity
-public class ProfileBOD {
+public class ProfileBIE {
 
     @Id
     private long topLevelAbieId;
@@ -110,10 +110,10 @@ public class ProfileBOD {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
 
-    public ProfileBOD() {
+    public ProfileBIE() {
     }
 
-    public ProfileBOD(long topLevelAbieId, long abieId, String version, String status, long asbiepId, long asccpId, Long releaseId,
+    public ProfileBIE(long topLevelAbieId, long abieId, String version, String status, long asbiepId, long asccpId, Long releaseId,
                       String propertyTerm, long bizCtxId, String bizCtxName, String releaseNum,
                       AggregateBusinessInformationEntityState state, long ownerUserId, String ownerName, Date creationTimestamp) {
         this.topLevelAbieId = topLevelAbieId;
@@ -258,7 +258,7 @@ public class ProfileBOD {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ProfileBOD that = (ProfileBOD) o;
+        ProfileBIE that = (ProfileBIE) o;
 
         if (topLevelAbieId != 0L && topLevelAbieId == that.topLevelAbieId) return true;
         return false;
@@ -286,7 +286,7 @@ public class ProfileBOD {
 
     @Override
     public String toString() {
-        return "ProfileBOD{" +
+        return "ProfileBIE{" +
                 "topLevelAbieId=" + topLevelAbieId +
                 ", abieId=" + abieId +
                 ", version='" + version + '\'' +

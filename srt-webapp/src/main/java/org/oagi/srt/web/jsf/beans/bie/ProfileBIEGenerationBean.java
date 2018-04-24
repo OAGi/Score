@@ -1,8 +1,8 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
-import org.oagi.srt.repository.ProfileBODRepository;
-import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.ProfileBIERepository;
+import org.oagi.srt.repository.entity.ProfileBIE;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ProfileBODGenerateService;
@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODGenerationBean extends UIHandler {
+public class ProfileBIEGenerationBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private ProfileBODRepository profileBODRepository;
+    private ProfileBIERepository profileBIERepository;
     @Autowired
     private ProfileBODGenerateService profileBODGenerateService;
 
@@ -49,16 +49,16 @@ public class ProfileBODGenerationBean extends UIHandler {
 
     private ProfileBODGenerationOption option = new ProfileBODGenerationOption();
 
-    private List<ProfileBOD> allProfileBODs;
+    private List<ProfileBIE> allProfileBIEs;
     private String selectedPropertyTerm;
-    private List<ProfileBOD> profileBODs;
-    private List<ProfileBOD> selectedProfileBODs;
+    private List<ProfileBIE> profileBIEs;
+    private List<ProfileBIE> selectedProfileBIEs;
 
     @PostConstruct
     public void init() {
         User currentUser = getCurrentUser();
-        allProfileBODs = profileBODRepository.findAll();
-        allProfileBODs = allProfileBODs.stream()
+        allProfileBIEs = profileBIERepository.findAll();
+        allProfileBIEs = allProfileBIEs.stream()
                 .filter(e -> bieService.canUserGenerateThisProfileBOD(e, currentUser)).collect(Collectors.toList());
         search();
     }
@@ -71,12 +71,12 @@ public class ProfileBODGenerationBean extends UIHandler {
         this.option = option;
     }
 
-    public List<ProfileBOD> getAllProfileBODs() {
-        return allProfileBODs;
+    public List<ProfileBIE> getAllProfileBIEs() {
+        return allProfileBIEs;
     }
 
-    public void setAllProfileBODs(List<ProfileBOD> allProfileBODs) {
-        this.allProfileBODs = allProfileBODs;
+    public void setAllProfileBIEs(List<ProfileBIE> allProfileBIEs) {
+        this.allProfileBIEs = allProfileBIEs;
     }
 
     public String getSelectedPropertyTerm() {
@@ -87,33 +87,33 @@ public class ProfileBODGenerationBean extends UIHandler {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
-    public List<ProfileBOD> getProfileBODs() {
-        return profileBODs;
+    public List<ProfileBIE> getProfileBIEs() {
+        return profileBIEs;
     }
 
-    public void setProfileBODs(List<ProfileBOD> profileBODs) {
-        this.profileBODs = profileBODs;
+    public void setProfileBIEs(List<ProfileBIE> profileBIEs) {
+        this.profileBIEs = profileBIEs;
     }
 
-    public List<ProfileBOD> getSelectedProfileBODs() {
-        return selectedProfileBODs;
+    public List<ProfileBIE> getSelectedProfileBIEs() {
+        return selectedProfileBIEs;
     }
 
-    public void setSelectedProfileBODs(List<ProfileBOD> selectedProfileBODs) {
-        this.selectedProfileBODs = selectedProfileBODs;
+    public void setSelectedProfileBIEs(List<ProfileBIE> selectedProfileBIEs) {
+        this.selectedProfileBIEs = selectedProfileBIEs;
     }
 
     public List<String> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
 
         if (StringUtils.isEmpty(q)) {
-            return allProfileBODs.stream()
+            return allProfileBIEs.stream()
                     .map(e -> e.getPropertyTerm())
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
-            return allProfileBODs.stream()
+            return allProfileBIEs.stream()
                     .map(e -> e.getPropertyTerm())
                     .distinct()
                     .filter(e -> {
@@ -131,28 +131,28 @@ public class ProfileBODGenerationBean extends UIHandler {
 
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
-        List<ProfileBOD> profileBODs;
+        List<ProfileBIE> profileBIES;
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            profileBODs = allProfileBODs.stream()
-                    .sorted(Comparator.comparing(ProfileBOD::getPropertyTerm))
+            profileBIES = allProfileBIEs.stream()
+                    .sorted(Comparator.comparing(ProfileBIE::getPropertyTerm))
                     .collect(Collectors.toList());
         } else {
-            profileBODs = allProfileBODs.stream()
+            profileBIES = allProfileBIEs.stream()
                     .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
                     .collect(Collectors.toList());
         }
 
-        Collections.sort(profileBODs, (a, b) ->
+        Collections.sort(profileBIES, (a, b) ->
                 (int) (b.getCreationTimestamp().getTime() - a.getCreationTimestamp().getTime()));
-        setProfileBODs(profileBODs);
+        setProfileBIEs(profileBIES);
     }
 
     private File generateSchemaFile;
 
     public void generate() throws Exception {
         List<Long> topLevelAbieIds = new ArrayList();
-        for (ProfileBOD selectedProfileBOD : getSelectedProfileBODs()) {
-            topLevelAbieIds.add(selectedProfileBOD.getTopLevelAbieId());
+        for (ProfileBIE selectedProfileBIE : getSelectedProfileBIEs()) {
+            topLevelAbieIds.add(selectedProfileBIE.getTopLevelAbieId());
         }
 
         ProfileBODGenerationOption option = getOption();

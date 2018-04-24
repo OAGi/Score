@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.apache.lucene.store.Directory;
 import org.oagi.srt.model.node.ASBIEPNode;
@@ -41,7 +41,7 @@ import static org.oagi.srt.common.util.Utility.createDirectory;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class CreateProfileBODBean extends AbstractProfileBODBean {
+public class CreateBIEBean extends AbstractBIEBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -449,7 +449,7 @@ public class CreateProfileBODBean extends AbstractProfileBODBean {
             long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
 
             FacesContext.getCurrentInstance().getExternalContext().redirect(
-                    "/profile_bod/" + topLevelAbieId);
+                    "/profile_bie/" + topLevelAbieId);
         } finally {
             requestContext.execute("PF('loadingBlock').hide()");
         }

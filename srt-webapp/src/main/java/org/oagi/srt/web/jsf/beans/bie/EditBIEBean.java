@@ -1,4 +1,4 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.model.node.ASBIEPNode;
 import org.oagi.srt.model.node.BBIEPNode;
@@ -45,7 +45,7 @@ import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityS
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class EditProfileBODBean extends AbstractProfileBODBean implements Validator {
+public class EditBIEBean extends AbstractBIEBean implements Validator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -88,7 +88,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
             return;
         }
 
-        if (!bieService.canUserSeeThisProfileBOD(topLevelAbieId, getCurrentUser())) {
+        if (!bieService.canUserSeeThisProfileBIE(topLevelAbieId, getCurrentUser())) {
             return;
         }
 
@@ -296,7 +296,7 @@ public class EditProfileBODBean extends AbstractProfileBODBean implements Valida
             throw t;
         }
 
-        return "/views/profile_bod/list.jsf?faces-redirect=true";
+        return "/views/profile_bie/list.jsf?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)

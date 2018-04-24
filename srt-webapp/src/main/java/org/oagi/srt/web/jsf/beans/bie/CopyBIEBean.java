@@ -1,9 +1,9 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.model.node.ASBIEPNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.entity.ProfileBIE;
 import org.oagi.srt.repository.entity.Release;
 import org.oagi.srt.repository.entity.TopLevelAbie;
 import org.oagi.srt.service.NodeService;
@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class CopyProfileBODBean extends AbstractProfileBODBean {
+public class CopyBIEBean extends AbstractBIEBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private ProfileBODRepository profileBODRepository;
+    private ProfileBIERepository profileBIERepository;
     private String currentStep;
 
     /*
@@ -52,11 +52,11 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     /*
      * for 'Select Top-Level ABIE' Step
      */
-    private List<ProfileBOD> allProfileBODs;
-    private Map<Long, ProfileBOD> allProfileBODMap;
+    private List<ProfileBIE> allProfileBIES;
+    private Map<Long, ProfileBIE> allProfileBIEMap;
     private String selectedPropertyTerm;
-    private List<ProfileBOD> topLevelConcepts;
-    private ProfileBOD selectedProfileBOD;
+    private List<ProfileBIE> topLevelConcepts;
+    private ProfileBIE selectedProfileBIE;
 
     /*
      * for 'Select Business Context' Step
@@ -79,12 +79,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     @Autowired
     private ModuleRepository moduleRepository;
 
-    public List<ProfileBOD> getAllProfileBODs() {
-        if (allProfileBODs == null) {
-            allProfileBODs = profileBODRepository.findAll();
-            allProfileBODMap = allProfileBODs.stream().collect(Collectors.toMap(ProfileBOD::getTopLevelAbieId, Function.identity()));
+    public List<ProfileBIE> getAllProfileBIEs() {
+        if (allProfileBIES == null) {
+            allProfileBIES = profileBIERepository.findAll();
+            allProfileBIEMap = allProfileBIES.stream().collect(Collectors.toMap(ProfileBIE::getTopLevelAbieId, Function.identity()));
         }
-        return allProfileBODs;
+        return allProfileBIES;
     }
 
     public String getCurrentStep() {
@@ -119,83 +119,83 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
-    public void onProfileBODSelect(SelectEvent event) {
-        getProfileBODCheckBox(((ProfileBOD) event.getObject()).getTopLevelAbieId()).setChecked(true);
+    public void onProfileBIESelect(SelectEvent event) {
+        getProfileBIECheckBox(((ProfileBIE) event.getObject()).getTopLevelAbieId()).setChecked(true);
     }
 
-    public void onProfileBODUnselect(SelectEvent event) {
-        getProfileBODCheckBox(((ProfileBOD) event.getObject()).getTopLevelAbieId()).setChecked(false);
+    public void onProfileBIEUnselect(SelectEvent event) {
+        getProfileBIECheckBox(((ProfileBIE) event.getObject()).getTopLevelAbieId()).setChecked(false);
     }
 
-    private Map<Long, Boolean> profileBODCheckBoxes = new HashMap();
+    private Map<Long, Boolean> profileBIECheckBoxes = new HashMap();
 
-    public class ProfileBODCheckBox {
+    public class ProfileBIECheckBox {
         private Long topLevelAbieId;
 
-        public ProfileBODCheckBox(Long bizCtxId) {
+        public ProfileBIECheckBox(Long bizCtxId) {
             this.topLevelAbieId = bizCtxId;
         }
 
         public boolean isChecked() {
-            return profileBODCheckBoxes.getOrDefault(topLevelAbieId, false);
+            return profileBIECheckBoxes.getOrDefault(topLevelAbieId, false);
         }
 
         public void setChecked(boolean value) {
-            profileBODCheckBoxes = new HashMap();
+            profileBIECheckBoxes = new HashMap();
 
             RequestContext requestContext = RequestContext.getCurrentInstance();
             if (value) {
                 BusinessContext previousOne = getSelectedBusinessContext();
                 if (previousOne != null) {
-                    profileBODCheckBoxes.put(previousOne.getBizCtxId(), false);
+                    profileBIECheckBoxes.put(previousOne.getBizCtxId(), false);
                 }
 
-                selectedProfileBOD = allProfileBODMap.get(topLevelAbieId);
+                selectedProfileBIE = allProfileBIEMap.get(topLevelAbieId);
 
             } else {
-                selectedProfileBOD = null;
+                selectedProfileBIE = null;
             }
 
-            profileBODCheckBoxes.put(topLevelAbieId, value);
+            profileBIECheckBoxes.put(topLevelAbieId, value);
         }
     }
 
-    public ProfileBODCheckBox getProfileBODCheckBox(Long topLevelAbieId) {
-        return new ProfileBODCheckBox(topLevelAbieId);
+    public ProfileBIECheckBox getProfileBIECheckBox(Long topLevelAbieId) {
+        return new ProfileBIECheckBox(topLevelAbieId);
     }
 
-    public List<ProfileBOD> getProfileBODs() {
+    public List<ProfileBIE> getProfileBIEs() {
         if (topLevelConcepts == null) {
-            setProfileBODs(getAllProfileBODs().stream()
+            setProfileBIEs(getAllProfileBIEs().stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         }
         return topLevelConcepts;
     }
 
-    public void setProfileBODs(List<ProfileBOD> topLevelConcepts) {
+    public void setProfileBIEs(List<ProfileBIE> topLevelConcepts) {
         this.topLevelConcepts = topLevelConcepts;
     }
 
-    public ProfileBOD getSelectedProfileBOD() {
-        return selectedProfileBOD;
+    public ProfileBIE getSelectedProfileBIE() {
+        return selectedProfileBIE;
     }
 
-    public void setSelectedProfileBOD(ProfileBOD selectedProfileBOD) {
-        this.selectedProfileBOD = selectedProfileBOD;
+    public void setSelectedProfileBIE(ProfileBIE selectedProfileBIE) {
+        this.selectedProfileBIE = selectedProfileBIE;
     }
 
     public List<String> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
 
         if (StringUtils.isEmpty(q)) {
-            return getAllProfileBODs().stream()
+            return getAllProfileBIEs().stream()
                     .map(e -> e.getPropertyTerm())
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
-            return getAllProfileBODs().stream()
+            return getAllProfileBIEs().stream()
                     .map(e -> e.getPropertyTerm())
                     .distinct()
                     .filter(e -> {
@@ -214,12 +214,12 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setProfileBODs(getAllProfileBODs().stream()
+            setProfileBIEs(getAllProfileBIEs().stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         } else {
-            setProfileBODs(
-                    getAllProfileBODs().stream()
+            setProfileBIEs(
+                    getAllProfileBIEs().stream()
                             .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
@@ -321,10 +321,10 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
                     break;
 
                 case "step_2":
-                    if (selectedProfileBOD == null) {
+                    if (selectedProfileBIE == null) {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                        "'Profile BOD' must be selected."));
+                                        "'Profile BIE' must be selected."));
                         requestContext.update("growl");
                         nextStep = event.getOldStep();
 
@@ -381,7 +381,7 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
     public void copy() throws IOException {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
-            TopLevelAbie sourceTopLevelAbie = topLevelAbieRepository.findOne(selectedProfileBOD.getTopLevelAbieId());
+            TopLevelAbie sourceTopLevelAbie = topLevelAbieRepository.findOne(selectedProfileBIE.getTopLevelAbieId());
             createTreeNode(sourceTopLevelAbie);
 
             progressListener = new ProgressListener();
@@ -389,13 +389,13 @@ public class CopyProfileBODBean extends AbstractProfileBODBean {
             ASBIEPNode topLevelNode = getTopLevelNode();
             nodeService.validate(topLevelNode);
 
-            long releaseId = selectedProfileBOD.getReleaseId();
+            long releaseId = selectedProfileBIE.getReleaseId();
             Release release = (releaseId > 0L) ? releaseRepository.findOne(releaseId) : Release.WORKING_RELEASE;
             TopLevelAbie topLevelAbie = nodeService.copy(topLevelNode, release, getCurrentUser(), selectedBusinessContext, progressListener);
             long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
 
             FacesContext.getCurrentInstance().getExternalContext().redirect(
-                    "/profile_bod/" + topLevelAbieId);
+                    "/profile_bie/" + topLevelAbieId);
         } finally {
             requestContext.execute("PF('loadingBlock').hide()");
         }

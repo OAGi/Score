@@ -1,7 +1,7 @@
-package org.oagi.srt.web.jsf.beans.bod;
+package org.oagi.srt.web.jsf.beans.bie;
 
-import org.oagi.srt.repository.ProfileBODRepository;
-import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.ProfileBIERepository;
+import org.oagi.srt.repository.entity.ProfileBIE;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.UserService;
@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODBean extends UIHandler {
+public class ProfileBIEBean extends UIHandler {
 
     @Autowired
-    private ProfileBODRepository profileBODRepository;
+    private ProfileBIERepository profileBIERepository;
 
     @Autowired
     private BusinessInformationEntityService bieService;
@@ -34,29 +34,29 @@ public class ProfileBODBean extends UIHandler {
     @Autowired
     private UserService userService;
 
-    private List<ProfileBOD> allProfileBODs;
+    private List<ProfileBIE> allProfileBIEs;
     private String selectedPropertyTerm;
-    private List<ProfileBOD> profileBODs;
+    private List<ProfileBIE> profileBIEs;
 
-    private ProfileBOD selectedProfileBOD;
+    private ProfileBIE selectedProfileBIE;
 
     @PostConstruct
     public void init() {
         User user = getCurrentUser();
-        allProfileBODs = profileBODRepository.findAll();
-        setProfileBODs(
-                allProfileBODs.stream()
+        allProfileBIEs = profileBIERepository.findAll();
+        setProfileBIEs(
+                allProfileBIEs.stream()
                         .sorted((a, b) -> b.getCreationTimestamp().compareTo(a.getCreationTimestamp()))
                         .collect(Collectors.toList())
         );
     }
 
-    public List<ProfileBOD> getProfileBODs() {
-        return profileBODs;
+    public List<ProfileBIE> getProfileBIEs() {
+        return profileBIEs;
     }
 
-    public void setProfileBODs(List<ProfileBOD> profileBODs) {
-        this.profileBODs = profileBODs;
+    public void setProfileBIEs(List<ProfileBIE> profileBIEs) {
+        this.profileBIEs = profileBIEs;
     }
 
     public String getSelectedPropertyTerm() {
@@ -67,25 +67,25 @@ public class ProfileBODBean extends UIHandler {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
-    public ProfileBOD getSelectedProfileBOD() {
-        return selectedProfileBOD;
+    public ProfileBIE getSelectedProfileBIE() {
+        return selectedProfileBIE;
     }
 
-    public void setSelectedProfileBOD(ProfileBOD selectedProfileBOD) {
-        this.selectedProfileBOD = selectedProfileBOD;
+    public void setSelectedProfileBIE(ProfileBIE selectedProfileBIE) {
+        this.selectedProfileBIE = selectedProfileBIE;
     }
 
     public List<String> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
 
         if (StringUtils.isEmpty(q)) {
-            return allProfileBODs.stream()
+            return allProfileBIEs.stream()
                     .map(e -> e.getPropertyTerm())
                     .collect(Collectors.toList());
         } else {
             String[] split = q.split(" ");
 
-            return allProfileBODs.stream()
+            return allProfileBIEs.stream()
                     .map(e -> e.getPropertyTerm())
                     .distinct()
                     .filter(e -> {
@@ -104,12 +104,12 @@ public class ProfileBODBean extends UIHandler {
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setProfileBODs(allProfileBODs.stream()
+            setProfileBIEs(allProfileBIEs.stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         } else {
-            setProfileBODs(
-                    allProfileBODs.stream()
+            setProfileBIEs(
+                    allProfileBIEs.stream()
                             .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
@@ -117,17 +117,17 @@ public class ProfileBODBean extends UIHandler {
     }
 
     @Transactional
-    public void deleteProfileBOD() {
-        ProfileBOD profileBOD = getSelectedProfileBOD();
-        if (profileBOD == null) {
+    public void deleteProfileBIE() {
+        ProfileBIE profileBIE = getSelectedProfileBIE();
+        if (profileBIE == null) {
             return;
         }
 
-        bieService.deleteProfileBOD(profileBOD.getTopLevelAbieId());
+        bieService.deleteProfileBIE(profileBIE.getTopLevelAbieId());
         init();
     }
 
-    public boolean canCurrentUserSeeThisProfileBOD(ProfileBOD profileBOD) {
-        return bieService.canUserSeeThisProfileBOD(profileBOD.getTopLevelAbieId(), getCurrentUser());
+    public boolean canCurrentUserSeeThisProfileBIE(ProfileBIE profileBIE) {
+        return bieService.canUserSeeThisProfileBIE(profileBIE.getTopLevelAbieId(), getCurrentUser());
     }
 }

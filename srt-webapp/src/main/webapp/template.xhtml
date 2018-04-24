@@ -58,66 +58,66 @@
                             <div id="navbar-collapse-1">
                                 <ul class="nav navbar-nav">
                                     <li class="dropdown menu-first">
-                                        <h:outputLink id="menuProfileBods"
+                                        <h:outputLink id="menuProfileBIEs"
                                                       pt:href="#" styleClass="dropdown-toggle"
                                                       pt:data-toggle="dropdown" pt:role="button"
                                                       pt:aria-haspopup="true" pt:aria-expanded="false">
                                             <h:outputText value="Manage BIE"/>
                                             <span class="caret"></span>
                                         </h:outputLink>
-                                        <p:tooltip id="toolTipProfileBods" for="menuProfileBods"
+                                        <p:tooltip id="toolTipProfileBIEs" for="menuProfileBIEs"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('topmenu.profile_bods.tooltip')}"
+                                                   value="#{resourceBean.term('topmenu.manage_bie.tooltip')}"
                                                    position="left"/>
 
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <h:link styleClass="header-nav-link"
-                                                        id="menuCreateProfileBod"
-                                                        outcome="/views/profile_bod/create_profile_bod.jsf">
+                                                        id="menuCreateBIE"
+                                                        outcome="/views/profile_bie/create_bie.jsf">
                                                     <h:outputText
                                                             value="Create BIE"/>
                                                 </h:link>
-                                                <p:tooltip id="toolTipCreateProfileBod" for="menuCreateProfileBod"
+                                                <p:tooltip id="toolTipCreateBIE" for="menuCreateBIE"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                           value="#{resourceBean.term('submenu.create_profile_bod.tooltip')}"
+                                                           value="#{resourceBean.term('submenu.create_bie.tooltip')}"
                                                            position="right"/>
                                             </li>
                                             <li>
-                                                <h:link id="menuProfileBodList"
-                                                        outcome="/views/profile_bod/list.jsf">
+                                                <h:link id="menuBIEList"
+                                                        outcome="/views/profile_bie/list.jsf">
                                                     <h:outputText
                                                             value="BIE List"/>
                                                 </h:link>
-                                                <p:tooltip id="toolTipProfileBodList" for="menuProfileBodList"
+                                                <p:tooltip id="toolTipBIEList" for="menuBIEList"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                           value="#{resourceBean.term('submenu.profile_bod_list.tooltip')}"
+                                                           value="#{resourceBean.term('submenu.profile_bie_list.tooltip')}"
                                                            position="right"/>
                                             </li>
                                             <li>
-                                                <h:link id="menuCopyProfileBod"
-                                                        outcome="/views/profile_bod/copy_profile_bod.jsf">
+                                                <h:link id="menuCopyBIE"
+                                                        outcome="/views/profile_bie/copy_bie.jsf">
                                                     <h:outputText
                                                             value="Copy BIE"/>
                                                 </h:link>
-                                                <p:tooltip id="toolTipCopyProfileBod" for="menuCopyProfileBod"
+                                                <p:tooltip id="toolTipCopyBIE" for="menuCopyBIE"
                                                            rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                           value="#{resourceBean.term('submenu.copy_profile_bod.tooltip')}"
+                                                           value="#{resourceBean.term('submenu.copy_bie.tooltip')}"
                                                            position="right"/>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="dropdown">
-                                        <h:outputLink id="menuProfileBODExpression"
+                                        <h:outputLink id="menuProfileBIEExpression"
                                                       pt:href="#" styleClass="dropdown-toggle"
                                                       pt:data-toggle="dropdown" pt:role="button"
                                                       pt:aria-haspopup="true" pt:aria-expanded="false">
                                             <h:outputText value="Profile BIE Expression"/>
                                             <span class="caret"></span>
                                         </h:outputLink>
-                                        <p:tooltip id="toolTipProfileBODExpression" for="menuProfileBODExpression"
+                                        <p:tooltip id="toolTipProfileBIEExpression" for="menuProfileBIEExpression"
                                                    rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
-                                                   value="#{resourceBean.term('topmenu.profile_bod_expression.tooltip')}"
+                                                   value="#{resourceBean.term('topmenu.profile_bie_expression.tooltip')}"
                                                    position="left"/>
                                         <ul class="dropdown-menu">
                                             <li>

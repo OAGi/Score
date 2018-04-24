@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{resourceBean.term('profile_bod_expression.title')}</h2>
+                <h2 class="subhead-heading">#{resourceBean.term('profile_bie_expression.title')}</h2>
             </div>
         </div>
         <p:panel id="panel">
@@ -17,51 +17,51 @@
                 <div class="col-md-12 col-sm-12">
                     <p:panel>
                         <f:facet name="header">
-                            <p:autoComplete id="propertyTerm" value="#{profileBODGenerationBean.selectedPropertyTerm}"
-                                            completeMethod="#{profileBODGenerationBean.completeInput}" maxResults="20"
+                            <p:autoComplete id="propertyTerm" value="#{profileBIEGenerationBean.selectedPropertyTerm}"
+                                            completeMethod="#{profileBIEGenerationBean.completeInput}" maxResults="20"
                                             style="width: 440px; margin-right: 20px;">
                                 <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
                             <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                             actionListener="#{profileBODGenerationBean.search}"
+                                             actionListener="#{profileBIEGenerationBean.search}"
                                              update="tbl" icon="fa fa-white fa-search"/>
                         </f:facet>
-                        <p:dataTable id="tbl" var="profileBOD" value="#{profileBODGenerationBean.profileBODs}"
+                        <p:dataTable id="tbl" var="profileBIE" value="#{profileBIEGenerationBean.profileBIEs}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom" rows="10"
-                                     style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.topLevelAbieId}"
-                                     selection="#{profileBODGenerationBean.selectedProfileBODs}">
+                                     style="width: 100%; margin-bottom:20px" rowKey="#{profileBIE.topLevelAbieId}"
+                                     selection="#{profileBIEGenerationBean.selectedProfileBIEs}">
                             <p:column selectionMode="multiple" styleClass="table-checkbox"/>
-                            <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                                <h:outputText value="#{profileBOD.propertyTerm}"/>
+                            <p:column headerText="Name" sortBy="#{profileBIE.propertyTerm}">
+                                <h:outputText value="#{profileBIE.propertyTerm}"/>
                             </p:column>
                             <p:column style="width: 100px; text-align: center;" headerText="Release"
-                                      sortBy="#{profileBOD.releaseNum}">
-                                <h:outputText value="#{profileBOD.releaseNum}"/>
+                                      sortBy="#{profileBIE.releaseNum}">
+                                <h:outputText value="#{profileBIE.releaseNum}"/>
                             </p:column>
                             <p:column style="width: 200px; text-align: center;" headerText="Business Context"
-                                      sortBy="#{profileBOD.bizCtxName}">
-                                <h:outputText value="#{profileBOD.bizCtxName}"/>
+                                      sortBy="#{profileBIE.bizCtxName}">
+                                <h:outputText value="#{profileBIE.bizCtxName}"/>
                             </p:column>
                             <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                                      sortBy="#{profileBOD.ownerName}">
-                                <h:outputText value="#{profileBOD.ownerName}"/>
+                                      sortBy="#{profileBIE.ownerName}">
+                                <h:outputText value="#{profileBIE.ownerName}"/>
                             </p:column>
                             <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
-                                      sortBy="#{profileBOD.creationTimestamp}">
-                                <h:outputText value="#{profileBOD.creationTimestamp}">
+                                      sortBy="#{profileBIE.creationTimestamp}">
+                                <h:outputText value="#{profileBIE.creationTimestamp}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
                             <p:column style="width: 100px; text-align: center;" headerText="State"
-                                      sortBy="#{profileBOD.state}">
-                                <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
+                                      sortBy="#{profileBIE.state}">
+                                <h:panelGroup rendered="#{profileBIE.state == 'Editing'}">
                                     <span class="label label-primary">Editing</span>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                <h:panelGroup rendered="#{profileBIE.state == 'Candidate'}">
                                     <span class="label label-warning">Candidate</span>
                                 </h:panelGroup>
-                                <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
+                                <h:panelGroup rendered="#{profileBIE.state == 'Published'}">
                                     <span class="label label-default">Published</span>
                                 </h:panelGroup>
                             </p:column>
@@ -84,7 +84,7 @@
                         <h:panelGrid columns="2" styleClass="option-panel">
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="definitionCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieDefinition}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -92,7 +92,7 @@
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="remarkStatusCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.remarkAndStatus}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.remarkAndStatus}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption" styleClass="outputtext-disabled"/>
                                 </h:selectBooleanCheckbox>
@@ -102,16 +102,16 @@
                             <h:panelGroup styleClass="option-left"
                                           style="left: 20px;">
                                 <h:selectBooleanCheckbox id="inheritCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.inheritIfEmpty}"
-                                                         disabled="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.inheritIfEmpty}"
+                                                         disabled="#{profileBIEGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
                                 <h:outputText value="Inherit if empty"
-                                              styleClass="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'outputtext-disabled' : ''}"/>
+                                              styleClass="#{profileBIEGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="versionCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.bieVersion}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieVersion}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -120,7 +120,7 @@
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.bieGuid}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieGuid}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -128,7 +128,7 @@
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="termCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.businessTerm}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.businessTerm}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -137,7 +137,7 @@
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.businessContext}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.businessContext}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -145,7 +145,7 @@
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="othersCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.bieDocumentationOption.others}"
+                                                         value="#{profileBIEGenerationBean.option.bieDocumentationOption.others}"
                                                          disabled="true">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -159,7 +159,7 @@
                         <h:panelGrid columns="2" styleClass="option-panel">
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ccDefinitionCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.ccDocumentationOption.ccDefinition}"
+                                                         value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccDefinition}"
                                                          disabled="true">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -167,7 +167,7 @@
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="ccVersionCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.ccDocumentationOption.ccVersion}"
+                                                         value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccVersion}"
                                                          disabled="true">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -176,7 +176,7 @@
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ccguidCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.ccDocumentationOption.ccGuid}"
+                                                         value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccGuid}"
                                                          disabled="true">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -184,7 +184,7 @@
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="ccOthersCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBODGenerationBean.option.ccDocumentationOption.others}"
+                                                         value="#{profileBIEGenerationBean.option.ccDocumentationOption.others}"
                                                          disabled="true">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
@@ -203,7 +203,7 @@
                     <h:panelGrid id="schemaExpressionOption"
                                  columns="1" styleClass="option-panel" style="margin-top: 15px;">
                         <h:selectOneRadio id="expressionRadio" styleClass="option-radio"
-                                          value="#{profileBODGenerationBean.option.schemaExpression}">
+                                          value="#{profileBIEGenerationBean.option.schemaExpression}">
                             <f:selectItem itemValue="XML" itemLabel="XML Schema"/>
                             <f:selectItem itemValue="JSON" itemLabel="JSON Schema"/>
                             <f:ajax render=":form:schemaExpressionOption"/>
@@ -215,7 +215,7 @@
                     <h:panelGrid id="schemaPackageOption"
                                  columns="1" styleClass="option-panel" style="margin-top: 15px;">
                         <h:selectOneRadio id="packageRadio" styleClass="option-radio"
-                                          value="#{profileBODGenerationBean.option.schemaPackage}">
+                                          value="#{profileBIEGenerationBean.option.schemaPackage}">
                             <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
                             <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"/>
                             <f:ajax render=":form:schemaPackageOption"/>
@@ -228,9 +228,9 @@
         <h:panelGroup id="btnPanel" style="display: inline-block; margin-top: 20px;">
             <p:commandButton id="btnGenerate" ajax="false" value="Generate" icon="fa fa-white fa-external-link"
                              onclick="PrimeFaces.monitorDownload(function() { PF('loadingBlock').show(); }, function() { PF('loadingBlock').hide(); })"
-                             actionListener="#{profileBODGenerationBean.generate}"
-                             disabled="#{profileBODGenerationBean.selectedProfileBODs.isEmpty() == true}">
-                <p:fileDownload value="#{profileBODGenerationBean.file}"/>
+                             actionListener="#{profileBIEGenerationBean.generate}"
+                             disabled="#{profileBIEGenerationBean.selectedProfileBIEs.isEmpty() == true}">
+                <p:fileDownload value="#{profileBIEGenerationBean.file}"/>
             </p:commandButton>
         </h:panelGroup>
 
