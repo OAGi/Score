@@ -869,7 +869,7 @@ public class NodeService {
                             long basedAsccId = ascc.getAsccId();
                             AssociationBusinessInformationEntity asbie =
                                     asbieRepository.findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(basedAsccId, abieId, topLevelAbieId);
-                            if (asbie.isUsed()) {
+                            if (asbie != null && asbie.isUsed()) {
                                 sum++;
                             }
                         } else if (relation instanceof BasicCoreComponent) {
@@ -879,7 +879,7 @@ public class NodeService {
                             long bccId = bcc.getBccId();
                             BasicBusinessInformationEntity bbie =
                                     bbieRepository.findOneByBasedBccIdAndFromAbieIdAndOwnerTopLevelAbieId(bccId, abieId, topLevelAbieId);
-                            if (bbie.isUsed()) {
+                            if (bbie != null && bbie.isUsed()) {
                                 sum++;
                             }
                         }

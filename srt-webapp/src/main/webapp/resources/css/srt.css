@@ -1134,3 +1134,13 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 .height-70 {
     height: 70px;
 }
+
+.hideUnusedNodesBoolBtn span.ui-button-text {
+    border: 1px solid #d6d6d6;
+    background: #ffffff;
+    font-weight: normal;
+    color: #555555 !important;
+    display: block;
+    line-height: 8px !important;
+    font-size: 11px;
+}

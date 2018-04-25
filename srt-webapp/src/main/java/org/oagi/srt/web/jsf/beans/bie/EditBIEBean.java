@@ -141,6 +141,10 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         this.hideUnusedNodes = hideUnusedNodes;
     }
 
+    public void toggleHideUnusedNodes() {
+        setHideUnusedNodes(!isHideUnusedNodes());
+    }
+
     public void recreateTreeNode() {
         setSelectedTreeNode(null);
         createTreeNode(topLevelAbie, hideUnusedNodes);
