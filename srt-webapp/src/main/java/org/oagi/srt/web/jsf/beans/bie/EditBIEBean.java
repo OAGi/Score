@@ -78,6 +78,8 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     private Release release;
     private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
 
+    private boolean hideUnusedNodes;
+
     @PostConstruct
     public void init() {
         Long topLevelAbieId = Long.parseLong(
@@ -96,7 +98,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         Release release = releaseRepository.findOne(topLevelAbie.getReleaseId());
         setRelease(release);
 
-        createTreeNode(topLevelAbie);
+        createTreeNode(topLevelAbie, hideUnusedNodes);
 
         List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
                 bieUserExtRevisionRepository.findByTopLevelAbieId(topLevelAbieId);
@@ -129,6 +131,19 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
 
     public void setBieUserExtRevisionList(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
         this.bieUserExtRevisionList = bieUserExtRevisionList;
+    }
+
+    public boolean isHideUnusedNodes() {
+        return hideUnusedNodes;
+    }
+
+    public void setHideUnusedNodes(boolean hideUnusedNodes) {
+        this.hideUnusedNodes = hideUnusedNodes;
+    }
+
+    public void recreateTreeNode() {
+        setSelectedTreeNode(null);
+        createTreeNode(topLevelAbie, hideUnusedNodes);
     }
 
     public String encode(BusinessInformationEntityUserExtensionRevision bieUserExtRevision) {

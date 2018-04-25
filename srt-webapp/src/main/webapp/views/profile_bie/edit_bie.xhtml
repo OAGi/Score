@@ -9,6 +9,13 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
+                <div style="float: right;">
+                    <h:outputText value="Hide unused nodes" styleClass="section-label" style="position: relative !important; margin-right: 10px;"/>
+                    <h:selectBooleanCheckbox id="hideUnusedNodesCB"
+                                             value="${editBIEBean.hideUnusedNodes}">
+                        <p:ajax listener="#{editBIEBean.recreateTreeNode()}" update="@form"/>
+                    </h:selectBooleanCheckbox>
+                </div>
                 <h2 class="subhead-heading">
                     <h:outputText rendered="#{resourceBean.termKeyPrefix() eq 'ccts'}"
                                   value="#{editBIEBean.topLevelAbie.state eq 'Editing' ? 'Edit' : (editBIEBean.topLevelAbie.state eq 'Candidate' ? 'Review' : 'View')} #{resourceBean.term('edit_bie.title.suffix')}"/>
@@ -95,7 +102,10 @@
                     </div>
                     <div id="main_panel" class="col-md-7" style="max-height: 470px; overflow-y: scroll">
                         <div id="myAffix" style="overflow-y: auto;">
-                            <p:panel id="details" header="Details">
+                            <p:panel id="details">
+                                <f:facet name="header">
+                                    <h:outputText value="Details"/>
+                                </f:facet>
                                 <h:panelGroup id="editingPanel">
                                     <!--
                                         ABIE

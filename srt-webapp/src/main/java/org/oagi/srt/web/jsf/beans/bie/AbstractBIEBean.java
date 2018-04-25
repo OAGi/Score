@@ -44,7 +44,11 @@ abstract class AbstractBIEBean extends UIHandler {
     }
 
     TreeNode createTreeNode(TopLevelAbie topLevelAbie) {
-        ASBIEPNode topLevelNode = nodeService.createBusinessInformationEntityTreeNode(topLevelAbie);
+        return createTreeNode(topLevelAbie, false);
+    }
+
+    TreeNode createTreeNode(TopLevelAbie topLevelAbie, boolean hideUnusedNodes) {
+        ASBIEPNode topLevelNode = nodeService.createBusinessInformationEntityTreeNode(topLevelAbie, hideUnusedNodes);
         return createTreeNode(topLevelNode);
     }
 

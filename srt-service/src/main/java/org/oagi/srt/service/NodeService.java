@@ -748,7 +748,7 @@ public class NodeService {
     }
 
     public ASBIEPNode createBusinessInformationEntityTreeNode(
-            TopLevelAbie topLevelAbie) {
+            TopLevelAbie topLevelAbie, boolean hideUnusedNodes) {
 
         long releaseId = topLevelAbie.getReleaseId();
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
@@ -757,7 +757,7 @@ public class NodeService {
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
         AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
 
-        ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, releaseId, bizCtx);
+        ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, releaseId, bizCtx, hideUnusedNodes);
         return new AssociationBIEPropertyNodeImpl(asbiep, asccp, releaseId, abieNode);
     }
 
@@ -771,6 +771,7 @@ public class NodeService {
         private AggregateCoreComponent basedAcc;
         private final long releaseId;
         private BusinessContext bizCtx;
+        private boolean hideUnusedNodes;
 
         private Boolean hasChild = null;
         private List<BIENode> children = null;
@@ -784,11 +785,13 @@ public class NodeService {
 
         public ABIENodeImpl(AggregateBusinessInformationEntity abie,
                             AggregateCoreComponent acc,
-                            long releaseId, BusinessContext bizCtx) {
+                            long releaseId, BusinessContext bizCtx,
+                            boolean hideUnusedNodes) {
             this.abie = abie;
             this.basedAcc = acc;
             this.releaseId = releaseId;
             this.bizCtx = bizCtx;
+            this.hideUnusedNodes = hideUnusedNodes;
         }
 
         private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, BusinessContext bizCtx) {
@@ -840,6 +843,52 @@ public class NodeService {
 
         @Override
         public boolean hasChild() {
+            if (hideUnusedNodes) {
+                AggregateBusinessInformationEntity abie = getAbie();
+                if (abie.getAbieId() == 0L) {
+                    return false;
+                }
+
+                LinkedList<AggregateCoreComponent> accList = new LinkedList();
+                AggregateCoreComponent acc = this.basedAcc;
+                while (acc != null) {
+                    accList.add(acc);
+                    acc = coreComponentService.findBasedAcc(acc, releaseId, Published);
+                }
+
+                int sum = 0;
+                while (!accList.isEmpty()) {
+                    acc = accList.pollLast();
+
+                    List<CoreComponentRelation> associations = getAssociations(acc, releaseId, CoreComponentState.Published);
+                    for (CoreComponentRelation relation : associations) {
+                        if (relation instanceof AssociationCoreComponent) {
+                            AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
+                            long abieId = abie.getAbieId();
+                            long topLevelAbieId = abie.getOwnerTopLevelAbieId();
+                            long basedAsccId = ascc.getAsccId();
+                            AssociationBusinessInformationEntity asbie =
+                                    asbieRepository.findOneByBasedAsccIdAndFromAbieIdAndOwnerTopLevelAbieId(basedAsccId, abieId, topLevelAbieId);
+                            if (asbie.isUsed()) {
+                                sum++;
+                            }
+                        } else if (relation instanceof BasicCoreComponent) {
+                            BasicCoreComponent bcc = (BasicCoreComponent) relation;
+                            long abieId = abie.getAbieId();
+                            long topLevelAbieId = abie.getOwnerTopLevelAbieId();
+                            long bccId = bcc.getBccId();
+                            BasicBusinessInformationEntity bbie =
+                                    bbieRepository.findOneByBasedBccIdAndFromAbieIdAndOwnerTopLevelAbieId(bccId, abieId, topLevelAbieId);
+                            if (bbie.isUsed()) {
+                                sum++;
+                            }
+                        }
+                    }
+                }
+
+                return sum > 0;
+            }
+
             if (hasChild == null) {
                 AggregateCoreComponent acc = this.basedAcc;
                 while (acc != null) {
@@ -886,18 +935,24 @@ public class NodeService {
                         if (relation instanceof AssociationCoreComponent) {
                             AssociationCoreComponent ascc = (AssociationCoreComponent) relation;
                             AssociationBIEPropertyNodeImpl asbieChild =
-                                    new AssociationBIEPropertyNodeImpl(abie, ascc, releaseId, bizCtx, ++seqKey);
+                                    new AssociationBIEPropertyNodeImpl(abie, ascc, releaseId, bizCtx, ++seqKey, this.hideUnusedNodes);
                             asbieChild.setParent(parent);
 
+                            if (hideUnusedNodes && !asbieChild.isUsed()) {
+                                continue;
+                            }
                             children.add(asbieChild);
                         } else if (relation instanceof BasicCoreComponent) {
                             BasicCoreComponent bcc = (BasicCoreComponent) relation;
 
                             BasicBIEPropertyNodeImpl bbieChild =
                                     new BasicBIEPropertyNodeImpl(
-                                            abie, bcc, releaseId, (bcc.getEntityType() == Attribute ? 0 : ++seqKey));
+                                            abie, bcc, releaseId, (bcc.getEntityType() == Attribute ? 0 : ++seqKey), this.hideUnusedNodes);
                             bbieChild.setParent(parent);
 
+                            if (hideUnusedNodes && !bbieChild.isUsed()) {
+                                continue;
+                            }
                             children.add(bbieChild);
                         }
                     }
@@ -953,6 +1008,7 @@ public class NodeService {
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationCoreComponentProperty asccp;
         private final long releaseId;
+        private boolean hideUnusedNodes;
 
         private ABIENodeImpl type;
 
@@ -986,7 +1042,8 @@ public class NodeService {
                                               AssociationCoreComponent ascc,
                                               long releaseId,
                                               BusinessContext bizCtx,
-                                              int seqKey) {
+                                              int seqKey,
+                                              boolean hideUnusedNodes) {
             this.ascc = ascc;
             this.releaseId = releaseId;
 
@@ -1004,7 +1061,7 @@ public class NodeService {
                 AggregateBusinessInformationEntity roleOfAbie = abieRepository.findOne(asbiep.getRoleOfAbieId());
                 AggregateCoreComponent basedAcc = coreComponentService.findRoleOfAcc(asccp, releaseId, Published);
 
-                type = new ABIENodeImpl(roleOfAbie, basedAcc, releaseId, bizCtx);
+                type = new ABIENodeImpl(roleOfAbie, basedAcc, releaseId, bizCtx, hideUnusedNodes);
 
             } else {
                 asccp = coreComponentService.findAsccp(ascc, releaseId, Published);
@@ -1162,6 +1219,7 @@ public class NodeService {
         private BasicBusinessInformationEntity bbie;
         private BasicCoreComponent bcc;
         private final long releaseId;
+        private boolean hideUnusedNodes;
 
         private DataType bdt;
 
@@ -1171,9 +1229,11 @@ public class NodeService {
         public BasicBIEPropertyNodeImpl(AggregateBusinessInformationEntity fromAbie,
                                         BasicCoreComponent bcc,
                                         long releaseId,
-                                        int seqKey) {
+                                        int seqKey,
+                                        boolean hideUnusedNodes) {
             this.bcc = bcc;
             this.releaseId = releaseId;
+            this.hideUnusedNodes = hideUnusedNodes;
 
             long abieId = fromAbie.getAbieId();
             if (abieId > 0L) {
@@ -1256,6 +1316,27 @@ public class NodeService {
 
         @Override
         public boolean hasChild() {
+            if (hideUnusedNodes) {
+                long bbieId = bbie.getBbieId();
+                if (bbieId == 0L) {
+                    return false;
+                }
+
+                long bdtId = bdt.getDtId();
+
+                List<DataTypeSupplementaryComponent> dtScList =
+                        dtScRepository.findByOwnerDtId(bdtId)
+                                .stream()
+                                .filter(dtSc -> dtSc.getCardinalityMax() != 0)
+                                .collect(Collectors.toList());
+
+                long ownerTopLevelAbieId = bbie.getOwnerTopLevelAbieId();
+                return dtScList.stream().map(dtSc -> {
+                    long dtScId = dtSc.getDtScId();
+                    return bbieScRepository.findOneByBbieIdAndDtScIdAndOwnerTopLevelAbieId(bbieId, dtScId, ownerTopLevelAbieId);
+                }).mapToInt(e -> (e != null && e.isUsed()) ? 1 : 0).sum() > 0;
+            }
+
             if (hasChild == null) {
                 long bdtId = bdt.getDtId();
                 hasChild = dtScRepository.findByOwnerDtId(bdtId).stream().filter(e -> e.getCardinalityMax() != 0).count() > 0;
@@ -1266,7 +1347,6 @@ public class NodeService {
         @Override
         public Collection<? extends BIENode> getChildren() {
             if (children == null) {
-
                 long bdtId = bdt.getDtId();
 
                 List<DataTypeSupplementaryComponent> dtScList =
@@ -1315,6 +1395,9 @@ public class NodeService {
 
                     BBIESCNode bbieScNode =
                             new BasicBIESupplementaryComponentNodeImpl(this, bbieSc, bdtSc);
+                    if (hideUnusedNodes && !bbieScNode.isUsed()) {
+                        continue;
+                    }
                     children.add(bbieScNode);
                 }
             }
