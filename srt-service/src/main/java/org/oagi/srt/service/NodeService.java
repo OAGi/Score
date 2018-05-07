@@ -807,7 +807,6 @@ public class NodeService {
             abie.setGuid(abieGuid);
             abie.setBasedAcc(acc);
             abie.setBizCtx(bizCtx);
-            abie.setDefinition(acc.getDefinition());
             abie.afterLoaded();
 
             return abie;
@@ -1163,7 +1162,6 @@ public class NodeService {
             asbie.setBasedAsccId(ascc.getAsccId());
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
-            asbie.setDefinition(ascc.getDefinition());
             asbie.setSeqKey(seqKey);
             asbie.afterLoaded();
             return asbie;
@@ -1175,7 +1173,6 @@ public class NodeService {
             asbiep.setGuid(Utility.generateGUID());
             asbiep.setBasedAsccp(asccp);
             asbiep.setRoleOfAbie(roleOfAbie);
-            asbiep.setDefinition(asccp.getDefinition());
             asbiep.afterLoaded();
             return asbiep;
         }
@@ -1386,7 +1383,6 @@ public class NodeService {
 
                         bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
                         bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
-                        bbieSc.setDefinition(dtSc.getDefinition());
                         bbieSc.afterLoaded();
                     }
 
@@ -1439,7 +1435,6 @@ public class NodeService {
             BasicBusinessInformationEntityProperty bbiep = new BasicBusinessInformationEntityProperty();
             bbiep.setGuid(Utility.generateGUID());
             bbiep.setBasedBccp(bccp);
-            bbiep.setDefinition(bccp.getDefinition());
             bbiep.afterLoaded();
             return bbiep;
         }
@@ -1463,7 +1458,6 @@ public class NodeService {
 //                bbie.setCodeListId(codeListId);
 //            }
             bbie.setSeqKey(seqKey);
-            bbie.setDefinition(bcc.getDefinition());
             bbie.afterLoaded();
             return bbie;
         }
