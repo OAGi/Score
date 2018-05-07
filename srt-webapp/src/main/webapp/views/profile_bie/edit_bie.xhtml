@@ -250,6 +250,15 @@
                                                             update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
                                                 </h:inputTextarea>
 
+                                                <h:outputText value="Association Definition"
+                                                              styleClass="section-label"/>
+                                                <h:inputTextarea id="asccDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.ascc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                </h:inputTextarea>
+
                                                 <h:outputText value="Component Definition" styleClass="section-label"/>
                                                 <h:inputTextarea id="asbiepDefinition"
                                                                  value="#{editBIEBean.selectedTreeNode.data.asccp.definition}"
