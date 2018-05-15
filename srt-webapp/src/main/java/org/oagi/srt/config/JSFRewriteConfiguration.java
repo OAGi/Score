@@ -34,7 +34,7 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                 .addRule(Join.path("/profile_bie/{top_level_abie_id}/transfer_ownership")
                         .to("/views/profile_bie/transfer_bie_ownership.jsf?topLevelAbieId={top_level_abie_id}"))
 
-                // Profile BIE Expression Menu
+                // BIE Expression Menu
                 .addRule(Join.path("/profile_bie/expression/generate")
                         .to("/views/generate_oagis/generate.jsf"))
 
