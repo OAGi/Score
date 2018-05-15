@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.util.Utility;
@@ -207,6 +210,7 @@ public class ProfileBODGenerateService {
         private List<Integer> abieIds = new ArrayList();
         private List<String> storedCC = new ArrayList();
         private List<String> guidArrayList = new ArrayList();
+        private List<String> storedXbt = new ArrayList();
 
         public GenerationContext(TopLevelAbie topLevelAbie) {
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
@@ -483,12 +487,16 @@ public class ProfileBODGenerateService {
             guidArrayList.add(agencyIdListGuid);
         }
 
+        public void addXSDBuiltInType(String xsdBuiltInType) {
+            storedXbt.add(xsdBuiltInType);
+        }
+
         public boolean isCodeListGenerated(CodeList codeList) {
-            for (int i = 0; i < guidArrayList.size(); i++) {
-                if (codeList.getGuid().equals(guidArrayList.get(i)))
-                    return true;
-            }
-            return false;
+            return guidArrayList.contains(codeList.getGuid());
+        }
+
+        public boolean isXbtGenerated(XSDBuiltInType xbt) {
+            return storedXbt.contains(xbt.getBuiltInType());
         }
 
         public boolean isCCStored(String id) {
@@ -754,6 +762,7 @@ public class ProfileBODGenerateService {
 
         private Document document;
         private Element schemaNode;
+        private Element rootElementNode;
 
         public XMLSchemaExpressionGenerator() {
             this.document = new Document();
@@ -778,7 +787,7 @@ public class ProfileBODGenerateService {
         public Document generateTopLevelABIE(AssociationBusinessInformationEntityProperty asbiep,
                                              Document tlABIEDOM, Element schemaNode,
                                              GenerationContext generationContext) {
-            Element rootElementNode = generateTopLevelASBIEP(asbiep, schemaNode, generationContext);
+            rootElementNode = generateTopLevelASBIEP(asbiep, schemaNode, generationContext);
             AggregateBusinessInformationEntity abie = generationContext.queryTargetABIE(asbiep);
             Element rootSeqNode = generateABIE(abie, rootElementNode, schemaNode, generationContext);
             schemaNode = generateBIEs(abie, rootSeqNode, schemaNode, generationContext);
@@ -798,12 +807,10 @@ public class ProfileBODGenerateService {
             Element rootEleNode = newElement("element");
             gSchemaNode.addContent(rootEleNode);
             rootEleNode.setAttribute("name", asccp.getPropertyTerm().replaceAll(" ", ""));
-            rootEleNode.setAttribute("id", asbiep.getGuid()); //rootEleNode.setAttribute("id", asccpVO.getASCCPGuid());
-            //rootEleNode.setAttribute("type", Utility.second(asccpVO.getDen()).replaceAll(" ", "")+"Type");
+            rootEleNode.setAttribute("id", asbiep.getGuid());
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS);
-            //documentation.setTextContent(asccpVO.getDefinition());
             rootEleNode.addContent(annotation);
             annotation.addContent(documentation);
 
@@ -815,13 +822,14 @@ public class ProfileBODGenerateService {
 
         public Element generateABIE(AggregateBusinessInformationEntity abie, Element gElementNode,
                                     Element gSchemaNode, GenerationContext generationContext) {
-            //AggregateCoreComponent gACC = queryBasedACC(gABIE);
 
             if (generationContext.isCCStored(abie.getGuid()))
                 return gElementNode;
+
             Element complexType = newElement("complexType");
             complexType.setAttribute("id", abie.getGuid());
             gElementNode.addContent(complexType);
+
             //serm: why is this one called generateACC - the function name is not sensible.
             Element PNode = generateACC(abie, complexType, gElementNode, generationContext);
             return PNode;
@@ -832,12 +840,10 @@ public class ProfileBODGenerateService {
 
             AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
             Element PNode = newElement("sequence");
-            //***complexType.setAttribute("id", Utility.generateGUID());
             generationContext.addCCGuidIntoStoredCC(acc.getGuid());
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            //documentation.setTextContent(gACC.getDefinition());
             complexType.addContent(annotation);
             annotation.addContent(documentation);
             complexType.addContent(PNode);
@@ -902,19 +908,16 @@ public class ProfileBODGenerateService {
                                    CodeList codeList, GenerationContext generationContext) {
 
             DataType bdt = generationContext.queryBDT(bbie);
-//		if(isCCStored(bDT.getGuid()))
-//			return eNode;
 
             Element complexType = newElement("complexType");
             Element simpleContent = newElement("simpleContent");
             Element extNode = newElement("extension");
-            //complexType.setAttribute("name", Utility.DenToName(bDT.getDen()));
-            complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
+            complexType.setAttribute("id", Utility.generateGUID());
+
             if (bdt.getDefinition() != null) {
                 Element annotation = newElement("annotation");
                 Element documentation = newElement("documentation");
                 documentation.setAttribute("source", OAGI_NS);
-                //documentation.setTextContent(bDT.getDefinition());
                 complexType.addContent(annotation);
             }
             generationContext.addCCGuidIntoStoredCC(bdt.getGuid());
@@ -931,6 +934,7 @@ public class ProfileBODGenerateService {
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
                     generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
             XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+            addXbtSimpleType(generationContext, xbt);
             return xbt.getBuiltInType();
         }
 
@@ -938,6 +942,7 @@ public class ProfileBODGenerateService {
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
                     generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
             XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+            addXbtSimpleType(generationContext, xbt);
             return xbt.getBuiltInType();
         }
 
@@ -946,11 +951,12 @@ public class ProfileBODGenerateService {
                     generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                     generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-            XSDBuiltInType aXSDBuiltInType =
+            XSDBuiltInType xbt =
                     generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-            if (aXSDBuiltInType.getBuiltInType() != null) {
-                gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
+            if (xbt.getBuiltInType() != null) {
+                gNode.setAttribute("type", xbt.getBuiltInType());
             }
+            addXbtSimpleType(generationContext, xbt);
             return gNode;
         }
 
@@ -959,11 +965,12 @@ public class ProfileBODGenerateService {
                     generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                     generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-            XSDBuiltInType aXSDBuiltInType =
+            XSDBuiltInType xbt =
                     generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-            if (aXSDBuiltInType.getBuiltInType() != null) {
-                gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
+            if (xbt.getBuiltInType() != null) {
+                gNode.setAttribute("type", xbt.getBuiltInType());
             }
+            addXbtSimpleType(generationContext, xbt);
             return gNode;
         }
 
@@ -971,19 +978,15 @@ public class ProfileBODGenerateService {
                                    Element eNode, GenerationContext generationContext) {
 
             DataType bDT = generationContext.queryBDT(gBBIE);
-//		if(isCCStored(bDT.getGuid()))
-//			return eNode;
 
             Element complexType = newElement("complexType");
             Element simpleContent = newElement("simpleContent");
             Element extNode = newElement("extension");
-            //complexType.setAttribute("name", Utility.DenToName(bDT.getDen()));
-            complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
+            complexType.setAttribute("id", Utility.generateGUID());
             if (bDT.getDefinition() != null) {
                 Element annotation = newElement("annotation");
                 Element documentation = newElement("documentation");
                 documentation.setAttribute("source", OAGI_NS);
-                //documentation.setTextContent(bDT.getDefinition());
                 complexType.addContent(annotation);
             }
             generationContext.addCCGuidIntoStoredCC(bDT.getGuid());
@@ -1009,7 +1012,7 @@ public class ProfileBODGenerateService {
             AssociationCoreComponent gASCC = generationContext.queryBasedASCC(gASBIE);
 
             Element element = newElement("element");
-            element.setAttribute("id", gASBIE.getGuid()); //element.setAttribute("id", gASCC.getASCCGuid());
+            element.setAttribute("id", gASBIE.getGuid());
             element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
             if (gASBIE.getCardinalityMax() == -1)
                 element.setAttribute("maxOccurs", "unbounded");
@@ -1024,7 +1027,6 @@ public class ProfileBODGenerateService {
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            //documentation.setTextContent(gASBIE.getDefinition());
             annotation.addContent(documentation);
             element.addContent(annotation);
             gPNode.addContent(element);
@@ -1036,7 +1038,6 @@ public class ProfileBODGenerateService {
                                       AssociationBusinessInformationEntityProperty gASBIEP, Element gElementNode) {
             AssociationCoreComponentProperty asccp = generationContext.findASCCP(gASBIEP.getBasedAsccpId());
             gElementNode.setAttribute("name", Utility.first(asccp.getDen(), true));
-            //gElementNode.setAttribute("type", Utility.second(asccp.getDen())+"Type");
             return gElementNode;
         }
 
@@ -1045,7 +1046,7 @@ public class ProfileBODGenerateService {
 
             BasicCoreComponent bccVO = generationContext.queryBasedBCC(gBBIE);
             eNode.setAttribute("name", Utility.second(bccVO.getDen(), true));
-            eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
+            eNode.setAttribute("id", gBBIE.getGuid());
             generationContext.addCCGuidIntoStoredCC(bccVO.getGuid());
             if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
                 System.out.println("Error");
@@ -1071,7 +1072,6 @@ public class ProfileBODGenerateService {
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            //documentation.setTextContent(gBBIE.getDefinition());
             annotation.addContent(documentation);
             eNode.addContent(annotation);
 
@@ -1083,7 +1083,7 @@ public class ProfileBODGenerateService {
 
             BasicCoreComponent bcc = generationContext.queryBasedBCC(bbie);
             eNode.setAttribute("name", Utility.second(bcc.getDen(), false));
-            eNode.setAttribute("id", bbie.getGuid()); //eNode.setAttribute("id", bcc.getGuid());
+            eNode.setAttribute("id", bbie.getGuid());
             generationContext.addCCGuidIntoStoredCC(bcc.getGuid());
             if (bbie.getDefaultValue() != null && bbie.getFixedValue() != null) {
                 System.out.println("Error");
@@ -1101,10 +1101,10 @@ public class ProfileBODGenerateService {
                 eNode.setAttribute("use", "required");
             else
                 eNode.setAttribute("use", "optional");
+
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
             documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            //documentation.setTextContent(bbie.getDefinition());
             annotation.addContent(documentation);
             eNode.addContent(annotation);
             return eNode;
@@ -1114,8 +1114,10 @@ public class ProfileBODGenerateService {
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
                     generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
             XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
-            if (xbt.getBuiltInType() != null)
+            if (xbt.getBuiltInType() != null) {
                 gNode.setAttribute("type", xbt.getBuiltInType());
+            }
+            addXbtSimpleType(generationContext, xbt);
 
             return gNode;
         }
@@ -1124,10 +1126,56 @@ public class ProfileBODGenerateService {
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
                     generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
             XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
-            if (xbt.getBuiltInType() != null)
+            if (xbt.getBuiltInType() != null) {
                 gNode.setAttribute("type", xbt.getBuiltInType());
+            }
+            addXbtSimpleType(generationContext, xbt);
 
             return gNode;
+        }
+
+        public void addXbtSimpleType(GenerationContext generationContext, XSDBuiltInType xbt) {
+            /*
+             * Issue #521
+             * If XBT has a value of schema definition, it is not XML Schema Built-in Type.
+             * It should generated as the XML Schema simple type at the global level.
+             */
+            if (xbt == null || StringUtils.isEmpty(xbt.getSchemaDefinition())) {
+                return;
+            }
+            if (rootElementNode == null) {
+                return;
+            }
+            if (generationContext.isXbtGenerated(xbt)) {
+                return;
+            }
+
+            String name = xbt.getBuiltInType();
+
+            Element xbtNode = newElement("simpleType");
+            xbtNode.setAttribute("name", name);
+            xbtNode.setAttribute("id", Utility.generateGUID());
+
+            try {
+                StringBuilder sb = new StringBuilder();
+                // To read the definition, it must has defined 'xsd:schema' as a parent.
+                sb.append("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
+                        "xmlns=\"http://www.openapplications.org/oagis/10\">");
+                sb.append(xbt.getSchemaDefinition());
+                sb.append("</xsd:schema>");
+
+                Element content = new SAXBuilder().build(
+                        new StringReader(sb.toString())).getRootElement();
+                for (Content child : content.removeContent()) {
+                    xbtNode.addContent(child);
+                }
+
+                rootElementNode.addContent(xbtNode);
+            } catch (JDOMException | IOException e) {
+                throw new IllegalStateException("Error occurs while the schema definition loads for " + name, e);
+            }
+
+            generationContext.addXSDBuiltInType(name);
         }
 
         public Element generateBBIE(BasicBusinessInformationEntity bbie, DataType bdt, Element gPNode,
@@ -1141,11 +1189,9 @@ public class ProfileBODGenerateService {
                 while (!gPNode.getName().equals("sequence")) {
                     gPNode = gPNode.getParentElement();
                 }
-
                 gPNode.addContent(eNode);
 
                 List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(bbie);
-
                 CodeList aCL = getCodeList(generationContext, bbie, bdt);
 
                 if (aCL == null) {
@@ -1191,7 +1237,7 @@ public class ProfileBODGenerateService {
                             eNode = handleBBIE_Attributevalue(bbie, eNode, generationContext);
 
                             while (!gPNode.getName().equals("complexType")) {
-                                gPNode = (Element) gPNode.getParentElement();
+                                gPNode = gPNode.getParentElement();
                             }
 
                             gPNode.addContent(eNode);
@@ -1261,6 +1307,7 @@ public class ProfileBODGenerateService {
                 CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
                         generationContext.findCdtAwdPriXpsTypeMap(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
                 XSDBuiltInType xbt = generationContext.findXSDBuiltInType(cdtAwdPriXpsTypeMap.getXbtId());
+                addXbtSimpleType(generationContext, xbt);
                 return xbt.getBuiltInType();
             }
         }
@@ -1274,6 +1321,7 @@ public class ProfileBODGenerateService {
                 CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
                         generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
                 XSDBuiltInType xbt = generationContext.findXSDBuiltInType(cdtScAwdPriXpsTypeMap.getXbtId());
+                addXbtSimpleType(generationContext, xbt);
                 return xbt.getBuiltInType();
             }
         }
@@ -1282,7 +1330,6 @@ public class ProfileBODGenerateService {
                                         Element gSchemaNode, GenerationContext generationContext) {
             Element stNode = newElement("simpleType");
             stNode.setAttribute("name", getCodeListTypeName(codeList));
-
             stNode.setAttribute("id", codeList.getGuid());
 
             Element rtNode = newElement("restriction");
@@ -1385,6 +1432,7 @@ public class ProfileBODGenerateService {
                         if (xbt != null && xbt.getBuiltInType() != null) {
                             gNode.setAttribute("type", xbt.getBuiltInType());
                         }
+                        addXbtSimpleType(generationContext, xbt);
                     }
                 }
             }
@@ -1401,6 +1449,7 @@ public class ProfileBODGenerateService {
             if (xbt.getBuiltInType() != null) {
                 gNode.setAttribute("type", xbt.getBuiltInType());
             }
+            addXbtSimpleType(generationContext, xbt);
             return gNode;
 
         }
@@ -1414,7 +1463,6 @@ public class ProfileBODGenerateService {
                     break;
                 List<Element> children = tNode.getChildren();
                 tNode = children.get(children.size() - 1);
-                //tNode = (Element) tNode.getParentElement();
             }
             List<Element> children = tNode.getChildren();
             for (Element child : children) {
@@ -1424,9 +1472,6 @@ public class ProfileBODGenerateService {
                 }
             }
 
-//		if(tNode.getFirstChild().getName().equals("simpleContent"))
-//			tNode = (Element) tNode.getFirstChild().getFirstChild();
-            //here
             for (int i = 0; i < bbieScList.size(); i++) {
                 BasicBusinessInformationEntitySupplementaryComponent bbieSc = bbieScList.get(i);
                 if (bbieSc.getCardinalityMax() == 0)
@@ -1474,9 +1519,7 @@ public class ProfileBODGenerateService {
                         aNode.setAttribute("type", getCodeListTypeName(codeList));
                     }
                 }
-//			if(isCCStored(aNode.getAttribute("id")))
-//				continue;
-//			storedCC.add(aNode.getAttribute("id"));
+
                 tNode.addContent(aNode);
             }
             return tNode;
@@ -1929,7 +1972,6 @@ public class ProfileBODGenerateService {
                     BusinessDataTypePrimitiveRestriction bdtPriRestri =
                             generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
                     XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
-
                     ref = fillDefinitions(definitions, xbt, generationContext);
                 }
             }
