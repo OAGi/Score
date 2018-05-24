@@ -638,11 +638,16 @@ public class Utility {
 
     public static String suggestWord(String word, Directory directory, String field) {
         List<String> suggestWords = suggestWords(word, directory, field);
+        if (suggestWords.isEmpty()) {
+            suggestWords = suggestWords(word.toUpperCase(), directory, field);
+        }
+
         if (suggestWords.size() > 0) {
             if (!suggestWords.contains(word)) {
                 return suggestWords.get(0);
             }
         }
+        
         return word;
     }
 
