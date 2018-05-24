@@ -784,6 +784,24 @@ public class ProfileBODGenerateService {
             return new Element(localName, XSD_NAMESPACE);
         }
 
+        public void setDefinition(Element node, String definition) {
+            setDefinition(node, definition);
+        }
+
+        public void setDefinition(Element node, String definition, String namespace) {
+            if (StringUtils.isEmpty(definition)) {
+                return;
+            }
+
+            Element annotation = newElement("annotation");
+            Element documentation = newElement("documentation");
+            documentation.setAttribute("source", namespace);
+            documentation.setText(definition);
+
+            node.addContent(annotation);
+            annotation.addContent(documentation);
+        }
+
         public Document generateTopLevelABIE(AssociationBusinessInformationEntityProperty asbiep,
                                              Document tlABIEDOM, Element schemaNode,
                                              GenerationContext generationContext) {
@@ -808,11 +826,7 @@ public class ProfileBODGenerateService {
             gSchemaNode.addContent(rootEleNode);
             rootEleNode.setAttribute("name", asccp.getPropertyTerm().replaceAll(" ", ""));
             rootEleNode.setAttribute("id", asbiep.getGuid());
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS);
-            rootEleNode.addContent(annotation);
-            annotation.addContent(documentation);
+            setDefinition(rootEleNode, asbiep.getDefinition());
 
             //serm: what does this do?
             generationContext.addCCGuidIntoStoredCC(asbiep.getGuid());
@@ -841,11 +855,7 @@ public class ProfileBODGenerateService {
             AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
             Element PNode = newElement("sequence");
             generationContext.addCCGuidIntoStoredCC(acc.getGuid());
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            complexType.addContent(annotation);
-            annotation.addContent(documentation);
+            setDefinition(complexType, abie.getDefinition());
             complexType.addContent(PNode);
 
             return PNode;
@@ -913,13 +923,8 @@ public class ProfileBODGenerateService {
             Element simpleContent = newElement("simpleContent");
             Element extNode = newElement("extension");
             complexType.setAttribute("id", Utility.generateGUID());
+            setDefinition(complexType, bbie.getDefinition());
 
-            if (bdt.getDefinition() != null) {
-                Element annotation = newElement("annotation");
-                Element documentation = newElement("documentation");
-                documentation.setAttribute("source", OAGI_NS);
-                complexType.addContent(annotation);
-            }
             generationContext.addCCGuidIntoStoredCC(bdt.getGuid());
 
             complexType.addContent(simpleContent);
@@ -974,61 +979,55 @@ public class ProfileBODGenerateService {
             return gNode;
         }
 
-        public Element generateBDT(BasicBusinessInformationEntity gBBIE,
+        public Element generateBDT(BasicBusinessInformationEntity bbie,
                                    Element eNode, GenerationContext generationContext) {
 
-            DataType bDT = generationContext.queryBDT(gBBIE);
+            DataType bDT = generationContext.queryBDT(bbie);
 
             Element complexType = newElement("complexType");
             Element simpleContent = newElement("simpleContent");
             Element extNode = newElement("extension");
             complexType.setAttribute("id", Utility.generateGUID());
-            if (bDT.getDefinition() != null) {
-                Element annotation = newElement("annotation");
-                Element documentation = newElement("documentation");
-                documentation.setAttribute("source", OAGI_NS);
-                complexType.addContent(annotation);
-            }
+            setDefinition(complexType, bbie.getDefinition());
+
             generationContext.addCCGuidIntoStoredCC(bDT.getGuid());
 
             complexType.addContent(simpleContent);
             simpleContent.addContent(extNode);
 
-            DataType gBDT = generationContext.queryAssocBDT(gBBIE);
+            DataType gBDT = generationContext.queryAssocBDT(bbie);
 
-            if (gBBIE.getBdtPriRestriId() == 0)
+            if (bbie.getBdtPriRestriId() == 0)
                 extNode.setAttribute("base", setBDTBase(generationContext, gBDT));
             else {
-                extNode.setAttribute("base", setBDTBase(generationContext, gBBIE));
+                extNode.setAttribute("base", setBDTBase(generationContext, bbie));
             }
 
             eNode.addContent(complexType);
             return eNode;
         }
 
-        public Element generateASBIE(AssociationBusinessInformationEntity gASBIE,
+        public Element generateASBIE(AssociationBusinessInformationEntity asbie,
                                      Element gPNode, GenerationContext generationContext) {
 
-            AssociationCoreComponent gASCC = generationContext.queryBasedASCC(gASBIE);
+            AssociationCoreComponent gASCC = generationContext.queryBasedASCC(asbie);
 
             Element element = newElement("element");
-            element.setAttribute("id", gASBIE.getGuid());
-            element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
-            if (gASBIE.getCardinalityMax() == -1)
+            element.setAttribute("id", asbie.getGuid());
+            element.setAttribute("minOccurs", String.valueOf(asbie.getCardinalityMin()));
+            if (asbie.getCardinalityMax() == -1)
                 element.setAttribute("maxOccurs", "unbounded");
             else
-                element.setAttribute("maxOccurs", String.valueOf(gASBIE.getCardinalityMax()));
-            if (gASBIE.isNillable())
-                element.setAttribute("nillable", String.valueOf(gASBIE.isNillable()));
+                element.setAttribute("maxOccurs", String.valueOf(asbie.getCardinalityMax()));
+            if (asbie.isNillable())
+                element.setAttribute("nillable", String.valueOf(asbie.isNillable()));
 
             while (!gPNode.getName().equals("sequence")) {
                 gPNode = gPNode.getParentElement();
             }
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            annotation.addContent(documentation);
-            element.addContent(annotation);
+
+            setDefinition(element, asbie.getDefinition());
+
             gPNode.addContent(element);
             generationContext.addCCGuidIntoStoredCC(gASCC.getGuid());//check
             return element;
@@ -1041,39 +1040,35 @@ public class ProfileBODGenerateService {
             return gElementNode;
         }
 
-        public Element handleBBIE_Elementvalue(BasicBusinessInformationEntity gBBIE,
+        public Element handleBBIE_Elementvalue(BasicBusinessInformationEntity bbie,
                                                Element eNode, GenerationContext generationContext) {
 
-            BasicCoreComponent bccVO = generationContext.queryBasedBCC(gBBIE);
+            BasicCoreComponent bccVO = generationContext.queryBasedBCC(bbie);
             eNode.setAttribute("name", Utility.second(bccVO.getDen(), true));
-            eNode.setAttribute("id", gBBIE.getGuid());
+            eNode.setAttribute("id", bbie.getGuid());
             generationContext.addCCGuidIntoStoredCC(bccVO.getGuid());
-            if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
+            if (bbie.getDefaultValue() != null && bbie.getFixedValue() != null) {
                 System.out.println("Error");
             }
-            if (gBBIE.isNillable()) {
+            if (bbie.isNillable()) {
                 eNode.setAttribute("nillable", "true");
             }
-            if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
-                eNode.setAttribute("default", gBBIE.getDefaultValue());
+            if (bbie.getDefaultValue() != null && bbie.getDefaultValue().length() != 0) {
+                eNode.setAttribute("default", bbie.getDefaultValue());
             }
-            if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-                eNode.setAttribute("fixed", gBBIE.getFixedValue());
+            if (bbie.getFixedValue() != null && bbie.getFixedValue().length() != 0) {
+                eNode.setAttribute("fixed", bbie.getFixedValue());
             }
 
-            eNode.setAttribute("minOccurs", String.valueOf(gBBIE.getCardinalityMin()));
-            if (gBBIE.getCardinalityMax() == -1)
+            eNode.setAttribute("minOccurs", String.valueOf(bbie.getCardinalityMin()));
+            if (bbie.getCardinalityMax() == -1)
                 eNode.setAttribute("maxOccurs", "unbounded");
             else
-                eNode.setAttribute("maxOccurs", String.valueOf(gBBIE.getCardinalityMax()));
-            if (gBBIE.isNillable())
-                eNode.setAttribute("nillable", String.valueOf(gBBIE.isNillable()));
+                eNode.setAttribute("maxOccurs", String.valueOf(bbie.getCardinalityMax()));
+            if (bbie.isNillable())
+                eNode.setAttribute("nillable", String.valueOf(bbie.isNillable()));
 
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            annotation.addContent(documentation);
-            eNode.addContent(annotation);
+            setDefinition(eNode, bbie.getDefinition());
 
             return eNode;
         }
@@ -1102,11 +1097,8 @@ public class ProfileBODGenerateService {
             else
                 eNode.setAttribute("use", "optional");
 
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            annotation.addContent(documentation);
-            eNode.addContent(annotation);
+            setDefinition(eNode, bbie.getDefinition());
+
             return eNode;
         }
 
@@ -1408,12 +1400,7 @@ public class ProfileBODGenerateService {
 
             aNode.setAttribute("id", bbieSc.getGuid());
 
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS + "/platform/2");
-            //documentation.setTextContent(aBBIESC.getDefinition());
-            annotation.addContent(documentation);
-            aNode.addContent(annotation);
+            setDefinition(aNode, bbieSc.getDefinition());
 
             return aNode;
         }
