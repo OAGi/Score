@@ -2,10 +2,8 @@ package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.model.node.ASBIEPNode;
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.entity.ProfileBIE;
-import org.oagi.srt.repository.entity.Release;
-import org.oagi.srt.repository.entity.TopLevelAbie;
+import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.service.NodeService.ProgressListener;
 import org.primefaces.context.RequestContext;
@@ -41,6 +39,10 @@ public class CopyBIEBean extends AbstractBIEBean {
 
     @Autowired
     private ProfileBIERepository profileBIERepository;
+
+    @Autowired
+    private BusinessInformationEntityService bieService;
+
     private String currentStep;
 
     /*
@@ -81,8 +83,11 @@ public class CopyBIEBean extends AbstractBIEBean {
 
     public List<ProfileBIE> getAllProfileBIEs() {
         if (allProfileBIES == null) {
-            allProfileBIES = profileBIERepository.findAll();
-            allProfileBIEMap = allProfileBIES.stream().collect(Collectors.toMap(ProfileBIE::getTopLevelAbieId, Function.identity()));
+            User currentUser = getCurrentUser();
+            allProfileBIES = profileBIERepository.findAll().stream()
+                    .filter(e -> bieService.canUserGenerateThisProfileBOD(e, currentUser)).collect(Collectors.toList());
+            allProfileBIEMap = allProfileBIES.stream()
+                    .collect(Collectors.toMap(ProfileBIE::getTopLevelAbieId, Function.identity()));
         }
         return allProfileBIES;
     }
