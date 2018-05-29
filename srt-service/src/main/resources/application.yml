@@ -42,3 +42,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.Oracle12cDialect
+
+# MySQL environment
+---
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/oagi?useSSL=false
+    username: oagi
+    password: oagi
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        globally_quoted_identifiers: true
