@@ -1,6 +1,6 @@
 # ************************************************************
 # Database: oagi
-# Generation Time: 2018-03-15 19:45:33 +0000
+# Generation Time: 2018-05-29 16:18:03 +0000
 # ************************************************************
 
 
@@ -8,6 +8,7 @@
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
+SET NAMES utf8mb4;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
@@ -1219,6 +1220,7 @@ CREATE TABLE `xbt` (
   `xbt_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
   `name` varchar(45) DEFAULT NULL COMMENT 'Human understandable name of the built-in type.',
   `builtIn_type` varchar(45) DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
+  `jbt_draft05_map` varchar(500) DEFAULT NULL,
   `subtype_of_xbt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.',
   `schema_definition` text,
   `module_id` bigint(20) unsigned DEFAULT NULL,
