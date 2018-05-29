@@ -24,12 +24,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dependency.locations.enabled>false</dependency.locations.enabled>
 
-        <spring.framework.version>4.3.12.RELEASE</spring.framework.version>
-        <spring.boot.version>1.5.10.RELEASE</spring.boot.version>
-        <spring.data.jpa.version>1.11.8.RELEASE</spring.data.jpa.version>
-        <spring.data.commons.version>1.13.8.RELEASE</spring.data.commons.version>
-        <spring.data.rest.version>2.6.8.RELEASE</spring.data.rest.version>
-        <spring.hateoas.version>0.23.0.RELEASE</spring.hateoas.version>
+        <spring.framework.version>4.3.17.RELEASE</spring.framework.version>
+        <spring.boot.version>1.5.13.RELEASE</spring.boot.version>
+        <spring.data.jpa.version>1.11.12.RELEASE</spring.data.jpa.version>
+        <spring.data.commons.version>1.13.12.RELEASE</spring.data.commons.version>
+        <spring.data.rest.version>2.6.12.RELEASE</spring.data.rest.version>
+        <spring.hateoas.version>0.24.0.RELEASE</spring.hateoas.version>
         <spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
         <spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
         <commons.logging.version>1.2</commons.logging.version>
