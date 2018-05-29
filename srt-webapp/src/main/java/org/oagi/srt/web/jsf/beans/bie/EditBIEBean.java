@@ -1,9 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bie;
 
-import org.oagi.srt.model.node.ASBIEPNode;
-import org.oagi.srt.model.node.BBIEPNode;
-import org.oagi.srt.model.node.BBIESCNode;
-import org.oagi.srt.model.node.BIENode;
+import org.apache.commons.lang.StringUtils;
+import org.oagi.srt.model.node.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -284,6 +282,8 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     public void update() {
         ASBIEPNode topLevelNode = getTopLevelNode();
         try {
+            checkZeroMaximumCardinalities(topLevelNode);
+
             nodeService.update(topLevelNode, getCurrentUser());
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
@@ -292,6 +292,57 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
+
+    private void checkZeroMaximumCardinalities(BIENode bieNode) {
+        /**
+         * Issue #501
+         */
+        if (bieNode == null) {
+            return;
+        }
+
+        bieNode.accept(new BIENodeVisitor() {
+            @Override
+            public void visit(ABIENode abieNode) {
+            }
+
+            @Override
+            public void visit(ASBIEPNode asbiepNode) {
+                AssociationBusinessInformationEntity asbie = asbiepNode.getAsbie();
+                if (asbie == null) {
+                    return;
+                }
+                if (asbie.getCardinalityMax() == 0 && StringUtils.isEmpty(asbie.getDefinition())) {
+                    throw new IllegalStateException("The context definition of '" + getTreeNodeTypeNameResolver(asbiepNode).getName() +
+                            "' should define why the max cardinality is zero.");
+                }
+            }
+
+            @Override
+            public void visit(BBIEPNode bbiepNode) {
+                BasicBusinessInformationEntity bbie = bbiepNode.getBbie();
+                if (bbie == null) {
+                    return;
+                }
+                if (bbie.getCardinalityMax() == 0 && StringUtils.isEmpty(bbie.getDefinition())) {
+                    throw new IllegalStateException("The context definition of '" + getTreeNodeTypeNameResolver(bbiepNode).getName() +
+                            "' should define why the max cardinality is zero.");
+                }
+            }
+
+            @Override
+            public void visit(BBIESCNode bbieScNode) {
+                BasicBusinessInformationEntitySupplementaryComponent bbieSc = bbieScNode.getBbieSc();
+                if (bbieSc == null) {
+                    return;
+                }
+                if (bbieSc.getCardinalityMax() == 0 && StringUtils.isEmpty(bbieSc.getDefinition())) {
+                    throw new IllegalStateException("The context definition of '" + getTreeNodeTypeNameResolver(bbieScNode).getName() +
+                            "' should define why the max cardinality is zero.");
+                }
+            }
+        });
     }
 
     public void afterUpdate() {
