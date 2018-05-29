@@ -785,7 +785,7 @@ public class ProfileBODGenerateService {
         }
 
         public void setDefinition(Element node, String definition) {
-            setDefinition(node, definition);
+            setDefinition(node, definition, OAGI_NS);
         }
 
         public void setDefinition(Element node, String definition, String namespace) {
