@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.oagi</groupId>
     <artifactId>srt</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>srt-common</module>
@@ -38,7 +38,8 @@
         <org.ow2.asm.version>5.0.4</org.ow2.asm.version>
         <xml.apis.version>1.4.01</xml.apis.version>
         <lucene.version>7.1.0</lucene.version>
-        <com.fasterxml.jackson.version>2.9.5</com.fasterxml.jackson.version>
+        <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
+        <hsqldb.version>2.4.1</hsqldb.version>
 
         <maven-site-plugin.version>3.6</maven-site-plugin.version>
         <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>
