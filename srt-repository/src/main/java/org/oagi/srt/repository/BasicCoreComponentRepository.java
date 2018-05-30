@@ -18,6 +18,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1")
     public List<BasicCoreComponent> findByFromAccId(long fromAccId);
 
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.releaseId is null")
+    public List<BasicCoreComponent> findByFromAccIdAndReleaseIdIsNull(long fromAccId);
+
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 

@@ -54,12 +54,12 @@ public class CoreComponentTreeNodeTests {
     @Test
     public void createAggregateCoreComponentTreeNode() {
         String acknowledgeBOMTypeGuid = "oagis-id-49831133a4ff4586a208398eb5236477";
-        AggregateCoreComponent acknowledgeBOMAcc = accRepository.findOneByGuid(acknowledgeBOMTypeGuid);
+        AggregateCoreComponent acknowledgeBOMAcc = accRepository.findOneByGuidAndReleaseIdIsNull(acknowledgeBOMTypeGuid);
         assertThat(acknowledgeBOMAcc).isNotNull();
 
         String businessObjectDocumentTypeGuid = "oagis-id-2783857358f145e799471461f5192fa7";
         // it's the 'BusinessObjectDocumentType' base type of AcknowledgeBOMType
-        AggregateCoreComponent businessObjectDocumentTypeAcc = accRepository.findOneByGuid(businessObjectDocumentTypeGuid);
+        AggregateCoreComponent businessObjectDocumentTypeAcc = accRepository.findOneByGuidAndReleaseIdIsNull(businessObjectDocumentTypeGuid);
         assertThat(businessObjectDocumentTypeAcc).isNotNull();
 
         String dataTypeGuid = "oagis-id-cf2c1df2881a434f8cce0855c301a0c8";
@@ -88,21 +88,21 @@ public class CoreComponentTreeNodeTests {
     /*
      * [ Model/BODs/AcknowledgeBOM.xsd ]
      *
-     * <xsd:complexType name="AcknowledgeBOMDataAreaType" id="oagis-id-c9e79fe541bf4e25be70f80abe4e3145">
-     *     <xsd:sequence>
-     *         <xsd:element ref="Acknowledge" id="oagis-id-f8b4f55ad21d471dbbe204a156e520f7"/>
-     *         <xsd:element ref="BOM" maxOccurs="unbounded" id="oagis-id-0cdae06e26314915b44fd03bc405582e"/>
-     *     </xsd:sequence>
-     * </xsd:complexType>
+     * <xsd:complexType name="AcknowledgeBOMDataAreaType" id="oagis-id-ad1161582d0d4e0aa2ac44358a9d9a2c">
+	 *     <xsd:sequence>
+	 *         <xsd:element ref="Acknowledge" id="oagis-id-f8b4f55ad21d471dbbe204a156e520f7"/>
+	 *         <xsd:element ref="BOM" id="oagis-id-0cdae06e26314915b44fd03bc405582e" maxOccurs="unbounded"/>
+	 *     </xsd:sequence>
+	 * </xsd:complexType>
      */
     @Test
     public void createAssociationCoreComponentPropertyTreeNode() {
-        String acknowledgeBOMDataAreaTypeGuid = "oagis-id-c9e79fe541bf4e25be70f80abe4e3145";
-        AggregateCoreComponent acknowledgeBOMDataAreaTypeAcc = accRepository.findOneByGuid(acknowledgeBOMDataAreaTypeGuid);
+        String acknowledgeBOMDataAreaTypeGuid = "oagis-id-ad1161582d0d4e0aa2ac44358a9d9a2c";
+        AggregateCoreComponent acknowledgeBOMDataAreaTypeAcc = accRepository.findOneByGuidAndReleaseIdIsNull(acknowledgeBOMDataAreaTypeGuid);
         assertThat(acknowledgeBOMDataAreaTypeAcc).isNotNull();
 
         List<AssociationCoreComponent> asccList =
-                asccRepository.findByFromAccId(acknowledgeBOMDataAreaTypeAcc.getAccId());
+                asccRepository.findByFromAccIdAndReleaseIdIsNull(acknowledgeBOMDataAreaTypeAcc.getAccId());
         assertThat(asccList.size()).isEqualTo(2);
         Collections.sort(asccList, Comparator.comparingInt(AssociationCoreComponent::getSeqKey));
 
@@ -142,11 +142,11 @@ public class CoreComponentTreeNodeTests {
     @Test
     public void createBasicCoreComponentPropertyTreeNode() {
         String businessObjectDocumentTypeGuid = "oagis-id-2783857358f145e799471461f5192fa7";
-        AggregateCoreComponent businessObjectDocumentTypeAcc = accRepository.findOneByGuid(businessObjectDocumentTypeGuid);
+        AggregateCoreComponent businessObjectDocumentTypeAcc = accRepository.findOneByGuidAndReleaseIdIsNull(businessObjectDocumentTypeGuid);
         assertThat(businessObjectDocumentTypeAcc).isNotNull();
 
         List<BasicCoreComponent> bccList =
-                bccRepository.findByFromAccId(businessObjectDocumentTypeAcc.getAccId());
+                bccRepository.findByFromAccIdAndReleaseIdIsNull(businessObjectDocumentTypeAcc.getAccId());
         assertThat(bccList.size()).isEqualTo(4);
         Collections.sort(bccList, treeNodeService.comparingCoreComponentRelation());
 
@@ -215,7 +215,7 @@ public class CoreComponentTreeNodeTests {
     @Test
     public void includeGroupElementsTest() {
         String stateChangeBaseTypeGuid = "oagis-id-51533a96aced4db8ab6c6285e9fb5d9a";
-        AggregateCoreComponent stateChangeBaseTypeAcc = accRepository.findOneByGuid(stateChangeBaseTypeGuid);
+        AggregateCoreComponent stateChangeBaseTypeAcc = accRepository.findOneByGuidAndReleaseIdIsNull(stateChangeBaseTypeGuid);
         assertThat(stateChangeBaseTypeAcc).isNotNull();
 
         ACCNode stateChangeBaseTypeTreeNode =
@@ -258,7 +258,7 @@ public class CoreComponentTreeNodeTests {
     @Test
     public void orderingOfSequenceTest() {
         String moveInventoryLineBaseTypeGuid = "oagis-id-e2662d3d7d7f48b39d96618060fa23d1";
-        AggregateCoreComponent moveInventoryLineBaseTypeAcc = accRepository.findOneByGuid(moveInventoryLineBaseTypeGuid);
+        AggregateCoreComponent moveInventoryLineBaseTypeAcc = accRepository.findOneByGuidAndReleaseIdIsNull(moveInventoryLineBaseTypeGuid);
         assertThat(moveInventoryLineBaseTypeAcc).isNotNull();
 
         ACCNode moveInventoryLineBaseTypeTreeNode =
