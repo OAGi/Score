@@ -1,9 +1,9 @@
 package org.oagi.srt.persistence.populate.script.postgres;
 
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.*;
 import org.hibernate.type.descriptor.converter.AttributeConverterTypeAdapter;
-import org.postgresql.util.Base64;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
@@ -155,7 +155,7 @@ public class PostgresEntityUpdateInterceptor extends EmptyInterceptor {
                 String str = (String) value;
                 if (str.length() > 4000) {
                     try {
-                        sb.append("decode('").append(Base64.encodeBytes(str.getBytes("UTF-8"))).append("', 'base64')");
+                        sb.append("decode('").append(Base64.encodeBase64(str.getBytes("UTF-8"))).append("', 'base64')");
                     } catch (UnsupportedEncodingException e) {
                         throw new IllegalStateException(e);
                     }
@@ -169,7 +169,7 @@ public class PostgresEntityUpdateInterceptor extends EmptyInterceptor {
         } else if (type == TimestampType.INSTANCE) {
             sb.append("CURRENT_TIMESTAMP");
         } else if (type == BinaryType.INSTANCE || type == BlobType.INSTANCE || type == MaterializedBlobType.INSTANCE) {
-            sb.append("decode('").append(Base64.encodeBytes((byte[]) value)).append("', 'base64')");
+            sb.append("decode('").append(Base64.encodeBase64((byte[]) value)).append("', 'base64')");
         } else if (type.getClass() == AttributeConverterTypeAdapter.class) {
             sb.append(getEnumValue(value));
         } else if (type.getClass() == CustomType.class) {  // EnumType

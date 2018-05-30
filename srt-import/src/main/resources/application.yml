@@ -72,11 +72,16 @@ spring:
 
   datasource:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
-    url: jdbc:oracle:thin:@localhost:1521/OAGISRTDB
-    username: oagi
-    password: oagi
-    platform: oracle
-    auto-commit: false
+    url: jdbc:hsqldb:mem:.
+    platform: hsqldb
+    initialize: true
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.HSQLDialect
+        ejb:
+          interceptor: org.oagi.srt.persistence.populate.script.hsqldb.HsqldbEntityUpdateInterceptor
 
 # Staging environment
 ---
