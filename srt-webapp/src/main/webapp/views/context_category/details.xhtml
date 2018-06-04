@@ -31,15 +31,18 @@
                 <h:inputText id="name" value="#{contextCategoryDetailBean.contextCategory.name}"
                              required="true"
                              requiredMessage="Please fill out 'Name' field."
-                             maxlength="255"
+                             maxlength="45"
                              label="Name" styleClass="section-content input-section">
-                    <f:validateLength maximum="255"/>
+                    <f:validateLength maximum="45"/>
+                    <p:ajax update="form"/>
                 </h:inputText>
 
                 <h:outputText value="Description" styleClass="section-label"/>
                 <h:inputTextarea id="description" value="#{contextCategoryDetailBean.contextCategory.description}"
                                  rows="6" a:placeholder="Leave a description"
-                                 styleClass="section-content input-section"/>
+                                 styleClass="section-content input-section">
+                    <p:ajax update="form"/>
+                </h:inputTextarea>
             </h:panelGrid>
         </p:panel>
 
