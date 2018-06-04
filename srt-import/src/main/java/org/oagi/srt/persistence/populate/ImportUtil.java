@@ -112,8 +112,8 @@ public class ImportUtil {
 
             String str = StringUtils.trim(writer.toString());
             // Eliminate definitions of the namespace
-            str = str.replaceAll("[\\W]+xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", "")
-                    .replaceAll("[\\W]+xmlns=\"http://www.openapplications.org/oagis/10\"", "")
+            str = str.replaceAll("[\\s]+xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", "")
+                    .replaceAll("[\\s]+xmlns=\"http://www.openapplications.org/oagis/10\"", "")
                     .replaceAll("([\t]+)", "\t")
                     .replaceAll("[\t]</", "</");
             sb.append(str);
