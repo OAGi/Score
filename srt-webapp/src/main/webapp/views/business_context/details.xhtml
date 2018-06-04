@@ -28,7 +28,9 @@
 
                 <h:outputText value="Name" styleClass="section-label"/>
                 <h:inputText id="name" value="#{businessContextDetailBean.businessContext.name}"
-                             label="Name" styleClass="section-content input-section">
+                             label="Name" styleClass="section-content input-section"
+                             maxlength="100">
+                    <f:validateLength maximum="100"/>
                     <p:ajax update="form"/>
                 </h:inputText>
             </h:panelGrid>
