@@ -52,6 +52,9 @@ public class P_1_4_PopulateCodeList {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    @Autowired
+    private ImportUtil importUtil;
+
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.4 Start");
@@ -149,7 +152,7 @@ public class P_1_4_PopulateCodeList {
 
                 Element definitionNode = (Element) xh.getNode("//xsd:simpleType[@name = '" + name + "']/xsd:annotation/xsd:documentation");
                 if (definitionNode != null) {
-                    codeList.setDefinition(definitionNode.getTextContent());
+                    codeList.setDefinition(importUtil.toString(definitionNode.getChildNodes()));
                     codeList.setDefinitionSource(definitionNode.getAttribute("source"));
                 }
                 codeList.setExtensibleIndicator(true);  //logic changed. extensible indicator is always TRUE.
@@ -322,7 +325,7 @@ public class P_1_4_PopulateCodeList {
                         }
                         if (definitionNode != null) {
                             Element definition = (Element) definitionNode;
-                            codeListValue.setDefinition(definition.getTextContent().trim());
+                            codeListValue.setDefinition(importUtil.toString(definitionNode.getChildNodes()));
                             codeListValue.setDefinitionSource(definition.getAttribute("source"));
                         }
 
