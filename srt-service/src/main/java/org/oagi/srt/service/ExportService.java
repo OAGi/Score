@@ -512,7 +512,7 @@ public class ExportService {
             if (this.codeListDocument != null) {
                 File codeListFile = new File(tempDir, "CodeList.xsd");
                 try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(codeListFile))) {
-                    outputter.output(this.document, outputStream);
+                    outputter.output(this.codeListDocument, outputStream);
                     outputStream.flush();
                 }
                 targetFiles.add(codeListFile);
