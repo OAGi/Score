@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.List;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -14,7 +14,7 @@ public class Zip {
     private static final Logger logger = LoggerFactory.getLogger(Zip.class);
     private static final int BUFFER = 2048;
 
-    public static File compression(List<File> targetFiles, String filename) throws IOException {
+    public static File compression(Collection<File> targetFiles, String filename) throws IOException {
         File file = File.createTempFile("oagis-", null);
         FileOutputStream dest = new FileOutputStream(file);
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest))) {

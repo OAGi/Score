@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Manage Data</h2>
+            </div>
+        </div>
+        <p:panel>
+            <p:commandButton value="Export Data..." ajax="false"
+                             onclick="PrimeFaces.monitorDownload(function() { PF('loadingBlock').show(); }, function() { PF('loadingBlock').hide(); })"
+                             actionListener="${exportBean.export()}">
+                <p:fileDownload value="#{exportBean.exportedFile}"/>
+            </p:commandButton>
+        </p:panel>
+    </ui:define>
+</ui:composition>

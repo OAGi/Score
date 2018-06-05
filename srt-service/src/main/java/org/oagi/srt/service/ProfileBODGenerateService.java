@@ -705,14 +705,16 @@ public class ProfileBODGenerateService {
                 return generateSchemaForAll(topLevelAbieIds, option);
 
             case Each:
-                return generateSchemaForEach(topLevelAbieIds, option);
+                Map<Long, File> files = generateSchemaForEach(topLevelAbieIds, option);
+                return Zip.compression(files.values(), Utility.generateGUID());
 
             default:
                 throw new IllegalStateException();
         }
     }
 
-    private File generateSchemaForAll(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
+    public File generateSchemaForAll(List<Long> topLevelAbieIds,
+                                     ProfileBODGenerationOption option) throws Exception {
         SchemaExpressionGenerator schemaExpressionGenerator = createSchemaExpressionGenerator(option);
 
         for (long topLevelAbieId : topLevelAbieIds) {
@@ -724,8 +726,9 @@ public class ProfileBODGenerateService {
         return schemaExpressionFile;
     }
 
-    private File generateSchemaForEach(List<Long> topLevelAbieIds, ProfileBODGenerationOption option) throws Exception {
-        List<File> targetFiles = new ArrayList();
+    public Map<Long, File> generateSchemaForEach(List<Long> topLevelAbieIds,
+                                                 ProfileBODGenerationOption option) throws Exception {
+        Map<Long, File> targetFiles = new HashMap();
         for (long topLevelAbieId : topLevelAbieIds) {
             SchemaExpressionGenerator schemaExpressionGenerator = createSchemaExpressionGenerator(option);
 
@@ -733,10 +736,10 @@ public class ProfileBODGenerateService {
             schemaExpressionGenerator.generate(topLevelAbie, option);
 
             File schemaExpressionFile = schemaExpressionGenerator.asFile(topLevelAbie.getAbie().getGuid());
-            targetFiles.add(schemaExpressionFile);
+            targetFiles.put(topLevelAbieId, schemaExpressionFile);
         }
 
-        return Zip.compression(targetFiles, Utility.generateGUID());
+        return targetFiles;
     }
 
     private SchemaExpressionGenerator createSchemaExpressionGenerator(ProfileBODGenerationOption option) {
