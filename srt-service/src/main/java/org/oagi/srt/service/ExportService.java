@@ -13,6 +13,7 @@ import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.expression.ProfileBIEGenerateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class ExportService {
     private ReleaseRepository releaseRepository;
 
     @Autowired
-    private ProfileBODGenerateService profileBODGenerateService;
+    private ProfileBIEGenerateService profileBIEGenerateService;
 
     private interface TraversalExportVisitor {
 
@@ -463,7 +464,7 @@ public class ExportService {
             option.setSchemaPackage(ProfileBODGenerationOption.SchemaPackage.Each);
             option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.XML);
 
-            profileBIEs = profileBODGenerateService.generateSchemaForEach(
+            profileBIEs = profileBIEGenerateService.generateSchemaForEach(
                     topLevelAbies.stream()
                             .map(e -> e.getTopLevelAbieId()).collect(Collectors.toList()),
                     option);

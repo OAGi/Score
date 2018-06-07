@@ -9,7 +9,7 @@ import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.TopLevelAbie;
-import org.oagi.srt.service.ProfileBODGenerateService;
+import org.oagi.srt.service.expression.ProfileBIEGenerateService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -39,7 +39,7 @@ import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaExpression
 @Scope("view")
 @ManagedBean
 @ViewScoped
-public class ProfileBODHandler extends UIHandler implements Serializable {
+public class ProfileBIEHandler extends UIHandler implements Serializable {
 
 	private static final long serialVersionUID = 4424008438705914095L;
 
@@ -59,7 +59,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private TopLevelAbieRepository topLevelAbieRepository;
 
 	@Autowired
-	private ProfileBODGenerateService profileBODGenerateService;
+	private ProfileBIEGenerateService profileBIEGenerateService;
 
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();
@@ -99,7 +99,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
     }
 	
 	public void onABIEChosen(SelectEvent event) {
-		ProfileBODHandler bh = (ProfileBODHandler) event.getObject();
+		ProfileBIEHandler bh = (ProfileBIEHandler) event.getObject();
 		abieViewList.add(bh.getSelected());
 		
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Top-level ABIEs are added", "Top-level ABIEs are added");
@@ -205,7 +205,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}
 
-		generateSchemaFile = profileBODGenerateService.generateSchema(al, generationOption);
+		generateSchemaFile = profileBIEGenerateService.generateSchema(al, generationOption);
 		System.out.println("### " + generateSchemaFile);
 	}
 	

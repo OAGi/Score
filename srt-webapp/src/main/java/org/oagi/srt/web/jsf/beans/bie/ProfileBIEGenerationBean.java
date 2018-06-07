@@ -5,7 +5,7 @@ import org.oagi.srt.repository.ProfileBIERepository;
 import org.oagi.srt.repository.entity.ProfileBIE;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
-import org.oagi.srt.service.ProfileBODGenerateService;
+import org.oagi.srt.service.expression.ProfileBIEGenerateService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -45,7 +45,7 @@ public class ProfileBIEGenerationBean extends UIHandler {
     @Autowired
     private ProfileBIERepository profileBIERepository;
     @Autowired
-    private ProfileBODGenerateService profileBODGenerateService;
+    private ProfileBIEGenerateService profileBIEGenerateService;
 
     @Autowired
     private BusinessInformationEntityService bieService;
@@ -183,7 +183,7 @@ public class ProfileBIEGenerationBean extends UIHandler {
         }
 
         ProfileBODGenerationOption option = getOption();
-        generateSchemaFile = profileBODGenerateService.generateSchema(topLevelAbieIds, option);
+        generateSchemaFile = profileBIEGenerateService.generateSchema(topLevelAbieIds, option);
     }
 
     public StreamedContent getFile() throws Exception {
