@@ -81,6 +81,19 @@ public class ProfileBODGenerationOption {
         public void setOthers(boolean others) {
             this.others = others;
         }
+
+        public BIEDocumentationOption clone() {
+            BIEDocumentationOption clone = new BIEDocumentationOption();
+            clone.bieDefinition = this.bieDefinition;
+            clone.inheritIfEmpty = this.inheritIfEmpty;
+            clone.bieGuid = this.bieGuid;
+            clone.businessContext = this.businessContext;
+            clone.remarkAndStatus = this.remarkAndStatus;
+            clone.bieVersion = this.bieVersion;
+            clone.businessTerm = this.businessTerm;
+            clone.others = this.others;
+            return clone;
+        }
     }
 
     public static class CCDocumentationOption {
@@ -122,6 +135,15 @@ public class ProfileBODGenerationOption {
 
         public void setOthers(boolean others) {
             this.others = others;
+        }
+
+        public CCDocumentationOption clone() {
+            CCDocumentationOption clone = new CCDocumentationOption();
+            clone.ccDefinition = this.ccDefinition;
+            clone.ccGuid = this.ccGuid;
+            clone.ccVersion = this.ccVersion;
+            clone.others = this.others;
+            return clone;
         }
     }
 
@@ -171,5 +193,14 @@ public class ProfileBODGenerationOption {
 
     public void setSchemaPackage(SchemaPackage schemaPackage) {
         this.schemaPackage = schemaPackage;
+    }
+
+    public ProfileBODGenerationOption clone() {
+        ProfileBODGenerationOption clone = new ProfileBODGenerationOption();
+        clone.bieDocumentationOption = this.bieDocumentationOption.clone();
+        clone.ccDocumentationOption = this.ccDocumentationOption.clone();
+        clone.schemaExpression = this.schemaExpression;
+        clone.schemaPackage = this.schemaPackage;
+        return clone;
     }
 }

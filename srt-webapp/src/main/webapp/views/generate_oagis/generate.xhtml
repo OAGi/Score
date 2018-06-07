@@ -85,18 +85,18 @@
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="definitionCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieDefinition}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="BIE Definition" styleClass="outputtext-disabled"/>
+                                <h:outputText value="BIE Definition" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="remarkStatusCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.remarkAndStatus}"
-                                                         disabled="true">
-                                    <f:ajax render="bieDocumentationOption" styleClass="outputtext-disabled"/>
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
+                                    <f:ajax render="bieDocumentationOption" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Remark &amp; Status" styleClass="outputtext-disabled"/>
+                                <h:outputText value="Remark &amp; Status" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left"
@@ -112,44 +112,44 @@
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="versionCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieVersion}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="BIE Version" styleClass="outputtext-disabled"/>
+                                <h:outputText value="BIE Version" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.bieGuid}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="BIE GUID" styleClass="outputtext-disabled"/>
+                                <h:outputText value="BIE GUID" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="termCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.businessTerm}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Business Term" styleClass="outputtext-disabled"/>
+                                <h:outputText value="Business Term" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.businessContext}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Business Context" styleClass="outputtext-disabled"/>
+                                <h:outputText value="Business Context" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="othersCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.bieDocumentationOption.others}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Others (DEN, etc.)" styleClass="outputtext-disabled"/>
+                                <h:outputText value="Others (DEN, etc.)" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                         </h:panelGrid>
                     </p:panel>
@@ -160,35 +160,35 @@
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ccDefinitionCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccDefinition}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="CC Definition" styleClass="outputtext-disabled"/>
+                                <h:outputText value="CC Definition" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="ccVersionCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccVersion}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="CC Version" styleClass="outputtext-disabled"/>
+                                <h:outputText value="CC Version" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left">
                                 <h:selectBooleanCheckbox id="ccguidCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.ccDocumentationOption.ccGuid}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="CC GUID" styleClass="outputtext-disabled"/>
+                                <h:outputText value="CC GUID" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="ccOthersCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.ccDocumentationOption.others}"
-                                                         disabled="true">
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="ccDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Others (DEN, etc.)" styleClass="outputtext-disabled"/>
+                                <h:outputText value="Others (DEN, etc.)" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                         </h:panelGrid>
                     </p:panel>
@@ -206,7 +206,7 @@
                                           value="#{profileBIEGenerationBean.option.schemaExpression}">
                             <f:selectItem itemValue="XML" itemLabel="XML Schema"/>
                             <f:selectItem itemValue="JSON" itemLabel="JSON Schema"/>
-                            <f:ajax render=":form:schemaExpressionOption"/>
+                            <f:ajax listener="#{profileBIEGenerationBean.onChangeSchemaExpressionOption()}" render=":form:optPanel1"/>
                         </h:selectOneRadio>
                     </h:panelGrid>
                 </div>
@@ -218,7 +218,7 @@
                                           value="#{profileBIEGenerationBean.option.schemaPackage}">
                             <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
                             <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"/>
-                            <f:ajax render=":form:schemaPackageOption"/>
+                            <f:ajax render=":form:optPanel1"/>
                         </h:selectOneRadio>
                     </h:panelGrid>
                 </div>

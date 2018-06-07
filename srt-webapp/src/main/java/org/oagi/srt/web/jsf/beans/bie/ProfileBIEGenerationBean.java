@@ -30,6 +30,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaExpression.JSON;
+import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaExpression.XML;
+
 @Controller
 @Scope("view")
 @ManagedBean
@@ -145,6 +148,30 @@ public class ProfileBIEGenerationBean extends UIHandler {
         Collections.sort(profileBIES, (a, b) ->
                 (int) (b.getCreationTimestamp().getTime() - a.getCreationTimestamp().getTime()));
         setProfileBIEs(profileBIES);
+    }
+
+    private ProfileBODGenerationOption backupOption;
+
+    public void onChangeSchemaExpressionOption() {
+        switch (this.option.getSchemaExpression()) {
+            case XML:
+                if (backupOption != null) {
+                    this.option = backupOption;
+                    backupOption = null;
+
+                    this.option.setSchemaExpression(XML);
+                }
+
+                break;
+
+            case JSON:
+                backupOption = option.clone();
+                this.option = new ProfileBODGenerationOption();
+                this.option.setSchemaExpression(JSON);
+                this.option.setSchemaPackage(backupOption.getSchemaPackage());
+
+                break;
+        }
     }
 
     private File generateSchemaFile;
