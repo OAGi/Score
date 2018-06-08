@@ -39,7 +39,7 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
                          TopLevelAbie topLevelAbie, ProfileBODGenerationOption option) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
 
-        AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
+        AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie);
         AggregateBusinessInformationEntity typeAbie = generationContext.queryTargetABIE(asbiep);
 
         Map<String, Object> definitions;

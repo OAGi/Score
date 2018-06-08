@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -78,6 +79,22 @@ public class GenerationContext {
 
     @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
+
+    @Autowired
+    private ContextCategoryRepository contextCategoryRepository;
+
+    @Autowired
+    private ContextSchemeRepository contextSchemeRepository;
+
+    @Autowired
+    private ContextSchemeValueRepository contextSchemeValueRepository;
+
+    @Autowired
+    private BusinessContextRepository businessContextRepository;
+
+    @Autowired
+    private BusinessContextValueRepository businessContextValueRepository;
+
 
     public void init(TopLevelAbie topLevelAbie) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
@@ -405,8 +422,8 @@ public class GenerationContext {
         return findBbieScByBbieIdAndUsedIsTrue(bbieId);
     }
 
-    public AssociationBusinessInformationEntityProperty receiveASBIEP(long abieId) {
-        return findAsbiepByRoleOfAbieId(abieId);
+    public AssociationBusinessInformationEntityProperty receiveASBIEP(AggregateBusinessInformationEntity abie) {
+        return findAsbiepByRoleOfAbieId(abie.getAbieId());
     }
 
     public DataType queryBDT(BasicBusinessInformationEntity bbie) {
@@ -535,5 +552,32 @@ public class GenerationContext {
         BasicCoreComponent bcc = findBCC(bbie.getBasedBccId());
         BasicCoreComponentProperty bccp = findBCCP(bcc.getToBccpId());
         return queryBDT(bccp);
+    }
+
+    public BusinessContext findBusinessContext(TopLevelAbie topLevelAbie) {
+        long bizCtxId = topLevelAbie.getAbie().getBizCtxId();
+        return businessContextRepository.findOne(bizCtxId);
+    }
+
+    public List<ContextSchemeValue> findContextSchemeValue(BusinessContext businessContext) {
+        List<BusinessContextValue> businessContextValues =
+                businessContextValueRepository.findByBizCtxId(businessContext.getBizCtxId());
+
+        return businessContextValues.stream().map(e -> e.getContextSchemeValue()).collect(Collectors.toList());
+    }
+
+    public AgencyIdList findAgencyIdList(ContextScheme contextScheme) {
+        String schemeAgencyId = contextScheme.getSchemeAgencyId();
+        if (StringUtils.isEmpty(schemeAgencyId)) {
+            return null;
+        }
+
+        for (AgencyIdList agencyIdList : findAgencyIdListMap.values()) {
+            if (schemeAgencyId.equals(agencyIdList.getListId())) {
+                return agencyIdList;
+            }
+        }
+
+        return null;
     }
 }

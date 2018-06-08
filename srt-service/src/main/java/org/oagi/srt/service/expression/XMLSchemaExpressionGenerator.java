@@ -1,21 +1,23 @@
 package org.oagi.srt.service.expression;
 
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import org.apache.commons.io.FileUtils;
+import org.jdom2.*;
+import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.oagi.srt.ServiceApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +64,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         this.generationContext = generationContext;
         this.option = option;
 
-        AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-        AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
-        logger.debug("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
-        generateTopLevelABIE(asbiep);
+        generateTopLevelABIE(topLevelAbie);
     }
 
     @Override
@@ -84,11 +83,17 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         return tempFile;
     }
 
-    public Document generateTopLevelABIE(AssociationBusinessInformationEntityProperty asbiep) {
-        rootElementNode = generateTopLevelASBIEP(asbiep);
-        AggregateBusinessInformationEntity abie = generationContext.queryTargetABIE(asbiep);
+    public Document generateTopLevelABIE(TopLevelAbie topLevelAbie) {
+        AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+        AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie);
+        logger.debug("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
+
+        rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAbie);
+
+        abie = generationContext.queryTargetABIE(asbiep);
         Element rootSeqNode = generateABIE(abie, rootElementNode);
         generateBIEs(abie, rootSeqNode);
+
         return document;
     }
 
@@ -158,27 +163,158 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
     private void setDefinition(Element node, String contextDefinition, String componentDefinition) {
         ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
-        if (bieDocumentationOption.isBieDefinition()) {
-            String definition = contextDefinition;
-            if (StringUtils.isEmpty(definition) && bieDocumentationOption.isInheritIfEmpty()) {
-                definition = componentDefinition;
+        if (!bieDocumentationOption.isBieDefinition()) {
+            return;
+        }
+
+        String definition = contextDefinition;
+        if (StringUtils.isEmpty(definition) && bieDocumentationOption.isInheritIfEmpty()) {
+            definition = componentDefinition;
+        }
+
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
+
+        Element annotation = node.getChild("annotation", XSD_NAMESPACE);
+        if (annotation == null) {
+            annotation = newElement("annotation");
+            node.addContent(0, annotation);
+        }
+
+        Element documentation = newElement("documentation");
+        documentation.setAttribute("source", OAGI_NS);
+        documentation.setText(definition);
+
+        annotation.addContent(documentation);
+    }
+
+    private void setBusinessContext(Element node, TopLevelAbie topLevelAbie) {
+        ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
+        if (!bieDocumentationOption.isBusinessContext()) {
+            return;
+        }
+
+        Element annotation = node.getChild("annotation", XSD_NAMESPACE);
+        if (annotation == null) {
+            annotation = newElement("annotation");
+            node.addContent(0, annotation);
+        }
+
+        Element documentation = newElement("documentation");
+        annotation.addContent(documentation);
+
+        Element ccts_BusinessContext = new Element("ccts_BusinessContext", OAGI_NS);
+        documentation.addContent(ccts_BusinessContext);
+
+        BusinessContext businessContext = generationContext.findBusinessContext(topLevelAbie);
+
+        Element ccts_BusinessContextGUID = new Element("ccts_BusinessContextGUID", OAGI_NS);
+        ccts_BusinessContext.addContent(ccts_BusinessContextGUID);
+        ccts_BusinessContextGUID.setText(businessContext.getGuid());
+
+        Element ccts_BusinessContextName = new Element("ccts_BusinessContextName", OAGI_NS);
+        ccts_BusinessContext.addContent(ccts_BusinessContextName);
+        ccts_BusinessContextName.setText(businessContext.getName());
+
+        List<ContextSchemeValue> contextSchemeValues = generationContext.findContextSchemeValue(businessContext);
+        for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
+            Element ccts_ContextValue = new Element("ccts_ContextValue", OAGI_NS);
+            ccts_BusinessContext.addContent(ccts_ContextValue);
+
+            Element ccts_ContextSchemeValueGUID = new Element("ccts_ContextSchemeValueGUID", OAGI_NS);
+            ccts_ContextValue.addContent(ccts_ContextSchemeValueGUID);
+            ccts_ContextSchemeValueGUID.setText(contextSchemeValue.getGuid());
+
+            Element ccts_ContextSchemeValue = new Element("ccts_ContextSchemeValue", OAGI_NS);
+            ccts_ContextValue.addContent(ccts_ContextSchemeValue);
+            ccts_ContextSchemeValue.setText(contextSchemeValue.getValue());
+
+            Element ccts_ContextSchemeValueMeaning = new Element("ccts_ContextSchemeValueMeaning", OAGI_NS);
+            ccts_ContextValue.addContent(ccts_ContextSchemeValueMeaning);
+            ccts_ContextSchemeValueMeaning.setText(contextSchemeValue.getMeaning());
+
+            ContextScheme contextScheme = contextSchemeValue.getContextScheme();
+
+            Element ccts_ClassificationScheme = new Element("ccts_ClassificationScheme", OAGI_NS);
+            ccts_ContextValue.addContent(ccts_ClassificationScheme);
+
+            Element ccts_ClassificationSchemeGUID = new Element("ccts_ClassificationSchemeGUID", OAGI_NS);
+            ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeGUID);
+            ccts_ClassificationSchemeGUID.setText(contextScheme.getGuid());
+
+            {
+                ContextCategory contextCategory = contextScheme.getContextCategory();
+
+                Element ccts_ContextCategory = new Element("ccts_ContextCategory", OAGI_NS);
+                ccts_ClassificationScheme.addContent(ccts_ContextCategory);
+
+                Element ccts_ContextCategoryGUID = new Element("ccts_ContextCategoryGUID", OAGI_NS);
+                ccts_ContextCategory.addContent(ccts_ContextCategoryGUID);
+                ccts_ContextCategoryGUID.setText(contextCategory.getGuid());
+
+                Element ccts_ContextCategoryName = new Element("ccts_ContextCategoryName", OAGI_NS);
+                ccts_ContextCategory.addContent(ccts_ContextCategoryName);
+                ccts_ContextCategoryName.setText(contextCategory.getName());
+
+                Element ccts_ContextCategoryDescription = new Element("ccts_ContextCategoryDescription", OAGI_NS);
+                ccts_ContextCategory.addContent(ccts_ContextCategoryDescription);
+                ccts_ContextCategoryDescription.setText(contextCategory.getDescription());
             }
 
-            if (StringUtils.isEmpty(definition)) {
-                return;
+            Element ccts_ClassificationSchemeName = new Element("ccts_ClassificationSchemeName", OAGI_NS);
+            ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeName);
+            ccts_ClassificationSchemeName.setText(contextScheme.getSchemeName());
+
+            Element ccts_ClassificationSchemeAgencyID = new Element("ccts_ClassificationSchemeAgencyID", OAGI_NS);
+            ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeAgencyID);
+            String schemeAgencyId = contextScheme.getSchemeAgencyId();
+            AgencyIdList agencyIdList = generationContext.findAgencyIdList(contextScheme);
+            if (agencyIdList != null) {
+                ccts_ClassificationSchemeAgencyID.setText(agencyIdList.getListId());
+                ccts_ClassificationSchemeAgencyID.setAttribute("schemeVersionID", agencyIdList.getVersionId());
+            } else {
+                ccts_ClassificationSchemeAgencyID.setText(schemeAgencyId);
             }
 
-            Element annotation = newElement("annotation");
-            Element documentation = newElement("documentation");
-            documentation.setAttribute("source", OAGI_NS);
-            documentation.setText(definition);
+            Element ccts_ClassificationSchemeVersionID = new Element("ccts_ClassificationSchemeVersionID", OAGI_NS);
+            ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeVersionID);
+            ccts_ClassificationSchemeVersionID.setText(contextScheme.getSchemeVersionId());
 
-            node.addContent(annotation);
-            annotation.addContent(documentation);
+            Element ccts_ClassificationSchemeDefinition = new Element("ccts_ClassificationSchemeDefinition", OAGI_NS);
+            ccts_ClassificationScheme.addContent(ccts_ClassificationSchemeDefinition);
+            ccts_ClassificationSchemeDefinition.setText(contextScheme.getDescription());
         }
     }
 
-    public Element generateTopLevelASBIEP(AssociationBusinessInformationEntityProperty asbiep) {
+    private void setOptionalDocumentation(Element node,
+                                          AssociationBusinessInformationEntityProperty asbiep,
+                                          AssociationCoreComponentProperty asccp) {
+        ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
+
+        boolean bieGuid = bieDocumentationOption.isBieGuid();
+        boolean remarkAndStatus = bieDocumentationOption.isRemarkAndStatus();
+        boolean bieVersion = bieDocumentationOption.isBieVersion();
+
+        boolean businessTerm = bieDocumentationOption.isBusinessTerm();
+        if (businessTerm) {
+            Element ccts_BusinessTerm = new Element("ccts_BusinessTerm", OAGI_NS);
+            ccts_BusinessTerm.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+            ccts_BusinessTerm.setText(asbiep.getBizTerm());
+        }
+
+        boolean bieOthers = bieDocumentationOption.isOthers();
+
+        ProfileBODGenerationOption.CCDocumentationOption ccDocumentationOption = option.getCcDocumentationOption();
+
+        boolean ccDefinition = ccDocumentationOption.isCcDefinition();
+        boolean ccGuid = ccDocumentationOption.isCcGuid();
+        boolean ccVersion = ccDocumentationOption.isCcVersion();
+        boolean ccOthers = ccDocumentationOption.isOthers();
+
+    }
+
+    public Element generateTopLevelASBIEP(AssociationBusinessInformationEntityProperty asbiep, TopLevelAbie topLevelAbie) {
         if (isProcessed(asbiep)) {
             return getProcessedElement(asbiep);
         }
@@ -189,7 +325,10 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         rootEleNode.setAttribute("name", asccp.getPropertyTerm().replaceAll(" ", ""));
         rootEleNode.setAttribute("id", asbiep.getGuid());
+
         setDefinition(rootEleNode, asbiep.getDefinition(), asccp.getDefinition());
+        setBusinessContext(rootEleNode, topLevelAbie);
+        setOptionalDocumentation(rootEleNode, asbiep, asccp);
 
         setProcessedElement(asbiep, rootEleNode);
 
@@ -205,43 +344,39 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         complexType.setAttribute("id", abie.getGuid());
         parentNode.addContent(complexType);
 
-        //serm: why is this one called generateACC - the function name is not sensible.
-        Element sequenceElement = generateACC(abie, complexType);
+        AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
+        setDefinition(complexType, abie.getDefinition(), acc.getDefinition());
+
+        Element sequenceElement = newElement("sequence");
+        complexType.addContent(sequenceElement);
         setProcessedElement(abie, sequenceElement);
 
         return sequenceElement;
     }
 
-    public Element generateACC(AggregateBusinessInformationEntity abie, Element complexType) {
-        AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
-        Element sequenceElement = newElement("sequence");
-        complexType.addContent(sequenceElement);
-
-        setDefinition(complexType, abie.getDefinition(), acc.getDefinition());
-
-        return sequenceElement;
-    }
-
-    public void generateBIEs(AggregateBusinessInformationEntity abie, Element gPNode) {
+    public void generateBIEs(AggregateBusinessInformationEntity abie, Element parent) {
 
         List<BusinessInformationEntity> childBIEs = generationContext.queryChildBIEs(abie);
         for (BusinessInformationEntity bie : childBIEs) {
             if (bie instanceof BasicBusinessInformationEntity) {
-                BasicBusinessInformationEntity childBIE = (BasicBusinessInformationEntity) bie;
-                DataType bdt = generationContext.queryAssocBDT(childBIE);
-                generateBBIE(childBIE, bdt, gPNode);
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) bie;
+                DataType bdt = generationContext.queryAssocBDT(bbie);
+                generateBBIE(bbie, bdt, parent);
             } else {
-                AssociationBusinessInformationEntity childBIE = (AssociationBusinessInformationEntity) bie;
+                AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) bie;
 
-                if (isAnyProperty(childBIE, generationContext)) {
-                    generateAnyABIE(childBIE, gPNode);
+                if (isAnyProperty(asbie, generationContext)) {
+                    generateAnyABIE(asbie, parent);
                 } else {
-                    Element node = generateASBIE(childBIE, gPNode);
-                    AssociationBusinessInformationEntityProperty anASBIEP = generationContext.queryAssocToASBIEP(childBIE);
-                    node = generateASBIEP(anASBIEP, node);
-                    AggregateBusinessInformationEntity anABIE = generationContext.queryTargetABIE2(anASBIEP);
-                    node = generateABIE(anABIE, node);
-                    generateBIEs(anABIE, node);
+                    Element node = generateASBIE(asbie, parent);
+                    AssociationBusinessInformationEntityProperty asbiep = generationContext.queryAssocToASBIEP(asbie);
+                    Element asbiepNode = generateASBIEP(asbiep, node);
+                    AggregateBusinessInformationEntity childAbie = generationContext.queryTargetABIE2(asbiep);
+                    Element sequenceNode = generateABIE(childAbie, asbiepNode);
+                    generateBIEs(childAbie, sequenceNode);
+                    if (sequenceNode.getChildren().isEmpty()) {
+                        sequenceNode.detach();
+                    }
                 }
             }
         }
@@ -355,7 +490,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         return eNode;
     }
 
-    public Element generateASBIE(AssociationBusinessInformationEntity asbie, Element gPNode) {
+    public Element generateASBIE(AssociationBusinessInformationEntity asbie, Element parent) {
         Element element = newElement("element");
         element.setAttribute("id", asbie.getGuid());
         element.setAttribute("minOccurs", String.valueOf(asbie.getCardinalityMin()));
@@ -366,14 +501,14 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         if (asbie.isNillable())
             element.setAttribute("nillable", String.valueOf(asbie.isNillable()));
 
-        while (!gPNode.getName().equals("sequence")) {
-            gPNode = gPNode.getParentElement();
+        while (!parent.getName().equals("sequence")) {
+            parent = parent.getParentElement();
         }
 
         AssociationCoreComponent ascc = generationContext.queryBasedASCC(asbie);
         setDefinition(element, asbie.getDefinition(), ascc.getDefinition());
 
-        gPNode.addContent(element);
+        parent.addContent(element);
         return element;
     }
 
@@ -869,14 +1004,22 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         return stNode;
     }
 
-    public List<AggregateBusinessInformationEntity> receiveABIE(GenerationContext generationContext, List<Integer> abieIds) {
-        List<AggregateBusinessInformationEntity> abieList = new ArrayList();
-        for (int abieId : abieIds) {
-            AggregateBusinessInformationEntity abie = generationContext.findAbie(abieId);
-            if (abie != null) {
-                abieList.add(abie);
+    public static void main(String[] args) throws Exception {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ServiceApplication.class, args)) {
+            ProfileBIEGenerateService profileBIEGenerateService = ctx.getBean(ProfileBIEGenerateService.class);
+            ProfileBODGenerationOption option = new ProfileBODGenerationOption();
+            option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.XML);
+            option.setSchemaPackage(ProfileBODGenerationOption.SchemaPackage.All);
+            option.getBieDocumentationOption().setBieDefinition(true);
+            option.getBieDocumentationOption().setInheritIfEmpty(true);
+            option.getBieDocumentationOption().setBusinessContext(true);
+
+            File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(1L), option);
+            for (String line : FileUtils.readLines(schemaFile)) {
+                System.out.println(line);
             }
+
+            FileUtils.deleteQuietly(schemaFile);
         }
-        return abieList;
     }
 }
