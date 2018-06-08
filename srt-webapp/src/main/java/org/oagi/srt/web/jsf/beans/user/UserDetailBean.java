@@ -54,7 +54,7 @@ public class UserDetailBean extends UIHandler {
     }
 
     @Transactional
-    public String update() {
+    public String create() {
         String loginId = user.getLoginId();
         if (userService.findByLoginId(loginId) != null) {
             FacesContext.getCurrentInstance().addMessage(null,
@@ -62,6 +62,11 @@ public class UserDetailBean extends UIHandler {
             return null;
         }
 
+        return update();
+    }
+
+    @Transactional
+    public String update() {
         try {
             userService.update(user);
         } catch (Throwable t) {
