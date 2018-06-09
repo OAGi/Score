@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.oagi</groupId>
 	<artifactId>srt-webapp</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<packaging>war</packaging>
 
 	<name>oagi-srt-webapp</name>
@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.oagi</groupId>
 		<artifactId>srt</artifactId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<properties>
@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>org.oagi</groupId>
 			<artifactId>srt-service</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

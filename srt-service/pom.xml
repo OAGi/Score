@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.oagi</groupId>
     <artifactId>srt-service</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>oagi-srt-service</name>
@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.oagi</groupId>
         <artifactId>srt</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1.0</version>
     </parent>
 
     <properties>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.oagi</groupId>
             <artifactId>srt-repository</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
