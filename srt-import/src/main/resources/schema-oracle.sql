@@ -2943,9 +2943,6 @@ The column name is specific to BDT because, the column does not apply to CDT.' ;
   COMMENT ON COLUMN DT.IS_DEPRECATED
 IS
   'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).' ;
-  CREATE INDEX DT_GUID_IDX ON DT
-    ( GUID ASC
-    ) LOGGING ;
 CREATE UNIQUE INDEX DT_DT_ID_IDX ON DT
   (
     DT_ID ASC
@@ -3031,9 +3028,6 @@ IS
   COMMENT ON COLUMN DT_SC.BASED_DT_SC_ID
 IS
   'Foreign key to the DT_SC table itself. This column is used when the SC is derived from the based DT.' ;
-  CREATE INDEX DT_SC_GUID_IDX ON DT_SC
-    ( GUID ASC
-    ) LOGGING ;
 CREATE UNIQUE INDEX DT_SC_DT_SC_ID_IDX ON DT_SC
   (
     DT_SC_ID ASC
