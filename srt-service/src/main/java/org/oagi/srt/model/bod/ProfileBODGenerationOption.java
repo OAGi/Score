@@ -9,6 +9,7 @@ public class ProfileBODGenerationOption {
     private boolean bieCctsMetaData;
     private boolean businessContext;
     private boolean includeCctsDefinitionTag;
+    private boolean includeWhoColumns;
     private boolean bieOagiSrtMetaData;
     private boolean basedCcMetaData;
 
@@ -50,6 +51,14 @@ public class ProfileBODGenerationOption {
 
     public void setIncludeCctsDefinitionTag(boolean includeCctsDefinitionTag) {
         this.includeCctsDefinitionTag = includeCctsDefinitionTag;
+    }
+
+    public boolean isIncludeWhoColumns() {
+        return includeWhoColumns;
+    }
+
+    public void setIncludeWhoColumns(boolean includeWhoColumns) {
+        this.includeWhoColumns = includeWhoColumns;
     }
 
     public boolean isBieOagiSrtMetaData() {
@@ -104,6 +113,7 @@ public class ProfileBODGenerationOption {
         clone.bieCctsMetaData = this.bieCctsMetaData;
         clone.businessContext = this.businessContext;
         clone.includeCctsDefinitionTag = this.includeCctsDefinitionTag;
+        clone.includeWhoColumns = includeWhoColumns;
         clone.bieOagiSrtMetaData = this.bieOagiSrtMetaData;
         clone.basedCcMetaData = this.basedCcMetaData;
         clone.schemaExpression = this.schemaExpression;

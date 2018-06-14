@@ -91,12 +91,12 @@
                                 <h:outputText value="BIE Definition" />
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
-                                <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBIEGenerationBean.option.bieGuid}"
+                                <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
+                                                         value="#{profileBIEGenerationBean.option.businessContext}"
                                                          disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="BIE GUID" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
+                                <h:outputText value="Business Context" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left">
@@ -108,12 +108,12 @@
                                 <h:outputText value="BIE CCTS Meta Data" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
                             <h:panelGroup styleClass="option-right">
-                                <h:selectBooleanCheckbox id="ctxCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBIEGenerationBean.option.businessContext}"
+                                <h:selectBooleanCheckbox id="oagiSrtMetaDataCB" styleClass="boolean-checkbox"
+                                                         value="#{profileBIEGenerationBean.option.bieOagiSrtMetaData}"
                                                          disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="Business Context" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
+                                <h:outputText value="BIE OAGi/SRT Meta Data" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left"
@@ -126,17 +126,26 @@
                                 <h:outputText value="Include CCTS_Definition Tag"
                                               styleClass="#{profileBIEGenerationBean.option.bieCctsMetaData == false ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
-                            <h:panelGroup styleClass="option-right">
-                                <h:selectBooleanCheckbox id="oagiSrtMetaDataCB" styleClass="boolean-checkbox"
-                                                         value="#{profileBIEGenerationBean.option.bieOagiSrtMetaData}"
-                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
+                            <h:panelGroup styleClass="option-right"
+                                          style="left: 410px;">
+                                <h:selectBooleanCheckbox id="includeWHOColumns" styleClass="boolean-checkbox"
+                                                         value="#{profileBIEGenerationBean.option.includeWhoColumns}"
+                                                         disabled="#{profileBIEGenerationBean.option.bieOagiSrtMetaData == false}">
                                     <f:ajax render="bieDocumentationOption"/>
                                 </h:selectBooleanCheckbox>
-                                <h:outputText value="BIE OAGi/SRT Meta Data" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
+                                <h:outputText value="Include WHO Columns"
+                                              styleClass="#{profileBIEGenerationBean.option.bieOagiSrtMetaData == false ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
 
                             <h:panelGroup styleClass="option-left">
+                                <h:selectBooleanCheckbox id="guidCB" styleClass="boolean-checkbox"
+                                                         value="#{profileBIEGenerationBean.option.bieGuid}"
+                                                         disabled="#{profileBIEGenerationBean.option.schemaExpression ne 'XML'}">
+                                    <f:ajax render="bieDocumentationOption"/>
+                                </h:selectBooleanCheckbox>
+                                <h:outputText value="BIE GUID" styleClass="#{profileBIEGenerationBean.option.schemaExpression ne 'XML' ? 'outputtext-disabled' : ''}"/>
                             </h:panelGroup>
+
                             <h:panelGroup styleClass="option-right">
                                 <h:selectBooleanCheckbox id="basedCcMetaDataCB" styleClass="boolean-checkbox"
                                                          value="#{profileBIEGenerationBean.option.basedCcMetaData}"

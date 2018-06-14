@@ -95,6 +95,8 @@ public class GenerationContext {
     @Autowired
     private BusinessContextValueRepository businessContextValueRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     public void init(TopLevelAbie topLevelAbie) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
@@ -198,6 +200,9 @@ public class GenerationContext {
                 .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
         findAsbiepByRoleOfAbieIdMap = asbiepList.stream()
                 .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
+
+        findUserNameMap = userRepository.findAll().stream()
+                .collect(Collectors.toMap(e -> e.getAppUserId(), e -> e.getLoginId()));
     }
 
     // Prepared Datas
@@ -361,8 +366,14 @@ public class GenerationContext {
         return findAsbiepByRoleOfAbieIdMap.get(roleOfAbieId);
     }
 
-    public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity gABIE) {
-        long basedAccId = gABIE.getBasedAccId();
+    private Map<Long, String> findUserNameMap;
+
+    public String findUserName(long userId) {
+        return findUserNameMap.get(userId);
+    }
+
+    public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity abie) {
+        long basedAccId = abie.getBasedAccId();
         return findACC(basedAccId);
     }
 
