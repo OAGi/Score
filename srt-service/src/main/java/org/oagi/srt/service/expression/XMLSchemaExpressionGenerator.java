@@ -162,13 +162,12 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     }
 
     private void setDefinition(Element node, String contextDefinition, String componentDefinition) {
-        ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
-        if (!bieDocumentationOption.isBieDefinition()) {
+        if (!option.isBieDefinition()) {
             return;
         }
 
         String definition = contextDefinition;
-        if (StringUtils.isEmpty(definition) && bieDocumentationOption.isInheritIfEmpty()) {
+        if (StringUtils.isEmpty(definition) && option.isIncludeCctsDefinitionTag()) {
             definition = componentDefinition;
         }
 
@@ -190,8 +189,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     }
 
     private void setBusinessContext(Element node, TopLevelAbie topLevelAbie) {
-        ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
-        if (!bieDocumentationOption.isBusinessContext()) {
+        if (!option.isBusinessContext()) {
             return;
         }
 
@@ -290,27 +288,14 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     private void setOptionalDocumentation(Element node,
                                           AssociationBusinessInformationEntityProperty asbiep,
                                           AssociationCoreComponentProperty asccp) {
-        ProfileBODGenerationOption.BIEDocumentationOption bieDocumentationOption = option.getBieDocumentationOption();
 
-        boolean bieGuid = bieDocumentationOption.isBieGuid();
-        boolean remarkAndStatus = bieDocumentationOption.isRemarkAndStatus();
-        boolean bieVersion = bieDocumentationOption.isBieVersion();
+        boolean basedCcMetaData = option.isBasedCcMetaData();
 
-        boolean businessTerm = bieDocumentationOption.isBusinessTerm();
-        if (businessTerm) {
+        if (basedCcMetaData) {
             Element ccts_BusinessTerm = new Element("ccts_BusinessTerm", OAGI_NS);
             ccts_BusinessTerm.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
             ccts_BusinessTerm.setText(asbiep.getBizTerm());
         }
-
-        boolean bieOthers = bieDocumentationOption.isOthers();
-
-        ProfileBODGenerationOption.CCDocumentationOption ccDocumentationOption = option.getCcDocumentationOption();
-
-        boolean ccDefinition = ccDocumentationOption.isCcDefinition();
-        boolean ccGuid = ccDocumentationOption.isCcGuid();
-        boolean ccVersion = ccDocumentationOption.isCcVersion();
-        boolean ccOthers = ccDocumentationOption.isOthers();
 
     }
 
@@ -1010,9 +995,6 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             ProfileBODGenerationOption option = new ProfileBODGenerationOption();
             option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.XML);
             option.setSchemaPackage(ProfileBODGenerationOption.SchemaPackage.All);
-            option.getBieDocumentationOption().setBieDefinition(true);
-            option.getBieDocumentationOption().setInheritIfEmpty(true);
-            option.getBieDocumentationOption().setBusinessContext(true);
 
             File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(1L), option);
             for (String line : FileUtils.readLines(schemaFile)) {
