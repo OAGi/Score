@@ -22,12 +22,23 @@
         <p:panel>
             <h:panelGrid columns="2" cellpadding="3">
                 <h:outputText value="Login ID" styleClass="section-label"/>
-                <h:inputText id="bG9naW5JZA" value="#{userDetailBean.user.loginId}"
-                             required="true" pt:autocomplete="nope"
-                             requiredMessage="Please fill out 'Login ID' field."
-                             maxlength="45"
-                             label="Login ID" styleClass="section-content input-section">
+                <h:inputText id="bG9naW5JZA" value="#{userDetailBean.user.loginId}" pt:autocomplete="nope"
+                             required="true" requiredMessage="Please fill out 'Login ID' field."
+                             maxlength="45" disabled="#{userDetailBean.user.appUserId > 0}"
+                             label="Login ID" styleClass="section-content input-section #{userDetailBean.user.appUserId > 0 ? 'disabled' : ''}">
                     <f:validateLength maximum="45"/>
+                </h:inputText>
+
+                <h:outputText value="Name" styleClass="section-label"/>
+                <h:inputText value="#{userDetailBean.user.name}" pt:autocomplete="nope" maxlength="100"
+                             label="Name" styleClass="section-content input-section">
+                    <f:validateLength maximum="100"/>
+                </h:inputText>
+
+                <h:outputText value="Organization" styleClass="section-label"/>
+                <h:inputText value="#{userDetailBean.user.organization}" pt:autocomplete="nope" maxlength="100"
+                             label="Organization" styleClass="section-content input-section">
+                    <f:validateLength maximum="100"/>
                 </h:inputText>
 
                 <h:outputText value="Password" styleClass="section-label"/>
@@ -50,7 +61,7 @@
 
         <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
                          rendered="#{userDetailBean.user.appUserId == 0}"
-                         action="#{userDetailBean.update()}"/>
+                         action="#{userDetailBean.create()}"/>
 
         <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
                          rendered="#{userDetailBean.user.appUserId != 0}"
