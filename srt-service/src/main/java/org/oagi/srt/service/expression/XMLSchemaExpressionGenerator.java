@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import static org.oagi.srt.common.SRTConstants.OAGI_NS;
+import static org.oagi.srt.common.util.Utility.toZuluTimeString;
 import static org.oagi.srt.service.expression.Helper.*;
 
 class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
@@ -90,7 +91,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAbie);
 
         abie = generationContext.queryTargetABIE(asbiep);
-        Element rootSeqNode = generateABIE(abie, rootElementNode);
+        Element rootSeqNode = generateABIE(topLevelAbie, rootElementNode);
         generateBIEs(abie, rootSeqNode);
 
         return document;
@@ -274,11 +275,32 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
     }
 
+    private class Definition {
+        private String definition;
+        private String definitionSource;
+
+        public Definition(String definition) {
+            this.definition = definition;
+        }
+
+        public Definition(String definition, String definitionSource) {
+            this.definition = definition;
+            this.definitionSource = definitionSource;
+        }
+
+        public String getDefinition() {
+            return definition;
+        }
+
+        public String getDefinitionSource() {
+            return definitionSource;
+        }
+    }
+
     private interface BIEMetaData {
         String getEntityTypeCode();
         String getDictionaryEntryName();
-        String getDefinition();
-        String getDefinitionSource();
+        Collection<Definition> getDefinitions();
         String getObjectClassTermName();
         String getPropertyTermName();
         String getRepresentationTermName();
@@ -287,9 +309,10 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     }
 
     private interface SRTMetaData {
+        String getReleaseNumber();
         String getVersion();
+        String getStateCode();
         String getStatus();
-        String getState();
         String getRemark();
         String getCreatedUserName();
         String getLastUpdatedUserName();
@@ -298,18 +321,21 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         Date getLastUpdatedTimestamp();
     }
 
-    private abstract class AbstractBIEDocumentation implements BIEMetaData, SRTMetaData {
+    private interface CCMetaData {
+        String ccType();
+        String getGuid();
+        int getRevisionNumber();
+        Collection<Definition> getCoreComponentDefinitions();
+    }
+
+    private abstract class AbstractBIEDocumentation implements BIEMetaData, SRTMetaData, CCMetaData {
         @Override
         public String getDictionaryEntryName() {
             return null;
         }
         @Override
-        public String getDefinition() {
-            return null;
-        }
-        @Override
-        public String getDefinitionSource() {
-            return null;
+        public Collection<Definition> getDefinitions() {
+            return Collections.emptyList();
         }
         @Override
         public String getObjectClassTermName() {
@@ -333,15 +359,19 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
 
         @Override
+        public String getReleaseNumber() {
+            return null;
+        }
+        @Override
         public String getVersion() {
             return null;
         }
         @Override
-        public String getStatus() {
+        public String getStateCode() {
             return null;
         }
         @Override
-        public String getState() {
+        public String getStatus() {
             return null;
         }
         @Override
@@ -367,6 +397,19 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         @Override
         public Date getLastUpdatedTimestamp() {
             return null;
+        }
+
+        @Override
+        public String getGuid() {
+            return null;
+        }
+        @Override
+        public int getRevisionNumber() {
+            return 0;
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Collections.emptyList();
         }
     }
 
@@ -398,8 +441,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return acc.getDen();
         }
         @Override
-        public String getDefinition() {
-            return abie.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(abie.getDefinition()));
         }
         @Override
         public String getObjectClassTermName() {
@@ -410,6 +453,13 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return abie.getBizTerm();
         }
 
+        @Override
+        public String getReleaseNumber() {
+            if (topLevelAbie != null) {
+                return generationContext.findReleaseNumber(topLevelAbie.getReleaseId());
+            }
+            return null;
+        }
         @Override
         public String getVersion() {
             if (topLevelAbie != null) {
@@ -425,7 +475,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return null;
         }
         @Override
-        public String getState() {
+        public String getStateCode() {
             if (topLevelAbie != null) {
                 return topLevelAbie.getState().toString();
             }
@@ -436,6 +486,13 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return abie.getRemark();
         }
         @Override
+        public String getOwnerUserName() {
+            if (topLevelAbie != null) {
+                return generationContext.findUserName(topLevelAbie.getOwnerUserId());
+            }
+            return null;
+        }
+        @Override
         public String getCreatedUserName() {
             return generationContext.findUserName(abie.getCreatedBy());
         }
@@ -444,19 +501,29 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return generationContext.findUserName(abie.getLastUpdatedBy());
         }
         @Override
-        public String getOwnerUserName() {
-            if (topLevelAbie != null) {
-                return generationContext.findUserName(topLevelAbie.getOwnerUserId());
-            }
-            return null;
-        }
-        @Override
         public Date getCreationTimestamp() {
             return abie.getCreationTimestamp();
         }
         @Override
         public Date getLastUpdatedTimestamp() {
             return abie.getLastUpdateTimestamp();
+        }
+
+        @Override
+        public String ccType() {
+            return "ACC";
+        }
+        @Override
+        public String getGuid() {
+            return acc.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return acc.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(acc.getDefinition(), acc.getDefinitionSource()));
         }
     }
 
@@ -479,8 +546,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return ascc.getDen();
         }
         @Override
-        public String getDefinition() {
-            return asbie.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(asbie.getDefinition()));
         }
 
         @Override
@@ -503,6 +570,23 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         public Date getLastUpdatedTimestamp() {
             return asbie.getLastUpdateTimestamp();
         }
+
+        @Override
+        public String ccType() {
+            return "ASCC";
+        }
+        @Override
+        public String getGuid() {
+            return ascc.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return ascc.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(ascc.getDefinition(), ascc.getDefinitionSource()));
+        }
     }
 
     private class AssociationBusinessInformationEntityPropertyDocumentation extends AbstractBIEDocumentation {
@@ -524,8 +608,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return asccp.getDen();
         }
         @Override
-        public String getDefinition() {
-            return asbiep.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(asbiep.getDefinition()));
         }
         @Override
         public String getPropertyTermName() {
@@ -552,6 +636,23 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         public Date getLastUpdatedTimestamp() {
             return asbiep.getLastUpdateTimestamp();
         }
+
+        @Override
+        public String ccType() {
+            return "ASCCP";
+        }
+        @Override
+        public String getGuid() {
+            return asccp.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return asccp.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(asccp.getDefinition(), asccp.getDefinitionSource()));
+        }
     }
 
     private class BasicBusinessInformationEntityDocumentation extends AbstractBIEDocumentation {
@@ -573,8 +674,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return bcc.getDen();
         }
         @Override
-        public String getDefinition() {
-            return bbie.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(bbie.getDefinition()));
         }
 
         @Override
@@ -597,6 +698,23 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         public Date getLastUpdatedTimestamp() {
             return bbie.getLastUpdateTimestamp();
         }
+
+        @Override
+        public String ccType() {
+            return "BCC";
+        }
+        @Override
+        public String getGuid() {
+            return bcc.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return bcc.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(bcc.getDefinition(), bcc.getDefinitionSource()));
+        }
     }
 
     private class BasicBusinessInformationEntityPropertyDocumentation extends AbstractBIEDocumentation {
@@ -618,8 +736,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return bccp.getDen();
         }
         @Override
-        public String getDefinition() {
-            return bbiep.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(bbiep.getDefinition()));
         }
         @Override
         public String getPropertyTermName() {
@@ -650,6 +768,23 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         public Date getLastUpdatedTimestamp() {
             return bbiep.getLastUpdateTimestamp();
         }
+
+        @Override
+        public String ccType() {
+            return "BCCP";
+        }
+        @Override
+        public String getGuid() {
+            return bccp.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return bccp.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(bccp.getDefinition(), bccp.getDefinitionSource()));
+        }
     }
 
     private class BasicBusinessInformationEntitySupplementaryComponentDocumentation extends AbstractBIEDocumentation {
@@ -671,8 +806,8 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return dtSc.getDen();
         }
         @Override
-        public String getDefinition() {
-            return bbieSc.getDefinition();
+        public Collection<Definition> getDefinitions() {
+            return Arrays.asList(new Definition(bbieSc.getDefinition()));
         }
         @Override
         public String getPropertyTermName() {
@@ -686,6 +821,19 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         @Override
         public String getRemark() {
             return bbieSc.getRemark();
+        }
+
+        @Override
+        public String ccType() {
+            return "BDT_SC";
+        }
+        @Override
+        public String getGuid() {
+            return dtSc.getGuid();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(dtSc.getDefinition(), dtSc.getDefinitionSource()));
         }
     }
 
@@ -709,9 +857,26 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         public String getDataTypeTermName() {
             return bdt.getDataTypeTerm();
         }
+
+        @Override
+        public String ccType() {
+            return "BDT";
+        }
+        @Override
+        public String getGuid() {
+            return bdt.getGuid();
+        }
+        @Override
+        public int getRevisionNumber() {
+            return bdt.getRevisionNum();
+        }
+        @Override
+        public Collection<Definition> getCoreComponentDefinitions() {
+            return Arrays.asList(new Definition(bdt.getDefinition(), bdt.getDefinitionSource()));
+        }
     }
 
-    private BIEMetaData getBIEDocumentation(BusinessInformationEntity bie, CoreComponent cc) {
+    private AbstractBIEDocumentation getBIEDocumentation(BusinessInformationEntity bie, CoreComponent cc) {
         if (bie instanceof AggregateBusinessInformationEntity && cc instanceof AggregateCoreComponent) {
             return new AggregateBusinessInformationEntityDocumentation(
                     (AggregateBusinessInformationEntity) bie,
@@ -744,6 +909,11 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     }
 
     private void setOptionalDocumentation(Element node, BusinessInformationEntity bie, CoreComponent cc) {
+        AbstractBIEDocumentation bieDocumentation = getBIEDocumentation(bie, cc);
+        setOptionalDocumentation(node, bieDocumentation);
+    }
+
+    private void setOptionalDocumentation(Element node, AbstractBIEDocumentation bieDocumentation) {
         boolean bieCctsMetaData = option.isBieCctsMetaData();
         boolean bieOagiSrtMetaData = option.isBieOagiSrtMetaData();
         boolean basedCcMetaData = option.isBasedCcMetaData();
@@ -768,7 +938,6 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             annotation.addContent(documentation);
         }
 
-        BIEMetaData bieDocumentation = getBIEDocumentation(bie, cc);
         if (bieCctsMetaData) {
             String entityTypeCode = bieDocumentation.getEntityTypeCode();
             Element ccts_BIEEntityTypeCode = new Element("ccts_BIEEntityTypeCode", OAGI_NS);
@@ -783,15 +952,15 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             }
 
             if (option.isIncludeCctsDefinitionTag()) {
-                String definition = bieDocumentation.getDefinition();
-                if (!StringUtils.isEmpty(definition)) {
-                    Element ccts_Definition = new Element("ccts_Definition", OAGI_NS);
-                    documentation.addContent(ccts_Definition);
-                    ccts_Definition.setText(definition);
+                for (Definition definition : bieDocumentation.getDefinitions()) {
+                    if (!StringUtils.isEmpty(definition.getDefinition())) {
+                        Element ccts_Definition = new Element("ccts_Definition", OAGI_NS);
+                        documentation.addContent(ccts_Definition);
+                        ccts_Definition.setText(definition.getDefinition());
 
-                    String definitionSource = bieDocumentation.getDefinitionSource();
-                    if (!StringUtils.isEmpty(definitionSource)) {
-                        ccts_Definition.setAttribute("source", definitionSource);
+                        if (!StringUtils.isEmpty(definition.getDefinitionSource())) {
+                            ccts_Definition.setAttribute("source", definition.getDefinitionSource());
+                        }
                     }
                 }
             }
@@ -833,32 +1002,106 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
 
         if (bieOagiSrtMetaData) {
-            Element srt_Version = new Element("srt_Version", OAGI_NS);
-            documentation.addContent(srt_Version);
+            String releaseNumber = bieDocumentation.getReleaseNumber();
+            if (!StringUtils.isEmpty(releaseNumber)) {
+                Element srt_BasedStandardReleaseNumber = new Element("srt_BasedStandardReleaseNumber", OAGI_NS);
+                documentation.addContent(srt_BasedStandardReleaseNumber);
+                srt_BasedStandardReleaseNumber.setText(releaseNumber);
+            }
 
-            Element srt_Status = new Element("srt_Status", OAGI_NS);
-            documentation.addContent(srt_Status);
+            String version = bieDocumentation.getVersion();
+            if (!StringUtils.isEmpty(version)) {
+                Element srt_Version = new Element("srt_Version", OAGI_NS);
+                documentation.addContent(srt_Version);
+                srt_Version.setText(version);
+            }
 
-            Element srt_Remark = new Element("srt_Remark", OAGI_NS);
-            documentation.addContent(srt_Remark);
+            String stateCode = bieDocumentation.getStateCode();
+            if (!StringUtils.isEmpty(stateCode)) {
+                Element srt_StateCode = new Element("srt_StateCode", OAGI_NS);
+                documentation.addContent(srt_StateCode);
+                srt_StateCode.setText(stateCode);
+            }
 
-            Element srt_CreatedByUserName = new Element("srt_CreatedByUserName", OAGI_NS);
-            documentation.addContent(srt_CreatedByUserName);
+            String status = bieDocumentation.getStatus();
+            if (!StringUtils.isEmpty(status)) {
+                Element srt_Status = new Element("srt_Status", OAGI_NS);
+                documentation.addContent(srt_Status);
+                srt_Status.setText(status);
+            }
 
-            Element srt_LastUpdatedByUserName = new Element("srt_LastUpdatedByUserName", OAGI_NS);
-            documentation.addContent(srt_LastUpdatedByUserName);
+            String remark = bieDocumentation.getRemark();
+            if (!StringUtils.isEmpty(remark)) {
+                Element srt_Remark = new Element("srt_Remark", OAGI_NS);
+                documentation.addContent(srt_Remark);
+                srt_Remark.setText(remark);
+            }
 
-            Element srt_CreationTimestamp = new Element("srt_CreationTimestamp", OAGI_NS);
-            documentation.addContent(srt_CreationTimestamp);
+            if (option.isIncludeWhoColumns()) {
+                String ownerUserName = bieDocumentation.getOwnerUserName();
+                if (!StringUtils.isEmpty(ownerUserName)) {
+                    Element srt_OwnerUserName = new Element("srt_OwnerUserName", OAGI_NS);
+                    documentation.addContent(srt_OwnerUserName);
+                    srt_OwnerUserName.setText(ownerUserName);
+                }
 
-            Element srt_LastUpdateTimestamp = new Element("srt_LastUpdateTimestamp", OAGI_NS);
-            documentation.addContent(srt_LastUpdateTimestamp);
+                String createdUserName = bieDocumentation.getCreatedUserName();
+                if (!StringUtils.isEmpty(createdUserName)) {
+                    Element srt_CreatedByUserName = new Element("srt_CreatedByUserName", OAGI_NS);
+                    documentation.addContent(srt_CreatedByUserName);
+                    srt_CreatedByUserName.setText(createdUserName);
+                }
+
+                String lastUpdatedUserName = bieDocumentation.getLastUpdatedUserName();
+                if (!StringUtils.isEmpty(lastUpdatedUserName)) {
+                    Element srt_LastUpdatedByUserName = new Element("srt_LastUpdatedByUserName", OAGI_NS);
+                    documentation.addContent(srt_LastUpdatedByUserName);
+                    srt_LastUpdatedByUserName.setText(lastUpdatedUserName);
+                }
+
+                Date creationTimestamp = bieDocumentation.getCreationTimestamp();
+                if (creationTimestamp != null) {
+                    Element srt_CreationTimestamp = new Element("srt_CreationTimestamp", OAGI_NS);
+                    documentation.addContent(srt_CreationTimestamp);
+                    srt_CreationTimestamp.setText(toZuluTimeString(creationTimestamp));
+                }
+
+                Date lastUpdatedTimestamp = bieDocumentation.getLastUpdatedTimestamp();
+                if (lastUpdatedTimestamp != null) {
+                    Element srt_LastUpdateTimestamp = new Element("srt_LastUpdateTimestamp", OAGI_NS);
+                    documentation.addContent(srt_LastUpdateTimestamp);
+                    srt_LastUpdateTimestamp.setText(toZuluTimeString(lastUpdatedTimestamp));
+                }
+            }
         }
 
         if (basedCcMetaData) {
+            String ccType = bieDocumentation.ccType();
 
+            String guid = bieDocumentation.getGuid();
+            Element ccts_Based_GUID = new Element("ccts_Based" + ccType + "_GUID", OAGI_NS);
+            documentation.addContent(ccts_Based_GUID);
+            ccts_Based_GUID.setText(guid);
+
+            int revisionNumber = bieDocumentation.getRevisionNumber();
+            if (revisionNumber > 0) {
+                Element ccts_BasedRevisionNumber = new Element("ccts_Based" + ccType + "RevisionNumber", OAGI_NS);
+                documentation.addContent(ccts_BasedRevisionNumber);
+                ccts_BasedRevisionNumber.setText(Integer.toString(revisionNumber));
+            }
+
+            for (Definition definition : bieDocumentation.getCoreComponentDefinitions()) {
+                if (!StringUtils.isEmpty(definition.getDefinition())) {
+                    Element ccts_BasedDefinition = new Element("ccts_Based" + ccType + "Definition", OAGI_NS);
+                    documentation.addContent(ccts_BasedDefinition);
+                    ccts_BasedDefinition.setText(definition.getDefinition());
+
+                    if (!StringUtils.isEmpty(definition.getDefinitionSource())) {
+                        ccts_BasedDefinition.setAttribute("source", definition.getDefinitionSource());
+                    }
+                }
+            }
         }
-
     }
 
     public Element generateTopLevelASBIEP(AssociationBusinessInformationEntityProperty asbiep, TopLevelAbie topLevelAbie) {
@@ -884,7 +1127,15 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         return rootEleNode;
     }
 
+    public Element generateABIE(TopLevelAbie topLevelAbie, Element parentNode) {
+        return generateABIE(topLevelAbie.getAbie(), topLevelAbie, parentNode);
+    }
+
     public Element generateABIE(AggregateBusinessInformationEntity abie, Element parentNode) {
+        return generateABIE(abie, null, parentNode);
+    }
+
+    private Element generateABIE(AggregateBusinessInformationEntity abie, TopLevelAbie topLevelAbie, Element parentNode) {
         if (isProcessed(abie)) {
             return parentNode;
         }
@@ -897,6 +1148,13 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
         setDefinition(complexType, abie.getDefinition());
+        if (topLevelAbie != null) {
+            AggregateBusinessInformationEntityDocumentation bieDocumentation =
+                    new AggregateBusinessInformationEntityDocumentation(abie, acc, topLevelAbie);
+            setOptionalDocumentation(complexType, bieDocumentation);
+        } else {
+            setOptionalDocumentation(complexType, abie, acc);
+        }
 
         Element sequenceElement = newElement("sequence");
         complexType.addContent(sequenceElement);
@@ -969,6 +1227,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
 
         setDefinition(complexType, bbie.getDefinition());
+        setOptionalDocumentation(complexType, bbie, bcc);
 
         complexType.addContent(simpleContent);
         simpleContent.addContent(extNode);
@@ -1034,6 +1293,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
 
         setDefinition(complexType, bbie.getDefinition());
+        setOptionalDocumentation(complexType, bbie, bcc);
 
         complexType.addContent(simpleContent);
         simpleContent.addContent(extNode);
@@ -1069,6 +1329,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         AssociationCoreComponent ascc = generationContext.queryBasedASCC(asbie);
         setDefinition(element, asbie.getDefinition());
+        setOptionalDocumentation(element, asbie, ascc);
 
         parent.addContent(element);
         return element;
@@ -1109,6 +1370,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             eNode.setAttribute("nillable", String.valueOf(bbie.isNillable()));
 
         setDefinition(eNode, bbie.getDefinition());
+        setOptionalDocumentation(eNode, bbie, bcc);
 
         return eNode;
     }
@@ -1138,6 +1400,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             eNode.setAttribute("use", "optional");
 
         setDefinition(eNode, bbie.getDefinition());
+        setOptionalDocumentation(eNode, bbie, bcc);
 
         return eNode;
     }
@@ -1427,6 +1690,11 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
         setDefinition(aNode, bbieSc.getDefinition());
 
+        DataTypeSupplementaryComponent bdtSc = generationContext.findDtSc(bbieSc.getDtScId());
+        BasicBusinessInformationEntitySupplementaryComponentDocumentation bieDocumentation =
+                new BasicBusinessInformationEntitySupplementaryComponentDocumentation(bbieSc, bdtSc);
+        setOptionalDocumentation(aNode, bieDocumentation);
+
         return aNode;
     }
 
@@ -1588,9 +1856,21 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             ProfileBODGenerationOption option = new ProfileBODGenerationOption();
             option.setSchemaExpression(ProfileBODGenerationOption.SchemaExpression.XML);
             option.setSchemaPackage(ProfileBODGenerationOption.SchemaPackage.All);
+
             option.setBusinessContext(true);
 
-            File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(2L), option);
+            option.setBieDefinition(true);
+            option.setBieGuid(true);
+
+            option.setBieCctsMetaData(true);
+            option.setIncludeCctsDefinitionTag(true);
+
+            option.setBieOagiSrtMetaData(true);
+            option.setIncludeWhoColumns(true);
+
+            option.setBasedCcMetaData(true);
+
+            File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(1L), option);
             for (String line : FileUtils.readLines(schemaFile)) {
                 System.out.println(line);
             }

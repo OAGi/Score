@@ -21,6 +21,8 @@ import org.apache.lucene.store.RAMDirectory;
 import org.oagi.srt.common.lucene.CaseSensitiveStandardAnalyzer;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -760,6 +762,12 @@ public class Utility {
             objectOutputStream.close();
         }
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public static String toZuluTimeString(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return dateFormat.format(date);
     }
 
     public static void main(String args[]) {

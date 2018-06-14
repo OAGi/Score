@@ -20,13 +20,13 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.*;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.oagi.srt.common.util.Utility.toZuluTimeString;
 
 @Service
 public class ExportService {
@@ -313,12 +313,6 @@ public class ExportService {
             }
 
             this.rootElement.addContent(businessContextsEle);
-        }
-
-        private String toZuluTimeString(Date date) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-            return dateFormat.format(date);
         }
 
         @Override

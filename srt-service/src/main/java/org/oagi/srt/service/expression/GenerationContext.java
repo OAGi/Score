@@ -98,6 +98,9 @@ public class GenerationContext {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
     public void init(TopLevelAbie topLevelAbie) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
         findBdtPriRestriByBdtIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
@@ -203,6 +206,8 @@ public class GenerationContext {
 
         findUserNameMap = userRepository.findAll().stream()
                 .collect(Collectors.toMap(e -> e.getAppUserId(), e -> e.getLoginId()));
+        findReleaseNumberMap = releaseRepository.findAll().stream()
+                .collect(Collectors.toMap(e -> e.getReleaseId(), e -> e.getReleaseNum()));
     }
 
     // Prepared Datas
@@ -370,6 +375,12 @@ public class GenerationContext {
 
     public String findUserName(long userId) {
         return findUserNameMap.get(userId);
+    }
+
+    private Map<Long, String> findReleaseNumberMap;
+
+    public String findReleaseNumber(long releaseId) {
+        return findReleaseNumberMap.get(releaseId);
     }
 
     public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity abie) {

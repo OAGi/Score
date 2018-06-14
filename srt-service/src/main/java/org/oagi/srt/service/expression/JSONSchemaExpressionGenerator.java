@@ -28,6 +28,7 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
     private ObjectMapper mapper;
     private Map<String, Object> root;
+    private ProfileBODGenerationOption option;
 
     public JSONSchemaExpressionGenerator() {
         mapper = new ObjectMapper();
@@ -37,6 +38,8 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
     @Override
     public void generate(GenerationContext generationContext,
                          TopLevelAbie topLevelAbie, ProfileBODGenerationOption option) {
+        this.option = option;
+
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
 
         AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie);
@@ -109,9 +112,11 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
 
-        String definition = asbie.getDefinition();
-        if (!StringUtils.isEmpty(definition)) {
-            properties.put("description", definition);
+        if (option.isBieDefinition()) {
+            String definition = asbie.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("description", definition);
+            }
         }
 
         if (isNillable) {
@@ -166,10 +171,13 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
         }
         ((Map<String, Object>) parent.get("properties")).put(name, properties);
 
-        String definition = abie.getDefinition();
-        if (!StringUtils.isEmpty(definition)) {
-            properties.put("description", definition);
+        if (option.isBieDefinition()) {
+            String definition = abie.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("description", definition);
+            }
         }
+
         properties.put("type", "object");
         properties.put("required", new ArrayList());
         properties.put("additionalProperties", false);
@@ -346,9 +354,11 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
             parentRequired.add(name);
         }
 
-        String definition = bbie.getDefinition();
-        if (!StringUtils.isEmpty(definition)) {
-            properties.put("description", definition);
+        if (option.isBieDefinition()) {
+            String definition = bbie.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("description", definition);
+            }
         }
 
         if (isNillable) {
@@ -427,9 +437,11 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
             ((List<String>) parent.get("required")).add(name);
         }
 
-        String definition = bbieSc.getDefinition();
-        if (!StringUtils.isEmpty(definition)) {
-            properties.put("description", definition);
+        if (option.isBieDefinition()) {
+            String definition = bbieSc.getDefinition();
+            if (!StringUtils.isEmpty(definition)) {
+                properties.put("description", definition);
+            }
         }
 
         CodeList codeList = generationContext.getCodeList(bbieSc);
