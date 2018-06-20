@@ -1253,13 +1253,13 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         return xbt.getBuiltInType();
     }
 
-    public Element setBBIE_Attr_Type(DataType gBDT, Element gNode) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
-                generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
+    public Element setBBIE_Attr_Type(DataType bdt, Element gNode) {
+        BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                generationContext.findCdtAwdPriXpsTypeMap(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType xbt =
-                generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+                generationContext.findXSDBuiltInType(cdtAwdPriXpsTypeMap.getXbtId());
         if (xbt.getBuiltInType() != null) {
             gNode.setAttribute("type", xbt.getBuiltInType());
         }

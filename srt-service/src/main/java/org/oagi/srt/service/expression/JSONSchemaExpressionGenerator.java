@@ -397,9 +397,17 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
             if (agencyIdList != null) {
                 ref = fillDefinitions(definitions, agencyIdList, generationContext);
             } else {
-                BusinessDataTypePrimitiveRestriction bdtPriRestri =
-                        generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
-                XSDBuiltInType xbt = getXbt(generationContext, bdtPriRestri);
+                XSDBuiltInType xbt;
+                if (bbie.getBdtPriRestriId() == 0) {
+                    BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                            generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(bdt.getDtId());
+                    xbt = getXbt(generationContext, bdtPriRestri);
+                } else {
+                    BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                            generationContext.findBdtPriRestri(bbie.getBdtPriRestriId());
+                    xbt = getXbt(generationContext, bdtPriRestri);
+                }
+
                 ref = fillDefinitions(definitions, xbt, generationContext);
             }
         }
@@ -453,11 +461,21 @@ class JSONSchemaExpressionGenerator implements SchemaExpressionGenerator {
             if (agencyIdList != null) {
                 ref = fillDefinitions(definitions, agencyIdList, generationContext);
             } else {
-                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
-                        generationContext.findBdtScPriRestri(bbieSc.getDtScPriRestriId());
-                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
-                        generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
-                XSDBuiltInType xbt = generationContext.findXSDBuiltInType(cdtScAwdPriXpsTypeMap.getXbtId());
+                XSDBuiltInType xbt;
+                if (bbieSc.getDtScPriRestriId() == 0L) {
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                            generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(dtSc.getDtScId());
+                    CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                            generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
+                    xbt = generationContext.findXSDBuiltInType(cdtScAwdPriXpsTypeMap.getXbtId());
+                } else {
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                            generationContext.findBdtScPriRestri(bbieSc.getDtScPriRestriId());
+                    CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                            generationContext.findCdtScAwdPriXpsTypeMap(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
+                    xbt = generationContext.findXSDBuiltInType(cdtScAwdPriXpsTypeMap.getXbtId());
+                }
+
                 ref = fillDefinitions(definitions, xbt, generationContext);
             }
         }
