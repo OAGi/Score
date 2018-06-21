@@ -78,6 +78,9 @@ public class GenerationContext {
     private BasicBusinessInformationEntityRepository bbieRepository;
 
     @Autowired
+    private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
+
+    @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
     @Autowired
@@ -203,6 +206,11 @@ public class GenerationContext {
                 .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
         findAsbiepByRoleOfAbieIdMap = asbiepList.stream()
                 .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
+
+        List<BasicBusinessInformationEntityProperty> bbiepList =
+                bbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+        findBBIEPMap = bbiepList.stream()
+                .collect(Collectors.toMap(e -> e.getBbiepId(), Function.identity()));
 
         findUserNameMap = userRepository.findAll().stream()
                 .collect(Collectors.toMap(e -> e.getAppUserId(), e -> e.getLoginId()));
@@ -369,6 +377,12 @@ public class GenerationContext {
 
     public AssociationBusinessInformationEntityProperty findAsbiepByRoleOfAbieId(long roleOfAbieId) {
         return findAsbiepByRoleOfAbieIdMap.get(roleOfAbieId);
+    }
+
+    private Map<Long, BasicBusinessInformationEntityProperty> findBBIEPMap;
+
+    public BasicBusinessInformationEntityProperty findBBIEP(long bbiepId) {
+        return findBBIEPMap.get(bbiepId);
     }
 
     private Map<Long, String> findUserNameMap;

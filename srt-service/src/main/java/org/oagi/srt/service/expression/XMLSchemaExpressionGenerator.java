@@ -91,7 +91,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAbie);
 
         abie = generationContext.queryTargetABIE(asbiep);
-        Element rootSeqNode = generateABIE(topLevelAbie, rootElementNode);
+        Element rootSeqNode = generateABIE(abie, rootElementNode);
         generateBIEs(abie, rootSeqNode);
 
         return document;
@@ -416,20 +416,12 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     private class AggregateBusinessInformationEntityDocumentation extends AbstractBIEDocumentation {
         private final AggregateBusinessInformationEntity abie;
         private final AggregateCoreComponent acc;
-        private TopLevelAbie topLevelAbie;
 
         public AggregateBusinessInformationEntityDocumentation(
                 AggregateBusinessInformationEntity abie,
                 AggregateCoreComponent acc) {
-            this(abie, acc, null);
-        }
-
-        public AggregateBusinessInformationEntityDocumentation(
-                AggregateBusinessInformationEntity abie,
-                AggregateCoreComponent acc, TopLevelAbie topLevelAbie) {
             this.abie = abie;
             this.acc = acc;
-            this.topLevelAbie = topLevelAbie;
         }
 
         @Override
@@ -449,48 +441,20 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             return acc.getObjectClassTerm();
         }
         @Override
-        public String getBusinessTerm() {
-            return abie.getBizTerm();
-        }
-
-        @Override
-        public String getReleaseNumber() {
-            if (topLevelAbie != null) {
-                return generationContext.findReleaseNumber(topLevelAbie.getReleaseId());
-            }
-            return null;
-        }
-        @Override
         public String getVersion() {
-            if (topLevelAbie != null) {
-                return abie.getVersion();
-            }
-            return null;
+            return abie.getVersion();
         }
         @Override
         public String getStatus() {
-            if (topLevelAbie != null) {
-                return abie.getStatus();
-            }
-            return null;
+            return abie.getStatus();
         }
         @Override
-        public String getStateCode() {
-            if (topLevelAbie != null) {
-                return topLevelAbie.getState().toString();
-            }
-            return null;
+        public String getBusinessTerm() {
+            return abie.getBizTerm();
         }
         @Override
         public String getRemark() {
             return abie.getRemark();
-        }
-        @Override
-        public String getOwnerUserName() {
-            if (topLevelAbie != null) {
-                return generationContext.findUserName(topLevelAbie.getOwnerUserId());
-            }
-            return null;
         }
         @Override
         public String getCreatedUserName() {
@@ -592,16 +556,26 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     private class AssociationBusinessInformationEntityPropertyDocumentation extends AbstractBIEDocumentation {
         private final AssociationBusinessInformationEntityProperty asbiep;
         private final AssociationCoreComponentProperty asccp;
+        private TopLevelAbie topLevelAbie;
+
         public AssociationBusinessInformationEntityPropertyDocumentation(
                 AssociationBusinessInformationEntityProperty asbiep,
                 AssociationCoreComponentProperty asccp) {
+            this(asbiep, asccp, null);
+        }
+
+        public AssociationBusinessInformationEntityPropertyDocumentation(
+                AssociationBusinessInformationEntityProperty asbiep,
+                AssociationCoreComponentProperty asccp,
+                TopLevelAbie topLevelAbie) {
             this.asbiep = asbiep;
             this.asccp = asccp;
+            this.topLevelAbie = topLevelAbie;
         }
 
         @Override
         public String getEntityTypeCode() {
-            return "ASIEP";
+            return "ASBIEP";
         }
         @Override
         public String getDictionaryEntryName() {
@@ -614,6 +588,28 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         @Override
         public String getPropertyTermName() {
             return asccp.getPropertyTerm();
+        }
+
+        @Override
+        public String getReleaseNumber() {
+            if (topLevelAbie != null) {
+                return generationContext.findReleaseNumber(topLevelAbie.getReleaseId());
+            }
+            return null;
+        }
+        @Override
+        public String getStateCode() {
+            if (topLevelAbie != null) {
+                return topLevelAbie.getState().toString();
+            }
+            return null;
+        }
+        @Override
+        public String getOwnerUserName() {
+            if (topLevelAbie != null) {
+                return generationContext.findUserName(topLevelAbie.getOwnerUserId());
+            }
+            return null;
         }
 
         @Override
@@ -1120,22 +1116,15 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         setDefinition(rootEleNode, asbiep.getDefinition());
         setBusinessContext(rootEleNode, topLevelAbie);
-        setOptionalDocumentation(rootEleNode, asbiep, asccp);
+        setOptionalDocumentation(rootEleNode,
+                new AssociationBusinessInformationEntityPropertyDocumentation(asbiep, asccp, topLevelAbie));
 
         setProcessedElement(asbiep, rootEleNode);
 
         return rootEleNode;
     }
 
-    public Element generateABIE(TopLevelAbie topLevelAbie, Element parentNode) {
-        return generateABIE(topLevelAbie.getAbie(), topLevelAbie, parentNode);
-    }
-
-    public Element generateABIE(AggregateBusinessInformationEntity abie, Element parentNode) {
-        return generateABIE(abie, null, parentNode);
-    }
-
-    private Element generateABIE(AggregateBusinessInformationEntity abie, TopLevelAbie topLevelAbie, Element parentNode) {
+    private Element generateABIE(AggregateBusinessInformationEntity abie, Element parentNode) {
         if (isProcessed(abie)) {
             return parentNode;
         }
@@ -1148,13 +1137,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         AggregateCoreComponent acc = generationContext.queryBasedACC(abie);
         setDefinition(complexType, abie.getDefinition());
-        if (topLevelAbie != null) {
-            AggregateBusinessInformationEntityDocumentation bieDocumentation =
-                    new AggregateBusinessInformationEntityDocumentation(abie, acc, topLevelAbie);
-            setOptionalDocumentation(complexType, bieDocumentation);
-        } else {
-            setOptionalDocumentation(complexType, abie, acc);
-        }
+        setOptionalDocumentation(complexType, abie, acc);
 
         Element sequenceElement = newElement("sequence");
         complexType.addContent(sequenceElement);
@@ -1282,8 +1265,6 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     }
 
     public Element generateBDT(BasicBusinessInformationEntity bbie, Element eNode) {
-        BasicCoreComponent bcc = generationContext.queryBasedBCC(bbie);
-
         Element complexType = newElement("complexType");
         Element simpleContent = newElement("simpleContent");
         Element extNode = newElement("extension");
@@ -1292,16 +1273,14 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
             complexType.setAttribute("id", Utility.generateGUID());
         }
 
-        setDefinition(complexType, bbie.getDefinition());
-        setOptionalDocumentation(complexType, bbie, bcc);
+        DataType bdt = generationContext.queryAssocBDT(bbie);
+        setOptionalDocumentation(complexType, new BusinessDataTypeDocumentation(bdt));
 
         complexType.addContent(simpleContent);
         simpleContent.addContent(extNode);
 
-        DataType gBDT = generationContext.queryAssocBDT(bbie);
-
         if (bbie.getBdtPriRestriId() == 0)
-            extNode.setAttribute("base", setBDTBase(gBDT));
+            extNode.setAttribute("base", setBDTBase(bdt));
         else {
             extNode.setAttribute("base", setBDTBase(bbie));
         }
@@ -1338,6 +1317,10 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
     public Element generateASBIEP(AssociationBusinessInformationEntityProperty asbiep, Element parent) {
         AssociationCoreComponentProperty asccp = generationContext.findASCCP(asbiep.getBasedAsccpId());
         parent.setAttribute("name", Utility.first(asccp.getDen(), true));
+
+        setDefinition(parent, asbiep.getDefinition());
+        setOptionalDocumentation(parent, asbiep, asccp);
+
         return parent;
     }
 
@@ -1369,8 +1352,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         if (bbie.isNillable())
             eNode.setAttribute("nillable", String.valueOf(bbie.isNillable()));
 
-        setDefinition(eNode, bbie.getDefinition());
-        setOptionalDocumentation(eNode, bbie, bcc);
+        setDocumentation(eNode, bbie);
 
         return eNode;
     }
@@ -1399,10 +1381,22 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
         else
             eNode.setAttribute("use", "optional");
 
-        setDefinition(eNode, bbie.getDefinition());
-        setOptionalDocumentation(eNode, bbie, bcc);
+        setDocumentation(eNode, bbie);
 
         return eNode;
+    }
+
+    private void setDocumentation(Element node, BasicBusinessInformationEntity bbie) {
+        BasicCoreComponent bcc = generationContext.queryBasedBCC(bbie);
+
+        setDefinition(node, bbie.getDefinition());
+        setOptionalDocumentation(node, bbie, bcc);
+
+        BasicBusinessInformationEntityProperty bbiep = generationContext.findBBIEP(bbie.getToBbiepId());
+        BasicCoreComponentProperty bccp = generationContext.findBCCP(bbiep.getBasedBccpId());
+
+        setDefinition(node, bbiep.getDefinition());
+        setOptionalDocumentation(node, bbiep, bccp);
     }
 
     public Element setBBIEType(DataType bdt, Element gNode) {
@@ -1480,6 +1474,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
         Element eNode = newElement("element");
         eNode = handleElementBBIE(bbie, eNode);
+
         if (bcc.getEntityType() == BasicCoreComponentEntityType.Element) {
             while (!parent.getName().equals("sequence")) {
                 parent = parent.getParentElement();
@@ -1870,7 +1865,7 @@ class XMLSchemaExpressionGenerator implements SchemaExpressionGenerator {
 
             option.setBasedCcMetaData(true);
 
-            File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(1L), option);
+            File schemaFile = profileBIEGenerateService.generateSchema(Arrays.asList(2L), option);
             for (String line : FileUtils.readLines(schemaFile)) {
                 System.out.println(line);
             }
