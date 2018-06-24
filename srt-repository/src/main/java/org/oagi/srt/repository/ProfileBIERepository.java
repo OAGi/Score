@@ -17,7 +17,7 @@ public class ProfileBIERepository {
     private static final String FIND_ALL_STATEMENT =
             "SELECT new ProfileBIE( tla.topLevelAbieId, abie.abieId, abie.version, abie.status, asbiep.asbiepId, asccp.asccpId, tla.releaseId, " +
                                    "asccp.propertyTerm, bc.bizCtxId, bc.name as bizCtxName, r.releaseNum, tla.state, " +
-                                   "tla.ownerUserId, u.loginId as ownerName, abie.creationTimestamp ) " +
+                                   "tla.ownerUserId, u.loginId as ownerName, abie.creationTimestamp, abie.lastUpdateTimestamp ) " +
             "FROM TopLevelAbie tla, AggregateBusinessInformationEntity abie, AssociationBusinessInformationEntityProperty asbiep, " +
                  "AssociationCoreComponentProperty asccp, BusinessContext bc, User u, Release r " +
             "WHERE tla.abie.abieId = abie.abieId AND abie.abieId = asbiep.roleOfAbieId AND asbiep.basedAsccpId = asccp.asccpId" +

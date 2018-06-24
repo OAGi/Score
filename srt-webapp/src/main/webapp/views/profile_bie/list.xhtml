@@ -47,7 +47,7 @@
                           sortBy="#{profileBIE.bizCtxName}">
                     <a href="/context_management/business_context/#{profileBIE.bizCtxId}">#{profileBIE.bizCtxName}</a>
                 </p:column>
-                <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                           sortBy="#{profileBIE.ownerName}">
                     <h:outputText value="#{profileBIE.ownerName}"/>
                     <h:panelGroup style="display: block;"
@@ -69,9 +69,9 @@
                           sortBy="#{profileBIE.status}">
                     <h:outputText value="#{profileBIE.status}"/>
                 </p:column>
-                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                          sortBy="#{profileBIE.creationTimestamp}">
-                    <h:outputText value="#{profileBIE.creationTimestamp}">
+                <p:column style="width: 190px; text-align: center;" headerText="Last Update Timestamp"
+                          sortBy="#{profileBIE.lastUpdateTimestamp}">
+                    <h:outputText value="#{profileBIE.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                     </h:outputText>
                 </p:column>

@@ -21,6 +21,7 @@ import java.util.Date;
                         fields = {
                                 @FieldResult(name = "abieId", column = "abie_id"),
                                 @FieldResult(name = "creationTimestamp", column = "creation_timestamp"),
+                                @FieldResult(name = "lastUpdateTimestamp", column = "last_update_timestamp"),
                                 @FieldResult(name = "version", column = "version"),
                                 @FieldResult(name = "status", column = "status"),
                         }
@@ -110,12 +111,16 @@ public class ProfileBIE {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
 
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdateTimestamp;
+
     public ProfileBIE() {
     }
 
     public ProfileBIE(long topLevelAbieId, long abieId, String version, String status, long asbiepId, long asccpId, Long releaseId,
                       String propertyTerm, long bizCtxId, String bizCtxName, String releaseNum,
-                      AggregateBusinessInformationEntityState state, long ownerUserId, String ownerName, Date creationTimestamp) {
+                      AggregateBusinessInformationEntityState state, long ownerUserId, String ownerName, Date creationTimestamp, Date lastUpdateTimestamp) {
         this.topLevelAbieId = topLevelAbieId;
         this.abieId = abieId;
         this.version = version;
@@ -131,6 +136,7 @@ public class ProfileBIE {
         this.ownerUserId = ownerUserId;
         this.ownerName = ownerName;
         this.creationTimestamp = creationTimestamp;
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
     public long getTopLevelAbieId() {
@@ -253,6 +259,14 @@ public class ProfileBIE {
         this.creationTimestamp = creationTimestamp;
     }
 
+    public Date getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -281,6 +295,7 @@ public class ProfileBIE {
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (ownerName != null ? ownerName.hashCode() : 0);
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         return result;
     }
 
@@ -302,6 +317,7 @@ public class ProfileBIE {
                 ", ownerUserId=" + ownerUserId +
                 ", ownerName='" + ownerName + '\'' +
                 ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 '}';
     }
 }
