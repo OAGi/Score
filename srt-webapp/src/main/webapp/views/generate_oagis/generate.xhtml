@@ -47,9 +47,9 @@
                                       sortBy="#{profileBIE.ownerName}">
                                 <h:outputText value="#{profileBIE.ownerName}"/>
                             </p:column>
-                            <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
-                                      sortBy="#{profileBIE.creationTimestamp}">
-                                <h:outputText value="#{profileBIE.creationTimestamp}">
+                            <p:column style="width: 210px; text-align: center;" headerText="Last Update Timestamp"
+                                      sortBy="#{profileBIE.lastUpdateTimestamp}">
+                                <h:outputText value="#{profileBIE.lastUpdateTimestamp}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
