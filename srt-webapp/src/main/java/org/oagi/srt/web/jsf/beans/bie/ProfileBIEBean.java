@@ -2,7 +2,6 @@ package org.oagi.srt.web.jsf.beans.bie;
 
 import org.oagi.srt.repository.ProfileBIERepository;
 import org.oagi.srt.repository.entity.ProfileBIE;
-import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.UserService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -15,6 +14,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,13 +42,8 @@ public class ProfileBIEBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        User user = getCurrentUser();
         allProfileBIEs = profileBIERepository.findAll();
-        setProfileBIEs(
-                allProfileBIEs.stream()
-                        .sorted((a, b) -> b.getCreationTimestamp().compareTo(a.getCreationTimestamp()))
-                        .collect(Collectors.toList())
-        );
+        setProfileBIEs(allProfileBIEs);
     }
 
     public List<ProfileBIE> getProfileBIEs() {
@@ -105,7 +100,7 @@ public class ProfileBIEBean extends UIHandler {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setProfileBIEs(allProfileBIEs.stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp))
                     .collect(Collectors.toList()));
         } else {
             setProfileBIEs(
