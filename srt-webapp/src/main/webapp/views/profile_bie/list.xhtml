@@ -28,7 +28,7 @@
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                          paginator="true" paginatorPosition="bottom" rows="10"
                          style="width: 100%; margin-bottom:20px" rowKey="#{profileBIE.asccpId}">
-                <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis"
+                <p:column style="text-align: center;" headerText="Name" styleClass="ellipsis"
                           sortBy="#{profileBIE.propertyTerm}">
                     <h:panelGroup rendered="#{profileBIEBean.canCurrentUserSeeThisProfileBIE(profileBIE)}">
                         <a href="/profile_bie/#{profileBIE.topLevelAbieId}">#{profileBIE.propertyTerm}</a>
@@ -38,12 +38,12 @@
                     <p:tooltip id="toolTipFocus" for="focus" value="This profile BIE only can access by an owner."
                                position="bottom"/>
                 </p:column>
-                <p:column headerText="Release" style="width: 80px; text-align: center;" styleClass="ellipsis"
+                <p:column headerText="Release" style="width: 90px; text-align: center;" styleClass="ellipsis"
                           sortBy="#{profileBIE.releaseNum}">
                     <h:outputText value="#{profileBIE.releaseNum}"/>
                 </p:column>
-                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
-                          headerText="Business Context"
+                <p:column style="width: 100px; text-align: center;"
+                          headerText="Context"
                           sortBy="#{profileBIE.bizCtxName}">
                     <a href="/context_management/business_context/#{profileBIE.bizCtxId}">#{profileBIE.bizCtxName}</a>
                 </p:column>
@@ -69,7 +69,7 @@
                           sortBy="#{profileBIE.status}">
                     <h:outputText value="#{profileBIE.status}"/>
                 </p:column>
-                <p:column style="width: 190px; text-align: center;" headerText="Last Update Timestamp"
+                <p:column style="width: 170px; text-align: center;" headerText="Last Update Time"
                           sortBy="#{profileBIE.lastUpdateTimestamp}">
                     <h:outputText value="#{profileBIE.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>

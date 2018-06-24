@@ -23,27 +23,27 @@
                                  update="tblBasedCodeList"
                                  icon="fa fa-white fa-search"/>
             </f:facet>
-            <p:dataTable id="tblBasedCodeList" var="cVO"
+            <p:dataTable id="tblBasedCodeList" var="codeList"
                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                          paginator="true" paginatorPosition="bottom" rows="10"
                          style="width: 100%; margin-bottom: 20px;"
-                         value="#{codeListCreateFromAnotherSelectionBean.codeLists}" rowKey="#{cVO.codeListId}">
-                <p:column headerText="Name" sortBy="#{cVO.name}">
-                    <a href="/code_list/create/from_another/#{cVO.codeListId}">#{cVO.name}</a>
+                         value="#{codeListCreateFromAnotherSelectionBean.codeLists}" rowKey="#{codeList.codeListId}">
+                <p:column headerText="Name" sortBy="#{codeList.name}">
+                    <a href="/code_list/create/from_another/#{codeList.codeListId}">#{codeList.name}</a>
                 </p:column>
-                <p:column headerText="Based Code List" sortBy="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}">
-                    <h:outputText value="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(cVO.basedCodeListId)}"/>
+                <p:column headerText="Based Code List" sortBy="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(codeList.basedCodeListId)}">
+                    <h:outputText value="#{codeListCreateFromAnotherSelectionBean.getBasedCodeListName(codeList.basedCodeListId)}"/>
                 </p:column>
-                <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
-                    <h:outputText id="agencyId" value="#{cVO.agencyId}" style="float: right;"/>
-                    <p:tooltip id="toolTipAgencyId" for="agencyId" value="#{codeListCreateFromAnotherSelectionBean.getAgencyName(cVO.agencyId)}" position="bottom"/>
+                <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{codeList.agencyId}">
+                    <h:outputText id="agencyId" value="#{codeList.agencyId}" style="float: right;"/>
+                    <p:tooltip id="toolTipAgencyId" for="agencyId" value="#{codeListCreateFromAnotherSelectionBean.getAgencyName(codeList.agencyId)}" position="bottom"/>
                 </p:column>
-                <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
-                    <h:outputText value="#{cVO.versionId}" style="float: right;"/>
+                <p:column style="width: 100px;" headerText="Version" sortBy="#{codeList.versionId}">
+                    <h:outputText value="#{codeList.versionId}" style="float: right;"/>
                 </p:column>
-                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                          sortBy="#{cVO.creationTimestamp}">
-                    <h:outputText value="#{cVO.creationTimestamp}">
+                <p:column style="width: 170px; text-align: center;" headerText="Last Update Time"
+                          sortBy="#{codeList.lastUpdateTimestamp}">
+                    <h:outputText value="#{codeList.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                     </h:outputText>
                 </p:column>

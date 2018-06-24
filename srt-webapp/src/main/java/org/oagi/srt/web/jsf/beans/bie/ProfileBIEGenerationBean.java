@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -137,7 +136,7 @@ public class ProfileBIEGenerationBean extends UIHandler {
         List<ProfileBIE> profileBIES;
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             profileBIES = allProfileBIEs.stream()
-                    .sorted(Comparator.comparing(ProfileBIE::getPropertyTerm))
+                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp))
                     .collect(Collectors.toList());
         } else {
             profileBIES = allProfileBIEs.stream()
@@ -145,8 +144,6 @@ public class ProfileBIEGenerationBean extends UIHandler {
                     .collect(Collectors.toList());
         }
 
-        Collections.sort(profileBIES, (a, b) ->
-                (int) (b.getCreationTimestamp().getTime() - a.getCreationTimestamp().getTime()));
         setProfileBIEs(profileBIES);
     }
 

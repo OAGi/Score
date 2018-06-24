@@ -43,7 +43,7 @@ public class CodeListBean extends UIHandler {
     }
 
     public List<CodeList> allCodeLists() {
-        allCodeLists = codeListService.findAll(Sort.Direction.DESC, "creationTimestamp");
+        allCodeLists = codeListService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
         allCodeListMap = allCodeLists.stream()
                 .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         return allCodeLists;
