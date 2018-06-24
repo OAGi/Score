@@ -39,9 +39,9 @@
                           sortBy="#{namespaceBean.getUserName(namespace.ownerUserId)}">
                     <h:outputText value="#{namespaceBean.getUserName(namespace.ownerUserId)}"/>
                 </p:column>
-                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
-                          sortBy="#{namespace.creationTimestamp}">
-                    <h:outputText value="#{namespace.creationTimestamp}">
+                <p:column style="width: 180px; text-align: center;" headerText="Last Update Time"
+                          sortBy="#{namespace.lastUpdateTimestamp}">
+                    <h:outputText value="#{namespace.lastUpdateTimestamp}">
                         <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                     </h:outputText>
                 </p:column>
