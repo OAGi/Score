@@ -17,12 +17,7 @@
             </div>
         </div>
         <p:growl id="growl" life="3000"/>
-<!--        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
-                    autoUpdate="true"
-                    closable="true"/>-->
         <p:panel>
-
-
             <h:panelGrid columns="2" cellpadding="3">
 
                 <h:outputText value="Context Category" styleClass="section-label"/>
@@ -133,7 +128,7 @@
                          rendered="#{contextSchemeDetailBean.contextScheme.guid == null}"
                          action="#{contextSchemeDetailBean.update()}"/>
 
-        <p:commandButton id="updateBtn" ajax="true" value="Update"
+        <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
                          rendered="#{contextSchemeDetailBean.contextScheme.guid != null}"
                          action="#{contextSchemeDetailBean.update()}"/>
 
