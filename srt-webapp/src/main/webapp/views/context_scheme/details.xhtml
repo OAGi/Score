@@ -16,11 +16,15 @@
                 </h:panelGroup>
             </div>
         </div>
-        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+        <p:growl id="growl" life="3000"/>
+<!--        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
                     autoUpdate="true"
-                    closable="true"/>
+                    closable="true"/>-->
         <p:panel>
+
+
             <h:panelGrid columns="2" cellpadding="3">
+
                 <h:outputText value="Context Category" styleClass="section-label"/>
                 <p:autoComplete id="inputContextCategory" widgetVar="inputContextCategory"
                                 value="#{contextSchemeDetailBean.selectedContextCategoryName}"
@@ -125,7 +129,7 @@
             </p:panel>
         </p:panel>
 
-        <p:commandButton id="createBtn" ajax="true" value="Create"
+        <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
                          rendered="#{contextSchemeDetailBean.contextScheme.guid == null}"
                          action="#{contextSchemeDetailBean.update()}"/>
 
