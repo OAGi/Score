@@ -29,7 +29,15 @@
                                 styleClass="section-content input-section">
                     <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
                 </p:autoComplete>
-
+                <h:outputText value="Code List" styleClass="section-label"/>
+                <p:autoComplete id="inputCodeList" widgetVar="inputContextCategory"
+                                value="#{contextSchemeDetailBean.selectedContextCategoryName}"
+                                completeMethod="#{contextSchemeDetailBean.completeInputForContextCategory}"
+                                dropdown="true"
+                                required="true" requiredMessage="Please fill out 'Code List' field."
+                                styleClass="section-content input-section">
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
+                </p:autoComplete>
                 <h:outputText value="GUID" styleClass="section-label"
                               rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"/>
                 <h:inputText id="guid" value="#{contextSchemeDetailBean.contextScheme.guid}"
