@@ -36,21 +36,16 @@
 		<dependency>
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
-			<version>${spring.hateoas.version}</version>
+			<version>0.24.0.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.plugin</groupId>
 			<artifactId>spring-plugin-core</artifactId>
-			<version>${spring.plugin.core.version}</version>
+			<version>spring.plugin.core.version</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>springloaded</artifactId>
-			<version>${spring.loaded.version}</version>
 		</dependency>
 
 		<dependency>
@@ -169,13 +164,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>1.4.0.RELEASE</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework</groupId>
-						<artifactId>springloaded</artifactId>
-						<version>${spring.loaded.version}</version>
-					</dependency>
-				</dependencies>
 				<configuration>
 					<fork>true</fork>
 				</configuration>

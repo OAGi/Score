@@ -25,9 +25,6 @@
         <dependency.locations.enabled>false</dependency.locations.enabled>
 
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
-        <spring.hateoas.version>0.24.0.RELEASE</spring.hateoas.version>
-        <spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
-        <spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
         <commons.logging.version>1.2</commons.logging.version>
         <guava.version>19.0</guava.version>
         <org.ow2.asm.version>5.0.4</org.ow2.asm.version>
