@@ -136,7 +136,7 @@ public class ProfileBIEGenerationBean extends UIHandler {
         List<ProfileBIE> profileBIES;
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             profileBIES = allProfileBIEs.stream()
-                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp))
+                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp).reversed())
                     .collect(Collectors.toList());
         } else {
             profileBIES = allProfileBIEs.stream()
