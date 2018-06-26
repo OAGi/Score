@@ -77,7 +77,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
         } else {
             for (DataTypeSupplementaryComponent aDataTypeSupplementaryComponent : al) {
-                DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
+                DataType dtVO = dataTypeRepository.findById(aDataTypeSupplementaryComponent.getOwnerDtId()).orElse(null);
 
                 String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
                 for (int k = 0; k < metalist.length; k++) {
@@ -131,12 +131,12 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 }
 
                 if (!is_fields_xsd) {
-                    DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
+                    DataType dtVO = dataTypeRepository.findById(aDataTypeSupplementaryComponent.getOwnerDtId()).orElse(null);
                     XSDBuiltInType xbtToken = xbtRepository.findOneByBuiltInType("xsd:token");
                     XSDBuiltInType xbtNormalizedString = xbtRepository.findOneByBuiltInType("xsd:normalizedString");
 
                     if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Language")) {
-                        DataType defaultTextBDT = dataTypeRepository.findOne(dtVO.getBasedDtId());
+                        DataType defaultTextBDT = dataTypeRepository.findById(dtVO.getBasedDtId()).orElse(null);
                         List<DataTypeSupplementaryComponent> baseDTSCs = dtScRepository.findByOwnerDtId(defaultTextBDT.getDtId());
 
                         for (int i = 0; i < baseDTSCs.size(); i++) {
@@ -151,7 +151,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 bVO.setCdtScAwdPriXpsTypeMapId(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
 
                                 CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap CDTSCAPX =
-                                        cdtScAwdPriXpsTypeMapRepository.findOne(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
+                                        cdtScAwdPriXpsTypeMapRepository.findById(aBDTSCPri.getCdtScAwdPriXpsTypeMapId()).orElse(null);
 
                                 if (CDTSCAPX.getXbtId() == xbtToken.getXbtId()) {//if it is token
                                     bVO.setDefault(true);
@@ -159,7 +159,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                     bVO.setDefault(false);
                                 }
 
-                                XSDBuiltInType xbtName = xbtRepository.findOne(CDTSCAPX.getXbtId());
+                                XSDBuiltInType xbtName = xbtRepository.findById(CDTSCAPX.getXbtId()).orElse(null);
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
                                 bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
@@ -188,7 +188,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 } else {
                                     bVO.setDefault(false);
                                 }
-                                XSDBuiltInType xbtName = xbtRepository.findOne(cdtSCMaps.get(j).getXbtId());
+                                XSDBuiltInType xbtName = xbtRepository.findById(cdtSCMaps.get(j).getXbtId()).orElse(null);
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
                                 bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
@@ -226,7 +226,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 } else {
                                     bVO.setDefault(false);
                                 }
-                                XSDBuiltInType xbtName = xbtRepository.findOne(cdtSCMaps.get(j).getXbtId());
+                                XSDBuiltInType xbtName = xbtRepository.findById(cdtSCMaps.get(j).getXbtId()).orElse(null);
                                 logger.debug("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
                                 bdtScPriRestriRepository.saveAndFlush(bVO);
                             }
@@ -254,7 +254,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     long xbt_id = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
 
                     long cdt_id = 0L;
-                    DataTypeSupplementaryComponent stscVO = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
+                    DataTypeSupplementaryComponent stscVO = dtScRepository.findById(aDataTypeSupplementaryComponent.getBasedDtScId()).orElse(null);
                     if (stscVO == null) {
                         stscVO = new DataTypeSupplementaryComponent();
                     }
@@ -283,15 +283,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                     CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX = null;
                     if (CDTSCAllowedPrimitiveExpressionTypeMapID > 0) {
-                        aCDTSCPAX = cdtScAwdPriXpsTypeMapRepository.findOne(
-                                bVO1.getCdtScAwdPriXpsTypeMapId());
+                        aCDTSCPAX = cdtScAwdPriXpsTypeMapRepository.findById(
+                                bVO1.getCdtScAwdPriXpsTypeMapId()).orElse(null);
                     }
 
                     XSDBuiltInType aXBT;
                     if (aCDTSCPAX == null) {
                         aXBT = new XSDBuiltInType();
                     } else {
-                        aXBT = xbtRepository.findOne(aCDTSCPAX.getXbtId());
+                        aXBT = xbtRepository.findById(aCDTSCPAX.getXbtId()).orElse(null);
                     }
                     logger.debug("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO1.isDefault());
                     bdtScPriRestriRepository.saveAndFlush(bVO1);
@@ -303,7 +303,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     } else { // DTSC is based on other dt_sc
                         al3 = cdtScAwdPriRepository.findByCdtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
                         if (al3.isEmpty()) {
-                            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
+                            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dtScRepository.findById(aDataTypeSupplementaryComponent.getBasedDtScId()).orElse(null);
                             al3 = cdtScAwdPriRepository.findByCdtScId(dataTypeSupplementaryComponent.getBasedDtScId());
                         }
                     }
@@ -344,10 +344,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                             }
 
                             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX =
-                                    cdtScAwdPriXpsTypeMapRepository.findOne(bVO.getCdtScAwdPriXpsTypeMapId());
+                                    cdtScAwdPriXpsTypeMapRepository.findById(bVO.getCdtScAwdPriXpsTypeMapId()).orElse(null);
 
-
-                            XSDBuiltInType aXBT = xbtRepository.findOne(aCDTSCPAX.getXbtId());
+                            XSDBuiltInType aXBT = xbtRepository.findById(aCDTSCPAX.getXbtId()).orElse(null);
 
                             //exceptional case
                             if (ele != null && ele.getAttribute("type") != null && ele.getAttribute("type").equalsIgnoreCase("NumberType_B98233")) {
@@ -370,15 +369,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public DataTypeSupplementaryComponent getDTSC(long id) throws Exception {
-        return dtScRepository.findOne(id);
+        return dtScRepository.findById(id).orElse(null);
     }
 
     public String getDen(long id) throws Exception {
-        return dataTypeRepository.findOne(id).getDen();
+        return dataTypeRepository.findById(id).get().getDen();
     }
 
     public boolean isBDTSC(long id) throws Exception {
-        DataType tmp = dataTypeRepository.findOne(id);
+        DataType tmp = dataTypeRepository.findById(id).orElse(null);
 
         if (tmp != null && tmp.getType() == DataTypeType.BusinessDataType)
             return true;
@@ -386,11 +385,11 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public String getCDTPrimitiveName(long id) throws Exception {
-        return cdtPriRepository.findOne(id).getName();
+        return cdtPriRepository.findById(id).get().getName();
     }
 
     public XSDBuiltInType getXbtId(long id) throws Exception {
-        return xbtRepository.findOne(id);
+        return xbtRepository.findById(id).orElse(null);
     }
 
     public static void main(String args[]) throws Exception {

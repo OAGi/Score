@@ -437,7 +437,7 @@ public class CreateBIEBean extends AbstractBIEBean {
     public void submit() throws IOException {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
-            AssociationCoreComponentProperty selectedASCCP = asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+            AssociationCoreComponentProperty selectedASCCP = asccpRepository.findById(selectedTopLevelConcept.getAsccpId()).orElse(null);
             assert selectedASCCP.getReleaseId() == getRelease().getReleaseId();
 
             createTreeNode(selectedASCCP, release, selectedBusinessContext);

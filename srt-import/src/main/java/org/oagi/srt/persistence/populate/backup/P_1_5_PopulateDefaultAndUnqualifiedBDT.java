@@ -278,7 +278,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         }
 
         List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findByCdtId(cdtId);
-        DataType bdt = dataTypeRepository.findOne(bdtId);
+        DataType bdt = dataTypeRepository.findById(bdtId).orElse(null);
 
         Set<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = new LinkedHashSet();
         if (bdt.getBasedDtId() == cdtId) {//if default BDT
@@ -317,12 +317,12 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             if (bdtPriRestriList.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_ID['" + bdtId + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
             }
-            bdtPriRestriRepository.save(bdtPriRestriList);
+            bdtPriRestriRepository.saveAll(bdtPriRestriList);
         }
     }
 
     private String getXsdBuiltinType(long id) {
-        return xbtRepository.findOne(id).getBuiltInType();
+        return xbtRepository.findById(id).get().getBuiltInType();
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm,
@@ -587,7 +587,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findByCdtId(cdtID);
         Set<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = new LinkedHashSet();
 
-        DataType bdt = dataTypeRepository.findOne(bdtId);
+        DataType bdt = dataTypeRepository.findById(bdtId).orElse(null);
         if (bdt.getBasedDtId() == cdtID) {
             boolean isTimePoint = false;
             if (bdt.getDen().equals(Utility.typeToDen("DateType_DB95C8"))        //DayDateType
@@ -645,7 +645,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             if (bdtPriRestriList.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_ID['" + bdtId + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
             }
-            bdtPriRestriRepository.save(bdtPriRestriList);
+            bdtPriRestriRepository.saveAll(bdtPriRestriList);
         }
     }
 
@@ -765,7 +765,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     private void populateDTSCforDefaultBDT(DataType dt, XPathHandler xh, XPathHandler xh2) throws Exception {
 
-        DataType baseCDT = dataTypeRepository.findOne(dt.getBasedDtId());
+        DataType baseCDT = dataTypeRepository.findById(dt.getBasedDtId()).orElse(null);
         logger.debug("Popuating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
         List<DataTypeSupplementaryComponent> cdtSCList = dtScRepository.findByOwnerDtId(baseCDT.getDtId());
 
@@ -1010,7 +1010,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                             CoreDataTypeAllowedPrimitive cdtAP = CDTAwdPris.get(k);
                             cdtSCAP.setCdtScId(insertedSC.getDtScId());
                             cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
-                            CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
+                            CoreDataTypePrimitive tmpPri = cdtPriRepository.findById(cdtAP.getCdtPriId()).orElse(null);
 
                             cdtSCAP.setDefault(cdtAP.isDefault());
 
@@ -1116,7 +1116,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                     bVO.setBdtScId(dtSc.getDtScId());
 
                     bVO.setCdtScAwdPriXpsTypeMapId(aCDTSCAllowedPrimitiveExVO.getCdtScAwdPriXpsTypeMapId());
-                    XSDBuiltInType xbtVO = xbtRepository.findOne(aCDTSCAllowedPrimitiveExVO.getXbtId());
+                    XSDBuiltInType xbtVO = xbtRepository.findById(aCDTSCAllowedPrimitiveExVO.getXbtId()).orElse(null);
 
                     if (type.equals(xbtVO.getBuiltInType())) {
                         bVO.setDefault(true);
@@ -1260,7 +1260,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     public long getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
         if (dtsc.getBasedDtScId() > 0L) {
-            DataTypeSupplementaryComponent baseDTSC = dtScRepository.findOne(dtsc.getBasedDtScId());
+            DataTypeSupplementaryComponent baseDTSC = dtScRepository.findById(dtsc.getBasedDtScId()).orElse(null);
             return getCDTSCAncestor(baseDTSC);
         }
         return dtsc.getDtScId();

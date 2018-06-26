@@ -237,7 +237,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     private void insertBDTPrimitiveRestriction(long cdtId, long bdtID, long defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtId);
-        DataType bdt = dataTypeRepository.findOne(bdtID);
+        DataType bdt = dataTypeRepository.findById(bdtID).orElse(null);
         
         if(bdt.getBasedDtId()==cdtId) {//if default BDT
         	for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
@@ -275,7 +275,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private String getXsdBuiltinType(long id) {
-        return xbtRepository.findOne(id).getBuiltInType();
+        return xbtRepository.findById(id).get().getBuiltInType();
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm,
@@ -515,7 +515,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     private void insertBDTPrimitiveRestrictionForExceptionalBDT(long cdtID, long bdtID, long defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
         
-        DataType bdt = dataTypeRepository.findOne(bdtID);
+        DataType bdt = dataTypeRepository.findById(bdtID).orElse(null);
         if(bdt.getBasedDtId()==cdtID){
 	        boolean isTimePoint = false;
 	        if(bdt.getDen().equals(Utility.typeToDen("DateType_DB95C8")) 		//DayDateType

@@ -4,7 +4,7 @@ spring:
 
   datasource:
     continue-on-error: true
-    initialize: false
+    initialization-mode: never
 
   jpa:
     generate-ddl: false
@@ -20,8 +20,7 @@ spring:
       hibernate.cache.use_second_level_cache: false
 
   batch:
-    initializer:
-      enabled: false
+    initialize-schema: never
 
   mvc:
     favicon:
@@ -67,11 +66,11 @@ jsf:
   facelets-refresh-period: 0
 
 server:
-  session:
-    timeout: 6000000
-    cookie:
-      max-age: 6000000
-
+  servlet:
+    session:
+      timeout: 6000000s
+      cookie:
+        max-age: 6000000s
 
 # Development MySQL environment
 ---
@@ -103,10 +102,11 @@ jsf:
   facelets-refresh-period: 0
 
 server:
-  session:
-    timeout: 6000000
-    cookie:
-      max-age: 6000000
+  servlet:
+    session:
+      timeout: 6000000s
+      cookie:
+        max-age: 6000000s
 
 # Staging environment
 ---
@@ -125,10 +125,11 @@ jsf:
   project-stage: Production
 
 server:
-  session:
-    timeout: 6000000
-    cookie:
-      max-age: 6000000
+  servlet:
+    session:
+      timeout: 6000000s
+      cookie:
+        max-age: 6000000s
 
 # Production environment
 ---

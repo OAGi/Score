@@ -36,7 +36,7 @@ public class BCCPService {
     }
 
     public BasicCoreComponentProperty findByBCC(BasicCoreComponent bcc) {
-        return bccpRepository.findOne(bcc.getToBccpId());
+        return bccpRepository.findById(bcc.getToBccpId()).orElse(null);
     }
 
 }

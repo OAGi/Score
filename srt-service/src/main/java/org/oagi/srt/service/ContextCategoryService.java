@@ -52,7 +52,7 @@ public class ContextCategoryService {
     }
 
     public ContextCategory findById(long ctxCategoryId) {
-        return contextCategoryRepository.findOne(ctxCategoryId);
+        return contextCategoryRepository.findById(ctxCategoryId).orElse(null);
     }
 
     public ContextCategory findOneByGuid(String ctxCategoryGuid) {
@@ -73,7 +73,7 @@ public class ContextCategoryService {
 
     @Transactional(readOnly = false)
     public void deleteById(long ctxCategoryId) {
-        contextCategoryRepository.delete(ctxCategoryId);
+        contextCategoryRepository.deleteById(ctxCategoryId);
     }
 
     public class ContextCategoryBuilder {

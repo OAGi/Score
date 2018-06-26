@@ -87,7 +87,7 @@ public class P_1_4_PopulateCodeList {
             String filename = fileName + ".xsd";
             codeLists.addAll(codeList(filename, agencyId));
         }
-        codeListRepository.save(codeLists);
+        codeListRepository.saveAll(codeLists);
 
         for (int i = 0; i < tt.length; i++) {
             String fileName = tt[i][0];

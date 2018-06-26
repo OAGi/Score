@@ -21,10 +21,10 @@ public class TopLevelConceptRepository {
             "from asccp LEFT JOIN module ON asccp.module_id = module.module_id " +
             "where #COND# ORDER BY asccp.property_term";
 
-    public TopLevelConcept findOne(long asccpId) {
-        Query query = entityManager.createNativeQuery(FIND_ALL_STATEMENT + " AND ASCCP.ASCCP_ID = ?", TopLevelConcept.class);
-        query.setParameter(1, asccpId);
-        return (TopLevelConcept) query.getSingleResult();
+    public Optional<TopLevelConcept> findById(long asccpId) {
+        Query query = entityManager.createNativeQuery(FIND_ALL_STATEMENT + " AND asccp.asccp_id = :asccpId", TopLevelConcept.class);
+        query.setParameter("asccpId", asccpId);
+        return Optional.ofNullable((TopLevelConcept) query.getSingleResult());
     }
 
     public List<TopLevelConcept> findAll(Release release) {
@@ -35,9 +35,9 @@ public class TopLevelConceptRepository {
             query = entityManager.createNativeQuery(statement, TopLevelConcept.class);
         } else {
             String statement = FIND_ALL_STATEMENT.replace("#COND#",
-                    "asccp.revision_num > 0 and asccp.release_id <= ?");
+                    "asccp.revision_num > 0 and asccp.release_id <= :releaseId");
             query = entityManager.createNativeQuery(statement, TopLevelConcept.class);
-            query.setParameter(1, release.getReleaseId());
+            query.setParameter("releaseId", release.getReleaseId());
         }
         return distinct(query.getResultList());
     }
@@ -50,15 +50,15 @@ public class TopLevelConceptRepository {
         Query query;
         if (release == Release.WORKING_RELEASE) {
             String statement = FIND_ALL_STATEMENT.replace("#COND#",
-                    "asccp.revision_num = 0 and asccp.release_id IS NULL") + " AND ASCCP.PROPERTY_TERM = ?";
+                    "asccp.revision_num = 0 and asccp.release_id IS NULL") + " AND asccp.property_term = :propertyTerm";
             query = entityManager.createNativeQuery(statement, TopLevelConcept.class);
         } else {
             String statement = FIND_ALL_STATEMENT.replace("#COND#",
-                    "asccp.revision_num > 0 and asccp.release_id <= ?") + " AND ASCCP.PROPERTY_TERM = ?";
+                    "asccp.revision_num > 0 and asccp.release_id <= :releaseId") + " AND asccp.property_term = :propertyTerm";
             query = entityManager.createNativeQuery(statement, TopLevelConcept.class);
-            query.setParameter(1, release.getReleaseId());
+            query.setParameter("releaseId", release.getReleaseId());
         }
-        query.setParameter(2, propertyTerm);
+        query.setParameter("propertyTerm", propertyTerm);
 
         return distinct(query.getResultList());
     }

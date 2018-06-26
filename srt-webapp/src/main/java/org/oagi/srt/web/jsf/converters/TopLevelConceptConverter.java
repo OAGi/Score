@@ -29,7 +29,7 @@ public class TopLevelConceptConverter implements Converter {
         if (asccpId <= 0L) {
             return NULL_INSTANCE;
         }
-        return topLevelConceptRepository.findOne(asccpId);
+        return topLevelConceptRepository.findById(asccpId).orElse(null);
     }
 
     @Override

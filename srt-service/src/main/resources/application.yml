@@ -4,7 +4,7 @@ spring:
 
   datasource:
     continue-on-error: true
-    initialize: false
+    initialization-mode: never
 
   jpa:
     generate-ddl: false
@@ -18,8 +18,7 @@ spring:
           use_second_level_cache: false
 
   batch:
-    initializer:
-      enabled: false
+    initialize-schema: never
 
 logging:
   level:

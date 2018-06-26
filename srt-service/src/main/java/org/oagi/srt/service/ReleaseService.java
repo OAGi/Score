@@ -46,7 +46,7 @@ public class ReleaseService {
     }
 
     public Release findById(long namespaceId) {
-        return releaseRepository.findOne(namespaceId);
+        return releaseRepository.findById(namespaceId).orElse(null);
     }
 
     public List<Release> findAll(Sort.Direction direction, String property) {
@@ -86,7 +86,7 @@ public class ReleaseService {
                 maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByAccIdAndRevisionNumAndReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "ASCC":
-                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                AssociationCoreComponent ascc = asccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
                 maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseId(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
                 break;
@@ -95,7 +95,7 @@ public class ReleaseService {
                 maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "BCC":
-                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                BasicCoreComponent bcc = bccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
                 maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseId(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
                 break;
@@ -125,7 +125,7 @@ public class ReleaseService {
                 maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByAccIdAndRevisionNum(cc.getId(), maxRevisionNum);
                 break;
             case "ASCC":
-                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                AssociationCoreComponent ascc = asccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
                 maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
                 break;
@@ -134,7 +134,7 @@ public class ReleaseService {
                 maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByAsccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
                 break;
             case "BCC":
-                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                BasicCoreComponent bcc = bccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
                 maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
                 break;
@@ -165,27 +165,27 @@ public class ReleaseService {
 
         switch (ccId.getType()) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(ccId.getId());
+                AggregateCoreComponent acc = accRepository.findById(ccId.getId()).orElse(null);
                 maxRevisionNum = accRepository.findMaxRevisionNumByCurrentAccId(acc.getCurrentAccId());
                 maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(acc.getCurrentAccId(), maxRevisionNum);
                 return acc.getRevisionNum() == maxRevisionNum && acc.getRevisionTrackingNum() == maxRevisionTrackingNum;
             case "ASCC":
-                AssociationCoreComponent ascc = asccRepository.findOne(ccId.getId());
+                AssociationCoreComponent ascc = asccRepository.findById(ccId.getId()).orElse(null);
                 maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
                 maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
                 return ascc.getRevisionNum() == maxRevisionNum && ascc.getRevisionTrackingNum() == maxRevisionTrackingNum;
             case "ASCCP":
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ccId.getId());
+                AssociationCoreComponentProperty asccp = asccpRepository.findById(ccId.getId()).orElse(null);
                 maxRevisionNum = asccpRepository.findMaxRevisionNumByCurrentAsccpId(asccp.getCurrentAsccpId());
                 maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(asccp.getCurrentAsccpId(), maxRevisionNum);
                 return asccp.getRevisionNum() == maxRevisionNum && asccp.getRevisionTrackingNum() == maxRevisionTrackingNum;
             case "BCC":
-                BasicCoreComponent bcc = bccRepository.findOne(ccId.getId());
+                BasicCoreComponent bcc = bccRepository.findById(ccId.getId()).orElse(null);
                 maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
                 maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
                 return bcc.getRevisionNum() == maxRevisionNum && bcc.getRevisionTrackingNum() == maxRevisionTrackingNum;
             case "BCCP":
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(ccId.getId());
+                BasicCoreComponentProperty bccp = bccpRepository.findById(ccId.getId()).orElse(null);
                 maxRevisionNum = bccpRepository.findMaxRevisionNumByCurrentBccpId(bccp.getCurrentBccpId());
                 maxRevisionTrackingNum = bccpRepository.findMaxRevisionTrackingNumByCurrentBccpIdAndRevisionNum(bccp.getCurrentBccpId(), maxRevisionNum);
                 return bccp.getRevisionNum() == maxRevisionNum && bccp.getRevisionTrackingNum() == maxRevisionTrackingNum;
@@ -267,7 +267,7 @@ public class ReleaseService {
                 }
             }
 
-            releaseRepository.delete(r.getReleaseId());
+            releaseRepository.deleteById(r.getReleaseId());
             releaseRepository.flush();
         }
 
@@ -285,7 +285,7 @@ public class ReleaseService {
             acc.setState(CoreComponentState.Published);
             accRepository.saveAndFlush(acc);
 
-            AggregateCoreComponent currentACC = accRepository.findOne(acc.getCurrentAccId());
+            AggregateCoreComponent currentACC = accRepository.findById(acc.getCurrentAccId()).orElse(null);
             if (isLatestRevision(acc, currentACC)) { // do not update current record because of acc if there are later releases (Issue #463)
                 currentACC.setState(CoreComponentState.Published);
                 accRepository.saveAndFlush(currentACC);
@@ -303,7 +303,7 @@ public class ReleaseService {
             ascc.setState(CoreComponentState.Published);
             asccRepository.saveAndFlush(ascc);
 
-            AssociationCoreComponent currentAscc = asccRepository.findOne(ascc.getCurrentAsccId());
+            AssociationCoreComponent currentAscc = asccRepository.findById(ascc.getCurrentAsccId()).orElse(null);
             currentAscc.setState(CoreComponentState.Published);
             asccRepository.saveAndFlush(currentAscc);
         }
@@ -312,7 +312,7 @@ public class ReleaseService {
             asccp.setState(CoreComponentState.Published);
             asccpRepository.saveAndFlush(asccp);
 
-            AssociationCoreComponentProperty currentAsccp = asccpRepository.findOne(asccp.getCurrentAsccpId());
+            AssociationCoreComponentProperty currentAsccp = asccpRepository.findById(asccp.getCurrentAsccpId()).orElse(null);
             currentAsccp.setState(CoreComponentState.Published);
             asccpRepository.saveAndFlush(currentAsccp);
         }
@@ -321,7 +321,7 @@ public class ReleaseService {
             bcc.setState(CoreComponentState.Published);
             bccRepository.saveAndFlush(bcc);
 
-            BasicCoreComponent currentBcc = bccRepository.findOne(bcc.getCurrentBccId());
+            BasicCoreComponent currentBcc = bccRepository.findById(bcc.getCurrentBccId()).orElse(null);
             currentBcc.setState(CoreComponentState.Published);
             bccRepository.saveAndFlush(currentBcc);
         }
@@ -330,7 +330,7 @@ public class ReleaseService {
             bccp.setState(CoreComponentState.Published);
             bccpRepository.saveAndFlush(bccp);
 
-            BasicCoreComponentProperty currentBccp = bccpRepository.findOne(bccp.getCurrentBccpId());
+            BasicCoreComponentProperty currentBccp = bccpRepository.findById(bccp.getCurrentBccpId()).orElse(null);
             currentBccp.setState(CoreComponentState.Published);
             bccpRepository.saveAndFlush(currentBccp);
         }
@@ -359,19 +359,19 @@ public class ReleaseService {
         List<BasicCoreComponentProperty> bccps = bccpRepository.findByReleaseId(release.getReleaseId());
 
         accs.stream().forEach(acc -> acc.setState(state));
-        accRepository.save(accs);
+        accRepository.saveAll(accs);
 
         asccs.stream().forEach(ascc -> ascc.setState(state));
-        asccRepository.save(asccs);
+        asccRepository.saveAll(asccs);
 
         asccps.stream().forEach(asccp -> asccp.setState(state));
-        asccpRepository.save(asccps);
+        asccpRepository.saveAll(asccps);
 
         bccs.stream().forEach(bcc -> bcc.setState(state));
-        bccRepository.save(bccs);
+        bccRepository.saveAll(bccs);
 
         bccps.stream().forEach(bccp -> bccp.setState(state));
-        bccpRepository.save(bccps);
+        bccpRepository.saveAll(bccps);
     }
 
     private void deleteCCsByRelease(Release fromRel) {
@@ -386,7 +386,7 @@ public class ReleaseService {
             accRepository.flush();
 
             if (accRepository.findByCurrentAccId(acc.getCurrentAccId()).isEmpty()) { // acc was the only revision, remove current as well
-                accRepository.delete(acc.getCurrentAccId());
+                accRepository.deleteById(acc.getCurrentAccId());
                 accRepository.flush();
             }
         }
@@ -396,7 +396,7 @@ public class ReleaseService {
             asccRepository.flush();
 
             if (asccRepository.findByCurrentAsccId(ascc.getCurrentAsccId()).isEmpty()) { // ascc was the only revision, remove current as well
-                asccRepository.delete(ascc.getCurrentAsccId());
+                asccRepository.deleteById(ascc.getCurrentAsccId());
                 asccRepository.flush();
             }
         }
@@ -406,7 +406,7 @@ public class ReleaseService {
             asccpRepository.flush();
 
             if (asccpRepository.findByCurrentAsccpId(asccp.getCurrentAsccpId()).isEmpty()) { // acsccp was the only revision, remove current as well
-                asccpRepository.delete(asccp.getCurrentAsccpId());
+                asccpRepository.deleteById(asccp.getCurrentAsccpId());
                 asccpRepository.flush();
             }
         }
@@ -416,7 +416,7 @@ public class ReleaseService {
             bccRepository.flush();
 
             if (bccRepository.findByCurrentBccId(bcc.getCurrentBccId()).isEmpty()) { // bcc was the only revision, remove current as well
-                bccRepository.delete(bcc.getCurrentBccId());
+                bccRepository.deleteById(bcc.getCurrentBccId());
                 bccRepository.flush();
             }
         }
@@ -426,7 +426,7 @@ public class ReleaseService {
             bccpRepository.flush();
 
             if (bccpRepository.findByCurrentBccpId(bccp.getCurrentBccpId()).isEmpty()) { // bccp was the only revision, remove current as well
-                bccpRepository.delete(bccp.getCurrentBccpId());
+                bccpRepository.deleteById(bccp.getCurrentBccpId());
                 bccpRepository.flush();
             }
         }
@@ -446,7 +446,7 @@ public class ReleaseService {
             acc.setState(ccState);
             accRepository.saveAndFlush(acc);
 
-            AggregateCoreComponent currentACC = accRepository.findOne(acc.getCurrentAccId());
+            AggregateCoreComponent currentACC = accRepository.findById(acc.getCurrentAccId()).orElse(null);
             if (currentACC != null) {
                 currentACC.setState(ccState);
                 accRepository.saveAndFlush(currentACC);
@@ -458,7 +458,7 @@ public class ReleaseService {
             ascc.setState(CoreComponentState.Published);
             asccRepository.saveAndFlush(ascc);
 
-            AssociationCoreComponent currentAscc = asccRepository.findOne(ascc.getCurrentAsccId());
+            AssociationCoreComponent currentAscc = asccRepository.findById(ascc.getCurrentAsccId()).orElse(null);
             if (currentAscc != null) {
                 currentAscc.setState(ccState);
                 asccRepository.saveAndFlush(currentAscc);
@@ -470,7 +470,7 @@ public class ReleaseService {
             asccp.setState(ccState);
             asccpRepository.saveAndFlush(asccp);
 
-            AssociationCoreComponentProperty currentAsccp = asccpRepository.findOne(asccp.getCurrentAsccpId());
+            AssociationCoreComponentProperty currentAsccp = asccpRepository.findById(asccp.getCurrentAsccpId()).orElse(null);
             if (currentAsccp != null) {
                 currentAsccp.setState(ccState);
                 asccpRepository.saveAndFlush(currentAsccp);
@@ -482,7 +482,7 @@ public class ReleaseService {
             bcc.setState(ccState);
             bccRepository.saveAndFlush(bcc);
 
-            BasicCoreComponent currentBcc = bccRepository.findOne(bcc.getCurrentBccId());
+            BasicCoreComponent currentBcc = bccRepository.findById(bcc.getCurrentBccId()).orElse(null);
             if (currentBcc != null) {
                 currentBcc.setState(ccState);
                 bccRepository.saveAndFlush(currentBcc);
@@ -494,7 +494,7 @@ public class ReleaseService {
             bccp.setState(ccState);
             bccpRepository.saveAndFlush(bccp);
 
-            BasicCoreComponentProperty currentBccp = bccpRepository.findOne(bccp.getCurrentBccpId());
+            BasicCoreComponentProperty currentBccp = bccpRepository.findById(bccp.getCurrentBccpId()).orElse(null);
             if (currentBccp != null) {
                 currentBccp.setState(ccState);
                 bccpRepository.saveAndFlush(currentBccp);
@@ -703,8 +703,8 @@ public class ReleaseService {
     public class ReleaseComparator implements Comparator<Long> {
         @Override
         public int compare(Long a, Long b) {
-            Release aRelease = releaseRepository.findOne(a);
-            Release bRelease = releaseRepository.findOne(b);
+            Release aRelease = releaseRepository.findById(a).orElse(null);
+            Release bRelease = releaseRepository.findById(b).orElse(null);
 
             return new VersionStringComparator().compare(aRelease.getReleaseNum(), bRelease.getReleaseNum());
         }

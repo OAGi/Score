@@ -80,7 +80,7 @@ public class CodeListBaseBean extends UIHandler {
     public AgencyIdListValue getAgencyIdListValue() {
         long agencyId = getCodeList().getAgencyId();
         if (agencyId > 0L) {
-            return agencyIdListValueRepository.findOne(agencyId);
+            return agencyIdListValueRepository.findById(agencyId).orElse(null);
         } else {
             return null;
         }

@@ -592,7 +592,7 @@ public class GenerationContext {
 
     public BusinessContext findBusinessContext(TopLevelAbie topLevelAbie) {
         long bizCtxId = topLevelAbie.getAbie().getBizCtxId();
-        return businessContextRepository.findOne(bizCtxId);
+        return businessContextRepository.findById(bizCtxId).orElse(null);
     }
 
     public List<ContextSchemeValue> findContextSchemeValue(BusinessContext businessContext) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ProfileBIERepository {
@@ -28,9 +29,9 @@ public class ProfileBIERepository {
         return query.getResultList();
     }
 
-    public ProfileBIE findOne(long topLevelAbieId) {
-        Query query = entityManager.createQuery(FIND_ALL_STATEMENT + " AND tla.topLevelAbieId = ?", ProfileBIE.class);
-        query.setParameter(1, topLevelAbieId);
-        return (ProfileBIE) query.getSingleResult();
+    public Optional<ProfileBIE> findById(long topLevelAbieId) {
+        Query query = entityManager.createQuery(FIND_ALL_STATEMENT + " AND tla.topLevelAbieId = :topLevelAbieId", ProfileBIE.class);
+        query.setParameter("topLevelAbieId", topLevelAbieId);
+        return Optional.ofNullable((ProfileBIE) query.getSingleResult());
     }
 }

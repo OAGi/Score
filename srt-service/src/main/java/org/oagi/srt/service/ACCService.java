@@ -69,6 +69,6 @@ public class ACCService {
     }
 
     public AggregateCoreComponent findById(Long accId) {
-        return accRepository.findOne(accId);
+        return accRepository.findById(accId).orElse(null);
     }
 }

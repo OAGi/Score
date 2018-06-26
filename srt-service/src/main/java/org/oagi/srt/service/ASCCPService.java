@@ -36,7 +36,7 @@ public class ASCCPService {
     }
 
     public AssociationCoreComponentProperty findByASCC(AssociationCoreComponent ascc) {
-        return asccpRepository.findOne(ascc.getToAsccpId());
+        return asccpRepository.findById(ascc.getToAsccpId()).orElse(null);
     }
 
 }

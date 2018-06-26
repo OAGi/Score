@@ -44,7 +44,7 @@ public class CodeListService {
     }
 
     public CodeList findOne(long codeListId) {
-        return codeListRepository.findOne(codeListId);
+        return codeListRepository.findById(codeListId).orElse(null);
     }
 
     public List<CodeList> findByListIdAndAgencyId(String listId, long agencyId) {
@@ -95,7 +95,7 @@ public class CodeListService {
 
     @Transactional
     public void delete(Collection<CodeListValue> codeListValues) {
-        codeListValueRepository.delete(codeListValues);
+        codeListValueRepository.deleteAll(codeListValues);
     }
 
     public CodeListBuilder newCodeListBuilder(CodeList codeList) {

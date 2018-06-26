@@ -167,7 +167,7 @@ public class P_1_6_PopulateDTFromMeta {
             populateDTSC(dataType);
         }
 
-        bdtPriRestriRepository.save(bdtPriRestriList);
+        bdtPriRestriRepository.saveAll(bdtPriRestriList);
     }
 
     private Collection<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
@@ -361,7 +361,7 @@ public class P_1_6_PopulateDTFromMeta {
 
         } else if (dtSc.getPropertyTerm().equals("Action")) {
 
-            DataType baseDT = dataTypeRepository.findOne(dtSc.getOwnerDtId());
+            DataType baseDT = dataTypeRepository.findById(dtSc.getOwnerDtId()).orElse(null);
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
@@ -430,8 +430,8 @@ public class P_1_6_PopulateDTFromMeta {
 
     public void inheritLanguageCode(DataTypeSupplementaryComponent dtSc) {
 
-        DataType baseBDT = dataTypeRepository.findOne(dtSc.getOwnerDtId());
-        DataType baseDefaultTextBDT = dataTypeRepository.findOne(baseBDT.getBasedDtId());
+        DataType baseBDT = dataTypeRepository.findById(dtSc.getOwnerDtId()).orElse(null);
+        DataType baseDefaultTextBDT = dataTypeRepository.findById(baseBDT.getBasedDtId()).orElse(null);
 
         DataTypeSupplementaryComponent languageCodeSC = dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(baseDefaultTextBDT.getDtId(), "Language", "Code");
 

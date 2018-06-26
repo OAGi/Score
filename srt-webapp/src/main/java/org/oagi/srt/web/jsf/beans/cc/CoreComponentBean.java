@@ -83,7 +83,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
         Object selectedRelease = sessionMap.get(SELECTED_RELEASE_KEY);
         if (selectedRelease != null) {
-            this.release = releaseRepository.findOne((Long) selectedRelease);
+            this.release = releaseRepository.findById((Long) selectedRelease).orElse(null);
         } else {
             setRelease(Release.WORKING_RELEASE);
         }
@@ -422,7 +422,7 @@ public class CoreComponentBean extends AbstractCoreComponentBean {
 
         switch (coreComponents.getType()) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                AggregateCoreComponent acc = accRepository.findById(coreComponents.getId()).orElse(null);
                 if (acc.getOagisComponentType() == UserExtensionGroup) {
                     return false;
                 } else {

@@ -29,7 +29,7 @@ public class AssociationCoreComponentPropertyConverter implements Converter {
         if (asccpId <= 0L) {
             return NULL_INSTANCE;
         }
-        return asccpRepository.findOne(asccpId);
+        return asccpRepository.findById(asccpId).orElse(null);
     }
 
     @Override

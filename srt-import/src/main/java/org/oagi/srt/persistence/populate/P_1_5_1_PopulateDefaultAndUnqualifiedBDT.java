@@ -307,7 +307,7 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                     bdtPriRestriList.add(bdtPriRestri);
                 }
 
-                bdtPriRestriList = bdtPriRestriRepository.save(bdtPriRestriList);
+                bdtPriRestriList = bdtPriRestriRepository.saveAll(bdtPriRestriList);
                 return bdtPriRestriList;
             } else {
                 return buildBdtPriRestriList();
@@ -350,8 +350,8 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
             if (isFloat && cdtAwdPriXpsTypeMapList.size() > 1) {
                 cdtAwdPriXpsTypeMapList = cdtAwdPriXpsTypeMapList.stream()
                         .filter(e -> {
-                            Long cdtPriId = cdtAwdPriRepository.findOne(e.getCdtAwdPriId()).getCdtPriId();
-                            CoreDataTypePrimitive cdtPri = cdtPriRepository.findOne(cdtPriId);
+                            Long cdtPriId = cdtAwdPriRepository.findById(e.getCdtAwdPriId()).get().getCdtPriId();
+                            CoreDataTypePrimitive cdtPri = cdtPriRepository.findById(cdtPriId).orElse(null);
                             return "Float".equals(cdtPri.getName());
                         }).collect(Collectors.toList());
             }
@@ -362,8 +362,8 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                 bdtPriRestri.setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId());
                 boolean isDefault;
                 if (isFloat) {
-                    Long cdtPriId = cdtAwdPriRepository.findOne(cdtAwdPriXpsTypeMap.getCdtAwdPriId()).getCdtPriId();
-                    CoreDataTypePrimitive cdtPri = cdtPriRepository.findOne(cdtPriId);
+                    Long cdtPriId = cdtAwdPriRepository.findById(cdtAwdPriXpsTypeMap.getCdtAwdPriId()).get().getCdtPriId();
+                    CoreDataTypePrimitive cdtPri = cdtPriRepository.findById(cdtPriId).orElse(null);
                     isDefault = "Float".equals(cdtPri.getName());
                 } else {
                     isDefault = (isUnion) ? (cdtAwdPriXpsTypeMap.getXbtId() == tokenXbt.getXbtId()) :
@@ -378,7 +378,7 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                 throw new IllegalStateException("Only one BusinessDataTypePrimitiveRestriction can allow to have that isDefault value is true.");
             }
 
-            bdtPriRestriList = bdtPriRestriRepository.save(bdtPriRestriList);
+            bdtPriRestriList = bdtPriRestriRepository.saveAll(bdtPriRestriList);
             return bdtPriRestriList;
         }
 
@@ -533,7 +533,7 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
 
                 cdtScAwdPriList.add(cdtScAwdPri);
 
-                CoreDataTypePrimitive cdtPri = cdtPriRepository.findOne(cdtAwdPri.getCdtPriId());
+                CoreDataTypePrimitive cdtPri = cdtPriRepository.findById(cdtAwdPri.getCdtPriId()).orElse(null);
                 List<XSDBuiltInType> xbtList = populateCDTandCDTSC.findXSDBuiltInTypesByCdtPri(cdtPri);
                 if (xbtList.isEmpty()) {
                     throw new IllegalStateException();
@@ -630,12 +630,12 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
         }
 
         private List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findCdtScAwdPriList(DataTypeSupplementaryComponent dtSc) {
-            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findOne(dtSc.getBasedDtScId());
+            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findById(dtSc.getBasedDtScId()).orElse(null);
             List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList = Collections.emptyList();
             while (basedDtSc != null) {
                 cdtScAwdPriList = cdtScAwdPriRepository.findByCdtScId(basedDtSc.getDtScId());
                 if (cdtScAwdPriList.isEmpty()) {
-                    basedDtSc = dtScRepository.findOne(basedDtSc.getBasedDtScId());
+                    basedDtSc = dtScRepository.findById(basedDtSc.getBasedDtScId()).orElse(null);
                 } else {
                     break;
                 }
@@ -678,8 +678,8 @@ public class P_1_5_1_PopulateDefaultAndUnqualifiedBDT {
                     if ("xsd:float".equals(defaultXbt.getBuiltInType())) {
                         if (cdtScAwdPriXpsTypeMap.getXbtId() == defaultXbt.getXbtId()) {
                             CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri =
-                                    cdtScAwdPriRepository.findOne(cdtScAwdPriXpsTypeMap.getCdtScAwdPriId());
-                            CoreDataTypePrimitive cdtPri = cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId());
+                                    cdtScAwdPriRepository.findById(cdtScAwdPriXpsTypeMap.getCdtScAwdPriId()).orElse(null);
+                            CoreDataTypePrimitive cdtPri = cdtPriRepository.findById(cdtScAwdPri.getCdtPriId()).orElse(null);
                             bdtScPriRestri.setDefault("Float".equals(cdtPri.getName()));
                         }
 

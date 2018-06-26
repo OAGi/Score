@@ -29,7 +29,7 @@ public class BasicCoreComponentPropertyConverter implements Converter {
         if (bccpId <= 0L) {
             return NULL_INSTANCE;
         }
-        return bccpRepository.findOne(bccpId);
+        return bccpRepository.findById(bccpId).orElse(null);
     }
 
     @Override

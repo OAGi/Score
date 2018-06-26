@@ -34,7 +34,7 @@ public class AgencyIdListValueConverter implements Converter {
         if (agencyIdListValueId <= 0L) {
             return NULL_INSTANCE;
         }
-        return agencyIdListValueRepository.findOne(agencyIdListValueId);
+        return agencyIdListValueRepository.findById(agencyIdListValueId).orElse(null);
     }
 
     @Override

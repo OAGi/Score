@@ -11,6 +11,8 @@ import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 
 @Component
 abstract class AbstractBIEBean extends UIHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private NodeService nodeService;
@@ -144,19 +148,24 @@ abstract class AbstractBIEBean extends UIHandler {
     }
 
     public void expand(NodeExpandEvent expandEvent) {
-        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
+        long s = System.currentTimeMillis();
+        try {
+            DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
 
-        BIENode bieNode = (BIENode) treeNode.getData();
-        Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
-        if (expanded == null || expanded == false) {
-            if (bieNode.hasChild()) {
-                treeNode.setChildren(new ArrayList()); // clear children
+            BIENode bieNode = (BIENode) treeNode.getData();
+            Boolean expanded = (Boolean) bieNode.getAttribute("expanded");
+            if (expanded == null || expanded == false) {
+                if (bieNode.hasChild()) {
+                    treeNode.setChildren(new ArrayList()); // clear children
 
-                for (BIENode child : bieNode.getChildren()) {
-                    toTreeNode(child, treeNode);
+                    for (BIENode child : bieNode.getChildren()) {
+                        toTreeNode(child, treeNode);
+                    }
                 }
+                bieNode.setAttribute("expanded", true);
             }
-            bieNode.setAttribute("expanded", true);
+        } finally {
+            logger.debug("Expanding tree node took " + (System.currentTimeMillis() - s) + " ms");
         }
     }
 

@@ -105,7 +105,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             );
         }
 
-        bdtPriRestriRepository.save(bdtPriRestris);
+        bdtPriRestriRepository.saveAll(bdtPriRestris);
     }
 
     private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(

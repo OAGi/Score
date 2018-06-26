@@ -93,7 +93,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent ueAcc = accRepository.findOne(Long.parseLong(accId));
+        AggregateCoreComponent ueAcc = accRepository.findById(Long.parseLong(accId)).orElse(null);
         setUserExtensionAcc(ueAcc);
 
         List<AssociationCoreComponentProperty> asccpList =
@@ -401,7 +401,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
             return;
         }
 
-        AssociationCoreComponentProperty tAsccp = asccpRepository.findOne(selectedAsccpLookup.getAsccpId());
+        AssociationCoreComponentProperty tAsccp = asccpRepository.findById(selectedAsccpLookup.getAsccpId()).orElse(null);
         AggregateCoreComponent pAcc = getUserExtensionAcc();
 
         if (extensionService.exists(pAcc, tAsccp)) {
@@ -647,7 +647,7 @@ public class ExtensionBean extends BaseCoreComponentDetailBean {
             return;
         }
 
-        BasicCoreComponentProperty tBccp = bccpRepository.findOne(selectedBccpLookup.getBccpId());
+        BasicCoreComponentProperty tBccp = bccpRepository.findById(selectedBccpLookup.getBccpId()).orElse(null);
         AggregateCoreComponent pAcc = getUserExtensionAcc();
 
         if (extensionService.exists(pAcc, tBccp)) {

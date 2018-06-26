@@ -312,13 +312,13 @@ public class TopLevelABIEHandler implements Serializable {
                 }
 
                 AssociationCoreComponentProperty asccp =
-                        asccpRepository.findOne(asbiep.getBasedAsccpId());
+                        asccpRepository.findById(asbiep.getBasedAsccpId()).orElse(null);
                 if (asccp == null) {
                     continue;
                 }
 
                 BusinessContext businessContext =
-                        businessContextRepository.findOne(abie.getBizCtxId());
+                        businessContextRepository.findById(abie.getBizCtxId()).orElse(null);
                 abie.setBizCtxName(businessContext.getName());
 
                 ABIEView aABIEView = applicationContext.getBean(ABIEView.class,
@@ -446,7 +446,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Transactional(rollbackFor = Throwable.class)
     public void createBIEs() {
-        AssociationCoreComponentProperty asccp = asccpRepository.findOne(selected.getAsccpId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findById(selected.getAsccpId()).orElse(null);
         BusinessInformationEntityService.CreateBIEsResult createBIEsResult = bieService.createBIEs(asccp, bCSelected);
 
         abieCount = createBIEsResult.getAbieCount();
@@ -486,7 +486,7 @@ public class TopLevelABIEHandler implements Serializable {
                     selectedBod.getAbie();
             TopLevelAbie selectedTopLevelAbie = topLevelAbieRepository.findByAbieId(selectedAbie.getAbieId());
             AggregateCoreComponent aggregateCoreComponent =
-                    accRepository.findOne(selectedAbie.getBasedAccId());
+                    accRepository.findById(selectedAbie.getBasedAccId()).orElse(null);
 
             List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByRoleOfAccId(aggregateCoreComponent.getAccId());
             if (asccpList.size() != 1) {
@@ -501,7 +501,7 @@ public class TopLevelABIEHandler implements Serializable {
             long abieId = topAbieVO.getAbieId();
 
             ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, asccp.getPropertyTerm(), abieId, "ABIE");
-            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topAbieVO.getOwnerTopLevelAbieId());
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topAbieVO.getOwnerTopLevelAbieId()).orElse(null);
             rootABIEView.setTopLevelAbie(topLevelAbie);
             rootABIEView.setAbie(topAbieVO);
             root = new DefaultTreeNode(rootABIEView, null);
@@ -596,20 +596,20 @@ public class TopLevelABIEHandler implements Serializable {
 
         for (BasicBusinessInformationEntity basicBusinessInformationEntity : basicBusinessInformationEntities) {
             BasicBusinessInformationEntityProperty oBBIEPVO =
-                    bbiepRepository.findOne(basicBusinessInformationEntity.getToBbiepId());
+                    bbiepRepository.findById(basicBusinessInformationEntity.getToBbiepId()).orElse(null);
             BasicBusinessInformationEntityProperty nBBIEPVO = copyBBIEP(userId, oBBIEPVO, topLevelAbie);
             BasicBusinessInformationEntity nBasicBusinessInformationEntity =
                     copyBBIE(userId, basicBusinessInformationEntity, nabieVO.getAbieId(), nBBIEPVO.getBbiepId(), topLevelAbie);
 
-            BasicCoreComponentProperty bccpVO = bccpRepository.findOne(nBBIEPVO.getBasedBccpId());
+            BasicCoreComponentProperty bccpVO = bccpRepository.findById(nBBIEPVO.getBasedBccpId()).orElse(null);
 
             ABIEView av = applicationContext.getBean(ABIEView.class, bccpVO.getPropertyTerm(),
                     nBasicBusinessInformationEntity.getBbieId(), "BBIE");
-            av.setTopLevelAbie(topLevelAbieRepository.findOne(nBBIEPVO.getOwnerTopLevelAbieId()));
+            av.setTopLevelAbie(topLevelAbieRepository.findById(nBBIEPVO.getOwnerTopLevelAbieId()).orElse(null));
             av.setBbiep(nBBIEPVO);
             av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, nBasicBusinessInformationEntity);
 
-            DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
+            DataType dtVO = dataTypeRepository.findById(bccpVO.getBdtId()).orElse(null);
             av.setBdtName(dtVO.getDen());
             av.setColor("green");
             TreeNode tNode2 = new DefaultTreeNode(av, tNode);
@@ -623,9 +623,9 @@ public class TopLevelABIEHandler implements Serializable {
         List<AssociationBusinessInformationEntity> asbie = getASBIEsFromABIE(oabieVO.getAbieId());
         for (AssociationBusinessInformationEntity oASBIEVO : asbie) {
             AssociationBusinessInformationEntityProperty o_next_asbiepVO =
-                    asbiepRepository.findOne(oASBIEVO.getToAsbiepId());
+                    asbiepRepository.findById(oASBIEVO.getToAsbiepId()).orElse(null);
             AggregateBusinessInformationEntity o_next_abieVO =
-                    abieRepository.findOne(o_next_asbiepVO.getRoleOfAbieId());
+                    abieRepository.findById(o_next_asbiepVO.getRoleOfAbieId()).orElse(null);
             AggregateBusinessInformationEntity n_next_abieVO = copyABIE(userId, o_next_abieVO, topLevelAbie);
             AssociationBusinessInformationEntityProperty n_next_asbiepVO =
                     copyASBIEP(userId, o_next_asbiepVO, n_next_abieVO.getAbieId(), topLevelAbie);
@@ -633,11 +633,11 @@ public class TopLevelABIEHandler implements Serializable {
                     copyASBIE(userId, oASBIEVO, nabieVO.getAbieId(), n_next_asbiepVO.getAsbiepId(), topLevelAbie);
 
             AssociationCoreComponentProperty asccpVO =
-                    asccpRepository.findOne(n_next_asbiepVO.getBasedAsccpId());
+                    asccpRepository.findById(n_next_asbiepVO.getBasedAsccpId()).orElse(null);
 
             ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), nabieVO.getAbieId(), "ASBIE");
             av.setColor("blue");
-            av.setTopLevelAbie(topLevelAbieRepository.findOne(n_next_abieVO.getOwnerTopLevelAbieId()));
+            av.setTopLevelAbie(topLevelAbieRepository.findById(n_next_abieVO.getOwnerTopLevelAbieId()).orElse(null));
             av.setAbie(n_next_abieVO);
             av.setAsbie(nASBIEVO);
             av.setAsbiep(n_next_asbiepVO);
@@ -785,10 +785,10 @@ public class TopLevelABIEHandler implements Serializable {
         bieDAO.save(nbbiescVO);
         bbiescCount++;
 
-        DataTypeSupplementaryComponent dtscvo = dtScRepository.findOne(nbbiescVO.getDtScId());
+        DataTypeSupplementaryComponent dtscvo = dtScRepository.findById(nbbiescVO.getDtScId()).orElse(null);
 
         ABIEView av = applicationContext.getBean(ABIEView.class, dtscvo.getPropertyTerm(), nbbiescVO.getBbieScId(), "BBIESC");
-        av.setTopLevelAbie(topLevelAbieRepository.findOne(nbbiescVO.getOwnerTopLevelAbieId()));
+        av.setTopLevelAbie(topLevelAbieRepository.findById(nbbiescVO.getOwnerTopLevelAbieId()).orElse(null));
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
         if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text") ||
@@ -846,7 +846,7 @@ public class TopLevelABIEHandler implements Serializable {
 
         for (AssociationCoreComponent ascc : asccList) {
             ascc.setState(CoreComponentState.Editing);
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            AssociationCoreComponentProperty asccp = asccpRepository.findById(ascc.getToAsccpId()).orElse(null);
             asccp.setState(CoreComponentState.Editing);//Editing
             ccDAO.save(ascc);
             ccDAO.save(asccp);
@@ -953,7 +953,7 @@ public class TopLevelABIEHandler implements Serializable {
         AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) event.getObject();
         FacesMessage msg = new FacesMessage(asccp.getPropertyTerm(), String.valueOf(asccp.getAsccpId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
-        selected = topLevelConceptRepository.findOne(asccp.getAsccpId());
+        selected = topLevelConceptRepository.findById(asccp.getAsccpId()).orElse(null);
     }
 
     public void onBODRowSelect(SelectEvent event) {
@@ -963,7 +963,7 @@ public class TopLevelABIEHandler implements Serializable {
         //root = new DefaultTreeNode(selectedBod, null);
 
         logger.debug("#### " + selectedBod.getName());
-        TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(selectedBod.getAbie().getOwnerTopLevelAbieId());
+        TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(selectedBod.getAbie().getOwnerTopLevelAbieId()).orElse(null);
 
         ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, selectedBod.getName(), selectedBod.getId(), "ROOT");
         rootABIEView.setTopLevelAbie(topLevelAbie);
@@ -1013,35 +1013,35 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private void showBBIETree(BasicBusinessInformationEntity bbieVO, TreeNode tNode) {
-        BasicBusinessInformationEntityProperty bbiepVO = bbiepRepository.findOne(bbieVO.getToBbiepId());
-        BasicCoreComponentProperty bccpVO = bccpRepository.findOne(bbiepVO.getBasedBccpId());
-        BasicCoreComponent bccVO = bccRepository.findOne(bbieVO.getBasedBccId());
+        BasicBusinessInformationEntityProperty bbiepVO = bbiepRepository.findById(bbieVO.getToBbiepId()).orElse(null);
+        BasicCoreComponentProperty bccpVO = bccpRepository.findById(bbiepVO.getBasedBccpId()).orElse(null);
+        BasicCoreComponent bccVO = bccRepository.findById(bbieVO.getBasedBccId()).orElse(null);
 
         ABIEView av = applicationContext.getBean(ABIEView.class, bccpVO.getPropertyTerm(), bbieVO.getBbieId(), "BBIE");
         av.setBcc(bccVO);
-        av.setTopLevelAbie(topLevelAbieRepository.findOne(bbiepVO.getOwnerTopLevelAbieId()));
+        av.setTopLevelAbie(topLevelAbieRepository.findById(bbiepVO.getOwnerTopLevelAbieId()).orElse(null));
         av.setBbiep(bbiepVO);
         av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, bbieVO);
 
-        DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
+        DataType dtVO = dataTypeRepository.findById(bccpVO.getBdtId()).orElse(null);
         av.setBdtName(dtVO.getDen());
         av.setColor("green");
         TreeNode tNode2 = new DefaultTreeNode(av, tNode);
     }
 
     private void showASBIETree(AssociationBusinessInformationEntity asbieVO, TreeNode tNode) {
-        AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findOne(asbieVO.getToAsbiepId());
-        AssociationCoreComponentProperty asccpVO = asccpRepository.findOne(asbiepVO.getBasedAsccpId());
-        AssociationCoreComponent asccVO = asccRepository.findOne(asbieVO.getBasedAsccId());
-        AggregateBusinessInformationEntity abieVO = abieRepository.findOne(asbiepVO.getRoleOfAbieId());
-        AggregateCoreComponent accVO = accRepository.findOne(abieVO.getBasedAccId());
+        AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findById(asbieVO.getToAsbiepId()).orElse(null);
+        AssociationCoreComponentProperty asccpVO = asccpRepository.findById(asbiepVO.getBasedAsccpId()).orElse(null);
+        AssociationCoreComponent asccVO = asccRepository.findById(asbieVO.getBasedAsccId()).orElse(null);
+        AggregateBusinessInformationEntity abieVO = abieRepository.findById(asbiepVO.getRoleOfAbieId()).orElse(null);
+        AggregateCoreComponent accVO = accRepository.findById(abieVO.getBasedAccId()).orElse(null);
 
         ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
         av.setColor("blue");
         av.setAscc(asccVO);
         av.setAsccp(asccpVO);
         av.setAcc(accVO);
-        av.setTopLevelAbie(topLevelAbieRepository.findOne(abieVO.getOwnerTopLevelAbieId()));
+        av.setTopLevelAbie(topLevelAbieRepository.findById(abieVO.getOwnerTopLevelAbieId()).orElse(null));
         av.setAbie(abieVO);
         av.setAsbiep(asbiepVO);
         av.setAsbie(asbieVO);
@@ -1052,11 +1052,11 @@ public class TopLevelABIEHandler implements Serializable {
         List<BasicBusinessInformationEntitySupplementaryComponent> list_01 =
                 bbiescRepository.findByBbieId(bbieVO.getBbieId());
         for (BasicBusinessInformationEntitySupplementaryComponent bbiescVO : list_01) {
-            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(bbiescVO.getDtScId());
+            DataTypeSupplementaryComponent dtscVO = dtScRepository.findById(bbiescVO.getDtScId()).orElse(null);
 
             ABIEView av_01 = applicationContext.getBean(ABIEView.class, dtscVO.getPropertyTerm(), bbiescVO.getBbieScId(), "BBIESC");
             av_01.setDtsc(dtscVO);
-            av_01.setTopLevelAbie(topLevelAbieRepository.findOne(bbiescVO.getOwnerTopLevelAbieId()));
+            av_01.setTopLevelAbie(topLevelAbieRepository.findById(bbiescVO.getOwnerTopLevelAbieId()).orElse(null));
             av_01.setBbiesc(bbiescVO);
 
             String sc_name = "";
@@ -1241,7 +1241,7 @@ public class TopLevelABIEHandler implements Serializable {
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
                     bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(aABIEView.getBdtPrimitiveRestrictionId());
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-            CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId()) : null;
+            CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findById(aBDTPrimitiveRestrictionVO.getCodeListId()).get() : null;
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
     }
@@ -1268,7 +1268,7 @@ public class TopLevelABIEHandler implements Serializable {
         BasicBusinessInformationEntityProperty bbiepVO = aABIEView.getBbiep();
 
         if (aABIEView.getRestrictionType().equalsIgnoreCase("Primitive")) {
-            bbieVO.setBdtPriRestri(bdtPriRestriRepository.findOne(aABIEView.getBdtPrimitiveRestrictionId()));
+            bbieVO.setBdtPriRestri(bdtPriRestriRepository.findById(aABIEView.getBdtPrimitiveRestrictionId()).orElse(null));
             bbieVO.setCodeList(null);
         } else if (aABIEView.getRestrictionType().equalsIgnoreCase("Code")) {
             if (codeList != null) {
@@ -1320,7 +1320,7 @@ public class TopLevelABIEHandler implements Serializable {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
                 bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(bdtPrimitiveRestrictionId);
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-        CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId()) : null;
+        CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findById(aBDTPrimitiveRestrictionVO.getCodeListId()).get() : null;
         codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
 
         logger.debug("##### " + codeLists);
@@ -1383,7 +1383,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public BasicCoreComponentEntityType getEntityType(long bccId) {
-        BasicCoreComponent basicCoreComponent = bccRepository.findOne(bccId);
+        BasicCoreComponent basicCoreComponent = bccRepository.findById(bccId).orElse(null);
         return basicCoreComponent.getEntityType();
     }
 

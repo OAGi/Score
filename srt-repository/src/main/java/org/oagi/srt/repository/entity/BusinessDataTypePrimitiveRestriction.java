@@ -5,6 +5,7 @@ import org.oagi.srt.common.util.ApplicationContextProvider;
 import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
 import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Example;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -141,7 +142,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
         return "BusinessDataTypePrimitiveRestriction{" +
                 "bdtPriRestriId=" + bdtPriRestriId +
                 ", bdtId=" + bdtId +
-                ", cdtAwdPriXpsTypeMapId=" + xbtRepository.findOne(cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId).getXbtId()) +
+                ", cdtAwdPriXpsTypeMapId=" + xbtRepository.findById(
+                        cdtAwdPriXpsTypeMapRepository.findById(cdtAwdPriXpsTypeMapId).get().getXbtId()) +
                 ", codeListId=" + codeListId +
                 ", agencyIdListId=" + agencyIdListId +
                 ", isDefault=" + isDefault +

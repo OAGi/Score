@@ -60,7 +60,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String asccpId = requestParameterMap.get("asccpId");
-        AssociationCoreComponentProperty targetAsccp = asccpRepository.findOne(Long.parseLong(asccpId));
+        AssociationCoreComponentProperty targetAsccp = asccpRepository.findById(Long.parseLong(asccpId)).orElse(null);
 
         if (targetAsccp == null) {
             throw new IllegalStateException();
@@ -70,7 +70,7 @@ public class AsccpDetailBean extends BaseCoreComponentDetailBean {
         }
 
         long roleOfAccId = targetAsccp.getRoleOfAccId();
-        AggregateCoreComponent roleOfAcc = accRepository.findOne(roleOfAccId);
+        AggregateCoreComponent roleOfAcc = accRepository.findById(roleOfAccId).orElse(null);
         targetAsccp.setRoleOfAcc(roleOfAcc);
         targetAsccp.afterLoaded();
 

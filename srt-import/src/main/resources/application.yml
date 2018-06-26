@@ -6,7 +6,7 @@ spring:
 # DataSource
   datasource:
     continue-on-error: true
-    initialize: false
+    initialization-mode: never
     auto-commit: false
 
   jpa:
@@ -21,8 +21,7 @@ spring:
           use_second_level_cache: false
 
   batch:
-    initializer:
-      enabled: false
+    initialize-schema: never
 
 logging:
   level:
@@ -74,7 +73,7 @@ spring:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
     url: jdbc:hsqldb:mem:.
     platform: hsqldb
-    initialize: true
+    initialization-mode: never
 
   jpa:
     properties:

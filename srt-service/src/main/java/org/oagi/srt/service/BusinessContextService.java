@@ -36,7 +36,7 @@ public class BusinessContextService {
     }
 
     public BusinessContext findById(long bizCtxId) {
-        return businessContextRepository.findOne(bizCtxId);
+        return businessContextRepository.findById(bizCtxId).orElse(null);
     }
 
     public BusinessContext findOneByGuid(String guid) {
@@ -47,16 +47,16 @@ public class BusinessContextService {
         businessContextRepository.saveAndFlush(businessContext);
         businessContextValues.stream()
                 .forEach(e -> e.setBusinessContext(businessContext));
-        businessContextValueRepository.save(businessContextValues);
+        businessContextValueRepository.saveAll(businessContextValues);
     }
 
     public void delete(List<BusinessContextValue> businessContextValues) {
-        businessContextValueRepository.delete(businessContextValues);
+        businessContextValueRepository.deleteAll(businessContextValues);
     }
 
     public void deleteById(long bizCtxId) {
         businessContextValueRepository.deleteByBizCtxId(bizCtxId);
-        businessContextRepository.delete(bizCtxId);
+        businessContextRepository.deleteById(bizCtxId);
     }
 
     public BusinessContextBuilder newBusinessContextBuilder() {

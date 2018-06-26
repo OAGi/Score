@@ -556,7 +556,7 @@ public class DataTypeTest {
                 if (dtVO != null) {
 
                     if (dtVO.getQualifier() != null) {
-                        DataType basedtVO = dataTypeRepository.findOne(dtVO.getBasedDtId());
+                        DataType basedtVO = dataTypeRepository.findById(dtVO.getBasedDtId()).orElse(null);
                         boolean checkAlready = false;
 
                         if (basedtVO.getDen().equals("Code Content. Type") || basedtVO.getDen().equals("Identifier Content. Type")) {
@@ -675,7 +675,7 @@ public class DataTypeTest {
 
         //To validate bdt_pri_restri,
         //check it inherit base's bdt_pri_restri successfully (except id itself)
-        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findById(queriedQBDataType.getBasedDtId()).orElse(null);
 
         fromDataType = fromDataType + "type=" + queriedQBDataType.getType()
                 + " version_number=" + queriedQBDataType.getVersionNum()
@@ -745,7 +745,7 @@ public class DataTypeTest {
         denFromDataType = denFromDataType.replaceAll(" ", "");
         denFromDataType = denFromDataType.replace(".Content", "Type");
 
-        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findById(queriedQBDataType.getBasedDtId()).orElse(null);
 
         fromDataType = fromDataType + "type=" + queriedQBDataType.getType()
                 + " version_number=" + queriedQBDataType.getVersionNum()
@@ -873,7 +873,7 @@ public class DataTypeTest {
             denFromDataType = denFromDataType.replace("String", "");
         }
 
-        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findById(queriedQBDataType.getBasedDtId()).orElse(null);
         String baseTypeName = "";
         baseTypeName = baseDataType.getContentComponentDen();
         baseTypeName = baseTypeName.replaceAll("_", "");
@@ -1381,7 +1381,7 @@ public class DataTypeTest {
     }
 
     public String getPrimitiveName(long CDTPrimitiveID) {
-        return cdtPriRepository.findOne(CDTPrimitiveID).getName();
+        return cdtPriRepository.findById(CDTPrimitiveID).get().getName();
     }
 
     public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(long cdt_id) {
@@ -1391,7 +1391,7 @@ public class DataTypeTest {
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
+            DataTypeSupplementaryComponent dtscVO = dtScRepository.findById(dt_sc_id).orElse(null);
             res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());
         }
         return res;
@@ -1415,7 +1415,7 @@ public class DataTypeTest {
     }
 
     private DataType getDataType(long dtid) {
-        return dataTypeRepository.findOne(dtid);
+        return dataTypeRepository.findById(dtid).orElse(null);
     }
 
     private void validate_bdt_pri_resti(String datatype) {
@@ -1512,27 +1512,27 @@ public class DataTypeTest {
             BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
             long bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
 
-            DataType aDataType = dataTypeRepository.findOne(bdt_id);
+            DataType aDataType = dataTypeRepository.findById(bdt_id).orElse(null);
 
             bdtDen = aDataType.getDen();
 
             long cdt_awd_pri_xps_type_map_id = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
 
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
-                    cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
+                    cdtAwdPriXpsTypeMapRepository.findById(cdt_awd_pri_xps_type_map_id).orElse(null);
 
             long cdt_awd_pri_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriId();
             long xbt_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId();
 
-            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = cdtAwdPriRepository.findOne(cdt_awd_pri_id);
+            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = cdtAwdPriRepository.findById(cdt_awd_pri_id).orElse(null);
 
-            CoreDataTypePrimitive cdtPrimitiveVO = cdtPriRepository.findOne(cdtAllowedPrimitiveVO.getCdtPriId());
+            CoreDataTypePrimitive cdtPrimitiveVO = cdtPriRepository.findById(cdtAllowedPrimitiveVO.getCdtPriId()).orElse(null);
             cdtPriTerm = cdtPrimitiveVO.getName();
 
-            DataType cdtVO = dataTypeRepository.findOne(cdtAllowedPrimitiveVO.getCdtId());
+            DataType cdtVO = dataTypeRepository.findById(cdtAllowedPrimitiveVO.getCdtId()).orElse(null);
             cdtDen = cdtVO.getDen();
 
-            XSDBuiltInType xsdBuiltInTypeVO = xbtRepository.findOne(xbt_id);
+            XSDBuiltInType xsdBuiltInTypeVO = xbtRepository.findById(xbt_id).orElse(null);
             xsdBuiltInType = xsdBuiltInTypeVO.getBuiltInType();
 
         }
@@ -1558,9 +1558,9 @@ public class DataTypeTest {
                 continue;
             long dt_id = dtscvo.getOwnerDtId();
 
-            DataType ownerDT = dataTypeRepository.findOne(dt_id);
+            DataType ownerDT = dataTypeRepository.findById(dt_id).orElse(null);
             if (ownerDT.getDen().contains("_")) {// if BDT is default BDT
-                DataTypeSupplementaryComponent basedDTscvo = dtScRepository.findOne(dtscvo.getBasedDtScId());
+                DataTypeSupplementaryComponent basedDTscvo = dtScRepository.findById(dtscvo.getBasedDtScId()).orElse(null);
                 if (basedDTscvo.getOwnerDtId() != ownerDT.getBasedDtId())
                     System.out.println("DTSC based on default BDT is wrong when dt_sc_id = " + dtscvo.getDtScId());
                 else

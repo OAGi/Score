@@ -27,7 +27,7 @@ public class ModuleService {
     }
 
     public Module findById(long moduleId) {
-        return moduleRepository.findOne(moduleId);
+        return moduleRepository.findById(moduleId).orElse(null);
     }
 
     public List<Module> findAll(Sort.Direction direction, String property) {
@@ -56,13 +56,13 @@ public class ModuleService {
 
     public Module update(Module module, List<ModuleDep> dependedModules) {
         Module res = update(module);
-        moduleDepRepository.save(dependedModules);
+        moduleDepRepository.saveAll(dependedModules);
 
         return res;
     }
 
     public void delete(Module module, List<ModuleDep> dependedModules) {
-        moduleDepRepository.delete(dependedModules);
+        moduleDepRepository.deleteAll(dependedModules);
         moduleRepository.delete(module);
     }
 

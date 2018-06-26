@@ -10,7 +10,7 @@ import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.MySQLDialect;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.factory.spi.MutableIdentifierGeneratorFactory;
@@ -42,7 +42,7 @@ public class ByDialectIdentifierGenerator implements IdentifierGenerator, Config
     }
 
     @Override
-    public Serializable generate(SessionImplementor session, Object object) throws HibernateException {
+    public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
         IdentifierGenerator identifierGenerator = getIdentifierGenerator();
         return identifierGenerator.generate(session, object);
     }

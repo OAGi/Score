@@ -36,7 +36,7 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
 
     public String getUserName(Long appUserId) {
         if (!userNameMap.containsKey(appUserId)) {
-            User user = userRepository.findOne(appUserId);
+            User user = userRepository.findById(appUserId).orElse(null);
             userNameMap.put(appUserId, (user != null) ? user.getLoginId() : "");
         }
         return userNameMap.get(appUserId);
@@ -46,7 +46,7 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
 
     public String getObjectClassTermByAccId(Long accId) {
         if (!accObjectClassTermMap.containsKey(accId)) {
-            AggregateCoreComponent acc = accRepository.findOne(accId);
+            AggregateCoreComponent acc = accRepository.findById(accId).orElse(null);
             if (OagisComponentType.UserExtensionGroup == acc.getOagisComponentType()) {
                 Long parentAccId = getParentAccIdOfUserExtensionGroupAcc(acc.getAccId());
                 return getObjectClassTermByAccId(parentAccId);
@@ -74,7 +74,7 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
 
     public String getPropertyTermByAsccpId(Long asccpId) {
         if (!asccpPropertyTermMap.containsKey(asccpId)) {
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+            AssociationCoreComponentProperty asccp = asccpRepository.findById(asccpId).orElse(null);
             asccpPropertyTermMap.put(asccpId, (asccp != null) ? asccp.getPropertyTerm() : "");
         }
         return asccpPropertyTermMap.get(asccpId);
@@ -84,7 +84,7 @@ public abstract class AbstractCoreComponentBean extends UIHandler {
 
     public String getPropertyTermByBccpId(Long bccpId) {
         if (!bccpPropertyTermMap.containsKey(bccpId)) {
-            BasicCoreComponentProperty bccp = bccpRepository.findOne(bccpId);
+            BasicCoreComponentProperty bccp = bccpRepository.findById(bccpId).orElse(null);
             bccpPropertyTermMap.put(bccpId, (bccp != null) ? bccp.getPropertyTerm() : "");
         }
         return bccpPropertyTermMap.get(bccpId);

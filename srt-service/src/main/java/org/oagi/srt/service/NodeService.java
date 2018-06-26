@@ -258,7 +258,7 @@ public class NodeService {
                 AggregateCoreComponent acc = getAcc();
                 long basedAccId = acc.getBasedAccId();
                 if (basedAccId > 0L) {
-                    AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+                    AggregateCoreComponent basedAcc = accRepository.findById(basedAccId).orElse(null);
                     base = new AggregateCoreComponentNodeImpl(basedAcc, enableShowingGroup);
                 }
             }
@@ -273,7 +273,7 @@ public class NodeService {
         @Override
         public Namespace getNamespace() {
             long namespaceId = getAcc().getNamespaceId();
-            return namespaceRepository.findOne(namespaceId);
+            return namespaceRepository.findById(namespaceId).orElse(null);
         }
 
         @Override
@@ -472,7 +472,7 @@ public class NodeService {
         @Override
         public Namespace getNamespace() {
             long namespaceId = getAsccp().getNamespaceId();
-            return namespaceRepository.findOne(namespaceId);
+            return namespaceRepository.findById(namespaceId).orElse(null);
         }
 
         @Override
@@ -519,7 +519,7 @@ public class NodeService {
         public ACCNode getParent() {
             if (parent == null) {
                 long fromAccId = getAscc().getFromAccId();
-                AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
+                AggregateCoreComponent fromAcc = accRepository.findById(fromAccId).orElse(null);
                 parent = new AggregateCoreComponentNodeImpl(fromAcc, enableShowingGroup);
             }
             return parent;
@@ -592,7 +592,7 @@ public class NodeService {
         public DataType getBdt() {
             if (dataType == null) {
                 long bdtId = getBccp().getBdtId();
-                dataType = dtRepository.findOne(bdtId);
+                dataType = dtRepository.findById(bdtId).orElse(null);
             }
             return dataType;
         }
@@ -605,7 +605,7 @@ public class NodeService {
         @Override
         public Namespace getNamespace() {
             long namespaceId = getBccp().getNamespaceId();
-            return namespaceRepository.findOne(namespaceId);
+            return namespaceRepository.findById(namespaceId).orElse(null);
         }
 
         @Override
@@ -649,7 +649,7 @@ public class NodeService {
         public ACCNode getParent() {
             if (parent == null) {
                 long fromAccId = getBcc().getFromAccId();
-                AggregateCoreComponent fromAcc = accRepository.findOne(fromAccId);
+                AggregateCoreComponent fromAcc = accRepository.findById(fromAccId).orElse(null);
                 parent = new AggregateCoreComponentNodeImpl(fromAcc, enableShowingGroup);
             }
             return parent;
@@ -752,10 +752,10 @@ public class NodeService {
 
         long releaseId = topLevelAbie.getReleaseId();
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-        BusinessContext bizCtx = businessContextRepository.findOne(abie.getBizCtxId());
+        BusinessContext bizCtx = businessContextRepository.findById(abie.getBizCtxId()).orElse(null);
         AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
-        AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
-        AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findById(asbiep.getBasedAsccpId()).orElse(null);
+        AggregateCoreComponent acc = accRepository.findById(abie.getBasedAccId()).orElse(null);
 
         ABIENodeImpl abieNode = new ABIENodeImpl(abie, acc, releaseId, bizCtx, hideUnusedNodes);
         return new AssociationBIEPropertyNodeImpl(asbiep, asccp, releaseId, abieNode);
@@ -1054,10 +1054,10 @@ public class NodeService {
             }
 
             if (asbie != null) {
-                asbiep = asbiepRepository.findOne(asbie.getToAsbiepId());
-                asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
+                asbiep = asbiepRepository.findById(asbie.getToAsbiepId()).orElse(null);
+                asccp = asccpRepository.findById(asbiep.getBasedAsccpId()).orElse(null);
 
-                AggregateBusinessInformationEntity roleOfAbie = abieRepository.findOne(asbiep.getRoleOfAbieId());
+                AggregateBusinessInformationEntity roleOfAbie = abieRepository.findById(asbiep.getRoleOfAbieId()).orElse(null);
                 AggregateCoreComponent basedAcc = coreComponentService.findRoleOfAcc(asccp, releaseId, Published);
 
                 type = new ABIENodeImpl(roleOfAbie, basedAcc, releaseId, bizCtx, hideUnusedNodes);
@@ -1240,8 +1240,8 @@ public class NodeService {
                 bbie = bbieRepository.findOneByBasedBccIdAndFromAbieIdAndOwnerTopLevelAbieId(bccId, abieId, topLevelAbieId);
                 if (bbie != null) {
                     long toBbiepId = bbie.getToBbiepId();
-                    bbiep = bbiepRepository.findOne(toBbiepId);
-                    bccp = bccpRepository.findOne(bbiep.getBasedBccpId());
+                    bbiep = bbiepRepository.findById(toBbiepId).orElse(null);
+                    bccp = bccpRepository.findById(bbiep.getBasedBccpId()).orElse(null);
                 }
             }
 
@@ -1251,7 +1251,7 @@ public class NodeService {
             }
 
             long bdtId = bccp.getBdtId();
-            bdt = dtRepository.findOne(bdtId);
+            bdt = dtRepository.findById(bdtId).orElse(null);
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
                     bdtPriRestriRepository.findOneByBdtIdAndCodeListIdIsNotZero(bdtId);
             long codeListId = (bdtPriRestri != null) ? bdtPriRestri.getCodeListId() : 0L;
@@ -1387,7 +1387,7 @@ public class NodeService {
                     }
 
                     long dtScId = bbieSc.getDtScId();
-                    DataTypeSupplementaryComponent bdtSc = dtScRepository.findOne(dtScId);
+                    DataTypeSupplementaryComponent bdtSc = dtScRepository.findById(dtScId).orElse(null);
 
                     BBIESCNode bbieScNode =
                             new BasicBIESupplementaryComponentNodeImpl(this, bbieSc, bdtSc);
@@ -2018,7 +2018,7 @@ public class NodeService {
 
         private TopLevelAbie prepareForTopLevelAbieEntity() {
             long topLevelAbieId = root.getType().getAbie().getOwnerTopLevelAbieId();
-            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topLevelAbieId).orElse(null);
 
             return topLevelAbie;
         }

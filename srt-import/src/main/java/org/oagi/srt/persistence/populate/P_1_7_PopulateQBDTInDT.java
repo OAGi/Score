@@ -368,7 +368,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (dtSc.getBasedDtScId() == 0) {
                 return Collections.emptyList();
             }
-            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findOne(dtSc.getBasedDtScId());
+            DataTypeSupplementaryComponent basedDtSc = dtScRepository.findById(dtSc.getBasedDtScId()).orElse(null);
             bdtScPriRestiList = getBDTSCPrimitiveRestriction(basedDtSc);
         }
         return bdtScPriRestiList;
@@ -401,7 +401,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (bdtScPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_SC_ID['" + dtSc.getDtScId() + "'] has incorrect 'is_default' value in BDT_SC_PRI_RESTRI.");
             }
-            bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
+            bdtScPriRestriRepository.saveAll(bdtScPriRestriListForSaving);
         }
     }
 
@@ -521,7 +521,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (bdtPriRestriListForSaving.stream().mapToInt(e -> e.isDefault() ? 1 : 0).sum() != 1) {
                 throw new IllegalStateException("BDT_ID['" + dataType.getDtId() + "'] has incorrect 'is_default' value in BDT_PRI_RESTRI.");
             }
-            bdtPriRestriRepository.save(bdtPriRestriListForSaving);
+            bdtPriRestriRepository.saveAll(bdtPriRestriListForSaving);
         }
     }
 
@@ -797,7 +797,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public String getPrimitiveName(long cdtPriId) throws Exception {
-        return cdtPriRepository.findOne(cdtPriId).getName();
+        return cdtPriRepository.findById(cdtPriId).get().getName();
     }
 
 
@@ -812,7 +812,7 @@ public class P_1_7_PopulateQBDTInDT {
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) throws Exception {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dt_sc_id);
+            DataTypeSupplementaryComponent dtSc = dtScRepository.findById(dt_sc_id).orElse(null);
             res = getCdtSCAllowedPrimitiveID(dtSc.getBasedDtScId());
         }
         return res;
@@ -824,8 +824,8 @@ public class P_1_7_PopulateQBDTInDT {
 
     public boolean isTokenXBT(long cdtAwdPriXpsTypeMapId) throws Exception {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
-                cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId);
-        XSDBuiltInType xbt = xbtRepository.findOne(cdtAwdPriXpsTypeMap.getXbtId());
+                cdtAwdPriXpsTypeMapRepository.findById(cdtAwdPriXpsTypeMapId).orElse(null);
+        XSDBuiltInType xbt = xbtRepository.findById(cdtAwdPriXpsTypeMap.getXbtId()).orElse(null);
         if (xbt.getName().equalsIgnoreCase("token")) {
             return true;
         } else {

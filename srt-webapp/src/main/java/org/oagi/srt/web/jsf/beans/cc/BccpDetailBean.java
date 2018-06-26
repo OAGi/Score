@@ -70,7 +70,7 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String bccpId = requestParameterMap.get("bccpId");
-        BasicCoreComponentProperty targetBccp = bccpRepository.findOne(Long.parseLong(bccpId));
+        BasicCoreComponentProperty targetBccp = bccpRepository.findById(Long.parseLong(bccpId)).orElse(null);
 
         if (targetBccp == null) {
             throw new IllegalStateException();
@@ -80,7 +80,7 @@ public class BccpDetailBean extends BaseCoreComponentDetailBean {
         }
 
         long bdtId = targetBccp.getBdtId();
-        DataType bdt = dataTypeRepository.findOne(bdtId);
+        DataType bdt = dataTypeRepository.findById(bdtId).orElse(null);
         targetBccp.setBdt(bdt);
         targetBccp.afterLoaded();
 

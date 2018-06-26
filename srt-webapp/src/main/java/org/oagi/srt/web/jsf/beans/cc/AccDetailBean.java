@@ -94,7 +94,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         Map<String, String> requestParameterMap = externalContext.getRequestParameterMap();
 
         String accId = requestParameterMap.get("accId");
-        AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
+        AggregateCoreComponent targetAcc = accRepository.findById(Long.parseLong(accId)).orElse(null);
 
         if (targetAcc == null) {
             throw new IllegalStateException();
@@ -405,10 +405,10 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             }
         } else if (coreComponent instanceof AssociationCoreComponent) {
             AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
-            return isDisabled(accRepository.findOne(ascc.getFromAccId()));
+            return isDisabled(accRepository.findById(ascc.getFromAccId()).orElse(null));
         } else if (coreComponent instanceof BasicCoreComponent) {
             BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
-            return isDisabled(accRepository.findOne(bcc.getFromAccId()));
+            return isDisabled(accRepository.findById(bcc.getFromAccId()).orElse(null));
         } else if (coreComponent instanceof AssociationCoreComponentProperty) {
             AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) coreComponent;
             if (asccp.getOwnerUserId() != currentUser.getAppUserId() || asccp.getState() != Editing) {
@@ -744,7 +744,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             return;
         }
 
-        AggregateCoreComponent selectedAcc = accRepository.findOne(selectedAccLookup.getAccId());
+        AggregateCoreComponent selectedAcc = accRepository.findById(selectedAccLookup.getAccId()).orElse(null);
         AggregateCoreComponent targetAcc = getTargetAcc();
 
         long previousBasedAccId = targetAcc.getBasedAccId();
@@ -1001,7 +1001,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             return;
         }
 
-        AssociationCoreComponentProperty tAsccp = asccpRepository.findOne(selectedAsccpLookup.getAsccpId());
+        AssociationCoreComponentProperty tAsccp = asccpRepository.findById(selectedAsccpLookup.getAsccpId()).orElse(null);
         AggregateCoreComponent pAcc = getTargetAcc();
 
         if (extensionService.exists(pAcc, tAsccp)) {
@@ -1248,7 +1248,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
             return;
         }
 
-        BasicCoreComponentProperty tBccp = bccpRepository.findOne(selectedBccpLookup.getBccpId());
+        BasicCoreComponentProperty tBccp = bccpRepository.findById(selectedBccpLookup.getBccpId()).orElse(null);
         AggregateCoreComponent pAcc = getTargetAcc();
 
         if (extensionService.exists(pAcc, tBccp)) {
@@ -1404,7 +1404,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         if (node instanceof ASCCPNode) {
             ASCCPNode asccpNode = (ASCCPNode) node;
             AssociationCoreComponent ascc = asccpNode.getAscc();
-            AggregateCoreComponent acc = accRepository.findOne(ascc.getFromAccId());
+            AggregateCoreComponent acc = accRepository.findById(ascc.getFromAccId()).orElse(null);
 
             if (acc.getOwnerUserId() == currentUser.getAppUserId() && Editing == ascc.getState()) {
                 return true;
@@ -1412,7 +1412,7 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
         } else if (node instanceof BCCPNode) {
             BCCPNode bccpNode = (BCCPNode) node;
             BasicCoreComponent bcc = bccpNode.getBcc();
-            AggregateCoreComponent acc = accRepository.findOne(bcc.getFromAccId());
+            AggregateCoreComponent acc = accRepository.findById(bcc.getFromAccId()).orElse(null);
 
             if (acc.getOwnerUserId() == currentUser.getAppUserId() && Editing == bcc.getState()) {
                 return true;

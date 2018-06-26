@@ -50,7 +50,7 @@ public class ContextSchemeService {
     }
 
     public ContextScheme findContextSchemeById(long ctxSchemeId) {
-        return contextSchemeRepository.findOne(ctxSchemeId);
+        return contextSchemeRepository.findById(ctxSchemeId).orElse(null);
     }
 
     public ContextScheme findContextSchemeByGuid(String guid) {
@@ -58,19 +58,19 @@ public class ContextSchemeService {
     }
 
     public ContextSchemeValue findContextSchemeValueById(long ctxSchemeValueId) {
-        return contextSchemeValueRepository.findOne(ctxSchemeValueId);
+        return contextSchemeValueRepository.findById(ctxSchemeValueId).orElse(null);
     }
 
     @Transactional(readOnly = false)
     public void update(ContextScheme contextScheme, List<ContextSchemeValue> contextSchemeValues) {
         contextSchemeRepository.saveAndFlush(contextScheme);
         contextSchemeValues.stream().forEach(e -> e.setContextScheme(contextScheme));
-        contextSchemeValueRepository.save(contextSchemeValues);
+        contextSchemeValueRepository.saveAll(contextSchemeValues);
     }
 
     @Transactional(readOnly = false)
     public void delete(List<ContextSchemeValue> contextSchemeValues) {
-        contextSchemeValueRepository.delete(contextSchemeValues);
+        contextSchemeValueRepository.deleteAll(contextSchemeValues);
     }
 
     @Transactional(readOnly = false)

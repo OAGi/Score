@@ -56,27 +56,27 @@ public class CoreComponentDAO {
 
     @Transactional
     public List<AggregateCoreComponent> saveAccList(Collection<AggregateCoreComponent> accList) {
-        return accRepository.save(accList);
+        return accRepository.saveAll(accList);
     }
 
     @Transactional
     public List<AssociationCoreComponent> saveAsccList(Collection<AssociationCoreComponent> asccList) {
-        return asccRepository.save(asccList);
+        return asccRepository.saveAll(asccList);
     }
 
     @Transactional
     public List<AssociationCoreComponentProperty> saveAsccpList(Collection<AssociationCoreComponentProperty> asccpList) {
-        return asccpRepository.save(asccpList);
+        return asccpRepository.saveAll(asccpList);
     }
 
     @Transactional
     public List<BasicCoreComponent> saveBccList(Collection<BasicCoreComponent> bccList) {
-        return bccRepository.save(bccList);
+        return bccRepository.saveAll(bccList);
     }
 
     @Transactional
     public List<BasicCoreComponentProperty> saveBccpList(Collection<BasicCoreComponentProperty> bccpList) {
-        return bccpRepository.save(bccpList);
+        return bccpRepository.saveAll(bccpList);
     }
 
     @Transactional

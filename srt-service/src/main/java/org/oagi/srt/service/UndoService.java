@@ -85,11 +85,11 @@ public class UndoService {
 
     private void undoInsertHistoryRecord(AssociationCoreComponent ascc) {
         long currentAsccId = ascc.getCurrentAsccId();
-        asccRepository.delete(ascc.getAsccId()); // remove history record
+        asccRepository.deleteById(ascc.getAsccId()); // remove history record
 
         if (asccRepository.countByCurrentAsccId(currentAsccId) - 1 == 0) { // no other history records,
             // i.e., current record should be removed as well
-            asccRepository.delete(currentAsccId);
+            asccRepository.deleteById(currentAsccId);
         }
 
         asccRepository.flush();
@@ -97,11 +97,11 @@ public class UndoService {
 
     private void undoInsertHistoryRecord(BasicCoreComponent bcc) {
         long currentBccId = bcc.getCurrentBccId();
-        bccRepository.delete(bcc.getBccId()); // remove history record
+        bccRepository.deleteById(bcc.getBccId()); // remove history record
 
         if (bccRepository.countByCurrentBccId(currentBccId) - 1 == 0) { // no other history records,
             // i.e., current record should be removed as well
-            bccRepository.delete(currentBccId);
+            bccRepository.deleteById(currentBccId);
         }
 
         bccRepository.flush();
@@ -133,7 +133,7 @@ public class UndoService {
 
     private void undoUpdateHistoryRecord(BasicCoreComponent bcc) {
         BasicCoreComponent previousRecord = bccRepository.findOneByCurrentBccIdAndRevisions(bcc.getCurrentBccId(), bcc.getRevisionNum(), bcc.getRevisionTrackingNum() - 1);
-        BasicCoreComponent currentRecord = bccRepository.findOne(bcc.getCurrentBccId());
+        BasicCoreComponent currentRecord = bccRepository.findById(bcc.getCurrentBccId()).orElse(null);
 
         currentRecord.setDeprecated(previousRecord.isDeprecated());
         currentRecord.setState(previousRecord.getState());
@@ -150,7 +150,7 @@ public class UndoService {
 
     private void undoUpdateHistoryRecord(AssociationCoreComponent ascc) {
         AssociationCoreComponent previousRecord = asccRepository.findOneByCurrentAsccIdAndRevisions(ascc.getCurrentAsccId(), ascc.getRevisionNum(), ascc.getRevisionTrackingNum() - 1);
-        AssociationCoreComponent currentRecord = asccRepository.findOne(ascc.getCurrentAsccId());
+        AssociationCoreComponent currentRecord = asccRepository.findById(ascc.getCurrentAsccId()).orElse(null);
 
         currentRecord.setDeprecated(previousRecord.isDeprecated());
         currentRecord.setState(previousRecord.getState());
@@ -340,15 +340,15 @@ public class UndoService {
 
         switch (coreComponents.getType()) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                AggregateCoreComponent acc = accRepository.findById(coreComponents.getId()).orElse(null);
                 return hasMultipleRevisions(acc);
 
             case "ASCCP":
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                AssociationCoreComponentProperty asccp = asccpRepository.findById(coreComponents.getId()).orElse(null);
                 return hasMultipleRevisions(asccp);
 
             case "BCCP":
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                BasicCoreComponentProperty bccp = bccpRepository.findById(coreComponents.getId()).orElse(null);
                 return hasMultipleRevisions(bccp);
 
             default:
@@ -416,7 +416,7 @@ public class UndoService {
             AssociationCoreComponent historyRecord = asccRepository.findOneByCurrentAsccIdAndRevisions(ascc.getAsccId(), maxRevisionNum - 1, maxRevisionTrackingNum);
 
             if (historyRecord == null) { // revision was insert and only one; remove current record then
-                asccRepository.delete(ascc.getId());
+                asccRepository.deleteById(ascc.getId());
                 asccRepository.flush();
             } else {
                 ascc.setDeprecated(historyRecord.isDeprecated());
@@ -444,7 +444,7 @@ public class UndoService {
             BasicCoreComponent historyRecord = bccRepository.findOneByCurrentBccIdAndRevisions(bcc.getBccId(), maxRevisionNum - 1, maxRevisionTrackingNum);
 
             if (historyRecord == null) { // revision was insert and only one; remove current record then
-                bccRepository.delete(bcc.getId());
+                bccRepository.deleteById(bcc.getId());
                 bccRepository.flush();
             } else {
                 bcc.setDeprecated(historyRecord.isDeprecated());

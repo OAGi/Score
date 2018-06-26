@@ -70,37 +70,37 @@ public class BusinessInformationEntityDAO {
     @Transactional
     public List<AggregateBusinessInformationEntity> saveAbieList(
             Collection<AggregateBusinessInformationEntity> abieList) {
-        return abieRepository.save(abieList);
+        return abieRepository.saveAll(abieList);
     }
 
     @Transactional
     public List<AssociationBusinessInformationEntity> saveAsbieList(
             Collection<AssociationBusinessInformationEntity> asbieList) {
-        return asbieRepository.save(asbieList);
+        return asbieRepository.saveAll(asbieList);
     }
 
     @Transactional
     public List<AssociationBusinessInformationEntityProperty> saveAsbiepList(
             Collection<AssociationBusinessInformationEntityProperty> asbiepList) {
-        return asbiepRepository.save(asbiepList);
+        return asbiepRepository.saveAll(asbiepList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntity> saveBbieList(
             Collection<BasicBusinessInformationEntity> bbieList) {
-        return bbieRepository.save(bbieList);
+        return bbieRepository.saveAll(bbieList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntityProperty> saveBbiepList(
             Collection<BasicBusinessInformationEntityProperty> bbiepList) {
-        return bbiepRepository.save(bbiepList);
+        return bbiepRepository.saveAll(bbiepList);
     }
 
     @Transactional
     public List<BasicBusinessInformationEntitySupplementaryComponent> saveBbieScList(
             Collection<BasicBusinessInformationEntitySupplementaryComponent> bbieScList) {
-        return bbieScRepository.save(bbieScList);
+        return bbieScRepository.saveAll(bbieScList);
     }
 
     @Transactional
@@ -116,7 +116,7 @@ public class BusinessInformationEntityDAO {
 
         bieUserExtRevRepository.deleteByTopLevelAbieId(topLevelAbieId);
 
-        topLevelAbieRepository.delete(topLevelAbieId);
+        topLevelAbieRepository.deleteById(topLevelAbieId);
     }
 
 }

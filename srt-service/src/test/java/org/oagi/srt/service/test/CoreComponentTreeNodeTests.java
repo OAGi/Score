@@ -177,7 +177,7 @@ public class CoreComponentTreeNodeTests {
         BasicCoreComponent bcc = bccGuidMap.get(guid);
         assertThat(bcc).isNotNull();
 
-        BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+        BasicCoreComponentProperty bccp = bccpRepository.findById(bcc.getToBccpId()).orElse(null);
         assertThat(bccp).isNotNull();
 
         BCCPNode bccpTreeNode = (BCCPNode) bccTreeNodeGuidMap.get(bccp.getGuid());

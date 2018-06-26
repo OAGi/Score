@@ -49,7 +49,7 @@ public class TransferBIEOwnershipBean extends UIHandler {
         String paramTopLevelAbieId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("topLevelAbieId");
         Long topLevelAbieId = Long.parseLong(paramTopLevelAbieId);
         if (topLevelAbieId != null) {
-            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topLevelAbieId).orElse(null);
             setTopLevelAbie(topLevelAbie);
         }
 

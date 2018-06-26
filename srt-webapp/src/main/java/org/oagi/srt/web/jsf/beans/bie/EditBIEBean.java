@@ -83,7 +83,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         Long topLevelAbieId = Long.parseLong(
                 FacesContext.getCurrentInstance().getExternalContext()
                         .getRequestParameterMap().get("topLevelAbieId"));
-        TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+        TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topLevelAbieId).orElse(null);
         if (topLevelAbie == null) {
             return;
         }
@@ -93,7 +93,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         }
 
         setTopLevelAbie(topLevelAbie);
-        Release release = releaseRepository.findOne(topLevelAbie.getReleaseId());
+        Release release = releaseRepository.findById(topLevelAbie.getReleaseId()).orElse(null);
         setRelease(release);
 
         createTreeNode(topLevelAbie, hideUnusedNodes);
@@ -156,7 +156,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         asccpStack.push(asccp);
 
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-        AggregateCoreComponent acc = accRepository.findOne(abie.getBasedAccId());
+        AggregateCoreComponent acc = accRepository.findById(abie.getBasedAccId()).orElse(null);
         AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
 
         Map<Long, AggregateCoreComponent> accMap =
@@ -191,7 +191,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     @Transactional(rollbackFor = Throwable.class)
     public void discard(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
         if (bieUserExtRevisionList != null && !bieUserExtRevisionList.isEmpty()) {
-            bieUserExtRevisionRepository.delete(bieUserExtRevisionList);
+            bieUserExtRevisionRepository.deleteAll(bieUserExtRevisionList);
         }
         setBieUserExtRevisionList(null);
     }
@@ -206,7 +206,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     private AssociationCoreComponentProperty getAsccpOfTopLevelNode(TopLevelAbie topLevelAbie) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
-        AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findById(asbiep.getBasedAsccpId()).orElse(null);
         return asccp;
     }
 
@@ -225,7 +225,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         sourceAccList.add(sourceAcc);
 
         while (sourceAcc != null && sourceAcc.getBasedAccId() > 0L) {
-            sourceAcc = accRepository.findOne(sourceAcc.getBasedAccId());
+            sourceAcc = accRepository.findById(sourceAcc.getBasedAccId()).orElse(null);
             sourceAccList.add(sourceAcc);
         }
 
@@ -359,7 +359,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
             bieService.updateState(topLevelAbieId, state);
 
             // Issue #439: To update the screen status.
-            setTopLevelAbie(topLevelAbieRepository.findOne(topLevelAbieId));
+            setTopLevelAbie(topLevelAbieRepository.findById(topLevelAbieId).orElse(null));
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -385,7 +385,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
             boolean isSameBetweenRequesterAndOwner = user.getAppUserId() == ueAcc.getOwnerUserId();
             if (ueAccState == CoreComponentState.Editing) {
                 if (!isSameBetweenRequesterAndOwner) {
-                    User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
+                    User ueAccOwner = userRepository.findById(ueAcc.getOwnerUserId()).orElse(null);
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
                     return;

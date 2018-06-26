@@ -62,7 +62,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         for (DataType dt : srtObjects) {
-            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findById(dt.getBasedDtId()).orElse(null);
 
             // default BDT
             if (dt2.getType() == DataTypeType.CoreDataType) {
@@ -201,7 +201,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     private void validatePopulateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(DataTypeType.BusinessDataType);
         for (DataType dt : srtObjects) {
-            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findById(dt.getBasedDtId()).orElse(null);
 
             // default BDT
             if (dt2.getType() == DataTypeType.CoreDataType) {
@@ -379,7 +379,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         }
 
         for (DataType dt : srtObjects) {
-            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findById(dt.getBasedDtId()).orElse(null);
             // unqualified BDT
             if (dt2.getType() != DataTypeType.CoreDataType) {
                 //inheritance
@@ -502,7 +502,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     CoreDataTypeAllowedPrimitive cdtAP = CDTAwdPris.get(k);
                                     cdtSCAP.setCdtScId(insertedSC.getDtScId());
                                     cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
-                                    CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
+                                    CoreDataTypePrimitive tmpPri = cdtPriRepository.findById(cdtAP.getCdtPriId()).orElse(null);
      
                                     if(!is_fields_xsd){ 
                                     	if(tmpPri.getName().equals("Token") && (insertedSC.getPropertyTerm().equals("Action") || insertedSC.getPropertyTerm().equals("Language"))){
@@ -583,7 +583,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         }
 
         for (DataType dt : srtObjects) {
-            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findById(dt.getBasedDtId()).orElse(null);
             // unqualified BDT
             if (dt2.getType() != DataTypeType.CoreDataType) {
                 String denType = Utility.denToName(dt.getDen());
@@ -699,7 +699,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                 CoreDataTypeAllowedPrimitive cdtAP = CDTAwdPris.get(k);
                                 cdtSCAP.setCdtScId(insertedSC.getDtScId());
                                 cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
-                                CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
+                                CoreDataTypePrimitive tmpPri = cdtPriRepository.findById(cdtAP.getCdtPriId()).orElse(null);
                                 if(!is_fields_xsd){
                                 	if(tmpPri.equals("Token")){
                                 		cdtSCAP.setDefault(true);
@@ -739,7 +739,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     tmp.setXbtId(thisAPXTmap.getXbtId());
                                     tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
 
-                                    XSDBuiltInType xbt = xbtRepository.findOne(tmp.getXbtId());
+                                    XSDBuiltInType xbt = xbtRepository.findById(tmp.getXbtId()).orElse(null);
 
                                     //cdtScAwdPriXpsTypeMapRepository.insertObject(tmp);
                                     logger.debug("          ** XBT:" + xbt.getBuiltInType());

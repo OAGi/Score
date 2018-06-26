@@ -431,14 +431,14 @@ public class CoreComponentService {
         // update ascc DEN
         List<AssociationCoreComponent> dirtyAsccList = new ArrayList();
         for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(accId)) {
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            AssociationCoreComponentProperty asccp = asccpRepository.findById(ascc.getToAsccpId()).orElse(null);
             ascc.setDen(acc, asccp);
             if (ascc.isDirty()) {
                 dirtyAsccList.add(ascc);
             }
         }
         if (!dirtyAsccList.isEmpty()) {
-            asccRepository.save(dirtyAsccList);
+            asccRepository.saveAll(dirtyAsccList);
         }
 
         // update asccp DEN
@@ -450,20 +450,20 @@ public class CoreComponentService {
             }
         }
         if (!dirtyAsccpList.isEmpty()) {
-            asccpRepository.save(dirtyAsccpList);
+            asccpRepository.saveAll(dirtyAsccpList);
         }
 
         // update bcc DEN
         List<BasicCoreComponent> dirtyBccList = new ArrayList();
         for (BasicCoreComponent bcc : bccRepository.findByFromAccId(accId)) {
-            BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+            BasicCoreComponentProperty bccp = bccpRepository.findById(bcc.getToBccpId()).orElse(null);
             bcc.setDen(acc, bccp);
             if (bcc.isDirty()) {
                 dirtyBccList.add(bcc);
             }
         }
         if (!dirtyBccList.isEmpty()) {
-            bccRepository.save(dirtyBccList);
+            bccRepository.saveAll(dirtyBccList);
         }
 
         // to check RevisionTrackingNum
@@ -508,7 +508,7 @@ public class CoreComponentService {
 
         // #Issue 437
         if (state == Published) {
-            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+            AggregateCoreComponent acc = accRepository.findById(asccp.getRoleOfAccId()).orElse(null);
             if (acc.getState() != Published) {
                 throw new IllegalStateException("This state cannot be updated until the associated ACC is in Publish state.");
             }
@@ -564,7 +564,7 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
-        AssociationCoreComponent oldAscc = asccRepository.findOne(ascc.getId()).clone();
+        AssociationCoreComponent oldAscc = asccRepository.findById(ascc.getId()).get().clone();
         int oldSeqKey = oldAscc.getSeqKey();
         AssociationCoreComponent newAscc = ascc.clone();
 
@@ -675,7 +675,7 @@ public class CoreComponentService {
                 break;
         }
 
-        BasicCoreComponent oldBcc = bccRepository.findOne(bcc.getId()).clone();
+        BasicCoreComponent oldBcc = bccRepository.findById(bcc.getId()).get().clone();
         int oldSeqKey = oldBcc.getSeqKey();
         BasicCoreComponent newBcc = bcc.clone();
 
@@ -767,7 +767,7 @@ public class CoreComponentService {
 
         coreComponentDAO.save(asccp);
         asccRepository.findAllByToAsccpId(asccp.getAsccpId()).forEach(e -> {
-            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            AggregateCoreComponent acc = accRepository.findById(e.getFromAccId()).orElse(null);
             e.setDen(acc, asccp);
             coreComponentDAO.save(e);
         });
@@ -831,7 +831,7 @@ public class CoreComponentService {
 
         coreComponentDAO.save(bccp);
         bccRepository.findAllByToBccpId(bccp.getBccpId()).forEach(e -> {
-            AggregateCoreComponent acc = accRepository.findOne(e.getFromAccId());
+            AggregateCoreComponent acc = accRepository.findById(e.getFromAccId()).orElse(null);
             e.setDen(acc, bccp);
             coreComponentDAO.save(e);
         });
@@ -882,7 +882,7 @@ public class CoreComponentService {
     public void discard(CoreComponents coreComponents, User requester) {
         switch (coreComponents.getType()) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(coreComponents.getId());
+                AggregateCoreComponent acc = accRepository.findById(coreComponents.getId()).orElse(null);
                 if (undoService.hasMultipleRevisions(acc)) {
                     undoService.revertToPreviousRevision(acc);
                 } else {
@@ -891,7 +891,7 @@ public class CoreComponentService {
                 break;
 
             case "ASCCP":
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(coreComponents.getId());
+                AssociationCoreComponentProperty asccp = asccpRepository.findById(coreComponents.getId()).orElse(null);
                 if (undoService.hasMultipleRevisions(asccp)) {
                     undoService.revertToPreviousRevision(asccp);
                 } else {
@@ -900,7 +900,7 @@ public class CoreComponentService {
                 break;
 
             case "BCCP":
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(coreComponents.getId());
+                BasicCoreComponentProperty bccp = bccpRepository.findById(coreComponents.getId()).orElse(null);
                 if (undoService.hasMultipleRevisions(bccp)) {
                     undoService.revertToPreviousRevision(bccp);
                 } else {
@@ -960,7 +960,7 @@ public class CoreComponentService {
                 ascc.setLastUpdatedBy(lastUpdatedBy);
             }
         }
-        asccRepository.save(asccList.stream()
+        asccRepository.saveAll(asccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
 
         List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
@@ -970,7 +970,7 @@ public class CoreComponentService {
                 bcc.setLastUpdatedBy(lastUpdatedBy);
             }
         }
-        bccRepository.save(bccList.stream()
+        bccRepository.saveAll(bccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
 
         if (state == Published) {
@@ -1150,7 +1150,7 @@ public class CoreComponentService {
             }
         }
 
-        bieUserExtRevisionRepository.save(bieUserExtRevisionList);
+        bieUserExtRevisionRepository.saveAll(bieUserExtRevisionList);
     }
 
     private boolean hasExtensionAsccpAsChild(TopLevelAbie topLevelAbie, AggregateCoreComponent eAcc) {
@@ -1158,7 +1158,7 @@ public class CoreComponentService {
         long releaseId = topLevelAbie.getReleaseId();
         long basedAccId = abie.getBasedAccId();
 
-        AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+        AggregateCoreComponent basedAcc = accRepository.findById(basedAccId).orElse(null);
         if (basedAcc.getReleaseId() > 0L) {
             basedAccId = basedAcc.getCurrentAccId();
         }
@@ -1215,37 +1215,37 @@ public class CoreComponentService {
 
     public int findOriginalCardinalityMin(AssociationBusinessInformationEntity asbie) {
         long basedAsccId = asbie.getBasedAsccId();
-        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        AssociationCoreComponent ascc = asccRepository.findById(basedAsccId).orElse(null);
         return ascc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(AssociationBusinessInformationEntity asbie) {
         long basedAsccId = asbie.getBasedAsccId();
-        AssociationCoreComponent ascc = asccRepository.findOne(basedAsccId);
+        AssociationCoreComponent ascc = asccRepository.findById(basedAsccId).orElse(null);
         return ascc.getCardinalityMax();
     }
 
     public int findOriginalCardinalityMin(BasicBusinessInformationEntity bbie) {
         long basedBccId = bbie.getBasedBccId();
-        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        BasicCoreComponent bcc = bccRepository.findById(basedBccId).orElse(null);
         return bcc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(BasicBusinessInformationEntity bbie) {
         long basedBccId = bbie.getBasedBccId();
-        BasicCoreComponent bcc = bccRepository.findOne(basedBccId);
+        BasicCoreComponent bcc = bccRepository.findById(basedBccId).orElse(null);
         return bcc.getCardinalityMax();
     }
 
     public int findOriginalCardinalityMin(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
         long dtScId = bbieSc.getDtScId();
-        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findById(dtScId).orElse(null);
         return dtSc.getCardinalityMin();
     }
 
     public int findOriginalCardinalityMax(BasicBusinessInformationEntitySupplementaryComponent bbieSc) {
         long dtScId = bbieSc.getDtScId();
-        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(dtScId);
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findById(dtScId).orElse(null);
         return dtSc.getCardinalityMax();
     }
 
@@ -1258,7 +1258,7 @@ public class CoreComponentService {
         long oldOwnerId;
         switch (type) {
             case "ACC":
-                AggregateCoreComponent acc = accRepository.findOne(ccId);
+                AggregateCoreComponent acc = accRepository.findById(ccId).orElse(null);
                 oldOwnerId = acc.getOwnerUserId();
                 if (oldOwnerId == newOwnerId) {
                     return;
@@ -1280,7 +1280,7 @@ public class CoreComponentService {
 
                 break;
             case "ASCCP":
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ccId);
+                AssociationCoreComponentProperty asccp = asccpRepository.findById(ccId).orElse(null);
                 oldOwnerId = asccp.getOwnerUserId();
                 if (oldOwnerId == newOwnerId) {
                     return;
@@ -1291,7 +1291,7 @@ public class CoreComponentService {
 
                 break;
             case "BCCP":
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(ccId);
+                BasicCoreComponentProperty bccp = bccpRepository.findById(ccId).orElse(null);
                 oldOwnerId = bccp.getOwnerUserId();
                 if (oldOwnerId == newOwnerId) {
                     return;
@@ -1330,7 +1330,7 @@ public class CoreComponentService {
                 maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByAccIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "ASCC":
-                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                AssociationCoreComponent ascc = asccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpIdAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), releaseId);
                 maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNumAndReleaseIdLessThanEqual(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum, releaseId);
                 break;
@@ -1339,7 +1339,7 @@ public class CoreComponentService {
                 maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByAsccpIdAndRevisionNumAndLessThanReleaseId(cc.getId(), maxRevisionNum, releaseId);
                 break;
             case "BCC":
-                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                BasicCoreComponent bcc = bccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpIdAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), releaseId);
                 maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNumAndReleaseIdLessThanEqual(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum, releaseId);
                 break;
@@ -1369,7 +1369,7 @@ public class CoreComponentService {
                 maxRevisionTrackingNum = accRepository.findMaxRevisionTrackingNumByCurrentAccIdAndRevisionNum(cc.getId(), maxRevisionNum);
                 break;
             case "ASCC":
-                AssociationCoreComponent ascc = asccRepository.findOne(cc.getId());
+                AssociationCoreComponent ascc = asccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = asccRepository.findMaxRevisionNumByFromAccIdAndToAsccpId(ascc.getFromAccId(), ascc.getToAsccpId());
                 maxRevisionTrackingNum = asccRepository.findMaxRevisionTrackingNumByFromAccIdAndToAsccpIdAndRevisionNum(ascc.getFromAccId(), ascc.getToAsccpId(), maxRevisionNum);
                 break;
@@ -1378,7 +1378,7 @@ public class CoreComponentService {
                 maxRevisionTrackingNum = asccpRepository.findMaxRevisionTrackingNumByCurrentAsccpIdAndRevisionNum(cc.getId(), maxRevisionNum);
                 break;
             case "BCC":
-                BasicCoreComponent bcc = bccRepository.findOne(cc.getId());
+                BasicCoreComponent bcc = bccRepository.findById(cc.getId()).orElse(null);
                 maxRevisionNum = bccRepository.findMaxRevisionNumByFromAccIdAndToBccpId(bcc.getFromAccId(), bcc.getToBccpId());
                 maxRevisionTrackingNum = bccRepository.findMaxRevisionTrackingNumByFromAccIdAndToBccpIdAndRevisionNum(bcc.getFromAccId(), bcc.getToBccpId(), maxRevisionNum);
                 break;
@@ -1405,7 +1405,7 @@ public class CoreComponentService {
         long roleOfAccId = asccp.getRoleOfAccId();
         if (releaseId <= 0L) {
             if (state == null) {
-                return accRepository.findOne(roleOfAccId);
+                return accRepository.findById(roleOfAccId).orElse(null);
             } else {
                 return accRepository.findOneByAccIdAndRevisionNumAndState(roleOfAccId, 0, state);
             }
@@ -1450,7 +1450,7 @@ public class CoreComponentService {
         long asccpId = ascc.getToAsccpId();
         if (releaseId <= 0L) {
             if (state == null) {
-                return asccpRepository.findOne(asccpId);
+                return asccpRepository.findById(asccpId).orElse(null);
             } else {
                 return asccpRepository.findOneByAsccpIdAndRevisionNumAndState(asccpId, 0, state);
             }
@@ -1495,7 +1495,7 @@ public class CoreComponentService {
         long bccpId = bcc.getToBccpId();
         if (releaseId <= 0L) {
             if (state == null) {
-                return bccpRepository.findOne(bccpId);
+                return bccpRepository.findById(bccpId).orElse(null);
             } else {
                 return bccpRepository.findOneByBccpIdAndRevisionNumAndState(bccpId, 0, state);
             }
@@ -1544,7 +1544,7 @@ public class CoreComponentService {
     public AggregateCoreComponent findAcc(long accId, long releaseId, CoreComponentState state) {
         if (releaseId <= 0L) {
             if (state == null) {
-                return accRepository.findOne(accId);
+                return accRepository.findById(accId).orElse(null);
             } else {
                 return accRepository.findOneByAccIdAndRevisionNumAndState(accId, 0, state);
             }

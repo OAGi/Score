@@ -34,7 +34,7 @@ public class UserService {
     }
 
     public User findByUserId(long userId) {
-        return userRepository.findOne(userId);
+        return userRepository.findById(userId).orElse(null);
     }
 
     public User findByLoginId(String loginId) {

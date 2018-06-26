@@ -468,11 +468,11 @@ public class ExportService {
                 Element bieEle = new Element("business_information_entity");
 
                 bieEle.setAttribute("owner", userMap.get(topLevelAbie.getOwnerUserId()).getLoginId());
-                Release release = releaseRepository.findOne(topLevelAbie.getReleaseId());
+                Release release = releaseRepository.findById(topLevelAbie.getReleaseId()).orElse(null);
                 bieEle.setAttribute("release", release.getReleaseNum());
                 bieEle.setAttribute("state", topLevelAbie.getState().toString());
 
-                BusinessContext businessContext = businessContextRepository.findOne(topLevelAbie.getAbie().getBizCtxId());
+                BusinessContext businessContext = businessContextRepository.findById(topLevelAbie.getAbie().getBizCtxId()).orElse(null);
                 bieEle.setAttribute("business_context_ref", businessContext.getGuid());
                 File file = profileBIEs.get(topLevelAbie.getTopLevelAbieId());
                 bieEle.setAttribute("href", "file:///" + file.getName());

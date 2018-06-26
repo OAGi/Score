@@ -25,7 +25,7 @@ public class NamespaceService {
     }
 
     public Namespace findById(long namespaceId) {
-        return namespaceRepository.findOne(namespaceId);
+        return namespaceRepository.findById(namespaceId).orElse(null);
     }
 
     @Transactional

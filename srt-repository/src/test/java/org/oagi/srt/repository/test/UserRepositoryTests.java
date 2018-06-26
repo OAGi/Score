@@ -41,7 +41,7 @@ public class UserRepositoryTests {
         userRepository.saveAndFlush(user);
         Long appUserId = user.getAppUserId();
 
-        user = userRepository.findOne(appUserId);
+        user = userRepository.findById(appUserId).get();
         assertThat(user).isNotNull();
 
         assertThat(user.getLoginId()).isEqualTo(expectedLoginId);

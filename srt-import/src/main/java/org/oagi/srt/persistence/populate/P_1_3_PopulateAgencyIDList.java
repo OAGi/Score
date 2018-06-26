@@ -128,7 +128,7 @@ public class P_1_3_PopulateAgencyIDList {
             }
         }
 
-        agencyIdListValueRepository.save(agencyIdListValues);
+        agencyIdListValueRepository.saveAll(agencyIdListValues);
     }
 
     private void updateAgencyIDList() throws Exception {

@@ -116,7 +116,7 @@ public class CodeListBean extends UIHandler {
         if (agencyIdListValueId == 0L) {
             return null;
         }
-        AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOne(agencyIdListValueId);
+        AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findById(agencyIdListValueId).orElse(null);
         return (agencyIdListValue != null) ? agencyIdListValue.getName() : null;
     }
 }

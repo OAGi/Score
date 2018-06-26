@@ -57,7 +57,7 @@ public class ExtensionService {
         }
 
         if (ueAcc != null) {
-            eAcc = accRepository.findOne(eAcc.getCurrentAccId());
+            eAcc = accRepository.findById(eAcc.getCurrentAccId()).orElse(null);
             updateRevisionNumberOfUserExtensionGroupACC(eAcc, ueAcc, releaseId, user);
         } else {
             ueAcc = createNewUserExtensionGroupACC(eAcc, releaseId, user);
@@ -116,7 +116,7 @@ public class ExtensionService {
             assert asccpList.size() == 1;
 
             AssociationCoreComponentProperty asccp = asccpList.get(0);
-            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+            AggregateCoreComponent acc = accRepository.findById(asccp.getRoleOfAccId()).orElse(null);
             if (acc.getOagisComponentType() == UserExtensionGroup) {
                 return acc;
             }
@@ -244,7 +244,7 @@ public class ExtensionService {
                                                             AggregateCoreComponent ueAcc,
                                                             AssociationCoreComponentProperty ueAsccp) {
 
-        AggregateCoreComponent fromAcc = accRepository.findOne(eAcc.getCurrentAccId());
+        AggregateCoreComponent fromAcc = accRepository.findById(eAcc.getCurrentAccId()).orElse(null);
         AssociationCoreComponent ueAscc = createASCC(fromAcc, ueAsccp, currentLoginUser, 1);
         ueAscc.setCardinalityMin(1);
         ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
@@ -406,11 +406,11 @@ public class ExtensionService {
         }
 
         AssociationCoreComponent ascc = asccList.get(0);
-        AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findById(ascc.getToAsccpId()).orElse(null);
         if (asccp == null) {
             throw new IllegalStateException();
         }
-        return accRepository.findOne(asccp.getRoleOfAccId());
+        return accRepository.findById(asccp.getRoleOfAccId()).orElse(null);
     }
 
     public static class AppendAsccResult {

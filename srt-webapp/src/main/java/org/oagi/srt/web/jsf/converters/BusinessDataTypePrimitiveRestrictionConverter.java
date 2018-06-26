@@ -29,7 +29,7 @@ public class BusinessDataTypePrimitiveRestrictionConverter implements Converter 
         if (bdtPriRestriId <= 0L) {
             return NULL_INSTANCE;
         }
-        return bdtPriRestriRepository.findOne(bdtPriRestriId);
+        return bdtPriRestriRepository.findById(bdtPriRestriId).orElse(null);
     }
 
     @Override

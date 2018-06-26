@@ -33,7 +33,7 @@ public abstract class BaseCoreComponentDetailBean extends UIHandler {
 
     public User getOwnerUser(AggregateCoreComponent acc) {
         long ownerUserId = acc.getOwnerUserId();
-        return userRepository.findOne(ownerUserId);
+        return userRepository.findById(ownerUserId).orElse(null);
     }
 
     public Map<String, OagisComponentType> availableOagisComponentTypes(AggregateCoreComponent acc) {

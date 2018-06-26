@@ -55,7 +55,7 @@ public class ProfileBIEGenerateService {
         SchemaExpressionGenerator schemaExpressionGenerator = createSchemaExpressionGenerator(option);
 
         for (long topLevelAbieId : topLevelAbieIds) {
-            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topLevelAbieId).orElse(null);
             schemaExpressionGenerator.generate(generationContext(topLevelAbie), topLevelAbie, option);
         }
 
@@ -69,7 +69,7 @@ public class ProfileBIEGenerateService {
         for (long topLevelAbieId : topLevelAbieIds) {
             SchemaExpressionGenerator schemaExpressionGenerator = createSchemaExpressionGenerator(option);
 
-            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findById(topLevelAbieId).orElse(null);
             schemaExpressionGenerator.generate(generationContext(topLevelAbie), topLevelAbie, option);
 
             File schemaExpressionFile = schemaExpressionGenerator.asFile(topLevelAbie.getAbie().getGuid());

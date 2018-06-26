@@ -113,14 +113,14 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
                 primitiveType = "XSD Builtin Type";
 
                 CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
-                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
+                        cdtAwdPriXpsTypeMapRepository.findById(cc.getCdtAwdPriXpsTypeMapId()).orElse(null);
 
-                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
+                XSDBuiltInType xbt = xbtRepository.findById(vo.getXbtId()).orElse(null);
                 bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
             } else {
                 primitiveType = "Code List";
 
-                CodeList code = codeListRepository.findOne(cc.getCodeListId());
+                CodeList code = codeListRepository.findById(cc.getCodeListId()).orElse(null);
                 bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
             }
         }

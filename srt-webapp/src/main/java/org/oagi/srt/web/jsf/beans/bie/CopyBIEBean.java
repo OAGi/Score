@@ -387,7 +387,7 @@ public class CopyBIEBean extends AbstractBIEBean {
     public void copy() throws IOException {
         RequestContext requestContext = RequestContext.getCurrentInstance();
         try {
-            TopLevelAbie sourceTopLevelAbie = topLevelAbieRepository.findOne(selectedProfileBIE.getTopLevelAbieId());
+            TopLevelAbie sourceTopLevelAbie = topLevelAbieRepository.findById(selectedProfileBIE.getTopLevelAbieId()).orElse(null);
             createTreeNode(sourceTopLevelAbie);
 
             progressListener = new ProgressListener();
@@ -396,7 +396,7 @@ public class CopyBIEBean extends AbstractBIEBean {
             nodeService.validate(topLevelNode);
 
             long releaseId = selectedProfileBIE.getReleaseId();
-            Release release = (releaseId > 0L) ? releaseRepository.findOne(releaseId) : Release.WORKING_RELEASE;
+            Release release = (releaseId > 0L) ? releaseRepository.findById(releaseId).get() : Release.WORKING_RELEASE;
             TopLevelAbie topLevelAbie = nodeService.copy(topLevelNode, release, getCurrentUser(), selectedBusinessContext, progressListener);
             long topLevelAbieId = topLevelAbie.getTopLevelAbieId();
 
