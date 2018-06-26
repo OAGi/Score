@@ -22,6 +22,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,7 +173,7 @@ public class CopyBIEBean extends AbstractBIEBean {
     public List<ProfileBIE> getProfileBIEs() {
         if (topLevelConcepts == null) {
             setProfileBIEs(getAllProfileBIEs().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(ProfileBIE::getPropertyTerm))
                     .collect(Collectors.toList()));
         }
         return topLevelConcepts;
@@ -220,7 +221,7 @@ public class CopyBIEBean extends AbstractBIEBean {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setProfileBIEs(getAllProfileBIEs().stream()
-                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .sorted(Comparator.comparing(ProfileBIE::getPropertyTerm))
                     .collect(Collectors.toList()));
         } else {
             setProfileBIEs(

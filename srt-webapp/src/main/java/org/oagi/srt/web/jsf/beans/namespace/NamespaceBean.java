@@ -38,7 +38,7 @@ public class NamespaceBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        allNamespaceList = namespaceService.findAll(Sort.Direction.DESC, "creationTimestamp");
+        allNamespaceList = namespaceService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
         setNamespaceList(allNamespaceList);
 
         userMap = userService.findByUserIds(

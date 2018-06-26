@@ -43,7 +43,7 @@ public class ProfileBIEBean extends UIHandler {
     @PostConstruct
     public void init() {
         allProfileBIEs = profileBIERepository.findAll();
-        setProfileBIEs(allProfileBIEs);
+        search();
     }
 
     public List<ProfileBIE> getProfileBIEs() {
@@ -100,7 +100,7 @@ public class ProfileBIEBean extends UIHandler {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
             setProfileBIEs(allProfileBIEs.stream()
-                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp))
+                    .sorted(Comparator.comparing(ProfileBIE::getLastUpdateTimestamp).reversed())
                     .collect(Collectors.toList()));
         } else {
             setProfileBIEs(
