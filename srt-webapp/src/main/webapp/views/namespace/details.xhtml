@@ -16,9 +16,11 @@
                 </h:panelGroup>
             </div>
         </div>
-        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+<!--        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
                     autoUpdate="true"
-                    closable="true"/>
+                    closable="true"/>-->
+        <p:growl id="growl" life="3000"/>
+
         <p:panel>
             <h:panelGrid columns="2" cellpadding="3">
                 <h:outputText value="URI" styleClass="section-label"/>
@@ -44,11 +46,11 @@
             </h:panelGrid>
         </p:panel>
 
-        <p:commandButton id="createBtn" ajax="true" value="Create"
+        <p:commandButton id="createBtn" ajax="true" value="Create" update="growl"
                          rendered="#{namespaceDetailBean.namespace.namespaceId == 0}"
                          action="#{namespaceDetailBean.update()}"/>
 
-        <p:commandButton id="updateBtn" ajax="true" value="Update"
+        <p:commandButton id="updateBtn" ajax="true" value="Update" update="growl"
                          rendered="#{namespaceDetailBean.namespace.namespaceId != 0}"
                          action="#{namespaceDetailBean.update()}"/>
 
