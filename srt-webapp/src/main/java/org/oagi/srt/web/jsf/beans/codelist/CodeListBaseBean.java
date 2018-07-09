@@ -3,10 +3,7 @@ package org.oagi.srt.web.jsf.beans.codelist;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.entity.AgencyIdListValue;
-import org.oagi.srt.repository.entity.CodeList;
-import org.oagi.srt.repository.entity.CodeListState;
-import org.oagi.srt.repository.entity.CodeListValue;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
@@ -369,4 +366,6 @@ public class CodeListBaseBean extends UIHandler {
         }
     }
 
+
 }
+

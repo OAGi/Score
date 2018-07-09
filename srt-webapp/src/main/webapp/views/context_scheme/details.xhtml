@@ -25,7 +25,7 @@
                                 value="#{contextSchemeDetailBean.selectedContextCategoryName}"
                                 completeMethod="#{contextSchemeDetailBean.completeInputForContextCategory}"
                                 dropdown="true"
-                                required="true" requiredMessage="Please fill out 'Content Category' field."
+                                required="true" requiredMessage="Please fill out 'Context Category' field."
                                 styleClass="section-content input-section">
                     <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
                 </p:autoComplete>
@@ -43,6 +43,19 @@
                              label="Name" styleClass="section-content input-section">
                     <f:validateLength maximum="255"/>
                 </h:inputText>
+
+                <h:outputText value="Code List" styleClass="section-label"/>
+                <p:autoComplete id="inputCodeList"
+                                requiredMessage="Please fill out 'Code List' field."
+                                styleClass="section-content input-section"
+                                completeMethod="#{codeListBean.completeInput}"
+                                dropdown="true" scrollHeight="220"
+                                itemLabel="Select a code List"
+                                itemValue="#{codeListBaseBean.codeList.listId}">
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="agencyId"/>
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="version"/>
+
+                </p:autoComplete>
 
                 <h:outputText value="Scheme ID" styleClass="section-label"/>
                 <h:inputText id="schemeId" value="#{contextSchemeDetailBean.contextScheme.schemeId}"
@@ -180,6 +193,6 @@
                                  onclick="PF('confirmDiscard').hide()"/>
             </div>
         </p:confirmDialog>
-    </ui:define>
 
+    </ui:define>
 </ui:composition>

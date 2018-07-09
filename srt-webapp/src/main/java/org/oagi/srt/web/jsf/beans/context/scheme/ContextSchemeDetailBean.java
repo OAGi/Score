@@ -3,9 +3,11 @@ package org.oagi.srt.web.jsf.beans.context.scheme;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BusinessContextValueRepository;
+import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.entity.ContextScheme;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
+import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -46,6 +48,13 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     @Autowired
     private BusinessContextValueRepository businessContextValueRepository;
+
+    @Autowired
+    private CodeListService codeListService;
+
+    private Map<Long, CodeList> codeListMap;
+    private CodeList codeList;
+    private CodeList basedCodeList;
 
     @PostConstruct
     public void init() {
@@ -108,10 +117,6 @@ public class ContextSchemeDetailBean extends UIHandler {
                 setContextCategory(contextScheme.getContextCategory());
             }
         }
-    }
-
-    public List<ContextSchemeValue> getContextSchemeValues() {
-        return contextSchemeValues;
     }
 
     public void setContextSchemeValues(List<ContextSchemeValue> contextSchemeValues) {
@@ -324,6 +329,61 @@ public class ContextSchemeDetailBean extends UIHandler {
         }
 
         return true;
+    }
+    public void setBasedCodeList(CodeList basedCodeList) {
+        this.basedCodeList = basedCodeList;
+    }
+
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
+
+        if (codeList != null) {
+            long basedCodeListId = codeList.getBasedCodeListId();
+            if (basedCodeListId > 0L) {
+                CodeList basedCodeList = codeListService.findOne(basedCodeListId);
+                setBasedCodeList(basedCodeList);
+            }
+        }
+    }
+
+    private void setSelectedCodeListName(String selectedCodeListName) {
+        List<CodeList> codeLists;
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        setCodeList(codeListMap.get(selectedCodeListName));
+    }
+
+    private String GetAgencyIdFromCodeListName(String selectedCodeListName) {
+        List<CodeList> codeLists;
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                return Long.toString(codeList.getAgencyId());
+            }
+        }
+        return null;
+    }
+
+    private String GetVersionFromCodeListName(String selectedCodeListName) {
+        List<CodeList> codeLists;
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                return codeList.getVersionId();
+            }
+        }
+        return null;
+    }
+
+    public void onSelectCodeList(SelectEvent event){
+        setSelectedCodeListName(event.getObject().toString());
+        contextScheme.setSchemeAgencyId(GetAgencyIdFromCodeListName(event.getObject().toString()));
+        contextScheme.setSchemeVersionId(GetVersionFromCodeListName(event.getObject().toString()));
     }
 
     @Transactional(rollbackFor = Throwable.class)
