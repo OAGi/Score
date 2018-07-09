@@ -7,7 +7,6 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CodeListValue.Color.*;
@@ -39,8 +37,6 @@ public class CodeListBaseBean extends UIHandler {
     private List<CodeListValue> codeListValues = new ArrayList();
     private CodeListValue selectedCodeListValue;
     private List<CodeListValue> deleteCodeListValues = new ArrayList();
-    private Map<String, CodeList> codeListMap;
-    private List<CodeList> allCodeList;
 
     private boolean allUsedIndicator = true;
 
@@ -52,10 +48,6 @@ public class CodeListBaseBean extends UIHandler {
     public void init() {
         codeList = new CodeList();
         codeList.setListId(Utility.generateGUID());
-        allCodeList = codeListService.findAll(Sort.Direction.ASC, "name");
-
-        codeListMap = allCodeList.stream()
-                .collect(Collectors.toMap(e -> e.getName(), Function.identity()));
     }
 
     public CodeList getCodeList() {
@@ -374,23 +366,6 @@ public class CodeListBaseBean extends UIHandler {
         }
     }
 
-
-    public void setSelectedCodeListName(String selectedCodeListName) {
-        setCodeList(codeListMap.get(selectedCodeListName));
-        System.out.println("Test Ajax vide ?");
-    }
-
-
-    public void onSelectCodeList(SelectEvent event){
-        setSelectedCodeListName(event.getObject().toString());
-        System.out.println("Test Ajax");
-    }
-
-    public void onSelectCodeListPrint(SelectEvent event){
-        System.out.println("Test Ajax viiiiide");
-        System.out.println(codeListMap);
-
-    }
 
 }
 
