@@ -52,8 +52,9 @@
                                 dropdown="true" scrollHeight="220"
                                 itemLabel="Select a code List"
                                 itemValue="#{codeListBaseBean.codeList.listId}">
-                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="agencyId"/>
-                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="version"/>
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList1}" update="agencyId"/>
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="version" />
+                    <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList2}" update="tbl" />
 
                 </p:autoComplete>
 
