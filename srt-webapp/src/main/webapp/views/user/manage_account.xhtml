@@ -10,48 +10,45 @@
                 <h2 class="subhead-heading">Manage Account</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="uri" value="#{manageAccountBean.searchLoginId}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{manageAccountBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                     actionListener="#{manageAccountBean.search}"
-                                     update="tbl"
-                                     icon="fa fa-white fa-search"/>
-                    <p:button id="createBtn" value="Create User"
-                              style="float: right; padding: 3px 0 3px 0;"
-                              outcome="/views/user/details.jsf"/>
-                </f:facet>
-                <p:dataTable id="tbl" var="user" value="#{manageAccountBean.userList}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{user.appUserId}">
-                    <p:column style="width: 150px; text-align: center;" headerText="Login ID" sortBy="#{user.loginId}">
-                        <a href="/account/#{user.loginId}">#{user.loginId}</a>
-                    </p:column>
-                    <p:column style="width: 250px; text-align: center;" styleClass="ellipsis" headerText="Name" sortBy="#{user.name}">
-                        <h:outputText value="#{user.name}"/>
-                    </p:column>
-                    <p:column style="text-align: center;" styleClass="ellipsis" headerText="Organization"
-                              sortBy="#{user.organization}">
-                        <h:outputText value="#{user.organization}"/>
-                    </p:column>
-                    <p:column style="width: 95px; text-align: center;" headerText="OAGIS Developer">
-                        <h:panelGroup rendered="#{user.oagisDeveloperIndicator}">
-                            <i class="fa fa-check" aria-hidden="true"></i>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{!user.oagisDeveloperIndicator}">
-                            <i class="fa fa-times" aria-hidden="true"></i>
-                        </h:panelGroup>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="uri" value="#{manageAccountBean.searchLoginId}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{manageAccountBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                 actionListener="#{manageAccountBean.search}"
+                                 update="tbl"
+                                 icon="fa fa-white fa-search"/>
+                <p:button id="createBtn" value="Create User"
+                          style="float: right; padding: 3px 0 3px 0;"
+                          outcome="/views/user/details.jsf"/>
+            </f:facet>
+            <p:dataTable id="tbl" var="user" value="#{manageAccountBean.userList}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{user.appUserId}">
+                <p:column style="width: 150px; text-align: center;" headerText="Login ID" sortBy="#{user.loginId}">
+                    <a href="/account/#{user.loginId}">#{user.loginId}</a>
+                </p:column>
+                <p:column style="width: 250px; text-align: center;" styleClass="ellipsis" headerText="Name" sortBy="#{user.name}">
+                    <h:outputText value="#{user.name}"/>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="ellipsis" headerText="Organization"
+                          sortBy="#{user.organization}">
+                    <h:outputText value="#{user.organization}"/>
+                </p:column>
+                <p:column style="width: 95px; text-align: center;" headerText="OAGIS Developer">
+                    <h:panelGroup rendered="#{user.oagisDeveloperIndicator}">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{!user.oagisDeveloperIndicator}">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </h:panelGroup>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

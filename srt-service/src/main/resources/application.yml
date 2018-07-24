@@ -26,3 +26,36 @@ logging:
     org.oagi.srt: INFO
     org.springframework: INFO
     org.hibernate.SQL: INFO
+
+# Oracle environment
+---
+spring:
+  profiles: oracle
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
+
+# MySQL environment
+---
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/oagi?useSSL=false
+    username: oagi
+    password: oagi
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        globally_quoted_identifiers: true

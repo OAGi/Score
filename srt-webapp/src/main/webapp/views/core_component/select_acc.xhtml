@@ -7,70 +7,99 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Select ACC to create new ASCCP</h2>
+                <h2 class="subhead-heading">${resourceBean.term('select_acc.title')}</h2>
             </div>
         </div>
-        <h:form id="form">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="objectClassTerm" value="#{selectACCBean.objectClassTerm}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{selectACCBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                     actionListener="#{selectACCBean.search}"
-                                     update="tblACC"
-                                     icon="fa fa-white fa-search"/>
-                </f:facet>
-                <p:dataTable id="tblACC" var="acc" selectionMode="single" selection="#{selectACCBean.selectedACC}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom: 20px;"
-                             value="#{selectACCBean.accList}" rowKey="#{acc.accId}">
-                    <p:ajax event="rowSelect" update=":form:btnGroup"
-                            listener="#{selectACCBean.onACCSelect}"/>
-                    <p:ajax event="rowUnselect" update=":form:btnGroup"
-                            listener="#{selectACCBean.onACCUnselect}"/>
 
-                    <p:column headerText="Object Class Term" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
-                        <a href="/core_component/acc/${acc.accId}" target="_new">#{selectACCBean.getObjectClassTermByAccId(acc.accId)}</a>
-                    </p:column>
+        <p:growl id="growl" showDetail="true" life="3000"/>
 
-                    <p:column style="width: 150px; text-align: center;" headerText="Type"
-                              sortBy="#{acc.oagisComponentType}">
-                        <span class="label label-info">#{acc.oagisComponentType}</span>
-                    </p:column>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="objectClassTerm" value="#{selectACCBean.objectClassTerm}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{selectACCBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                 actionListener="#{selectACCBean.search}"
+                                 update="tblACC"
+                                 icon="fa fa-white fa-search"/>
+            </f:facet>
+            <p:dataTable id="tblACC" var="acc" selectionMode="single" selection="#{selectACCBean.selectedACC}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom: 20px;"
+                         value="#{selectACCBean.accList}" rowKey="#{acc.accId}">
+                <p:ajax event="rowSelect" update=":form:tblACC, :form:btnGroup"
+                        listener="#{selectACCBean.onACCSelect}"/>
+                <p:ajax event="rowUnselect" update=":form:tblACC, :form:btnGroup"
+                        listener="#{selectACCBean.onACCUnselect}"/>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{selectACCBean.getUserName(acc.ownerUserId)}">
-                        <h:outputText value="#{selectACCBean.getUserName(acc.ownerUserId)}"/>
-                    </p:column>
+                <p:column style="width: 50px; text-align: center;">
+                    <p:selectBooleanCheckbox
+                            value="#{selectACCBean.getAccCheckBox(acc.accId).checked}">
+                        <p:ajax update=":form:tblACC, :form:btnGroup"/>
+                    </p:selectBooleanCheckbox>
+                </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{selectACCBean.getUserName(acc.lastUpdatedBy)}">
-                        <h:outputText value="#{selectACCBean.getUserName(acc.lastUpdatedBy)}"/>
-                    </p:column>
+                <p:column headerText="${resourceBean.term('select_acc.table.column.acc_name')}" sortBy="#{selectACCBean.getObjectClassTermByAccId(acc.accId)}">
+                    <a href="/core_component/acc/${acc.accId}" target="_new">#{selectACCBean.getObjectClassTermByAccId(acc.accId)}</a>
+                </p:column>
 
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{acc.lastUpdateTimestamp}">
-                        <h:outputText value="#{acc.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
+                <p:column style="width: 150px; text-align: center;" headerText="Type"
+                          sortBy="#{acc.oagisComponentType}">
+                    <span class="label label-info">#{acc.oagisComponentType}</span>
+                </p:column>
 
-            <p:panel id="btnGroup">
-                <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
-                                 disabled="#{selectACCBean.selectedACC eq null}"
-                                 action="#{selectACCBean.createASCCP()}"/>
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
-                                 action="#{selectACCBean.back}"/>
-            </p:panel>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{selectACCBean.getUserName(acc.ownerUserId)}">
+                    <h:outputText value="#{selectACCBean.getUserName(acc.ownerUserId)}"/>
+                </p:column>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
+                          sortBy="#{selectACCBean.getUserName(acc.lastUpdatedBy)}">
+                    <h:outputText value="#{selectACCBean.getUserName(acc.lastUpdatedBy)}"/>
+                </p:column>
+
+                <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
+                          sortBy="#{acc.lastUpdateTimestamp}">
+                    <h:outputText value="#{acc.lastUpdateTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column style="width: 120px; text-align: center;"
+                          headerText="Deprecated" sortBy="#{acc.isDeprecated()}">
+                    <h:panelGroup rendered="#{acc.isDeprecated()}">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{!acc.isDeprecated()}">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column style="width: 100px; text-align: center;" headerText="State"
+                          sortBy="#{acc.state}">
+                    <h:panelGroup rendered="#{acc.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{acc.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{acc.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+
+        <p:panel id="btnGroup">
+            <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
+                             disabled="#{selectACCBean.selectedACC eq null}"
+                             action="#{selectACCBean.createASCCP()}"/>
+            <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
+                             action="#{selectACCBean.back}"/>
+        </p:panel>
     </ui:define>
 </ui:composition>

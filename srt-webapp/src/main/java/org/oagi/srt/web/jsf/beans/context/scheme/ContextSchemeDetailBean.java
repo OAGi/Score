@@ -3,12 +3,12 @@ package org.oagi.srt.web.jsf.beans.context.scheme;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BusinessContextValueRepository;
-import org.oagi.srt.repository.entity.ContextCategory;
-import org.oagi.srt.repository.entity.ContextScheme;
-import org.oagi.srt.repository.entity.ContextSchemeValue;
+import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
+import org.omnifaces.util.Components;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,6 +44,16 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     @Autowired
     private BusinessContextValueRepository businessContextValueRepository;
+
+    @Autowired
+    private CodeListService codeListService;
+
+    private Map<Long, CodeList> codeListMap;
+    List<CodeListValue> value = new ArrayList<>();
+
+
+    private CodeList codeList;
+    private CodeList basedCodeList;
 
     @PostConstruct
     public void init() {
@@ -108,10 +116,6 @@ public class ContextSchemeDetailBean extends UIHandler {
                 setContextCategory(contextScheme.getContextCategory());
             }
         }
-    }
-
-    public List<ContextSchemeValue> getContextSchemeValues() {
-        return contextSchemeValues;
     }
 
     public void setContextSchemeValues(List<ContextSchemeValue> contextSchemeValues) {
@@ -231,9 +235,10 @@ public class ContextSchemeDetailBean extends UIHandler {
         }
         contextScheme.setLastUpdatedBy(getCurrentUser().getAppUserId());
         contextScheme.setContextCategory(contextCategory);
-        contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
 
+        contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
         contextSchemeService.update(contextScheme, contextSchemeValues);
+
         contextSchemeService.delete(
                 deletedContextSchemeValues.stream()
                         .filter(e -> e.getCtxSchemeValueId() > 0L)
@@ -325,11 +330,126 @@ public class ContextSchemeDetailBean extends UIHandler {
 
         return true;
     }
+    public void setBasedCodeList(CodeList basedCodeList) {
+        this.basedCodeList = basedCodeList;
+    }
+
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
+
+        if (codeList != null) {
+            long basedCodeListId = codeList.getBasedCodeListId();
+            if (basedCodeListId > 0L) {
+                CodeList basedCodeList = codeListService.findOne(basedCodeListId);
+                setBasedCodeList(basedCodeList);
+            }
+        }
+    }
+
+    private void setSelectedCodeListName(String selectedCodeListName) {
+        List<CodeList> codeLists;
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        setCodeList(codeListMap.get(selectedCodeListName));
+    }
+
+    private String GetAgencyIdFromCodeListName(String selectedCodeListName) {
+        List<CodeList> codeLists;
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                return Long.toString(codeList.getAgencyId());
+            }
+        }
+        return null;
+    }
+
+    private String GetVersionFromCodeListName(String selectedCodeListName) {
+                codeListMap = codeListService.findAll(Sort.Direction.DESC, "name").stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                return codeList.getVersionId();
+            }
+        }
+        return null;
+    }
+
+    private List<CodeListValue> GetCodeListValuesFromCodeListName (String selectedCodeListName){
+        List<CodeList> codeLists;
+        value.clear();
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        codeListMap = codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                for (CodeListValue codeListvalue : codeListService.findByCodeList(codeList)) {
+                        value.add(codeListvalue);
+                }
+            }
+        }
+        return value;
+    }
+
+    private List<ContextSchemeValue> ConvertCodeListIntoContextSchemeValue (List<CodeListValue> A){
+       List<ContextSchemeValue> B = new ArrayList<>();
+       for (int i = 0; i < A.size(); i=i+1) {
+           ContextSchemeValue C= new ContextSchemeValue();
+           C.setContextScheme(contextScheme);
+             C.setMeaning(A.get(i).getName());
+             C.setValue(A.get(i).getValue());
+             B.add(C);
+         }
+        return B;
+    }
+
+    public void onSelectCodeList(SelectEvent event){
+        setSelectedCodeListName(event.getObject().toString());
+        contextScheme.setSchemeVersionId(GetVersionFromCodeListName(event.getObject().toString()));
+    }
+
+    public void onSelectCodeList1(SelectEvent event){
+        setSelectedCodeListName(event.getObject().toString());
+        contextScheme.setSchemeAgencyId(GetAgencyIdFromCodeListName(event.getObject().toString()));
+    }
+
+    public void onSelectCodeList2 (SelectEvent event) {
+        setSelectedCodeListName(event.getObject().toString());
+        contextSchemeValues.clear();
+        contextSchemeValues.addAll(contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()));
+        List<Boolean> a = new ArrayList();
+        if (contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).isEmpty()) {
+            contextSchemeValues.addAll(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())));
+        } else {
+            for (int i = 0; i<ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).size(); i=i+1) {
+                for (int j = 0; j<contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).size(); j=j+1) {
+                    try {
+                        if (!ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getValue().equals(
+                                contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getValue()) ||
+                                !ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getMeaning().equals(
+                                        contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getMeaning())) {
+                            a.add(true);
+                        } else {
+                            a.add(false);
+                        }
+                    }catch(IndexOutOfBoundsException e){
+                        System.out.println("Invalid : " + e);
+                    }
+                }
+                if (!a.contains(false)) {
+                    contextSchemeValues.add(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i));
+                }
+                a.clear();
+            }
+        }
+    }
 
     @Transactional(rollbackFor = Throwable.class)
     public String delete() {
         contextSchemeService.delete(contextScheme);
-
         return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 }

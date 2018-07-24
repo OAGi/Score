@@ -10,54 +10,51 @@
                 <h2 class="subhead-heading">Context Scheme</h2>
             </div>
         </div>
-        <h:form id="listForm">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="name" value="#{contextSchemeBean.name}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{contextSchemeBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{contextSchemeBean.search}"
-                                     update="tbl1"
-                                     icon="fa fa-white fa-search"/>
-                    <p:button id="createBtn" value="Create Context Scheme"
-                              style="float: right; padding: 3px 0 3px 0;"
-                              outcome="/views/context_scheme/details.xhtml"/>
-                </f:facet>
-                <p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeBean.contextSchemes}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
-                    <p:column style="width: 30%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
-                        <a href="/context_management/context_scheme/#{contextScheme.guid}">#{contextScheme.schemeName}</a>
-                        <div>
-                            <a href="/context_management/context_scheme/#{contextScheme.guid}">
-                                <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextScheme.guid}</span>
-                            </a>
-                        </div>
-                    </p:column>
-                    <p:column styleClass="ellipsis" headerText="Context Category" sortBy="#{contextScheme.contextCategory.name}">
-                        <h:link value="#{contextScheme.contextCategory.name}" outcome="/views/context_category/details.xhtml">
-                            <f:param name="ctxCategoryId" value="#{contextScheme.contextCategory.ctxCategoryId}"/>
-                        </h:link>
-                    </p:column>
-                    <p:column headerText="Scheme ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeId}">
-                        <h:outputText value="#{contextScheme.schemeId}"/>
-                    </p:column>
-                    <p:column headerText="Agency ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeAgencyId}">
-                        <h:outputText value="#{contextScheme.schemeAgencyId}"/>
-                    </p:column>
-                    <p:column headerText="Version" styleClass="ellipsis" sortBy="#{contextScheme.schemeVersionId}">
-                        <h:outputText value="#{contextScheme.schemeVersionId}"/>
-                    </p:column>
-                    <p:column headerText="Description" styleClass="ellipsis" sortBy="#{contextScheme.description}">
-                        <h:outputText value="#{contextScheme.description}"/>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="name" value="#{contextSchemeBean.name}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{contextSchemeBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{contextSchemeBean.search}"
+                                 update="tbl1"
+                                 icon="fa fa-white fa-search"/>
+                <p:button id="createBtn" value="Create Context Scheme"
+                          style="float: right; padding: 3px 0 3px 0;"
+                          outcome="/views/context_scheme/details.xhtml"/>
+            </f:facet>
+            <p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeBean.contextSchemes}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
+                <p:column style="width: 30%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
+                    <a href="/context_management/context_scheme/#{contextScheme.guid}">#{contextScheme.schemeName}</a>
+                    <div>
+                        <a href="/context_management/context_scheme/#{contextScheme.guid}">
+                            <span style="font-size: 12px !important; color: #767676 !important;">GUID: #{contextScheme.guid}</span>
+                        </a>
+                    </div>
+                </p:column>
+                <p:column styleClass="ellipsis" headerText="Context Category" sortBy="#{contextScheme.contextCategory.name}">
+                    <h:link value="#{contextScheme.contextCategory.name}" outcome="/views/context_category/details.xhtml">
+                        <f:param name="ctxCategoryId" value="#{contextScheme.contextCategory.ctxCategoryId}"/>
+                    </h:link>
+                </p:column>
+                <p:column headerText="Scheme ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeId}">
+                    <h:outputText value="#{contextScheme.schemeId}"/>
+                </p:column>
+                <p:column headerText="Agency ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeAgencyId}">
+                    <h:outputText value="#{contextScheme.schemeAgencyId}"/>
+                </p:column>
+                <p:column headerText="Version" styleClass="ellipsis" sortBy="#{contextScheme.schemeVersionId}">
+                    <h:outputText value="#{contextScheme.schemeVersionId}"/>
+                </p:column>
+                <p:column headerText="Description" styleClass="ellipsis" sortBy="#{contextScheme.description}">
+                    <h:outputText value="#{contextScheme.description}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </ui:define>
 </ui:composition>

@@ -389,17 +389,11 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public boolean canBeAbstract(AggregateCoreComponent acc) {
-        long basedAccId = acc.getBasedAccId();
-        if (basedAccId <= 0L) {
-            return false;
-        }
+        return true;
+    }
 
-        AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
-        if (basedAcc == null) {
-            return false;
-        }
-
-        return basedAcc.isAbstract();
+    public int getMaxRevisionNum(AggregateCoreComponent acc) {
+        return accRepository.findMaxRevisionNumByCurrentAccId(acc.getId());
     }
 
     public boolean isDisabled(CoreComponent coreComponent) {
@@ -646,8 +640,8 @@ public class AccDetailBean extends BaseCoreComponentDetailBean {
     }
 
     public void prepareSetBasedAcc() {
-        allAccList = simpleACCRepository.findAll().stream()
-                .filter(e -> e.getAccId() != getTargetAcc().getAccId())
+        allAccList = simpleACCRepository.findAll(getTargetAcc().getReleaseId()).stream()
+                .filter(e -> !Arrays.asList(getTargetAcc().getAccId(), getTargetAcc().getCurrentAccId()).contains(e.getAccId()))
                 .filter(e -> getTargetAcc().isAbstract() ? e.isAbstract() : true)
                 .collect(Collectors.toList());
 

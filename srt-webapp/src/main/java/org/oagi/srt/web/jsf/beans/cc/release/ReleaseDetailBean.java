@@ -99,6 +99,7 @@ public class ReleaseDetailBean extends UIHandler {
         this.deltaCoreComponents = deltaCoreComponents;
     }
 
+    @Transactional
     public String update() {
         String releaseNum = release.getReleaseNum();
         boolean addSelectedDelta = false;

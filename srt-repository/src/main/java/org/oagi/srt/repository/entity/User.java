@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Properties;
 
 @Entity
 @Table(name = "app_user")
@@ -38,6 +39,9 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private boolean oagisDeveloperIndicator;
+
+    @Transient
+    private transient Properties properties = new Properties();
 
     public long getAppUserId() {
         return appUserId;
@@ -85,6 +89,18 @@ public class User implements Serializable {
 
     public void setOagisDeveloperIndicator(boolean oagisDeveloperIndicator) {
         this.oagisDeveloperIndicator = oagisDeveloperIndicator;
+    }
+
+    public String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
     }
 
     @Override

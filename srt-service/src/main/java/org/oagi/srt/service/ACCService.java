@@ -7,13 +7,11 @@ import org.oagi.srt.repository.BasicCoreComponentRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
-import org.oagi.srt.repository.entity.CoreComponentRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -72,16 +70,5 @@ public class ACCService {
 
     public AggregateCoreComponent findById(Long accId) {
         return accRepository.findOne(accId);
-    }
-
-    public AggregateCoreComponent findByGuid(String guid) {
-        if (StringUtils.isEmpty(guid)) {
-            return null;
-        }
-        return accRepository.findOneByGuid(guid);
-    }
-
-    public List<CoreComponentRelation> getCoreComponents(AggregateCoreComponent acc) {
-        return coreComponentService.getCoreComponents(acc, coreComponentProvider);
     }
 }

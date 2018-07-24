@@ -7,6 +7,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <f:facet name="first">
@@ -32,135 +33,270 @@
 </h:head>
 
 <h:body id="body">
-    <div class="header" role="banner">
-        <div class="container">
-            <nav class="navbar">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                                data-target="#navbar-collapse-1" aria-expanded="false">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="/">
-                            <p:graphicImage name="images/oagi.png" width="126" height="38"
-                                            style="border: 0; padding: 0; margin: -4px 15px 0 15px; !important"/>
-                        </a>
-                    </div>
+    <h:form id="form" pt:autocomplete="false">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                    <h:panelGroup rendered="#{request.userPrincipal != null}">
-                        <div id="navbar-collapse-1">
-                            <ul class="nav navbar-nav">
-                                <li class="dropdown menu-first">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">Profile BODs <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><h:link styleClass="header-nav-link"
-                                                    outcome="/views/profile_bod/create_profile_bod.jsf">Create Profile BOD</h:link>
-                                        </li>
-                                        <li><h:link outcome="/views/profile_bod/list.jsf">Profile BOD List</h:link>
-                                        </li>
-                                        <li>
-                                            <h:link outcome="/views/profile_bod/copy_profile_bod.jsf">Copy Profile BOD</h:link>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">Profile BOD Expression <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <h:link outcome="/views/generate_oagis/generate.jsf">Generate Expression</h:link>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">Context Management <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><h:link
-                                                outcome="/views/context_category/list.jsf">Context Category</h:link>
-                                        </li>
-                                        <li><h:link
-                                                outcome="/views/context_scheme/list.jsf">Context Scheme</h:link>
-                                        </li>
-                                        <li><h:link
-                                                outcome="/views/business_context/list.jsf">Business Context</h:link>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">CC Management <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a href="/core_component">Core Component</a>
-                                        </li>
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
-                                            <li>
-                                                <a href="/namespace">Namespace</a>
-                                            </li>
-                                            <li>
-                                                <a href="/release">Release Management</a>
-                                            </li>
-                                        </h:panelGroup>
-                                    </ul>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">Code List <span class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><h:link outcome="/views/code_list/list.jsf">View Code List</h:link></li>
-                                        <li>
-                                            <h:link outcome="/views/code_list/create_wo_base.jsf">Create Code List w/o base</h:link>
-                                        </li>
-                                        <li>
-                                            <h:link outcome="/views/code_list/create_from_another_selection.jsf">Create Code List from another</h:link>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <ul class="nav navbar-nav navbar-right">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                       aria-haspopup="true" aria-expanded="false">#{request.userPrincipal.name} <span
-                                            class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
-                                        </li>
-                                        <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
-                                            <li role="separator" class="divider"></li>
-                                            <li><h:link outcome="/views/user/manage_account.jsf">Manage Account</h:link>
-                                            </li>
-                                        </h:panelGroup>
-                                        <li role="separator" class="divider"></li>
-                                        <li><h:link outcome="/views/user/settings.jsf">Settings</h:link></li>
-                                        <li><a href="/logout">Sign out</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
+        <div class="header" role="banner">
+            <div class="container">
+                <nav class="navbar">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                    data-target="#navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="/">
+                                <p:graphicImage name="images/oagi.png" width="126" height="38"
+                                                style="border: 0; padding: 0; margin: -4px 15px 0 15px; !important"/>
+                            </a>
                         </div>
-                    </h:panelGroup>
-                </div>
-            </nav>
-        </div>
-    </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="main">
-                    <ui:insert name="content"/>
+                        <h:panelGroup rendered="#{request.userPrincipal != null}">
+                            <div id="navbar-collapse-1">
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown menu-first">
+                                        <h:outputLink id="menuProfileBIEs"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="Manage BIE"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipProfileBIEs" for="menuProfileBIEs"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.manage_bie.tooltip')}"
+                                                   position="left"/>
+
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <h:link styleClass="header-nav-link"
+                                                        id="menuCreateBIE"
+                                                        outcome="/views/profile_bie/create_bie.jsf">
+                                                    <h:outputText
+                                                            value="Create BIE"/>
+                                                </h:link>
+                                                <p:tooltip id="toolTipCreateBIE" for="menuCreateBIE"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.create_bie.tooltip')}"
+                                                           position="right"/>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuBIEList"
+                                                        outcome="/views/profile_bie/list.jsf">
+                                                    <h:outputText
+                                                            value="BIE List"/>
+                                                </h:link>
+                                                <p:tooltip id="toolTipBIEList" for="menuBIEList"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.profile_bie_list.tooltip')}"
+                                                           position="right"/>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuCopyBIE"
+                                                        outcome="/views/profile_bie/copy_bie.jsf">
+                                                    <h:outputText
+                                                            value="Copy BIE"/>
+                                                </h:link>
+                                                <p:tooltip id="toolTipCopyBIE" for="menuCopyBIE"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.copy_bie.tooltip')}"
+                                                           position="right"/>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <h:outputLink id="menuProfileBIEExpression"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="BIE Expression"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipProfileBIEExpression" for="menuProfileBIEExpression"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.bie_expression.tooltip')}"
+                                                   position="left"/>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <h:link id="menuGenerateExpression"
+                                                        outcome="/views/generate_oagis/generate.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.generate_expression')}"/>
+                                                </h:link>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <h:outputLink id="menuContextManagement"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.context_management')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <h:link id="menuContextCategory"
+                                                        outcome="/views/context_category/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.context_category')}"/>
+                                                </h:link>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuContextScheme"
+                                                        outcome="/views/context_scheme/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.context_scheme')}"/>
+                                                </h:link>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuBusinessContext"
+                                                        outcome="/views/business_context/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.business_context')}"/>
+                                                </h:link>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <h:outputLink id="menuCoreComponentManagement"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.core_component_management')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <p:tooltip id="toolTipCoreComponentManagement" for="menuCoreComponentManagement"
+                                                   rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                   value="#{resourceBean.term('topmenu.core_component_management.tooltip')}"
+                                                   position="right"/>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <h:link id="menuCoreComponent"
+                                                        outcome="/views/core_component/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.core_component')}"/>
+                                                </h:link>
+                                                <p:tooltip id="toolTipMenuCoreComponent" for="menuCoreComponent"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.core_component.tooltip')}"
+                                                           position="right"/>
+                                            </li>
+                                            <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                                <li>
+                                                    <h:link id="menuNamespace"
+                                                            outcome="/views/namespace/list.jsf">
+                                                        <h:outputText value="#{resourceBean.term('submenu.namespace')}"/>
+                                                    </h:link>
+                                                </li>
+                                                <li>
+                                                    <h:link id="menuReleaseManagement"
+                                                            outcome="/views/core_component/release/list.jsf">
+                                                        <h:outputText value="#{resourceBean.term('submenu.release_management')}"/>
+                                                    </h:link>
+                                                </li>
+                                            </h:panelGroup>
+                                            <li>
+                                                <h:link id="menuModuleManagement"
+                                                        outcome="/views/core_component/module/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.module_management')}"/>
+                                                </h:link>
+                                                <p:tooltip id="toolTipMenuModuleManagement" for="menuModuleManagement"
+                                                           rendered="#{resourceBean.termKeyPrefix() ne 'ccts'}"
+                                                           value="#{resourceBean.term('submenu.module_management.tooltip')}"
+                                                           position="right"/>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <h:outputLink id="menuCodeList"
+                                                      pt:href="#" styleClass="dropdown-toggle"
+                                                      pt:data-toggle="dropdown" pt:role="button"
+                                                      pt:aria-haspopup="true" pt:aria-expanded="false">
+                                            <h:outputText value="#{resourceBean.term('topmenu.code_list')}"/>
+                                            <span class="caret"></span>
+                                        </h:outputLink>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <h:link id="menuViewCodeList"
+                                                        outcome="/views/code_list/list.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.view_code_list')}"/>
+                                                </h:link>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuCreateCodeListWithoutBase"
+                                                        outcome="/views/code_list/create_wo_base.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.create_code_list_without_base')}"/>
+                                                </h:link>
+                                            </li>
+                                            <li>
+                                                <h:link id="menuCreateCodeListFromAnother"
+                                                        outcome="/views/code_list/create_from_another_selection.jsf">
+                                                    <h:outputText value="#{resourceBean.term('submenu.create_code_list_from_another')}"/>
+                                                </h:link>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                           aria-haspopup="true" aria-expanded="false">#{request.userPrincipal.name}
+                                            <span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
+                                            </li>
+                                            <li role="separator" class="divider"></li>
+
+                                            <li>
+                                                <h:panelGroup onclick="cctsClick()">
+                                                    <a href="#">
+                                                        <span><i class="fa fa-check" aria-hidden="true"
+                                                                 style="#{resourceBean.termKeyPrefix() ne 'ccts' ? 'visibility: hidden' : ''}"></i> CCTS Terminology</span>
+                                                    </a>
+                                                </h:panelGroup>
+                                                <p:remoteCommand name="cctsClick" update=":form"
+                                                                 actionListener="#{resourceBean.termKeyPrefix('ccts')}"/>
+                                            </li>
+                                            <li>
+                                                <h:panelGroup onclick="oagisClick()">
+                                                    <a href="#">
+                                                        <span><i class="fa fa-check" aria-hidden="true"
+                                                                 style="#{resourceBean.termKeyPrefix() ne 'oagis' ? 'visibility: hidden' : ''}"></i> OAGIS Terminology</span>
+                                                    </a>
+                                                </h:panelGroup>
+                                                <p:remoteCommand name="oagisClick" update=":form"
+                                                                 actionListener="#{resourceBean.termKeyPrefix('oagis')}"/>
+                                            </li>
+
+                                            <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq true}">
+                                                <li role="separator" class="divider"></li>
+                                                <li><h:link
+                                                        outcome="/views/user/manage_account.jsf">Manage Account</h:link>
+                                                </li>
+                                            </h:panelGroup>
+
+                                            <li role="separator" class="divider"></li>
+                                            <li><h:link outcome="/views/user/settings.jsf">Settings</h:link></li>
+                                            <li><a href="/logout">Sign out</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main">
+                        <ui:insert name="content"/>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </h:form>
 
     <div class="container">
         <div class="row">
@@ -180,6 +316,7 @@
     <script>
         $(document).ready(function () {
             $('.fa-spin').parent().addClass('loading-block');
+            $('[name="javax.faces.ViewState"]').appendTo($('[name="form"]'));
         });
     </script>
 </h:body>

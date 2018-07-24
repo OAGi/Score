@@ -2,25 +2,18 @@ package org.oagi.srt.persistence.populate;
 
 import org.oagi.srt.ImportApplication;
 import org.oagi.srt.persistence.populate.script.DataImportScriptRunner;
-import org.oagi.srt.persistence.populate.script.DataimportScriptRunnerFactory;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.oagi.srt.persistence.populate.script.DataImportScriptRunnerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 import javax.persistence.EntityManager;
-
-import static org.oagi.srt.persistence.populate.script.oracle.OracleDataImportScriptPrinter.*;
 
 public class RunAll {
 
     public static void main(String args[]) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             DataImportScriptRunner importScriptRunner =
-                    DataimportScriptRunnerFactory.loadDataImportScriptRunner(ctx);
+                    DataImportScriptRunnerFactory.loadDataImportScriptRunner(ctx);
             importScriptRunner.printHeader();
             importScriptRunner.printSettings();
 

@@ -9,16 +9,16 @@
         <navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
         <view-handler>org.primefaces.application.DialogViewHandler</view-handler>
         <navigation-handler>org.primefaces.mobile.application.MobileNavigationHandler</navigation-handler>
-        <locale-config>
-            <default-locale>en</default-locale>
-        </locale-config>
         <el-resolver>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver</el-resolver>
         <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
         <resource-handler>org.oagi.srt.web.jsf.component.resource.SRTResourceHandler</resource-handler>
         <resource-bundle>
-            <base-name>i18n.menu</base-name>
-            <var>str</var>
+            <base-name>i18n.term</base-name>
+            <var>term</var>
         </resource-bundle>
+        <locale-config>
+            <default-locale>en_US</default-locale>
+        </locale-config>
     </application>
 
     <lifecycle>
@@ -44,6 +44,16 @@
             <component-family>org.primefaces.component</component-family>
             <renderer-type>org.primefaces.component.AutoCompleteRenderer</renderer-type>
             <renderer-class>org.oagi.srt.web.jsf.component.autocomplete.SRTAutoCompleteRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.TooltipRenderer</renderer-type>
+            <renderer-class>org.oagi.srt.web.jsf.component.tooltip.SRTTooltipRenderer</renderer-class>
+        </renderer>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.SelectManyCheckboxRenderer</renderer-type>
+            <renderer-class>org.oagi.srt.web.jsf.component.checkbox.SRTSelectManyCheckboxRenderer</renderer-class>
         </renderer>
     </render-kit>
 

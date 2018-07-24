@@ -36,6 +36,9 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
     @Column(name = "builtin_type", length = 45)
     private String builtInType;
 
+    @Column(name = "jbt_draft05_map", length = 500)
+    private String jbtDraft05Map;
+
     @Column
     private Long subtypeOfXbtId;
 
@@ -117,6 +120,14 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
 
     public void setBuiltInType(String builtInType) {
         this.builtInType = builtInType;
+    }
+
+    public String getJbtDraft05Map() {
+        return jbtDraft05Map;
+    }
+
+    public void setJbtDraft05Map(String jbtDraft05Map) {
+        this.jbtDraft05Map = jbtDraft05Map;
     }
 
     public long getSubtypeOfXbtId() {
@@ -263,6 +274,7 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
         int result = (int) (xbtId ^ (xbtId >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (builtInType != null ? builtInType.hashCode() : 0);
+        result = 31 * result + (jbtDraft05Map != null ? jbtDraft05Map.hashCode() : 0);
         result = 31 * result + (subtypeOfXbtId != null ? subtypeOfXbtId.hashCode() : 0);
         result = 31 * result + (schemaDefinition != null ? schemaDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
@@ -288,6 +300,7 @@ public class XSDBuiltInType implements CreatorModifierAware, TimestampAware, Ser
                 "xbtId=" + xbtId +
                 ", name='" + name + '\'' +
                 ", builtInType='" + builtInType + '\'' +
+                ", jbtDraft05Map='" + jbtDraft05Map + '\'' +
                 ", subtypeOfXbtId=" + subtypeOfXbtId +
                 ", schemaDefinition='" + schemaDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +

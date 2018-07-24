@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="0F4F795D-9E2B-3443-F95C-3B906D6A364F" containerWithKeyObject="5C468B32-F34E-0690-F8FF-E5F24D48C598" localFKIndex="9504BD20-9551-A281-65D1-4B59EAB7E79D" name="BBIE_BASED_BCC_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:36:06 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <deleteRule>NO ACTION</deleteRule>

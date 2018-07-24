@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D35A26B6-5F4A-0233-8F27-B63E96585811" name="CDT_AWD_PRI">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:44:42 UTC</createdTime>
 <comment>This table capture allowed primitives of the CDT’s Content Component.  The information in this table is captured from the Allowed Primitive column in each of the CDT Content Component section/table in CCTS DTC3.</comment>
 <commentInRDBMS>This table capture allowed primitives of the CDT’s Content Component.  The information in this table is captured from the Allowed Primitive column in each of the CDT Content Component section/table in CCTS DTC3.</commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="CDT_AWD_PRI_ID" id="482C00E1-6F09-C7BE-1E0E-C1AE2671EAAF">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:45:22 UTC</createdTime>
 <commentInRDBMS>Primary, internal database key.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CDT_ID" id="F8B6511D-6DEA-DAD3-47B0-75D2F7CEF26B">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:45:22 UTC</createdTime>
 <commentInRDBMS>Foreign key pointing to a CDT in the DT table.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -38,7 +38,7 @@
 </associations>
 </Column>
 <Column name="CDT_PRI_ID" id="8CDAFE93-7B39-8B65-A75D-F16FB69B9759">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:45:22 UTC</createdTime>
 <commentInRDBMS>Foreign key from the CDT_PRI table. It indicates the primative allowed for the CDT identified in the CDT_ID column. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -53,7 +53,7 @@
 </associations>
 </Column>
 <Column name="IS_DEFAULT" id="625FDF23-F8BE-0587-16E7-732514E1120C">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:45:22 UTC</createdTime>
 <commentInRDBMS>Indicating a default primitive for the CDT’s Content Component. True for a default primitive; False otherwise.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -67,7 +67,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="FD1D2BF1-D849-A7EA-49D5-7D98C38725BC" name="CDT_AWD_PRI_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:45:22 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -78,7 +78,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="96A6B47C-25B7-2814-C578-5DB606F895A1" name="CDT_AWD_PRI_CDT_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:46:26 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -88,7 +88,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7E63FEA9-71E4-BFDD-549D-B99367F78A0B" name="CDT_AWD_PRI_CDT_PRI_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:46:26 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

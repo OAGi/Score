@@ -16,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -83,11 +84,17 @@ public class ContextCategoryDetailBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String delete() {
         long ctxCategoryId = contextCategory.getCtxCategoryId();
+
         if (!contextSchemeService.findByCtxCategoryId(ctxCategoryId).isEmpty()) {
+            List<String> schemeIds = contextSchemeService.findByCtxCategoryId(getContextCategory().getCtxCategoryId()).stream()
+                    .map(e -> e.getGuid()).collect(Collectors.toList());
+
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                             "The selected context category cannot be deleted. " +
-                                    "The context schemes with the following IDs depend on it. " +
+                                    "The context schemes with the following GUIDs (" +
+                                    schemeIds +
+                                    ") depend on it. " +
                                     "They need to be deleted first."));
             return null;
         }

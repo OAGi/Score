@@ -18,24 +18,25 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                 .addRule(Join.path("/signin").to("/views/user/login.jsf"))
                 .addRule(Join.path("/signup").to("/views/user/join.jsf"))
                 .addRule(Join.path("/preferences").to("/views/user/settings.jsf"))
+                .addRule(Join.path("/data/manage").to("/views/resources/manage_data.jsf"))
                 .addRule(Join.path("/account/manage").to("/views/user/manage_account.jsf"))
                 .addRule(Join.path("/account/create").to("/views/user/details.jsf"))
                 .addRule(Join.path("/account/{login_id}").to("/views/user/details.jsf?loginId={login_id}"))
 
-                // Profile BOD Menu
-                .addRule(Join.path("/profile_bod")
-                        .to("/views/profile_bod/list.jsf"))
-                .addRule(Join.path("/profile_bod/create")
-                        .to("/views/profile_bod/create_profile_bod.jsf"))
-                .addRule(Join.path("/profile_bod/copy")
-                        .to("/views/profile_bod/copy_profile_bod.jsf"))
-                .addRule(Join.path("/profile_bod/{top_level_abie_id}")
-                        .to("/views/profile_bod/edit_profile_bod.jsf?topLevelAbieId={top_level_abie_id}"))
-                .addRule(Join.path("/profile_bod/{top_level_abie_id}/transfer_ownership")
-                        .to("/views/profile_bod/transfer_profile_bod_ownership.jsf?topLevelAbieId={top_level_abie_id}"))
+                // Profile BIE Menu
+                .addRule(Join.path("/profile_bie")
+                        .to("/views/profile_bie/list.jsf"))
+                .addRule(Join.path("/profile_bie/create")
+                        .to("/views/profile_bie/create_bie.jsf"))
+                .addRule(Join.path("/profile_bie/copy")
+                        .to("/views/profile_bie/copy_bie.jsf"))
+                .addRule(Join.path("/profile_bie/{top_level_abie_id}")
+                        .to("/views/profile_bie/edit_bie.jsf?topLevelAbieId={top_level_abie_id}"))
+                .addRule(Join.path("/profile_bie/{top_level_abie_id}/transfer_ownership")
+                        .to("/views/profile_bie/transfer_bie_ownership.jsf?topLevelAbieId={top_level_abie_id}"))
 
-                // Profile BOD Expression Menu
-                .addRule(Join.path("/profile_bod/expression/generate")
+                // BIE Expression Menu
+                .addRule(Join.path("/profile_bie/expression/generate")
                         .to("/views/generate_oagis/generate.jsf"))
 
                 // Context Management Menu
@@ -76,7 +77,7 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
 
                 // Core Component Management Menu
                 .addRule(Join.path("/core_component")
-                        .to("/views/core_component/list.jsf?invalidate=true"))
+                        .to("/views/core_component/list.jsf"))
                 .addRule(Join.path("/core_component/extension/{acc_id}")
                         .to("/views/core_component/extension.jsf?accId={acc_id}"))
                 .addRule(Join.path("/core_component/acc/{acc_id}")
@@ -97,6 +98,12 @@ public class JSFRewriteConfiguration extends HttpConfigurationProvider {
                         .to("/views/core_component/release/details.jsf"))
                 .addRule(Join.path("/release/{release_id}")
                         .to("/views/core_component/release/details.jsf?releaseId={release_id}"))
+                .addRule(Join.path("/module")
+                        .to("/views/core_component/module/list.jsf"))
+                .addRule(Join.path("/module/create")
+                        .to("/views/core_component/module/details.jsf"))
+                .addRule(Join.path("/module/{module_id}")
+                        .to("/views/core_component/module/details.jsf?moduleId={module_id}"))
 
                 // Code List Menu
                 .addRule(Join.path("/code_list")

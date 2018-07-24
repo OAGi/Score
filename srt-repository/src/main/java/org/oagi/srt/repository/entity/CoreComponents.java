@@ -32,6 +32,9 @@ public class CoreComponents implements Serializable {
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
 
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean deprecated;
+
     @Column
     @Convert(attributeName = "oagisComponentType", converter = OagisComponentTypeConverter.class)
     private OagisComponentType oagisComponentType;
@@ -122,6 +125,14 @@ public class CoreComponents implements Serializable {
         this.state = state;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
     public OagisComponentType getOagisComponentType() {
         return oagisComponentType;
     }
@@ -177,6 +188,8 @@ public class CoreComponents implements Serializable {
         if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
         if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
         if (state != that.state) return false;
+        if (deprecated != that.deprecated) return false;
+
         if (oagisComponentType != that.oagisComponentType) return false;
         if (lastUpdatedUser != null ? !lastUpdatedUser.equals(that.lastUpdatedUser) : that.lastUpdatedUser != null)
             return false;
@@ -195,6 +208,7 @@ public class CoreComponents implements Serializable {
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
         result = 31 * result + (lastUpdatedUser != null ? lastUpdatedUser.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
@@ -213,6 +227,7 @@ public class CoreComponents implements Serializable {
                 ", owner='" + owner + '\'' +
                 ", releaseId=" + releaseId +
                 ", state=" + state +
+                ", deprecated=" + deprecated +
                 ", oagisComponentType=" + oagisComponentType +
                 ", lastUpdatedUser='" + lastUpdatedUser + '\'' +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +

@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">#{resourceBean.term('list_bie.title')}</h2>
+            </div>
+        </div>
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                    closable="true"/>
+
+        <p:panel id="pPanel">
+            <f:facet name="header">
+                <p:autoComplete id="propertyTerm" value="#{profileBIEBean.selectedPropertyTerm}"
+                                completeMethod="#{profileBIEBean.completeInput}" maxResults="20"
+                                style="width: 440px; margin-right: 20px;">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true" actionListener="#{profileBIEBean.search}"
+                                 update="tbl" icon="fa fa-white fa-search"/>
+            </f:facet>
+
+            <p:dataTable id="tbl" var="profileBIE" value="#{profileBIEBean.profileBIEs}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom:20px" rowKey="#{profileBIE.asccpId}">
+                <p:column style="width: 150px; text-align: center;" headerText="Name" styleClass="ellipsis"
+                          sortBy="#{profileBIE.propertyTerm}">
+                    <h:panelGroup rendered="#{profileBIEBean.canCurrentUserSeeThisProfileBIE(profileBIE)}">
+                        <a href="/profile_bie/#{profileBIE.topLevelAbieId}">#{profileBIE.propertyTerm}</a>
+                    </h:panelGroup>
+                    <h:outputText rendered="#{!profileBIEBean.canCurrentUserSeeThisProfileBIE(profileBIE)}"
+                                  id="focus" value="#{profileBIE.propertyTerm}"/>
+                    <p:tooltip id="toolTipFocus" for="focus" value="This profile BIE only can access by an owner."
+                               position="bottom"/>
+                </p:column>
+                <p:column headerText="Release" style="width: 80px; text-align: center;" styleClass="ellipsis"
+                          sortBy="#{profileBIE.releaseNum}">
+                    <h:outputText value="#{profileBIE.releaseNum}"/>
+                </p:column>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                          headerText="Business Context"
+                          sortBy="#{profileBIE.bizCtxName}">
+                    <a href="/context_management/business_context/#{profileBIE.bizCtxId}">#{profileBIE.bizCtxName}</a>
+                </p:column>
+                <p:column style="width: 170px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{profileBIE.ownerName}">
+                    <h:outputText value="#{profileBIE.ownerName}"/>
+                    <h:panelGroup style="display: block;"
+                                  rendered="#{profileBIEBean.currentUser.appUserId eq ProfileBIE.ownerUserId and ProfileBIE.state eq 'Editing'}">
+                        <a href="/profile_bie/#{profileBIE.topLevelAbieId}/transfer_ownership">
+                            <h:panelGroup id="exchangeOwner" style="cursor: pointer;">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                            </h:panelGroup>
+                        </a>
+                    </h:panelGroup>
+                    <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership."
+                               position="bottom"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Version"
+                          sortBy="#{profileBIE.version}">
+                    <h:outputText value="#{profileBIE.version}"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center;" styleClass="ellipsis" headerText="Status"
+                          sortBy="#{profileBIE.status}">
+                    <h:outputText value="#{profileBIE.status}"/>
+                </p:column>
+                <p:column style="width: 180px; text-align: center;" headerText="Creation Timestamp"
+                          sortBy="#{profileBIE.creationTimestamp}">
+                    <h:outputText value="#{profileBIE.creationTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="width: 80px; text-align: center;" headerText="State" sortBy="#{profileBIE.state}">
+                    <h:panelGroup rendered="#{profileBIE.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{profileBIE.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{profileBIE.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column style="text-align: center; width: 65px;"
+                          rendered="#{profileBIEBean.profileBIEs.isEmpty() == false}">
+                    <p:commandButton id="deleteBtn" icon="fa fa-white fa-times" styleClass="delete"
+                                     disabled="#{profileBIEBean.currentUser.appUserId ne profileBIE.ownerUserId or profileBIE.state eq 'Published'}"
+                                     onclick="PF('confirmDiscard').show()">
+                        <f:setPropertyActionListener value="#{profileBIE}"
+                                                     target="#{profileBIEBean.selectedProfileBIE}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+
+        <p:confirmDialog id="confirmDiscardDlg" widgetVar="confirmDiscard" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                The profile BIE will be permanently removed.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
+                                 oncomplete="PF('loadingBlock').hide();"
+                                 actionListener="#{profileBIEBean.deleteProfileBIE()}"
+                                 update="tbl" ajax="true"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmDiscard').hide()"/>
+            </div>
+        </p:confirmDialog>
+    </ui:define>
+</ui:composition>

@@ -7,73 +7,84 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Select BDT to create new BCCP</h2>
+                <h2 class="subhead-heading">${resourceBean.term('select_bdt.title')}</h2>
             </div>
         </div>
-        <h:form id="form">
-            <p:panel>
-                <f:facet name="header">
-                    <p:autoComplete id="qualifierDataTypeTerm" value="#{selectBDTBean.qualifierDataTypeTerm}"
-                                    style="min-width: 440px; margin-right: 20px;"
-                                    maxResults="10"
-                                    completeMethod="#{selectBDTBean.completeInput}">
-                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
-                    </p:autoComplete>
-                    <p:commandButton id="searchBtn" value="Search" ajax="true"
-                                     actionListener="#{selectBDTBean.search}"
-                                     update="tblBDT"
-                                     icon="fa fa-white fa-search"/>
-                </f:facet>
-                <p:dataTable id="tblBDT" var="bdt" selectionMode="single" selection="#{selectBDTBean.selectedBDT}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="10"
-                             style="width: 100%; margin-bottom: 20px;"
-                             value="#{selectBDTBean.bdtList}" rowKey="#{bdt.dtId}">
-                    <p:ajax event="rowSelect" update=":form:btnGroup"
-                            listener="#{selectBDTBean.onBDTSelect}"/>
-                    <p:ajax event="rowUnselect" update=":form:btnGroup"
-                            listener="#{selectBDTBean.onBDTUnselect}"/>
 
-                    <p:column headerText="Qualifier" sortBy="#{bdt.qualifier}">
-                        <h:outputText value="#{bdt.qualifier}"/>
-                    </p:column>
+        <p:growl id="growl" showDetail="true" life="3000"/>
 
-                    <p:column headerText="Data Type Term" sortBy="#{bdt.dataTypeTerm}">
-                        <h:outputText value="#{bdt.dataTypeTerm}"/>
-                    </p:column>
+        <p:panel>
+            <f:facet name="header">
+                <p:autoComplete id="qualifierDataTypeTerm" value="#{selectBDTBean.qualifierDataTypeTerm}"
+                                style="min-width: 440px; margin-right: 20px;"
+                                maxResults="10"
+                                completeMethod="#{selectBDTBean.completeInput}">
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                </p:autoComplete>
+                <p:commandButton id="searchBtn" value="Search" ajax="true"
+                                 actionListener="#{selectBDTBean.search}"
+                                 update="tblBDT"
+                                 icon="fa fa-white fa-search"/>
+            </f:facet>
+            <p:dataTable id="tblBDT" var="bdt" selectionMode="single" selection="#{selectBDTBean.selectedBDT}"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         paginator="true" paginatorPosition="bottom" rows="10"
+                         style="width: 100%; margin-bottom: 20px;"
+                         value="#{selectBDTBean.bdtList}" rowKey="#{bdt.dtId}">
+                <p:ajax event="rowSelect" update=":form:tblBDT, :form:btnGroup"
+                        listener="#{selectBDTBean.onBDTSelect}"/>
+                <p:ajax event="rowUnselect" update=":form:tblBDT, :form:btnGroup"
+                        listener="#{selectBDTBean.onBDTUnselect}"/>
 
-                    <p:column headerText="DEN" sortBy="#{bdt.den}">
-                        <h:outputText value="#{bdt.den}"/>
-                    </p:column>
+                <p:column style="width: 50px; text-align: center;">
+                    <p:selectBooleanCheckbox
+                            value="#{selectBDTBean.getBdtCheckBox(bdt.dtId).checked}">
+                        <p:ajax update=":form:tblBDT, :form:btnGroup"/>
+                    </p:selectBooleanCheckbox>
+                </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
-                              sortBy="#{selectBDTBean.getUserName(bdt.ownerUserId)}">
-                        <h:outputText value="#{selectBDTBean.getUserName(bdt.ownerUserId)}"/>
-                    </p:column>
+                <p:column headerText="${resourceBean.term('select_bdt.table.column.den')}" sortBy="#{bdt.den}">
+                    <h:outputText value="#{bdt.den}"/>
+                </p:column>
 
-                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
-                              sortBy="#{selectBDTBean.getUserName(bdt.lastUpdatedBy)}">
-                        <h:outputText value="#{selectBDTBean.getUserName(bdt.lastUpdatedBy)}"/>
-                    </p:column>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                          sortBy="#{selectBDTBean.getUserName(bdt.ownerUserId)}">
+                    <h:outputText value="#{selectBDTBean.getUserName(bdt.ownerUserId)}"/>
+                </p:column>
 
-                    <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
-                              sortBy="#{bdt.lastUpdateTimestamp}">
-                        <h:outputText value="#{bdt.lastUpdateTimestamp}">
-                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                        </h:outputText>
-                    </p:column>
-                </p:dataTable>
-            </p:panel>
+                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Last Updated By"
+                          sortBy="#{selectBDTBean.getUserName(bdt.lastUpdatedBy)}">
+                    <h:outputText value="#{selectBDTBean.getUserName(bdt.lastUpdatedBy)}"/>
+                </p:column>
 
-            <p:panel id="btnGroup">
-                <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
-                                 disabled="#{selectBDTBean.selectedBDT eq null}"
-                                 action="#{selectBDTBean.createBCCP()}"/>
-                <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
-                                 action="#{selectBDTBean.back}"/>
-            </p:panel>
+                <p:column style="width: 220px; text-align: center;" headerText="Last Updated Timestamp"
+                          sortBy="#{bdt.lastUpdateTimestamp}">
+                    <h:outputText value="#{bdt.lastUpdateTimestamp}">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
 
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </h:form>
+                <p:column style="width: 100px; text-align: center;" headerText="State"
+                          sortBy="#{bdt.state}">
+                    <h:panelGroup rendered="#{bdt.state == 'Editing'}">
+                        <span class="label label-primary">Editing</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{bdt.state == 'Candidate'}">
+                        <span class="label label-warning">Candidate</span>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{bdt.state == 'Published'}">
+                        <span class="label label-default">Published</span>
+                    </h:panelGroup>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+
+        <p:panel id="btnGroup">
+            <p:commandButton id="btnCreate" widgetVar="btnCreate" value="Create"
+                             disabled="#{selectBDTBean.selectedBDT eq null}"
+                             action="#{selectBDTBean.createBCCP()}"/>
+            <p:commandButton id="btnDiscard" widgetVar="btnDiscard" value="Discard" styleClass="danger"
+                             action="#{selectBDTBean.back}"/>
+        </p:panel>
     </ui:define>
 </ui:composition>

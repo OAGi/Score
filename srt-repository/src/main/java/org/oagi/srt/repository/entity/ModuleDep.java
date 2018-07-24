@@ -1,5 +1,6 @@
 package org.oagi.srt.repository.entity;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.converter.DependencyTypeConverter;
 
@@ -31,6 +32,11 @@ public class ModuleDep implements Serializable {
                 }
             }
             throw new IllegalArgumentException("Unknown value: " + value);
+        }
+
+        @Override
+        public String toString() {
+            return StringUtils.capitalize(this.name().toLowerCase());
         }
     }
 

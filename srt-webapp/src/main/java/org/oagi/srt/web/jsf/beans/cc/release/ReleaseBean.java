@@ -6,6 +6,7 @@ import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -32,11 +33,13 @@ public class ReleaseBean extends UIHandler {
         setAllReleases(releaseService.findAllReleases());
     }
 
+    @Transactional
     public void makeReleaseFinal(Releases release, boolean purge) {
         setAllReleases(null); // trigger refresh
         releaseService.makeReleaseFinal(release, purge);
     }
 
+    @Transactional
     public void makeReleaseFinal (boolean purge) {
         if (selectedReleases != null) {
             setAllReleases(null); // trigger refresh

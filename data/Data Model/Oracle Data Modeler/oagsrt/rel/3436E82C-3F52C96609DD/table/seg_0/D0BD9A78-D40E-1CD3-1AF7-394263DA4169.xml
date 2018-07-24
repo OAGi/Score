@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D0BD9A78-D40E-1CD3-1AF7-394263DA4169" name="ASBIEP">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:49:18 UTC</createdTime>
 <comment>ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP.</comment>
 <commentInRDBMS>ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP.</commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="ASBIEP_ID" id="DED39440-6579-847B-FCCE-72A73CB3A55D">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A internal, primary database key of an ASBIEP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="GUID" id="10B1D067-4D07-FC2D-00A0-0B20E4889929">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A globally unique identifier (GUID) of an ASBIEP. GUID of an ASBIEP is different from its based ASCCP. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -35,7 +35,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BASED_ASCCP_ID" id="818D33E8-398D-DF2F-E59A-5A0FFBBEECF4">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A foreign key point to the ASCCP record. It is the ASCCP which the ASBIEP contextualizes.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -50,7 +50,7 @@
 </associations>
 </Column>
 <Column name="ROLE_OF_ABIE_ID" id="406835BD-59CE-863D-DECA-AB8B5D705022">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A foreign key pointing to the ABIE record. It is the ABIE which the property term in the based ASCCP qualifies. Note that the ABIE has to be derived from the ACC used by the based ASCCP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -65,7 +65,7 @@
 </associations>
 </Column>
 <Column name="DEFINITION" id="C2F59416-FAEB-D373-B7E2-AB1048599986">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2017-07-27 20:10:59 UTC</createdTime>
 <commentInRDBMS>Definition to override the ASCCP&apos;s Definition. If Null, it means that the definition should be derived from the based CC on the UI, expression generation, and any API.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -77,7 +77,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="REMARK" id="3EACD5FC-3876-CDF2-5852-835661B023D7">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>This column allows the user to specify very context-specific usage of the BIE. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be &quot;Type of BOM should be recognized in the BOM/typeCode.&quot;</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -90,7 +90,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BIZ_TERM" id="4EED7FEB-0FD6-0A5B-AEB6-23FE787567FF">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>This column represents a business term to indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -103,7 +103,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CREATED_BY" id="180B16FC-A5AB-8E87-4B62-59861AD41EC6">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the user who creates the ASBIEP. The creator of the ASBIEP is also its owner by default. ASBIEPs created as children of another ABIE have the same CREATED_BY_USER_ID.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -118,7 +118,7 @@
 </associations>
 </Column>
 <Column name="LAST_UPDATED_BY" id="22D5CFAA-B0A7-91D0-51B7-45103BFF909A">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>A foreign key referring to the last user who has updated the ASBIEP record. </commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -133,7 +133,7 @@
 </associations>
 </Column>
 <Column name="CREATION_TIMESTAMP" id="BD89E662-02ED-5F10-48FB-A8F7D3EAD33A">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>Timestamp when the ASBIEP record was first created. ASBIEPs created as children of another ABIE have the same CREATION_TIMESTAMP.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -145,7 +145,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="LAST_UPDATE_TIMESTAMP" id="E4CB8903-5F98-0EC9-1002-390298D845C8">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <commentInRDBMS>The timestamp when the ASBIEP was last updated.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -157,7 +157,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="OWNER_TOP_LEVEL_ABIE_ID" id="87AE10D5-BD69-AA4D-8881-EDAC41D02527">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:10:38 UTC</createdTime>
 <commentInRDBMS>This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this ASBIEP record.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -174,7 +174,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="6D36201B-4136-83B6-891A-650EE9B5D61D" name="ASBIEP_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:50:43 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -185,7 +185,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="3FE60FD0-64D6-F765-CA81-FB99DEB6D7E8" name="ASBIEP_OWNER_TLVL_ABIE_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:09:32 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -194,7 +194,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="BE34DC31-C1B0-9E73-C212-E7045021AB87" name="ASBIEP_BASED_ASCCP_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -204,7 +204,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="068DDFBA-3230-1EA8-2F67-5DDDAE075A5B" name="ASBIEP_ROLE_OF_ABIE_ID">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -214,7 +214,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="1246E721-DFAD-DAEF-3E1A-A5B6B97721BA" name="ASBIEP_CREATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -224,7 +224,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7063562D-88A5-4811-94AA-393441F161AB" name="ASBIEP_LAST_UPDATED_BY_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -234,7 +234,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="07063058-B89F-F42C-0F22-3732BBEBEF37" name="ASBIEP_TOP_LEVEL_ABIE_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 18:10:50 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

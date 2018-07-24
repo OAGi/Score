@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -81,10 +82,18 @@ public class CodeListService {
         return codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(name);
     }
 
+    @Transactional
     public void update(CodeList codeList) {
         codeListRepository.save(codeList);
     }
 
+    @Transactional
+    public void delete(CodeList codeList) {
+        delete(codeListValueRepository.findByCodeListId(codeList.getCodeListId()));
+        codeListRepository.delete(codeList);
+    }
+
+    @Transactional
     public void delete(Collection<CodeListValue> codeListValues) {
         codeListValueRepository.delete(codeListValues);
     }

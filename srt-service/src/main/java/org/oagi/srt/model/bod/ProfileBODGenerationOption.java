@@ -4,129 +4,78 @@ import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaExpression
 import static org.oagi.srt.model.bod.ProfileBODGenerationOption.SchemaPackage.All;
 
 public class ProfileBODGenerationOption {
+    private boolean bieDefinition = true;
+    private boolean bieGuid;
+    private boolean bieCctsMetaData;
+    private boolean businessContext;
+    private boolean includeCctsDefinitionTag;
+    private boolean includeWhoColumns;
+    private boolean bieOagiSrtMetaData;
+    private boolean basedCcMetaData;
 
-    public static class BIEDocumentationOption {
-        private boolean bieDefinition;
-        private boolean inheritIfEmpty;
-        private boolean bieGuid;
-        private boolean businessContext;
-        private boolean remarkAndStatus;
-        private boolean bieVersion;
-        private boolean businessTerm;
-        private boolean others;
-
-        private BIEDocumentationOption() {
-        }
-
-        public boolean isBieDefinition() {
-            return bieDefinition;
-        }
-
-        public void setBieDefinition(boolean bieDefinition) {
-            this.bieDefinition = bieDefinition;
-        }
-
-        public boolean isInheritIfEmpty() {
-            return inheritIfEmpty;
-        }
-
-        public void setInheritIfEmpty(boolean inheritIfEmpty) {
-            this.inheritIfEmpty = inheritIfEmpty;
-        }
-
-        public boolean isBieGuid() {
-            return bieGuid;
-        }
-
-        public void setBieGuid(boolean bieGuid) {
-            this.bieGuid = bieGuid;
-        }
-
-        public boolean isBusinessContext() {
-            return businessContext;
-        }
-
-        public void setBusinessContext(boolean businessContext) {
-            this.businessContext = businessContext;
-        }
-
-        public boolean isRemarkAndStatus() {
-            return remarkAndStatus;
-        }
-
-        public void setRemarkAndStatus(boolean remarkAndStatus) {
-            this.remarkAndStatus = remarkAndStatus;
-        }
-
-        public boolean isBieVersion() {
-            return bieVersion;
-        }
-
-        public void setBieVersion(boolean bieVersion) {
-            this.bieVersion = bieVersion;
-        }
-
-        public boolean isBusinessTerm() {
-            return businessTerm;
-        }
-
-        public void setBusinessTerm(boolean businessTerm) {
-            this.businessTerm = businessTerm;
-        }
-
-        public boolean isOthers() {
-            return others;
-        }
-
-        public void setOthers(boolean others) {
-            this.others = others;
-        }
+    public boolean isBieDefinition() {
+        return bieDefinition;
     }
 
-    public static class CCDocumentationOption {
-        private boolean ccDefinition;
-        private boolean ccGuid;
-        private boolean ccVersion;
-        private boolean others;
-
-        private CCDocumentationOption() {
-        }
-
-        public boolean isCcDefinition() {
-            return ccDefinition;
-        }
-
-        public void setCcDefinition(boolean ccDefinition) {
-            this.ccDefinition = ccDefinition;
-        }
-
-        public boolean isCcGuid() {
-            return ccGuid;
-        }
-
-        public void setCcGuid(boolean ccGuid) {
-            this.ccGuid = ccGuid;
-        }
-
-        public boolean isCcVersion() {
-            return ccVersion;
-        }
-
-        public void setCcVersion(boolean ccVersion) {
-            this.ccVersion = ccVersion;
-        }
-
-        public boolean isOthers() {
-            return others;
-        }
-
-        public void setOthers(boolean others) {
-            this.others = others;
-        }
+    public void setBieDefinition(boolean bieDefinition) {
+        this.bieDefinition = bieDefinition;
     }
 
-    private BIEDocumentationOption bieDocumentationOption = new BIEDocumentationOption();
-    private CCDocumentationOption ccDocumentationOption = new CCDocumentationOption();
+    public boolean isBieGuid() {
+        return bieGuid;
+    }
+
+    public void setBieGuid(boolean bieGuid) {
+        this.bieGuid = bieGuid;
+    }
+
+    public boolean isBieCctsMetaData() {
+        return bieCctsMetaData;
+    }
+
+    public void setBieCctsMetaData(boolean bieCctsMetaData) {
+        this.bieCctsMetaData = bieCctsMetaData;
+    }
+
+    public boolean isBusinessContext() {
+        return businessContext;
+    }
+
+    public void setBusinessContext(boolean businessContext) {
+        this.businessContext = businessContext;
+    }
+
+    public boolean isIncludeCctsDefinitionTag() {
+        return includeCctsDefinitionTag;
+    }
+
+    public void setIncludeCctsDefinitionTag(boolean includeCctsDefinitionTag) {
+        this.includeCctsDefinitionTag = includeCctsDefinitionTag;
+    }
+
+    public boolean isIncludeWhoColumns() {
+        return includeWhoColumns;
+    }
+
+    public void setIncludeWhoColumns(boolean includeWhoColumns) {
+        this.includeWhoColumns = includeWhoColumns;
+    }
+
+    public boolean isBieOagiSrtMetaData() {
+        return bieOagiSrtMetaData;
+    }
+
+    public void setBieOagiSrtMetaData(boolean bieOagiSrtMetaData) {
+        this.bieOagiSrtMetaData = bieOagiSrtMetaData;
+    }
+
+    public boolean isBasedCcMetaData() {
+        return basedCcMetaData;
+    }
+
+    public void setBasedCcMetaData(boolean basedCcMetaData) {
+        this.basedCcMetaData = basedCcMetaData;
+    }
 
     public enum SchemaExpression {
         XML,
@@ -140,22 +89,6 @@ public class ProfileBODGenerationOption {
 
     private SchemaExpression schemaExpression = XML;
     private SchemaPackage schemaPackage = All;
-
-    public BIEDocumentationOption getBieDocumentationOption() {
-        return bieDocumentationOption;
-    }
-
-    public void setBieDocumentationOption(BIEDocumentationOption bieDocumentationOption) {
-        this.bieDocumentationOption = bieDocumentationOption;
-    }
-
-    public CCDocumentationOption getCcDocumentationOption() {
-        return ccDocumentationOption;
-    }
-
-    public void setCcDocumentationOption(CCDocumentationOption ccDocumentationOption) {
-        this.ccDocumentationOption = ccDocumentationOption;
-    }
 
     public SchemaExpression getSchemaExpression() {
         return schemaExpression;
@@ -171,5 +104,20 @@ public class ProfileBODGenerationOption {
 
     public void setSchemaPackage(SchemaPackage schemaPackage) {
         this.schemaPackage = schemaPackage;
+    }
+
+    public ProfileBODGenerationOption clone() {
+        ProfileBODGenerationOption clone = new ProfileBODGenerationOption();
+        clone.bieDefinition = this.bieDefinition;
+        clone.bieGuid = this.bieGuid;
+        clone.bieCctsMetaData = this.bieCctsMetaData;
+        clone.businessContext = this.businessContext;
+        clone.includeCctsDefinitionTag = this.includeCctsDefinitionTag;
+        clone.includeWhoColumns = includeWhoColumns;
+        clone.bieOagiSrtMetaData = this.bieOagiSrtMetaData;
+        clone.basedCcMetaData = this.basedCcMetaData;
+        clone.schemaExpression = this.schemaExpression;
+        clone.schemaPackage = this.schemaPackage;
+        return clone;
     }
 }

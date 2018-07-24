@@ -1,0 +1,658 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">
+                    <h:outputText rendered="#{resourceBean.termKeyPrefix() eq 'ccts'}"
+                                  value="#{editBIEBean.topLevelAbie.state eq 'Editing' ? 'Edit' : (editBIEBean.topLevelAbie.state eq 'Candidate' ? 'Review' : 'View')} #{resourceBean.term('edit_bie.title.suffix')}"/>
+                </h2>
+            </div>
+        </div>
+
+        <p:growl id="growl" showDetail="true" life="3000"/>
+
+        <p:confirmDialog id="notifyExtensionChangeDlg" widgetVar="notifyExtensionChange" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Notification">
+            <f:facet name="message">
+                There is an update to the extension content of the following extension#{editBIEBean.bieUserExtRevisionList.size() > 1 ? "s" : ""}.
+                <div style="padding: 10px 0 10px 0;">
+                    <ui:repeat value="#{editBIEBean.bieUserExtRevisionList}" var="bieUserExtRevision">
+                        <li><h:outputText value="#{editBIEBean.encode(bieUserExtRevision)}" escape="false"/>
+                        </li>
+                    </ui:repeat>
+                </div>
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="okBtn" value="Okay" icon="fa fa-white fa-check"
+                                 action="#{editBIEBean.discard(editBIEBean.bieUserExtRevisionList)}"
+                                 onclick="PF('notifyExtensionChange').hide();"/>
+                <p:commandButton id="laterBtn" value="Remind me later" icon="fa fa-white fa-times"
+                                 onclick="PF('notifyExtensionChange').hide();"/>
+            </div>
+        </p:confirmDialog>
+
+        <p:confirmDialog id="confirmChangeStateToEditingDlg" widgetVar="confirmChangeStateToEditing" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Change state to editing">
+            <f:facet name="message">
+                This profile BIE's state is in 'Candidate'. It needs to change the state to 'Editing'.
+                <br/>
+                Would you like to accept it?
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn" value="Accept" icon="fa fa-white fa-check"
+                                 action="#{editBIEBean.uptakeExtensionsWithChangingState(editBIEBean.bieUserExtRevisionList, 'Editing')}"
+                                 update=":form:panel, :form:btnGroup"
+                                 onclick="PF('confirmChangeStateToEditing').hide(); PF('loadingBlock').show();"/>
+                <p:commandButton id="cancelBtn" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmChangeStateToEditing').hide(); PF('confirmKeepNotification').show();"/>
+            </div>
+        </p:confirmDialog>
+
+        <p:panel id="panel">
+            <h:panelGroup style="width: 100%;">
+                <div class="row">
+                    <div id="left_panel" class="col-md-5" style="max-height: 470px; overflow-y: scroll;">
+                        <p:treeTable value="#{editBIEBean.treeNode}" var="node" id="treeTable"
+                                     selection="#{editBIEBean.selectedTreeNode}"
+                                     selectionMode="single">
+                            <p:ajax event="expand" listener="#{editBIEBean.expand}"
+                                    update=":form:treeTable"/>
+                            <p:ajax event="collapse"
+                                    update=":form:treeTable"/>
+                            <p:ajax event="select" update=":form:details"/>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <p:commandButton id="hideUnusedNodesBoolBtn"
+                                                     styleClass="hideUnusedNodesBoolBtn"
+                                                     style="float: left; z-index: 1;"
+                                                     value="#{editBIEBean.hideUnusedNodes eq true ? 'Unhide' : 'Hide'}"
+                                                     actionListener="#{editBIEBean.toggleHideUnusedNodes()}"
+                                                     action="#{editBIEBean.recreateTreeNode()}"
+                                                     update="@form"/>
+                                    <span style="position: absolute; text-align: center; width: 100%;">
+                                        <h:outputText value="#{resourceBean.term('edit_bie.left_treetable.header')}"/>
+                                    </span>
+                                    <span style="float: right;">#{editBIEBean.release.releaseNum}</span>
+                                </f:facet>
+                                <h:selectBooleanCheckbox
+                                        rendered="#{editBIEBean.getTreeNodeTypeNameResolver(node).type ne 'ABIE'}"
+                                        disabled="#{editBIEBean.topLevelNode.type.abie.state ne 'Editing'}"
+                                        value="${node.used}" style="margin-right: 5px;">
+                                    <p:ajax listener="#{editBIEBean.onChangeData(node)}"
+                                            update=":form:growl, :form:treeTable, :form:editingPanel, :form:btnGroup"/>
+                                </h:selectBooleanCheckbox>
+                                <h:outputText value="#{editBIEBean.getTreeNodeTypeNameResolver(node).name}"/>
+                            </p:column>
+                        </p:treeTable>
+
+                        <p:contextMenu for="treeTable" nodeType="ASBIE-Extension"
+                                       rendered="#{editBIEBean.topLevelAbie.state == 'Editing'}">
+                            <p:menuitem id="localExtension" value="Create ABIE Extension Locally" style="width: 100%;"
+                                        action="#{editBIEBean.createABIEExtension(true)}"/>
+                            <p:menuitem id="globalExtension" value="Create ABIE Extension Globally" style="width: 100%;"
+                                        action="#{editBIEBean.createABIEExtension(false)}"/>
+                        </p:contextMenu>
+                    </div>
+                    <div id="main_panel" class="col-md-7" style="max-height: 470px; overflow-y: scroll">
+                        <div id="myAffix" style="overflow-y: auto;">
+                            <p:panel id="details">
+                                <f:facet name="header">
+                                    <h:outputText value="Details"/>
+                                </f:facet>
+                                <h:panelGroup id="editingPanel">
+                                    <!--
+                                        ABIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{fn:startsWith(editBIEBean.selectedTreeNode.type, 'ABIE')}">
+
+                                        <p:panel id="topLevelBiePanelForEditing">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editBIEBean.getTreeNodeTypeNameResolver(editBIEBean.selectedTreeNode.data).name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Version" styleClass="section-label"/>
+                                                <h:inputText id="topLevelBieVersion"
+                                                             value="#{editBIEBean.selectedTreeNode.data.type.abie.version}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:topLevelBiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Status" styleClass="section-label"/>
+                                                <h:inputText id="topLevelBieStatus"
+                                                             value="#{editBIEBean.selectedTreeNode.data.type.abie.status}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:topLevelBiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText id="topLevelBieTerm"
+                                                             value="#{editBIEBean.selectedTreeNode.data.type.abie.bizTerm}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:topLevelBiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText id="topLevelBieRemark"
+                                                             value="#{editBIEBean.selectedTreeNode.data.type.abie.remark}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:topLevelBiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Context Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="topLevelBieDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.type.abie.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 a:placeholder="Leave a definition"
+                                                                 styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                                 disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:topLevelBiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputTextarea>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        ASBIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{fn:startsWith(editBIEBean.selectedTreeNode.type, 'ASBIE')}">
+                                        <p:panel id="asbiePanelForEditing">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editBIEBean.getTreeNodeTypeNameResolver(editBIEBean.selectedTreeNode.data).name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="asbieUsedCB"
+                                                                         value="${editBIEBean.selectedTreeNode.data.used}"
+                                                                         styleClass="section-content #{editBIEBean.topLevelAbie.state ne 'Editing' ? 'disabled' : ''}}"
+                                                                         disabled="#{editBIEBean.topLevelAbie.state ne 'Editing'}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:treeTable, :form:editingPanel, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:inputText id="asbieMin"
+                                                             value="#{editBIEBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMinConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText id="asbieMax"
+                                                             value="#{editBIEBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="asbieNillableCB"
+                                                                         value="#{editBIEBean.selectedTreeNode.data.asbie.nillable}"
+                                                                         styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                                         disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText id="asbiepTerm"
+                                                             value="#{editBIEBean.selectedTreeNode.data.asbiep.bizTerm}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText id="asbiepRemark"
+                                                             value="#{editBIEBean.selectedTreeNode.data.asbiep.remark}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Context Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="asbieDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.asbie.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 a:placeholder="Leave a definition"
+                                                                 styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                                 disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:asbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputTextarea>
+
+                                                <h:outputText value="Association Definition"
+                                                              styleClass="section-label"/>
+                                                <h:inputTextarea id="asccDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.ascc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                </h:inputTextarea>
+
+                                                <h:outputText value="Component Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="asbiepDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.asccp.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true"/>
+
+                                                <h:outputText value="Type Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="abieDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.type.acc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        BBIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editBIEBean.selectedTreeNode.type eq 'BBIE' or
+                                                        editBIEBean.selectedTreeNode.type eq 'BBIE-Attribute'}">
+                                        <p:panel id="bbiePanelForEditing">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editBIEBean.getTreeNodeTypeNameResolver(editBIEBean.selectedTreeNode.data).name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="bbieUsedCB"
+                                                                         value="${editBIEBean.selectedTreeNode.data.used}"
+                                                                         styleClass="section-content #{editBIEBean.topLevelAbie.state ne 'Editing' ? 'disabled' : ''}}"
+                                                                         disabled="#{editBIEBean.topLevelAbie.state ne 'Editing'}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:treeTable, :form:editingPanel, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:inputText id="bbieMin"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMinConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText id="bbieMax"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="bbieNillableCB"
+                                                                         value="#{editBIEBean.selectedTreeNode.data.bbie.nillable}"
+                                                                         styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                                         disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                <h:inputText id="bbieFixedValue"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbie.fixedValue}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText id="bbiepTerm"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbiep.bizTerm}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText id="bbiepRemark"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbiep.remark}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Primitive Restriction" styleClass="section-label"/>
+                                                <h:panelGrid columns="2" cellpadding="2"
+                                                             styleClass="section-content input-section"
+                                                             style="border-collapse: separate !important;"
+                                                             columnClasses="text-align-left, text-align-left">
+                                                    <h:outputText value="Based Data Type Name"
+                                                                  styleClass="subsection-label"/>
+                                                    <h:outputText value="#{editBIEBean.selectedTreeNode.data.bdt.den}"/>
+
+                                                    <h:outputText value="Primitive Type" styleClass="subsection-label"/>
+                                                    <h:outputText
+                                                            value="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType}"
+                                                            style="width: 100px; font-weight: normal !important;"
+                                                            rendered="${editBIEBean.isDisabled()}"/>
+                                                    <h:selectOneMenu id="selectBdtPriRestriForEditing"
+                                                                     style="width: 100px; font-weight: normal !important;"
+                                                                     value="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType}"
+                                                                     rendered="${!editBIEBean.isDisabled()}">
+                                                        <f:selectItems
+                                                                value="#{editBIEBean.getAvailablePrimitiveRestrictions(editBIEBean.selectedTreeNode.data)}"/>
+                                                        <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                                update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                    </h:selectOneMenu>
+
+                                                    <h:outputText
+                                                            value="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType}"
+                                                            styleClass="subsection-label"/>
+                                                    <p:autoComplete id="bdtPriRestriPrimitiveAuto"
+                                                                    value="#{editBIEBean.bbieXbtName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType eq 'Primitive'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieXbt}"
+                                                                    dropdown="true" scrollHeight="250"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieXbtName}"
+                                                                update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                    <p:autoComplete id="bdtPriRestriCodeListAuto"
+                                                                    value="#{editBIEBean.bbieCodeListName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType eq 'Code'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieCodeList}"
+                                                                    dropdown="true" maxResults="20"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieCodeListName}"
+                                                                update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                    <p:autoComplete id="bdtPriRestriAgencyAuto"
+                                                                    value="#{editBIEBean.bbieAgencyIdListName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbie.restrictionType eq 'Agency'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieAgencyIdList}"
+                                                                    dropdown="true" maxResults="20"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieAgencyIdListName}"
+                                                                update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                </h:panelGrid>
+
+                                                <h:outputText value="Context Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="bbieDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.bbie.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 a:placeholder="Leave a definition"
+                                                                 styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                                 disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbiePanelForEditing, :form:btnGroup"/>
+                                                </h:inputTextarea>
+
+                                                <h:outputText value="Association Definition"
+                                                              styleClass="section-label"/>
+                                                <h:inputTextarea id="bccDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.bcc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                </h:inputTextarea>
+
+                                                <h:outputText value="Component Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="bbiepDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.bccp.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                </h:inputTextarea>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        BBIE_SC
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editBIEBean.selectedTreeNode.type eq 'BBIESC'}">
+
+                                        <p:panel id="bbieScPanelForEditing">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editBIEBean.getTreeNodeTypeNameResolver(editBIEBean.selectedTreeNode.data).name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox id="bbieScUsedCB"
+                                                                         value="${editBIEBean.selectedTreeNode.data.used}"
+                                                                         styleClass="section-content #{editBIEBean.topLevelAbie.state ne 'Editing' ? 'disabled' : ''}}"
+                                                                         disabled="#{editBIEBean.topLevelAbie.state ne 'Editing'}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:treeTable, :form:editingPanel, :form:btnGroup"/>
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:inputText id="bbieScMin"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMinConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText id="bbieScMax"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{editBIEBean}"/>
+                                                    <p:ajax update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                <h:inputText id="bbieScFixedValue"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.fixedValue}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Default" styleClass="section-label"/>
+                                                <h:inputText id="bbieScDefault"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.defaultValue}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText id="bbieScTerm"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.bizTerm}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText id="bbieScRemark"
+                                                             value="#{editBIEBean.selectedTreeNode.data.bbieSc.remark}"
+                                                             styleClass="section-content input-section #{editBIEBean.isDisabled() ? 'disabled' : ''}"
+                                                             disabled="#{editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputText>
+
+                                                <h:outputText value="Primitive Restriction" styleClass="section-label"/>
+                                                <h:panelGrid columns="2" cellpadding="2"
+                                                             styleClass="section-content input-section"
+                                                             style="border-collapse: separate !important;"
+                                                             columnClasses="text-align-left, text-align-left">
+
+                                                    <h:outputText value="Primitive Type" styleClass="subsection-label"/>
+                                                    <h:outputText
+                                                            value="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType}"
+                                                            style="width: 100px; font-weight: normal !important;"
+                                                            rendered="${editBIEBean.isDisabled()}"/>
+                                                    <h:selectOneMenu id="selectBdtScPriRestriForEditing"
+                                                                     style="width: 100px; font-weight: normal !important;"
+                                                                     value="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType}"
+                                                                     rendered="${!editBIEBean.isDisabled()}">
+                                                        <f:selectItems
+                                                                value="#{editBIEBean.getAvailableScPrimitiveRestrictions(editBIEBean.selectedTreeNode.data)}"/>
+                                                        <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                                update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                    </h:selectOneMenu>
+
+                                                    <h:outputText
+                                                            value="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType}"
+                                                            styleClass="subsection-label"/>
+                                                    <p:autoComplete id="bdtScPriRestriPrimitiveAuto"
+                                                                    value="#{editBIEBean.bbieScXbtName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Primitive'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieScXbt}"
+                                                                    dropdown="true" maxResults="20"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieScXbtName}"
+                                                                update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                    <p:autoComplete id="bdtScPriRestriCodeListAuto"
+                                                                    value="#{editBIEBean.bbieScCodeListName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Code'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieScCodeList}"
+                                                                    dropdown="true" maxResults="20"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieScCodeListName}"
+                                                                update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                    <p:autoComplete id="bdtScPriRestriAgencyAuto"
+                                                                    value="#{editBIEBean.bbieScAgencyIdListName}"
+                                                                    rendered="#{editBIEBean.selectedTreeNode.data.bbieSc.restrictionType eq 'Agency'}"
+                                                                    completeMethod="#{editBIEBean.completeInputForBbieScAgencyIdList}"
+                                                                    dropdown="true" maxResults="20"
+                                                                    disabled="${editBIEBean.isDisabled()}"
+                                                                    style="width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+                                                        <p:ajax event="itemSelect"
+                                                                listener="#{editBIEBean.onSelectBbieScAgencyIdListName}"
+                                                                update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                    </p:autoComplete>
+                                                </h:panelGrid>
+
+                                                <h:outputText value="Context Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="bbieScDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.bbieSc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 a:placeholder="Leave a definition"
+                                                                 styleClass="section-content input-section ${editBIEBean.selectedTreeNode.data.used == false ? 'disabled' : ''}"
+                                                                 disabled="${editBIEBean.isDisabled()}">
+                                                    <p:ajax listener="#{editBIEBean.onChangeData(editBIEBean.selectedTreeNode.data)}"
+                                                            update=":form:growl, :form:bbieScPanelForEditing, :form:btnGroup"/>
+                                                </h:inputTextarea>
+
+                                                <h:outputText value="Component Definition" styleClass="section-label"/>
+                                                <h:inputTextarea id="bdtScDefinition"
+                                                                 value="#{editBIEBean.selectedTreeNode.data.bdtSc.definition}"
+                                                                 rows="6" autoResize="false"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                </h:inputTextarea>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </p:panel>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </p:panel>
+
+        <p:panel id="btnGroup"
+                 rendered="#{editBIEBean.currentUser.appUserId eq editBIEBean.topLevelAbie.ownerUserId}">
+            <p:commandButton rendered="#{editBIEBean.topLevelAbie.state == 'Editing'}"
+                             disabled="#{!editBIEBean.canUpdate()}"
+                             id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                             actionListener="#{editBIEBean.update()}"
+                             action="#{editBIEBean.afterUpdate()}"
+                             update=":form:growl, :form:treeTable, :form:details, :form:btnGroup"/>
+
+            <p:commandButton rendered="#{editBIEBean.topLevelAbie.state == 'Editing'}"
+                             disabled="#{editBIEBean.canUpdate()}"
+                             id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                             action="#{editBIEBean.updateState('Candidate')}"
+                             update=":form:growl, :form:treeTable, :form:details, :form:btnGroup"/>
+            <p:commandButton rendered="#{editBIEBean.topLevelAbie.state == 'Candidate'}"
+                             disabled="#{editBIEBean.canUpdate()}"
+                             id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
+                             action="#{editBIEBean.updateState('Editing')}"
+                             update=":form:growl, :form:treeTable, :form:details, :form:btnGroup"/>
+            <p:commandButton rendered="#{editBIEBean.topLevelAbie.state == 'Candidate'}"
+                             disabled="#{editBIEBean.canUpdate()}"
+                             id="btnPublish" widgetVar="btnPublish" value="Publish"
+                             onclick="PF('confirmPublish').show();"/>
+        </p:panel>
+
+        <p:confirmDialog id="confirmPublishDlg" widgetVar="confirmPublish" showEffect="fade"
+                         hideEffect="fade" closable="false" header="Warning">
+            <f:facet name="message">
+                Do you really want to move this to the Published state?<br/>
+                Once in the Published state the entity can no longer be changed or discarded.
+            </f:facet>
+            <div style="text-align: center;">
+                <p:commandButton id="acceptBtn2" value="Accept" icon="fa fa-white fa-check"
+                                 onclick="PF('confirmPublish').hide(); PF('loadingBlock').show();"
+                                 oncomplete="PF('loadingBlock').hide();"
+                                 action="#{editBIEBean.updateState('Published')}"
+                                 update=":form:btnGroup" ajax="true"/>
+                <p:commandButton id="cancelBtn2" value="Cancel" icon="fa fa-white fa-times"
+                                 onclick="PF('confirmPublish').hide()"/>
+            </div>
+        </p:confirmDialog>
+    </ui:define>
+</ui:composition>

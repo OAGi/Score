@@ -3,10 +3,7 @@ package org.oagi.srt.web.jsf.beans.codelist;
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.entity.AgencyIdListValue;
-import org.oagi.srt.repository.entity.CodeList;
-import org.oagi.srt.repository.entity.CodeListState;
-import org.oagi.srt.repository.entity.CodeListValue;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
@@ -245,22 +242,28 @@ public class CodeListBaseBean extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public String forceUpdate() {
-        codeList = codeListService.newCodeListBuilder(codeList)
-                .userId(getCurrentUser().getAppUserId())
-                .state(state)
-                .build();
-
-        for (CodeListValue codeListValue : codeListValues) {
-            codeListService.newCodeListValueBuilder(codeListValue)
-                    .codeList(codeList)
+        CodeListState previousCodeListState = codeList.getState();
+        if (previousCodeListState == CodeListState.Editing) {
+            codeListService.delete(codeList);
+        } else {
+            codeList = codeListService.newCodeListBuilder(codeList)
+                    .userId(getCurrentUser().getAppUserId())
+                    .state(state)
                     .build();
+
+            for (CodeListValue codeListValue : codeListValues) {
+                codeListService.newCodeListValueBuilder(codeListValue)
+                        .codeList(codeList)
+                        .build();
+            }
+
+            codeListService.delete(
+                    deleteCodeListValues.stream()
+                            .filter(e -> e.getCodeListValueId() > 0L)
+                            .collect(Collectors.toList())
+            );
         }
 
-        codeListService.delete(
-                deleteCodeListValues.stream()
-                        .filter(e -> e.getCodeListValueId() > 0L)
-                        .collect(Collectors.toList())
-        );
 
         return "/views/code_list/list.jsf?faces-redirect=true";
     }
@@ -363,4 +366,6 @@ public class CodeListBaseBean extends UIHandler {
         }
     }
 
+
 }
+

@@ -8,6 +8,7 @@ import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.CreatorModifierAwareEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.service.DataTypeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,6 +192,11 @@ public class P_1_1_PopulateCommonData {
                 String versionNum = getVersion(file);
                 module.setVersionNum(versionNum);
 
+                CreatorModifierAwareEventListener eventListener = new CreatorModifierAwareEventListener(oagisUser);
+                module.addPersistEventListener(eventListener);
+                module.setOwnerUserId(oagisUser.getAppUserId());
+                module.addPersistEventListener(new TimestampAwareEventListener());
+
                 moduleRepository.saveAndFlush(module);
             }
         }
@@ -265,6 +271,7 @@ public class P_1_1_PopulateCommonData {
     private class XBTBuilder {
         private String name;
         private String builtInType;
+        private String jbtDraft05Map;
         private String schemaDefinition;
         private Module module;
         private XSDBuiltInType subTypeXbt;
@@ -279,6 +286,11 @@ public class P_1_1_PopulateCommonData {
 
         public XBTBuilder builtInType(String builtInType) {
             this.builtInType = builtInType;
+            return this;
+        }
+
+        public XBTBuilder jbtDraft05Map(String jbtDraft05Map) {
+            this.jbtDraft05Map = jbtDraft05Map;
             return this;
         }
 
@@ -306,6 +318,7 @@ public class P_1_1_PopulateCommonData {
             xbt = new XSDBuiltInType();
             xbt.setName(name);
             xbt.setBuiltInType(builtInType);
+            xbt.setJbtDraft05Map(jbtDraft05Map);
             xbt.setSchemaDefinition(schemaDefinition);
             xbt.setModule(module);
             if (subTypeXbt != null) {
@@ -322,31 +335,31 @@ public class P_1_1_PopulateCommonData {
     private void populateXbtFromXMLSchemaBuiltInTypes() {
         printTitle("Populate XSD Built-In Types");
 
-        XSDBuiltInType anyType = xbtName("any type").builtInType("xsd:anyType").build();
-        XSDBuiltInType anySimpleType = xbtName("any simple type").builtInType("xsd:anySimpleType").subTypeOfXbt(anyType).build();
-        xbtName("duration").builtInType("xsd:duration").subTypeOfXbt(anySimpleType).build();
-        xbtName("date time").builtInType("xsd:dateTime").subTypeOfXbt(anySimpleType).build();
-        xbtName("time").builtInType("xsd:time").subTypeOfXbt(anySimpleType).build();
-        xbtName("date").builtInType("xsd:date").subTypeOfXbt(anySimpleType).build();
-        xbtName("gregorian year month").builtInType("xsd:gYearMonth").subTypeOfXbt(anySimpleType).build();
-        xbtName("gregorian year").builtInType("xsd:gYear").subTypeOfXbt(anySimpleType).build();
-        xbtName("gregorian month day").builtInType("xsd:gMonthDay").subTypeOfXbt(anySimpleType).build();
-        xbtName("gregorian day").builtInType("xsd:gDay").subTypeOfXbt(anySimpleType).build();
-        xbtName("gregorian month").builtInType("xsd:gMonth").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType stringType = xbtName("string").builtInType("xsd:string").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType normalizedStringType = xbtName("normalized string").builtInType("xsd:normalizedString").subTypeOfXbt(stringType).build();
-        XSDBuiltInType tokenType = xbtName("token").builtInType("xsd:token").subTypeOfXbt(normalizedStringType).build();
-        xbtName("language").builtInType("xsd:language").subTypeOfXbt(tokenType).build();
-        XSDBuiltInType booleanType = xbtName("boolean").builtInType("xsd:boolean").subTypeOfXbt(anySimpleType).build();
-        xbtName("base64 binary").builtInType("xsd:base64Binary").subTypeOfXbt(anySimpleType).build();
-        xbtName("hex binary").builtInType("xsd:hexBinary").subTypeOfXbt(anySimpleType).build();
-        xbtName("float").builtInType("xsd:float").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType decimalType = xbtName("decimal").builtInType("xsd:decimal").subTypeOfXbt(anySimpleType).build();
-        XSDBuiltInType integerType = xbtName("integer").builtInType("xsd:integer").subTypeOfXbt(decimalType).build();
-        XSDBuiltInType nonNegativeIntegerType = xbtName("non negative integer").builtInType("xsd:nonNegativeInteger").subTypeOfXbt(integerType).build();
-        xbtName("positive integer").builtInType("xsd:positiveInteger").subTypeOfXbt(nonNegativeIntegerType).build();
-        xbtName("double").builtInType("xsd:double").subTypeOfXbt(anySimpleType).build();
-        xbtName("any URI").builtInType("xsd:anyURI").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType anyType = xbtName("any type").builtInType("xsd:anyType").jbtDraft05Map("{\"type\":\"string\"}").build();
+        XSDBuiltInType anySimpleType = xbtName("any simple type").builtInType("xsd:anySimpleType").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anyType).build();
+        xbtName("duration").builtInType("xsd:duration").jbtDraft05Map("{\"type\":\"string\", \"pattern\":\"^[-]?P(?!$)(?:\\\\d+Y)?(?:\\\\d+M)?(?:\\\\d+D)?(?:T(?!$)(?:\\\\d+H)?(?:\\\\d+M)?(?:\\\\d+(?:\\\\.\\\\d+)?S)?)?$\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("date time").builtInType("xsd:dateTime").jbtDraft05Map("{\"type\":\"string\", \"format\":\"date-time\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("time").builtInType("xsd:time").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("date").builtInType("xsd:date").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("gregorian year month").builtInType("xsd:gYearMonth").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("gregorian year").builtInType("xsd:gYear").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("gregorian month day").builtInType("xsd:gMonthDay").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("gregorian day").builtInType("xsd:gDay").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("gregorian month").builtInType("xsd:gMonth").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType stringType = xbtName("string").builtInType("xsd:string").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType normalizedStringType = xbtName("normalized string").builtInType("xsd:normalizedString").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(stringType).build();
+        XSDBuiltInType tokenType = xbtName("token").builtInType("xsd:token").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(normalizedStringType).build();
+        xbtName("language").builtInType("xsd:language").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(tokenType).build();
+        XSDBuiltInType booleanType = xbtName("boolean").builtInType("xsd:boolean").jbtDraft05Map("{\"type\":\"boolean\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("base64 binary").builtInType("xsd:base64Binary").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("hex binary").builtInType("xsd:hexBinary").jbtDraft05Map("{\"type\":\"string\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("float").builtInType("xsd:float").jbtDraft05Map("{\"type\":\"number\"}").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType decimalType = xbtName("decimal").builtInType("xsd:decimal").jbtDraft05Map("{\"type\":\"number\"}").subTypeOfXbt(anySimpleType).build();
+        XSDBuiltInType integerType = xbtName("integer").builtInType("xsd:integer").jbtDraft05Map("{\"type\":\"number\", \"multipleOf\":1}").subTypeOfXbt(decimalType).build();
+        XSDBuiltInType nonNegativeIntegerType = xbtName("non negative integer").builtInType("xsd:nonNegativeInteger").jbtDraft05Map("{\"type\":\"integer\", \"minimum\":0, \"exclusiveMinimum\":false}").subTypeOfXbt(integerType).build();
+        xbtName("positive integer").builtInType("xsd:positiveInteger").jbtDraft05Map("{\"type\":\"integer\", \"minimum\":0, \"exclusiveMinimum\":true}").subTypeOfXbt(nonNegativeIntegerType).build();
+        xbtName("double").builtInType("xsd:double").jbtDraft05Map("{\"type\":\"number\"}").subTypeOfXbt(anySimpleType).build();
+        xbtName("any URI").builtInType("xsd:anyURI").jbtDraft05Map("{\"type\":\"string\", \"format\":\"uriref\"}").subTypeOfXbt(anySimpleType).build();
     }
 
     public XBTBuilder xbtName(String name) {
@@ -385,6 +398,7 @@ public class P_1_1_PopulateCommonData {
 
                 XBTBuilder xbtBuilder =
                         xbtName(name).builtInType(builtInType)
+                                .jbtDraft05Map(builtInType.contains("Boolean") ? "{\"type\":\"boolean\"}" : "{\"type\":\"string\"}")
                                 .schemaDefinition(schemaDefinition)
                                 .module(xbtModule)
                                 .element(simpleTypeElement);

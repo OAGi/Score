@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D70D1073-E659-622A-D0AA-1C3801DFE4BD" name="CDT_AWD_PRI_XPS_TYPE_MAP">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:46:34 UTC</createdTime>
 <comment>This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. &lt;br/&gt;&lt;br/&gt;For each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.&lt;br/&gt;&lt;br/&gt;If we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. </comment>
 <commentInRDBMS>This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. &lt;br/&gt;&lt;br/&gt;For each additional expression, a column similar to the XBT_ID column will need to be added to this table for mapping to data types in another expression.&lt;br/&gt;&lt;br/&gt;If we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using a column may not work with all kinds of expressions, particulary if it does not map well to the XML schema data types. </commentInRDBMS>
@@ -11,7 +11,7 @@
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
 <Column name="CDT_AWD_PRI_XPS_TYPE_MAP_ID" id="5521BF1A-9B7F-16A0-7F1D-AED486AB6B91">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:47:10 UTC</createdTime>
 <commentInRDBMS>Internal, primary database key.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -23,7 +23,7 @@
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="CDT_AWD_PRI_ID" id="A48D3E5A-F52D-5AEC-159C-D1D61EE44DB5">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:47:10 UTC</createdTime>
 <commentInRDBMS>Foreign key to the CDT_AWD_PRI table.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -38,7 +38,7 @@
 </associations>
 </Column>
 <Column name="XBT_ID" id="AD66D812-6E94-64E7-AFF9-DCA73F5D2CE4">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:47:10 UTC</createdTime>
 <commentInRDBMS>Foreign key and to the XBT table. It identifies the XML schema built-in types that can be mapped to the CDT primivite identified in the CDT_AWD_PRI_ID column. The CDT primitives are typically broad and hence it usually maps to more than one XML schema built-in types.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -55,7 +55,7 @@
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="EFE93421-F152-77C7-F143-32D4F55A4722" name="CAPXTM_PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:47:10 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <pk>true</pk>
@@ -66,7 +66,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="F0DFF0B6-A430-746B-C0EF-97116514276A" name="CAPXTM_PK_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:19:33 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Unique Plain Index</indexState>
@@ -76,7 +76,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="BB110142-77FE-A039-0CDE-791EE3CD7DEF" name="CAPXTM_CAP_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:19:33 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -85,7 +85,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="7A1A7094-8AEF-C878-5A08-FCB1A5C489A0" name="CAPXTM_XBT_ID_IDX">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-18 19:19:33 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <isSurrogateKey>false</isSurrogateKey>
@@ -94,7 +94,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="CAC33426-27A1-FC03-DC44-4EC3E020D97B" name="CAPXTM_CDT_AWD_PRI_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:47:35 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
@@ -104,7 +104,7 @@
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="2D81F07C-581D-E407-A2DF-7E9BE4A4A588" name="CAPXTM_XBT_ID_FK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:48:07 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>

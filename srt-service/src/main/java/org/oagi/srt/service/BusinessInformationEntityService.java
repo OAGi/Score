@@ -111,7 +111,7 @@ public class BusinessInformationEntityService {
     private BusinessInformationEntityDAO bieDAO;
 
     @Autowired
-    private ProfileBODRepository profileBODRepository;
+    private ProfileBIERepository profileBIERepository;
 
     public class CreateBIEsResult {
 
@@ -759,7 +759,7 @@ public class BusinessInformationEntityService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void deleteProfileBOD(long topLevelAbieId) {
+    public void deleteProfileBIE(long topLevelAbieId) {
         bieDAO.deleteProfileBOD(topLevelAbieId);
     }
 
@@ -1131,24 +1131,24 @@ public class BusinessInformationEntityService {
         topLevelAbieRepository.save(topLevelAbie);
     }
 
-    public boolean canUserSeeThisProfileBOD(long topLevelAbieId, User currentUser) {
-        ProfileBOD profileBOD = profileBODRepository.findOne(topLevelAbieId);
-        return canUserSeeThisProfileBOD(profileBOD, currentUser);
+    public boolean canUserSeeThisProfileBIE(long topLevelAbieId, User currentUser) {
+        ProfileBIE profileBIE = profileBIERepository.findOne(topLevelAbieId);
+        return canUserSeeThisProfileBIE(profileBIE, currentUser);
     }
 
-    public boolean canUserSeeThisProfileBOD(ProfileBOD profileBOD, User currentUser) {
-        if (profileBOD == null) {
+    public boolean canUserSeeThisProfileBIE(ProfileBIE profileBIE, User currentUser) {
+        if (profileBIE == null) {
             return false;
         }
 
-        long ownerUserId = profileBOD.getOwnerUserId();
+        long ownerUserId = profileBIE.getOwnerUserId();
         long userId = currentUser.getAppUserId();
 
         if (ownerUserId == userId) {
             return true;
         }
 
-        AggregateBusinessInformationEntityState state = profileBOD.getState();
+        AggregateBusinessInformationEntityState state = profileBIE.getState();
 
         if (Editing == state) {
             return false;
@@ -1157,18 +1157,18 @@ public class BusinessInformationEntityService {
         return true;
     }
 
-    public boolean canUserGenerateThisProfileBOD(ProfileBOD profileBOD, User currentUser) {
-        if (profileBOD == null) {
+    public boolean canUserGenerateThisProfileBOD(ProfileBIE profileBIE, User currentUser) {
+        if (profileBIE == null) {
             return false;
         }
 
-        long ownerUserId = profileBOD.getOwnerUserId();
+        long ownerUserId = profileBIE.getOwnerUserId();
         long userId = currentUser.getAppUserId();
 
         if (ownerUserId == userId) {
             return true;
         }
-        AggregateBusinessInformationEntityState state = profileBOD.getState();
+        AggregateBusinessInformationEntityState state = profileBIE.getState();
 
         if (Editing == state) {
             return false;

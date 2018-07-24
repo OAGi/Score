@@ -20,8 +20,10 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -41,6 +43,7 @@ public class SelectACCBean extends AbstractCoreComponentBean {
     private CoreComponentBeanHelper coreComponentBeanHelper;
 
     private List<AggregateCoreComponent> accList;
+    private Map<Long, AggregateCoreComponent> allAccMap;
     private String objectClassTerm;
     private AggregateCoreComponent selectedACC;
 
@@ -78,6 +81,8 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     public void setAccList(List<AggregateCoreComponent> accList) {
         this.accList = accList;
+        this.allAccMap = accList.stream()
+                .collect(Collectors.toMap(AggregateCoreComponent::getAccId, Function.identity()));
     }
 
     public String getObjectClassTerm() {
@@ -94,14 +99,52 @@ public class SelectACCBean extends AbstractCoreComponentBean {
 
     public void setSelectedACC(AggregateCoreComponent selectedACC) {
         this.selectedACC = selectedACC;
+        getAccCheckBox(selectedACC.getAccId()).setChecked(true);
     }
 
     public void onACCSelect(SelectEvent event) {
         setSelectedACC((AggregateCoreComponent) event.getObject());
+        getAccCheckBox(((AggregateCoreComponent) event.getObject()).getAccId()).setChecked(true);
     }
 
     public void onACCUnselect(UnselectEvent event) {
         setSelectedACC(null);
+        getAccCheckBox(((AggregateCoreComponent) event.getObject()).getAccId()).setChecked(false);
+    }
+
+    private Map<Long, Boolean> accCheckBoxes = new HashMap();
+
+    public class AccCheckBox {
+        private Long accId;
+
+        public AccCheckBox(Long accId) {
+            this.accId = accId;
+        }
+
+        public boolean isChecked() {
+            return accCheckBoxes.getOrDefault(accId, false);
+        }
+
+        public void setChecked(boolean value) {
+            accCheckBoxes = new HashMap();
+
+            if (value) {
+                AggregateCoreComponent previousOne = getSelectedACC();
+                if (previousOne != null) {
+                    accCheckBoxes.put(previousOne.getAccId(), false);
+                }
+
+                selectedACC = allAccMap.get(accId);
+            } else {
+                selectedACC = null;
+            }
+
+            accCheckBoxes.put(accId, value);
+        }
+    }
+
+    public AccCheckBox getAccCheckBox(Long accId) {
+        return new AccCheckBox(accId);
     }
 
     public List<String> completeInput(String query) {

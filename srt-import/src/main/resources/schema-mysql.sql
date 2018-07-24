@@ -1,7 +1,14 @@
+# ************************************************************
+# Database: oagi
+# Generation Time: 2018-05-29 16:18:03 +0000
+# ************************************************************
+
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
+SET NAMES utf8mb4;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
@@ -55,11 +62,12 @@ DROP TABLE IF EXISTS `acc`;
 CREATE TABLE `acc` (
   `acc_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ACC.',
   `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of an ACC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
-  `object_class_term` varchar(100) NOT NULL DEFAULT '' COMMENT 'Object class name of the ACC concept. For OAGIS, this is generally name of a type with the "Type" truncated from the end. Per CCS the name is space separated. "ID" is expanded to "Identifier".',
-  `den` varchar(200) NOT NULL DEFAULT '' COMMENT 'DEN (dictionary entry name) of the ACC. It can be derived as OBJECT_CLASS_QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". Details".',
+  `object_class_term` varchar(100) NOT NULL COMMENT 'Object class name of the ACC concept. For OAGIS, this is generally name of a type with the "Type" truncated from the end. Per CCS the name is space separated. "ID" is expanded to "Identifier".',
+  `den` varchar(200) NOT NULL COMMENT 'DEN (dictionary entry name) of the ACC. It can be derived as OBJECT_CLASS_QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". Details".',
   `definition` text COMMENT 'This is a documentation or description of the ACC. Since ACC is business context independent, this is a business context independent description of the ACC concept.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `based_acc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'BASED_ACC_ID is a foreign key to the ACC table itself. It represents the ACC that is qualified by this ACC. In general CCS sense, a qualification can be a content extension or restriction, but the current scope supports only extension.',
-  `object_class_qualifier` varchar(100) DEFAULT '' COMMENT 'This column stores the qualifier of an ACC, particularly when it has a based ACC. ',
+  `object_class_qualifier` varchar(100) DEFAULT NULL COMMENT 'This column stores the qualifier of an ACC, particularly when it has a based ACC. ',
   `oagis_component_type` int(11) DEFAULT NULL COMMENT 'The value can be 0 = BASE, 1 = SEMANTICS, 2 = EXTENSION, 3 = SEMANTIC_GROUP, 4 = USER_EXTENSION_GROUP, 5 = EMBEDDED. Generally, BASE is assigned when the OBJECT_CLASS_TERM contains "Base" at the end. EXTENSION is assigned with the OBJECT_CLASS_TERM contains "Extension" at the end. SEMANTIC_GROUP is assigned when an ACC is imported from an XSD Group. USER_EXTENSION_GROUP is a wrapper ACC (a virtual ACC) for segregating user''s extension content. EMBEDDED is used for an ACC whose content is not explicitly defined in the database, for example, the Any Structured Content ACC that corresponds to the xsd:any.  Other cases are assigned SEMANTICS. ',
   `module_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the module table indicating the physical schema the ACC belongs to.',
   `namespace_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user''s component because there is also a namespace assigned at the release level.',
@@ -77,7 +85,6 @@ CREATE TABLE `acc` (
   `is_deprecated` tinyint(1) DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be allowed).',
   `is_abstract` tinyint(1) DEFAULT '0' COMMENT 'This is the XML Schema abstract flag. Default is false. If it is true, the abstract flag will be set to true when generating a corresponding xsd:complexType. So although this flag may not apply to some ACCs such as those that are xsd:group. It is still have a false value.',
   PRIMARY KEY (`acc_id`),
-  UNIQUE KEY `acc_uk1` (`guid`),
   KEY `acc_based_acc_id_fk` (`based_acc_id`),
   KEY `acc_created_by_fk` (`created_by`),
   KEY `acc_current_acc_id_fk` (`current_acc_id`),
@@ -105,12 +112,12 @@ DROP TABLE IF EXISTS `agency_id_list`;
 
 CREATE TABLE `agency_id_list` (
   `agency_id_list_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key.',
-  `guid` varchar(41) DEFAULT '' COMMENT 'A globally unique identifier (GUID) of an agency identifier scheme. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
+  `guid` varchar(41) DEFAULT NULL COMMENT 'A globally unique identifier (GUID) of an agency identifier scheme. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
   `enum_type_guid` varchar(41) NOT NULL COMMENT 'This column stores the GUID of the type containing the enumerated values. In OAGIS, most code lists and agnecy ID lists are defined by an XyzCodeContentType (or XyzAgencyIdentificationContentType) and XyzCodeEnumerationType (or XyzAgencyIdentificationEnumerationContentType). However, some don''t have the enumeration type. When that is the case, this column is null.',
-  `name` varchar(100) DEFAULT '' COMMENT 'Name of the agency identification list.',
-  `list_id` varchar(10) DEFAULT '' COMMENT 'This is a business or standard identification assigned to the agency identification list.',
+  `name` varchar(100) DEFAULT NULL COMMENT 'Name of the agency identification list.',
+  `list_id` varchar(10) DEFAULT NULL COMMENT 'This is a business or standard identification assigned to the agency identification list.',
   `agency_id_list_value_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is the identification of the agency or organization which developed and/or maintains the list. Theoretically, this can be modeled as a self-reference foreign key, but it is not implemented at this point.',
-  `version_id` varchar(10) DEFAULT '' COMMENT 'Version number of the agency identification list (assigned by the agency).',
+  `version_id` varchar(10) DEFAULT NULL COMMENT 'Version number of the agency identification list (assigned by the agency).',
   `module_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the module table indicating the physical schema the MODULE belongs to.',
   `definition` text COMMENT 'Description of the agency identification list.',
   PRIMARY KEY (`agency_id_list_id`),
@@ -131,8 +138,8 @@ DROP TABLE IF EXISTS `agency_id_list_value`;
 
 CREATE TABLE `agency_id_list_value` (
   `agency_id_list_value_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
-  `value` varchar(150) NOT NULL DEFAULT '' COMMENT 'A value in the agency identification list.',
-  `name` varchar(150) DEFAULT '' COMMENT 'Descriptive or short name of the value.',
+  `value` varchar(150) NOT NULL COMMENT 'A value in the agency identification list.',
+  `name` varchar(150) DEFAULT NULL COMMENT 'Descriptive or short name of the value.',
   `definition` text COMMENT 'The meaning of the value.',
   `owner_list_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the agency identification list in the AGENCY_ID_LIST table this value belongs to.',
   PRIMARY KEY (`agency_id_list_value_id`),
@@ -150,9 +157,9 @@ DROP TABLE IF EXISTS `app_user`;
 CREATE TABLE `app_user` (
   `app_user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key column.',
   `login_id` varchar(45) NOT NULL COMMENT 'User Id of the user.',
-  `password` varchar(100) NOT NULL DEFAULT '' COMMENT 'Password to authenticate the user.',
-  `name` varchar(100) DEFAULT '' COMMENT 'Full name of the user.',
-  `organization` varchar(100) DEFAULT '' COMMENT 'The company the user represents.',
+  `password` varchar(100) NOT NULL COMMENT 'Password to authenticate the user.',
+  `name` varchar(100) DEFAULT NULL COMMENT 'Full name of the user.',
+  `organization` varchar(100) DEFAULT NULL COMMENT 'The company the user represents.',
   `oagis_developer_indicator` tinyint(1) NOT NULL COMMENT 'This indicates whether the user can edit OAGIS Model content. Content created by the OAGIS developer is also considered OAGIS Model content.',
   PRIMARY KEY (`app_user_id`),
   UNIQUE KEY `app_user_uk1` (`login_id`)
@@ -184,7 +191,6 @@ CREATE TABLE `asbie` (
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It signifies whether the field/component should be generated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE which owns this ASBIE record.',
   PRIMARY KEY (`asbie_id`),
-  UNIQUE KEY `asbie_uk1` (`guid`,`from_abie_id`,`to_asbiep_id`),
   KEY `asbie_based_ascc_id_fk` (`based_ascc_id`),
   KEY `asbie_created_by_fk` (`created_by`),
   KEY `asbie_from_abie_id_fk` (`from_abie_id`),
@@ -220,7 +226,6 @@ CREATE TABLE `asbiep` (
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the ASBIEP was last updated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this ASBIEP record.',
   PRIMARY KEY (`asbiep_id`),
-  UNIQUE KEY `asbiep_uk1` (`guid`),
   KEY `asbiep_based_asccp_id_fk` (`based_asccp_id`),
   KEY `asbiep_role_of_abie_id_fk` (`role_of_abie_id`),
   KEY `asbiep_created_by_fk` (`created_by`),
@@ -242,14 +247,15 @@ DROP TABLE IF EXISTS `ascc`;
 
 CREATE TABLE `ascc` (
   `ascc_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of an ASCC.',
-  `guid` varchar(41) NOT NULL DEFAULT '' COMMENT 'A globally unique identifier (GUID) of an ASCC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
+  `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of an ASCC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
   `cardinality_min` int(11) NOT NULL COMMENT 'Minimum occurrence of the TO_ASCCP_ID. The valid values are non-negative integer.',
   `cardinality_max` int(11) NOT NULL COMMENT 'Maximum cardinality of the TO_ASCCP_ID. A valid value is integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.',
   `seq_key` int(11) NOT NULL COMMENT 'This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again. ',
   `from_acc_id` bigint(20) unsigned NOT NULL COMMENT 'FROM_ACC_ID is a foreign key pointing to an ACC record. It is basically pointing to a parent data element (type) of the TO_ASCCP_ID.',
   `to_asccp_id` bigint(20) unsigned NOT NULL COMMENT 'TO_ASCCP_ID is a foreign key to an ASCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. ',
-  `den` varchar(200) NOT NULL DEFAULT '' COMMENT 'DEN (dictionary entry name) of the ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " + OBJECT_CLASS_TERM + ". " + DEN. ',
+  `den` varchar(200) NOT NULL COMMENT 'DEN (dictionary entry name) of the ASCC. This column can be derived from Qualifier and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_ASCCP_ID as Qualifier + "_ " + OBJECT_CLASS_TERM + ". " + DEN. ',
   `definition` text COMMENT 'This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are definitions also in the ASCCP (as referenced by the TO_ASCCP_ID column) and the ACC under that ASCCP, definition in the ASCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the ASCCP.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `is_deprecated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
   `created_by` bigint(20) unsigned NOT NULL COMMENT 'A foreign key to the APP_USER table referring to the user who creates the entity.\n\nThis column never change between the history and the current record for a given revision. The history record should have the same value as that of its current record.',
   `owner_user_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn''t rollback the ownership. ',
@@ -263,7 +269,6 @@ CREATE TABLE `ascc` (
   `release_id` bigint(20) unsigned DEFAULT NULL COMMENT 'RELEASE_ID is an incremental integer. It is an unformatted counterpart of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. RELEASE_ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).\n\nNot all component revisions have an associated RELEASE_ID because some revisions may never be released.\n\nUnpublished components cannot be released.\n\nThis column is NULL for the current record.',
   `current_ascc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
   PRIMARY KEY (`ascc_id`),
-  UNIQUE KEY `ascc_uk1` (`guid`,`from_acc_id`,`to_asccp_id`),
   KEY `ascc_from_acc_id_fk` (`from_acc_id`),
   KEY `ascc_to_asccp_id_fk` (`to_asccp_id`),
   KEY `ascc_created_by_fk` (`created_by`),
@@ -290,10 +295,11 @@ DROP TABLE IF EXISTS `asccp`;
 CREATE TABLE `asccp` (
   `asccp_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key of an ASCCP.',
   `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of an ASCCP. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
-  `property_term` varchar(60) DEFAULT '' COMMENT 'The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \\n\\nThere must be only one ASCCP without a Property_Term for a particular ACC.',
+  `property_term` varchar(60) DEFAULT NULL COMMENT 'The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \\n\\nThere must be only one ASCCP without a Property_Term for a particular ACC.',
   `definition` text COMMENT 'Description of the ASCCP.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `role_of_acc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'The ACC from which this ASCCP is created (ASCCP applies role to the ACC).',
-  `den` varchar(200) DEFAULT '' COMMENT 'The dictionary entry name of the ASCCP.',
+  `den` varchar(200) DEFAULT NULL COMMENT 'The dictionary entry name of the ASCCP.',
   `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the user who creates the entity. \n\nThis column never change between the history and the current record for a given revision. The history record should have the same value as that of its current record.',
   `owner_user_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn''t rollback the ownership. ',
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who has updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).',
@@ -311,7 +317,6 @@ CREATE TABLE `asccp` (
   `current_asccp_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose REVISION_NUM is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
   `is_nillable` tinyint(1) DEFAULT NULL COMMENT 'This is corresponding to the XML schema nillable flag. Although the nillable may not apply in certain cases of the ASCCP (e.g., when it corresponds to an XSD group), the value is default to false for simplification.',
   PRIMARY KEY (`asccp_id`),
-  UNIQUE KEY `asccp_uk1` (`guid`),
   KEY `asccp_role_of_acc_id_fk` (`role_of_acc_id`),
   KEY `asccp_created_by_fk` (`created_by`),
   KEY `asccp_owner_user_id_fk` (`owner_user_id`),
@@ -362,7 +367,6 @@ CREATE TABLE `bbie` (
   `is_used` tinyint(1) DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated in the expression generation.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE, which owns this BBIE record.',
   PRIMARY KEY (`bbie_id`),
-  UNIQUE KEY `bbie_uk1` (`guid`,`from_abie_id`,`to_bbiep_id`),
   KEY `bbie_based_bcc_id_fk` (`based_bcc_id`),
   KEY `bbie_from_abie_id_fk` (`from_abie_id`),
   KEY `bbie_to_bbiep_id_fk` (`to_bbiep_id`),
@@ -442,7 +446,6 @@ CREATE TABLE `bbiep` (
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the BBIEP was last updated.',
   `owner_top_level_abie_id` bigint(20) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE table. It specifies the top-level ABIE which owns this BBIEP record.',
   PRIMARY KEY (`bbiep_id`),
-  UNIQUE KEY `bbiep_uk1` (`guid`),
   KEY `bbiep_based_bccp_id_fk` (`based_bccp_id`),
   KEY `bbiep_created_by_fk` (`created_by`),
   KEY `bbiep_last_updated_by_fk` (`last_updated_by`),
@@ -462,15 +465,16 @@ DROP TABLE IF EXISTS `bcc`;
 
 CREATE TABLE `bcc` (
   `bcc_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an BCC.',
-  `guid` varchar(41) NOT NULL DEFAULT '' COMMENT 'A globally unique identifier (GUID) of BCC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.'',',
+  `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of BCC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.'',',
   `cardinality_min` int(11) NOT NULL COMMENT 'Minimum cardinality of the TO_BCCP_ID. The valid values are non-negative integer.',
   `cardinality_max` int(11) DEFAULT NULL COMMENT 'Maximum cardinality of the TO_BCCP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.'',',
   `to_bccp_id` bigint(20) unsigned NOT NULL COMMENT 'TO_BCCP_ID is a foreign key to an BCCP table record. It is basically pointing to a child data element of the FROM_ACC_ID. \n\nNote that for the BCC history records, this column always points to the BCCP_ID of the current record of a BCCP.'',',
   `from_acc_id` bigint(20) unsigned NOT NULL COMMENT 'FROM_ACC_ID is a foreign key pointing to an ACC record. It is basically pointing to a parent data element (type) of the TO_BCCP_ID. \n\nNote that for the BCC history records, this column always points to the ACC_ID of the current record of an ACC.',
   `seq_key` int(11) DEFAULT NULL COMMENT 'This indicates the order of the associations among other siblings. A valid value is positive integer. The SEQ_KEY at the CC side is localized. In other words, if an ACC is based on another ACC, SEQ_KEY of ASCCs or BCCs of the former ACC starts at 1 again. ',
   `entity_type` int(11) DEFAULT NULL COMMENT 'This is a code list: 0 = ATTRIBUTE and 1 = ELEMENT. An expression generator may or may not use this information. This column is necessary because some of the BCCs are xsd:attribute and some are xsd:element in the OAGIS 10.x. ',
-  `den` varchar(200) NOT NULL DEFAULT '' COMMENT 'DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". " + DEN. ',
+  `den` varchar(200) NOT NULL COMMENT 'DEN (dictionary entry name) of the BCC. This column can be derived from QUALIFIER and OBJECT_CLASS_TERM of the FROM_ACC_ID and DEN of the TO_BCCP_ID as QUALIFIER + "_ " + OBJECT_CLASS_TERM + ". " + DEN. ',
   `definition` text COMMENT 'This is a documentation or description of the BCC. Since BCC is business context independent, this is a business context independent description of the BCC. Since there are definitions also in the BCCP (as referenced by TO_BCCP_ID column) and the BDT under that BCCP, the definition in the BCC is a specific description about the relationship between the ACC (as in FROM_ACC_ID) and the BCCP.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the user who creates the entity.\n\nThis column never change between the history and the current record. The history record should have the same value as that of its current record.',
   `owner_user_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn''t rollback the ownership.',
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who has updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).',
@@ -486,7 +490,6 @@ CREATE TABLE `bcc` (
   `is_nillable` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicate whether the field can have a NULL This is corresponding to the nillable flag in the XML schema.',
   `default_value` text COMMENT 'This set the default value at the association level. ',
   PRIMARY KEY (`bcc_id`),
-  UNIQUE KEY `bcc_uk1` (`guid`,`from_acc_id`,`to_bccp_id`),
   KEY `bcc_to_bccp_id_fk` (`to_bccp_id`),
   KEY `bcc_from_acc_id_fk` (`from_acc_id`),
   KEY `bcc_created_by_fk` (`created_by`),
@@ -513,11 +516,12 @@ DROP TABLE IF EXISTS `bccp`;
 CREATE TABLE `bccp` (
   `bccp_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'An internal, primary database key.',
   `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID). Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.'',',
-  `property_term` varchar(60) NOT NULL DEFAULT '' COMMENT 'The property concept that the BCCP models. ',
-  `representation_term` varchar(20) NOT NULL DEFAULT '' COMMENT 'The representation term convey the format of the data the BCCP can take. The value is derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to by the BDT_ID column.',
+  `property_term` varchar(60) NOT NULL COMMENT 'The property concept that the BCCP models. ',
+  `representation_term` varchar(20) NOT NULL COMMENT 'The representation term convey the format of the data the BCCP can take. The value is derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to by the BDT_ID column.',
   `bdt_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key pointing to the DT table indicating the data typye or data format of the BCCP. Only DT_ID which DT_Type is BDT can be used.',
-  `den` varchar(200) NOT NULL DEFAULT '' COMMENT 'The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.',
+  `den` varchar(200) NOT NULL COMMENT 'The dictionary entry name of the BCCP. It is derived by PROPERTY_TERM + ". " + REPRESENTATION_TERM.',
   `definition` text COMMENT 'Description of the BCCP.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `module_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the module table indicating physical schema module the BCCP belongs to.',
   `namespace_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the NAMESPACE table. This is the namespace to which the entity belongs. This namespace column is primarily used in the case the component is a user''s component because there is also a namespace assigned at the release level.',
   `is_deprecated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
@@ -535,8 +539,6 @@ CREATE TABLE `bccp` (
   `is_nillable` tinyint(1) NOT NULL COMMENT 'This is corresponding to the XML Schema nillable flag. Although the nillable may not apply to certain cases of the BCCP (e.g., when it is only used as XSD attribute), the value is default to false for simplification. ',
   `default_value` text COMMENT 'This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.',
   PRIMARY KEY (`bccp_id`),
-  UNIQUE KEY `bccp_uk1` (`guid`),
-  UNIQUE KEY `bccp_uk2` (`property_term`,`guid`),
   KEY `bccp_bdt_id_fk` (`bdt_id`),
   KEY `bccp_module_id_fk` (`module_id`),
   KEY `bccp_namespace_id_fk` (`namespace_id`),
@@ -607,6 +609,36 @@ CREATE TABLE `bdt_sc_pri_restri` (
 
 
 
+# Dump of table bie_usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `bie_usage_rule`;
+
+CREATE TABLE `bie_usage_rule` (
+  `bie_usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the table.',
+  `assigned_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the USAGE_RULE table indicating the usage rule assigned to a BIE.',
+  `target_abie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ABIE table indicating the ABIE, to which the usage rule is applied.',
+  `target_asbie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIE table indicating the ASBIE, to which the usage rule is applied.',
+  `target_asbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ASBIEP table indicating the ASBIEP, to which the usage rule is applied.',
+  `target_bbie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIE table indicating the BBIE, to which the usage rule is applied.',
+  `target_bbiep_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the BBIEP table indicating the ABIEP, to which the usage rule is applied.',
+  PRIMARY KEY (`bie_usage_rule_id`),
+  KEY `bie_usage_rule_assigned_usage_rule_id_fk` (`assigned_usage_rule_id`),
+  KEY `bie_usage_rule_target_abie_id_fk` (`target_abie_id`),
+  KEY `bie_usage_rule_target_asbie_id_fk` (`target_asbie_id`),
+  KEY `bie_usage_rule_target_asbiep_id_fk` (`target_asbiep_id`),
+  KEY `bie_usage_rule_target_bbie_id_fk` (`target_bbie_id`),
+  KEY `bie_usage_rule_target_bbiep_id_fk` (`target_bbiep_id`),
+  CONSTRAINT `bie_usage_rule_assigned_usage_rule_id_fk` FOREIGN KEY (`assigned_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`),
+  CONSTRAINT `bie_usage_rule_target_abie_id_fk` FOREIGN KEY (`target_abie_id`) REFERENCES `abie` (`abie_id`),
+  CONSTRAINT `bie_usage_rule_target_asbie_id_fk` FOREIGN KEY (`target_asbie_id`) REFERENCES `asbie` (`asbie_id`),
+  CONSTRAINT `bie_usage_rule_target_asbiep_id_fk` FOREIGN KEY (`target_asbiep_id`) REFERENCES `asbiep` (`asbiep_id`),
+  CONSTRAINT `bie_usage_rule_target_bbie_id_fk` FOREIGN KEY (`target_bbie_id`) REFERENCES `bbie` (`bbie_id`),
+  CONSTRAINT `bie_usage_rule_target_bbiep_id_fk` FOREIGN KEY (`target_bbiep_id`) REFERENCES `bbiep` (`bbiep_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and all kinds of BIEs. In a particular record, either only one of the TARGET_ABIE_ID, TARGET_ASBIE_ID, TARGET_ASBIEP_ID, TARGET_BBIE_ID, or TARGET_BBIEP_ID.';
+
+
+
 # Dump of table bie_user_ext_revision
 # ------------------------------------------------------------
 
@@ -640,7 +672,7 @@ DROP TABLE IF EXISTS `biz_ctx`;
 CREATE TABLE `biz_ctx` (
   `biz_ctx_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
   `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID). Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
-  `name` varchar(100) DEFAULT '' COMMENT 'Short, descriptive name of the business context.',
+  `name` varchar(100) DEFAULT NULL COMMENT 'Short, descriptive name of the business context.',
   `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the user who creates the entity. ',
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table  referring to the last user who has updated the business context.',
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the business context record was first created. ',
@@ -802,13 +834,13 @@ CREATE TABLE `code_list` (
   `code_list_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Internal, primary database key.',
   `guid` varchar(41) NOT NULL COMMENT 'GUID of the code list. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
   `enum_type_guid` varchar(41) DEFAULT NULL COMMENT 'In the OAGIS Model XML schema, a type, which keeps all the enumerated values, is  defined separately from the type that represents a code list. This only applies to some code lists. When that is the case, this column stores the GUID of that enumeration type.',
-  `name` varchar(100) DEFAULT '' COMMENT 'Name of the code list.',
-  `list_id` varchar(100) NOT NULL DEFAULT '' COMMENT 'External identifier.',
+  `name` varchar(100) DEFAULT NULL COMMENT 'Name of the code list.',
+  `list_id` varchar(100) NOT NULL COMMENT 'External identifier.',
   `agency_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the AGENCY_ID_LIST_VALUE table. It indicates the organization which maintains the code list.',
-  `version_id` varchar(10) NOT NULL DEFAULT '' COMMENT 'Code list version number.',
+  `version_id` varchar(10) NOT NULL COMMENT 'Code list version number.',
   `definition` text COMMENT 'Description of the code list.',
   `remark` varchar(225) DEFAULT NULL COMMENT 'Usage information about the code list.',
-  `definition_source` varchar(100) DEFAULT '' COMMENT 'This is typically a URL which indicates the source of the code list''s DEFINITION.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL which indicates the source of the code list''s DEFINITION.',
   `based_code_list_id` bigint(20) unsigned DEFAULT NULL COMMENT 'This is a foreign key to the CODE_LIST table itself. This identifies the code list on which this code list is based, if any. The derivation may be restriction and/or extension.',
   `extensible_indicator` tinyint(1) NOT NULL COMMENT 'This is a flag to indicate whether the code list is final and shall not be further derived.',
   `module_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the module table indicating the physical file the code list belongs to when generating a physical model schema. ',
@@ -816,7 +848,7 @@ CREATE TABLE `code_list` (
   `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It identifies the user who last updated the code list.',
   `creation_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the code list was created.',
   `last_update_timestamp` datetime(6) NOT NULL COMMENT 'Timestamp when the code list was last updated.',
-  `state` varchar(10) DEFAULT '' COMMENT 'Life cycle state of the code list. Possible values are Editing, Published, or Deleted. Only a code list in published state is available for derivation and for used by the CC and BIE. Once the code list is published, it cannot go back to Editing. A new version would have to be created.',
+  `state` varchar(10) DEFAULT NULL COMMENT 'Life cycle state of the code list. Possible values are Editing, Published, or Deleted. Only a code list in published state is available for derivation and for used by the CC and BIE. Once the code list is published, it cannot go back to Editing. A new version would have to be created.',
   PRIMARY KEY (`code_list_id`),
   UNIQUE KEY `code_list_uk1` (`guid`),
   UNIQUE KEY `code_list_uk2` (`enum_type_guid`),
@@ -843,9 +875,9 @@ CREATE TABLE `code_list_value` (
   `code_list_value_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Internal, primary database key.',
   `code_list_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the CODE_LIST table. It indicates the code list this code value belonging to.',
   `value` tinytext NOT NULL COMMENT 'The code list value used in the instance data, e.g., EA, US-EN.',
-  `name` varchar(100) DEFAULT '' COMMENT 'Pretty print name of the code list value, e.g., ''Each'' for EA, ''English'' for EN.',
+  `name` varchar(100) DEFAULT NULL COMMENT 'Pretty print name of the code list value, e.g., ''Each'' for EA, ''English'' for EN.',
   `definition` text COMMENT 'Long description or explannation of the code list value, e.g., ''EA is a discrete quantity for counting each unit of an item, such as, 2 shampoo bottles, 3 box of cereals''.',
-  `definition_source` varchar(100) DEFAULT '' COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
+  `definition_source` varchar(100) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `used_indicator` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'This indicates whether the code value is allowed to be used or not in that code list context. In other words, this flag allows a user to enable or disable a code list value.',
   `locked_indicator` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This indicates whether the USED_INDICATOR can be changed from False to True. In other words, if the code value is derived from its base code list and the USED_INDICATOR of the code value in the base is False, then the USED_iNDICATOR cannot be changed from False to True for this code value; and this is indicated using this LOCKED_INDICATOR flag in the derived code list.',
   `extension_Indicator` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This indicates whether this code value has just been added in this code list. It is used particularly in the derived code list. If the code value has only been added to the derived code list, then it can be deleted; otherwise, it cannot be deleted.',
@@ -933,11 +965,12 @@ CREATE TABLE `dt` (
   `version_num` varchar(45) NOT NULL COMMENT 'Format X.Y.Z where all of them are integer with no leading zero allowed. X means major version number, Y means minor version number and Z means patch version number. This column is different from the REVISION_NUM column in that the new version is only assigned to the release component while the REVISION_NUM is assigned every time editing life cycle.',
   `previous_version_dt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foregin key to the DT table itself. It identifies the previous version.',
   `data_type_term` varchar(45) DEFAULT NULL COMMENT 'This is the data type term assigned to the DT. The allowed set of data type terms are defined in the DTC specification. This column is derived from the Based_DT_ID when the column is not blank. ',
-  `qualifier` varchar(100) DEFAULT '' COMMENT 'This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is ''Code_1E7368. Type''). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these "unqualified BDTs". ',
+  `qualifier` varchar(100) DEFAULT NULL COMMENT 'This column shall be blank when the DT_TYPE is CDT. When the DT_TYPE is BDT, this is optional. If the column is not blank it is a qualified BDT. If blank then the row may be a default BDT or an unqualified BDT. Default BDT is OAGIS concrete implementation of the CDT, these are the DT with numbers in the name, e.g., CodeType_1E7368 (DEN is ''Code_1E7368. Type''). Default BDTs are almost like permutation of the CDT options into concrete data types. Unqualified BDT is a BDT that OAGIS model schema generally used for its canonical. A handful of default BDTs were selected; and each of them is wrapped with another type definition that has a simpler name such as CodeType and NormalizedString type - we call these "unqualified BDTs". ',
   `based_dt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key pointing to the DT table itself. This column must be blank when the DT_TYPE is CDT. This column must not be blank when the DT_TYPE is BDT.',
-  `den` varchar(200) NOT NULL DEFAULT '' COMMENT 'Dictionary Entry Name of the data type. ',
-  `content_component_den` varchar(200) DEFAULT '' COMMENT 'When the DT_TYPE is CDT this column is automatically derived from DATA_TYPE_TERM as "<DATA_TYPE_TYPE>. Content", where ''Content'' is called property term of the content component according to CCTS. When the DT_TYPE is BDT this column has the same value as its BASED_DT_ID.',
+  `den` varchar(200) NOT NULL COMMENT 'Dictionary Entry Name of the data type. ',
+  `content_component_den` varchar(200) DEFAULT NULL COMMENT 'When the DT_TYPE is CDT this column is automatically derived from DATA_TYPE_TERM as "<DATA_TYPE_TYPE>. Content", where ''Content'' is called property term of the content component according to CCTS. When the DT_TYPE is BDT this column has the same value as its BASED_DT_ID.',
   `definition` text COMMENT 'Description of the data type.',
+  `definition_source` varchar(200) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `content_component_definition` text COMMENT 'Description of the content component of the data type.',
   `revision_doc` text COMMENT 'This is for documenting about the revision, e.g., how the newer version of the DT is different from the previous version.',
   `state` int(11) DEFAULT NULL COMMENT '1 = EDITING, 2 = CANDIDATE, 3 = PUBLISHED. This the revision life cycle state of the entity.\\n\\nState change can''t be undone. But the history record can still keep the records of when the state was changed.',
@@ -986,6 +1019,7 @@ CREATE TABLE `dt_sc` (
   `property_term` varchar(60) DEFAULT NULL COMMENT 'Property term of the SC.',
   `representation_term` varchar(20) DEFAULT NULL COMMENT 'Representation of the supplementary component.',
   `definition` text COMMENT 'Description of the supplementary component.',
+  `definition_source` varchar(200) DEFAULT NULL COMMENT 'This is typically a URL identifying the source of the DEFINITION column.',
   `owner_dt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreigned key to the DT table indicating the data type, to which this supplementary component belongs.',
   `cardinality_min` int(11) NOT NULL DEFAULT '0' COMMENT 'The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.',
   `cardinality_max` int(11) DEFAULT NULL COMMENT 'The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.',
@@ -1000,6 +1034,27 @@ CREATE TABLE `dt_sc` (
 
 
 
+# Dump of table dt_usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dt_usage_rule`;
+
+CREATE TABLE `dt_usage_rule` (
+  `dt_usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the table.',
+  `assigned_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the USAGE_RULE table indicating the usage rule assigned to the DT content component or DT_SC.',
+  `target_dt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreing key to the DT_ID for assigning a usage rule to the corresponding DT content component.',
+  `target_dt_sc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreing key to the DT_SC_ID for assigning a usage rule to the corresponding DT_SC.',
+  PRIMARY KEY (`dt_usage_rule_id`),
+  KEY `dt_usage_rule_assigned_usage_rule_id_fk` (`assigned_usage_rule_id`),
+  KEY `dt_usage_rule_target_dt_id_fk` (`target_dt_id`),
+  KEY `dt_usage_rule_target_dt_sc_id_fk` (`target_dt_sc_id`),
+  CONSTRAINT `dt_usage_rule_assigned_usage_rule_id_fk` FOREIGN KEY (`assigned_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`),
+  CONSTRAINT `dt_usage_rule_target_dt_id_fk` FOREIGN KEY (`target_dt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_usage_rule_target_dt_sc_id_fk` FOREIGN KEY (`target_dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This is an intersection table. Per CCTS, a usage rule may be reused. This table allows m-m relationships between the usage rule and the DT content component and usage rules and DT supplementary component. In a particular record, either a TARGET_DT_ID or TARGET_DT_SC_ID must be present but not both.';
+
+
+
 # Dump of table module
 # ------------------------------------------------------------
 
@@ -1007,14 +1062,25 @@ DROP TABLE IF EXISTS `module`;
 
 CREATE TABLE `module` (
   `module_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
-  `module` varchar(100) NOT NULL DEFAULT '' COMMENT 'The is the subdirectory and filename. The format is Windows file path. The starting directory typically is the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename'' without the extension. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filenam''. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, ''.xsd'' maybe added; or for JSON, ''.json'' maybe added as the file extension.',
+  `module` varchar(100) NOT NULL COMMENT 'The is the subdirectory and filename. The format is Windows file path. The starting directory typically is the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename'' without the extension. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filenam''. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, ''.xsd'' maybe added; or for JSON, ''.json'' maybe added as the file extension.',
   `release_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table. It identifies the release, for which this module is associated.',
   `namespace_id` bigint(20) unsigned NOT NULL COMMENT 'Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release''s namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.',
   `version_num` varchar(45) DEFAULT NULL COMMENT 'This is the version number to be assigned to the schema module.',
+  `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table. It indicates the user who created this MODULE.',
+  `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table referring to the last user who updated the record. \n\nIn the history record, this should always be the user who is editing the entity (perhaps except when the ownership has just been changed).',
+  `owner_user_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying the user who can update or delete the record.',
+  `creation_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was first created.',
+  `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was last updated.',
   PRIMARY KEY (`module_id`),
   KEY `module_release_id_fk` (`release_id`),
   KEY `module_namespace_id_fk` (`namespace_id`),
+  KEY `module_owner_user_id_fk` (`owner_user_id`),
+  KEY `module_created_by_fk` (`created_by`),
+  KEY `module_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `module_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `module_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
+  CONSTRAINT `module_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `module_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The module table stores information about a physical file, into which CC components will be generated during the expression generation.';
 
@@ -1046,7 +1112,7 @@ DROP TABLE IF EXISTS `namespace`;
 
 CREATE TABLE `namespace` (
   `namespace_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
-  `uri` varchar(100) NOT NULL DEFAULT '' COMMENT 'This is the URI of the namespace.',
+  `uri` varchar(100) NOT NULL COMMENT 'This is the URI of the namespace.',
   `prefix` varchar(45) DEFAULT NULL COMMENT 'This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.',
   `description` text COMMENT 'Description or explanation about the namespace or use of the namespace.',
   `is_std_nmsp` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.',
@@ -1073,11 +1139,20 @@ DROP TABLE IF EXISTS `release`;
 
 CREATE TABLE `release` (
   `release_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.',
-  `release_num` varchar(45) DEFAULT '' COMMENT 'Release number such has 10.0, 10.1, etc. ',
+  `release_num` varchar(45) DEFAULT NULL COMMENT 'Release number such has 10.0, 10.1, etc. ',
   `release_note` longtext COMMENT 'Description or note associated with the release.',
   `namespace_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.',
+  `created_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying user who created the namespace.',
+  `last_updated_by` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the APP_USER table identifying the user who last updated the record.',
+  `creation_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was first created.',
+  `last_update_timestamp` datetime(6) NOT NULL COMMENT 'The timestamp when the record was last updated.',
+  `state` int(11) DEFAULT NULL COMMENT '1 = DRAFT, 2 = FINAL. This the revision life cycle state of the Release.',
   PRIMARY KEY (`release_id`),
   KEY `release_namespace_id_fk` (`namespace_id`),
+  KEY `release_created_by_fk` (`created_by`),
+  KEY `release_last_updated_by_fk` (`last_updated_by`),
+  CONSTRAINT `release_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `release_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `release_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The is table store the release information.';
 
@@ -1092,13 +1167,47 @@ CREATE TABLE `top_level_abie` (
   `top_level_abie_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ACC.',
   `abie_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the ABIE table pointing to a record which is a top-level ABIE.',
   `owner_user_id` bigint(20) unsigned NOT NULL,
+  `release_id` bigint(20) unsigned NOT NULL COMMENT 'Foreign key to the RELEASE table. It identifies the release, for which this module is associated.',
   `state` int(11) DEFAULT NULL,
   PRIMARY KEY (`top_level_abie_id`),
   KEY `top_level_abie_abie_id_fk` (`abie_id`),
   KEY `top_level_abie_owner_user_id_fk` (`owner_user_id`),
+  KEY `top_level_abie_release_id_fk` (`release_id`),
   CONSTRAINT `top_level_abie_abie_id_fk` FOREIGN KEY (`abie_id`) REFERENCES `abie` (`abie_id`),
-  CONSTRAINT `top_level_abie_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`)
+  CONSTRAINT `top_level_abie_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `top_level_abie_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table indexes the ABIE which is a top-level ABIE. This table and the owner_top_level_abie_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions.';
+
+
+
+# Dump of table usage_rule
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `usage_rule`;
+
+CREATE TABLE `usage_rule` (
+  `usage_rule_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the usage rule.',
+  `name` text COMMENT 'Short nmenomic name of the usage rule.',
+  `condition_type` int(11) NOT NULL COMMENT 'Condition type according to the CC specification. It is a value list column. 0 = pre-condition, 1 = post-condition, 2 = invariant.',
+  PRIMARY KEY (`usage_rule_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table captures a usage rule information. A usage rule may be expressed in multiple expressions. Each expression is captured in the USAGE_RULE_EXPRESSION table. To capture a description of a usage rule, create a usage rule expression with the unstructured constraint type.';
+
+
+
+# Dump of table usage_rule_expression
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `usage_rule_expression`;
+
+CREATE TABLE `usage_rule_expression` (
+  `usage_rule_expression_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key of the usage rule expression',
+  `constraint_type` int(11) NOT NULL COMMENT 'Constraint type according to the CC spec. It represents the expression language (syntax) used in the CONSTRAINT column. It is a value list column. 0 = ''Unstructured'' which is basically a description of the rule, 1 = ''Schematron''.',
+  `constraint_text` text NOT NULL COMMENT 'This column capture the constraint expressing the usage rule. In other words, this is the expression.',
+  `represented_usage_rule_id` bigint(20) unsigned NOT NULL COMMENT 'The usage rule which the expression represents',
+  PRIMARY KEY (`usage_rule_expression_id`),
+  KEY `usage_rule_expression_represented_usage_rule_id_fk` (`represented_usage_rule_id`),
+  CONSTRAINT `usage_rule_expression_represented_usage_rule_id_fk` FOREIGN KEY (`represented_usage_rule_id`) REFERENCES `usage_rule` (`usage_rule_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The USAGE_RULE_EXPRESSION provides a representation of a usage rule in a particular syntax indicated by the CONSTRAINT_TYPE column. One of the syntaxes can be unstructured, which works a description of the usage rule.';
 
 
 
@@ -1111,9 +1220,37 @@ CREATE TABLE `xbt` (
   `xbt_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary, internal database key.',
   `name` varchar(45) DEFAULT NULL COMMENT 'Human understandable name of the built-in type.',
   `builtIn_type` varchar(45) DEFAULT NULL COMMENT 'Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be ''xsd'' and a default prefix for the OAGIS built-int type.',
+  `jbt_draft05_map` varchar(500) DEFAULT NULL,
   `subtype_of_xbt_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.',
+  `schema_definition` text,
+  `module_id` bigint(20) unsigned DEFAULT NULL,
+  `release_id` bigint(20) unsigned DEFAULT NULL,
+  `revision_doc` text,
+  `state` int(11) DEFAULT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
+  `owner_user_id` bigint(20) unsigned NOT NULL,
+  `last_updated_by` bigint(20) unsigned NOT NULL,
+  `creation_timestamp` datetime(6) NOT NULL,
+  `last_update_timestamp` datetime(6) NOT NULL,
+  `revision_num` int(11) NOT NULL DEFAULT '0',
+  `revision_tracking_num` int(11) NOT NULL DEFAULT '0',
+  `revision_action` tinyint(4) DEFAULT '1',
+  `current_xbt_id` bigint(20) unsigned DEFAULT NULL,
+  `is_deprecated` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`xbt_id`),
   KEY `xbt_subtype_of_xbt_id_fk` (`subtype_of_xbt_id`),
+  KEY `xbt_module_id_fk` (`module_id`),
+  KEY `xbt_release_id_fk` (`release_id`),
+  KEY `xbt_created_by_fk` (`created_by`),
+  KEY `xbt_last_updated_by_fk` (`last_updated_by`),
+  KEY `xbt_owner_user_id_fk` (`owner_user_id`),
+  KEY `xbt_current_xbt_id_fk` (`current_xbt_id`),
+  CONSTRAINT `xbt_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `xbt_current_xbt_id_fk` FOREIGN KEY (`current_xbt_id`) REFERENCES `xbt` (`xbt_id`),
+  CONSTRAINT `xbt_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `xbt_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `xbt_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `xbt_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
   CONSTRAINT `xbt_subtype_of_xbt_id_fk` FOREIGN KEY (`subtype_of_xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.';
 

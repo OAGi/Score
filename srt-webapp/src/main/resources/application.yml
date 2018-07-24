@@ -11,7 +11,6 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-      hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
       hibernate.id.new_generator_mappings: true
       hibernate.jdbc.fetch_size: 100
       hibernate.jdbc.batch_size: 25
@@ -38,18 +37,60 @@ jsf:
     public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu
     private-captcha-key: 6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR
 
-# Development environment
+
+# Development Oracle environment
 ---
 spring:
-  profiles: development
+  profiles: development-oracle
 
 # DataSource
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@docker:1521/xe
+    platform: oracle
     username: oagi
     password: oagi
-    platform: oracle
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
+
+logging:
+  level:
+    org.oagi.srt: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+jsf:
+  project-stage: Development
+  facelets-refresh-period: 0
+
+server:
+  session:
+    timeout: 6000000
+    cookie:
+      max-age: 6000000
+
+
+# Development MySQL environment
+---
+spring:
+  profiles: development-mysql
+
+# DataSource
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:33306/oagi?useSSL=false
+    username: oagi
+    password: oagi
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        globally_quoted_identifiers: true
 
 logging:
   level:
@@ -92,16 +133,34 @@ server:
 # Production environment
 ---
 spring:
-  profiles: production
+  profiles: production-oracle
 
 # DataSource
   datasource:
     jndi-name: ${datasource.jndi-name}
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: ${datasource.url}
-    username: ${datasource.username}
-    password: ${datasource.password}
     platform: oracle
+
+  jpa:
+    properties:
+      hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
+
+jsf:
+  project-stage: Production
+
+---
+spring:
+  profiles: production-mysql
+
+# DataSource
+  datasource:
+    jndi-name: ${datasource.jndi-name}
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+        globally_quoted_identifiers: true
 
 jsf:
   project-stage: Production

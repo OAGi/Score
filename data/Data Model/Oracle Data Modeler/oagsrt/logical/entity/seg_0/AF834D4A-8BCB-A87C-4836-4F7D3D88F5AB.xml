@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="AF834D4A-8BCB-A87C-4836-4F7D3D88F5AB" name="NAMESPACE">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>FE13509E-243F-D57D-F7C6-A80B37473762</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -17,7 +17,7 @@
 <normalForm>Third</normalForm>
 <attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
 <Attribute name="NAMESPACE ID" id="F9C80DC8-9772-7533-CC84-E5E091893399">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>D15FD659-BBEC-F525-3E84-220244871286</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -31,7 +31,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="URI" id="A98E5625-5314-F3DD-CD0C-56561D640426">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>2AC7D405-885B-F648-AE9D-AF782C935293</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -45,7 +45,7 @@
 <ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="PREFIX" id="8371484E-3F92-2820-369D-F4F26A0FBB86">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>F57B4B1D-993D-6608-F73E-152B1ADF8BA3</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -60,7 +60,7 @@
 <ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="DESCRIPTION" id="321D08DB-B5B9-3F1F-F0BC-CFD8CD1DAB38">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>A4F25B22-14BE-B0E1-A1DB-84DB994D813D</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -74,7 +74,7 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="IS STD NMSP" id="6FEFF13E-BAAA-23A0-8A4A-EE713E767E41">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>C3723D51-9208-8EFA-4083-C2510118108D</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -88,7 +88,7 @@
 <ownDataTypeParameters>1,,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="OWNER USER ID" id="95498D70-511F-A493-FB93-7D237558B8A2">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>160ABD20-EB3D-734D-8A8A-3EA8E34E3EAB</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -103,7 +103,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="CREATED BY" id="4435B7EB-03C5-8FAD-5E66-C30CFAF40804">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>53E2D58D-9B8C-3EB2-9E86-BB8682ADCAB2</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -118,7 +118,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="LAST UPDATED BY" id="45B0A622-A7BA-8E74-E0CF-04045C64D41E">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>AB645F4A-7F2F-60D6-E83A-9FA203E4C8FA</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -133,7 +133,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="CREATION TIMESTAMP" id="E1D65B02-F1E0-E0E1-6534-53C83D7184C9">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>11706480-9EFC-9726-6D3D-BB44C521706D</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -147,7 +147,7 @@
 <ownDataTypeParameters>,6,</ownDataTypeParameters>
 </Attribute>
 <Attribute name="LAST UPDATE TIMESTAMP" id="4948DC46-0AEF-16B3-6652-DBA00FE7A344">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>4678750B-A43E-060B-E040-09B33C0FCA66</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -163,7 +163,7 @@
 </attributes>
 <identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
 <identifier id="C57D87DA-9162-C3BE-6761-F32CD12E6C4A" name="NAMESPACE PK">
-<createdBy>hno2</createdBy>
+<createdBy>hakju</createdBy>
 <createdTime>2016-08-08 18:20:14 UTC</createdTime>
 <generatorID>F7349D8B-48F4-2E4E-1731-D676A0D94BF0</generatorID>
 <ownerDesignName>oagsrt</ownerDesignName>

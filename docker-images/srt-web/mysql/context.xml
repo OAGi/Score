@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource
+        name="jdbc/oagiDB" type="javax.sql.DataSource"
+        url="jdbc:mysql://srt-repo:3306/oagi?useSSL=false"
+        driverClassName="com.mysql.jdbc.Driver"
+        username="oagi" password="oagi"
+    />
+</Context>

@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEnti
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -152,10 +153,13 @@ public class AggregateBusinessInformationEntity
     }
 
     public String getDefinition() {
-        return definition;
+        return StringUtils.isEmpty(definition) ? null : definition;
     }
 
     public void setDefinition(String definition) {
+        if (StringUtils.isEmpty(definition)) {
+            return;
+        }
         this.definition = definition;
     }
 
@@ -208,34 +212,46 @@ public class AggregateBusinessInformationEntity
     }
 
     public String getVersion() {
-        return version;
+        return StringUtils.isEmpty(version) ? null : version;
     }
 
     public void setVersion(String version) {
+        if (StringUtils.isEmpty(version)) {
+            return;
+        }
         this.version = version;
     }
 
     public String getStatus() {
-        return status;
+        return StringUtils.isEmpty(status) ? null : status;
     }
 
     public void setStatus(String status) {
+        if (StringUtils.isEmpty(status)) {
+            return;
+        }
         this.status = status;
     }
 
     public String getRemark() {
-        return remark;
+        return StringUtils.isEmpty(remark) ? null : remark;
     }
 
     public void setRemark(String remark) {
+        if (StringUtils.isEmpty(remark)) {
+            return;
+        }
         this.remark = remark;
     }
 
     public String getBizTerm() {
-        return bizTerm;
+        return StringUtils.isEmpty(bizTerm) ? null : bizTerm;
     }
 
     public void setBizTerm(String bizTerm) {
+        if (StringUtils.isEmpty(bizTerm)) {
+            return;
+        }
         this.bizTerm = bizTerm;
     }
 

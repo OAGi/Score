@@ -18,8 +18,8 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1")
     public List<AggregateCoreComponent> findAllWithRevisionNum(int revisionNum);
 
-    @Query("select a from AggregateCoreComponent a where a.guid = ?1")
-    public AggregateCoreComponent findOneByGuid(String guid);
+    @Query("select a from AggregateCoreComponent a where a.guid = ?1 and a.releaseId is null")
+    public AggregateCoreComponent findOneByGuidAndReleaseIdIsNull(String guid);
 
     @Query("select case when count(a) > 0 then true else false end from AggregateCoreComponent a where a.guid = ?1")
     public boolean existsByGuid(String guid);
