@@ -235,9 +235,10 @@ public class ContextSchemeDetailBean extends UIHandler {
         }
         contextScheme.setLastUpdatedBy(getCurrentUser().getAppUserId());
         contextScheme.setContextCategory(contextCategory);
-        contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
 
+        contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
         contextSchemeService.update(contextScheme, contextSchemeValues);
+
         contextSchemeService.delete(
                 deletedContextSchemeValues.stream()
                         .filter(e -> e.getCtxSchemeValueId() > 0L)
@@ -415,15 +416,40 @@ public class ContextSchemeDetailBean extends UIHandler {
         contextScheme.setSchemeAgencyId(GetAgencyIdFromCodeListName(event.getObject().toString()));
     }
 
-    public void onSelectCodeList2 (SelectEvent event){
+    public void onSelectCodeList2 (SelectEvent event) {
+        setSelectedCodeListName(event.getObject().toString());
         contextSchemeValues.clear();
-        contextSchemeValues.addAll(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())));
+        contextSchemeValues.addAll(contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()));
+        List<Boolean> a = new ArrayList();
+        if (contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).isEmpty()) {
+            contextSchemeValues.addAll(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())));
+        } else {
+            for (int i = 0; i<ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).size(); i=i+1) {
+                for (int j = 0; j<contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).size(); j=j+1) {
+                    try {
+                        if (!ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getValue().equals(
+                                contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getValue()) ||
+                                !ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getMeaning().equals(
+                                        contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getMeaning())) {
+                            a.add(true);
+                        } else {
+                            a.add(false);
+                        }
+                    }catch(IndexOutOfBoundsException e){
+                        System.out.println("Invalid : " + e);
+                    }
+                }
+                if (!a.contains(false)) {
+                    contextSchemeValues.add(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i));
+                }
+                a.clear();
+            }
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public String delete() {
         contextSchemeService.delete(contextScheme);
-
         return "/views/context_scheme/list.jsf?faces-redirect=true";
     }
 }
