@@ -378,6 +378,17 @@ public class ContextSchemeDetailBean extends UIHandler {
         return null;
     }
 
+    private String GetCodeListIdFromCodeListName (String selectedCodeListName){
+        codeListMap = codeListService.findAll(Sort.Direction.DESC, "name").stream()
+                .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
+        for (CodeList codeList : codeListMap.values()) {
+            if (codeList.getName().equals(selectedCodeListName)) {
+                return Long.toString(codeList.getCodeListId());
+            }
+        }
+        return null;
+    }
+
     private List<CodeListValue> GetCodeListValuesFromCodeListName (String selectedCodeListName){
         List<CodeList> codeLists;
         value.clear();
@@ -418,6 +429,7 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     public void onSelectCodeList2 (SelectEvent event) {
         setSelectedCodeListName(event.getObject().toString());
+        contextScheme.setCodeListId(GetCodeListIdFromCodeListName(event.getObject().toString()));
         contextSchemeValues.clear();
         contextSchemeValues.addAll(contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()));
         List<Boolean> a = new ArrayList();

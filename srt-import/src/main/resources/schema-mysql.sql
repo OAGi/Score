@@ -915,6 +915,7 @@ CREATE TABLE `ctx_scheme` (
   `scheme_id` varchar(45) NOT NULL COMMENT 'External identification of the scheme. ',
   `scheme_name` varchar(255) DEFAULT NULL COMMENT 'Pretty print name of the context scheme.',
   `description` text COMMENT 'Description of the context scheme.',
+  `code_list_id` varchar(45) DEFAULT NULL,
   `scheme_agency_id` varchar(45) NOT NULL COMMENT 'Identification of the agency maintaining the scheme. This column currently does not use the AGENCY_ID_LIST table. It is just a free form text at this point.',
   `scheme_version_id` varchar(45) NOT NULL COMMENT 'Version number of the context scheme.',
   `ctx_category_id` bigint(20) unsigned NOT NULL COMMENT 'This the foreign key to the CTX_CATEGORY table. It identifies the context category associated with this context scheme.',
@@ -930,7 +931,8 @@ CREATE TABLE `ctx_scheme` (
   CONSTRAINT `ctx_scheme_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `ctx_scheme_ctx_category_id_fk` FOREIGN KEY (`ctx_category_id`) REFERENCES `ctx_category` (`ctx_category_id`),
   CONSTRAINT `ctx_scheme_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table represents a context scheme (a classification scheme) for a context category.';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='This table represents a context scheme (a classification scheme) for a context category.';
+
 
 
 

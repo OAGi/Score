@@ -39,6 +39,9 @@ public class ContextScheme implements TimestampAware, Serializable {
     private String description;
 
     @Column(nullable = false, length = 45)
+    private String codeListId;
+
+    @Column(nullable = false, length = 45)
     private String schemeAgencyId;
 
     @Column(nullable = false, length = 45)
@@ -112,6 +115,10 @@ public class ContextScheme implements TimestampAware, Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getCodeListId() {return codeListId;}
+
+    public void setCodeListId(String codeListId) {this.codeListId = codeListId;}
 
     public String getSchemeAgencyId() {
         return schemeAgencyId;
@@ -192,6 +199,7 @@ public class ContextScheme implements TimestampAware, Serializable {
         result = 31 * result + (schemeId != null ? schemeId.hashCode() : 0);
         result = 31 * result + (schemeName != null ? schemeName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
         result = 31 * result + (schemeAgencyId != null ? schemeAgencyId.hashCode() : 0);
         result = 31 * result + (schemeVersionId != null ? schemeVersionId.hashCode() : 0);
         result = 31 * result + (contextCategory != null ? contextCategory.hashCode() : 0);
@@ -210,6 +218,7 @@ public class ContextScheme implements TimestampAware, Serializable {
                 ", schemeId='" + schemeId + '\'' +
                 ", schemeName='" + schemeName + '\'' +
                 ", description='" + description + '\'' +
+                ", codeListId='" + codeListId + '\'' +
                 ", schemeAgencyId='" + schemeAgencyId + '\'' +
                 ", schemeVersionId='" + schemeVersionId + '\'' +
                 ", contextCategory=" + contextCategory +

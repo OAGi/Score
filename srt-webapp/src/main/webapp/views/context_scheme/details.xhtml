@@ -47,6 +47,7 @@
                 <h:outputText value="Code List" styleClass="section-label"/>
                 <p:autoComplete id="inputCodeList"
                                 requiredMessage="Please fill out 'Code List' field."
+                                value="#{contextSchemeDetailBean.contextScheme.codeListId}"
                                 styleClass="section-content input-section"
                                 completeMethod="#{codeListBean.completeInput}"
                                 dropdown="true" scrollHeight="220"
