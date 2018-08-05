@@ -38,8 +38,9 @@ public class ContextScheme implements TimestampAware, Serializable {
     @Column(length = 10 * 1024)
     private String description;
 
-    @Column(nullable = false, length = 45)
-    private String codeListId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code_list_id")
+    private CodeList codeList;
 
     @Column(nullable = false, length = 45)
     private String schemeAgencyId;
@@ -116,9 +117,13 @@ public class ContextScheme implements TimestampAware, Serializable {
         this.description = description;
     }
 
-    public String getCodeListId() {return codeListId;}
+    public CodeList getCodeList() {
+        return codeList;
+    }
 
-    public void setCodeListId(String codeListId) {this.codeListId = codeListId;}
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
+    }
 
     public String getSchemeAgencyId() {
         return schemeAgencyId;
@@ -199,7 +204,7 @@ public class ContextScheme implements TimestampAware, Serializable {
         result = 31 * result + (schemeId != null ? schemeId.hashCode() : 0);
         result = 31 * result + (schemeName != null ? schemeName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
         result = 31 * result + (schemeAgencyId != null ? schemeAgencyId.hashCode() : 0);
         result = 31 * result + (schemeVersionId != null ? schemeVersionId.hashCode() : 0);
         result = 31 * result + (contextCategory != null ? contextCategory.hashCode() : 0);
@@ -218,7 +223,7 @@ public class ContextScheme implements TimestampAware, Serializable {
                 ", schemeId='" + schemeId + '\'' +
                 ", schemeName='" + schemeName + '\'' +
                 ", description='" + description + '\'' +
-                ", codeListId='" + codeListId + '\'' +
+                ", codeList='" + codeList + '\'' +
                 ", schemeAgencyId='" + schemeAgencyId + '\'' +
                 ", schemeVersionId='" + schemeVersionId + '\'' +
                 ", contextCategory=" + contextCategory +

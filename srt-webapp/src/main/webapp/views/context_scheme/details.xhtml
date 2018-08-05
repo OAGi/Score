@@ -47,12 +47,13 @@
                 <h:outputText value="Code List" styleClass="section-label"/>
                 <p:autoComplete id="inputCodeList"
                                 requiredMessage="Please fill out 'Code List' field."
-                                value="#{contextSchemeDetailBean.contextScheme.codeListId}"
+                                value="#{contextSchemeDetailBean.contextScheme.codeList}"
                                 styleClass="section-content input-section"
                                 completeMethod="#{codeListBean.completeInput}"
-                                dropdown="true" scrollHeight="220"
-                                itemLabel="Select a code List"
-                                itemValue="#{codeListBaseBean.codeList.listId}">
+                                dropdown="true" scrollHeight="220" var="codeList"
+                                itemLabel="#{codeList.name}" itemValue="#{codeList}">
+                    <f:converter binding="#{codeListConverter}"/>
+
                     <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList1}" update="agencyId"/>
                     <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList}" update="version" />
                     <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectCodeList2}" update="tbl" />

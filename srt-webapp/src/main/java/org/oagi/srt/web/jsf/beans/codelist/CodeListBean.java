@@ -65,23 +65,19 @@ public class CodeListBean extends UIHandler {
         this.codeListName = codeListName;
     }
 
-    public List<String> completeInput(String query) {
+    public List<CodeList> completeInput(String query) {
         String q = (query != null) ? query.trim() : null;
 
         if (StringUtils.isEmpty(q)) {
-            return allCodeLists().stream()
-                    .map(e -> e.getName())
-                    .collect(Collectors.toList());
+            return allCodeLists();
         } else {
             String[] split = q.split(" ");
 
             return allCodeLists().stream()
-                    .map(e -> e.getName())
-                    .distinct()
                     .filter(e -> {
-                        e = e.toLowerCase();
+                        String lowerCaseName = e.getName().toLowerCase();
                         for (String s : split) {
-                            if (!e.contains(s.toLowerCase())) {
+                            if (!lowerCaseName.contains(s.toLowerCase())) {
                                 return false;
                             }
                         }

@@ -8,7 +8,6 @@ import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
-import org.omnifaces.util.Components;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -354,7 +353,7 @@ public class ContextSchemeDetailBean extends UIHandler {
         setCodeList(codeListMap.get(selectedCodeListName));
     }
 
-    private String GetAgencyIdFromCodeListName(String selectedCodeListName) {
+    private String getAgencyIdFromCodeListName(String selectedCodeListName) {
         List<CodeList> codeLists;
         codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
         codeListMap = codeLists.stream()
@@ -367,8 +366,8 @@ public class ContextSchemeDetailBean extends UIHandler {
         return null;
     }
 
-    private String GetVersionFromCodeListName(String selectedCodeListName) {
-                codeListMap = codeListService.findAll(Sort.Direction.DESC, "name").stream()
+    private String getVersionFromCodeListName(String selectedCodeListName) {
+        codeListMap = codeListService.findAll(Sort.Direction.DESC, "name").stream()
                 .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         for (CodeList codeList : codeListMap.values()) {
             if (codeList.getName().equals(selectedCodeListName)) {
@@ -378,81 +377,86 @@ public class ContextSchemeDetailBean extends UIHandler {
         return null;
     }
 
-    private String GetCodeListIdFromCodeListName (String selectedCodeListName){
+    private Long getCodeListIdFromCodeListName(String selectedCodeListName) {
         codeListMap = codeListService.findAll(Sort.Direction.DESC, "name").stream()
                 .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         for (CodeList codeList : codeListMap.values()) {
             if (codeList.getName().equals(selectedCodeListName)) {
-                return Long.toString(codeList.getCodeListId());
+                return codeList.getCodeListId();
             }
         }
         return null;
     }
 
-    private List<CodeListValue> GetCodeListValuesFromCodeListName (String selectedCodeListName){
-        List<CodeList> codeLists;
+    private List<CodeListValue> getCodeListValuesFromCodeListName(String selectedCodeListName) {
         value.clear();
-        codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
+        List<CodeList> codeLists = codeListService.findAll(Sort.Direction.DESC, "name");
         codeListMap = codeLists.stream()
                 .collect(Collectors.toMap(e -> e.getCodeListId(), Function.identity()));
         for (CodeList codeList : codeListMap.values()) {
             if (codeList.getName().equals(selectedCodeListName)) {
                 for (CodeListValue codeListvalue : codeListService.findByCodeList(codeList)) {
-                        value.add(codeListvalue);
+                    value.add(codeListvalue);
                 }
             }
         }
         return value;
     }
 
-    private List<ContextSchemeValue> ConvertCodeListIntoContextSchemeValue (List<CodeListValue> A){
-       List<ContextSchemeValue> B = new ArrayList<>();
-       for (int i = 0; i < A.size(); i=i+1) {
-           ContextSchemeValue C= new ContextSchemeValue();
-           C.setContextScheme(contextScheme);
-             C.setMeaning(A.get(i).getName());
-             C.setValue(A.get(i).getValue());
-             B.add(C);
-         }
-        return B;
+    private List<ContextSchemeValue> convertCodeListIntoContextSchemeValue(List<CodeListValue> codeListValues) {
+        List<ContextSchemeValue> contextSchemeValues = new ArrayList<>();
+        for (CodeListValue codeListValue : codeListValues) {
+            ContextSchemeValue contextSchemeValue = new ContextSchemeValue();
+            contextSchemeValue.setContextScheme(contextScheme);
+            contextSchemeValue.setMeaning(codeListValue.getName());
+            contextSchemeValue.setValue(codeListValue.getValue());
+            contextSchemeValues.add(contextSchemeValue);
+        }
+        return contextSchemeValues;
     }
 
-    public void onSelectCodeList(SelectEvent event){
-        setSelectedCodeListName(event.getObject().toString());
-        contextScheme.setSchemeVersionId(GetVersionFromCodeListName(event.getObject().toString()));
+    public void onSelectCodeList(SelectEvent event) {
+        CodeList codeList = (CodeList) event.getObject();
+        setSelectedCodeListName(codeList.getName());
+        contextScheme.setSchemeVersionId(codeList.getVersionId());
     }
 
-    public void onSelectCodeList1(SelectEvent event){
-        setSelectedCodeListName(event.getObject().toString());
-        contextScheme.setSchemeAgencyId(GetAgencyIdFromCodeListName(event.getObject().toString()));
+    public void onSelectCodeList1(SelectEvent event) {
+        CodeList codeList = (CodeList) event.getObject();
+        setSelectedCodeListName(codeList.getName());
+        contextScheme.setSchemeAgencyId(Long.toString(codeList.getAgencyId()));
     }
 
-    public void onSelectCodeList2 (SelectEvent event) {
-        setSelectedCodeListName(event.getObject().toString());
-        contextScheme.setCodeListId(GetCodeListIdFromCodeListName(event.getObject().toString()));
+    public void onSelectCodeList2(SelectEvent event) {
+        CodeList codeList = (CodeList) event.getObject();
+        setSelectedCodeListName(codeList.getName());
+
+        String codeListName = codeList.getName();
+
+        contextScheme.setCodeList(codeList);
         contextSchemeValues.clear();
         contextSchemeValues.addAll(contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()));
         List<Boolean> a = new ArrayList();
         if (contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).isEmpty()) {
-            contextSchemeValues.addAll(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())));
+            contextSchemeValues.addAll(convertCodeListIntoContextSchemeValue(getCodeListValuesFromCodeListName(codeListName)));
         } else {
-            for (int i = 0; i<ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).size(); i=i+1) {
-                for (int j = 0; j<contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).size(); j=j+1) {
+            for (int i = 0; i < convertCodeListIntoContextSchemeValue(getCodeListValuesFromCodeListName(codeListName)).size(); i = i + 1) {
+                for (int j = 0; j < contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).size(); j = j + 1) {
                     try {
-                        if (!ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getValue().equals(
+                        if (!convertCodeListIntoContextSchemeValue(getCodeListValuesFromCodeListName(codeListName)).get(i).getValue().equals(
                                 contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getValue()) ||
-                                !ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i).getMeaning().equals(
+                                !convertCodeListIntoContextSchemeValue(getCodeListValuesFromCodeListName(codeListName)).get(i).getMeaning().equals(
                                         contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId()).get(j).getMeaning())) {
                             a.add(true);
                         } else {
                             a.add(false);
                         }
-                    }catch(IndexOutOfBoundsException e){
+                    } catch (IndexOutOfBoundsException e) {
                         System.out.println("Invalid : " + e);
                     }
                 }
                 if (!a.contains(false)) {
-                    contextSchemeValues.add(ConvertCodeListIntoContextSchemeValue(GetCodeListValuesFromCodeListName(event.getObject().toString())).get(i));
+                    contextSchemeValues.add(convertCodeListIntoContextSchemeValue(getCodeListValuesFromCodeListName(codeListName)).get(i));
                 }
                 a.clear();
             }
