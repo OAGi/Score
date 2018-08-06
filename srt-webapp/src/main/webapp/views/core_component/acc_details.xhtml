@@ -79,12 +79,12 @@
 
                             <p:contextMenu id="cMenu" for="treeTable" nodeType="ACC-Target"
                                            rendered="#{accDetailBean.targetAcc.state == 'Editing'}">
-                                <p:menuitem id="setACCItem" value="Set based ACC" style="width: 100%;"
+                                <p:menuitem id="setACCItem" value="Set base ACC" style="width: 100%;"
                                             actionListener="#{accDetailBean.onClickSetBasedACCButton}"
                                             action="#{accDetailBean.prepareSetBasedAcc}"
                                             onclick="PF('leftBlockUI').show()"
                                             update=":form"/>
-                                <p:menuitem id="discardACCItem" value="Discard based ACC" style="width: 100%;"
+                                <p:menuitem id="discardACCItem" value="Discard base ACC" style="width: 100%;"
                                             rendered="#{accDetailBean.targetAcc.basedAccId gt 0}"
                                             actionListener="#{accDetailBean.discardBasedAcc}"
                                             update=":form">
