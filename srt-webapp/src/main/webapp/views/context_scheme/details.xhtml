@@ -132,6 +132,7 @@
                     <p:column style="text-align: center; width: 65px;">
                         <p:commandButton icon="fa fa-white fa-times" styleClass="delete"
                                          action="#{contextSchemeDetailBean.deleteContextSchemeValue}"
+                                         disabled="#{contextSchemeValue.meaning != null}"
                                          update="tbl">
                             <f:setPropertyActionListener value="#{contextSchemeValue}"
                                                          target="#{contextSchemeDetailBean.selectedContextSchemeValue}"/>
