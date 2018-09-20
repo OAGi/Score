@@ -282,6 +282,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         ASBIEPNode topLevelNode = getTopLevelNode();
         TopLevelAbie topLevelAbie = getTopLevelAbie();
         try {
+
             checkZeroMaximumCardinalities(topLevelNode);
             nodeService.update(topLevelNode, getCurrentUser());
             Date timestamp = new Date();
