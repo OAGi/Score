@@ -30,7 +30,4 @@ public interface AssociationBusinessInformationEntityRepository
     @Query("delete from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 
-/*    @Modifying
-    @Query("update AssociationBusinessInformationEntity t set t.lastUpdateTimestamp = ?2 where t.id = ?1")
-    public void updateLastUpdateTimestamp(long abieId);*/
 }

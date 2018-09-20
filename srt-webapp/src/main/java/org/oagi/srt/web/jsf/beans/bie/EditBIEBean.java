@@ -283,17 +283,10 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
         TopLevelAbie topLevelAbie = getTopLevelAbie();
         try {
             checkZeroMaximumCardinalities(topLevelNode);
-
             nodeService.update(topLevelNode, getCurrentUser());
             Date timestamp = new Date();
             topLevelAbie.getAbie().setLastUpdateTimestamp(timestamp);
-            System.out.println("======================================================");
-            System.out.println("top level abie last update :" + topLevelAbie.getAbie().getLastUpdateTimestamp());
-            System.out.println("top level abie last update :" + topLevelAbie.getAbie().getAbieId());
-            System.out.println("======================================================");
-
             abieRepository.updateLastUpdateTimestamp(topLevelAbie.getAbie().getOwnerTopLevelAbieId(), timestamp);
-
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
         } catch (Throwable t) {
