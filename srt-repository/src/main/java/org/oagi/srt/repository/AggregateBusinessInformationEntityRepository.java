@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AggregateBusinessInformationEntityRepository
@@ -30,4 +31,8 @@ public interface AggregateBusinessInformationEntityRepository
     @Modifying
     @Query("update AggregateBusinessInformationEntity a set a.state = ?2 where a.ownerTopLevelAbieId = ?1")
     public void updateState(long ownerTopLevelAbieId, AggregateBusinessInformationEntityState state);
+
+    @Modifying
+    @Query("update AggregateBusinessInformationEntity a set a.lastUpdateTimestamp = ?2 where a.ownerTopLevelAbieId = ?1")
+    public void updateLastUpdateTimestamp(long ownerTopLevelAbieId, Date timestamp);
 }

@@ -28,10 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -63,6 +60,8 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     private AssociationCoreComponentPropertyRepository asccpRepository;
     @Autowired
     private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
     @Autowired
@@ -281,10 +280,20 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
     @Transactional(readOnly = false, rollbackFor = Throwable.class)
     public void update() {
         ASBIEPNode topLevelNode = getTopLevelNode();
+        TopLevelAbie topLevelAbie = getTopLevelAbie();
         try {
             checkZeroMaximumCardinalities(topLevelNode);
 
             nodeService.update(topLevelNode, getCurrentUser());
+            Date timestamp = new Date();
+            topLevelAbie.getAbie().setLastUpdateTimestamp(timestamp);
+            System.out.println("======================================================");
+            System.out.println("top level abie last update :" + topLevelAbie.getAbie().getLastUpdateTimestamp());
+            System.out.println("top level abie last update :" + topLevelAbie.getAbie().getAbieId());
+            System.out.println("======================================================");
+
+            abieRepository.updateLastUpdateTimestamp(topLevelAbie.getAbie().getOwnerTopLevelAbieId(), timestamp);
+
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
         } catch (Throwable t) {
