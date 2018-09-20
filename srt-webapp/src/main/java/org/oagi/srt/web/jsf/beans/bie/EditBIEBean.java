@@ -287,6 +287,7 @@ public class EditBIEBean extends AbstractBIEBean implements Validator {
             Date timestamp = new Date();
             topLevelAbie.getAbie().setLastUpdateTimestamp(timestamp);
             abieRepository.updateLastUpdateTimestamp(topLevelAbie.getAbie().getOwnerTopLevelAbieId(), timestamp);
+
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
         } catch (Throwable t) {
