@@ -29,5 +29,4 @@ public interface AssociationBusinessInformationEntityRepository
     @Modifying
     @Query("delete from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
-
 }
