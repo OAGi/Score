@@ -1,0 +1,94 @@
+{
+  "CORE_COMPONENT_LIST": {
+    "TITLE": "Core Components",
+    "DEN": "DEN",
+    "MODULE": "Module"
+  },
+  "ACC_DETAIL": {
+    "TITLE": "ACC",
+    "OBJECT": "Object Class Term",
+    "DEN": "DEN"
+  },
+  "ASCCP_DETAIL": {
+    "TITLE": "ASCCP ",
+    "TITLE_CASE": "ASCCP Detail",
+    "PROPERTY_TERM": "Property Term",
+    "DEN": "DEN"
+  },
+  "ASCC_DETAIL": {
+    "TITLE": "ASCC ",
+    "TITLE_CASE": "ASCC Detail",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN"
+  },
+  "BCC_DETAIL": {
+    "TITLE": "BCC ",
+    "TITLE_CASE": "BCC Detail",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN"
+  },
+  "BCCP_DETAIL": {
+    "TITLE": "BCCP",
+    "TITLE_CASE": "BCCP Detail",
+    "PROPERTY_TERM": "Property Term",
+    "DEN": "DEN"
+  },
+  "DATA_TYPE_DETAIL": {
+    "TITLE": "Data Type ",
+    "DEN": "DEN"
+  },
+  "BDT_SC_DETAIL": {
+    "TITLE": "BDT_SC",
+    "TITLE_CASE": "Supplementary Component",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN"
+  },
+  "BIE_LIST": {
+    "TITLE": "BIEs",
+    "ASSIGNMENT_TITLE": "Choose a BIE to assign a Business Context",
+    "ASSIGNMENT": "Assign Business(es) Context(s) to a BIE"
+  },
+  "BIE_EXPRESS": {
+    "TITLE": "Express BIE"
+  },
+  "BIE_COPY": {
+    "TITLE": "Copy BIE"
+  },
+  "BIE_CREATE": {
+    "TITLE": "Create BIE"
+  },
+  "BIE_CREATE_2": {
+    "TITLE": "Create BIE"
+  },
+  "BIE_EDIT": {
+    "TITLE": "Edit BIE",
+    "MAX": "Cardinality Max (-1 for unbounded)"
+  },
+  "MODULE_LIST": {
+    "TITLE": "Module"
+  },
+  "MODULE_CREATE": {
+    "TITLE": "Create Module"
+  },
+  "BIE_NAV": {
+    "TITLE": "",
+    "CREATE": "",
+    "VIEW": "",
+    "COPY": "",
+    "GENERATE": ""
+  },
+  "CC_NAV": {
+    "TITLE": ""
+  },
+  "MODULE_NAV": {
+    "TITLE": ""
+  },
+  "ASCCP_CREATE": {
+    "TITLE": "Create an ASCCP",
+    "SUBTITLE": "Select an ACC to create a new ASCCP"
+  },
+  "BCCP_CREATE": {
+    "TITLE": "Create a BCCP",
+    "SUBTITLE": "Select an BDT to create a new BCCP"
+  }
+}

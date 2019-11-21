@@ -1,0 +1,30 @@
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>{{ actionName }} Context Scheme Value</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content class="mat-card-container">
+  <mat-card style="margin-bottom: 24px;">
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>Value</mat-label>
+        <input matInput required [(ngModel)]="contextSchemeValue.value" maxlength="45" [disabled]="isDisabled()">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Meaning</mat-label>
+        <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeValue.meaning" [disabled]="isDisabled()"></textarea>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button color="primary"
+          [disabled]="isDisabled()"
+          [mat-dialog-close]="contextSchemeValue">
+    <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
+    {{ actionName }}
+  </button>
+</mat-dialog-actions>

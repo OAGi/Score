@@ -1,0 +1,70 @@
+<div class="context-section">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <mat-form-field *ngIf="!loading">
+        <input #filter matInput (keyup)="applyFilter(filter.value)" placeholder="Filter">
+      </mat-form-field>
+
+      <div class="mat-elevation-z1">
+        <table mat-table matSort matSortActive="lastUpdateTimestamp" matSortDirection="desc"
+               [dataSource]="dataSource">
+
+          <ng-container matColumnDef="releaseNum">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Release</th>
+            <td mat-cell *matCellDef="let element">
+              <a routerLink="{{ element.releaseId }}">{{ element.releaseNum }}</a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef> State</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip-list [ngSwitch]="element.state">
+                <mat-chip *ngSwitchCase="'Draft'" color="warn" selected>{{ element.state }}</mat-chip>
+                <mat-chip *ngSwitchCase="'Final'" color="primary" selected>{{ element.state }}</mat-chip>
+                <mat-chip *ngSwitchDefault>{{ element.state }}</mat-chip>
+              </mat-chip-list>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="namespace">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Namespace</th>
+            <td mat-cell *matCellDef="let element">{{ element.namespace }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdatedBy">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated By</th>
+            <td mat-cell *matCellDef="let element"> {{ element.lastUpdatedBy }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdateTimestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Update Timestamp</th>
+            <td mat-cell *matCellDef="let element"> {{ element.lastUpdateTimestamp | date:'yyyy:MM:dd HH:mm:ss' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              (click)="toggle(row)"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions style="padding: 8px 0 8px 12px;">
+      <button mat-raised-button color="primary"
+              (click)="create()">Create Release
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

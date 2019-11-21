@@ -1,0 +1,123 @@
+.node-progress-bar {
+  margin-left: 30px;
+}
+
+.mat-tree-node {
+  font-size: 13px;
+  min-height: 33px;
+  font-family: Roboto;
+}
+
+.mat-tree-node .material-icons {
+  font-size: 20px;
+}
+
+.mat-tree-node .mat-icon-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  outline: none;
+}
+
+.mat-tree-node div {
+  height: 16px;
+}
+
+.mat-tree-node .acc, .mat-tree-node .acc-group {
+  color: #bd2c00 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .asccp {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bccp {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bccp-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bdt_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+.checklist-leaf-node {
+  padding-right: 8px;
+}
+
+.sticky {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 10px;
+  margin-bottom: 24px;
+}
+
+.cc-node-header {
+  display: block;
+  padding: 9px 10px 10px;
+  margin: 0px;
+  font-size: 14px;
+  line-height: 17px;
+  background-color: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  color: #333;
+  font-weight: 600;
+  -webkit-margin-before: 1em;
+  -webkit-margin-after: 1em;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+}
+
+.cc-node-header span, .mat-tree-node span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cc-node-tree-panel {
+  margin-bottom: 24px;
+}
+
+.cc-node-detail-container div.checkbox {
+  padding: 10px 0 20px 0;
+}
+
+.ngx-contextmenu a {
+  text-decoration: none;
+}
+
+.ngx-contextmenu .dropdown-menu {
+  padding: 0.25rem 0.8rem;
+}
+
+span.context-menu-item {
+  display: block;
+  font-size: 12px;
+  width: 92%;
+  outline: 0;
+  font-weight: 400;
+  border: solid 1px transparent;
+  line-height: 10px;
+  cursor: pointer;
+}
+
+.cc-node-detail-panel {
+  margin-bottom: 24px;
+}
+
+.left-panel, .right-panel {
+  margin-bottom: 0;
+  overflow-y: scroll;
+}

@@ -1,0 +1,10 @@
+.mat-card-content p {
+  font-family: 'Roboto', 'sans-serif';
+}
+
+.module .mat-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  margin-right: 6px;
+}

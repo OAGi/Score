@@ -1,0 +1,12 @@
+<h2 mat-dialog-title><U>Warning</U> :</h2>
+<div mat-dialog-content class="mat-typography" *ngIf="data.ids.length > 1">
+  Those business contexts will be permanently removed.
+</div>
+<div mat-dialog-content class="mat-typography" *ngIf="data.ids.length === 1">
+  The business context will be permanently removed.
+</div>
+<hr>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Accept</button>
+</mat-dialog-actions>

@@ -1,0 +1,334 @@
+<div class="context-section">
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ "BIE_EXPRESS.TITLE" | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card class="search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Owner</mat-label>
+                <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
+                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Updater</mat-label>
+                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                    {{loginId}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12" style="display: flex;">
+              <mat-form-field>
+                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                       [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                       (dateInput)="onDateEvent('startDate', $event)">
+                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                <mat-datepicker #dateStart></mat-datepicker>
+              </mat-form-field>
+              <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-flex">
+                  <div class="mat-form-field-infix">
+                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-12" style="display: flex;">
+              <mat-form-field>
+                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                       [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                       (dateInput)="onDateEvent('endDate', $event)">
+                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                <mat-datepicker #dateEnd></mat-datepicker>
+              </mat-form-field>
+              <div class="mat-form-field-wrapper" style="width: 14px;">
+                <div class="mat-form-field-flex">
+                  <div class="mat-form-field-infix">
+                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="container-fluid" style="padding: 0;">
+            <div class="row">
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.propertyTerm" (keyup.enter)="onChange()"
+                         placeholder="Property Term">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="request.filters.businessContext" (keyup.enter)="onChange()"
+                         placeholder="Business Context">
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-label>State</mat-label>
+                  <mat-select [(ngModel)]="request.states" multiple>
+                    <mat-option *ngFor="let state of states" [value]="state">
+                      {{state}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card-content class="mat-card-container">
+      <div class="mat-elevation-z1">
+          <table mat-table multiTemplateDataRows
+                 matSort matSortActive="propertyTerm" matSortDirection="asc"
+                 [dataSource]="dataSource">
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null"
+                            [checked]="selection.isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="propertyTerm">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
+            <td mat-cell *matCellDef="let element" [ngSwitch]="element.access">
+              <a target="_blank" rel="noopener noreferrer" href="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                <div style="display: flex;">
+                  <span class="den" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
+                  <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+                </div>
+                <div style="font-size: 12px !important; color: #767676 !important;">{{ element.guid }}</div>
+              </a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef> Version</th>
+            <td mat-cell *matCellDef="let element"> {{ element.version }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status</th>
+            <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="lastUpdateTimestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+            <td mat-cell *matCellDef="let element">
+              <div>{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+              <div style="font-size: 12px !important; color: #767676 !important;">by <b>{{ element.lastUpdateUser }}</b>
+              </div>
+            </td>
+          </ng-container>
+
+            <ng-container matColumnDef="expandedDetail">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                <div class="element-detail">
+                  <mat-card style="width: 57%; box-shadow: none;">
+                    <mat-card-content style="color: #545454; display: flex;">
+                      <p>Release <b>{{ element.releaseNum }}</b> owned by <b>{{ element.owner }}</b></p>
+                    </mat-card-content>
+
+                    <mat-card-content style="color: #545454; display: flex;">
+                      <div class="container-fluid" style="border: 0; display: flex;">
+                        <div class="row">
+                          <p style="margin-right: 8px;">Assigned Business Contexts </p>
+                          <mat-chip-list *ngFor="let bizCtx of element.businessContexts" selectable="false">
+                            <a target="_blank" rel="noopener noreferrer"
+                               href="/context_management/business_context/{{ bizCtx.bizCtxId }}"
+                               style="font-size: 12px">
+                              <mat-chip style="margin: 0px 8px 0px 8px;">{{bizCtx.name}}</mat-chip>
+                            </a>
+                          </mat-chip-list>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </td>
+            </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"
+              (click)="toggle(row)"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+              (click)="toggle(row)"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+
+  <mat-card class="filter-container">
+    <mat-card-content>
+      <div class="container-fluid" style="padding-bottom: 20px;">
+
+        <div class="row">
+          <div class="col-md-10 col-sm-12">
+            <span class="option-header">Select annotation to generate for BIEs</span>
+            <div class="option-body">
+
+              <div class="row">
+
+                <div class="col-md-5 col-sm-12">
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.bieDefinition">BIE Definition</mat-checkbox>
+                  </div>
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
+                                  [disabled]="option.expressionOption !== 'XML'">BIE CCTS Meta Data
+                    </mat-checkbox>
+                  </div>
+                  <div class="generate-option dependent-option">
+                    <mat-checkbox [(ngModel)]="option.includeCctsDefinitionTag"
+                                  [disabled]="option.expressionOption !== 'XML' || option.bieCctsMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieCctsMetaData !== true) ? 'toggle-disabled' : '' }}">Include CCTS_Definition Tag</span>
+                    </mat-checkbox>
+                  </div>
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.bieGuid"
+                                  [disabled]="option.expressionOption !== 'XML'">BIE GUID
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+                <div class="col-md-5 col-sm-12">
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.businessContext"
+                                  [disabled]="option.expressionOption !== 'XML'">Business Context
+                    </mat-checkbox>
+                  </div>
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.bieOagiSrtMetaData"
+                                  [disabled]="option.expressionOption !== 'XML'">BIE OAGi/SRT Meta Data
+                    </mat-checkbox>
+                  </div>
+                  <div class="generate-option dependent-option">
+                    <mat-checkbox [(ngModel)]="option.includeWhoColumns"
+                                  [disabled]="option.expressionOption !== 'XML' || option.bieOagiSrtMetaData !== true">
+                      <span
+                        class="{{ (option.expressionOption !== 'XML' || option.bieOagiSrtMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+                    </mat-checkbox>
+                  </div>
+                  <div class="generate-option">
+                    <mat-checkbox [(ngModel)]="option.basedCcMetaData"
+                                  [disabled]="option.expressionOption !== 'XML'">Based CC Meta Data
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-10 col-sm-12">
+            <div class="row">
+
+              <div class="col-md-5 col-sm-12" style="padding-top: 20px">
+                <span class="option-header">Select Expressions</span>
+                <div class="option-body">
+                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption">
+                    <mat-radio-button class="option-radio-button" value="XML">
+                      XML Schema
+                    </mat-radio-button>
+                    <mat-radio-button class="option-radio-button" value="JSON">
+                      JSON Schema
+                    </mat-radio-button>
+                    <div class="generate-option dependent-option">
+                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpression"
+                                    [disabled]="option.expressionOption !== 'JSON'">
+                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
+                      </mat-checkbox>
+                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
+                                    [disabled]="option.expressionOption !== 'JSON'"
+                                    (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
+                                             'includeMetaHeaderForJson',
+                                             'metaHeaderTopLevelAbieId')">
+                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                      </mat-checkbox>
+                      <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
+                                    [disabled]="option.expressionOption !== 'JSON'"
+                                    (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
+                                             'includePaginationResponseForJson',
+                                             'paginationResponseTopLevelAbieId')">
+                        <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                      </mat-checkbox>
+                    </div>
+                  </mat-radio-group>
+                </div>
+              </div>
+
+              <div class="col-md-5 col-sm-12" style="padding-top: 20px">
+                <span class="option-header">Schema Package Option</span>
+                <div class="option-body">
+                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.packageOption">
+                    <mat-radio-button class="option-radio-button" value="ALL"
+                                      [disabled]="option.expressionOption === 'JSON' && (option.includeMetaHeaderForJson || option.includePaginationResponseForJson)">
+                      Put all schemas in the same file
+                    </mat-radio-button>
+                    <mat-radio-button class="option-radio-button" value="EACH">
+                      Put each schema in an individual file
+                    </mat-radio-button>
+                  </mat-radio-group>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="fab-container">
+      <button mat-mini-fab color="primary" (click)="generate()"
+              [disabled]="selection.selected.length === 0">
+        <mat-icon matTooltip="Generate" fontSet="fontawesome" fontIcon="fa-file" style="color: white;"></mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

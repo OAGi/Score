@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>The selected context category cannot be deleted !</h2>
+<hr>
+<mat-dialog-content class="mat-typography">
+  <p>The context schemes with the following IDs depend on it. They need to be deleted first. </p>
+  <li *ngFor="let listDisplay of data.list">
+    {{listDisplay}}
+  </li>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>OK</button>
+</mat-dialog-actions>

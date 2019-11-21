@@ -1,0 +1,9 @@
+<srt-navbar *ngIf="isAuthenticated()"></srt-navbar>
+
+<div class="body">
+  <section class="container-fluid">
+    <router-outlet></router-outlet>
+  </section>
+</div>
+
+<srt-footer *ngIf="isAuthenticated()"></srt-footer>

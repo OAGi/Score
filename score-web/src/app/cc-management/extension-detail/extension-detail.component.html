@@ -1,0 +1,627 @@
+<div class="context-section">
+  <div class="row" (window:resize)="onResize($event)">
+    <div class="col-4 left-panel" [style.height.px]="innerHeight">
+      <mat-card class="cc-node-tree-panel">
+        <div class="cc-node-header">
+          <span>{{ title }}</span>
+        </div>
+
+        <mat-card-content>
+
+          <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+
+            <mat-tree-node *matTreeNodeDef="let node"
+                           [style.padding-left.px]="paddingPixel * node.level"
+                           matTreeNodePadding>
+              <button mat-icon-button [disabled]="node.isLoading || !node.item.hasChild"
+                      [attr.aria-label]="'toggle ' + node.type" matTreeNodeToggle>
+                <mat-icon class="mat-icon-rtl-mirror" *ngIf="node.item.hasChild">
+                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+              </button>
+
+              <!-- For the User Extension Group ACC -->
+              <div class="{{ type(node) }}" (click)="onClick(node)"
+                   *ngIf="node === this.rootNode && state === 'Editing' && access === 'CanEdit'"
+                   [contextMenu]="appendingMenu" [contextMenuSubject]="node"
+                   style="cursor: pointer; display: flex;">
+                <span style="padding-right: 10px;">{{ node.item.name }}</span>
+                <mat-icon fontSet="fontawesome" fontIcon="fa-external-link-alt" style="margin-top: 2px;"
+                          (click)="onContextMenu($event, node)"></mat-icon>
+              </div>
+
+              <!-- For the child of the User Extension Group -->
+              <div class="{{ type(node) }}" (click)="onClick(node)"
+                   *ngIf="isChildOfUserExtensionGroup(node) && state === 'Editing' && access === 'CanEdit'"
+                   style="cursor: pointer; display: flex;">
+                <span style="padding-right: 10px;">{{ node.item.name }}</span>
+                <mat-icon fontSet="fontawesome" fontIcon="fa-times" style="margin-top: 2px;"
+                          (click)="onClickDiscard($event, node)"></mat-icon>
+              </div>
+
+              <!-- Otherwise -->
+              <div class="{{ type(node) }}" (click)="onClick(node)"
+                   *ngIf="(node !== this.rootNode && !isChildOfUserExtensionGroup(node)) || state !== 'Editing' || access !== 'CanEdit'"
+                   style="cursor: pointer;">
+                <span>{{ node.item.name }}</span>
+              </div>
+
+              <mat-progress-spinner mode="indeterminate" [diameter]="14" *ngIf="node.isLoading"
+                                    class="node-progress-bar"></mat-progress-spinner>
+
+            </mat-tree-node>
+          </mat-tree>
+
+          <context-menu>
+            <ng-template contextMenuItem (execute)="appendAscc($event.item)">
+              <span class="context-menu-item">Append ASCCP</span>
+            </ng-template>
+            <ng-template contextMenuItem divider="true"></ng-template>
+            <ng-template contextMenuItem (execute)="appendBcc($event.item)">
+              <span class="context-menu-item">Append BCCP</span>
+            </ng-template>
+          </context-menu>
+
+        </mat-card-content>
+
+        <!-- Action Buttons -->
+        <mat-card-actions class="fab-container"
+                          *ngIf="state !== 'Published' && access === 'CanEdit'">
+          <button mat-mini-fab color="primary" (click)="updateDetails()"
+                  *ngIf="state === 'Editing'"
+                  [disabled]="!isChanged || isUpdating || !isValid()">
+            <mat-icon matTooltip="Update">save</mat-icon>
+          </button>
+
+          <button mat-mini-fab color="accent" (click)="updateState('Candidate')"
+                  *ngIf="state === 'Editing'"
+                  [disabled]="isUpdating || !isValid()">
+            <mat-icon matTooltip="Candidate" fontSet="fontawesome" fontIcon="fa-share" style="color: white;"></mat-icon>
+          </button>
+
+          <button mat-mini-fab color="warn" (click)="updateState('Editing')"
+                  *ngIf="state === 'Candidate'"
+                  [disabled]="isUpdating">
+            <mat-icon matTooltip="Back to Editing">reply</mat-icon>
+          </button>
+          <button mat-mini-fab color="accent" (click)="openConfirmDialog()"
+                  *ngIf="state === 'Candidate'"
+                  [disabled]="isUpdating">
+            <mat-icon matTooltip="Publish" fontSet="fontawesome" fontIcon="fa-share-square" style="color: white;"></mat-icon>
+          </button>
+
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div class="col-8 right-panel" [style.height.px]="innerHeight">
+
+      <div>
+
+        <!-- ACC -->
+        <mat-card class="cc-node-detail-panel"
+                  *ngIf="isAccDetail()">
+
+          <mat-card-header class="cc-node-header">
+            <span>{{ "ACC_DETAIL.TITLE" | translate }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="cc-node-detail-container">
+
+              <mat-form-field>
+                <input matInput placeholder="GUID" maxlength="41"
+                       [(ngModel)]="asAccDetail().guid" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="{{'ACC_DETAIL.OBJECT' | translate}}" maxlength="100"
+                       [(ngModel)]="asAccDetail().objectClassTerm" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="{{'ACC_DETAIL.DEN' | translate}}" maxlength="200"
+                       [(ngModel)]="asAccDetail().den" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-select placeholder="Component Type"
+                            [(ngModel)]="asAccDetail().oagisComponentType" [disabled]="true">
+                  <mat-option *ngFor="let componentType of componentTypes"
+                              [value]="componentType.value">
+                    {{ componentType.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asAccDetail().abstracted"
+                                  [disabled]="true">
+                      Abstract
+                    </mat-checkbox>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asAccDetail().deprecated"
+                                  [disabled]="true">
+                      Deprecated
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <mat-form-field>
+                  <textarea matInput rows="6" cols="30"
+                            placeholder="Definition"
+                            [(ngModel)]="asAccDetail().definition"
+                            [disabled]="true"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+
+        <div *ngIf="isAsccpDetail()">
+
+          <!-- ASCC -->
+          <mat-card class="cc-node-detail-panel">
+
+            <mat-card-header class="cc-node-header">
+              <ngx-growl></ngx-growl>
+              <span>{{"ASCC_DETAIL.TITLE_CASE" | translate}}</span>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="cc-node-detail-container">
+
+                <mat-form-field>
+                  <input matInput placeholder="GUID" maxlength="41"
+                         [(ngModel)]="asAsccpDetail().ascc.guid" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'ASCC_DETAIL.DEN' | translate}}" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().ascc.den" [disabled]="true">
+                </mat-form-field>
+
+                <div class="row">
+                  <div class="col-6">
+                    <mat-form-field>
+                      <input matInput placeholder="Cardinality Min" required
+                             [formControl]="ccCardinalityMin">
+                      <mat-error *ngIf="ccCardinalityMin.hasError('required')">
+                        Cardinality Min is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="!ccCardinalityMin.hasError('min') && ccCardinalityMin.hasError('pattern')">
+                        '{{ ccCardinalityMin.value }}' is not allowed for Cardinality Min
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMin.hasError('min')">
+                        Cardinality Min must be greater than or equals to {{ asAsccpDetail().ascc.cardinalityMin }}
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMin.hasError('max')">
+                        {{ ccCardinalityMin.getError('max') }}
+                      </mat-error>
+
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field>
+                      <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                             [formControl]="ccCardinalityMax"
+                             [value]="ccCardinalityMax.value | unbounded">
+                      <mat-hint *ngIf="ccCardinalityMax.valid && asAsccpDetail().ascc.cardinalityMax === 0" style="color: #ff5722;">
+                        Context Definition should define why Cardinality Max is zero (0)
+                      </mat-hint>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('required')">
+                        Cardinality Max is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('pattern')">
+                        '{{ ccCardinalityMax.value }}' is not allowed for Cardinality Max
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('min')">
+                        {{ ccCardinalityMax.getError('min') }}
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('max')">
+                        {{ ccCardinalityMax.getError('max') }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asAsccpDetail().ascc.deprecated"
+                                    (ngModelChange)="onChange()"
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                        Deprecated
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Definition"
+                                [(ngModel)]="asAsccpDetail().ascc.definition"
+                                (ngModelChange)="onChange()"
+                                [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- ASCCP -->
+          <mat-card class="cc-node-detail-panel">
+
+            <mat-card-header class="cc-node-header">
+              <span>{{"ASCCP_DETAIL.TITLE_CASE" | translate}}</span>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="cc-node-detail-container">
+
+                <mat-form-field>
+                  <input matInput placeholder="GUID" maxlength="41"
+                         [(ngModel)]="asAsccpDetail().asccp.guid" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'ASCCP_DETAIL.PROPERTY_TERM' | translate}}" maxlength="60"
+                         [(ngModel)]="asAsccpDetail().asccp.propertyTerm" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'ASCCP_DETAIL.DEN' | translate}}" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().asccp.den" [disabled]="true">
+                </mat-form-field>
+
+                <div class="row">
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asAsccpDetail().asccp.reusable"
+                                    [disabled]="true">
+                        Reusable
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asAsccpDetail().asccp.deprecated"
+                                    [disabled]="true">
+                        Deprecated
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Definition"
+                                [(ngModel)]="asAsccpDetail().asccp.definition"
+                                [disabled]="true"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+
+
+        <div *ngIf="isBccpDetail()">
+
+          <!-- BCC -->
+          <mat-card class="cc-node-detail-panel">
+
+            <mat-card-header class="cc-node-header">
+              <ngx-growl></ngx-growl>
+              <span>{{"BCC_DETAIL.TITLE_CASE" | translate}}</span>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="cc-node-detail-container">
+
+                <mat-form-field>
+                  <input matInput placeholder="GUID" maxlength="41"
+                         [(ngModel)]="asBccpDetail().bcc.guid" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'BCC_DETAIL.DEN' | translate}}" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bcc.den" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-select placeholder="Entity Type"
+                              [(ngModel)]="asBccpDetail().bcc.entityType"
+                              (ngModelChange)="onChange()"
+                              [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                    <mat-option *ngFor="let entityType of entityTypes"
+                                [value]="entityType.value">
+                      {{ entityType.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="row">
+                  <div class="col-6">
+                    <mat-form-field>
+                      <input matInput placeholder="Cardinality Min" required
+                             [formControl]="ccCardinalityMin">
+                      <mat-error *ngIf="ccCardinalityMin.hasError('required')">
+                        Cardinality Min is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="!ccCardinalityMin.hasError('min') && ccCardinalityMin.hasError('pattern')">
+                        '{{ ccCardinalityMin.value }}' is not allowed for Cardinality Min
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMin.hasError('min')">
+                        Cardinality Min must be greater than or equals to {{ asBccpDetail().bcc.cardinalityMin }}
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMin.hasError('max')">
+                        {{ ccCardinalityMin.getError('max') }}
+                      </mat-error>
+
+                    </mat-form-field>
+                  </div>
+                  <div class="col-6">
+                    <mat-form-field>
+                      <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                             [formControl]="ccCardinalityMax"
+                             [value]="ccCardinalityMax.value | unbounded">
+                      <mat-hint *ngIf="ccCardinalityMax.valid && asBccpDetail().bcc.cardinalityMax === 0" style="color: #ff5722;">
+                        Context Definition should define why Cardinality Max is zero (0)
+                      </mat-hint>
+
+                      <mat-error *ngIf="ccCardinalityMax.hasError('required')">
+                        Cardinality Max is <strong>required</strong>
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('pattern')">
+                        '{{ ccCardinalityMax.value }}' is not allowed for Cardinality Max
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('min')">
+                        {{ ccCardinalityMax.getError('min') }}
+                      </mat-error>
+                      <mat-error *ngIf="ccCardinalityMax.hasError('max')">
+                        {{ ccCardinalityMax.getError('max') }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asBccpDetail().bcc.nillable"
+                                    (ngModelChange)="onChange()"
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                        Nillable
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asBccpDetail().bcc.deprecated"
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                        Deprecated
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Default Value"
+                                [(ngModel)]="asBccpDetail().bcc.defaultValue"
+                                (ngModelChange)="onChange()"
+                                [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'"></textarea>
+                </mat-form-field>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Definition"
+                                [(ngModel)]="asBccpDetail().bcc.definition"
+                                (ngModelChange)="onChange()"
+                                [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- BCCP -->
+          <mat-card class="cc-node-detail-panel">
+
+            <mat-card-header class="cc-node-header">
+              <span>{{"BCCP_DETAIL.TITLE_CASE" | translate}}</span>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="cc-node-detail-container">
+
+                <mat-form-field>
+                  <input matInput placeholder="GUID" maxlength="41"
+                         [(ngModel)]="asBccpDetail().bccp.guid" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'BCCP_DETAIL.PROPERTY_TERM' | translate}}" maxlength="60"
+                         [(ngModel)]="asBccpDetail().bccp.propertyTerm" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'BCCP_DETAIL.DEN' | translate}}" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bccp.den" [disabled]="true">
+                </mat-form-field>
+
+                <div class="row">
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asBccpDetail().bccp.nillable"
+                                    [disabled]="true">
+                        Nillable
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="checkbox">
+                      <mat-checkbox color="primary"
+                                    [(ngModel)]="asBccpDetail().bccp.deprecated"
+                                    [disabled]="true">
+                        Deprecated
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Default Value"
+                                [(ngModel)]="asBccpDetail().bccp.defaultValue"
+                                [disabled]="true"></textarea>
+                </mat-form-field>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Definition"
+                                [(ngModel)]="asBccpDetail().bccp.definition"
+                                [disabled]="true"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- DT -->
+          <mat-card class="cc-node-detail-panel">
+
+            <mat-card-header class="cc-node-header">
+              <span>Data Type</span>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="cc-node-detail-container">
+
+                <mat-form-field>
+                  <input matInput placeholder="GUID" maxlength="41"
+                         [(ngModel)]="asBccpDetail().bdt.guid" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="Data Type Term" maxlength="45"
+                         [(ngModel)]="asBccpDetail().bdt.dataTypeTerm" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="Qualifier" maxlength="100"
+                         [(ngModel)]="asBccpDetail().bdt.qualifier" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="{{'DATA_TYPE_DETAIL.DEN' | translate}}" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bdt.den" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                      <textarea matInput rows="6" cols="30"
+                                placeholder="Definition"
+                                [(ngModel)]="asBccpDetail().bdt.definition"
+                                [disabled]="true"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </div>
+
+
+        <!-- BDT_SC -->
+        <mat-card class="cc-node-detail-panel"
+                  *ngIf="isBdtScDetail()">
+
+          <mat-card-header class="cc-node-header">
+            <span>{{"BDT_SC_DETAIL.TITLE_CASE" | translate}}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="cc-node-detail-container">
+
+              <mat-form-field>
+                <input matInput placeholder="GUID" maxlength="41"
+                       [(ngModel)]="asBdtScDetail().guid" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="{{'BDT_SC_DETAIL.DEN' | translate}}" maxlength="200"
+                       [(ngModel)]="asBdtScDetail().den" [disabled]="true">
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min" required
+                           [formControl]="ccCardinalityMin">
+                    <mat-error *ngIf="ccCardinalityMin.hasError('required')">
+                      Cardinality Min is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="!ccCardinalityMin.hasError('min') && ccCardinalityMin.hasError('pattern')">
+                      '{{ ccCardinalityMin.value }}' is not allowed for Cardinality Min
+                    </mat-error>
+                    <mat-error *ngIf="ccCardinalityMin.hasError('min')">
+                      Cardinality Min must be greater than or equals to {{ asBdtScDetail().cardinalityMin }}
+                    </mat-error>
+                    <mat-error *ngIf="ccCardinalityMin.hasError('max')">
+                      {{ ccCardinalityMin.getError('max') }}
+                    </mat-error>
+
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                           [formControl]="ccCardinalityMax"
+                           [value]="ccCardinalityMax.value | unbounded">
+                    <mat-hint *ngIf="ccCardinalityMax.valid && asBdtScDetail().cardinalityMax === 0" style="color: #ff5722;">
+                      Context Definition should define why Cardinality Max is zero (0)
+                    </mat-hint>
+
+                    <mat-error *ngIf="ccCardinalityMax.hasError('required')">
+                      Cardinality Max is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="ccCardinalityMax.hasError('pattern')">
+                      '{{ ccCardinalityMax.value }}' is not allowed for Cardinality Max
+                    </mat-error>
+                    <mat-error *ngIf="ccCardinalityMax.hasError('min')">
+                      {{ ccCardinalityMax.getError('min') }}
+                    </mat-error>
+                    <mat-error *ngIf="ccCardinalityMax.hasError('max')">
+                      {{ ccCardinalityMax.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-form-field>
+                  <textarea matInput rows="6" cols="30"
+                            placeholder="Definition"
+                            [(ngModel)]="asBdtScDetail().definition"
+                            [disabled]="true"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

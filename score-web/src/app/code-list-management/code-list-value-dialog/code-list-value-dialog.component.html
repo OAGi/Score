@@ -1,0 +1,53 @@
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>{{ actionName }} Code List Value</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content class="mat-card-container">
+  <mat-card style="margin-bottom: 24px;">
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>Code</mat-label>
+        <input matInput [disabled]="isDisabledColor(codeListValue)" required [(ngModel)]="codeListValue.value"
+               maxlength="255">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Short Name</mat-label>
+        <input matInput [disabled]="isDisabledColor(codeListValue)" required [(ngModel)]="codeListValue.name"
+               maxlength="100">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Definition</mat-label>
+        <textarea rows="6" cols="30" matInput [disabled]="isDisabledColor(codeListValue)"
+                  [(ngModel)]="codeListValue.definition"></textarea>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Definition Source</mat-label>
+        <input matInput [disabled]="isDisabledColor(codeListValue)" [(ngModel)]="codeListValue.definitionSource"
+               maxlength="100">
+      </mat-form-field>
+
+      <div class="row">
+        <div class="col-12">
+          <mat-checkbox color="warn" *ngIf="!codeListValue.extension"
+                        [(ngModel)]="codeListValue.used">
+            <span>Used</span>
+          </mat-checkbox>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>
+
+<mat-dialog-actions *ngIf="isAvailable(codeListValue)">
+  <button mat-raised-button color="primary"
+          [disabled]="isDisabled()"
+          [mat-dialog-close]="codeListValue">
+    <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
+    {{ actionName }}
+  </button>
+</mat-dialog-actions>

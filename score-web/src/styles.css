@@ -1,0 +1,297 @@
+body {
+  font-family: "Noto Sans", "Montserrat", Roboto, Helvetica, Arial, sans-serif, -apple-system, BlinkMacSystemFont, "Apple Color Emoji";
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fff;
+  word-wrap: break-word;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: 600 !important
+}
+
+.h1 {
+  font-size: 26px !important
+}
+
+@media (min-width: 768px) {
+  .h1 {
+    font-size: 32px !important
+  }
+}
+
+.h2 {
+  font-size: 22px !important
+}
+
+@media (min-width: 768px) {
+  .h2 {
+    font-size: 24px !important
+  }
+}
+
+.h3 {
+  font-size: 18px !important
+}
+
+@media (min-width: 768px) {
+  .h3 {
+    font-size: 20px !important
+  }
+}
+
+.h4 {
+  font-size: 16px !important
+}
+
+@media (min-width: 768px) {
+  .h4 {
+    font-size: 16px !important
+  }
+}
+
+.h5 {
+  font-size: 14px !important
+}
+
+.h6 {
+  font-size: 12px !important
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 600
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 600
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 600
+}
+
+h5 {
+  font-size: 14px;
+  font-weight: 600
+}
+
+h6 {
+  font-size: 12px;
+  font-weight: 600
+}
+
+b {
+  color: #000;
+}
+
+.dropdown-item:active {
+  color: #16181b;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
+
+.subhead {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.subhead-heading {
+  font-weight: normal;
+}
+
+div.context-section {
+  padding-top: 30px;
+}
+
+div.context-section > .mat-card {
+  box-shadow: none;
+}
+
+.mat-card-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-card-container > * {
+  width: 100%;
+}
+
+.context-section mat-card-actions .mat-raised-button:first-child {
+  margin: 0 4px;
+}
+
+.context-section .mat-card > .mat-card-actions:last-child {
+  padding-bottom: 4px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.mat-column-select {
+  overflow: initial;
+}
+
+table a {
+  color: rgba(0, 0, 0, .87);
+  text-decoration: none;
+}
+
+table a:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+mat-checkbox > .mat-checkbox-layout {
+  vertical-align: super;
+}
+
+.mat-tooltip {
+  font-size: 13px;
+}
+
+.mat-input-element:disabled {
+  color: rgba(0, 0, 0, .4);
+}
+
+.mat-chip {
+  font-size: 11px;
+}
+
+.mat-icon.fa {
+  height: 13px;
+  width: 13px;
+  color: rgba(0,0,0,.87);
+}
+
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+fa-icon {
+  color: #495057;
+}
+
+.mat-card-title {
+  flex: 1 1 auto;
+  font-size: 18px !important;
+  font-weight: 400;
+  border-bottom: 1px solid #e1e4e8;
+  display: flex !important;
+  flex-flow: row wrap;
+  margin-bottom: 16px !important;
+  padding-bottom: 8px;
+}
+
+.search-box {
+  margin-bottom: 24px;
+}
+
+.search-box .mat-card-header-text {
+  margin: 0 8px;
+}
+
+.search-box .mat-card-container {
+  margin: 0 8px;
+}
+
+.search-box .mat-card-actions {
+  margin: 0 8px;
+}
+
+div.mat-form-field-wrapper div.mat-form-field-infix mat-icon.datepicker-cancel {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  margin: 0;
+  cursor: pointer;
+}
+
+span.den {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+span.cc-state, span.bie-state {
+  font-size: 12px;
+  padding: .15em 4px;
+}
+
+span.Initiating {
+  background-color: #bfdadc;
+  color: #000000;
+}
+
+span.Editing {
+  background-color: #fc2929;
+  color: #fcfcfc;
+}
+
+span.Candidate {
+  background-color: #cc317c;
+  color: #ffffff;
+}
+
+span.Published {
+  background-color: #84b6eb;
+  color: #000000;
+}
+
+span.Deprecated {
+  background-color: #cccccc;
+  color: #000000;
+}
+
+.fab-container {
+  position: fixed;
+  bottom: 16px;
+  right: 48px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+}
+
+.fab-container .mat-card-actions {
+  padding: 8px 0 8px 12px;
+}
+
+.fab-container button.mat-mini-fab:not(:last-child) {
+  margin-right: 10px;
+}
+
+mat-checkbox.hide-unused > .mat-checkbox-layout {
+  margin-bottom: 0 !important;
+}

@@ -1,0 +1,663 @@
+<div class="context-section">
+  <mat-card-header>
+    <mat-card-title>{{ "BIE_EDIT.TITLE" | translate }}</mat-card-title>
+  </mat-card-header>
+
+  <div class="row" (window:resize)="onResize($event)">
+    <div class="col-4 left-panel" [style.height.px]="innerHeight">
+      <mat-card class="bie-edit-tree-panel">
+        <mat-card-header class="bie-edit-header">
+          <mat-checkbox class="hide-unused"
+                        [(ngModel)]="hideUnused"
+                        (ngModelChange)="onHideUnusedChange()">
+            <span>Hide unused</span>
+          </mat-checkbox>
+        </mat-card-header>
+
+        <mat-card-content>
+
+          <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+
+            <mat-tree-node *matTreeNodeDef="let node"
+                           [style.padding-left.px]="paddingPixel * node.level"
+                           matTreeNodePadding>
+              <button mat-icon-button disabled></button>
+              <mat-checkbox class="checklist-leaf-node"
+                            [checked]="checklistSelection.isSelected(node)"
+                            [disabled]="!isEditable()"
+                            (change)="itemSelectionToggle(node)">
+              </mat-checkbox>
+              <span class="{{ type(node) }}" (click)="onClick(node)"
+                    style="cursor: pointer;">{{ node.item.name }}</span>
+            </mat-tree-node>
+
+            <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
+                           [style.padding-left.px]="paddingPixel * node.level"
+                           matTreeNodePadding>
+              <button mat-icon-button [disabled]="node.isLoading"
+                      [attr.aria-label]="'toggle ' + node.type" matTreeNodeToggle>
+                <mat-icon class="mat-icon-rtl-mirror">
+                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+              </button>
+
+              <mat-checkbox class="checklist-leaf-node" [hidden]="node.item.type === 'abie'"
+                            [checked]="checklistSelection.isSelected(node)"
+                            [disabled]="!isEditable()"
+                            (change)="itemSelectionToggle(node)">
+              </mat-checkbox>
+
+              <div class="{{ type(node) }}" (click)="onClick(node)"
+                   *ngIf="type(node) === 'asbiep-extension'"
+                   [contextMenu]="contextMenu" [contextMenuSubject]="node"
+                   style="cursor: pointer; display: flex;">
+                <span style="padding-right: 10px;">{{ node.item.name }}</span>
+                <mat-icon fontSet="fontawesome" fontIcon="fa-external-link-alt" style="margin-top: 2px;"
+                          (click)="onContextMenu($event, node)"
+                          *ngIf="isEditable()"></mat-icon>
+              </div>
+
+              <span class="{{ type(node) }}" (click)="onClick(node)"
+                    *ngIf="type(node) !== 'asbiep-extension'"
+                    style="cursor: pointer;">{{ node.item.name }}</span>
+
+              <mat-progress-spinner mode="indeterminate" [diameter]="14" *ngIf="node.isLoading"
+                                    class="node-progress-bar"></mat-progress-spinner>
+
+            </mat-tree-node>
+          </mat-tree>
+
+          <context-menu #contextMenu [disabled]="!isEditable()">
+            <ng-template contextMenuItem (execute)="createLocalAbieExtension($event.item)">
+              <span class="context-menu-item">Create ABIE Extension Locally</span>
+            </ng-template>
+            <ng-template contextMenuItem divider="true"></ng-template>
+            <ng-template contextMenuItem (execute)="createGlobalAbieExtension($event.item)">
+              <span class="context-menu-item">Create ABIE Extension Globally</span>
+            </ng-template>
+          </context-menu>
+
+        </mat-card-content>
+
+        <!-- Action Buttons -->
+        <mat-card-actions class="fab-container">
+          <button mat-mini-fab color="primary" (click)="updateDetails()"
+                  *ngIf="isEditable()"
+                  [disabled]="!isChanged || isUpdating || access !== 'CanEdit' || !isValid()">
+            <mat-icon matTooltip="Update">save</mat-icon>
+          </button>
+
+          <button mat-mini-fab color="accent" (click)="updateState('Candidate')"
+                  *ngIf="isEditable()"
+                  [disabled]="isUpdating || access !== 'CanEdit' || !isValid()">
+            <mat-icon matTooltip="Candidate" fontSet="fontawesome" fontIcon="fa-share" style="color: white;"></mat-icon>
+          </button>
+
+          <button mat-mini-fab color="warn" (click)="updateState('Editing')"
+                  *ngIf="state === 'Candidate' && access === 'CanEdit'"
+                  [disabled]="isUpdating || access !== 'CanEdit'">
+            <mat-icon matTooltip="Back to Editing">reply</mat-icon>
+          </button>
+          <button mat-mini-fab color="accent" (click)="updateState('Published')"
+                  *ngIf="state === 'Candidate' && access === 'CanEdit'"
+                  [disabled]="isUpdating || access !== 'CanEdit'">
+            <mat-icon matTooltip="Publish" fontSet="fontawesome" fontIcon="fa-share-square" style="color: white;"></mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div class="col-8 right-panel" [style.height.px]="innerHeight">
+      <div>
+        <!-- ABIE -->
+        <mat-card class="bie-edit-detail-panel"
+                  *ngIf="isAbieDetail()">
+
+          <mat-card-header class="bie-edit-header">
+            <span>{{ selectedNode.item.name }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="bie-edit-detail-container">
+
+              <mat-form-field *ngIf="businessContexts.length > 0">
+                <mat-chip-list #businessContextChipList aria-label="Business Contexts">
+                  <mat-chip
+                    *ngFor="let businessContext of businessContexts"
+                    [selectable]="false"
+                    [removable]="isBusinessContextRemovable"
+                    (removed)="removeBusinessContext(businessContext)">
+                    {{ businessContext.name }}
+                    <mat-icon matChipRemove disabled="isBusinessContextRemovable">cancel</mat-icon>
+                  </mat-chip>
+                  <input
+                    placeholder="Business Context"
+                    #businessContextInput
+                    [formControl]="businessContextCtrl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="businessContextChipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="addOnBlur">
+                </mat-chip-list>
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBusinessContext($event)">
+                  <mat-option *ngFor="let businessContext of filteredBusinessContexts | async" [value]="businessContext">
+                    {{ businessContext.name }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Version" maxlength="45"
+                       [(ngModel)]="asAbieDetail().version" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable()">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Status" maxlength="45"
+                       [(ngModel)]="asAbieDetail().status" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable()">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Business Term" maxlength="225"
+                       [(ngModel)]="asAbieDetail().bizTerm" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable()">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Remark" maxlength="225"
+                       [(ngModel)]="asAbieDetail().remark" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable()">
+              </mat-form-field>
+
+              <mat-form-field>
+              <textarea matInput rows="6"
+                        placeholder="Context Definition"
+                        [(ngModel)]="asAbieDetail().definition" (ngModelChange)="onChange()"
+                        [disabled]="!isEditable()"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- ASBIEP -->
+        <mat-card class="bie-edit-detail-panel" *ngIf="isAsbiepDetail()">
+
+          <mat-card-header class="bie-edit-header">
+            <ngx-growl></ngx-growl>
+            <span>{{ selectedNode.item.name }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="bie-edit-detail-container">
+
+              <div class="row">
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asAsbiepDetail().used" (ngModelChange)="resetCardinalities()"
+                                  (change)="itemSelectionToggle(selectedNode)"
+                                  [disabled]="!isEditable()">
+                      Used
+                    </mat-checkbox>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asAsbiepDetail().nillable" (ngModelChange)="onChange()"
+                                  [disabled]="!isEditable() || !asAsbiepDetail().used">
+                      Nillable
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min" required
+                           [formControl]="bieCardinalityMin">
+                    <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                      Cardinality Min is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')">
+                      '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('min')">
+                      Cardinality Min must be greater than or equals to {{ asAsbiepDetail().ccCardinalityMin }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('max')">
+                      {{ bieCardinalityMin.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                           [formControl]="bieCardinalityMax"
+                           [value]="bieCardinalityMax.value | unbounded">
+                    <mat-hint *ngIf="bieCardinalityMax.valid && asAsbiepDetail().bieCardinalityMax === 0" style="color: #ff5722;">
+                      Context Definition should define why Cardinality Max is zero (0)
+                    </mat-hint>
+
+                    <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                      Cardinality Max is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
+                      '{{ bieCardinalityMax.value }}' is not allowed for Cardinality Max
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('min')">
+                      {{ bieCardinalityMax.getError('min') }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('max')">
+                      {{ bieCardinalityMax.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-form-field>
+                <input matInput placeholder="Business Term" maxlength="225"
+                       [(ngModel)]="asAsbiepDetail().bizTerm" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asAsbiepDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Remark" maxlength="225"
+                       [(ngModel)]="asAsbiepDetail().remark" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asAsbiepDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+              <textarea matInput rows="6"
+                        placeholder="Context Definition"
+                        [(ngModel)]="asAsbiepDetail().contextDefinition" (ngModelChange)="onChange()"
+                        [disabled]="!isEditable() || !asAsbiepDetail().used"></textarea>
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-md-4 col-sm-12">
+                  <mat-form-field>
+                    <textarea matInput rows="6"
+                              placeholder="Association Definition" [disabled]="true"
+                              value="{{ asAsbiepDetail().associationDefinition || ' ' }}">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                  <mat-form-field>
+                    <textarea matInput rows="6"
+                              placeholder="Component Definition" [disabled]="true"
+                              value="{{ asAsbiepDetail().componentDefinition || ' ' }}">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                  <mat-form-field>
+                    <textarea matInput rows="6"
+                              placeholder="Type Definition" [disabled]="true"
+                              value="{{ asAsbiepDetail().typeDefinition || ' ' }}">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- BBIEP -->
+        <mat-card class="bie-edit-detail-panel" *ngIf="isBbiepDetail()">
+
+          <mat-card-header class="bie-edit-header">
+            <ngx-growl></ngx-growl>
+            <span>{{ selectedNode.item.name }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="bie-edit-detail-container">
+
+              <div class="row">
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asBbiepDetail().used" (ngModelChange)="resetCardinalities()"
+                                  (change)="itemSelectionToggle(selectedNode)"
+                                  [disabled]="!isEditable()">
+                      Used
+                    </mat-checkbox>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [(ngModel)]="asBbiepDetail().nillable" (ngModelChange)="onChange()"
+                                  [disabled]="!isEditable() || !asBbiepDetail().used">
+                      Nillable
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min" required
+                           [formControl]="bieCardinalityMin">
+                    <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                      Cardinality Min is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')">
+                      '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('min')">
+                      Cardinality Min must be greater than or equals to {{ asBbiepDetail().ccCardinalityMin }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('max')">
+                      {{ bieCardinalityMin.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                           [formControl]="bieCardinalityMax"
+                           [value]="bieCardinalityMax.value | unbounded">
+                    <mat-hint *ngIf="bieCardinalityMax.valid && asBbiepDetail().bieCardinalityMax === 0" style="color: #ff5722;">
+                      Context Definition should define why Cardinality Max is zero (0)
+                    </mat-hint>
+
+                    <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                      Cardinality Max is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
+                      '{{ bieCardinalityMax.value }}' is not allowed for Cardinality Max
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('min')">
+                      {{ bieCardinalityMax.getError('min') }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('max')">
+                      {{ bieCardinalityMax.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-form-field>
+                <input matInput placeholder="Fixed Value"
+                       [(ngModel)]="asBbiepDetail().fixedValue" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbiepDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Default Value"
+                       [(ngModel)]="asBbiepDetail().defaultValue" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbiepDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Business Term" maxlength="225"
+                       [(ngModel)]="asBbiepDetail().bizTerm" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbiepDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Remark" maxlength="225"
+                       [(ngModel)]="asBbiepDetail().remark" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbiepDetail().used">
+              </mat-form-field>
+
+              <mat-card>
+                <mat-card-header class="bie-edit-header">Primitive Restriction</mat-card-header>
+                <mat-card-content>
+                  <mat-form-field>
+                    <input matInput placeholder="Based Data Type Name" [disabled]="true"
+                           [(ngModel)]="asBbiepDetail().bdtDen">
+                  </mat-form-field>
+
+                  <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                      <mat-form-field>
+                        <mat-select placeholder="Primitive Type" required
+                                    [(ngModel)]="asBbiepDetail().primitiveType" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbiepDetail().used">
+                          <mat-option *ngFor="let primitiveType of asBbiepDetail().primitiveTypes"
+                                      [value]="primitiveType.valueOf()">
+                            {{ primitiveType.toString() }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      <mat-form-field *ngIf="asBbiepDetail().primitiveType === 'Primitive'">
+                        <mat-select placeholder="Primitive" required
+                                    [(ngModel)]="asBbiepDetail().bdtPriRestriId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbiepDetail().used">
+                          <mat-option *ngFor="let xbt of asBbiepDetail().xbtList | sort: 'xbtId'"
+                                      [value]="xbt.priRestriId">
+                            {{ xbt.xbtName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field *ngIf="asBbiepDetail().primitiveType === 'Code'">
+                        <mat-select placeholder="Code" required
+                                    [(ngModel)]="asBbiepDetail().codeListId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbiepDetail().used">
+                          <mat-option *ngFor="let codeList of asBbiepDetail().codeLists | sort: 'codeListId'"
+                                      [value]="codeList.codeListId">
+                            {{ codeList.codeListName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field *ngIf="asBbiepDetail().primitiveType === 'Agency'">
+                        <mat-select placeholder="Agency" required
+                                    [(ngModel)]="asBbiepDetail().agencyIdListId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbiepDetail().used">
+                          <mat-option *ngFor="let agency of asBbiepDetail().agencyIdLists | sort: 'agencyIdListId'"
+                                      [value]="agency.agencyIdListId">
+                            {{ agency.agencyIdListName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                </mat-card-content>
+              </mat-card>
+
+              <mat-form-field style="padding-top: 14px;">
+                <textarea matInput rows="6"
+                          placeholder="Context Definition"
+                          [(ngModel)]="asBbiepDetail().contextDefinition" (ngModelChange)="onChange()"
+                          [disabled]="!isEditable() || !asBbiepDetail().used">
+                </textarea>
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                  <mat-form-field>
+                    <textarea matInput rows="6"
+                              placeholder="Association Definition" [disabled]="true"
+                              value="{{ asBbiepDetail().associationDefinition || ' ' }}">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                  <mat-form-field>
+                    <textarea matInput rows="6"
+                              placeholder="Component Definition" [disabled]="true"
+                              value="{{ asBbiepDetail().componentDefinition || ' ' }}">
+                    </textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- BBIE_SC -->
+        <mat-card class="bie-edit-detail-panel" *ngIf="isBbieScDetail()">
+
+          <mat-card-header class="bie-edit-header">
+            <ngx-growl></ngx-growl>
+            <span>{{ selectedNode.item.name }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="bie-edit-detail-container">
+
+              <div class="checkbox">
+                <mat-checkbox color="primary"
+                              [(ngModel)]="asBbieScDetail().used" (ngModelChange)="resetCardinalities()"
+                              (change)="itemSelectionToggle(selectedNode)"
+                              [disabled]="!isEditable()">
+                  Used
+                </mat-checkbox>
+              </div>
+
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min" required
+                           [formControl]="bieCardinalityMin">
+                    <mat-error *ngIf="bieCardinalityMin.hasError('required')">
+                      Cardinality Min is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="!bieCardinalityMin.hasError('min') && bieCardinalityMin.hasError('pattern')">
+                      '{{ bieCardinalityMin.value }}' is not allowed for Cardinality Min
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('min')">
+                      Cardinality Min must be greater than or equals to {{ asBbieScDetail().ccCardinalityMin }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMin.hasError('max')">
+                      {{ bieCardinalityMin.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                           [formControl]="bieCardinalityMax"
+                           [value]="bieCardinalityMax.value | unbounded">
+                    <mat-hint *ngIf="bieCardinalityMax.valid && asBbieScDetail().bieCardinalityMax === 0" style="color: #ff5722;">
+                      Context Definition should define why Cardinality Max is zero (0)
+                    </mat-hint>
+
+                    <mat-error *ngIf="bieCardinalityMax.hasError('required')">
+                      Cardinality Max is <strong>required</strong>
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('pattern')">
+                      '{{ bieCardinalityMax.value }}' is not allowed for Cardinality Max
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('min')">
+                      {{ bieCardinalityMax.getError('min') }}
+                    </mat-error>
+                    <mat-error *ngIf="bieCardinalityMax.hasError('max')">
+                      {{ bieCardinalityMax.getError('max') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-form-field>
+                <input matInput placeholder="Fixed Value"
+                       [(ngModel)]="asBbieScDetail().fixedValue" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbieScDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Default Value"
+                       [(ngModel)]="asBbieScDetail().defaultValue" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbieScDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Business Term" maxlength="225"
+                       [(ngModel)]="asBbieScDetail().bizTerm" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbieScDetail().used">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Remark" maxlength="225"
+                       [(ngModel)]="asBbieScDetail().remark" (ngModelChange)="onChange()"
+                       [disabled]="!isEditable() || !asBbieScDetail().used">
+              </mat-form-field>
+
+              <mat-card>
+                <mat-card-header class="bie-edit-header">Primitive Restriction</mat-card-header>
+                <mat-card-content>
+
+                  <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                      <mat-form-field>
+                        <mat-select placeholder="Primitive Type" required
+                                    [(ngModel)]="asBbieScDetail().primitiveType" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbieScDetail().used">
+                          <mat-option *ngFor="let primitiveType of asBbieScDetail().primitiveTypes"
+                                      [value]="primitiveType.valueOf()">
+                            {{ primitiveType.toString() }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      <mat-form-field *ngIf="asBbieScDetail().primitiveType === 'Primitive'">
+                        <mat-select placeholder="Primitive" required
+                                    [(ngModel)]="asBbieScDetail().dtScPriRestriId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbieScDetail().used">
+                          <mat-option *ngFor="let xbt of asBbieScDetail().xbtList | sort: 'xbtId'"
+                                      [value]="xbt.priRestriId">
+                            {{ xbt.xbtName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field *ngIf="asBbieScDetail().primitiveType === 'Code'">
+                        <mat-select placeholder="Code" required
+                                    [(ngModel)]="asBbieScDetail().codeListId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbieScDetail().used">
+                          <mat-option *ngFor="let codeList of asBbieScDetail().codeLists | sort: 'codeListId'"
+                                      [value]="codeList.codeListId">
+                            {{ codeList.codeListName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field *ngIf="asBbieScDetail().primitiveType === 'Agency'">
+                        <mat-select placeholder="Agency" required
+                                    [(ngModel)]="asBbieScDetail().agencyIdListId" (ngModelChange)="onChange()"
+                                    [disabled]="!isEditable() || !asBbieScDetail().used">
+                          <mat-option *ngFor="let agency of asBbieScDetail().agencyIdLists | sort: 'agencyIdListId'"
+                                      [value]="agency.agencyIdListId">
+                            {{ agency.agencyIdListName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                </mat-card-content>
+              </mat-card>
+
+              <mat-form-field style="padding-top: 14px;">
+                <textarea matInput rows="6"
+                          placeholder="Context Definition"
+                          [(ngModel)]="asBbieScDetail().contextDefinition" (ngModelChange)="onChange()"
+                          [disabled]="!isEditable() || !asBbieScDetail().used">
+                </textarea>
+              </mat-form-field>
+
+              <mat-form-field>
+                <textarea matInput rows="6"
+                          placeholder="Component Definition" [disabled]="true"
+                          value="{{ asBbieScDetail().componentDefinition || ' ' }}">
+                </textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,9 @@
+<h2 mat-dialog-title><U>Warning</U> :</h2>
+<mat-dialog-content class="mat-typography">
+  Another context scheme with the same properties already exist.
+</mat-dialog-content>
+<hr>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Update anyway</button>
+</mat-dialog-actions>

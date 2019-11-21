@@ -1,0 +1,94 @@
+{
+  "CORE_COMPONENT_LIST": {
+    "TITLE": "Core Components (Model Library)",
+    "DEN": "DEN (Directory Entry Name)",
+    "MODULE": "Module (Part of schema file path, no extension)"
+  },
+  "ACC_DETAIL": {
+    "TITLE": "ACC (Component Type or Group Definition)",
+    "OBJECT": "Object Class Term (Space Separated Name)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "ASCCP_DETAIL": {
+    "TITLE": "ASCCP (Component or Group Definition)",
+    "TITLE_CASE": "ASCCP (Associated Component) Detail",
+    "PROPERTY_TERM": "Property Term (Component Name)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "ASCC_DETAIL": {
+    "TITLE": "ASCC",
+    "TITLE_CASE": "ASCC (Component Association) Detail",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "BCC_DETAIL": {
+    "TITLE": "BCC ",
+    "TITLE_CASE": "BCC (Field Association) Detail",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "BCCP_DETAIL": {
+    "TITLE": "BCCP ",
+    "TITLE_CASE": "BCCP (Associated Field) Detail",
+    "PROPERTY_TERM": "Property Term (Field Name)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "DATA_TYPE_DETAIL": {
+    "TITLE": "Data Type ",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "BDT_SC_DETAIL": {
+    "TITLE": "BDT_SC",
+    "TITLE_CASE": "Supplementary Component (Field Metadata)",
+    "MAX": "Cardinality Max (-1 for unbounded)",
+    "DEN": "DEN (Dictionary Entry Name)"
+  },
+  "BIE_LIST": {
+    "TITLE": "BIEs (Profiled Components, Nouns, BODs)",
+    "ASSIGNMENT_TITLE": "Choose a BIE to assign a Business Context",
+    "ASSIGNMENT": "Assign Business(es) Context(s) to a BIE"
+  },
+  "BIE_EXPRESS": {
+    "TITLE": "Express BIE (Profiled Component, Noun, BOD)"
+  },
+  "BIE_COPY": {
+    "TITLE": "Copy BIE (Profiled Component, Noun, BOD)"
+  },
+  "BIE_CREATE": {
+    "TITLE": "Create BIE (Profiled Component, Noun, BOD)"
+  },
+  "BIE_CREATE_2": {
+    "TITLE": "Create BIE (Profiled Component, Noun, BOD)"
+  },
+  "BIE_EDIT": {
+    "TITLE": "Edit BIE (Profiled Component, Noun, BOD)",
+    "MAX": "Cardinality Max (-1 for unbounded)"
+  },
+  "MODULE_LIST": {
+    "TITLE": "Module (File Information)"
+  },
+  "MODULE_CREATE": {
+    "TITLE": "Create Module (Create Physical File)"
+  },
+  "BIE_NAV": {
+    "TITLE": "Manage Profiled Component, Noun, BOD",
+    "CREATE": "Profile a Component, Noun, BOD",
+    "VIEW": "List of Profiled Components, Nouns, BODs",
+    "COPY": "Copy a Profiled Component, Noun, BOD",
+    "GENERATE": "Generate Expression for a Profiled Component, Noun, BOD"
+  },
+  "CC_NAV": {
+    "TITLE": "Manage Model Library"
+  },
+  "MODULE_NAV": {
+    "TITLE": "Manage Physical File Information"
+  },
+  "ASCCP_CREATE": {
+    "TITLE": "Create an ASCCP",
+    "SUBTITLE": "Select an ACC to create a new ASCCP"
+  },
+  "BCCP_CREATE": {
+    "TITLE": "Create a BCCP",
+    "SUBTITLE": "Select an BDT to create a new BCCP"
+  }
+}

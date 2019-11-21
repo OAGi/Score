@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{data.bizCtx}} Business context(s) use this context scheme !</h2>
+<div mat-dialog-content class="mat-typography">
+  <li *ngFor="let Dlist of data.list">
+    {{Dlist}}
+  </li>
+  <br/>
+  <hr>
+  <p><b> Business context(s) need to be deleted first. </b></p>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>OK</button>
+</div>
