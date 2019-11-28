@@ -5,3 +5,6 @@ The dotcom boom drove tremendous progress in system-interoperability standards. 
 The Open Applications Group (OAGi) and its members endured painful experience of implementing CCTS/CCS (hereafter just CCS). Something had to be done. OAGi has enjoyed a long and productive collaborative relationship with the National Institute of Standards and Technology (NIST, under the United States Department of Commerce). NIST researchers took initiative to develop a proof-of-concept application that would enable CCS-based library development and maintenance, and contextual profile development and maintenance. OAGi provided a rich CCS-compliant library, design input, and real-world testing.
 
 Fast forward a few years and we have a tool: Score. Score has become an indispensable tool for multi-national companies in agriculture, aerospace, payroll processing, enterprise resource planning, and more. Score is now available as an open source project.
+
+## Specify Context
+Clearly specified context is a prerequisite to effective data model implementations. Key context categories include geopolitical, process, and industry. Score supports unlimited context categories, unlimited possible values for each categories, and unlimited business context definitions (set of context category/value pairs).
