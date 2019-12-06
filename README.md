@@ -24,8 +24,8 @@ When it comes to moving large amounts of data around reliably, XML is a proven w
 
 ## Produce JSON Schema
 
-While XML is a proven workhorse, JSON has emerged as the preferred syntax lighter-weight “chatty” system interactions. Score makes it easy to produce JSON schemas from profiled core components giving developers exactly what they need to complete their integration projects on time and on budget.
+While XML is a proven workhorse, JSON has emerged as the preferred syntax lighter-weight “chatty” system interactions. Score makes it easy to produce JSON schemas from profiled core components giving developers exactly what they need to complete their integration projects on time and on budget.  There are JSON Schema class generators for many programming languages to accelerate the integration development effort.
 
-## Produce API Specification
+## Produce Open API Specification
 
-Message formats are only part of interoperability story. Delivering and retrieving messages among systems is another part. API specifications give developers the details they need to invoke or make available the services behind the APIs. Score makes it easy to generate OAS 3.0-compliant API specifications that complement the schemas.
+Message formats are only part of interoperability story. Delivering and retrieving messages among systems is another part. RESTful Web API specifications give developers the details they need to invoke or make available the services behind the APIs. Score makes it easy to generate OAS 3.0-compliant API specifications that include the schema object.  There are OAS class generators for many programming languages to accelerate the integration development effort.
