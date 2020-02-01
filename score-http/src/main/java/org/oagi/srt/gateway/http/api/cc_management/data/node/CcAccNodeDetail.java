@@ -14,5 +14,6 @@ public class CcAccNodeDetail implements CcNodeDetail {
     private boolean abstracted;
     private boolean deprecated;
     private String definition;
+    private String definitionSource;
     private CcState state;
 }

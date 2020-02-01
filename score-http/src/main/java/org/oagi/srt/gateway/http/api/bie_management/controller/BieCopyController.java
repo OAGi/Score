@@ -19,7 +19,7 @@ public class BieCopyController {
     private BieCopyService service;
 
     @RequestMapping(value = "/profile_bie/copy", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity create(
             @AuthenticationPrincipal User user,
             @RequestBody BieCopyRequest request) {

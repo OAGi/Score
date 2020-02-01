@@ -17,7 +17,7 @@ public class AgencyIdController {
     private AgencyIdService service;
 
     @RequestMapping(value = "/simple_agency_id_list_values", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleAgencyIdListValue> getSimpleAgencyIdListValues() {
         return service.getSimpleAgencyIdListValues();
     }

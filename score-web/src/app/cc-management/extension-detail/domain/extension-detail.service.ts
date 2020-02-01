@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {AsccpForAppendAsccp, BccpForAppendBccp} from './extension-detail';
 import {HttpClient} from '@angular/common/http';
-import {CcNodeDetail} from '../../domain/core-component-node';
+import {CcAsccpNodeDetail, CcNode, CcNodeDetail} from '../../domain/core-component-node';
 
 @Injectable()
 export class ExtensionDetailService {
@@ -75,5 +75,9 @@ export class ExtensionDetailService {
     }
 
     return this.http.post('/api/core_component/extension/' + releaseId + '/' + extensionId + '/detail', body);
+  }
+
+  getCcLastRevision(releaseId: number, type: String, Ccid: number): Observable<any> {
+    return this.http.get<CcNode>('/api/core_component/extension/' + releaseId + '/' + type + '/' + Ccid + '/reivision');
   }
 }

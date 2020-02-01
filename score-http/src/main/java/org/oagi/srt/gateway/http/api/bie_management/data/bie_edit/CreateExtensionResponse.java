@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateExtensionResponse {
-
+    public boolean canEdit;
+    public boolean canView;
     public long extensionId;
 }

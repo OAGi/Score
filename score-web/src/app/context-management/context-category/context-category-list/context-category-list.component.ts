@@ -55,10 +55,11 @@ export class ContextCategoryListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadContextCategoryList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadContextCategoryList();
   }
 

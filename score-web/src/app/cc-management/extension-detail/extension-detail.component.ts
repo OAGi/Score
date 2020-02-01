@@ -33,6 +33,7 @@ import {AppendAsccpDialogComponent} from './append-asccp-dialog/append-asccp-dia
 import {AppendBccpDialogComponent} from './append-bccp-dialog/append-bccp-dialog.component';
 import {ExtensionDetailService} from './domain/extension-detail.service';
 import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
+import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
 import {GrowlService} from 'ngx-growl';
 
 @Injectable()
@@ -146,11 +147,11 @@ export class DynamicCcDataSource {
   }
 
   onSelect(...nodes: DynamicCcFlatNode[]) {
-    this.component.resetCardinalities();
+    this.component.preprocessProperty();
   }
 
   onDeselect(...nodes: DynamicCcFlatNode[]) {
-    this.component.resetCardinalities();
+    this.component.preprocessProperty();
   }
 }
 
@@ -202,6 +203,7 @@ export class ExtensionDetailComponent implements OnInit {
   ccCardinalityMax: FormControl;
   /* End cardinality management */
 
+  editNillable: boolean;
 
   checklistSelection = new SelectionModel<DynamicCcFlatNode>(true /* multiple */);
   @ViewChild(ContextMenuComponent, {static: true}) public appendingMenu: ContextMenuComponent;
@@ -215,7 +217,6 @@ export class ExtensionDetailComponent implements OnInit {
               private hotkeysService: HotkeysService,
               private contextMenuService: ContextMenuService,
               private dialog: MatDialog) {
-
   }
 
   ngOnInit() {
@@ -321,7 +322,7 @@ export class ExtensionDetailComponent implements OnInit {
     this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
       this.selectedNode = node;
       this.detail = detail;
-      this.resetCardinalities(this.detail);
+      this.preprocessProperty(this.detail);
     });
   }
 
@@ -423,11 +424,38 @@ export class ExtensionDetailComponent implements OnInit {
     return this.$isChanged.size > 0;
   }
 
-  updateDetails() {
+  validateDetails() {
     if (!this.isChanged || this.isUpdating) {
       return;
     }
 
+    const details = Array.from(this.$isChanged.values());
+    let emptyDefinition = false;
+    for (const detail of details) {
+      if (this.isAsccpDetail(detail)) {
+        if (this.asAsccpDetail(detail).ascc.definition == null || this.asAsccpDetail(detail).ascc.definition.length === 0) {
+          emptyDefinition = true;
+        }
+      }
+      if (this.isBccpDetail(detail)) {
+        if (this.asBccpDetail(detail).bcc.definition == null || this.asBccpDetail(detail).bcc.definition.length === 0) {
+          emptyDefinition = true;
+        }
+      }
+    }
+    if (emptyDefinition) {
+      const dialogRef = this.dialog.open(DefinitionConfirmDialogComponent, {});
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.updateDetails();
+        }
+      });
+    } else {
+      this.updateDetails();
+    }
+  }
+
+  updateDetails() {
     const details = Array.from(this.$isChanged.values());
     this.isUpdating = true;
     this.extensionDetailService.updateDetails(details, this.releaseId, this.extensionId).subscribe(_ => {
@@ -542,7 +570,7 @@ export class ExtensionDetailComponent implements OnInit {
     this.extensionDetailService.setState(this.releaseId, this.extensionId, state).subscribe(_ => {
       this.rootNode.item.state = state;
       this.isUpdating = false;
-      this.resetCardinalities();
+      this.preprocessProperty();
 
       this.snackBar.open('State updated', '', {
         duration: 1000,
@@ -563,24 +591,58 @@ export class ExtensionDetailComponent implements OnInit {
     });
   }
 
-  resetCardinalities(nodeDetail?: CcNodeDetail) {
-    this._setCardinalityMinFormControl(nodeDetail);
-    this._setCardinalityMaxFormControl(nodeDetail);
-  }
-
-  _setCardinalityMinFormControl(nodeDetail?: CcNodeDetail) {
+  preprocessProperty(nodeDetail?: CcNodeDetail) {
     if (!nodeDetail) {
       nodeDetail = this.detail;
     }
     if (!nodeDetail) {
       return;
     }
+    this.editNillable = true;
+    if (this.isAsccpDetail(nodeDetail)) {
+      const asccId = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc.asccId;
+      this.extensionDetailService.getCcLastRevision(this.rootNode.item.releaseId, 'ascc', asccId).subscribe(result => {
+        if (result) {
+          this._setCardinalityMinFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
+          this._setCardinalityMaxFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
+        } else {
+          this._setCardinalityMinFormControl(nodeDetail);
+          this._setCardinalityMaxFormControl(nodeDetail);
+        }
+      });
+    } else if (this.isBccpDetail(nodeDetail)) {
+      const bccId = (<unknown>nodeDetail as CcBccpNodeDetail).bcc.bccId;
+      this.extensionDetailService.getCcLastRevision(this.rootNode.item.releaseId, 'bcc', bccId).subscribe(result => {
+        if (result) {
+          if (result.nillable) {
+            this.editNillable = false;
+          }
+          this._setCardinalityMinFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
+          this._setCardinalityMaxFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
+        } else {
+          this._setCardinalityMinFormControl(nodeDetail);
+          this._setCardinalityMaxFormControl(nodeDetail);
+        }
+      });
+    } else {
+      this._setCardinalityMinFormControl(nodeDetail);
+      this._setCardinalityMaxFormControl(nodeDetail);
+    }
+  }
+
+  _setCardinalityMinFormControl(nodeDetail?: CcNodeDetail, revisionCardinalityMin?: number, revisionCardinalityMax?: number) {
+    if (!revisionCardinalityMin) {
+      revisionCardinalityMin = 0;
+    }
 
     let obj;
+    let revisionNum = 0;
     if (this.isAsccpDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc;
+      revisionNum = obj.revisionNum;
     } else if (this.isBccpDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcBccpNodeDetail).bcc;
+      revisionNum = obj.revisionNum;
     } else if (this.isBdtScDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcBdtScNodeDetail);
     } else {
@@ -589,12 +651,18 @@ export class ExtensionDetailComponent implements OnInit {
 
     this.ccCardinalityMin = new FormControl({
         value: obj.cardinalityMin,
-      disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup())
+      // tslint:disable-next-line:max-line-length
+      disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup() || (revisionNum > 1 && revisionCardinalityMin === 0) )
       }, [
         Validators.required,
         Validators.pattern('[0-9]+'),
         // validatorFn for maximum value
         (control: AbstractControl): ValidationErrors | null => {
+          if (revisionCardinalityMin !== 0) {
+            if (Number(control.value) > revisionCardinalityMin) {
+              return {'max': 'Cardinality Min must be less than or equals to ' + revisionCardinalityMin};
+            }
+          }
           if (obj.cardinalityMax === -1) {
             return null;
           }
@@ -610,24 +678,26 @@ export class ExtensionDetailComponent implements OnInit {
         value = isNumber(value) ? value : Number.parseInt(value, 10);
         obj.cardinalityMin = Number(value);
         this.onChange(nodeDetail);
-        this._setCardinalityMaxFormControl(nodeDetail);
+        this.ccCardinalityMax.updateValueAndValidity();
+        this._setCardinalityMaxFormControl(nodeDetail, revisionCardinalityMin, revisionCardinalityMax);
       }
     });
   }
 
-  _setCardinalityMaxFormControl(nodeDetail?: CcNodeDetail) {
-    if (!nodeDetail) {
-      nodeDetail = this.detail;
-    }
-    if (!nodeDetail) {
-      return;
+  _setCardinalityMaxFormControl(nodeDetail?: CcNodeDetail, revisionCardinalityMin?: number, revisionCardinalityMax?: number) {
+
+    if (!revisionCardinalityMax) {
+      revisionCardinalityMax = -1;
     }
 
     let obj;
+    let revisionNum = 0;
     if (this.isAsccpDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc;
+      revisionNum = obj.revisionNum;
     } else if (this.isBccpDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcBccpNodeDetail).bcc;
+      revisionNum = obj.revisionNum;
     } else if (this.isBdtScDetail(nodeDetail)) {
       obj = (<unknown>nodeDetail as CcBdtScNodeDetail);
     } else {
@@ -636,7 +706,8 @@ export class ExtensionDetailComponent implements OnInit {
 
     this.ccCardinalityMax = new FormControl({
         value: new UnboundedPipe().transform(obj.cardinalityMax),
-        disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup())
+      // tslint:disable-next-line:max-line-length
+        disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup() || (revisionNum > 1 && revisionCardinalityMax === -1) )
       }, [
         Validators.required,
         Validators.pattern('[0-9]+|-1|unbounded'),
@@ -645,6 +716,15 @@ export class ExtensionDetailComponent implements OnInit {
           let controlValue = control.value;
           controlValue = (controlValue === 'unbounded') ? -1 : (isNumber(controlValue) ? controlValue : Number.parseInt(controlValue, 10));
 
+          if (revisionCardinalityMax !== -1) {
+            if ( controlValue === -1 ) {
+              return null;
+            } else {
+              if (controlValue < revisionCardinalityMax) {
+                return {'min': 'Cardinality Max must be greater than or equal to ' + revisionCardinalityMax};
+              }
+            }
+          }
           if (!controlValue || controlValue === -1) {
             return null;
           }
@@ -660,7 +740,8 @@ export class ExtensionDetailComponent implements OnInit {
         value = (value === 'unbounded') ? -1 : (isNumber(value) ? value : Number.parseInt(value, 10));
         obj.cardinalityMax = value;
         this.onChange(nodeDetail);
-        this._setCardinalityMinFormControl(nodeDetail);
+        this.ccCardinalityMin.updateValueAndValidity();
+        this._setCardinalityMinFormControl(nodeDetail, revisionCardinalityMin, revisionCardinalityMax);
       }
     });
   }

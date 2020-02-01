@@ -22,7 +22,7 @@ public class ContextSchemeController {
     private ContextSchemeService service;
 
     @RequestMapping(value = "/context_schemes", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<ContextScheme> getContextSchemeList(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
@@ -60,43 +60,43 @@ public class ContextSchemeController {
     }
 
     @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextScheme getContextScheme(@PathVariable("id") long id) {
         return service.getContextScheme(id);
     }
 
     @RequestMapping(value = "/simple_context_schemes", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleContextScheme> getSimpleContextSchemeList() {
         return service.getSimpleContextSchemeList();
     }
 
     @RequestMapping(value = "/context_category/{id}/simple_context_schemes", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleContextScheme> getSimpleContextSchemeList(@PathVariable("id") long ctxCategoryId) {
         return service.getSimpleContextSchemeList(ctxCategoryId);
     }
 
     @RequestMapping(value = "/simple_context_scheme_value_from_ctx_values/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextSchemeValue getSimpleContextSchemeValueByCtxSchemeValuesId(@PathVariable("id") long ctxSchemeValuesId) {
         return service.getSimpleContextSchemeValueByCtxSchemeValuesId(ctxSchemeValuesId);
     }
 
     @RequestMapping(value = "/biz_ctx_values_from_ctx_values/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBizCtxValueFromCtxSchemeValueId(@PathVariable("id") long ctxSchemeValueId) {
         return service.getBizCtxValueFromCtxSchemeValueId(ctxSchemeValueId);
     }
 
     @RequestMapping(value = "/biz_ctx/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BusinessContext getBusinessContext(@PathVariable("id") long bizCtxId) {
         return service.getBusinessContext(bizCtxId);
     }
 
     @RequestMapping(value = "/biz_ctx_values", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBizCtxValues() {
         return service.getBizCtxValues();
     }

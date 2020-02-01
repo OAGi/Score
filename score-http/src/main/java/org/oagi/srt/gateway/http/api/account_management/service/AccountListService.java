@@ -8,6 +8,7 @@ import org.oagi.srt.gateway.http.api.account_management.data.AppUser;
 import org.oagi.srt.gateway.http.api.common.data.PageRequest;
 import org.oagi.srt.gateway.http.api.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class AccountListService {
 
         List<Condition> conditions = new ArrayList();
         if (!StringUtils.isEmpty(request.getLoginId())) {
-            conditions.add(APP_USER.LOGIN_ID.contains(request.getLoginId().trim()));
+            conditions.add(APP_USER.LOGIN_ID.containsIgnoreCase(request.getLoginId().trim()));
         }
         if (!StringUtils.isEmpty(request.getName())) {
             conditions.add(APP_USER.NAME.containsIgnoreCase(request.getName().trim()));
@@ -60,7 +61,7 @@ public class AccountListService {
         }
         Boolean excludeRequester = request.getExcludeRequester();
         if (excludeRequester != null && excludeRequester == true) {
-            conditions.add(APP_USER.LOGIN_ID.ne(requester.getUsername().trim()));
+            conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(requester.getUsername().trim()));
         }
 
         SelectConnectByStep<Record5<ULong, String, String, Byte, String>> conditionStep = step.where(conditions);
@@ -125,11 +126,10 @@ public class AccountListService {
         return dslContext.select(
                 APP_USER.APP_USER_ID,
                 APP_USER.LOGIN_ID,
-                APP_USER.PASSWORD,
                 APP_USER.NAME,
                 APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.ORGANIZATION
-        ).from(APP_USER).where(APP_USER.LOGIN_ID.eq(loginId))
+        ).from(APP_USER).where(APP_USER.LOGIN_ID.equalIgnoreCase(loginId))
                 .fetchOneInto(AppUser.class);
     }
 
@@ -157,7 +157,7 @@ public class AccountListService {
     public boolean hasTaken(String loginId) {
         return dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
-                .where(APP_USER.LOGIN_ID.eq(loginId))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(loginId))
                 .fetchOptionalInto(Long.class).orElse(0L) != 0L;
     }
 }

@@ -34,6 +34,9 @@ export class CcListService {
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
+
+    params = params.set('deprecated', '' + request.deprecated);
+
     if (request.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
     }

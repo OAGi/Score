@@ -117,6 +117,14 @@ public class ExtensionService {
         return null;
     }
 
+    public ACC getLatestUserExtension(long accId, long releaseId) {
+        return dslContext.selectFrom(Tables.ACC)
+                .where(Tables.ACC.CURRENT_ACC_ID.eq(ULong.valueOf(accId)))
+                .orderBy(Tables.ACC.ACC_ID.desc())
+                .limit(1)
+                .fetchOneInto(ACC.class);
+    }
+
 
     @Transactional
     public long appendUserExtension(BieEditAcc eAcc, ACC ueAcc,
@@ -166,6 +174,7 @@ public class ExtensionService {
 
         dslContext.update(Tables.ACC)
                 .set(Tables.ACC.STATE, history.getState())
+                .set(Tables.ACC.OWNER_USER_ID, userId)
                 .set(Tables.ACC.LAST_UPDATED_BY, userId)
                 .set(Tables.ACC.LAST_UPDATE_TIMESTAMP, timestamp)
                 .where(Tables.ACC.ACC_ID.eq(ULong.valueOf(ueAcc.getAccId())))
@@ -555,6 +564,59 @@ public class ExtensionService {
         ).execute();
     }
 
+    public boolean isExistChildren(long extensionId, Long releaseId, Long asccpId, Long bccpId) {
+        if (asccpId != null) {
+            boolean exists = dslContext.selectCount()
+                    .from(ASCC).where(and(
+                            ASCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                            ASCC.TO_ASCCP_ID.eq(ULong.valueOf(asccpId))
+                    ))
+                    .fetchOptionalInto(Integer.class).orElse(0) > 0;
+            if (exists) {
+                return true;
+            }
+        } else if (bccpId != null) {
+            boolean exists = dslContext.selectCount()
+                    .from(BCC).where(and(
+                            BCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                            BCC.TO_BCCP_ID.eq(ULong.valueOf(bccpId))
+                    ))
+                    .fetchOptionalInto(Integer.class).orElse(0) > 0;
+            if (exists) {
+                return true;
+            }
+        }
+        Long based_acc_id = dslContext.select(ACC.as("extension_acc").BASED_ACC_ID)
+                .from(ASCCP)
+                .join(ASCC).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(ACC.as("base_acc")).on(ACC.as("base_acc").ACC_ID.eq(ASCC.FROM_ACC_ID))
+                .join(ACC.as("extension_acc")).on(ACC.as("extension_acc").ACC_ID.eq(ACC.as("base_acc").BASED_ACC_ID))
+                .where(and(ASCCP.ROLE_OF_ACC_ID.eq(ULong.valueOf(extensionId)),
+                        ASCC.RELEASE_ID.eq(ULong.valueOf(releaseId)))).fetchOptionalInto(Long.class).orElse(null);
+
+        if(based_acc_id != null){
+            boolean baseExist = false;
+            if (asccpId != null) {
+                baseExist = dslContext.selectCount()
+                        .from(ASCC)
+                        .where(and(ASCC.FROM_ACC_ID.eq(ULong.valueOf(based_acc_id)),
+                                ASCC.TO_ASCCP_ID.eq(ULong.valueOf(asccpId))))
+                        .fetchOptionalInto(Integer.class).orElse(0) > 0;
+            } else if (bccpId != null) {
+                baseExist = dslContext.selectCount()
+                        .from(BCC)
+                        .where(and(BCC.FROM_ACC_ID.eq(ULong.valueOf(based_acc_id)),
+                                BCC.TO_BCCP_ID.eq(ULong.valueOf(bccpId))))
+                        .fetchOptionalInto(Integer.class).orElse(0) > 0;
+            }
+            if (baseExist) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     @Transactional
     public void appendAsccp(User user, long extensionId, Long releaseId, long asccpId) {
         int nextSeqKey = getNextSeqKey(extensionId);
@@ -567,12 +629,8 @@ public class ExtensionService {
          * Issue #710
          * Duplicated associations cannot be existed.
          */
-        boolean exists = dslContext.selectCount()
-                .from(ASCC).where(and(
-                        ASCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
-                        ASCC.TO_ASCCP_ID.eq(ULong.valueOf(asccpId))
-                ))
-                .fetchOptionalInto(Integer.class).orElse(0) > 0;
+
+        boolean exists = isExistChildren(extensionId, releaseId, asccpId, null);
         if (exists) {
             throw new IllegalArgumentException("You cannot associate the same component.");
         }
@@ -672,7 +730,7 @@ public class ExtensionService {
                 ascc.getLastUpdateTimestamp(),
                 ULong.valueOf(releaseId),
                 ascc.getState(),
-                revisionNum,
+                1,
                 1,
                 Integer.valueOf(RevisionAction.Insert.getValue()).byteValue(),
                 ascc.getAsccId()
@@ -691,12 +749,7 @@ public class ExtensionService {
          * Issue #710
          * Duplicated associations cannot be existed.
          */
-        boolean exists = dslContext.selectCount()
-                .from(BCC).where(and(
-                        BCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
-                        BCC.TO_BCCP_ID.eq(ULong.valueOf(bccpId))
-                ))
-                .fetchOptionalInto(Integer.class).orElse(0) > 0;
+        boolean exists = isExistChildren(extensionId, releaseId, null, bccpId);
         if (exists) {
             throw new IllegalArgumentException("You cannot associate the same component.");
         }
@@ -800,7 +853,7 @@ public class ExtensionService {
                 bcc.getLastUpdateTimestamp(),
                 ULong.valueOf(releaseId),
                 bcc.getState(),
-                revisionNum,
+                1,
                 1,
                 Integer.valueOf(RevisionAction.Insert.getValue()).byteValue(),
                 bcc.getBccId()
@@ -883,10 +936,6 @@ public class ExtensionService {
         updateAccState(extensionId, releaseId, state, userId, timestamp);
         updateAsccState(extensionId, releaseId, state, userId, timestamp);
         updateBccState(extensionId, releaseId, state, userId, timestamp);
-
-        if (state == CcState.Published) {
-            storeBieUserExtRevisions(extensionId, releaseId);
-        }
     }
 
     private void updateAccState(long extensionId, Long releaseId, CcState state,
@@ -1147,7 +1196,7 @@ public class ExtensionService {
     public void transferOwnership(User user, long releaseId, long extensionId, String targetLoginId) {
         long targetAppUserId = dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
-                .where(APP_USER.LOGIN_ID.eq(targetLoginId))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(targetLoginId))
                 .fetchOptionalInto(Long.class).orElse(0L);
         if (targetAppUserId == 0L) {
             throw new IllegalArgumentException("Not found a target user.");
@@ -1294,6 +1343,45 @@ public class ExtensionService {
             history.setOwnerUserId(targetAppUserId);
 
             dslContext.insertInto(BCC).set(history).execute();
+        }
+    }
+
+    public CcNode getLastRevisionCc(User user, String type, long id) {
+        if (type.equals("ascc")) {
+            return dslContext.select(
+                    ASCC.ASCC_ID,
+                    ASCC.CURRENT_ASCC_ID,
+                    ASCC.GUID,
+                    ASCC.REVISION_NUM,
+                    ASCC.REVISION_TRACKING_NUM,
+                    ASCC.CARDINALITY_MIN,
+                    ASCC.CARDINALITY_MAX,
+                    ASCC.RELEASE_ID)
+                    .from(ASCC)
+                    .where(and(ASCC.CURRENT_ASCC_ID.eq(ULong.valueOf(id)),
+                            ASCC.STATE.eq(CcState.Published.getValue())))
+                    .orderBy(ASCC.ASCC_ID.desc())
+                    .limit(1)
+                    .fetchOneInto(CcAsccNode.class);
+        } else if (type.equals("bcc")) {
+            return dslContext.select(
+                    BCC.BCC_ID,
+                    BCC.CURRENT_BCC_ID,
+                    BCC.GUID,
+                    BCC.REVISION_NUM,
+                    BCC.REVISION_TRACKING_NUM,
+                    BCC.CARDINALITY_MIN,
+                    BCC.CARDINALITY_MAX,
+                    BCC.RELEASE_ID,
+                    BCC.IS_NILLABLE.as("nillable")
+            ).from(BCC).where(and(
+                    BCC.CURRENT_BCC_ID.eq(ULong.valueOf(id)),
+                    BCC.STATE.eq(CcState.Published.getValue())))
+                    .orderBy(BCC.BCC_ID.desc())
+                    .limit(1)
+                    .fetchOneInto(CcBccNode.class);
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 }

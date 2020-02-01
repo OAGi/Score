@@ -22,7 +22,7 @@ public class BusinessContextController {
     private BusinessContextService service;
 
     @RequestMapping(value = "/business_contexts", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BusinessContext> getBusinessContextList(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "bizCtxIds", required = false) String bizCtxIds,
@@ -65,25 +65,25 @@ public class BusinessContextController {
     }
 
     @RequestMapping(value = "/business_context/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BusinessContext getBusinessContext(@PathVariable("id") long id) {
         return service.getBusinessContext(id);
     }
 
     @RequestMapping(value = "/business_context_values", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBusinessContextValues() {
         return service.getBusinessContextValues();
     }
 
     @RequestMapping(value = "/context_scheme/{id}/simple_context_scheme_values", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleContextSchemeValue> getSimpleContextSchemeValueList(@PathVariable("id") long ctxSchemeId) {
         return service.getSimpleContextSchemeValueList(ctxSchemeId);
     }
 
     @RequestMapping(value = "/business_context_values_from_biz_ctx/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessContextValue> getBusinessCtxValuesFromBizCtx(@PathVariable("id") long businessCtxID) {
         return service.getBusinessContextValuesByBusinessCtxId(businessCtxID);
     }

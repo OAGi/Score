@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ReleaseService} from '../domain/release.service';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {Router} from '@angular/router';
 import {ReleaseList} from '../domain/release';
@@ -37,6 +37,15 @@ export class ReleaseListComponent implements OnInit {
         (data.releaseNum && data.releaseNum.indexOf(filter) !== -1);
     };
 
+    this.loadCodeList();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.loadCodeList();
+  }
+
+  onChange() {
+    this.paginator.pageIndex = 0;
     this.loadCodeList();
   }
 

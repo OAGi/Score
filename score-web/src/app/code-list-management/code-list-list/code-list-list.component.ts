@@ -15,6 +15,9 @@ import {CodeListService} from '../domain/code-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'srt-code-list-list',
@@ -34,6 +37,8 @@ export class CodeListListComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CodeListForListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -59,15 +64,19 @@ export class CodeListListComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
     this.onChange();
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadCodeList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadCodeList();
   }
 

@@ -13,6 +13,9 @@ import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service'
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'srt-bie-create-asccp',
@@ -36,6 +39,10 @@ export class BieCreateAsccpComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -77,10 +84,14 @@ export class BieCreateAsccpComponent implements OnInit {
     this.sort.direction = 'asc';
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadData();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
 
     // Init releases
     this.releaseId = 0;
@@ -89,13 +100,13 @@ export class BieCreateAsccpComponent implements OnInit {
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         this.releaseId = this.releases[0].releaseId;
-        this.onChange();
+        this.loadData();
       }
     });
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadData();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -119,8 +130,12 @@ export class BieCreateAsccpComponent implements OnInit {
         break;
     }
   }
-
   onChange() {
+    this.paginator.pageIndex = 0;
+    this.loadData();
+  }
+
+  loadData() {
     this.loading = true;
 
     this.request.releaseId = this.releaseId;
@@ -134,10 +149,14 @@ export class BieCreateAsccpComponent implements OnInit {
       const list = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(new RegExp(this.request.filters.module, 'g'), '<b>' + this.request.filters.module + '</b>');
+          elm.module = elm.module.replace(
+            new RegExp(this.request.filters.module, 'ig'),
+            '<b>$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(new RegExp(this.request.filters.definition, 'g'), '<b>' + this.request.filters.definition + '</b>');
+          elm.definition = elm.definition.replace(
+            new RegExp(this.request.filters.definition, 'ig'),
+            '<b>$&</b>');
         }
         return elm;
       });

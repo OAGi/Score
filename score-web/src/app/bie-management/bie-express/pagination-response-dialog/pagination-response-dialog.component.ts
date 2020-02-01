@@ -6,6 +6,9 @@ import {BieListService} from '../../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest} from '../../../basis/basis';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../../common/utility';
 
 @Component({
   selector: 'srt-pagination-response-dialog',
@@ -22,6 +25,10 @@ export class PaginationResponseDialogComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Editing', 'Candidate', 'Published'];
   request: BieListRequest;
 
@@ -51,15 +58,20 @@ export class PaginationResponseDialogComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
     this.onChange();
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadBieList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadBieList();
   }
 

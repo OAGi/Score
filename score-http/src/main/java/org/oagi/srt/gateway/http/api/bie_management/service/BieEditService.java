@@ -10,6 +10,7 @@ import org.oagi.srt.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.srt.gateway.http.api.bie_management.data.bie_edit.tree.*;
 import org.oagi.srt.gateway.http.api.bie_management.service.edit_tree.BieEditTreeController;
 import org.oagi.srt.gateway.http.api.bie_management.service.edit_tree.DefaultBieEditTreeController;
+import org.oagi.srt.gateway.http.api.cc_management.data.CcState;
 import org.oagi.srt.gateway.http.api.cc_management.service.ExtensionService;
 import org.oagi.srt.gateway.http.configuration.security.SessionService;
 import org.oagi.srt.repository.TopLevelAbieRepository;
@@ -20,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -125,16 +127,43 @@ public class BieEditService {
     }
 
     @Transactional
-    public long createLocalAbieExtension(User user, BieEditAsbiepNode extension) {
+    public CreateExtensionResponse createLocalAbieExtension(User user, BieEditAsbiepNode extension) {
         long asccpId = extension.getAsccpId();
         long releaseId = extension.getReleaseId();
-
         long roleOfAccId = bieRepository.getRoleOfAccIdByAsccpId(asccpId);
-        return createAbieExtension(user, roleOfAccId, releaseId);
+
+        CreateExtensionResponse response = new CreateExtensionResponse();
+
+        ACC ueAcc = extensionService.getExistsUserExtension(roleOfAccId, releaseId);
+
+        response.setCanEdit(false);
+        response.setCanView(false);
+
+        if (ueAcc != null) {
+            ACC latestUeAcc = extensionService.getLatestUserExtension(ueAcc.getAccId(), releaseId);
+            boolean isSameBetweenRequesterAndOwner = sessionService.userId(user) == latestUeAcc.getOwnerUserId();
+            if (ueAcc.getState() == CcState.Published.getValue()) {
+                response.setCanEdit(true);
+                response.setCanView(true);
+            } else if (ueAcc.getState() == CcState.Candidate.getValue()) {
+                response.setCanView(true);
+            } else {
+                if (isSameBetweenRequesterAndOwner) {
+                    response.setCanEdit(true);
+                    response.setCanView(true);
+                }
+            }
+        } else {
+            response.setCanEdit(true);
+            response.setCanView(true);
+        }
+
+        response.setExtensionId(createAbieExtension(user, roleOfAccId, releaseId));
+        return response;
     }
 
     @Transactional
-    public long createGlobalAbieExtension(User user, BieEditAsbiepNode extension) {
+    public CreateExtensionResponse createGlobalAbieExtension(User user, BieEditAsbiepNode extension) {
         long releaseId = extension.getReleaseId();
         long roleOfAccId = dslContext.select(Tables.ACC.ACC_ID)
                 .from(Tables.ACC)
@@ -142,23 +171,39 @@ public class BieEditService {
                         Tables.ACC.OBJECT_CLASS_TERM.eq("All Extension"),
                         Tables.ACC.REVISION_NUM.eq(0)))
                 .fetchOneInto(Long.class);
-        return createAbieExtension(user, roleOfAccId, releaseId);
+
+        CreateExtensionResponse response = new CreateExtensionResponse();
+
+        ACC ueAcc = extensionService.getExistsUserExtension(roleOfAccId, releaseId);
+
+        response.setCanEdit(false);
+        response.setCanView(false);
+
+        if (ueAcc != null) {
+            ACC latestUeAcc = extensionService.getLatestUserExtension(ueAcc.getAccId(), releaseId);
+            boolean isSameBetweenRequesterAndOwner = sessionService.userId(user) == latestUeAcc.getOwnerUserId();
+            if (ueAcc.getState() == CcState.Published.getValue()) {
+                response.setCanEdit(true);
+                response.setCanView(true);
+            } else if (ueAcc.getState() == CcState.Candidate.getValue()) {
+                response.setCanView(true);
+            } else {
+                if (isSameBetweenRequesterAndOwner) {
+                    response.setCanEdit(true);
+                    response.setCanView(true);
+                }
+            }
+        } else {
+            response.setCanEdit(true);
+            response.setCanView(true);
+        }
+        response.setExtensionId(createAbieExtension(user, roleOfAccId, releaseId));
+        return response;
     }
 
     private long createAbieExtension(User user, long roleOfAccId, long releaseId) {
         BieEditAcc eAcc = bieRepository.getAccByCurrentAccId(roleOfAccId, releaseId);
         ACC ueAcc = extensionService.getExistsUserExtension(roleOfAccId, releaseId);
-        if (ueAcc != null) {
-            boolean isSameBetweenRequesterAndOwner = sessionService.userId(user) == ueAcc.getOwnerUserId();
-            if (!isSameBetweenRequesterAndOwner) {
-                String ownerUser = dslContext.select(Tables.APP_USER.LOGIN_ID)
-                        .from(Tables.APP_USER)
-                        .where(Tables.APP_USER.APP_USER_ID.eq(ULong.valueOf(ueAcc.getOwnerUserId())))
-                        .fetchOptionalInto(String.class).orElse(null);
-
-                throw new IllegalArgumentException("The component is currently owned by '" + ownerUser + "' user.");
-            }
-        }
 
         long ueAccId = extensionService.appendUserExtension(eAcc, ueAcc, releaseId, user);
         return ueAccId;

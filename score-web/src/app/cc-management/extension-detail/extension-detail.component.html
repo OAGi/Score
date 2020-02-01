@@ -36,6 +36,7 @@
                    style="cursor: pointer; display: flex;">
                 <span style="padding-right: 10px;">{{ node.item.name }}</span>
                 <mat-icon fontSet="fontawesome" fontIcon="fa-times" style="margin-top: 2px;"
+                          *ngIf="node.item.revisionNum == 1"
                           (click)="onClickDiscard($event, node)"></mat-icon>
               </div>
 
@@ -67,7 +68,7 @@
         <!-- Action Buttons -->
         <mat-card-actions class="fab-container"
                           *ngIf="state !== 'Published' && access === 'CanEdit'">
-          <button mat-mini-fab color="primary" (click)="updateDetails()"
+          <button mat-mini-fab color="primary" (click)="validateDetails()"
                   *ngIf="state === 'Editing'"
                   [disabled]="!isChanged || isUpdating || !isValid()">
             <mat-icon matTooltip="Update">save</mat-icon>
@@ -156,6 +157,11 @@
               </div>
 
               <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [(ngModel)]="asAccDetail().definitionSource" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
                   <textarea matInput rows="6" cols="30"
                             placeholder="Definition"
                             [(ngModel)]="asAccDetail().definition"
@@ -191,7 +197,7 @@
 
                 <div class="row">
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="ccCardinalityMin">
                       <input matInput placeholder="Cardinality Min" required
                              [formControl]="ccCardinalityMin">
                       <mat-error *ngIf="ccCardinalityMin.hasError('required')">
@@ -210,7 +216,7 @@
                     </mat-form-field>
                   </div>
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="ccCardinalityMax">
                       <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                              [formControl]="ccCardinalityMax"
                              [value]="ccCardinalityMax.value | unbounded">
@@ -239,12 +245,19 @@
                       <mat-checkbox color="primary"
                                     [(ngModel)]="asAsccpDetail().ascc.deprecated"
                                     (ngModelChange)="onChange()"
-                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit' || asAsccpDetail().ascc.revisionNum == 1">
                         Deprecated
                       </mat-checkbox>
                     </div>
                   </div>
                 </div>
+
+                <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().ascc.definitionSource"
+                         (ngModelChange)="onChange()"
+                         [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                </mat-form-field>
 
                 <mat-form-field>
                       <textarea matInput rows="6" cols="30"
@@ -304,6 +317,12 @@
                 </div>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().asccp.definitionSource"
+                         [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asAsccpDetail().asccp.definition"
@@ -353,7 +372,7 @@
 
                 <div class="row">
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="ccCardinalityMin">
                       <input matInput placeholder="Cardinality Min" required
                              [formControl]="ccCardinalityMin">
                       <mat-error *ngIf="ccCardinalityMin.hasError('required')">
@@ -372,7 +391,7 @@
                     </mat-form-field>
                   </div>
                   <div class="col-6">
-                    <mat-form-field>
+                    <mat-form-field *ngIf="ccCardinalityMax">
                       <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                              [formControl]="ccCardinalityMax"
                              [value]="ccCardinalityMax.value | unbounded">
@@ -402,7 +421,7 @@
                       <mat-checkbox color="primary"
                                     [(ngModel)]="asBccpDetail().bcc.nillable"
                                     (ngModelChange)="onChange()"
-                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit' || !editNillable">
                         Nillable
                       </mat-checkbox>
                     </div>
@@ -411,7 +430,7 @@
                     <div class="checkbox">
                       <mat-checkbox color="primary"
                                     [(ngModel)]="asBccpDetail().bcc.deprecated"
-                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
+                                    [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit' || asBccpDetail().bcc.revisionNum == 1">
                         Deprecated
                       </mat-checkbox>
                     </div>
@@ -424,6 +443,13 @@
                                 [(ngModel)]="asBccpDetail().bcc.defaultValue"
                                 (ngModelChange)="onChange()"
                                 [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'"></textarea>
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bcc.definitionSource"
+                         (ngModelChange)="onChange()"
+                         [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit'">
                 </mat-form-field>
 
                 <mat-form-field>
@@ -491,6 +517,12 @@
                 </mat-form-field>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bccp.definitionSource"
+                         [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asBccpDetail().bccp.definition"
@@ -531,6 +563,12 @@
                 </mat-form-field>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bdt.definitionSource"
+                         [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asBccpDetail().bdt.definition"
@@ -566,7 +604,7 @@
 
               <div class="row">
                 <div class="col-6">
-                  <mat-form-field>
+                  <mat-form-field *ngIf="ccCardinalityMin">
                     <input matInput placeholder="Cardinality Min" required
                            [formControl]="ccCardinalityMin">
                     <mat-error *ngIf="ccCardinalityMin.hasError('required')">
@@ -585,7 +623,7 @@
                   </mat-form-field>
                 </div>
                 <div class="col-6">
-                  <mat-form-field>
+                  <mat-form-field *ngIf="ccCardinalityMax">
                     <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                            [formControl]="ccCardinalityMax"
                            [value]="ccCardinalityMax.value | unbounded">
@@ -608,6 +646,12 @@
                   </mat-form-field>
                 </div>
               </div>
+
+              <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [(ngModel)]="asBdtScDetail().definitionSource"
+                       [disabled]="true">
+              </mat-form-field>
 
               <mat-form-field>
                   <textarea matInput rows="6" cols="30"

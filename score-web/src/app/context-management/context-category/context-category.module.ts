@@ -15,7 +15,6 @@ import {
   DialogDiscardContextCategoryDialogDetailComponent
 } from './context-category-detail/context-category-detail.component';
 import {AuthService} from '../../authentication/auth.service';
-import {MatDialogModule} from '@angular/material';
 import {DialogContentContextSchemeDialogDetailComponent} from '../context-scheme/context-scheme-detail/context-scheme-detail.component';
 import {DialogDiscardBieDialogComponent} from '../../bie-management/bie-list/bie-list.component';
 import {DialogDiscardCodeListDialogComponent} from '../../code-list-management/code-list-list/code-list-list.component';
@@ -48,7 +47,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FormsModule,
     MaterialModule,
-    MatDialogModule,
     CommonModule
   ],
   declarations: [

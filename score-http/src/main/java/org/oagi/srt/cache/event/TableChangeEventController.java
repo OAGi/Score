@@ -16,7 +16,7 @@ public class TableChangeEventController {
     private RedisTemplate redisTemplate;
 
     @RequestMapping(value = "/event/tableChange/{eventName}/{tableName}/{id}", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity putTableChangeEvent(
             @PathVariable("eventName") String eventName,
             @PathVariable("tableName") String tableName,

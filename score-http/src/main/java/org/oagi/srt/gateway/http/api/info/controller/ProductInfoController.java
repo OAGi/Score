@@ -22,7 +22,7 @@ public class ProductInfoController {
     private ProductInfoService service;
 
     @RequestMapping(value = "/info/products", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ProductInfo> getProductInfos() {
         List<ProductInfo> productInfos = new ArrayList();
         productInfos.add(service.gatewayMetadata());

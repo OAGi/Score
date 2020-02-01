@@ -35,13 +35,17 @@
   },
   "DATA_TYPE_DETAIL": {
     "TITLE": "Data Type ",
-    "DEN": "DEN"
+    "DEN": "DEN",
+    "DEFAULT_VALUE": "Default Value",
+    "FIXED_VALUE": "Fixed Value"
   },
   "BDT_SC_DETAIL": {
     "TITLE": "BDT_SC",
     "TITLE_CASE": "Supplementary Component",
     "MAX": "Cardinality Max (-1 for unbounded)",
-    "DEN": "DEN"
+    "DEN": "DEN",
+    "DEFAULT_VALUE": "Default Value",
+    "FIXED_VALUE": "Fixed Value"
   },
   "BIE_LIST": {
     "TITLE": "BIEs",

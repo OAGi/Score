@@ -20,14 +20,15 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              { "glob": "**/*", "input": "node_modules/ngx-monaco-editor/assets/monaco", "output": "./assets/monaco/" }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/bootstrap/dist/css/bootstrap-grid.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "src/assets/css/material-icons.css",
-              "src/score-web-theme.scss",
+              "src/srt-webapp-theme.scss",
               "src/styles.css"
             ],
             "scripts": [

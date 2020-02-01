@@ -41,6 +41,19 @@
                 </mat-select>
               </mat-form-field>
             </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Deprecated</mat-label>
+                <mat-select [(ngModel)]="request.deprecated">
+                  <mat-option [value]="true">
+                    True
+                  </mat-option>
+                  <mat-option [value]="false">
+                    False
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
           </div>
         </div>
 
@@ -51,7 +64,10 @@
               <mat-form-field>
                 <mat-label>Owner</mat-label>
                 <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
                 </mat-select>
@@ -62,8 +78,11 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
-                    {{loginId}}
+                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                  {{loginId}}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -157,7 +176,7 @@
           </ng-container>
 
           <ng-container matColumnDef="den">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Den</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
             <td mat-cell *matCellDef="let element">
               <div *ngIf="(element.state === 'Editing' && element.owner === currentUser) || element.state !== 'Editing'">
                 <a routerLink="{{ getRouterLink(element) }}">

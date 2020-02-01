@@ -103,6 +103,11 @@
               </div>
 
               <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [(ngModel)]="asAccDetail().definitionSource" [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
                   <textarea matInput rows="6" cols="30"
                             placeholder="Definition"
                             [(ngModel)]="asAccDetail().definition"
@@ -166,6 +171,11 @@
                 </div>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().ascc.definitionSource" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asAsccpDetail().ascc.definition"
@@ -221,6 +231,11 @@
                     </div>
                   </div>
                 </div>
+
+                <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asAsccpDetail().asccp.definitionSource" [disabled]="true">
+                </mat-form-field>
 
                 <mat-form-field>
                       <textarea matInput rows="6" cols="30"
@@ -314,6 +329,11 @@
                 </mat-form-field>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bcc.definitionSource" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asBccpDetail().bcc.definition"
@@ -378,6 +398,11 @@
                 </mat-form-field>
 
                 <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bccp.definitionSource" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
                       <textarea matInput rows="6" cols="30"
                                 placeholder="Definition"
                                 [(ngModel)]="asBccpDetail().bccp.definition"
@@ -415,6 +440,11 @@
                 <mat-form-field>
                   <input matInput placeholder="{{'DATA_TYPE_DETAIL.DEN' | translate}}" maxlength="200"
                          [(ngModel)]="asBccpDetail().bdt.den" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <input matInput placeholder="Definition Source" maxlength="200"
+                         [(ngModel)]="asBccpDetail().bdt.definitionSource" [disabled]="true">
                 </mat-form-field>
 
                 <mat-form-field>
@@ -467,6 +497,11 @@
                   </mat-form-field>
                 </div>
               </div>
+
+              <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [(ngModel)]="asBdtScDetail().definitionSource" [disabled]="true">
+              </mat-form-field>
 
               <mat-form-field>
                   <textarea matInput rows="6" cols="30"

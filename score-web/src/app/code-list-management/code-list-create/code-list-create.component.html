@@ -27,7 +27,13 @@
         <mat-form-field>
           <mat-select data-id="codeList.agencyId" [(ngModel)]="codeList.agencyId" placeholder="Agency ID" required
                       [disabled]="codeList.state !== 'Editing'">
-            <mat-option *ngFor="let agencyIdListValue of agencyIdListValues"
+            <mat-option>
+              <ngx-mat-select-search [formControl]="agencyListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching Agency List found.'">
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let agencyIdListValue of filteredAgencyLists | async"
                         [value]="agencyIdListValue.agencyIdListValueId">
               {{ agencyIdListValue.name }}
             </mat-option>

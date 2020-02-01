@@ -22,19 +22,19 @@ public class ModuleController {
     private ModuleService moduleService;
 
     @RequestMapping(value = "/simple_modules", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleModule> getSimpleModules() {
         return moduleService.getSimpleModules();
     }
 
     @RequestMapping(value = "/module_list", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ModuleList> getModuleList(@AuthenticationPrincipal User user) {
         return moduleService.getModuleList(user);
     }
 
     @RequestMapping(value = "/module/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public Module getModule(@AuthenticationPrincipal User user,
                             @PathVariable("id") long moduleId) {
         return moduleService.getModule(user, moduleId);

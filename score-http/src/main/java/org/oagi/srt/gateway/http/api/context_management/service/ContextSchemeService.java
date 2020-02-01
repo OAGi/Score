@@ -191,6 +191,7 @@ public class ContextSchemeService {
                 .leftJoin(BIZ_CTX_VALUE)
                 .on(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID.eq(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID))
                 .where(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID.eq(ULong.valueOf(ctxSchemeId)))
+                .groupBy(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID)
                 .fetchInto(ContextSchemeValue.class);
     }
 

@@ -103,12 +103,14 @@ export class AppendAsccDialogComponent implements OnInit {
       const list = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(new RegExp(this.request.filters.module, 'g'), '<b>' +
-            this.request.filters.module + '</b>');
+          elm.module = elm.module.replace(
+            new RegExp(this.request.filters.module, 'ig'),
+            '<b>$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(new RegExp(this.request.filters.definition, 'g'), '<b>' +
-            this.request.filters.definition + '</b>');
+          elm.definition = elm.definition.replace(
+            new RegExp(this.request.filters.definition, 'ig'),
+            '<b>$&</b>');
         }
         return elm;
       });

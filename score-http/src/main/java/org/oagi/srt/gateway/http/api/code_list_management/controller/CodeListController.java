@@ -28,7 +28,7 @@ public class CodeListController {
     private CodeListService service;
 
     @RequestMapping(value = "/code_list", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CodeListForList> getCodeLists(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "states", required = false) String states,
@@ -72,7 +72,7 @@ public class CodeListController {
     }
 
     @RequestMapping(value = "/code_list/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CodeList getCodeList(@PathVariable("id") long id) {
         return service.getCodeList(id);
     }

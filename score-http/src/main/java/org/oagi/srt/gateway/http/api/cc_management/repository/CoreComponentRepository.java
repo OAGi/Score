@@ -2,6 +2,7 @@ package org.oagi.srt.gateway.http.api.cc_management.repository;
 
 import org.oagi.srt.cache.impl.*;
 import org.oagi.srt.data.*;
+import org.oagi.srt.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

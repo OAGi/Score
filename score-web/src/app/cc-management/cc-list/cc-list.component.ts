@@ -13,6 +13,9 @@ import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'srt-cc-list',
@@ -31,7 +34,7 @@ export class CcListComponent implements OnInit {
   title = 'Core Component';
 
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'ASCC', 'BCC'];
-  stateList: string[] = ['Editing', 'Candidate', 'Published', 'Deprecated'];
+  stateList: string[] = ['Editing', 'Candidate', 'Published'];
 
   displayedColumns: string[] = [
     'type', 'den', 'lastUpdateTimestamp'
@@ -42,6 +45,10 @@ export class CcListComponent implements OnInit {
 
   releases: Release[];
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -77,7 +84,12 @@ export class CcListComponent implements OnInit {
     this.releases.push(workingRelease);
 
     this.releaseService.getSimpleReleases().subscribe(releases => this.releases.push(...releases));
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
 
     this.loadCcList();
   }
@@ -100,10 +112,14 @@ export class CcListComponent implements OnInit {
       const list = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(new RegExp(this.request.filters.module, 'g'), '<b>' + this.request.filters.module + '</b>');
+          elm.module = elm.module.replace(
+            new RegExp(this.request.filters.module, 'ig'),
+            '<b>$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(new RegExp(this.request.filters.definition, 'g'), '<b>' + this.request.filters.definition + '</b>');
+          elm.definition = elm.definition.replace(
+            new RegExp(this.request.filters.definition, 'ig'),
+            '<b>$&</b>');
         }
         return elm;
       });
@@ -121,6 +137,7 @@ export class CcListComponent implements OnInit {
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadCcList();
   }
 

@@ -11,6 +11,7 @@ export class BieEditNode {
   guid: string;
   name: string;
   used: boolean;
+  required: boolean;
   hasChild: boolean;
 
   constructor(obj?: BieEditNode) {
@@ -20,6 +21,7 @@ export class BieEditNode {
     this.guid = obj && obj.guid || '';
     this.name = obj && obj.name || '';
     this.used = obj && obj.used || false;
+    this.required = obj && obj.required || false;
     this.hasChild = obj && obj.hasChild || false;
   }
 }
@@ -124,6 +126,7 @@ export interface BieEditNodeDetail {
   guid: string;
   name: string;
   used: boolean;
+  required: boolean;
   hasChild: boolean;
 }
 
@@ -167,7 +170,8 @@ export class BieEditAsbiepNodeDetail
   bieCardinalityMax: number;
   ccCardinalityMin: number;
   ccCardinalityMax: number;
-  nillable: boolean;
+  ccNillable: boolean;
+  bieNillable: boolean;
   bizTerm: string;
   remark: string;
 
@@ -187,7 +191,8 @@ export class BieEditAsbiepNodeDetail
       this.ccCardinalityMin = asbiepDetail.ccCardinalityMin;
       this.ccCardinalityMax = asbiepDetail.ccCardinalityMax;
 
-      this.nillable = asbiepDetail.nillable;
+      this.ccNillable = asbiepDetail.ccNillable;
+      this.bieNillable = asbiepDetail.bieNillable;
       this.remark = asbiepDetail.remark;
       this.bizTerm = asbiepDetail.bizTerm;
 
@@ -203,14 +208,19 @@ export class BieEditBbiepNodeDetail
   extends BieEditBbiepNode
   implements BieEditNodeDetail, CardinalityAware {
 
-  bieCardinalityMin: number;
-  bieCardinalityMax: number;
   ccCardinalityMin: number;
+  bieCardinalityMin: number;
   ccCardinalityMax: number;
+  bieCardinalityMax: number;
 
-  nillable: boolean;
-  fixedValue: string;
-  defaultValue: string;
+  ccNillable: boolean;
+  bieNillable: boolean;
+  ccFixedValue: string;
+  bieFixedValue: string;
+  ccDefaultValue: string;
+  bieDefaultValue: string;
+
+  fixedOrDefault: string;
   bizTerm: string;
   remark: string;
   bdtDen: string;
@@ -230,6 +240,8 @@ export class BieEditBbiepNodeDetail
   associationDefinition: string;
   componentDefinition: string;
 
+  example: string;
+
   constructor(obj?: BieEditNode) {
     super(obj);
 
@@ -241,9 +253,12 @@ export class BieEditBbiepNodeDetail
       this.ccCardinalityMin = bbiepDetail.ccCardinalityMin;
       this.ccCardinalityMax = bbiepDetail.ccCardinalityMax;
 
-      this.nillable = bbiepDetail.nillable;
-      this.fixedValue = bbiepDetail.fixedValue;
-      this.defaultValue = bbiepDetail.defaultValue;
+      this.ccNillable = bbiepDetail.ccNillable;
+      this.bieNillable = bbiepDetail.bieNillable;
+      this.ccFixedValue = bbiepDetail.ccFixedValue;
+      this.bieFixedValue = bbiepDetail.bieFixedValue;
+      this.ccDefaultValue = bbiepDetail.ccDefaultValue;
+      this.bieDefaultValue = bbiepDetail.bieDefaultValue;
       this.bizTerm = bbiepDetail.bizTerm;
       this.remark = bbiepDetail.remark;
       this.bdtDen = bbiepDetail.bdtDen;
@@ -262,6 +277,7 @@ export class BieEditBbiepNodeDetail
       this.contextDefinition = bbiepDetail.contextDefinition;
       this.associationDefinition = bbiepDetail.associationDefinition;
       this.componentDefinition = bbiepDetail.componentDefinition;
+      this.example = bbiepDetail.example;
     }
   }
 }
@@ -270,13 +286,16 @@ export class BieEditBbieScNodeDetail
   extends BieEditBbieScNode
   implements BieEditNodeDetail, CardinalityAware {
 
-  bieCardinalityMin: number;
-  bieCardinalityMax: number;
   ccCardinalityMin: number;
+  bieCardinalityMin: number;
   ccCardinalityMax: number;
+  bieCardinalityMax: number;
 
-  fixedValue: string;
-  defaultValue: string;
+  ccFixedValue: string;
+  bieFixedValue: string;
+  ccDefaultValue: string;
+  bieDefaultValue: string;
+  fixedOrDefault: string;
   bizTerm: string;
   remark: string;
 
@@ -294,6 +313,8 @@ export class BieEditBbieScNodeDetail
   contextDefinition: string;
   componentDefinition: string;
 
+  example: string;
+
   constructor(obj?: BieEditNode) {
     super(obj);
 
@@ -305,8 +326,10 @@ export class BieEditBbieScNodeDetail
       this.ccCardinalityMin = bbieScDetail.ccCardinalityMin;
       this.ccCardinalityMax = bbieScDetail.ccCardinalityMax;
 
-      this.fixedValue = bbieScDetail.fixedValue;
-      this.defaultValue = bbieScDetail.defaultValue;
+      this.ccFixedValue = bbieScDetail.ccFixedValue;
+      this.bieFixedValue = bbieScDetail.bieFixedValue;
+      this.ccDefaultValue = bbieScDetail.ccDefaultValue;
+      this.bieDefaultValue = bbieScDetail.bieDefaultValue;
       this.bizTerm = bbieScDetail.bizTerm;
       this.remark = bbieScDetail.remark;
 
@@ -323,6 +346,7 @@ export class BieEditBbieScNodeDetail
 
       this.contextDefinition = bbieScDetail.contextDefinition;
       this.componentDefinition = bbieScDetail.componentDefinition;
+      this.example = bbieScDetail.example;
     }
   }
 }
@@ -331,6 +355,16 @@ export enum PrimitiveType {
   Primitive = 'Primitive',
   Code = 'Code',
   Agency = 'Agency',
+}
+
+export class Primitive {
+  readonly id: number;
+  readonly name: string;
+
+  constructor(id: number, name: string) {
+    this.id = id;
+    this.name = name;
+  }
 }
 
 export class Xbt {
@@ -377,6 +411,8 @@ export class BieEditBbieScUpdateResponse {
 }
 
 export class BieEditCreateExtensionResponse {
+  canEdit: boolean;
+  canView: boolean;
   extensionId: number;
 }
 
@@ -419,11 +455,13 @@ function hashCode(node: BieEditNode) {
       accId: (node as BieEditAsbiepNodeDetail).accId,
 
       used: (node as BieEditAsbiepNodeDetail).used || false,
+      required: (node as BieEditAsbiepNodeDetail).required || false,
 
       bieCardinalityMin: (node as BieEditAsbiepNodeDetail).bieCardinalityMin,
       bieCardinalityMax: (node as BieEditAsbiepNodeDetail).bieCardinalityMax,
 
-      nillable: (node as BieEditAsbiepNodeDetail).nillable || false,
+      ccNillable: (node as BieEditAsbiepNodeDetail).ccNillable || false,
+      bieNillable: (node as BieEditAsbiepNodeDetail).bieNillable || false,
       bizTerm: (node as BieEditAsbiepNodeDetail).bizTerm || '',
       remark: (node as BieEditAsbiepNodeDetail).remark || '',
 
@@ -448,13 +486,17 @@ function hashCode(node: BieEditNode) {
       attribute: (node as BieEditBbiepNodeDetail).attribute,
 
       used: (node as BieEditBbiepNodeDetail).used || false,
+      required: (node as BieEditBbiepNodeDetail).required || false,
 
       bieCardinalityMin: (node as BieEditBbiepNodeDetail).bieCardinalityMin,
       bieCardinalityMax: (node as BieEditBbiepNodeDetail).bieCardinalityMax,
 
-      nillable: (node as BieEditBbiepNodeDetail).nillable || false,
-      fixedValue: (node as BieEditBbiepNodeDetail).fixedValue || '',
-      defaultValue: (node as BieEditBbiepNodeDetail).defaultValue || '',
+      ccNillable: (node as BieEditBbiepNodeDetail).ccNillable || false,
+      bieNillable: (node as BieEditBbiepNodeDetail).bieNillable || false,
+      ccFixedValue: (node as BieEditBbiepNodeDetail).ccFixedValue || '',
+      bieFixedValue: (node as BieEditBbiepNodeDetail).bieFixedValue || '',
+      ccDefaultValue: (node as BieEditBbiepNodeDetail).ccDefaultValue || '',
+      bieDefaultValue: (node as BieEditBbiepNodeDetail).bieDefaultValue || '',
       bizTerm: (node as BieEditBbiepNodeDetail).bizTerm || '',
       remark: (node as BieEditBbiepNodeDetail).remark || '',
 
@@ -463,6 +505,7 @@ function hashCode(node: BieEditNode) {
       agencyIdListId: (node as BieEditBbiepNodeDetail).agencyIdListId || 0,
 
       contextDefinition: (node as BieEditBbiepNodeDetail).contextDefinition || '',
+      example: (node as BieEditBbiepNodeDetail).example || '',
     });
     return <string>Md5.hashStr(str);
   }
@@ -479,12 +522,15 @@ function hashCode(node: BieEditNode) {
       dtScId: (node as BieEditBbieScNodeDetail).dtScId,
 
       used: (node as BieEditBbieScNodeDetail).used || false,
+      required: (node as BieEditBbieScNodeDetail).required || false,
 
       bieCardinalityMin: (node as BieEditBbieScNodeDetail).bieCardinalityMin,
       bieCardinalityMax: (node as BieEditBbieScNodeDetail).bieCardinalityMax,
 
-      fixedValue: (node as BieEditBbieScNodeDetail).fixedValue || '',
-      defaultValue: (node as BieEditBbieScNodeDetail).defaultValue || '',
+      ccFixedValue: (node as BieEditBbieScNodeDetail).ccFixedValue || '',
+      bieFixedValue: (node as BieEditBbieScNodeDetail).bieFixedValue || '',
+      ccDefaultValue: (node as BieEditBbieScNodeDetail).ccDefaultValue || '',
+      bieDefaultValue: (node as BieEditBbieScNodeDetail).bieDefaultValue || '',
       bizTerm: (node as BieEditBbieScNodeDetail).bizTerm || '',
       remark: (node as BieEditBbieScNodeDetail).remark || '',
 
@@ -493,6 +539,7 @@ function hashCode(node: BieEditNode) {
       agencyIdListId: (node as BieEditBbieScNodeDetail).agencyIdListId || 0,
 
       contextDefinition: (node as BieEditBbieScNodeDetail).contextDefinition || '',
+      example: (node as BieEditBbieScNodeDetail).example || '',
     });
     return <string>Md5.hashStr(str);
   }

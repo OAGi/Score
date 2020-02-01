@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../../authentication/auth.service';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 
 import {ContextSchemeService} from '../context-scheme/domain/context-scheme.service';
@@ -47,8 +47,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forChild(routes),
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
-    MatDialogModule,
     CommonModule
   ],
   declarations: [

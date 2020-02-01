@@ -24,8 +24,10 @@
               <button mat-icon-button disabled></button>
               <mat-checkbox class="checklist-leaf-node"
                             [checked]="checklistSelection.isSelected(node)"
-                            [disabled]="!isEditable()"
-                            (change)="itemSelectionToggle(node)">
+                            [disabled]="!isEditable() || node.item.required"
+                            (change)="itemSelectionToggle(node)"
+                            matTooltip="This component is required."
+                            [matTooltipDisabled]="!node.item.required">
               </mat-checkbox>
               <span class="{{ type(node) }}" (click)="onClick(node)"
                     style="cursor: pointer;">{{ node.item.name }}</span>
@@ -43,8 +45,10 @@
 
               <mat-checkbox class="checklist-leaf-node" [hidden]="node.item.type === 'abie'"
                             [checked]="checklistSelection.isSelected(node)"
-                            [disabled]="!isEditable()"
-                            (change)="itemSelectionToggle(node)">
+                            [disabled]="!isEditable() || node.item.required"
+                            (change)="itemSelectionToggle(node)"
+                            matTooltip="This component is required."
+                            [matTooltipDisabled]="!node.item.required">
               </mat-checkbox>
 
               <div class="{{ type(node) }}" (click)="onClick(node)"
@@ -146,35 +150,45 @@
                 </mat-autocomplete>
               </mat-form-field>
 
-              <mat-form-field>
-                <input matInput placeholder="Version" maxlength="45"
-                       [(ngModel)]="asAbieDetail().version" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable()">
-              </mat-form-field>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Version" maxlength="45"
+                           [(ngModel)]="asAbieDetail().version" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable()">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Status" maxlength="45"
+                           [(ngModel)]="asAbieDetail().status" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable()">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Business Term" maxlength="225"
+                           [(ngModel)]="asAbieDetail().bizTerm" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable()">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" maxlength="225"
+                           [(ngModel)]="asAbieDetail().remark" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable()">
+                  </mat-form-field>
+                </div>
+              </div>
 
               <mat-form-field>
-                <input matInput placeholder="Status" maxlength="45"
-                       [(ngModel)]="asAbieDetail().status" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable()">
-              </mat-form-field>
-
-              <mat-form-field>
-                <input matInput placeholder="Business Term" maxlength="225"
-                       [(ngModel)]="asAbieDetail().bizTerm" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable()">
-              </mat-form-field>
-
-              <mat-form-field>
-                <input matInput placeholder="Remark" maxlength="225"
-                       [(ngModel)]="asAbieDetail().remark" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable()">
-              </mat-form-field>
-
-              <mat-form-field>
-              <textarea matInput rows="6"
-                        placeholder="Context Definition"
-                        [(ngModel)]="asAbieDetail().definition" (ngModelChange)="onChange()"
-                        [disabled]="!isEditable()"></textarea>
+                <textarea matInput rows="6"
+                          placeholder="Context Definition"
+                          [(ngModel)]="asAbieDetail().definition" (ngModelChange)="onChange()"
+                          [disabled]="!isEditable()"></textarea>
               </mat-form-field>
             </div>
           </mat-card-content>
@@ -197,7 +211,9 @@
                     <mat-checkbox color="primary"
                                   [(ngModel)]="asAsbiepDetail().used" (ngModelChange)="resetCardinalities()"
                                   (change)="itemSelectionToggle(selectedNode)"
-                                  [disabled]="!isEditable()">
+                                  [disabled]="!isEditable() || asAsbiepDetail().required"
+                                  matTooltip="This component is required."
+                                  [matTooltipDisabled]="!asAsbiepDetail().required">
                       Used
                     </mat-checkbox>
                   </div>
@@ -205,8 +221,10 @@
                 <div class="col-6">
                   <div class="checkbox">
                     <mat-checkbox color="primary"
-                                  [(ngModel)]="asAsbiepDetail().nillable" (ngModelChange)="onChange()"
-                                  [disabled]="!isEditable() || !asAsbiepDetail().used">
+                                  [(ngModel)]="asAsbiepDetail().bieNillable" (ngModelChange)="onChange()"
+                                  matTooltip="This property cannot change since the core component is nillable."
+                                  [matTooltipDisabled]="!asAsbiepDetail().ccNillable"
+                                  [disabled]="!isEditable() || !asAsbiepDetail().used || asAsbiepDetail().ccNillable">
                       Nillable
                     </mat-checkbox>
                   </div>
@@ -256,17 +274,22 @@
                 </div>
               </div>
 
-              <mat-form-field>
-                <input matInput placeholder="Business Term" maxlength="225"
-                       [(ngModel)]="asAsbiepDetail().bizTerm" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asAsbiepDetail().used">
-              </mat-form-field>
-
-              <mat-form-field>
-                <input matInput placeholder="Remark" maxlength="225"
-                       [(ngModel)]="asAsbiepDetail().remark" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asAsbiepDetail().used">
-              </mat-form-field>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Business Term" maxlength="225"
+                           [(ngModel)]="asAsbiepDetail().bizTerm" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asAsbiepDetail().used">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" maxlength="225"
+                           [(ngModel)]="asAsbiepDetail().remark" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asAsbiepDetail().used">
+                  </mat-form-field>
+                </div>
+              </div>
 
               <mat-form-field>
               <textarea matInput rows="6"
@@ -322,7 +345,9 @@
                     <mat-checkbox color="primary"
                                   [(ngModel)]="asBbiepDetail().used" (ngModelChange)="resetCardinalities()"
                                   (change)="itemSelectionToggle(selectedNode)"
-                                  [disabled]="!isEditable()">
+                                  [disabled]="!isEditable() || asBbiepDetail().required"
+                                  matTooltip="This component is required."
+                                  [matTooltipDisabled]="!asBbiepDetail().required">
                       Used
                     </mat-checkbox>
                   </div>
@@ -330,8 +355,10 @@
                 <div class="col-6">
                   <div class="checkbox">
                     <mat-checkbox color="primary"
-                                  [(ngModel)]="asBbiepDetail().nillable" (ngModelChange)="onChange()"
-                                  [disabled]="!isEditable() || !asBbiepDetail().used">
+                                  [(ngModel)]="asBbiepDetail().bieNillable" (ngModelChange)="onChange()"
+                                  matTooltip="This property cannot change since the core component is nillable."
+                                  [matTooltipDisabled]="!asAsbiepDetail().ccNillable"
+                                  [disabled]="!isEditable() || !asBbiepDetail().used || asBbiepDetail().ccNillable">
                       Nillable
                     </mat-checkbox>
                   </div>
@@ -381,29 +408,70 @@
                 </div>
               </div>
 
-              <mat-form-field>
-                <input matInput placeholder="Fixed Value"
-                       [(ngModel)]="asBbiepDetail().fixedValue" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbiepDetail().used">
-              </mat-form-field>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Business Term" maxlength="225"
+                           [(ngModel)]="asBbiepDetail().bizTerm" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asBbiepDetail().used">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" maxlength="225"
+                           [(ngModel)]="asBbiepDetail().remark" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asBbiepDetail().used">
+                  </mat-form-field>
+                </div>
+              </div>
 
-              <mat-form-field>
-                <input matInput placeholder="Default Value"
-                       [(ngModel)]="asBbiepDetail().defaultValue" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbiepDetail().used">
-              </mat-form-field>
+              <div class="row form-field-box">
+                <div class="col-md-6 col-sm-12">
+                  <mat-card>
+                    <mat-card-content
+                      matTooltip="This value constraint cannot modify by the definition of the core component."
+                      [matTooltipDisabled]="!isReflectValue()">
+                      <mat-form-field>
+                        <mat-select [(ngModel)]="asBbiepDetail().fixedOrDefault"
+                                    [disabled]="!isEditable() || !asBbiepDetail().used || isReflectValue()"
+                                    (ngModelChange)="onChangeFixedOrDefault(asBbiepDetail().fixedOrDefault)">
+                          <mat-option value="none">None</mat-option>
+                          <mat-option value="fixed">Fixed Value</mat-option>
+                          <mat-option value="default">Default Value</mat-option>
+                        </mat-select>
+                        <mat-label>Value Constraint</mat-label>
+                      </mat-form-field>
+                      <mat-form-field *ngIf="asBbiepDetail().fixedOrDefault == 'none'">
+                        <input matInput placeholder="No value constraints"
+                               [disabled]="!isEditable() || !asBbiepDetail().used || isReflectValue()">
+                      </mat-form-field>
 
-              <mat-form-field>
-                <input matInput placeholder="Business Term" maxlength="225"
-                       [(ngModel)]="asBbiepDetail().bizTerm" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbiepDetail().used">
-              </mat-form-field>
+                      <mat-form-field *ngIf="asBbiepDetail().fixedOrDefault == 'fixed'">
+                        <input matInput placeholder="Fixed Value"
+                               [(ngModel)]="asBbiepDetail().bieFixedValue"
+                               [disabled]="!isEditable() || !asBbiepDetail().used || isReflectValue()">
+                      </mat-form-field>
 
-              <mat-form-field>
-                <input matInput placeholder="Remark" maxlength="225"
-                       [(ngModel)]="asBbiepDetail().remark" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbiepDetail().used">
-              </mat-form-field>
+                      <mat-form-field *ngIf="asBbiepDetail().fixedOrDefault == 'default'">
+                        <input matInput placeholder="Default Value"
+                               [(ngModel)]="asBbiepDetail().bieDefaultValue"
+                               [disabled]="!isEditable() || !asBbiepDetail().used || isReflectValue()">
+                      </mat-form-field>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-card>
+                    <mat-card-content>
+                      <mat-form-field>
+                        <input matInput placeholder="Example"
+                               [(ngModel)]="asBbiepDetail().example" (ngModelChange)="onChange()"
+                               [disabled]="!isEditable() || !asBbiepDetail().used">
+                      </mat-form-field>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
 
               <mat-card>
                 <mat-card-header class="bie-edit-header">Primitive Restriction</mat-card-header>
@@ -431,9 +499,16 @@
                         <mat-select placeholder="Primitive" required
                                     [(ngModel)]="asBbiepDetail().bdtPriRestriId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbiepDetail().used">
-                          <mat-option *ngFor="let xbt of asBbiepDetail().xbtList | sort: 'xbtId'"
-                                      [value]="xbt.priRestriId">
-                            {{ xbt.xbtName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Primitive found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let xbt of filteredPrimitives | async"
+                                      [value]="xbt.id">
+                            {{ xbt.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -442,9 +517,16 @@
                         <mat-select placeholder="Code" required
                                     [(ngModel)]="asBbiepDetail().codeListId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbiepDetail().used">
-                          <mat-option *ngFor="let codeList of asBbiepDetail().codeLists | sort: 'codeListId'"
-                                      [value]="codeList.codeListId">
-                            {{ codeList.codeListName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Code found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let codeList of filteredPrimitives | async"
+                                      [value]="codeList.id">
+                            {{ codeList.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -453,9 +535,16 @@
                         <mat-select placeholder="Agency" required
                                     [(ngModel)]="asBbiepDetail().agencyIdListId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbiepDetail().used">
-                          <mat-option *ngFor="let agency of asBbiepDetail().agencyIdLists | sort: 'agencyIdListId'"
-                                      [value]="agency.agencyIdListId">
-                            {{ agency.agencyIdListName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Agency found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let agency of filteredPrimitives | async"
+                                      [value]="agency.id">
+                            {{ agency.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -510,7 +599,9 @@
                 <mat-checkbox color="primary"
                               [(ngModel)]="asBbieScDetail().used" (ngModelChange)="resetCardinalities()"
                               (change)="itemSelectionToggle(selectedNode)"
-                              [disabled]="!isEditable()">
+                              [disabled]="!isEditable() || asBbieScDetail().required"
+                              matTooltip="This component is required."
+                              [matTooltipDisabled]="!asBbieScDetail().required">
                   Used
                 </mat-checkbox>
               </div>
@@ -559,29 +650,70 @@
                 </div>
               </div>
 
-              <mat-form-field>
-                <input matInput placeholder="Fixed Value"
-                       [(ngModel)]="asBbieScDetail().fixedValue" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbieScDetail().used">
-              </mat-form-field>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Business Term" maxlength="225"
+                           [(ngModel)]="asBbieScDetail().bizTerm" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asBbieScDetail().used">
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" maxlength="225"
+                           [(ngModel)]="asBbieScDetail().remark" (ngModelChange)="onChange()"
+                           [disabled]="!isEditable() || !asBbieScDetail().used">
+                  </mat-form-field>
+                </div>
+              </div>
 
-              <mat-form-field>
-                <input matInput placeholder="Default Value"
-                       [(ngModel)]="asBbieScDetail().defaultValue" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbieScDetail().used">
-              </mat-form-field>
+              <div class="row form-field-box">
+                <div class="col-md-6 col-sm-12">
+                  <mat-card>
+                    <mat-card-content
+                      matTooltip="This value constraint cannot modify by the definition of the core component."
+                      [matTooltipDisabled]="!isReflectValue()">
+                      <mat-form-field>
+                        <mat-select [(ngModel)]="asBbieScDetail().fixedOrDefault"
+                                    [disabled]="!isEditable() || !asBbieScDetail().used || isReflectValue()"
+                                    (ngModelChange)="onChangeFixedOrDefault(asBbieScDetail().fixedOrDefault)">
+                          <mat-option value="none">None</mat-option>
+                          <mat-option value="fixed">Fixed Value</mat-option>
+                          <mat-option value="default">Default Value</mat-option>
+                        </mat-select>
+                        <mat-label>Value Constraint</mat-label>
+                      </mat-form-field>
+                      <mat-form-field *ngIf="asBbieScDetail().fixedOrDefault == 'none'">
+                        <input matInput placeholder="No value constraints"
+                               [disabled]="!isEditable() || !asBbieScDetail().used || isReflectValue()">
+                      </mat-form-field>
 
-              <mat-form-field>
-                <input matInput placeholder="Business Term" maxlength="225"
-                       [(ngModel)]="asBbieScDetail().bizTerm" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbieScDetail().used">
-              </mat-form-field>
+                      <mat-form-field *ngIf="asBbieScDetail().fixedOrDefault == 'fixed'">
+                        <input matInput placeholder="Fixed Value"
+                               [(ngModel)]="asBbieScDetail().bieFixedValue"
+                               [disabled]="!isEditable() || !asBbieScDetail().used || isReflectValue()">
+                      </mat-form-field>
 
-              <mat-form-field>
-                <input matInput placeholder="Remark" maxlength="225"
-                       [(ngModel)]="asBbieScDetail().remark" (ngModelChange)="onChange()"
-                       [disabled]="!isEditable() || !asBbieScDetail().used">
-              </mat-form-field>
+                      <mat-form-field *ngIf="asBbieScDetail().fixedOrDefault == 'default'">
+                        <input matInput placeholder="Default Value"
+                               [(ngModel)]="asBbieScDetail().bieDefaultValue"
+                               [disabled]="!isEditable() || !asBbieScDetail().used || isReflectValue()">
+                      </mat-form-field>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <mat-card>
+                    <mat-card-content>
+                      <mat-form-field>
+                        <input matInput placeholder="Example"
+                               [(ngModel)]="asBbieScDetail().example" (ngModelChange)="onChange()"
+                               [disabled]="!isEditable() || !asBbieScDetail().used">
+                      </mat-form-field>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
 
               <mat-card>
                 <mat-card-header class="bie-edit-header">Primitive Restriction</mat-card-header>
@@ -605,9 +737,16 @@
                         <mat-select placeholder="Primitive" required
                                     [(ngModel)]="asBbieScDetail().dtScPriRestriId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbieScDetail().used">
-                          <mat-option *ngFor="let xbt of asBbieScDetail().xbtList | sort: 'xbtId'"
-                                      [value]="xbt.priRestriId">
-                            {{ xbt.xbtName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Primitive found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let xbt of filteredPrimitives | async"
+                                      [value]="xbt.id">
+                            {{ xbt.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -616,9 +755,16 @@
                         <mat-select placeholder="Code" required
                                     [(ngModel)]="asBbieScDetail().codeListId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbieScDetail().used">
-                          <mat-option *ngFor="let codeList of asBbieScDetail().codeLists | sort: 'codeListId'"
-                                      [value]="codeList.codeListId">
-                            {{ codeList.codeListName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Code found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let codeList of filteredPrimitives | async"
+                                      [value]="codeList.id">
+                            {{ codeList.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -627,9 +773,16 @@
                         <mat-select placeholder="Agency" required
                                     [(ngModel)]="asBbieScDetail().agencyIdListId" (ngModelChange)="onChange()"
                                     [disabled]="!isEditable() || !asBbieScDetail().used">
-                          <mat-option *ngFor="let agency of asBbieScDetail().agencyIdLists | sort: 'agencyIdListId'"
-                                      [value]="agency.agencyIdListId">
-                            {{ agency.agencyIdListName }}
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="primitiveFilterCtrl"
+                                                   [placeholderLabel]="'Search...'"
+                                                   [noEntriesFoundLabel]="'No matching Agency found.'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+
+                          <mat-option *ngFor="let agency of filteredPrimitives | async"
+                                      [value]="agency.id">
+                            {{ agency.name }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -653,6 +806,8 @@
                           value="{{ asBbieScDetail().componentDefinition || ' ' }}">
                 </textarea>
               </mat-form-field>
+
+
             </div>
           </mat-card-content>
         </mat-card>

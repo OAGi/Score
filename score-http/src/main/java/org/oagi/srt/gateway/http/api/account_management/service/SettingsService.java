@@ -76,7 +76,7 @@ public class SettingsService {
         dslContext.update(APP_USER)
                 .set(row(APP_USER.PASSWORD, APP_USER.ORGANIZATION, APP_USER.NAME),
                         row(passwordEncoder.encode(newPassword), account.getOrganization(), account.getName()))
-                .where(APP_USER.LOGIN_ID.eq(account.getLoginId()))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(account.getLoginId()))
                 .execute();
     }
 
@@ -84,7 +84,7 @@ public class SettingsService {
         dslContext.update(APP_USER)
                 .set(row(APP_USER.ORGANIZATION, APP_USER.NAME),
                         row(account.getOrganization(), account.getName()))
-                .where(APP_USER.LOGIN_ID.eq(account.getLoginId()))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(account.getLoginId()))
                 .execute();
     }
 }

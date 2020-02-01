@@ -9,6 +9,9 @@ import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest} from '../../../basis/basis';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../../common/utility';
 
 @Component({
   selector: 'srt-append-bccp-dialog',
@@ -32,6 +35,10 @@ export class AppendBccpDialogComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -58,15 +65,24 @@ export class AppendBccpDialogComponent implements OnInit {
     this.sort.direction = 'asc';
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
-      this.onChange();
+      this.loadData();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
-    this.onChange();
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
+    this.loadData();
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadData();
+  }
+
+  onChange() {
+    this.paginator.pageIndex = 0;
+    this.loadData();
   }
 
   onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
@@ -91,7 +107,7 @@ export class AppendBccpDialogComponent implements OnInit {
     }
   }
 
-  onChange() {
+  loadData() {
     this.loading = true;
 
     this.request.page = new PageRequest(
@@ -104,10 +120,14 @@ export class AppendBccpDialogComponent implements OnInit {
       const list = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
-          elm.module = elm.module.replace(new RegExp(this.request.filters.module, 'g'), '<b>' + this.request.filters.module + '</b>');
+          elm.module = elm.module.replace(
+            new RegExp(this.request.filters.module, 'ig'),
+            '<b>$&</b>');
         }
         if (this.request.filters.definition.length > 0) {
-          elm.definition = elm.definition.replace(new RegExp(this.request.filters.definition, 'g'), '<b>' + this.request.filters.definition + '</b>');
+          elm.definition = elm.definition.replace(
+            new RegExp(this.request.filters.definition, 'ig'),
+            '<b>$&</b>');
         }
         return elm;
       });

@@ -20,7 +20,6 @@ public class BieEditAbieNodeDetail extends BieEditAbieNode implements BieEditNod
         this.setType(abieNode.getType());
         this.setGuid(abieNode.getGuid());
         this.setName(abieNode.getName());
-        this.setUsed(abieNode.isUsed());
         this.setHasChild(abieNode.isHasChild());
 
         this.setAsbiepId(abieNode.getAsbiepId());

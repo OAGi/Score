@@ -8,6 +8,7 @@ import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
 import {GrowlModule} from 'ngx-growl';
 import {MatDialogModule} from '@angular/material';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MaterialModule} from '../../material.module';
 import {ArraySortPipe} from '../sort';
 
@@ -17,6 +18,7 @@ import {BieListService} from '../bie-list/domain/bie-list.service';
 import {BieEditService} from './domain/bie-edit.service';
 import {AuthService} from '../../authentication/auth.service';
 import {SrtCommonModule} from '../../common/srt-common.module';
+import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
 
 
 const routes: Routes = [
@@ -40,21 +42,24 @@ const routes: Routes = [
     MaterialModule,
     HotkeyModule,
     MatDialogModule,
+    NgxMatSelectSearchModule,
     GrowlModule.forRoot({maxMessages: 10, displayTimeMs: 5000}),
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),
     TranslateModule,
     CommonModule,
-    SrtCommonModule
+    SrtCommonModule,
   ],
   declarations: [
     BieEditComponent,
     BieEditPublishDialogDetailComponent,
     ArraySortPipe,
+    ConfirmDialogComponent,
   ],
   entryComponents: [
     BieEditPublishDialogDetailComponent,
+    ConfirmDialogComponent,
   ],
   providers: [
     ReleaseService,

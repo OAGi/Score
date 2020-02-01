@@ -1,7 +1,7 @@
 {
   "CORE_COMPONENT_LIST": {
     "TITLE": "Core Components (Model Library)",
-    "DEN": "DEN (Directory Entry Name)",
+    "DEN": "DEN (Dictionary Entry Name)",
     "MODULE": "Module (Part of schema file path, no extension)"
   },
   "ACC_DETAIL": {

@@ -18,7 +18,10 @@
               <mat-form-field>
                 <mat-label>Owner</mat-label>
                 <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
                 </mat-select>
@@ -29,7 +32,10 @@
               <mat-form-field>
                 <mat-label>Updater</mat-label>
                 <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
                 </mat-select>
@@ -295,6 +301,66 @@
                                              'includePaginationResponseForJson',
                                              'paginationResponseTopLevelAbieId')">
                         <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                      </mat-checkbox>
+                    </div>
+                    <mat-radio-button class="option-radio-button" value="OpenAPI30">
+                      Open API 3.0 (Early prototype)
+                    </mat-radio-button>
+                    <div class="generate-option dependent-option">
+                      <mat-form-field>
+                        <mat-label>Format</mat-label>
+                        <mat-select [(ngModel)]="option.openAPIExpressionFormat"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30'"
+                                    required="true">
+                          <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
+                            {{ openApiFormat }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30'">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
+                      </mat-checkbox>
+
+                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    class="generate-second-option">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                      </mat-checkbox>
+                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    class="generate-second-option"
+                                    (click)="toggleMetaHeaderOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true),
+                                             'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
+                                             'metaHeaderTopLevelAbieIdForOpenAPI30GetTemplate')">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                      </mat-checkbox>
+                      <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    class="generate-second-option"
+                                    (click)="togglePaginationResponseOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true),
+                                             'includePaginationResponseForJsonForOpenAPI30GetTemplate',
+                                             'paginationResponseTopLevelAbieIdForOpenAPI30GetTemplate')">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                      </mat-checkbox>
+
+                      <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30'">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">POST Operation Template</span>
+                      </mat-checkbox>
+
+                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true"
+                                    class="generate-second-option">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                      </mat-checkbox>
+                      <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
+                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true"
+                                    class="generate-second-option"
+                                    (click)="toggleMetaHeaderOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true),
+                                             'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
+                                             'metaHeaderTopLevelAbieIdForOpenAPI30PostTemplate')">
+                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                       </mat-checkbox>
                     </div>
                   </mat-radio-group>

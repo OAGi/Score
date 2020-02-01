@@ -4,6 +4,9 @@ import {MatSnackBar} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../domain/accounts';
 import {GrowlService} from 'ngx-growl';
+import {HttpErrorResponse} from '@angular/common/http';
+import {catchError} from 'rxjs/operators';
+import {EMPTY, throwError} from 'rxjs';
 
 @Component({
   selector: 'srt-account-create',
@@ -15,9 +18,7 @@ export class AccountCreateComponent implements OnInit {
   newPassword: string;
   confirmPassword: string;
   account: AccountList;
-  loginNames;
-  loginUsed: boolean[] = [];
-  creable = true;
+  creable = false;
 
   constructor(private service: AccountListService,
               private snackBar: MatSnackBar,
@@ -30,10 +31,6 @@ export class AccountCreateComponent implements OnInit {
     this.account = new AccountList();
     this.newPassword = '';
     this.confirmPassword = '';
-    this.service.getAccountNames().subscribe(data => {
-      this.loginNames = data;
-    });
-
   }
 
   hasMinLengthError(variable: string) {
@@ -45,7 +42,7 @@ export class AccountCreateComponent implements OnInit {
   }
 
   isDisabled() {
-    return ((this.newPassword === '') || (this.confirmPassword === '') ||
+    return !this.creable || ((this.newPassword === '') || (this.confirmPassword === '') ||
       (this.hasMinLengthError(this.newPassword) || this.hasMinLengthError(this.confirmPassword)) || this.hasConfirmPasswordError());
   }
 
@@ -63,16 +60,18 @@ export class AccountCreateComponent implements OnInit {
   }
 
   changeLogin(value) {
-    this.loginUsed = [];
-    this.creable = true;
-    for (let i = 0; i < this.loginNames.length; i++) {
-      if (value === this.loginNames[i]) {
+    this.creable = false;
+
+    if (!value) {
+      return;
+    }
+
+    this.service.getAccount(value).subscribe(resp => {
+      if (resp) {
         this.growlService.addError({heading: 'Oops', message: 'This Login ID is already taken.'});
-        this.loginUsed[i] = true;
+      } else {
+        this.creable = true;
       }
-    }
-    if (this.loginUsed.length > 0) {
-      this.creable = !this.loginUsed.includes(true);
-    }
+    });
   }
 }

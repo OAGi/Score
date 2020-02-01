@@ -19,6 +19,9 @@ import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'srt-bie-list',
@@ -36,6 +39,10 @@ export class BieListComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Initiating', 'Editing', 'Candidate', 'Published'];
   request: BieListRequest;
 
@@ -64,7 +71,11 @@ export class BieListComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
     this.onChange();
   }
 
@@ -74,10 +85,11 @@ export class BieListComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadBieList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadBieList();
   }
 

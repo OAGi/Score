@@ -18,7 +18,7 @@ public class ContextCategoryController {
     private ContextCategoryService service;
 
     @RequestMapping(value = "/context_categories", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<ContextCategory> getContextCategoryList(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "description", required = false) String description,
@@ -43,20 +43,20 @@ public class ContextCategoryController {
     }
 
     @RequestMapping(value = "/simple_context_categories", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SimpleContextCategory> getSimpleContextCategoryList() {
         return service.getSimpleContextCategoryList();
     }
 
 
     @RequestMapping(value = "/context_category/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextCategory getContextCategory(@PathVariable("id") long id) {
         return service.getContextCategory(id);
     }
 
     @RequestMapping(value = "/context_schemes_from_ctg/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ContextScheme> getContextSchemeListFromCtxCategory(@PathVariable("id") long id) {
         return service.getContextSchemeByCategoryId(id);
     }

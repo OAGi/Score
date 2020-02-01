@@ -23,13 +23,13 @@ public class BieCreateController {
     private ModuleService moduleService;
 
     @RequestMapping(value = "/profile_bie/asccp/release/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AsccpForBie> getAsccpListForBie(@PathVariable("id") long releaseId) {
         return bieService.getAsccpListForBie(releaseId);
     }
 
     @RequestMapping(value = "/profile_bie/create", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieCreateResponse create(
             @AuthenticationPrincipal User user,
             @RequestBody BieCreateRequest bieCreateRequest) {

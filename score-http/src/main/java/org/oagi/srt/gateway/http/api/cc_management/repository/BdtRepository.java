@@ -4,6 +4,8 @@ import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.srt.data.BdtPriRestri;
 import org.oagi.srt.data.BdtScPriRestri;
+import org.oagi.srt.data.DT;
+import org.oagi.srt.entity.jooq.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,12 @@ public class BdtRepository {
 
     @Autowired
     private DSLContext dslContext;
+
+    public List<DT> findAll() {
+        return dslContext.select(Tables.DT.fields())
+                .from(Tables.DT)
+                .fetchInto(DT.class);
+    }
 
     public List<BdtPriRestri> getBdtPriRestriListByBdtId(long bdtId) {
         return dslContext.select(BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID,

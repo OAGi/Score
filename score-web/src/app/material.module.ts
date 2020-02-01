@@ -44,6 +44,7 @@ import {
 } from '@angular/material';
 
 import {NgModule} from '@angular/core';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 @NgModule({
   exports: [
@@ -92,6 +93,7 @@ import {NgModule} from '@angular/core';
     MatToolbarModule,
     MatTooltipModule,
     MatNativeDateModule,
+    NgxMatSelectSearchModule,
   ]
 })
 export class MaterialModule {

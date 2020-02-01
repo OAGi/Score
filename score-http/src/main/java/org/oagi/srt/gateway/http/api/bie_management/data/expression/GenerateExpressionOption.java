@@ -22,4 +22,17 @@ public class GenerateExpressionOption {
     private Long metaHeaderTopLevelAbieId;
     private boolean includePaginationResponseForJson;
     private Long paginationResponseTopLevelAbieId;
+
+    private String openAPIExpressionFormat;
+    private boolean openAPI30GetTemplate;
+    private boolean arrayForJsonExpressionForOpenAPI30GetTemplate;
+    private boolean includeMetaHeaderForJsonForOpenAPI30GetTemplate;
+    private Long metaHeaderTopLevelAbieIdForOpenAPI30GetTemplate;
+    private boolean includePaginationResponseForJsonForOpenAPI30GetTemplate;
+    private Long paginationResponseTopLevelAbieIdForOpenAPI30GetTemplate;
+
+    private boolean openAPI30PostTemplate;
+    private boolean arrayForJsonExpressionForOpenAPI30PostTemplate;
+    private boolean includeMetaHeaderForJsonForOpenAPI30PostTemplate;
+    private Long metaHeaderTopLevelAbieIdForOpenAPI30PostTemplate;
 }

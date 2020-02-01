@@ -5,10 +5,7 @@ import org.jooq.types.ULong;
 import org.oagi.srt.data.TopLevelAbie;
 import org.oagi.srt.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.srt.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
-import org.oagi.srt.gateway.http.api.bie_management.service.generate_expression.BieGenerateExpression;
-import org.oagi.srt.gateway.http.api.bie_management.service.generate_expression.BieGenerateFailureException;
-import org.oagi.srt.gateway.http.api.bie_management.service.generate_expression.BieJSONGenerateExpression;
-import org.oagi.srt.gateway.http.api.bie_management.service.generate_expression.BieXMLGenerateExpression;
+import org.oagi.srt.gateway.http.api.bie_management.service.generate_expression.*;
 import org.oagi.srt.gateway.http.helper.SrtGuid;
 import org.oagi.srt.gateway.http.helper.Zip;
 import org.oagi.srt.repository.TopLevelAbieRepository;
@@ -20,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,6 +186,9 @@ public class BieGenerateService {
                 break;
             case "JSON":
                 generateExpression = applicationContext.getBean(BieJSONGenerateExpression.class);
+                break;
+            case "OPENAPI30":
+                generateExpression = applicationContext.getBean(BieOpenAPIGenerateExpression.class);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown expression option: " + expressionOption);

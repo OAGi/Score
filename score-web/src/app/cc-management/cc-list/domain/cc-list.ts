@@ -4,6 +4,7 @@ export class CcListRequest {
   releaseId: number;
   types: string[] = [];
   states: string[] = [];
+  deprecated = false;
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   updatedDate: {

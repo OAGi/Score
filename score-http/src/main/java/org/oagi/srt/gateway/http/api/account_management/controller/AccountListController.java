@@ -22,7 +22,7 @@ public class AccountListController {
     private AccountListService service;
 
     @RequestMapping(value = "/accounts_list", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<AppUser> getAccounts(
             @AuthenticationPrincipal User requester,
             @RequestParam(name = "loginId", required = false) String loginId,
@@ -54,7 +54,7 @@ public class AccountListController {
     }
 
     @RequestMapping(value = "/account/{loginId}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUser getAccount(@PathVariable("loginId") String loginId) {
         return service.getAccount(loginId);
     }
@@ -66,13 +66,13 @@ public class AccountListController {
     }
 
     @RequestMapping(value = "/accounts/names", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getAccountLoginIds() {
         return service.getAccountLoginIds();
     }
 
     @RequestMapping(value = "/account/_check/loginId/hasTaken", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public Boolean hasTaken(@RequestBody Map<String, String> body) {
         return service.hasTaken(body.getOrDefault("loginId", ""));
     }

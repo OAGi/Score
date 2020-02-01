@@ -1,7 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.jooq.DSLContext;
-import org.jooq.Record16;
+import org.jooq.Record17;
 import org.jooq.SelectJoinStep;
 import org.jooq.types.ULong;
 import org.oagi.srt.data.BBIESC;
@@ -19,11 +19,11 @@ public class BBIESCRepository implements SrtRepository<BBIESC> {
     @Autowired
     private DSLContext dslContext;
 
-    private SelectJoinStep<Record16<
+    private SelectJoinStep<Record17<
             ULong, String, ULong, ULong, ULong,
             ULong, ULong, Integer, Integer, String,
-            String, String, String, String, Byte,
-            ULong>> getSelectJoinStep() {
+            String, String, String, String, String,
+            Byte, ULong>> getSelectJoinStep() {
         return dslContext.select(
                 Tables.BBIE_SC.BBIE_SC_ID,
                 Tables.BBIE_SC.GUID,
@@ -39,6 +39,7 @@ public class BBIESCRepository implements SrtRepository<BBIESC> {
                 Tables.BBIE_SC.DEFINITION,
                 Tables.BBIE_SC.REMARK,
                 Tables.BBIE_SC.BIZ_TERM,
+                Tables.BBIE_SC.EXAMPLE,
                 Tables.BBIE_SC.IS_USED.as("used"),
                 Tables.BBIE_SC.OWNER_TOP_LEVEL_ABIE_ID)
                 .from(Tables.BBIE_SC);

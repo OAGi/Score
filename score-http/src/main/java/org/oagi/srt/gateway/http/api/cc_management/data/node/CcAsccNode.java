@@ -12,6 +12,8 @@ public class CcAsccNode extends CcNode {
     private long currentAsccId;
     private long fromAccId;
     private long toAsccpId;
+    private long cardinalityMin;
+    private long cardinalityMax;
 
     @Override
     public long getId() {

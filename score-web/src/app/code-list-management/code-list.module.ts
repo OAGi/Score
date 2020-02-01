@@ -6,13 +6,13 @@ import {AuthService} from '../authentication/auth.service';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {HotkeyModule} from 'angular2-hotkeys';
-import {MatDialogModule} from '@angular/material';
 import {CodeListService} from './domain/code-list.service';
 import {CodeListValueDialogComponent} from './code-list-value-dialog/code-list-value-dialog.component';
 import {
   CodeListDetailComponent,
   DialogContentCodelistDialogDetailComponent,
-  DialogDiscardCodeListDetailDialogComponent, DialogPublishCodelistDialogDetailComponent
+  DialogDiscardCodeListDetailDialogComponent,
+  DialogPublishCodelistDialogDetailComponent
 } from './code-list-detail/code-list-detail.component';
 import {CodeListCreateComponent, DialogContentCodelistDialogComponent} from './code-list-create/code-list-create.component';
 import {CodeListForCreatingComponent} from './code-list-for-creating/code-list-for-creating.component';
@@ -62,7 +62,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     HotkeyModule,
-    MatDialogModule,
     CommonModule
   ],
   declarations: [

@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {MaterialModule} from '../../material.module';
 
@@ -49,9 +49,10 @@ const routes: Routes = [
   imports: [
     RouterModule.forChild(routes),
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     GrowlModule.forRoot({maxMessages: 2, displayTimeMs: 5000}),
-    CommonModule
+    CommonModule,
   ],
   declarations: [
     ContextSchemeListComponent,

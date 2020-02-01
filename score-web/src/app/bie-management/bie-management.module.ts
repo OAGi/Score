@@ -24,6 +24,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {GrowlModule} from 'ngx-growl';
 import {MatDialogModule} from '@angular/material';
 import {BieEditModule} from './bie-edit/bie-edit.module';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 const routes: Routes = [
   {
@@ -75,7 +76,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     HotkeyModule,
-    MatDialogModule,
     BieExpressModule,
     BieEditModule,
     TransferOwnershipDialogModule,

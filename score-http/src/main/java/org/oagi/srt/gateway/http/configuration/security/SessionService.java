@@ -20,7 +20,7 @@ public class SessionService {
     public long userId(User user) {
         return dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
-                .where(APP_USER.LOGIN_ID.eq(user.getUsername()))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(user.getUsername()))
                 .fetchOptional(APP_USER.APP_USER_ID).orElse(ULong.valueOf(0L)).longValue();
     }
 
@@ -32,7 +32,7 @@ public class SessionService {
                 APP_USER.IS_DEVELOPER.as("developer"),
                 APP_USER.ORGANIZATION
         ).from(APP_USER)
-                .where(APP_USER.LOGIN_ID.eq(username))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(username))
                 .fetchOneInto(AppUser.class);
     }
 }

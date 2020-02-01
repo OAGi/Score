@@ -35,7 +35,7 @@ public class BieEditController {
     private ObjectMapper objectMapper;
 
     @RequestMapping(value = "/profile_bie/node/root/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNode getRootNode(@AuthenticationPrincipal User user,
                                    @PathVariable("id") long topLevelAbieId) {
         BieEditAbieNode rootNode = service.getRootNode(user, topLevelAbieId);
@@ -78,7 +78,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/root/{id}/state", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateState(@AuthenticationPrincipal User user,
                             @PathVariable("id") long topLevelAbieId,
                             @RequestBody Map<String, Object> body) {
@@ -87,14 +87,14 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/root/bcc/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BccForBie getBcc(@AuthenticationPrincipal User user,
                             @PathVariable("id") long bccId) {
         return service.getBcc(user, bccId);
     }
 
     @RequestMapping(value = "/profile_bie/node/children/abie", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieEditNode> getAbieChildren(@AuthenticationPrincipal User user,
                                              @RequestParam("data") String data,
                                              @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
@@ -103,7 +103,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/detail/abie", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNodeDetail getAbieDetail(@AuthenticationPrincipal User user,
                                            @RequestParam("data") String data) {
         BieEditAbieNode abieNode = convertValue(data, BieEditAbieNode.class);
@@ -111,7 +111,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/children/asbiep", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieEditNode> getAsbiepChildren(@AuthenticationPrincipal User user,
                                                @RequestParam("data") String data,
                                                @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
@@ -120,7 +120,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/detail/asbiep", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNodeDetail getAsbiepDetail(@AuthenticationPrincipal User user,
                                              @RequestParam("data") String data) {
         BieEditAsbiepNode asbiepNode = convertValue(data, BieEditAsbiepNode.class);
@@ -128,7 +128,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/children/bbiep", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieEditNode> getBbiepChildren(@AuthenticationPrincipal User user,
                                               @RequestParam("data") String data,
                                               @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
@@ -137,7 +137,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/detail/bbiep", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNodeDetail getBbiepDetail(@AuthenticationPrincipal User user,
                                             @RequestParam("data") String data) {
         BieEditBbiepNode bbiepNode = convertValue(data, BieEditBbiepNode.class);
@@ -145,7 +145,7 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/detail/bbie_sc", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditNodeDetail getBbieScDetail(@AuthenticationPrincipal User user,
                                              @RequestParam("data") String data) {
         BieEditBbieScNode bbieScNode = convertValue(data, BieEditBbieScNode.class);
@@ -156,13 +156,18 @@ public class BieEditController {
         Map<String, Object> params = new HashMap();
         Arrays.stream(new String(Base64.getDecoder().decode(data)).split("&")).forEach(e -> {
             String[] keyValue = e.split("=");
-            params.put(keyValue[0], keyValue[1]);
+            if (keyValue.length > 1) {
+                params.put(keyValue[0], keyValue[1]);
+            } else {
+                params.put(keyValue[0], "");
+            }
+
         });
         return objectMapper.convertValue(params, clazz);
     }
 
     @RequestMapping(value = "/profile_bie/node/detail", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BieEditUpdateResponse updateDetails(@AuthenticationPrincipal User user,
                                                @RequestBody BieEditUpdateRequest request) {
 
@@ -170,22 +175,18 @@ public class BieEditController {
     }
 
     @RequestMapping(value = "/profile_bie/node/extension/local", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CreateExtensionResponse createLocalAbieExtension(@AuthenticationPrincipal User user,
                                                             @RequestBody BieEditAsbiepNode extensionNode) {
-        long extensionId = service.createLocalAbieExtension(user, extensionNode);
-        CreateExtensionResponse response = new CreateExtensionResponse();
-        response.setExtensionId(extensionId);
+        CreateExtensionResponse response = service.createLocalAbieExtension(user, extensionNode);
         return response;
     }
 
     @RequestMapping(value = "/profile_bie/node/extension/global", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CreateExtensionResponse createGlobalAbieExtension(@AuthenticationPrincipal User user,
                                                              @RequestBody BieEditAsbiepNode extensionNode) {
-        long extensionId = service.createGlobalAbieExtension(user, extensionNode);
-        CreateExtensionResponse response = new CreateExtensionResponse();
-        response.setExtensionId(extensionId);
+        CreateExtensionResponse response = service.createGlobalAbieExtension(user, extensionNode);
         return response;
     }
 }

@@ -11,6 +11,9 @@ import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest, PageResponse} from '../../basis/basis';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../common/utility';
 
 @Component({
   selector: 'srt-bie-create-asccp',
@@ -32,6 +35,10 @@ export class BieCopyProfileBieComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  loginIdListFilterCtrl: FormControl = new FormControl();
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   states: string[] = ['Editing', 'Candidate', 'Published'];
   request: BieListRequest;
 
@@ -62,7 +69,11 @@ export class BieCopyProfileBieComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
 
     // Load Business Contexts
     this.route.queryParamMap.pipe(
@@ -79,10 +90,11 @@ export class BieCopyProfileBieComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadBieList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadBieList();
   }
 

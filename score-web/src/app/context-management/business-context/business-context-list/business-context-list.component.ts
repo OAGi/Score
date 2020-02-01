@@ -15,6 +15,9 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest} from '../../../basis/basis';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../../common/utility';
 
 @Component({
   selector: 'srt-business-context',
@@ -32,6 +35,8 @@ export class BusinessContextListComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -57,15 +62,19 @@ export class BusinessContextListComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => this.loginIdList.push(...loginIds));
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
     this.onChange();
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadBusinessContextList();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadBusinessContextList();
   }
 

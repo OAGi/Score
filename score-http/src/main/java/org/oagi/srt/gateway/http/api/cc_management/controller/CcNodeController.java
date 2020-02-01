@@ -26,7 +26,7 @@ public class CcNodeController {
 
     @RequestMapping(value = "/core_component/node/{type}/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CcNode getCcNode(@AuthenticationPrincipal User user,
                             @PathVariable("type") String type,
                             @PathVariable("releaseId") long releaseId,
@@ -56,7 +56,7 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/acc/{id}", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void update(
             @AuthenticationPrincipal User user,
             @PathVariable("id") long id,
@@ -66,7 +66,7 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/asccp/{id}", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateAsccp(
             @AuthenticationPrincipal User user,
             @PathVariable("id") long id,
@@ -75,19 +75,19 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/asccp_id", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public long getLastAsccp() {
         return service.getLastAsccp().value1().longValue();
     }
 
     @RequestMapping(value = "/core_component/bccp_id", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public long getLastBccp() {
         return service.getLastBccp().value1().longValue();
     }
 
     @RequestMapping(value = "/core_component/asccp/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CcAsccpNodeDetail.Asccp getAsccp(@PathVariable("id") long id) {
         return service.getAsccp(id);
     }
@@ -99,7 +99,7 @@ public class CcNodeController {
 
     @RequestMapping(value = "/core_component/node/children/{type}/{releaseId:[\\d]+}",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<? extends CcNode> getNodeChildren(@AuthenticationPrincipal User user,
                                                   @PathVariable("type") String type,
                                                   @PathVariable("releaseId") long releaseId,
@@ -137,7 +137,7 @@ public class CcNodeController {
 
     @RequestMapping(value = "/core_component/node/detail/{type}/{releaseId:[\\d]+}",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CcNodeDetail getNodeDetail(@AuthenticationPrincipal User user,
                                       @PathVariable("type") String type,
                                       @PathVariable("releaseId") long releaseId,
@@ -165,7 +165,7 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/node/detail", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public CcEditUpdateResponse updateDetails(@AuthenticationPrincipal User user,
                                               @RequestBody CcEditUpdateRequest request) {
         return service.updateDetails(user, request);
@@ -173,7 +173,7 @@ public class CcNodeController {
 
     @RequestMapping(value = "/core_component/ascc/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity doAsccAction(@AuthenticationPrincipal User user,
                                        @PathVariable("releaseId") long releaseId,
                                        @PathVariable("id") long accId,
@@ -193,7 +193,7 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/asccp/create", method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createAsccp(
             @AuthenticationPrincipal User user,
             @RequestBody CcAsccpNode ccAsccpNode) {

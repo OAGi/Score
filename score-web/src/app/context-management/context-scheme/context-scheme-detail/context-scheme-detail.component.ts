@@ -21,8 +21,9 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {hashCode} from '../../../common/utility';
 import {GrowlService} from 'ngx-growl';
 import {CodeList, CodeListValue} from '../../../code-list-management/domain/code-list';
-import {forkJoin} from 'rxjs';
+import {forkJoin, ReplaySubject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'srt-context-scheme-detail',
@@ -35,6 +36,9 @@ export class ContextSchemeDetailComponent implements OnInit {
   ctxCategories: SimpleContextCategory[];
   codeLists: CodeList[];
   currCodeList: CodeList;
+  codeListFilterCtrl: FormControl = new FormControl();
+  filteredCodeLists: ReplaySubject<CodeList[]> = new ReplaySubject<CodeList[]>(1);
+
   contextSchemes: SimpleContextScheme[];
   bizCtxValues: BusinessContextValue[];
   contextScheme: ContextScheme;
@@ -81,10 +85,30 @@ export class ContextSchemeDetailComponent implements OnInit {
         this.importFromCodeList = this.contextScheme.codeListId ? true : false;
         this.hashCode = hashCode(contextScheme);
         this.dataSource.data = this.contextScheme.ctxSchemeValues;
+        this.filteredCodeLists.next(this.codeLists.slice());
       });
+
+    this.codeListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterCodeLists();
+      });
+
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
 
+  }
+
+  filterCodeLists() {
+    let search = this.codeListFilterCtrl.value;
+    if (!search) {
+      this.filteredCodeLists.next(this.codeLists.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredCodeLists.next(
+      this.codeLists.filter(codeList => codeList.codeListName.toLowerCase().indexOf(search) > -1)
+    );
   }
 
   isChanged() {
@@ -116,6 +140,15 @@ export class ContextSchemeDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(ContextSchemeValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
+        for ( const value of this.dataSource.data) {
+          if (value.value === result.value) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 4000,
+            });
+            this.disabled = false;
+            return;
+          }
+        }
         if (isAddAction) {
           const data = this.dataSource.data;
           result.guid = uuid();
@@ -352,6 +385,20 @@ export class ContextSchemeDetailComponent implements OnInit {
     this.contextScheme.schemeId = undefined;
     this.contextScheme.schemeAgencyId = undefined;
     this.contextScheme.schemeVersionId = undefined;
+  }
+
+  canImport(): boolean {
+    if (this.contextScheme.used) {
+      return false;
+    }
+    if (this.importFromCodeList) {
+      return true;
+    } else {
+      if (this.contextScheme.ctxSchemeValues && this.contextScheme.ctxSchemeValues.length > 0) {
+        return false;
+      }
+      return true;
+    }
   }
 
 }

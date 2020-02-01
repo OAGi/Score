@@ -30,7 +30,7 @@ public class BieListController {
 
     @RequestMapping(value = "/bie_list",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<BieList> getBieList(@AuthenticationPrincipal User user,
                                             @RequestParam(name = "propertyTerm", required = false) String propertyTerm,
                                             @RequestParam(name = "businessContext", required = false) String businessContext,
@@ -83,7 +83,7 @@ public class BieListController {
 
     @RequestMapping(value = "/profile_bie_list",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieList> getBieList(@AuthenticationPrincipal User user,
                                     @RequestParam(value = "biz_ctx_id", required = false) Long bizCtxId,
                                     @RequestParam(value = "exclude_json_related", required = false) Boolean excludeJsonRelated) {
@@ -91,19 +91,19 @@ public class BieListController {
     }
 
     @RequestMapping(value = "/profile_bie_list/meta_header", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieList> getMetaHeaderBieList(@AuthenticationPrincipal User user) {
         return service.getMetaHeaderBieList(user);
     }
 
     @RequestMapping(value = "/profile_bie_list/pagination_response", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BieList> getPaginationResponseBieList(@AuthenticationPrincipal User user) {
         return service.getPaginationResponseBieList(user);
     }
 
     @RequestMapping(value = "/profile_bie_list/delete", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteBieList(@RequestBody DeleteBieListRequest request) {
         List<Long> topLevelAbieIds = request.getTopLevelAbieIds();
         if (!topLevelAbieIds.isEmpty()) {
@@ -113,19 +113,19 @@ public class BieListController {
     }
 
     @RequestMapping(value="/profile_bie/business_ctx_from_abie/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public BizCtx findBizCtxFromAbieId(@PathVariable("id") long abieId) {
         return service.findBizCtxByAbieId(abieId);
     }
 
     @RequestMapping(value = "/profile_bie/{id}/biz_ctx", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BizCtxAssignment> getAssignBizCtx(@PathVariable("id") long topLevelAbieId) {
         return service.getAssignBizCtx(topLevelAbieId);
     }
 
     @RequestMapping(value = "/profile_bie/{id}/assign_biz_ctx", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity assignBizCtx(@AuthenticationPrincipal User user,
                                        @PathVariable("id") long topLevelAbieId,
                                        @RequestBody Map<String, List<Long>> request) {
@@ -134,7 +134,7 @@ public class BieListController {
     }
 
     @RequestMapping(value = "/profile_bie/{id}/transfer_ownership", method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal User user,
                                             @PathVariable("id") long topLevelAbieId,
                                             @RequestBody Map<String, String> request) {

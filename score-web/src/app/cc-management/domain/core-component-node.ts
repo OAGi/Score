@@ -55,6 +55,7 @@ export class CcAccNodeDetail extends CcNodeDetail {
   den: string;
   state: string;
   definition: string;
+  definitionSource: string;
   oagisComponentType: number;
   abstracted: boolean;
   deprecated: boolean;
@@ -102,6 +103,8 @@ export class CcAsccpNodeDetail extends CcNodeDetail {
     cardinalityMax: number;
     deprecated: boolean;
     definition: string;
+    definitionSource: string;
+    revisionNum: number;
     $hashCode: string;
   };
   asccp: {
@@ -112,6 +115,7 @@ export class CcAsccpNodeDetail extends CcNodeDetail {
     reusable: boolean;
     deprecated: boolean;
     definition: string;
+    definitionSource: string;
     $hashCode: string;
   };
 }
@@ -140,6 +144,8 @@ export class CcBccpNodeDetail extends CcNodeDetail {
     deprecated: boolean;
     defaultValue: string;
     definition: string;
+    definitionSource: string;
+    revisionNum: number;
     $hashCode: string;
   };
   bccp: {
@@ -151,6 +157,7 @@ export class CcBccpNodeDetail extends CcNodeDetail {
     deprecated: boolean;
     defaultValue: string;
     definition: string;
+    definitionSource: string;
     $hashCode: string;
   };
   bdt: {
@@ -160,6 +167,9 @@ export class CcBccpNodeDetail extends CcNodeDetail {
     qualifier: string;
     den: string;
     definition: string;
+    definitionSource: string;
+    defaultValue: string;
+    fixedValue: string;
     $hashCode: string;
   };
 }
@@ -171,6 +181,9 @@ export class CcBdtScNodeDetail extends CcNodeDetail {
   cardinalityMin: number;
   cardinalityMax: number;
   definition: string;
+  definitionSource: string;
+  defaultValue: string;
+  fixedValue: string;
   $hashCode: string;
 }
 

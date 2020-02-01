@@ -17,6 +17,8 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {switchMap} from 'rxjs/operators';
 import {Md5} from 'ts-md5';
 import {v4 as uuid} from 'uuid';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
 
 @Component({
   selector: 'srt-code-list-detail',
@@ -29,6 +31,8 @@ export class CodeListDetailComponent implements OnInit {
   agencyIdListValues: SimpleAgencyIdListValue[];
   disabled: boolean;
   codeLists: CodeList[];
+  agencyListFilterCtrl: FormControl = new FormControl();
+  filteredAgencyLists: ReplaySubject<SimpleAgencyIdListValue[]> = new ReplaySubject<SimpleAgencyIdListValue[]>(1);
 
   codeList: CodeList;
   hashCode;
@@ -54,7 +58,14 @@ export class CodeListDetailComponent implements OnInit {
   ngOnInit() {
     this.disabled = false;
 
-    this.service.getSimpleAgencyIdListValues().subscribe(resp => this.agencyIdListValues = resp);
+    this.service.getSimpleAgencyIdListValues().subscribe(resp => {
+      this.agencyIdListValues = resp;
+      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+    });
+    this.agencyListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterAgencyList();
+      });
     this.service.getCodeLists().subscribe(resp2 => this.codeLists = resp2.list);
 
     this.codeList = new CodeList();
@@ -76,6 +87,19 @@ export class CodeListDetailComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  filterAgencyList() {
+    let search = this.agencyListFilterCtrl.value;
+    if (!search) {
+      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredAgencyLists.next(
+      this.agencyIdListValues.filter(agencyList => agencyList.name.toLowerCase().indexOf(search) > -1)
+    );
   }
 
   color(codeListValue: CodeListValue): string {
@@ -132,7 +156,15 @@ export class CodeListDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(CodeListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-
+        for ( const value of this.dataSource.data) {
+          if (value.value === result.value) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 4000,
+            });
+            this.disabled = false;
+            return;
+          }
+        }
         if (isAddAction) {
           const data = this.dataSource.data;
           result.guid = uuid();

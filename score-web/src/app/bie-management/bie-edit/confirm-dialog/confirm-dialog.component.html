@@ -1,0 +1,20 @@
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>Confirmation</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content class="mat-typography">
+  <p>Candidate extension already exist.</p>
+  <p>Do you want review this?</p>
+  <hr>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button
+          [mat-dialog-close]="false">No
+  </button>
+  <button mat-raised-button color="primary"
+          [mat-dialog-close]="true">Yes
+  </button>
+</mat-dialog-actions>

@@ -119,3 +119,11 @@ span.context-menu-item {
 .right-panel > div {
   margin-bottom: 24px;
 }
+
+.choose-radio .mat-radio-button {
+  margin: 0 12px;
+}
+
+.form-field-box {
+  padding-bottom: 16px;
+}

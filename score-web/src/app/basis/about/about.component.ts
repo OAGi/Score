@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {AboutService} from './domain/about.service';
 import {ProductInfo} from './domain/about';
-
-const {version} = require('../../../../package.json');
+// @ts-ignore
+import * as pkg from '../../../../package.json';
 
 @Component({
   selector: 'srt-about',
@@ -16,7 +16,7 @@ export class AboutComponent implements OnInit {
   constructor(private service: AboutService) {
     const webProductInfo = new ProductInfo();
     webProductInfo.productName = 'srt-web';
-    webProductInfo.productVersion = version.replace('-rc', '');
+    webProductInfo.productVersion = pkg.version.replace('-rc', '');
 
     this.productInfos.push(webProductInfo);
   }

@@ -20,17 +20,27 @@
           <input matInput required [(ngModel)]="contextScheme.schemeName" maxlength="255"/>
         </mat-form-field>
 
-        <mat-checkbox label="Import from Code List" [(ngModel)]="importFromCodeList"
-                      (change)="resetCreateForm($event)">
+        <mat-checkbox label="Import from Code List"
+                      [(ngModel)]="importFromCodeList"
+                      (change)="resetCreateForm($event)"
+                      matTooltip="It cannot be modified if some Context Scheme Values are specified or using by Business Context."
+                      [matTooltipDisabled]="canImport()"
+                      [disabled]="!canImport()">
           Import from Code List
         </mat-checkbox>
 
         <mat-form-field *ngIf="importFromCodeList">
           <mat-select placeholder="Code List" [(ngModel)]="contextScheme.codeListId"
                       (selectionChange)="completeInputAgencyAndVersion($event)"
-                      [disabled]="!importFromCodeList">
-            <mat-option *ngFor="let codeList of codeLists " [value]="codeList.codeListId">
-              {{codeList?.codeListName}}
+                      [disabled]="!canImport()">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="codeListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching Code List found.'">
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let codeList of filteredCodeLists | async" [value]="codeList.codeListId">
+            {{codeList?.codeListName}}
             </mat-option>
           </mat-select>
         </mat-form-field>

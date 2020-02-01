@@ -18,7 +18,10 @@
             <mat-form-field>
               <mat-label>Owner</mat-label>
               <mat-select [(ngModel)]="request.ownerLoginIds" multiple>
-                <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
+                <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
                   {{loginId}}
                 </mat-option>
               </mat-select>
@@ -29,7 +32,10 @@
             <mat-form-field>
               <mat-label>Updater</mat-label>
               <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                <mat-option *ngFor="let loginId of loginIdList" [value]="loginId">
+                <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                                       [placeholderLabel]="'Search...'"
+                                       [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
+                <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
                   {{loginId}}
                 </mat-option>
               </mat-select>
@@ -123,7 +129,7 @@
       </ng-container>
 
       <ng-container matColumnDef="den">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Den</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
         <td mat-cell *matCellDef="let element">
           <a target="_blank" rel="noopener noreferrer"
              href="/core_component/asccp/{{ request.releaseId }}/{{ element.id }}">

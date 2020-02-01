@@ -18,8 +18,10 @@ public class BieEditBbieScNodeDetail extends BieEditBbieScNode implements BieEdi
     private Integer bieCardinalityMin;
     private Integer bieCardinalityMax;
 
-    private String fixedValue;
-    private String defaultValue;
+    private String ccFixedValue;
+    private String bieFixedValue;
+    private String ccDefaultValue;
+    private String bieDefaultValue;
     private String bizTerm;
     private String remark;
 
@@ -34,6 +36,8 @@ public class BieEditBbieScNodeDetail extends BieEditBbieScNode implements BieEdi
     private String contextDefinition;
     private String componentDefinition;
 
+    private String example;
+
     public BieEditBbieScNodeDetail append(BieEditBbieScNode bbieScNode) {
 
         this.setTopLevelAbieId(bbieScNode.getTopLevelAbieId());
@@ -41,7 +45,6 @@ public class BieEditBbieScNodeDetail extends BieEditBbieScNode implements BieEdi
         this.setType(bbieScNode.getType());
         this.setGuid(bbieScNode.getGuid());
         this.setName(bbieScNode.getName());
-        this.setUsed(bbieScNode.isUsed());
         this.setHasChild(bbieScNode.isHasChild());
 
         this.setBbieScId(bbieScNode.getBbieScId());

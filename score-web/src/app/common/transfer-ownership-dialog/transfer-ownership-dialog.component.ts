@@ -53,10 +53,11 @@ export class TransferOwnershipDialogComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.onChange();
+    this.loadAccounts();
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
     this.loadAccounts();
   }
 

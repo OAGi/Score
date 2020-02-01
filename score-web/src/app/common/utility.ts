@@ -1,6 +1,8 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {Md5} from 'ts-md5';
-import {isNumber, isString} from 'util';
+import {isString} from 'util';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
 
 export function hashCode(obj): string {
   return (typeof obj.hashCode === 'function') ? obj.hashCode() :
@@ -14,6 +16,29 @@ export function hashCode(obj): string {
 
     return val;
   }));
+}
+
+export function initFilter(formControl: FormControl,
+                           filteredSubject: ReplaySubject<string[]>,
+                           list: string[]) {
+  formControl.valueChanges
+    .subscribe(() => filter(formControl, filteredSubject, list));
+  filteredSubject.next(list.slice());
+}
+
+export function filter(formControl: FormControl,
+                       filteredSubject: ReplaySubject<string[]>,
+                       list: string[]) {
+  let search = formControl.value;
+  if (!search) {
+    filteredSubject.next(list.slice());
+    return;
+  } else {
+    search = search.toLowerCase();
+  }
+  filteredSubject.next(
+    list.filter(e => e.toLowerCase().indexOf(search) > -1)
+  );
 }
 
 @Pipe({name: 'unbounded'})

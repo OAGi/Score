@@ -56,7 +56,7 @@ const routes: Routes = [
     TransferOwnershipDialogModule,
     TranslateModule,
     CommonModule,
-    ContextMenuModule
+    ContextMenuModule,
   ],
   declarations: [
     CcListComponent,

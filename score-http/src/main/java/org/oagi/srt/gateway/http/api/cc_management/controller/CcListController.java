@@ -26,7 +26,7 @@ public class CcListController {
     private ExtensionService extensionService;
 
     @RequestMapping(value = "/core_component", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public PageResponse<CcList> getCcList(
             @RequestParam(name = "releaseId", required = false) long releaseId,
             @RequestParam(name = "den", required = false) String den,
@@ -34,6 +34,7 @@ public class CcListController {
             @RequestParam(name = "module", required = false) String module,
             @RequestParam(name = "types", required = false) String types,
             @RequestParam(name = "states", required = false) String states,
+            @RequestParam(name = "deprecated", required = false) boolean deprecated,
             @RequestParam(name = "ownerLoginIds", required = false) String ownerLoginIds,
             @RequestParam(name = "updaterLoginIds", required = false) String updaterLoginIds,
             @RequestParam(name = "updateStart", required = false) String updateStart,
@@ -51,12 +52,10 @@ public class CcListController {
             List<String> stateStrings = Arrays.asList(states.split(",")).stream().collect(Collectors.toList());
             request.setStates(stateStrings.stream().filter(e -> !"Deprecated".equals(e))
                     .map(e -> CcState.valueOf(e.trim())).collect(Collectors.toList()));
-            if (stateStrings.contains("Deprecated")) {
-                request.setDeprecated(true);
-            }
         } else {
             request.setStates(Collections.emptyList());
         }
+        request.setDeprecated(deprecated);
         request.setOwnerLoginIds(StringUtils.isEmpty(ownerLoginIds) ? Collections.emptyList() :
                 Arrays.asList(ownerLoginIds.split(",")).stream().map(e -> e.trim()).filter(e -> !StringUtils.isEmpty(e)).collect(Collectors.toList()));
         request.setUpdaterLoginIds(StringUtils.isEmpty(updaterLoginIds) ? Collections.emptyList() :
@@ -87,7 +86,7 @@ public class CcListController {
 
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/asccp_list",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AsccpForAppendAsccp> getAsccpForAppendAsccList(@AuthenticationPrincipal User user,
                                                                @PathVariable("releaseId") long releaseId,
                                                                @PathVariable("id") long extensionId) {
@@ -96,7 +95,7 @@ public class CcListController {
 
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/bccp_list",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BccpForAppendBccp> getBccpForAppendBccList(@AuthenticationPrincipal User user,
                                                            @PathVariable("releaseId") long releaseId,
                                                            @PathVariable("id") long extensionId) {
@@ -105,7 +104,7 @@ public class CcListController {
 
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/transfer_ownership",
             method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferOwnership(@AuthenticationPrincipal User user,
                                             @PathVariable("releaseId") long releaseId,
                                             @PathVariable("id") long extensionId,

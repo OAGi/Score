@@ -6,7 +6,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {HotkeyModule} from 'angular2-hotkeys';
 import {AuthService} from '../../authentication/auth.service';
-import {MatInputModule} from '@angular/material';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {ExtensionDetailService} from './domain/extension-detail.service';
 import {AppendAsccpDialogComponent} from './append-asccp-dialog/append-asccp-dialog.component';
@@ -15,6 +14,7 @@ import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component'
 import {GrowlModule} from 'ngx-growl';
 import {TranslateModule} from '@ngx-translate/core';
 import {SrtCommonModule} from '../../common/srt-common.module';
+import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
 
 const routes: Routes = [
   {
@@ -36,7 +36,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     HotkeyModule,
-    MatInputModule,
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),
@@ -50,11 +49,13 @@ const routes: Routes = [
     AppendAsccpDialogComponent,
     AppendBccpDialogComponent,
     ConfirmDialogComponent,
+    DefinitionConfirmDialogComponent
   ],
   entryComponents: [
     AppendAsccpDialogComponent,
     AppendBccpDialogComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    DefinitionConfirmDialogComponent
   ],
   providers: [
     ExtensionDetailService

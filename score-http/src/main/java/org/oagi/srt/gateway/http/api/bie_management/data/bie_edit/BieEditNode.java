@@ -12,6 +12,7 @@ public class BieEditNode {
     private String guid;
     private String name;
     private boolean used;
+    private boolean required;
     private boolean hasChild;
 
 }

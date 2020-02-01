@@ -9,7 +9,8 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {switchMap} from 'rxjs/operators';
 import {hashCode} from '../../common/utility';
 import {v4 as uuid} from 'uuid';
-import {EMPTY} from 'rxjs';
+import {EMPTY, ReplaySubject} from 'rxjs';
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'srt-code-list-create',
@@ -25,6 +26,8 @@ export class CodeListCreateComponent implements OnInit {
 
   codeList: CodeList;
   basedCodeList: CodeList;
+  agencyListFilterCtrl: FormControl = new FormControl();
+  filteredAgencyLists: ReplaySubject<SimpleAgencyIdListValue[]> = new ReplaySubject<SimpleAgencyIdListValue[]>(1);
   hashCode;
 
   displayedColumns: string[] = [
@@ -47,7 +50,14 @@ export class CodeListCreateComponent implements OnInit {
 
   ngOnInit() {
     this.disabled = false;
-    this.service.getSimpleAgencyIdListValues().subscribe(resp => this.agencyIdListValues = resp);
+    this.service.getSimpleAgencyIdListValues().subscribe(resp => {
+      this.agencyIdListValues = resp;
+      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+    });
+    this.agencyListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterAgencyList();
+      });
     this.codeList = new CodeList();
     this.service.getCodeLists().subscribe(resp2 => this.codeLists = resp2.list);
 
@@ -106,6 +116,19 @@ export class CodeListCreateComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
+  filterAgencyList() {
+    let search = this.agencyListFilterCtrl.value;
+    if (!search) {
+      this.filteredAgencyLists.next(this.agencyIdListValues.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredAgencyLists.next(
+      this.agencyIdListValues.filter(agencyList => agencyList.name.toLowerCase().indexOf(search) > -1)
+    );
+  }
+
   color(codeListValue: CodeListValue): string {
     if (codeListValue.locked) {
       return 'bright-red';
@@ -156,6 +179,15 @@ export class CodeListCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(CodeListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
+        for ( const value of this.dataSource.data) {
+          if (value.value === result.value) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 4000,
+            });
+            this.disabled = false;
+            return;
+          }
+        }
 
         if (isAddAction) {
           const data = this.dataSource.data;

@@ -70,6 +70,15 @@ export class BusinessContextCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(BusinessContextValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.ctxSchemeValueId !== undefined) {
+        for ( const value of this.dataSource.data) {
+          if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
+            this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
+              duration: 4000,
+            });
+            this.disabled = false;
+            return;
+          }
+        }
         if (isAddAction) {
           const data = this.dataSource.data;
           result.guid = uuid();
