@@ -601,8 +601,7 @@ export class BieEditComponent implements OnInit {
         if (this.bieCardinalityMin.valid) {
           value = isNumber(value) ? value : Number.parseInt(value, 10);
           obj.bieCardinalityMin = value;
-          this.bieCardinalityMax.updateValueAndValidity();
-          this._setCardinalityMaxFormControl(detailNode);
+          this.bieCardinalityMax.updateValueAndValidity({onlySelf: true, emitEvent: false});
         }
       });
     }
@@ -662,8 +661,7 @@ export class BieEditComponent implements OnInit {
         if (this.bieCardinalityMax.valid) {
           value = (value === 'unbounded') ? -1 : (isNumber(value) ? value : Number.parseInt(value, 10));
           obj.bieCardinalityMax = value;
-          this.bieCardinalityMin.updateValueAndValidity();
-          this._setCardinalityMinFormControl(detailNode);
+          this.bieCardinalityMin.updateValueAndValidity({onlySelf: true, emitEvent: false});
         }
       });
     }
@@ -857,6 +855,48 @@ export class BieEditComponent implements OnInit {
     const details: BieEditNodeDetail[] =
       this.details.filter((e: DynamicBieFlatNode) => e.isChanged())
         .map(e => e.item);
+
+    /*
+     * Issue #762
+     *
+     * It must be set one primtive type among 'DT', 'Code', or 'Agency'.
+     */
+    details.forEach((e: BieEditNodeDetail) => {
+      switch (e.type) {
+        case 'bbiep':
+          switch (this.asBbiepDetail(e).primitiveType) {
+            case 'Primitive':
+              this.asBbiepDetail(e).codeListId = null;
+              this.asBbiepDetail(e).agencyIdListId = null;
+              break;
+            case 'Code':
+              this.asBbiepDetail(e).bdtPriRestriId = null;
+              this.asBbiepDetail(e).agencyIdListId = null;
+              break;
+            case 'Agency':
+              this.asBbiepDetail(e).bdtPriRestriId = null;
+              this.asBbiepDetail(e).codeListId = null;
+              break;
+          }
+          break;
+        case 'bbie_sc':
+          switch (this.asBbieScDetail(e).primitiveType) {
+            case 'Primitive':
+              this.asBbieScDetail(e).codeListId = null;
+              this.asBbieScDetail(e).agencyIdListId = null;
+              break;
+            case 'Code':
+              this.asBbieScDetail(e).dtScPriRestriId = null;
+              this.asBbieScDetail(e).agencyIdListId = null;
+              break;
+            case 'Agency':
+              this.asBbieScDetail(e).dtScPriRestriId = null;
+              this.asBbieScDetail(e).codeListId = null;
+              break;
+          }
+          break;
+      }
+    });
     this.isUpdating = true;
 
     this.service.updateDetails(this.rootNode.item.topLevelAbieId, details)

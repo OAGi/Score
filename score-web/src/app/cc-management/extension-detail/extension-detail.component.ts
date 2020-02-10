@@ -677,9 +677,9 @@ export class ExtensionDetailComponent implements OnInit {
       if (this.ccCardinalityMin.valid) {
         value = isNumber(value) ? value : Number.parseInt(value, 10);
         obj.cardinalityMin = Number(value);
+        this.ccCardinalityMax.updateValueAndValidity({onlySelf: true, emitEvent: false});
+
         this.onChange(nodeDetail);
-        this.ccCardinalityMax.updateValueAndValidity();
-        this._setCardinalityMaxFormControl(nodeDetail, revisionCardinalityMin, revisionCardinalityMax);
       }
     });
   }
@@ -739,9 +739,9 @@ export class ExtensionDetailComponent implements OnInit {
       if (this.ccCardinalityMax.valid) {
         value = (value === 'unbounded') ? -1 : (isNumber(value) ? value : Number.parseInt(value, 10));
         obj.cardinalityMax = value;
+        this.ccCardinalityMin.updateValueAndValidity({onlySelf: true, emitEvent: false});
+
         this.onChange(nodeDetail);
-        this.ccCardinalityMin.updateValueAndValidity();
-        this._setCardinalityMinFormControl(nodeDetail, revisionCardinalityMin, revisionCardinalityMax);
       }
     });
   }

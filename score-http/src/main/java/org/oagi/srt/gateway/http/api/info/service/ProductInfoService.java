@@ -26,7 +26,7 @@ import java.util.Properties;
 public class ProductInfoService {
 
     private static final String groupId = "org.oagi";
-    private static final String artifactId = "srt-http-gateway";
+    private static final String artifactId = "score-http";
     private static final String unknownVersion = "0.0.0.0";
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired

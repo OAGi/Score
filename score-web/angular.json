@@ -28,7 +28,7 @@
               "node_modules/bootstrap/dist/css/bootstrap-grid.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "src/assets/css/material-icons.css",
-              "src/srt-webapp-theme.scss",
+              "src/score-web-theme.scss",
               "src/styles.css"
             ],
             "scripts": [

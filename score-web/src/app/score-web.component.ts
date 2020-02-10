@@ -6,10 +6,10 @@ import {MatIconRegistry} from '@angular/material';
 
 @Component({
   selector: 'srt-webapp',
-  templateUrl: './srt-webapp.component.html',
-  styleUrls: ['./srt-webapp.component.css']
+  templateUrl: './score-web.component.html',
+  styleUrls: ['./score-web.component.css']
 })
-export class SrtWebappComponent implements OnInit {
+export class ScoreWebComponent implements OnInit {
 
   constructor(private auth: AuthService,
               private router: Router,

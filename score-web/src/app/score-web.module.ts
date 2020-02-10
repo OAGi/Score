@@ -10,7 +10,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {AuthService, ErrorAlertInterceptor, XhrInterceptor} from './authentication/auth.service';
 
-import {SrtWebappComponent} from './srt-webapp.component';
+import {ScoreWebComponent} from './score-web.component';
 
 import {BasisModule} from './basis/basis.module';
 import {AccountManagementModule} from './account-management/account-management.module';
@@ -65,7 +65,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ModuleManagementModule
   ],
   declarations: [
-    SrtWebappComponent
+    ScoreWebComponent
   ],
   providers: [
     MatIconRegistry,
@@ -74,9 +74,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     httpInterceptorsProviders,
   ],
   bootstrap: [
-    SrtWebappComponent
+    ScoreWebComponent
   ],
   exports: [TranslateModule]
 })
-export class SrtWebappModule {
+export class ScoreWebModule {
 }

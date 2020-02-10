@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication(scanBasePackages = "org.oagi.srt")
 @RestController
-public class SrtHttpGatewayApplication extends SpringBootServletInitializer {
+public class ScoreHttpApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(SrtHttpGatewayApplication.class, args);
+        SpringApplication.run(ScoreHttpApplication.class, args);
     }
 }

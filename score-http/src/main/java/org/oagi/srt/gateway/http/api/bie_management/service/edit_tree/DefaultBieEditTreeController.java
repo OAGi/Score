@@ -669,6 +669,18 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
             ).from(Tables.BBIE)
                     .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNode.getBbieId())))
                     .fetchOneInto(BieEditBbiepNodeDetail.class);
+
+            /* Issue #762 */
+            if (detail.getAgencyIdListId() != null && detail.getAgencyIdListId() > 0L) {
+                detail.setBdtPriRestriId(null);
+                detail.setCodeListId(null);
+            } else if (detail.getCodeListId() != null && detail.getCodeListId() > 0L) {
+                detail.setBdtPriRestriId(null);
+                detail.setAgencyIdListId(null);
+            } else if (detail.getBdtPriRestriId() != null && detail.getBdtPriRestriId() > 0L) {
+                detail.setCodeListId(null);
+                detail.setAgencyIdListId(null);
+            }
         } else {
             detail = dslContext.select(
                     Tables.BCC.CARDINALITY_MIN.as("bie_cardinality_min"),
@@ -836,6 +848,18 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                     .from(Tables.BBIE_SC)
                     .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNode.getBbieScId())))
                     .fetchOneInto(BieEditBbieScNodeDetail.class);
+
+            /* Issue #762 */
+            if (detail.getAgencyIdListId() != null && detail.getAgencyIdListId() > 0L) {
+                detail.setDtScPriRestriId(null);
+                detail.setCodeListId(null);
+            } else if (detail.getCodeListId() != null && detail.getCodeListId() > 0L) {
+                detail.setDtScPriRestriId(null);
+                detail.setAgencyIdListId(null);
+            } else if (detail.getDtScPriRestriId() != null && detail.getDtScPriRestriId() > 0L) {
+                detail.setCodeListId(null);
+                detail.setAgencyIdListId(null);
+            }
         } else {
             detail = dslContext.select(
                     Tables.DT_SC.CARDINALITY_MIN.as("bie_cardinality_min"),
@@ -1106,24 +1130,25 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         Long codeListId = bbiepNodeDetail.getCodeListId();
         Long agencyIdListId = bbiepNodeDetail.getAgencyIdListId();
 
-        if (bdtPriRestriId != null) {
-            dslContext.update(Tables.BBIE)
-                    .set(Tables.BBIE.BDT_PRI_RESTRI_ID, ULong.valueOf(bdtPriRestriId))
-                    .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
-        }
-
-        if (codeListId != null) {
-            dslContext.update(Tables.BBIE)
-                    .set(Tables.BBIE.CODE_LIST_ID, ULong.valueOf(codeListId))
-                    .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
-        }
-
         if (agencyIdListId != null) {
             dslContext.update(Tables.BBIE)
                     .set(Tables.BBIE.AGENCY_ID_LIST_ID, ULong.valueOf(agencyIdListId))
+                    .setNull(Tables.BBIE.CODE_LIST_ID)
+                    .setNull(Tables.BBIE.BDT_PRI_RESTRI_ID)
+                    .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
+        } else if (codeListId != null) {
+            dslContext.update(Tables.BBIE)
+                    .setNull(Tables.BBIE.AGENCY_ID_LIST_ID)
+                    .set(Tables.BBIE.CODE_LIST_ID, ULong.valueOf(codeListId))
+                    .setNull(Tables.BBIE.BDT_PRI_RESTRI_ID)
+                    .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
+        } else if (bdtPriRestriId != null) {
+            dslContext.update(Tables.BBIE)
+                    .setNull(Tables.BBIE.AGENCY_ID_LIST_ID)
+                    .setNull(Tables.BBIE.CODE_LIST_ID)
+                    .set(Tables.BBIE.BDT_PRI_RESTRI_ID, ULong.valueOf(bdtPriRestriId))
                     .where(Tables.BBIE.BBIE_ID.eq(ULong.valueOf(bbiepNodeDetail.getBbieId()))).execute();
         }
-
 
         BccRecord bccRecord = dslContext.selectFrom(BCC)
                 .where(BCC.BCC_ID.eq(ULong.valueOf(bbiepNodeDetail.getBccId()))).fetchOne();
@@ -1183,21 +1208,23 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         Long codeListId = bbieScNodeDetail.getCodeListId();
         Long agencyIdListId = bbieScNodeDetail.getAgencyIdListId();
 
-        if (dtScPriRestriId != null) {
-            dslContext.update(Tables.BBIE_SC)
-                    .set(Tables.BBIE_SC.DT_SC_PRI_RESTRI_ID, ULong.valueOf(dtScPriRestriId))
-                    .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScId()))).execute();
-        }
-
-        if (codeListId != null) {
-            dslContext.update(Tables.BBIE_SC)
-                    .set(Tables.BBIE_SC.CODE_LIST_ID, ULong.valueOf(codeListId))
-                    .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScId()))).execute();
-        }
-
         if (agencyIdListId != null) {
             dslContext.update(Tables.BBIE_SC)
+                    .setNull(Tables.BBIE_SC.DT_SC_PRI_RESTRI_ID)
+                    .setNull(Tables.BBIE_SC.CODE_LIST_ID)
                     .set(Tables.BBIE_SC.AGENCY_ID_LIST_ID, ULong.valueOf(agencyIdListId))
+                    .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScId()))).execute();
+        } else if (codeListId != null) {
+            dslContext.update(Tables.BBIE_SC)
+                    .setNull(Tables.BBIE_SC.DT_SC_PRI_RESTRI_ID)
+                    .set(Tables.BBIE_SC.CODE_LIST_ID, ULong.valueOf(codeListId))
+                    .setNull(Tables.BBIE_SC.AGENCY_ID_LIST_ID)
+                    .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScId()))).execute();
+        } else if (dtScPriRestriId != null) {
+            dslContext.update(Tables.BBIE_SC)
+                    .set(Tables.BBIE_SC.DT_SC_PRI_RESTRI_ID, ULong.valueOf(dtScPriRestriId))
+                    .setNull(Tables.BBIE_SC.CODE_LIST_ID)
+                    .setNull(Tables.BBIE_SC.AGENCY_ID_LIST_ID)
                     .where(Tables.BBIE_SC.BBIE_SC_ID.eq(ULong.valueOf(bbieScNodeDetail.getBbieScId()))).execute();
         }
 
