@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.oagi.srt.gateway.http.api.cc_management.helper.CcUtility.getLatestEntity;
 import static org.oagi.srt.gateway.http.api.cc_management.helper.CcUtility.getRevision;
+import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 
 @Repository
 public class CcListRepository {
@@ -40,9 +43,9 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
-                .filter(e -> StringUtils.isEmpty(request.getModule()) || (!StringUtils.isEmpty(e.getModule()) && e.getModule().toLowerCase().contains(request.getModule().trim().toLowerCase())))
+                .filter(contains(request.getDen(), ACC::getDen))
+                .filter(contains(request.getDefinition(), ACC::getDefinition))
+                .filter(contains(request.getModule(), ACC::getModule))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -100,8 +103,8 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
+                .filter(contains(request.getDen(), ASCC::getDen))
+                .filter(contains(request.getDefinition(), ASCC::getDefinition))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -156,8 +159,8 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
+                .filter(contains(request.getDen(), BCC::getDen))
+                .filter(contains(request.getDefinition(), BCC::getDefinition))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -212,9 +215,9 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
-                .filter(e -> StringUtils.isEmpty(request.getModule()) || (!StringUtils.isEmpty(e.getModule()) && e.getModule().toLowerCase().contains(request.getModule().trim().toLowerCase())))
+                .filter(contains(request.getDen(), ASCCP::getDen))
+                .filter(contains(request.getDefinition(), ASCCP::getDefinition))
+                .filter(contains(request.getModule(), ASCCP::getModule))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -270,9 +273,9 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
-                .filter(e -> StringUtils.isEmpty(request.getModule()) || (!StringUtils.isEmpty(e.getModule()) && e.getModule().toLowerCase().contains(request.getModule().trim().toLowerCase())))
+                .filter(contains(request.getDen(), BCCP::getDen))
+                .filter(contains(request.getDefinition(), BCCP::getDefinition))
+                .filter(contains(request.getModule(), BCCP::getModule))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -327,8 +330,8 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
-                .filter(getDenFilter(request.getDen()))
-                .filter(e -> StringUtils.isEmpty(request.getDefinition()) || (!StringUtils.isEmpty(e.getDefinition()) && e.getDefinition().toLowerCase().contains(request.getDefinition().trim().toLowerCase())))
+                .filter(contains(request.getDen(), DT::getDen))
+                .filter(contains(request.getDefinition(), DT::getDefinition))
                 .filter(e -> {
                     Date start = request.getUpdateStartDate();
                     if (start != null) {
@@ -361,28 +364,5 @@ public class CcListRepository {
                     return ccList;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private Predicate<CoreComponent> getDenFilter(String filter) {
-        if (!StringUtils.isEmpty(filter)) {
-            filter = filter.trim();
-            List<String> filters = Arrays.asList(filter.toLowerCase().split(" ")).stream()
-                    .map(e -> e.replaceAll("[^a-z]", "").trim()).collect(Collectors.toList());
-
-            return coreComponent -> {
-                List<String> den = Arrays.asList(coreComponent.getDen().toLowerCase().split(" ")).stream()
-                        .map(e -> e.replaceAll("[^a-z]", "").trim()).collect(Collectors.toList());
-
-                for (String partialFilter : filters) {
-                    if (!den.contains(partialFilter)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            };
-        } else {
-            return coreComponent -> true;
-        }
     }
 }

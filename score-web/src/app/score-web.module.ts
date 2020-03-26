@@ -1,8 +1,6 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {HotkeyModule} from 'angular2-hotkeys';
-import {CookieService} from 'ngx-cookie-service';
 import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
@@ -41,7 +39,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot(SRT_WEBAPP_ROUTES),
-    HotkeyModule.forRoot(),
     HttpClientModule,
     TranslateModule.forRoot({
       loader: {
@@ -69,7 +66,6 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   providers: [
     MatIconRegistry,
-    CookieService,
     AuthService,
     httpInterceptorsProviders,
   ],

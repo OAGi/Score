@@ -5,7 +5,6 @@ import {CanActivateDeveloper, CanActivateUser} from '../authentication/auth.serv
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {SettingsService} from './settings/domain/settings.service';
 import {AccountListComponent} from './account-list/account-list.component';
@@ -44,7 +43,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     GrowlModule.forRoot({maxMessages: 1, displayTimeMs: 5000}),
     ContextMenuModule.forRoot({
       useBootstrap4: true,

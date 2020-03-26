@@ -24,6 +24,7 @@ import static org.jooq.impl.DSL.coalesce;
 import static org.jooq.impl.DSL.count;
 import static org.oagi.srt.entity.jooq.Tables.CTX_CATEGORY;
 import static org.oagi.srt.entity.jooq.Tables.CTX_SCHEME;
+import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 
 @Service
 @Transactional(readOnly = true)
@@ -46,10 +47,10 @@ public class ContextCategoryService {
 
         List<Condition> conditions = new ArrayList();
         if (!StringUtils.isEmpty(request.getName())) {
-            conditions.add(CTX_CATEGORY.NAME.containsIgnoreCase(request.getName().trim()));
+            conditions.addAll(contains(request.getName(), CTX_CATEGORY.NAME));
         }
         if (!StringUtils.isEmpty(request.getDescription())) {
-            conditions.add(CTX_CATEGORY.DESCRIPTION.containsIgnoreCase(request.getDescription().trim()));
+            conditions.addAll(contains(request.getDescription(), CTX_CATEGORY.DESCRIPTION));
         }
 
         SelectConnectByStep<Record4<ULong, String, String, String>> conditionStep = step.where(conditions);

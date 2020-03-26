@@ -24,7 +24,6 @@ import {
 } from './domain/bie-edit-node';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatSnackBar} from '@angular/material';
-import {Hotkey, HotkeysService} from 'angular2-hotkeys';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {GrowlService} from 'ngx-growl';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
@@ -354,7 +353,6 @@ export class BieEditComponent implements OnInit {
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               private growlService: GrowlService,
-              private hotkeysService: HotkeysService,
               private contextMenuService: ContextMenuService,
               private dialog: MatDialog) {
 
@@ -407,15 +405,6 @@ export class BieEditComponent implements OnInit {
     });
 
     this.isUpdating = false;
-    this.hotkeysService.add(new Hotkey(['meta+s', 'ctrl+s'],
-      (event: KeyboardEvent, combo: string): ExtendedKeyboardEvent => {
-
-        this.updateDetails();
-
-        const e: ExtendedKeyboardEvent = event;
-        e.returnValue = false; // Prevent bubbling
-        return e;
-      }));
   }
 
   getLevel = (node: DynamicBieFlatNode) => node.level;

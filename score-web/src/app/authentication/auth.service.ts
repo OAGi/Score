@@ -15,7 +15,6 @@ import {catchError} from 'rxjs/operators';
 import {Observable, throwError} from 'rxjs';
 import {MatSnackBar} from '@angular/material';
 import {UserToken} from './domain/auth';
-import {CookieService} from 'ngx-cookie-service';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
@@ -23,8 +22,7 @@ export class AuthService implements OnInit, CanActivate {
   USER_INFO_KEY = 'X-SRT-UserInfo';
 
   constructor(private http: HttpClient,
-              private router: Router,
-              private cookieService: CookieService) {
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -46,36 +44,33 @@ export class AuthService implements OnInit, CanActivate {
     const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
     this.http.post<UserToken>('/api/' + environment.loginPath, params, {
       headers: headers
-    })
-      .subscribe(res => {
-        this.cookieService.set(this.USER_INFO_KEY, btoa(JSON.stringify(res)), 0, '/');
-        return callback && callback(res);
-      }, err => {
-        return errCallback && errCallback(err);
-      });
+    }).subscribe(res => {
+      localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
+      return callback && callback(res);
+    }, err => {
+      return errCallback && errCallback(err);
+    });
   }
 
   getUserToken() {
-    if (this.cookieService.check(this.USER_INFO_KEY)) {
+    if (this.isAuthenticated()) {
       try {
-        return JSON.parse(atob(this.cookieService.get(this.USER_INFO_KEY)));
+        return JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
       } catch (e) {
         this.logout();
       }
     }
 
-    return {
-      username: '',
-      role: '',
-    };
+    this.logout();
   }
 
   isAuthenticated() {
-    return this.cookieService.check(this.USER_INFO_KEY);
+    const value = localStorage.getItem(this.USER_INFO_KEY);
+    return (value);
   }
 
   logout(url?) {
-    this.cookieService.deleteAll('/');
+    localStorage.removeItem(this.USER_INFO_KEY);
 
     this.http.get('/api/logout').subscribe(_ => {
     });

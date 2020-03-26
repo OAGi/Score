@@ -49,7 +49,6 @@ public class BieListController {
         BieListRequest request = new BieListRequest();
 
         request.setPropertyTerm(propertyTerm);
-        // todo make it a list for all the business context
         request.setBusinessContext(businessContext);
         request.setAccess(!StringUtils.isEmpty(access) ? AccessPrivilege.valueOf(access) : null);
         request.setStates(!StringUtils.isEmpty(states) ?
@@ -104,11 +103,10 @@ public class BieListController {
 
     @RequestMapping(value = "/profile_bie_list/delete", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteBieList(@RequestBody DeleteBieListRequest request) {
+    public ResponseEntity deleteBieList(@AuthenticationPrincipal User user,
+                                        @RequestBody DeleteBieListRequest request) {
         List<Long> topLevelAbieIds = request.getTopLevelAbieIds();
-        if (!topLevelAbieIds.isEmpty()) {
-            service.deleteBieList(topLevelAbieIds);
-        }
+        service.deleteBieList(user, topLevelAbieIds);
         return ResponseEntity.noContent().build();
     }
 

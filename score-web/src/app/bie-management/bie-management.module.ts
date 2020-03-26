@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {BieExpressModule} from './bie-express/bie-express.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
@@ -75,7 +74,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     BieExpressModule,
     BieEditModule,
     TransferOwnershipDialogModule,

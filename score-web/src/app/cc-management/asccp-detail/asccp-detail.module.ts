@@ -4,7 +4,6 @@ import {AsccpDetailComponent} from './asccp-detail.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {MatInputModule} from '@angular/material';
 import {AuthService} from '../../authentication/auth.service';
 import {AsccpCreateComponent} from '../asccp-create/asccp-create.component';
@@ -34,7 +33,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     MatInputModule,
     CommonModule,
     TranslateModule

@@ -4,7 +4,6 @@ import {ModuleListComponent} from './module-list/module-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {AuthService} from '../authentication/auth.service';
 import {ModuleService} from './domain/module.service';
 import {ModuleCreateComponent} from './module-create/module-create.component';
@@ -41,7 +40,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     TranslateModule,
     CommonModule
   ],

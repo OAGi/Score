@@ -4,7 +4,6 @@ import {AccDetailComponent} from './acc-detail.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material';
 import {AccCreateComponent} from '../acc-create/acc-create.component';
@@ -35,7 +34,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     MatInputModule,
     ContextMenuModule.forRoot({
       useBootstrap4: true,

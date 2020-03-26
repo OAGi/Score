@@ -66,8 +66,9 @@ export class AccountCreateComponent implements OnInit {
       return;
     }
 
-    this.service.getAccount(value).subscribe(resp => {
-      if (resp) {
+    this.service.getAccountNames().subscribe(resp => {
+      if (resp.indexOf(value) > -1) {
+        this.creable = false;
         this.growlService.addError({heading: 'Oops', message: 'This Login ID is already taken.'});
       } else {
         this.creable = true;

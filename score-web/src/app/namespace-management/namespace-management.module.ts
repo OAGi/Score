@@ -7,7 +7,6 @@ import {NamespaceService} from './domain/namespace.service';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {AuthService} from '../authentication/auth.service';
 
 const routes: Routes = [
@@ -39,7 +38,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     CommonModule
   ],
   declarations: [

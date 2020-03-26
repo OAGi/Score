@@ -53,10 +53,10 @@ public class AccountListController {
         return service.getAccounts(requester, request);
     }
 
-    @RequestMapping(value = "/account/{loginId}", method = RequestMethod.GET,
+    @RequestMapping(value = "/account/{appUserId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppUser getAccount(@PathVariable("loginId") String loginId) {
-        return service.getAccount(loginId);
+    public AppUser getAccount(@PathVariable("appUserId") long appUserId) {
+        return service.getAccount(appUserId);
     }
 
     @RequestMapping(value = "/account", method = RequestMethod.PUT)

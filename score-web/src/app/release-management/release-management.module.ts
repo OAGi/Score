@@ -4,7 +4,6 @@ import {ReleaseListComponent} from './release-list/release-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
 
@@ -27,7 +26,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     CommonModule
   ],
   declarations: [

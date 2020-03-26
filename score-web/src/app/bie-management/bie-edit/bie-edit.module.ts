@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {ContextMenuModule} from 'ngx-contextmenu';
 
 import {TranslateModule} from '@ngx-translate/core';
@@ -40,7 +39,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     MatDialogModule,
     NgxMatSelectSearchModule,
     GrowlModule.forRoot({maxMessages: 10, displayTimeMs: 5000}),

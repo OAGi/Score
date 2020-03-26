@@ -5,7 +5,6 @@ import {AuthService} from '../authentication/auth.service';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {MaterialModule} from '../material.module';
-import {HotkeyModule} from 'angular2-hotkeys';
 import {AccDetailModule} from './acc-detail/acc-detail.module';
 import {AsccpDetailModule} from './asccp-detail/asccp-detail.module';
 import {BccpDetailModule} from './bccp-detail/bccp-detail.module';
@@ -48,7 +47,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    HotkeyModule,
     AccDetailModule,
     AsccpDetailModule,
     BccpDetailModule,

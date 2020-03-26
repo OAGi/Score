@@ -6,7 +6,6 @@ import {map, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog, MatSnackBar} from '@angular/material';
-import {HotkeysService} from 'angular2-hotkeys';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNode,
@@ -197,8 +196,7 @@ export class AccDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private contextMenuService: ContextMenuService,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog,
-              private hotkeysService: HotkeysService) {
+              private dialog: MatDialog) {
 
   }
 

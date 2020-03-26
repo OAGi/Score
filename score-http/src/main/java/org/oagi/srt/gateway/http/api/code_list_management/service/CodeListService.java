@@ -3,6 +3,7 @@ package org.oagi.srt.gateway.http.api.code_list_management.service;
 import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.srt.entity.jooq.Tables;
+import org.oagi.srt.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.srt.gateway.http.api.code_list_management.data.*;
 import org.oagi.srt.gateway.http.api.common.data.PageRequest;
 import org.oagi.srt.gateway.http.api.common.data.PageResponse;
@@ -24,7 +25,9 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.oagi.srt.entity.jooq.Tables.*;
+import static org.oagi.srt.gateway.http.api.code_list_management.data.CodeListState.Editing;
 import static org.oagi.srt.gateway.http.helper.SrtJdbcTemplate.newSqlParameterSource;
+import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -73,7 +76,7 @@ public class CodeListService {
 
         List<Condition> conditions = new ArrayList();
         if (!StringUtils.isEmpty(request.getName())) {
-            conditions.add(Tables.CODE_LIST.NAME.containsIgnoreCase(request.getName().trim()));
+            conditions.addAll(contains(request.getName(), CODE_LIST.NAME));
         }
         if (!request.getStates().isEmpty()) {
             conditions.add(Tables.CODE_LIST.STATE.in(request.getStates()));
@@ -232,7 +235,7 @@ public class CodeListService {
                 codeList.getDefinitionSource(),
                 (codeList.getBasedCodeListId() != null) ? ULong.valueOf(codeList.getBasedCodeListId()) : null,
                 (byte) ((codeList.isExtensible()) ? 1 : 0),
-                CodeListState.Editing.name(),
+                Editing.name(),
                 userId, userId, timestamp, timestamp)
                 .returning(CODE_LIST.CODE_LIST_ID).fetchOne().getValue(CODE_LIST.CODE_LIST_ID);
         for (CodeListValue codeListValue : codeList.getCodeListValues()) {
@@ -335,7 +338,6 @@ public class CodeListService {
 
     @Transactional
     public void update(long codeListId, CodeListValue codeListValue) {
-
         boolean locked = codeListValue.isLocked();
         boolean used = codeListValue.isUsed();
         boolean extension = codeListValue.isExtension();
@@ -361,6 +363,8 @@ public class CodeListService {
 
     @Transactional
     public void delete(long codeListId, long codeListValueId) {
+        ensureProperDeleteCodeListRequest(ULong.valueOf(codeListId));
+
         dslContext.deleteFrom(CODE_LIST_VALUE)
                 .where(and(
                         CODE_LIST_VALUE.CODE_LIST_VALUE_ID.eq(ULong.valueOf(codeListValueId)),
@@ -371,6 +375,8 @@ public class CodeListService {
 
     @Transactional
     public void delete(long codeListId) {
+        ensureProperDeleteCodeListRequest(ULong.valueOf(codeListId));
+
         dslContext.deleteFrom(CODE_LIST_VALUE)
                 .where(CODE_LIST_VALUE.CODE_LIST_ID.eq(ULong.valueOf(codeListId)))
                 .execute();
@@ -383,5 +389,20 @@ public class CodeListService {
     @Transactional
     public void delete(List<Long> codeListIds) {
         codeListIds.stream().forEach(e -> delete(e));
+    }
+
+    private void ensureProperDeleteCodeListRequest(ULong codeListId) {
+        String state = dslContext.select(CODE_LIST.STATE)
+                .from(CODE_LIST)
+                .where(CODE_LIST.CODE_LIST_ID.eq(codeListId))
+                .fetchOptionalInto(String.class).orElse(null);
+
+        if (state == null) {
+            throw new IllegalArgumentException();
+        }
+        CodeListState codeListState = CodeListState.valueOf(state);
+        if (Editing != codeListState) {
+            throw new DataAccessForbiddenException("Not allowed to delete the code list in '" + codeListState + "' state.");
+        }
     }
 }

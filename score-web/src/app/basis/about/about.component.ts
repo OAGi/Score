@@ -15,7 +15,7 @@ export class AboutComponent implements OnInit {
 
   constructor(private service: AboutService) {
     const webProductInfo = new ProductInfo();
-    webProductInfo.productName = 'srt-web';
+    webProductInfo.productName = 'score-web';
     webProductInfo.productVersion = pkg.version.replace('-rc', '');
 
     this.productInfos.push(webProductInfo);

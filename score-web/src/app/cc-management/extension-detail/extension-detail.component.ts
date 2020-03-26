@@ -6,7 +6,6 @@ import {map, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog, MatSnackBar} from '@angular/material';
-import {HotkeysService} from 'angular2-hotkeys';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {hashCode, UnboundedPipe} from '../../common/utility';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
@@ -214,7 +213,6 @@ export class ExtensionDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               private growlService: GrowlService,
-              private hotkeysService: HotkeysService,
               private contextMenuService: ContextMenuService,
               private dialog: MatDialog) {
   }

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.*;
 import static org.oagi.srt.entity.jooq.Tables.*;
+import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -66,7 +67,7 @@ public class ContextSchemeService {
 
         List<Condition> conditions = new ArrayList();
         if (!StringUtils.isEmpty(request.getName())) {
-            conditions.add(CTX_SCHEME.SCHEME_NAME.containsIgnoreCase(request.getName().trim()));
+            conditions.addAll(contains(request.getName(), CTX_SCHEME.SCHEME_NAME));
         }
         if (!request.getUpdaterLoginIds().isEmpty()) {
             conditions.add(APP_USER.LOGIN_ID.in(request.getUpdaterLoginIds()));
