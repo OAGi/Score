@@ -139,6 +139,22 @@ export class BusinessContextDetailComponent implements OnInit {
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
+  select(row: BusinessContextValue) {
+    this.selection.select(row);
+  }
+
+  toggle(row: BusinessContextValue) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BusinessContextValue) {
+    return this.selection.isSelected(row);
+  }
+
   removeBizCtxValues() {
     const newData = [];
     this.dataSource.data.forEach(row => {

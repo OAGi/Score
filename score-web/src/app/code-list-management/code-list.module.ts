@@ -13,7 +13,7 @@ import {
   DialogDiscardCodeListDetailDialogComponent,
   DialogPublishCodelistDialogDetailComponent
 } from './code-list-detail/code-list-detail.component';
-import {CodeListCreateComponent, DialogContentCodelistDialogComponent} from './code-list-create/code-list-create.component';
+import {CodeListCreateComponent, DialogContentCodeListDialogComponent} from './code-list-create/code-list-create.component';
 import {CodeListForCreatingComponent} from './code-list-for-creating/code-list-for-creating.component';
 
 const routes: Routes = [
@@ -68,14 +68,14 @@ const routes: Routes = [
     CodeListDetailComponent,
     CodeListForCreatingComponent,
     CodeListValueDialogComponent,
-    DialogContentCodelistDialogComponent,
+    DialogContentCodeListDialogComponent,
     DialogContentCodelistDialogDetailComponent,
     DialogPublishCodelistDialogDetailComponent,
     DialogDiscardCodeListDetailDialogComponent
   ],
   entryComponents: [
     CodeListValueDialogComponent,
-    DialogContentCodelistDialogComponent,
+    DialogContentCodeListDialogComponent,
     DialogContentCodelistDialogDetailComponent,
     DialogPublishCodelistDialogDetailComponent,
     DialogDiscardCodeListDetailDialogComponent

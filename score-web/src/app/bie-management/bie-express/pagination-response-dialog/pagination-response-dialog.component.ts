@@ -21,7 +21,7 @@ export class PaginationResponseDialogComponent implements OnInit {
     'select', 'propertyTerm', 'releaseNum', 'bizCtxName', 'owner', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<BieList>(false, []);
+  selection = new SelectionModel<number>(false, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -121,6 +121,22 @@ export class PaginationResponseDialogComponent implements OnInit {
 
   isDisabled() {
     return this.selection.selected.length === 0;
+  }
+
+  select(row: BieList) {
+    this.selection.select(row.topLevelAbieId);
+  }
+
+  toggle(row: BieList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.topLevelAbieId);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BieList) {
+    return this.selection.isSelected(row.topLevelAbieId);
   }
 
 }

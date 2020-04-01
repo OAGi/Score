@@ -205,6 +205,22 @@ export class ContextSchemeDetailComponent implements OnInit {
       });
   }
 
+  select(row: ContextSchemeValue) {
+    this.selection.select(row);
+  }
+
+  toggle(row: ContextSchemeValue) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: ContextSchemeValue) {
+    return this.selection.isSelected(row);
+  }
+
   back() {
     this.location.back();
   }

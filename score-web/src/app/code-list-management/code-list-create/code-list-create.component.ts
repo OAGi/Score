@@ -179,7 +179,7 @@ export class CodeListCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(CodeListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for ( const value of this.dataSource.data) {
+        for (const value of this.dataSource.data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
@@ -235,10 +235,22 @@ export class CodeListCreateComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(codeListValue: CodeListValue) {
-    if (this.isAvailable(codeListValue)) {
-      this.selection.select(codeListValue);
+  select(row: CodeListValue) {
+    if (this.isAvailable(row)) {
+      this.selection.select(row);
     }
+  }
+
+  toggle(row: CodeListValue) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CodeListValue) {
+    return this.selection.isSelected(row);
   }
 
   isAvailable(codeListValue: CodeListValue) {
@@ -248,7 +260,7 @@ export class CodeListCreateComponent implements OnInit {
   removeCodeListValues() {
     const newData = [];
     this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
+      if (!this.isSelected(row)) {
         newData.push(row);
       }
     });
@@ -315,8 +327,8 @@ export class CodeListCreateComponent implements OnInit {
 
   openDialogCodeList() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codelist: this.codeList};
-    const dialogRef = this.dialog.open(DialogContentCodelistDialogComponent, dialogConfig);
+    dialogConfig.data = {codeList: this.codeList};
+    const dialogRef = this.dialog.open(DialogContentCodeListDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
@@ -334,10 +346,10 @@ export class CodeListCreateComponent implements OnInit {
 }
 
 @Component({
-  selector: 'srt-dialog-content-codelist-dialog',
-  templateUrl: 'dialog-content-codelist-dialog.html',
+  selector: 'srt-dialog-content-code-list-dialog',
+  templateUrl: 'dialog-content-code-list-dialog.html',
 })
-export class DialogContentCodelistDialogComponent {
+export class DialogContentCodeListDialogComponent {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }

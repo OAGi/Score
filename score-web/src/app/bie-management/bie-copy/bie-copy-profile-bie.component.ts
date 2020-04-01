@@ -142,6 +142,22 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.router.navigateByUrl('/profile_bie/copy');
   }
 
+  select(row: BieList) {
+    this.selection.select(row);
+  }
+
+  toggle(row: BieList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BieList) {
+    return this.selection.isSelected(row);
+  }
+
   copy() {
     const topLevelAbieId: number = this.selection.selected[0].topLevelAbieId;
     this.service.copy(topLevelAbieId, this.bizCtxIds).subscribe(_ => {

@@ -18,7 +18,7 @@ export class NamespaceListComponent implements OnInit {
     'uri', 'prefix', 'owner', 'lastUpdateTimestamp', 'description'
   ];
   dataSource = new MatTableDataSource<NamespaceList>();
-  selection = new SelectionModel<NamespaceList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -71,16 +71,20 @@ export class NamespaceListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
-    this.selection.select(row);
+  select(row: NamespaceList) {
+    this.selection.select(row.namespaceId);
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: NamespaceList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.namespaceId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: NamespaceList) {
+    return this.selection.isSelected(row.namespaceId);
   }
 
   create() {

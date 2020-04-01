@@ -480,8 +480,8 @@ export class ExtensionDetailComponent implements OnInit {
       },
       width: window.innerWidth + 'px'
     });
-    dialogRef.afterClosed().subscribe(asccp => {
-      if (!asccp) {
+    dialogRef.afterClosed().subscribe(asccpId => {
+      if (!asccpId) {
         return;
       }
       if (this.treeControl.isExpanded(this.rootNode)) {
@@ -499,8 +499,8 @@ export class ExtensionDetailComponent implements OnInit {
       },
       width: window.innerWidth + 'px'
     });
-    dialogRef.afterClosed().subscribe(bccp => {
-      if (!bccp) {
+    dialogRef.afterClosed().subscribe(bccpId => {
+      if (!bccpId) {
         return;
       }
       if (this.treeControl.isExpanded(this.rootNode)) {

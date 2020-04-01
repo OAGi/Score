@@ -29,7 +29,7 @@ export class BieExpressComponent implements OnInit {
     'select', 'propertyTerm', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<BieList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -138,21 +138,24 @@ export class BieExpressComponent implements OnInit {
       });
   }
 
-  select(row) {
-    this.selection.select(row);
+  select(row: BieList) {
+    this.selection.select(row.topLevelAbieId);
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: BieList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.topLevelAbieId);
     } else {
       this.select(row);
     }
   }
 
+  isSelected(row: BieList) {
+    return this.selection.isSelected(row.topLevelAbieId);
+  }
+
   generate() {
-    const selectedTopLevelAbieIds = this.selection.selected
-      .map((bieList: BieList) => bieList.topLevelAbieId);
+    const selectedTopLevelAbieIds = this.selection.selected;
 
     this.loading = true;
     this.service.generate(selectedTopLevelAbieIds, this.option).subscribe(resp => {
@@ -192,10 +195,10 @@ export class BieExpressComponent implements OnInit {
       this.bieListService.getMetaHeaderBieList().subscribe(resp => {
         dialogConfig.data = resp;
         const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selected => {
-          if (selected) {
+        dialogRef.afterClosed().subscribe(selectedTopLevelAbieId => {
+          if (selectedTopLevelAbieId) {
             this.option[includeMetaHeaderForJsonPropertyKey] = true;
-            this.option[metaHeaderTopLevelAbieIdPropertyKey] = selected.topLevelAbieId;
+            this.option[metaHeaderTopLevelAbieIdPropertyKey] = selectedTopLevelAbieId;
 
             this.previousPackageOption = this.option.packageOption;
             this.option.packageOption = 'EACH';
@@ -228,10 +231,10 @@ export class BieExpressComponent implements OnInit {
       this.bieListService.getPaginationResponseBieList().subscribe(resp => {
         dialogConfig.data = resp;
         const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selected => {
-          if (selected) {
+        dialogRef.afterClosed().subscribe(selectedTopLevelAbieId => {
+          if (selectedTopLevelAbieId) {
             this.option[includePaginationResponseForJsonPropertyKey] = true;
-            this.option[paginationResponseTopLevelAbieIdPropertyKey] = selected.topLevelAbieId;
+            this.option[paginationResponseTopLevelAbieIdPropertyKey] = selectedTopLevelAbieId;
 
             this.previousPackageOption = this.option.packageOption;
             this.option.packageOption = 'EACH';

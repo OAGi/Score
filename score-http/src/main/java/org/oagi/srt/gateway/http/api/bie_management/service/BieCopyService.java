@@ -165,6 +165,7 @@ public class BieCopyService implements InitializingBean {
                 BBIE.FIXED_VALUE,
                 BBIE.IS_NULL.as("nill"),
                 BBIE.DEFINITION,
+                BBIE.EXAMPLE,
                 BBIE.REMARK,
                 BBIE.SEQ_KEY,
                 BBIE.IS_USED.as("used")).from(BBIE)
@@ -211,6 +212,7 @@ public class BieCopyService implements InitializingBean {
                 BBIE_SC.DEFAULT_VALUE,
                 BBIE_SC.FIXED_VALUE,
                 BBIE_SC.DEFINITION,
+                BBIE_SC.EXAMPLE,
                 BBIE_SC.REMARK,
                 BBIE_SC.BIZ_TERM,
                 BBIE_SC.IS_USED.as("used")).from(BBIE_SC)
@@ -269,6 +271,7 @@ public class BieCopyService implements InitializingBean {
         private String fixedValue;
         private boolean nill;
         private String definition;
+        private String example;
         private String remark;
         private double seqKey;
         private boolean used;
@@ -315,6 +318,7 @@ public class BieCopyService implements InitializingBean {
         private String defaultValue;
         private String fixedValue;
         private String definition;
+        private String example;
         private String remark;
         private String bizTerm;
         private boolean used;
@@ -571,6 +575,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE.DEFAULT_VALUE, bbie.getDefaultValue())
                     .set(BBIE.FIXED_VALUE, bbie.getFixedValue())
                     .set(BBIE.DEFINITION, bbie.getDefinition())
+                    .set(BBIE.EXAMPLE, bbie.getExample())
                     .set(BBIE.REMARK, bbie.getRemark())
                     .set(BBIE.CARDINALITY_MIN, bbie.getCardinalityMin())
                     .set(BBIE.CARDINALITY_MAX, bbie.getCardinalityMax())
@@ -598,6 +603,7 @@ public class BieCopyService implements InitializingBean {
                     .set(BBIE_SC.DEFAULT_VALUE, bbieSc.getDefaultValue())
                     .set(BBIE_SC.FIXED_VALUE, bbieSc.getFixedValue())
                     .set(BBIE_SC.DEFINITION, bbieSc.getDefinition())
+                    .set(BBIE_SC.EXAMPLE, bbieSc.getExample())
                     .set(BBIE_SC.REMARK, bbieSc.getRemark())
                     .set(BBIE_SC.BIZ_TERM, bbieSc.getBizTerm())
                     .set(BBIE_SC.CARDINALITY_MIN, bbieSc.getCardinalityMin())

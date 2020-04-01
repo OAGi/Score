@@ -78,7 +78,7 @@
 
     <mat-card-content class="mat-card-container">
       <div class="mat-elevation-z1">
-        <table mat-table matSort matSortActive="lastUpdateTimestamp" matSortDirection="desc"
+        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="dataSource">
 
           <!-- Checkbox Column -->
@@ -93,8 +93,8 @@
               <mat-checkbox (click)="$event.stopPropagation()" [disabled]="row.state !== 'Editing'"
                             matTooltip="This code list cannot be modified."
                             [matTooltipDisabled]="row.state === 'Editing'"
-                            (change)="$event ? selection.toggle(row) : null"
-                            [checked]="selection.isSelected(row)">
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)">
               </mat-checkbox>
             </td>
           </ng-container>

@@ -163,7 +163,7 @@
 
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
-               matSort matSortActive="lastUpdateTimestamp" matSortDirection="desc"
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="data">
 
           <ng-container matColumnDef="type">

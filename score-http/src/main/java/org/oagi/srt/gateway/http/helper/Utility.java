@@ -1,11 +1,14 @@
 package org.oagi.srt.gateway.http.helper;
 
+import org.springframework.util.StringUtils;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 public class Utility {
 
@@ -93,6 +96,29 @@ public class Utility {
             str = str.replace("BOD s", "BODs");
         }
         return str;
+    }
+
+    public static boolean isUpperCase(String s) {
+        if (s == null) {
+            return false;
+        }
+
+        for (char ch : s.toCharArray()) {
+            if (!Character.isUpperCase(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String camelCase(String s, boolean includedAbbr) {
+        if (StringUtils.isEmpty(s)) {
+            return s;
+        }
+        if (!includedAbbr && isUpperCase(s)) {
+            return s;
+        }
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
     }
 
     public static String toCamelCase(final String init) {

@@ -14,7 +14,7 @@
       </mat-form-field>
 
       <div class="mat-elevation-z1">
-        <table mat-table matSort matSortActive="lastUpdateTimestamp" matSortDirection="desc"
+        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="dataSource">
 
           <ng-container matColumnDef="releaseNum">

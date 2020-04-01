@@ -24,7 +24,7 @@ export class ContextCategoryListComponent implements OnInit {
   title = 'Context Categories';
   displayedColumns: string[] = ['select', 'name', 'description'];
   dataSource = new MatTableDataSource<ContextCategory>();
-  selection = new SelectionModel<ContextCategory>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   request: ContextCategoryListRequest;
@@ -92,18 +92,22 @@ export class ContextCategoryListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
+  select(row: ContextCategory) {
     if (!row.used) {
-      this.selection.select(row);
+      this.selection.select(row.ctxCategoryId);
     }
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: ContextCategory) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.ctxCategoryId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: ContextCategory) {
+    return this.selection.isSelected(row.ctxCategoryId);
   }
 
   discard() {
@@ -112,10 +116,7 @@ export class ContextCategoryListComponent implements OnInit {
 
   openDialogContextCategoryListDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const ctxCategoryIds = [];
-    for (const elm of this.selection.selected) {
-      ctxCategoryIds.push(elm.ctxCategoryId);
-    }
+    const ctxCategoryIds = this.selection.selected;
     dialogConfig.data = {ids: ctxCategoryIds};
 
     const dialogRef = this.dialog.open(DialogDiscardContextCategoryDialogComponent, dialogConfig);

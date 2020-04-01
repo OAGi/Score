@@ -31,7 +31,7 @@ export class AppendAsccpDialogComponent implements OnInit {
     'select', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
-  selection = new SelectionModel<CcList>(false, []);
+  selection = new SelectionModel<number>(false, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -141,8 +141,24 @@ export class AppendAsccpDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  select(row: CcList) {
+    this.selection.select(row.id);
+  }
+
+  toggle(row: CcList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.id);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CcList) {
+    return this.selection.isSelected(row.id);
+  }
+
   onClick(): void {
-    const asccpId: number = this.selection.selected[0].id;
+    const asccpId: number = this.selection.selected[0];
     this.service.appendAsccp(asccpId, this.data.releaseId, this.data.extensionId).subscribe(_ => {
       this.dialogRef.close(this.selection.selected[0]);
     });

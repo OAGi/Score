@@ -18,7 +18,7 @@ export class ReleaseListComponent implements OnInit {
     'releaseNum', 'state', 'namespace', 'lastUpdatedBy', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<ReleaseList>();
-  selection = new SelectionModel<ReleaseList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -80,16 +80,20 @@ export class ReleaseListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
-    this.selection.select(row);
+  select(row: ReleaseList) {
+    this.selection.select(row.releaseId);
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: ReleaseList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.releaseId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: ReleaseList) {
+    return this.selection.isSelected(row.releaseId);
   }
 
   create() {

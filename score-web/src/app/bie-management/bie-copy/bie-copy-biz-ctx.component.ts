@@ -24,7 +24,7 @@ export class BieCopyBizCtxComponent implements OnInit {
     'select', 'name', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
-  selection = new SelectionModel<BusinessContext>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -122,11 +122,27 @@ export class BieCopyBizCtxComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+      this.dataSource.data.forEach(row => this.select(row));
+  }
+
+  select(row: BusinessContext) {
+    this.selection.select(row.bizCtxId);
+  }
+
+  toggle(row: BusinessContext) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.bizCtxId);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BusinessContext) {
+    return this.selection.isSelected(row.bizCtxId);
   }
 
   next() {
-    const selectedBizCtxIds = this.selection.selected.map(e => e.bizCtxId).join(',');
+    const selectedBizCtxIds = this.selection.selected.join(',');
     this.router.navigate(['/profile_bie/copy/bie'], {queryParams: {bizCtxIds: selectedBizCtxIds}});
   }
 

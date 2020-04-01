@@ -32,7 +32,7 @@ export class ContextSchemeListComponent implements OnInit {
     'schemeVersionId', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<ContextScheme>();
-  selection = new SelectionModel<ContextScheme>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -134,18 +134,22 @@ export class ContextSchemeListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
+  select(row: ContextScheme) {
     if (!row.used) {
-      this.selection.select(row);
+      this.selection.select(row.ctxSchemeId);
     }
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: ContextScheme) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.ctxSchemeId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: ContextScheme) {
+    return this.selection.isSelected(row.ctxSchemeId);
   }
 
   discard() {
@@ -154,10 +158,7 @@ export class ContextSchemeListComponent implements OnInit {
 
   openDialogContextSchemeListDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const ctxSchemeIds = [];
-    for (const elm of this.selection.selected) {
-      ctxSchemeIds.push(elm.ctxSchemeId);
-    }
+    const ctxSchemeIds = this.selection.selected;
     dialogConfig.data = {ids: ctxSchemeIds};
     const dialogRef = this.dialog.open(DialogContentContextSchemeListDiscardComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {

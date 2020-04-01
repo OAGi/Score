@@ -37,7 +37,7 @@
 
     <mat-card-content class="mat-card-container">
       <div class="mat-elevation-z1">
-        <table mat-table matSort matSortActive="loginId" matSortDirection="asc"
+        <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="dataSource">
 
           <ng-container matColumnDef="loginId">

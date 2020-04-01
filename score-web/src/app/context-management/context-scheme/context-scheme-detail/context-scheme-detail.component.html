@@ -90,10 +90,10 @@
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
-                              (change)="$event ? selection.toggle(row) : null"
+                              (change)="$event ? toggle(row) : null"
                               matTooltip="It is currently in use by another component."
                               [matTooltipDisabled]="!row.used"
-                              [checked]="selection.isSelected(row)"
+                              [checked]="isSelected(row)"
                               [disabled]="importFromCodeList || row.used">
                 </mat-checkbox>
               </td>

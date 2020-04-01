@@ -25,7 +25,7 @@ export class CodeListForCreatingComponent implements OnInit {
     'versionId', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(false, []);
+  selection = new SelectionModel<number>(false, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -119,8 +119,24 @@ export class CodeListForCreatingComponent implements OnInit {
     this.dataSource.filter = filterValue.trim();
   }
 
+  select(row: CodeListForList) {
+    this.selection.select(row.codeListId);
+  }
+
+  toggle(row: CodeListForList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.codeListId);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CodeListForList) {
+    return this.selection.isSelected(row.codeListId);
+  }
+
   next() {
-    this.router.navigateByUrl('/code_list/create/' + this.selection.selected[0].codeListId);
+    this.router.navigateByUrl('/code_list/create/' + this.selection.selected[0]);
   }
 
 }

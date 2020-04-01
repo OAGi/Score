@@ -211,10 +211,22 @@ export class CodeListDetailComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(codeListValue: CodeListValue) {
-    if (this.isAvailable(codeListValue)) {
-      this.selection.select(codeListValue);
+  select(row: CodeListValue) {
+    if (this.isAvailable(row)) {
+      this.selection.select(row);
     }
+  }
+
+  toggle(row: CodeListValue) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CodeListValue) {
+    return this.selection.isSelected(row);
   }
 
   isAvailable(codeListValue: CodeListValue) {
@@ -240,7 +252,6 @@ export class CodeListDetailComponent implements OnInit {
   create() {
     this.router.navigateByUrl('/code_list/create/' + this.codeList.codeListId);
   }
-
 
   sum(list: number[]): number {
     let sum = 0;
@@ -282,7 +293,7 @@ export class CodeListDetailComponent implements OnInit {
 
   openDialogCodeList() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codelist: this.codeList};
+    dialogConfig.data = {codeList: this.codeList};
     const dialogRef = this.dialog.open(DialogContentCodelistDialogDetailComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(result => {
@@ -316,7 +327,7 @@ export class CodeListDetailComponent implements OnInit {
 
   publish() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codelist: this.codeList.codeListName};
+    dialogConfig.data = {codeList: this.codeList.codeListName};
 
     const dialogRef = this.dialog.open(DialogPublishCodelistDialogDetailComponent, dialogConfig);
 
@@ -330,7 +341,6 @@ export class CodeListDetailComponent implements OnInit {
         });
       }
     });
-
   }
 
   discard() {
@@ -356,8 +366,8 @@ export class CodeListDetailComponent implements OnInit {
 }
 
 @Component({
-  selector: 'srt-dialog-content-codelist-dialog-detail',
-  templateUrl: 'dialog-content-codelist-detail-dialog.html',
+  selector: 'srt-dialog-content-code-list-dialog-detail',
+  templateUrl: 'dialog-content-code-list-detail-dialog.html',
 })
 export class DialogContentCodelistDialogDetailComponent {
 
@@ -378,8 +388,8 @@ export class DialogDiscardCodeListDetailDialogComponent {
 }
 
 @Component({
-  selector: 'srt-dialog-publish-codelist-dialog-detail',
-  templateUrl: 'dialog-publish-codelist-detail-dialog.html',
+  selector: 'srt-dialog-publish-code-list-dialog-detail',
+  templateUrl: 'dialog-publish-code-list-detail-dialog.html',
 })
 export class DialogPublishCodelistDialogDetailComponent {
 

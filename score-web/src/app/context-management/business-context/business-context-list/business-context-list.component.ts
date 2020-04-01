@@ -31,7 +31,7 @@ export class BusinessContextListComponent implements OnInit {
     'select', 'name', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
-  selection = new SelectionModel<BusinessContext>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -133,18 +133,22 @@ export class BusinessContextListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
+  select(row: BusinessContext) {
     if (!row.used) {
-      this.selection.select(row);
+      this.selection.select(row.bizCtxId);
     }
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: BusinessContext) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.bizCtxId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: BusinessContext) {
+    return this.selection.isSelected(row.bizCtxId);
   }
 
   discard() {
@@ -153,10 +157,7 @@ export class BusinessContextListComponent implements OnInit {
 
   openDialogContextSchemeListDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const bizCtxIds = [];
-    for (const elm of this.selection.selected) {
-      bizCtxIds.push(elm.bizCtxId);
-    }
+    const bizCtxIds = this.selection.selected;
     dialogConfig.data = {ids: bizCtxIds};
 
     const dialogRef = this.dialog.open(DialogContentBizContextListDiscardComponent, dialogConfig);

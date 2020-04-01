@@ -33,7 +33,7 @@ export class CodeListListComponent implements OnInit {
     'versionId', 'extensible', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CodeListForList>();
-  selection = new SelectionModel<CodeListForList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -134,18 +134,22 @@ export class CodeListListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
+  select(row: CodeListForList) {
     if (row.state === 'Editing') {
-      this.selection.select(row);
+      this.selection.select(row.codeListId);
     }
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: CodeListForList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.codeListId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: CodeListForList) {
+    return this.selection.isSelected(row.codeListId);
   }
 
   discard() {
@@ -154,10 +158,7 @@ export class CodeListListComponent implements OnInit {
 
   openDialogCodeListListDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const codeListIds = [];
-    for (const elm of this.selection.selected) {
-      codeListIds.push(elm.codeListId);
-    }
+    const codeListIds = this.selection.selected;
     dialogConfig.data = {ids: codeListIds};
 
     const dialogRef = this.dialog.open(DialogDiscardCodeListDialogComponent, dialogConfig);

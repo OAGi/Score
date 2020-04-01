@@ -60,6 +60,8 @@ public class BieGenerateService {
             contentType = "application/json";
         } else if (filename.endsWith(".zip")) {
             contentType = "application/zip";
+        } else if (filename.endsWith(".yml")) {
+            contentType = "text/x-yaml";
         } else {
             contentType = "application/octet-stream";
         }

@@ -168,8 +168,20 @@ export class ModuleDetailComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(moduleDependency: ModuleDependency) {
-    this.selection.select(moduleDependency);
+  select(row: ModuleDependency) {
+    this.selection.select(row);
+  }
+
+  toggle(row: ModuleDependency) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: ModuleDependency) {
+    return this.selection.isSelected(row);
   }
 
   removeModuleDependencies() {

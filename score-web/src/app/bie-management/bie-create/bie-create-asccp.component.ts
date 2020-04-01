@@ -130,6 +130,7 @@ export class BieCreateAsccpComponent implements OnInit {
         break;
     }
   }
+
   onChange() {
     this.paginator.pageIndex = 0;
     this.loadData();
@@ -168,6 +169,22 @@ export class BieCreateAsccpComponent implements OnInit {
 
   back() {
     this.router.navigateByUrl('/profile_bie/create');
+  }
+
+  select(row: CcList) {
+    this.selection.select(row);
+  }
+
+  toggle(row: CcList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CcList) {
+    return this.selection.isSelected(row);
   }
 
   create() {

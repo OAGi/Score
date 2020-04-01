@@ -35,7 +35,7 @@ export class BieListComponent implements OnInit {
     'select', 'propertyTerm', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
-  selection = new SelectionModel<BieList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -147,18 +147,22 @@ export class BieListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
+  select(row: BieList) {
     if (row.access === 'CanEdit') {
-      this.selection.select(row);
+      this.selection.select(row.topLevelAbieId);
     }
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: BieList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.topLevelAbieId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: BieList) {
+    return this.selection.isSelected(row.topLevelAbieId);
   }
 
   discard() {
@@ -166,10 +170,7 @@ export class BieListComponent implements OnInit {
   }
 
   openDialogBieDiscard() {
-    const topLevelAbieIds = [];
-    for (const elm of this.selection.selected) {
-      topLevelAbieIds.push(elm.topLevelAbieId);
-    }
+    const topLevelAbieIds = this.selection.selected;
     const dialogConfig = new MatDialogConfig();
     const dialogRef = this.dialog.open(DialogDiscardBieDialogComponent, dialogConfig);
 

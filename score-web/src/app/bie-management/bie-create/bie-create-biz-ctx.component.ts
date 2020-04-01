@@ -10,6 +10,7 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {BieList} from '../bie-list/domain/bie-list';
 
 @Component({
   selector: 'srt-bie-create',
@@ -24,7 +25,7 @@ export class BieCreateBizCtxComponent implements OnInit {
     'select', 'name', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BusinessContext>();
-  selection = new SelectionModel<BusinessContext>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
@@ -122,11 +123,27 @@ export class BieCreateBizCtxComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+      this.dataSource.data.forEach(row => this.select(row));
+  }
+
+  select(row: BusinessContext) {
+    this.selection.select(row.bizCtxId);
+  }
+
+  toggle(row: BusinessContext) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.bizCtxId);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: BusinessContext) {
+    return this.selection.isSelected(row.bizCtxId);
   }
 
   next() {
-    const selectedBizCtxIds = this.selection.selected.map(e => e.bizCtxId).join(',');
+    const selectedBizCtxIds = this.selection.selected.join(',');
     this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {bizCtxIds: selectedBizCtxIds}});
   }
 

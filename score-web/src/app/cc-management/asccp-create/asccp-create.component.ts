@@ -19,7 +19,7 @@ export class AsccpCreateComponent implements OnInit {
     'select', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
-  selection = new SelectionModel<CcList>(false, []);
+  selection = new SelectionModel<number>(false, []);
   loading = false;
 
   asccpId: number;
@@ -86,6 +86,22 @@ export class AsccpCreateComponent implements OnInit {
     }
   }
 
+  select(row: CcList) {
+    this.selection.select(row.id);
+  }
+
+  toggle(row: CcList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.id);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CcList) {
+    return this.selection.isSelected(row.id);
+  }
+
   onChange() {
     this.loading = true;
 
@@ -116,19 +132,18 @@ export class AsccpCreateComponent implements OnInit {
     });
   }
 
-  next(){
-      const asccpId = this.asccpId;
-      const seqKey = 1;
-      const accId: number = this.selection.selected[0].id;
+  next() {
+    const asccpId = this.asccpId;
+    const seqKey = 1;
+    const accId: number = this.selection.selected[0];
 
-      this.service.createAsccp(asccpId, accId, seqKey).subscribe(_ => {
-        this.snackBar.open('Created', '', {
-          duration: 1000,
-        });
-
-        this.router.navigateByUrl('/core_component/asccp/' + asccpId);
+    this.service.createAsccp(asccpId, accId, seqKey).subscribe(_ => {
+      this.snackBar.open('Created', '', {
+        duration: 1000,
       });
 
+      this.router.navigateByUrl('/core_component/asccp/' + asccpId);
+    });
   }
 
 }

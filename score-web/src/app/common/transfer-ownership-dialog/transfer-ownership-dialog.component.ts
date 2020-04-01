@@ -16,8 +16,8 @@ export class TransferOwnershipDialogComponent implements OnInit {
   displayedColumns: string[] = [
     'select', 'loginId', 'name', 'organization', 'developer'
   ];
-  selection = new SelectionModel<AccountList>(false, []);
   dataSource = new MatTableDataSource<AccountList>();
+  selection = new SelectionModel<AccountList>(false, []);
 
   loginIdList: string[] = [];
   request: AccountListRequest;
@@ -70,6 +70,22 @@ export class TransferOwnershipDialogComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list;
     });
+  }
+
+  select(row: AccountList) {
+    this.selection.select(row);
+  }
+
+  toggle(row: AccountList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: AccountList) {
+    return this.selection.isSelected(row);
   }
 
 }

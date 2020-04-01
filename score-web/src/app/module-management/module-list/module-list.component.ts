@@ -18,7 +18,7 @@ export class ModuleListComponent implements OnInit {
     'module', 'namespace', 'owner', 'lastUpdatedBy', 'lastUpdateTimestamp', 'sinceRelease'
   ];
   dataSource = new MatTableDataSource<ModuleList>();
-  selection = new SelectionModel<ModuleList>(true, []);
+  selection = new SelectionModel<number>(true, []);
   loading = false;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -71,16 +71,20 @@ export class ModuleListComponent implements OnInit {
       this.dataSource.data.forEach(row => this.select(row));
   }
 
-  select(row) {
-    this.selection.select(row);
+  select(row: ModuleList) {
+    this.selection.select(row.moduleId);
   }
 
-  toggle(row) {
-    if (this.selection.isSelected(row)) {
-      this.selection.deselect(row);
+  toggle(row: ModuleList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.moduleId);
     } else {
       this.select(row);
     }
+  }
+
+  isSelected(row: ModuleList) {
+    return this.selection.isSelected(row.moduleId);
   }
 
   create() {

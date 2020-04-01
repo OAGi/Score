@@ -20,7 +20,7 @@ export class BccpCreateComponent implements OnInit {
     'select', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
-  selection = new SelectionModel<CcList>(false, []);
+  selection = new SelectionModel<number>(false, []);
   loading = false;
 
   bccpId: number;
@@ -117,10 +117,26 @@ export class BccpCreateComponent implements OnInit {
     });
   }
 
+  select(row: CcList) {
+    this.selection.select(row.id);
+  }
+
+  toggle(row: CcList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row.id);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CcList) {
+    return this.selection.isSelected(row.id);
+  }
+
   next() {
     const bccpId = this.bccpId;
     const seqKey = 1;
-    const accId: number = this.selection.selected[0].id;
+    const accId: number = this.selection.selected[0];
 
     this.service.createAsccp(bccpId, accId, seqKey).subscribe(_ => {
       this.snackBar.open('Created', '', {
@@ -129,7 +145,6 @@ export class BccpCreateComponent implements OnInit {
 
       this.router.navigateByUrl('/core_component/bccp/' + bccpId);
     });
-
   }
 
 }

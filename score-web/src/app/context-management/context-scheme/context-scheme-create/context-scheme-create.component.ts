@@ -19,7 +19,6 @@ import {CodeList, CodeListValue} from '../../../code-list-management/domain/code
 import {v4 as uuid} from 'uuid';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {FormControl} from '@angular/forms';
-import {take, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'srt-context-scheme-create',
@@ -170,6 +169,22 @@ export class ContextSchemeCreateComponent implements OnInit {
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+
+  select(row: ContextSchemeValue) {
+    this.selection.select(row);
+  }
+
+  toggle(row: ContextSchemeValue) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: ContextSchemeValue) {
+    return this.selection.isSelected(row);
   }
 
   removeSchemeValues() {
