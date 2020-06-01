@@ -51,7 +51,12 @@
 
             <ng-container matColumnDef="ctxSchemeValue">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Context Scheme Value</th>
-              <td mat-cell *matCellDef="let element"> {{ element.ctxSchemeValue }}</td>
+              <td mat-cell *matCellDef="let element">
+                <span>{{ element.ctxSchemeValue }}</span>
+                <div class="description ellipsis">
+                  {{ element.ctxSchemeValueMeaning }}
+                </div>
+              </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

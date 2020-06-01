@@ -25,6 +25,6 @@
           [disabled]="isDisabled()"
           [mat-dialog-close]="contextSchemeValue">
     <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-    {{ actionName }}
+    {{ (actionName === 'Add') ? 'Add' : 'Save' }}
   </button>
 </mat-dialog-actions>

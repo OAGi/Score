@@ -5,6 +5,7 @@ import {
   ContextScheme,
   ContextSchemeListRequest,
   ContextSchemeValue,
+  ContextSchemeValueListRequest,
   SimpleContextCategory,
   SimpleContextScheme,
   SimpleContextSchemeValue
@@ -57,6 +58,19 @@ export class ContextSchemeService implements OnInit {
     }
 
     return this.http.get<PageResponse<ContextScheme>>('/api/context_schemes', {params: params});
+  }
+
+  getContextSchemeValueList(request: ContextSchemeValueListRequest): Observable<PageResponse<ContextSchemeValue>> {
+    let params = new HttpParams()
+      .set('sortActive', request.page.sortActive)
+      .set('sortDirection', request.page.sortDirection)
+      .set('pageIndex', '' + request.page.pageIndex)
+      .set('pageSize', '' + request.page.pageSize);
+    if (request.filters.value) {
+      params = params.set('value', request.filters.value);
+    }
+
+    return this.http.get<PageResponse<ContextSchemeValue>>('/api/context_scheme_values', {params: params});
   }
 
   getContextScheme(id): Observable<ContextScheme> {

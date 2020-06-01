@@ -1,9 +1,9 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {CodeListService} from '../domain/code-list.service';
 import {CodeList, CodeListValue, SimpleAgencyIdListValue} from '../domain/code-list';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
 import {CodeListValueDialogComponent} from '../code-list-value-dialog/code-list-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {switchMap} from 'rxjs/operators';
@@ -11,9 +11,11 @@ import {hashCode} from '../../common/utility';
 import {v4 as uuid} from 'uuid';
 import {EMPTY, ReplaySubject} from 'rxjs';
 import {FormControl} from '@angular/forms';
+import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'srt-code-list-create',
+  selector: 'score-code-list-create',
   templateUrl: './code-list-create.component.html',
   styleUrls: ['./code-list-create.component.css']
 })
@@ -178,40 +180,46 @@ export class CodeListCreateComponent implements OnInit {
     this.disabled = true;
     const dialogRef = this.dialog.open(CodeListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for (const value of this.dataSource.data) {
+      this.disabled = false;
+
+      if (!result) {
+        return;
+      }
+
+      const data = this.dataSource.data;
+      if (isAddAction) {
+        for (const value of data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
             });
-            this.disabled = false;
+
             return;
           }
         }
 
-        if (isAddAction) {
-          const data = this.dataSource.data;
-          result.guid = uuid();
-          data.push(result);
+        result.guid = uuid();
+        data.push(result);
 
-          this._updateDataSource(data);
-        } else {
-          const newData = [];
+        this._updateDataSource(data);
+      } else {
+        for (const value of data) {
+          if (value.guid !== result.guid && value.value === result.value) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 4000,
+            });
 
-          this.dataSource.data.forEach(row => {
-            if (row.guid === result.guid) {
-              newData.push(result);
-            } else {
-              newData.push(row);
-            }
-          });
-
-          this._updateDataSource(newData);
+            return;
+          }
         }
 
-        this.disabled = false;
-      } else {
-        this.disabled = false;
+        this._updateDataSource(data.map(row => {
+          if (row.guid === result.guid) {
+            return result;
+          } else {
+            return row;
+          }
+        }));
       }
     });
   }
@@ -258,15 +266,28 @@ export class CodeListCreateComponent implements OnInit {
   }
 
   removeCodeListValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Code List Value?';
+    dialogConfig.data.content = 'Are you sure you want to remove the code list value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
   back() {
@@ -307,51 +328,58 @@ export class CodeListCreateComponent implements OnInit {
     return this.sum(listUniqueness) > 0;
   }
 
-  create() {
-    if (this.checkUniqueness(this.codeList)) {
-      this.snackBar.open('Another code list with the triplet (ListID, AgencyID, Version) already exist', '', {
-        duration: 4000,
-      });
-    } else if (this.checkNameUniqueness(this.codeList)) {
-      this.openDialogCodeList();
-    } else {
-      this.service.create(this.codeList).subscribe(_ => {
-        this.hashCode = hashCode(this.codeList);
-        this.snackBar.open('Created', '', {
-          duration: 1000,
-        });
-        this.router.navigateByUrl('/code_list');
-      });
-    }
+  alertInvalidParameters() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Invalid parameters';
+    dialogConfig.data.content = [
+      'Another code list with the triplet (ListID, AgencyID, Version) already exist!'
+    ];
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
   }
 
-  openDialogCodeList() {
+  alertDuplicatedProperties() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codeList: this.codeList};
-    const dialogRef = this.dialog.open(DialogContentCodeListDialogComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Duplicated Properties';
+    dialogConfig.data.content = [
+      'Another code list with the same name already exists.',
+      'Are you sure you want to create the code list?'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.create(this.codeList).subscribe(_ => {
-          this.hashCode = hashCode(this.codeList);
-          this.snackBar.open('Created', '', {
-            duration: 1000,
-          });
-          this.router.navigateByUrl('/code_list');
-        });
-      }
+    dialogConfig.data.action = 'Create anyway';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.doCreate();
+        }
+      });
+  }
+
+  doCreate() {
+    this.service.create(this.codeList).subscribe(_ => {
+      this.hashCode = hashCode(this.codeList);
+      this.snackBar.open('Created', '', {
+        duration: 1000,
+      });
+      this.router.navigateByUrl('/code_list');
     });
   }
 
-}
-
-@Component({
-  selector: 'srt-dialog-content-code-list-dialog',
-  templateUrl: 'dialog-content-code-list-dialog.html',
-})
-export class DialogContentCodeListDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+  create() {
+    if (this.checkUniqueness(this.codeList)) {
+      this.alertInvalidParameters();
+    } else if (this.checkNameUniqueness(this.codeList)) {
+      this.alertDuplicatedProperties();
+    } else {
+      this.doCreate();
+    }
   }
 
 }

@@ -1,4 +1,7 @@
 import {PageRequest} from '../../../basis/basis';
+import {HttpParams} from '@angular/common/http';
+import {ParamMap} from '@angular/router';
+import {Base64} from 'js-base64';
 
 export class CcListRequest {
   releaseId: number;
@@ -7,6 +10,7 @@ export class CcListRequest {
   deprecated = false;
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
+  componentType: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -16,20 +20,78 @@ export class CcListRequest {
     definition: string;
     module: string;
   };
-  page: PageRequest;
+  page: PageRequest = new PageRequest();
 
-  constructor() {
-    this.releaseId = 0;
-    this.types = ['ACC', 'ASCCP', 'BCCP'];
+  constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
+    const q = (paramMap) ? paramMap.get('q') : undefined;
+    const params = (q) ? new HttpParams({fromString: Base64.decode(q)}) : new HttpParams();
+
+    this.page.sortActive = params.get('sortActive') || (defaultPageRequest) ? defaultPageRequest.sortActive : '';
+    this.page.sortDirection = params.get('sortDirection') || (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
+    this.page.pageIndex = Number(params.get('pageIndex') || (defaultPageRequest) ? defaultPageRequest.pageIndex : 0);
+    this.page.pageSize = Number(params.get('pageSize') || (defaultPageRequest) ? defaultPageRequest.pageSize : 10);
+
+    this.releaseId = Number(params.get('releaseId') || 0);
+    this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : ['ACC', 'ASCCP', 'BCCP'];
+    this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
+    this.deprecated = (params.get('deprecated')) ? (('true' === params.get('deprecated')) ? true : false) : undefined;
+    this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
+    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.componentType = (params.get('componentType')) ? Array.from(params.get('componentType').split(',')) : [];
     this.updatedDate = {
-      start: null,
-      end: null,
+      start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
+      end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
     };
     this.filters = {
-      den: '',
-      definition: '',
-      module: '',
+      den: params.get('den') || '',
+      definition: params.get('definition') || '',
+      module: params.get('module') || '',
     };
+  }
+
+  toQuery(): string {
+    let params = new HttpParams()
+      .set('sortActive', this.page.sortActive)
+      .set('sortDirection', this.page.sortDirection)
+      .set('pageIndex', '' + this.page.pageIndex)
+      .set('pageSize', '' + this.page.pageSize);
+
+    params = params.set('releaseId', '' + this.releaseId);
+    if (this.types && this.types.length > 0) {
+      params = params.set('types', this.types.join(','));
+    }
+    if (this.states && this.states.length > 0) {
+      params = params.set('states', this.states.join(','));
+    }
+    if (this.deprecated !== undefined) {
+      params = params.set('deprecated', (this.deprecated) ? 'true' : 'false');
+    }
+    if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
+      params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
+    }
+    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
+      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    }
+    if (this.updatedDate.start) {
+      params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
+    }
+    if (this.updatedDate.end) {
+      params = params.set('updatedDateEnd', '' + this.updatedDate.end.toUTCString());
+    }
+    if (this.filters.den && this.filters.den.length > 0) {
+      params = params.set('den', '' + this.filters.den);
+    }
+    if (this.filters.definition && this.filters.definition.length > 0) {
+      params = params.set('definition', '' + this.filters.definition);
+    }
+    if (this.filters.module && this.filters.module.length > 0) {
+      params = params.set('module', '' + this.filters.module);
+    }
+    if (this.componentType && this.componentType.length > 0) {
+      params = params.set('componentType', this.componentType.join(','));
+    }
+    const str = Base64.encode(params.toString());
+    return (str) ? 'q=' + str : undefined;
   }
 }
 
@@ -188,4 +250,28 @@ export class Ascc {
   revisionAction: string;
   releaseId: number;
   currentAsccId: number;
+}
+
+export class SummaryCcExt {
+  accId: number;
+  guid: string;
+  objectClassTerm: string;
+  state: string;
+  lastUpdateTimestamp: Date;
+  lastUpdateUser: string;
+
+  ownerUsername: string;
+  ownerUserId: number;
+
+  topLevelAbieId: number;
+  propertyTerm: string;
+  associationPropertyTerm: string;
+  seqKey: number;
+}
+
+export class SummaryCcExtInfo {
+  numberOfTotalCcExtByStates: Map<string, number>;
+  numberOfMyCcExtByStates: Map<string, number>;
+  ccExtByUsersAndStates: Map<string, Map<string, number>>;
+  myExtensionsUnusedInBIEs: SummaryCcExt[];
 }

@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../../environments/environment';
 
 @Component({
-  selector: 'srt-login',
+  selector: 'score-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })

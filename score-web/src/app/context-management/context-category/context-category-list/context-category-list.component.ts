@@ -1,21 +1,26 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategory, ContextCategoryListRequest} from '../domain/context-category';
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogConfig,
   MatPaginator,
   MatSnackBar,
   MatSort,
   MatTableDataSource,
-  PageEvent
+  PageEvent,
+  SortDirection
 } from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
+import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
+import {Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {finalize} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-context-category',
+  selector: 'score-context-category',
   templateUrl: './context-category-list.component.html',
   styleUrls: ['./context-category-list.component.css']
 })
@@ -34,24 +39,28 @@ export class ContextCategoryListComponent implements OnInit {
 
   constructor(private service: ContextCategoryService,
               private dialog: MatDialog,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute,
               private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
-    this.request = new ContextCategoryListRequest();
+    this.request = new ContextCategoryListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('name', 'asc', 0, 10));
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'name';
-    this.sort.direction = 'asc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
     });
 
-    this.onChange();
+    this.loadContextCategoryList(true);
   }
 
   onPageChange(event: PageEvent) {
@@ -63,19 +72,26 @@ export class ContextCategoryListComponent implements OnInit {
     this.loadContextCategoryList();
   }
 
-  loadContextCategoryList() {
+  loadContextCategoryList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getContextCategoryList(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list;
+    this.service.getContextCategoryList(this.request).pipe(
+      finalize(() => {
         this.loading = false;
-      });
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list;
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -111,39 +127,32 @@ export class ContextCategoryListComponent implements OnInit {
   }
 
   discard() {
-    this.openDialogContextCategoryListDiscard();
-  }
-
-  openDialogContextCategoryListDiscard() {
-    const dialogConfig = new MatDialogConfig();
     const ctxCategoryIds = this.selection.selected;
-    dialogConfig.data = {ids: ctxCategoryIds};
 
-    const dialogRef = this.dialog.open(DialogDiscardContextCategoryDialogComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard Context ' + (ctxCategoryIds.length > 1 ? 'Categories' : 'Category') + '?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard selected context ' + (ctxCategoryIds.length > 1 ? 'categories' : 'category') + '?',
+      'The context ' + (ctxCategoryIds.length > 1 ? 'categories' : 'category') + ' will be permanently removed.'
+    ];
 
+    dialogConfig.data.action = 'Discard';
 
-        this.service.delete(...ctxCategoryIds).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(...ctxCategoryIds).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.selection.clear();
+            this.loadContextCategoryList();
           });
-          this.selection.clear();
-          this.loadContextCategoryList();
-        });
-      }
-    });
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-context-category-dialog',
-  templateUrl: 'dialog-discard-context-category-dialog.html',
-})
-export class DialogDiscardContextCategoryDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+        }
+      });
   }
 
 }

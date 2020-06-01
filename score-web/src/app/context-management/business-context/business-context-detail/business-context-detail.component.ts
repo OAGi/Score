@@ -1,18 +1,20 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
 import {BieListService} from '../../../bie-management/bie-list/domain/bie-list.service';
 import {BusinessContext, BusinessContextValue} from '../domain/business-context';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
 import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
 import {switchMap} from 'rxjs/operators';
 import {hashCode} from '../../../common/utility';
+import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
+import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
 
 @Component({
-  selector: 'srt-business-context-detail',
+  selector: 'score-business-context-detail',
   templateUrl: './business-context-detail.component.html',
   styleUrls: ['./business-context-detail.component.css']
 })
@@ -22,8 +24,6 @@ export class BusinessContextDetailComponent implements OnInit {
   disabled: boolean;
   hashCode;
   bizCtx: BusinessContext;
-  listDisplayed;
-  listSize;
   displayedColumns: string[] = [
     'select', 'ctxCategoryName', 'ctxSchemeName', 'ctxSchemeValue'
   ];
@@ -80,6 +80,7 @@ export class BusinessContextDetailComponent implements OnInit {
   openDialog(bizCtxValue?: BusinessContextValue) {
     const dialogConfig = new MatDialogConfig();
 
+    dialogConfig.panelClass = ['center-dialog'];
     dialogConfig.data = new BusinessContextValue();
 
     if (bizCtxValue) { // deep copy
@@ -156,15 +157,28 @@ export class BusinessContextDetailComponent implements OnInit {
   }
 
   removeBizCtxValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Business Context?';
+    dialogConfig.data.content = 'Are you sure you want to remove the business context value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
   back() {
@@ -180,29 +194,44 @@ export class BusinessContextDetailComponent implements OnInit {
     });
   }
 
-  openDialogBizContext() {
+  openDialogBizContext(listDisplayed: string[]) {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {list: this.listDisplayed, size: this.listSize};
-    const dialogRef = this.dialog.open(DialogContentBizContextDialogDetailComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'The business context cannot be deleted!';
+    dialogConfig.data.content = [
+      'The BIEs with the following IDs depend on it. They need to be deleted first.'
+    ];
+    dialogConfig.data.list = listDisplayed;
 
-    dialogRef.afterClosed().subscribe(result => {
-    });
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
   }
 
-  openDialogContextCategoryDiscard() {
+  openDialogBusinessContextDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const dialogRef = this.dialog.open(DialogContentBizContextDialogDiscardComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard Business Context?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard the business context?',
+      'The business context will be permanently removed.'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.delete(this.bizCtx.bizCtxId).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    dialogConfig.data.action = 'Discard';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(this.bizCtx.bizCtxId).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.router.navigateByUrl('/context_management/business_context');
           });
-          this.router.navigateByUrl('/context_management/business_context');
-        });
-      }
-    });
+        }
+      });
   }
 
   discard() {
@@ -212,36 +241,11 @@ export class BusinessContextDetailComponent implements OnInit {
         value.forEach(el => {
           displayedList.push(el.guid);
         });
-        this.listSize = value.length;
-        this.listDisplayed = displayedList;
-        this.openDialogBizContext();
+        this.openDialogBizContext(displayedList);
       } else {
-        this.openDialogContextCategoryDiscard();
+        this.openDialogBusinessContextDiscard();
       }
     });
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-biz-context-dialog-detail',
-  templateUrl: 'dialog-content-biz-context-detail-dialog.html',
-})
-export class DialogContentBizContextDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-
-@Component({
-  selector: 'srt-dialog-content-biz-context-dialog-discard',
-  templateUrl: 'dialog-content-biz-context-discard-dialog.html',
-})
-export class DialogContentBizContextDialogDiscardComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
 }

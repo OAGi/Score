@@ -1,13 +1,13 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogConfig,
   MatPaginator,
   MatSnackBar,
   MatSort,
   MatTableDataSource,
-  PageEvent
+  PageEvent,
+  SortDirection
 } from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
@@ -18,9 +18,14 @@ import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
+import {Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {finalize} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-code-list-list',
+  selector: 'score-code-list-list',
   templateUrl: './code-list-list.component.html',
   styleUrls: ['./code-list-list.component.css']
 })
@@ -47,18 +52,22 @@ export class CodeListListComponent implements OnInit {
   constructor(private service: CodeListService,
               private accountService: AccountListService,
               private dialog: MatDialog,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute,
               private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
-    this.request = new CodeListForListRequest();
+    this.request = new CodeListForListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'lastUpdateTimestamp';
-    this.sort.direction = 'desc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
@@ -68,7 +77,8 @@ export class CodeListListComponent implements OnInit {
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.loadCodeList(true);
   }
 
   onPageChange(event: PageEvent) {
@@ -102,22 +112,29 @@ export class CodeListListComponent implements OnInit {
     }
   }
 
-  loadCodeList() {
+  loadCodeList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getCodeListList(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list.map((elm: CodeListForList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+    this.service.getCodeListList(this.request).pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list.map((elm: CodeListForList) => {
+        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        return elm;
       });
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -157,33 +174,32 @@ export class CodeListListComponent implements OnInit {
   }
 
   openDialogCodeListListDiscard() {
-    const dialogConfig = new MatDialogConfig();
     const codeListIds = this.selection.selected;
-    dialogConfig.data = {ids: codeListIds};
 
-    const dialogRef = this.dialog.open(DialogDiscardCodeListDialogComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.delete(...codeListIds).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard Code ' + (codeListIds.length > 1 ? 'Lists' : 'List') + '?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard selected code ' + (codeListIds.length > 1 ? 'lists' : 'list') + '?',
+      'The code ' + (codeListIds.length > 1 ? 'lists' : 'list') + ' will be permanently removed.'
+    ];
+
+    dialogConfig.data.action = 'Discard';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(...codeListIds).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.selection.clear();
+            this.loadCodeList();
           });
-          this.selection.clear();
-          this.loadCodeList();
-        });
-      }
-    });
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-discard-code-list-dialog',
-  templateUrl: 'dialog-discard-code-list-dialog.html',
-})
-export class DialogDiscardCodeListDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+        }
+      });
   }
 
 }

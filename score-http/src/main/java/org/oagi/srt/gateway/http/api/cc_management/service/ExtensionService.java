@@ -1,12 +1,17 @@
 package org.oagi.srt.gateway.http.api.cc_management.service;
 
 import org.jooq.DSLContext;
+import org.jooq.Record5;
 import org.jooq.Result;
 import org.jooq.types.ULong;
+import org.oagi.srt.cache.impl.ACCCachingRepository;
 import org.oagi.srt.data.ACC;
 import org.oagi.srt.data.*;
 import org.oagi.srt.entity.jooq.Tables;
-import org.oagi.srt.entity.jooq.tables.records.*;
+import org.oagi.srt.entity.jooq.tables.records.AccRecord;
+import org.oagi.srt.entity.jooq.tables.records.AsccRecord;
+import org.oagi.srt.entity.jooq.tables.records.AsccpRecord;
+import org.oagi.srt.entity.jooq.tables.records.BccRecord;
 import org.oagi.srt.gateway.http.api.bie_management.data.bie_edit.BieEditAcc;
 import org.oagi.srt.gateway.http.api.cc_management.data.CcState;
 import org.oagi.srt.gateway.http.api.cc_management.data.ExtensionUpdateRequest;
@@ -25,7 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -52,6 +59,9 @@ public class ExtensionService {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private ACCCachingRepository accRepository;
 
 
     public CcAccNode getExtensionNode(User user, long extensionId, long releaseId) {
@@ -936,6 +946,17 @@ public class ExtensionService {
         updateAccState(extensionId, releaseId, state, userId, timestamp);
         updateAsccState(extensionId, releaseId, state, userId, timestamp);
         updateBccState(extensionId, releaseId, state, userId, timestamp);
+
+        /*
+         * Issue #823
+         *
+         * After publishing the extension, ASBIEs and BBIEs whose based_ascc_id and based_bcc_id
+         * have linked to previous revisions must update to link the latest records.
+         */
+        if (state == CcState.Published) {
+            updateASBIELinks(extensionId, releaseId);
+            updateBBIELinks(extensionId, releaseId);
+        }
     }
 
     private void updateAccState(long extensionId, Long releaseId, CcState state,
@@ -1051,6 +1072,78 @@ public class ExtensionService {
             history.setState(state.getValue());
 
             dslContext.insertInto(BCC).set(history).execute();
+        }
+    }
+
+    private void updateASBIELinks(long extensionId, Long releaseId) {
+        Map<String, List<Record5<String, ULong, Integer, Integer, Integer>>> asccRecordMap =
+                dslContext.select(ASCC.GUID, ASCC.ASCC_ID, ASCC.STATE, ASCC.REVISION_NUM, ASCC.REVISION_TRACKING_NUM)
+                        .from(ASCC)
+                        .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                        .where(and(
+                                ASCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                                ASCC.REVISION_NUM.ne(0),
+                                ASCC.STATE.eq(CcState.Published.getValue())
+                        ))
+                        .fetchStream().collect(groupingBy(e -> e.get(ASCC.GUID)));
+
+        for (List<Record5<String, ULong, Integer, Integer, Integer>> asccRecords : asccRecordMap.values()) {
+            if (asccRecords.isEmpty()) {
+                continue;
+            }
+
+            Collections.sort(asccRecords, (o1, o2) -> Integer.compare(o2.get(ASCC.REVISION_NUM), o1.get(ASCC.REVISION_NUM)));
+
+            Record5<String, ULong, Integer, Integer, Integer> latestRecord = asccRecords.get(0);
+            int revisionNum = latestRecord.get(ASCC.REVISION_NUM);
+            if (revisionNum == 1) {
+                continue;
+            }
+
+            dslContext.update(ASBIE)
+                    .set(ASBIE.BASED_ASCC_ID, latestRecord.get(ASCC.ASCC_ID))
+                    .where(ASBIE.BASED_ASCC_ID.in(
+                            asccRecords.stream()
+                                    .map(e -> e.get(ASCC.ASCC_ID))
+                                    .collect(Collectors.toList())
+                    ))
+                    .execute();
+        }
+    }
+
+    private void updateBBIELinks(long extensionId, Long releaseId) {
+        Map<String, List<Record5<String, ULong, Integer, Integer, Integer>>> bccRecordMap =
+                dslContext.select(BCC.GUID, BCC.BCC_ID, BCC.STATE, BCC.REVISION_NUM, BCC.REVISION_TRACKING_NUM)
+                .from(BCC)
+                .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                .where(and(
+                        BCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                        BCC.REVISION_NUM.ne(0),
+                        BCC.STATE.eq(CcState.Published.getValue())
+                ))
+                .fetchStream().collect(groupingBy(e -> e.get(BCC.GUID)));
+
+        for (List<Record5<String, ULong, Integer, Integer, Integer>> bccRecords : bccRecordMap.values()) {
+            if (bccRecords.isEmpty()) {
+                continue;
+            }
+
+            Collections.sort(bccRecords, (o1, o2) -> Integer.compare(o2.get(BCC.REVISION_NUM), o1.get(BCC.REVISION_NUM)));
+
+            Record5<String, ULong, Integer, Integer, Integer> latestRecord = bccRecords.get(0);
+            int revisionNum = latestRecord.get(BCC.REVISION_NUM);
+            if (revisionNum == 1) {
+                continue;
+            }
+
+            dslContext.update(BBIE)
+                    .set(BBIE.BASED_BCC_ID, latestRecord.get(BCC.BCC_ID))
+                    .where(BBIE.BASED_BCC_ID.in(
+                            bccRecords.stream()
+                                    .map(e -> e.get(BCC.BCC_ID))
+                                    .collect(Collectors.toList())
+                    ))
+                    .execute();
         }
     }
 
@@ -1213,15 +1306,20 @@ public class ExtensionService {
 
     private void updateAccOwnerUserId(long extensionId, Long releaseId, ULong targetAppUserId,
                                       ULong userId, Timestamp timestamp) {
+        ULong currentAccId = dslContext.select(Tables.ACC.CURRENT_ACC_ID)
+                .from(Tables.ACC)
+                .where(ACC.ACC_ID.eq(ULong.valueOf(extensionId)))
+                .fetchOneInto(ULong.class);
+
         dslContext.update(Tables.ACC)
                 .set(ACC.OWNER_USER_ID, targetAppUserId)
                 .set(ACC.LAST_UPDATED_BY, userId)
                 .set(ACC.LAST_UPDATE_TIMESTAMP, timestamp)
-                .where(ACC.ACC_ID.eq(ULong.valueOf(extensionId)))
+                .where(ACC.ACC_ID.eq(currentAccId))
                 .execute();
 
         AccRecord history = dslContext.selectFrom(Tables.ACC)
-                .where(ACC.CURRENT_ACC_ID.eq(ULong.valueOf(extensionId)))
+                .where(ACC.CURRENT_ACC_ID.eq(currentAccId))
                 .orderBy(ACC.ACC_ID.desc()).limit(1)
                 .fetchOne();
 
@@ -1233,21 +1331,29 @@ public class ExtensionService {
         history.setCreationTimestamp(timestamp);
         history.setLastUpdateTimestamp(timestamp);
         history.setOwnerUserId(targetAppUserId);
-        dslContext.insertInto(Tables.ACC).set(history).execute();
+        long accId = dslContext.insertInto(Tables.ACC).set(history).returning().fetchOne().getAccId().longValue();
+        // update Cache after transferOwnership of Extension.
+        accRepository.findById(accId);
     }
 
     private void updateAsccOwnerUserId(long extensionId, Long releaseId, ULong targetAppUserId,
                                        ULong userId, Timestamp timestamp) {
+        ULong currentAccId = dslContext.select(Tables.ACC.CURRENT_ACC_ID)
+                .from(Tables.ACC)
+                .where(ACC.ACC_ID.eq(ULong.valueOf(extensionId)))
+                .fetchOneInto(ULong.class);
+
         List<CcAsccNode> asccNodes = dslContext.select(
                 ASCC.ASCC_ID,
                 ASCC.CURRENT_ASCC_ID,
                 ASCC.GUID,
                 ASCC.REVISION_NUM,
                 ASCC.REVISION_TRACKING_NUM,
-                ASCC.RELEASE_ID
-        ).from(ASCC).where(and(
-                ASCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
-                ASCC.REVISION_NUM.greaterThan(0)))
+                ASCC.RELEASE_ID)
+                .from(ASCC)
+                .where(and(
+                        ASCC.FROM_ACC_ID.eq(currentAccId),
+                        ASCC.REVISION_NUM.greaterThan(0)))
                 .fetchInto(CcAsccNode.class);
 
         if (asccNodes.isEmpty()) {
@@ -1260,7 +1366,7 @@ public class ExtensionService {
                 .set(ASCC.LAST_UPDATED_BY, userId)
                 .set(ASCC.LAST_UPDATE_TIMESTAMP, timestamp)
                 .where(and(
-                        ASCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                        ASCC.FROM_ACC_ID.eq(currentAccId),
                         ASCC.REVISION_NUM.eq(0)))
                 .execute();
 
@@ -1293,16 +1399,22 @@ public class ExtensionService {
 
     private void updateBccOwnerUserId(long extensionId, Long releaseId, ULong targetAppUserId,
                                       ULong userId, Timestamp timestamp) {
+        ULong currentAccId = dslContext.select(Tables.ACC.CURRENT_ACC_ID)
+                .from(Tables.ACC)
+                .where(ACC.ACC_ID.eq(ULong.valueOf(extensionId)))
+                .fetchOneInto(ULong.class);
+
         List<CcBccNode> bccNodes = dslContext.select(
                 BCC.BCC_ID,
                 BCC.CURRENT_BCC_ID,
                 BCC.GUID,
                 BCC.REVISION_NUM,
                 BCC.REVISION_TRACKING_NUM,
-                BCC.RELEASE_ID
-        ).from(BCC).where(and(
-                BCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
-                BCC.REVISION_NUM.greaterThan(0)))
+                BCC.RELEASE_ID)
+                .from(BCC)
+                .where(and(
+                        BCC.FROM_ACC_ID.eq(currentAccId),
+                        BCC.REVISION_NUM.greaterThan(0)))
                 .fetchInto(CcBccNode.class);
 
         if (bccNodes.isEmpty()) {
@@ -1315,7 +1427,7 @@ public class ExtensionService {
                 .set(BCC.LAST_UPDATED_BY, userId)
                 .set(BCC.LAST_UPDATE_TIMESTAMP, timestamp)
                 .where(and(
-                        BCC.FROM_ACC_ID.eq(ULong.valueOf(extensionId)),
+                        BCC.FROM_ACC_ID.eq(currentAccId),
                         BCC.REVISION_NUM.eq(0)))
                 .execute();
 

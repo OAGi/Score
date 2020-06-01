@@ -10,7 +10,7 @@ import {PageRequest} from '../../basis/basis';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'srt-asccp-create',
+  selector: 'score-asccp-create',
   templateUrl: './asccp-create.component.html',
   styleUrls: ['./asccp-create.component.css']
 })

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'srt-footer',
+  selector: 'score-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.css']
 })

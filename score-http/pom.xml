@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>1.3.1.1</version>
+    <version>1.4.0</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -25,7 +25,7 @@
 
         <cglib.version>3.3.0</cglib.version>
         <aspectj.version>1.9.4</aspectj.version>
-        <mysql-connector-java.version>8.0.18</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.19</mysql-connector-java.version>
         <lettuce.version>5.2.0.RELEASE</lettuce.version>
         <redisson.version>3.11.4</redisson.version>
         <netty.version>4.1.42.Final</netty.version>

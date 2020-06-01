@@ -1,0 +1,22 @@
+<div class="container" style="padding: 8px;">
+  <div class="row">
+    <div class="col-12">
+      <div class="state-progress-bar">
+        <div class="state-progress ellipsis {{ item.name }}" *ngFor="let item of data"
+             [style.width.%]="getWidth(item)"
+             [style.background-color]="item.style.bg_color">
+          <a [routerLink]="item.href[0]" [queryParams]="{ q: getParams(item) }">
+            <div class="state-progress-text"
+                 [style.color]="item.style.text_color">{{ item.name }} ({{ item.value }})</div>
+          </a>
+        </div>
+        <div class="state-progress ellipsis None" *ngIf="sum === 0"
+             [style.width.%]="100"
+             [style.background-color]="'#eaecef'">
+          <div class="state-progress-text"
+               [style.color]="'#333'">None</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -19,9 +19,11 @@ import {CodeList, CodeListValue} from '../../../code-list-management/domain/code
 import {v4 as uuid} from 'uuid';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {FormControl} from '@angular/forms';
+import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'srt-context-scheme-create',
+  selector: 'score-context-scheme-create',
   templateUrl: './context-scheme-create.component.html',
   styleUrls: ['./context-scheme-create.component.css']
 })
@@ -59,16 +61,17 @@ export class ContextSchemeCreateComponent implements OnInit {
     this.disabled = false;
     this.importFromCodeList = false;
     this.contextScheme = new ContextScheme();
+
     forkJoin(
       this.service.getSimpleContextCategories(),
       this.service.getCodeLists(),
-      this.service.getSimpleContextSchemes())
-      .subscribe(([simpleContextCategories, codeLists, simpleContextSchemes]) => {
-        this.ctxCategories = simpleContextCategories;
-        this.codeLists = codeLists.list;
-        this.contextSchemes = simpleContextSchemes;
-        this.filteredCodeLists.next(this.codeLists.slice());
-      });
+      this.service.getSimpleContextSchemes()
+    ).subscribe(([simpleContextCategories, codeLists, simpleContextSchemes]) => {
+      this.ctxCategories = simpleContextCategories;
+      this.codeLists = codeLists.list;
+      this.contextSchemes = simpleContextSchemes;
+      this.filteredCodeLists.next(this.codeLists.slice());
+    });
 
     this.codeListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -113,6 +116,7 @@ export class ContextSchemeCreateComponent implements OnInit {
       value: string;
       meaning: string;
       used: boolean;
+      ownerCtxSchemeId: number;
     };
 
     const isAddAction: boolean = (contextSchemeValue === undefined);
@@ -121,7 +125,7 @@ export class ContextSchemeCreateComponent implements OnInit {
     const dialogRef = this.dialog.open(ContextSchemeValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for ( const value of this.dataSource.data) {
+        for (const value of this.dataSource.data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
@@ -149,7 +153,6 @@ export class ContextSchemeCreateComponent implements OnInit {
       }
       this.disabled = false;
     });
-
   }
 
   _updateDataSource(data: ContextSchemeValue[]) {
@@ -188,44 +191,83 @@ export class ContextSchemeCreateComponent implements OnInit {
   }
 
   removeSchemeValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Context Scheme Value?';
+    dialogConfig.data.content = 'Are you sure you want to remove the context scheme value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
   back() {
     this.location.back();
   }
 
+  openDialogContextSchemeCreate() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Invalid parameters';
+    dialogConfig.data.content = [
+      'Another context scheme with the triplet (schemeID, AgencyID, Version) already exist!'
+    ];
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
+  }
+
+  openDialogContextSchemeUpdateCreate() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'The context scheme already has a variable with the same properties';
+    dialogConfig.data.content = [
+      'Are you sure you want to create the context scheme?'
+    ];
+
+    dialogConfig.data.action = 'Create anyway';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.doCreate();
+        }
+      });
+  }
+
+  doCreate() {
+    this.service.create(this.contextScheme).subscribe(_ => {
+      this.snackBar.open('Created', '', {
+        duration: 1000,
+      });
+      this.router.navigateByUrl('/context_management/context_scheme');
+    });
+  }
+
   create() {
     if (this.checkUniqueness(this.contextScheme)) {
-      this.snackBar.open('Another context scheme with the triplet (schemeID, AgencyID, Version) already exist', '', {
-        duration: 4000,
-      });
+      this.openDialogContextSchemeCreate();
     } else if (this.checkSchemeAgencyName(this.contextScheme)) {
-      this.snackBar.open('  Warning, another context scheme with the same properties already exist !', 'Create anyway', {
-        duration: 4000,
-      }).onAction().subscribe(() => {
-        this.service.create(this.contextScheme).subscribe(_ => {
-          this.snackBar.open('Created', '', {
-            duration: 1000,
-          });
-          this.router.navigateByUrl('/context_management/context_scheme');
-        });
-      });
+      this.openDialogContextSchemeUpdateCreate();
     } else {
-      this.service.create(this.contextScheme).subscribe(_ => {
-        this.snackBar.open('Created', '', {
-          duration: 1000,
-        });
-        this.router.navigateByUrl('/context_management/context_scheme');
-      });
+      this.doCreate();
     }
   }
 
@@ -276,17 +318,17 @@ export class ContextSchemeCreateComponent implements OnInit {
   }
 
   convertCodeListValuesIntoContextSchemeValues(codeListValues: CodeListValue[]) {
-    let _contextschemevalues: ContextSchemeValue[];
-    _contextschemevalues = [];
-    for (const codelistvalue of codeListValues) {
-      let _contextschemevalue: ContextSchemeValue;
-      _contextschemevalue = new ContextSchemeValue();
-      _contextschemevalue.meaning = codelistvalue.name;
-      _contextschemevalue.value = codelistvalue.value;
-      _contextschemevalues.push(_contextschemevalue);
-      this.selection.select(_contextschemevalue);
+    if (!codeListValues || codeListValues.length === 0) {
+      return [];
     }
-    return _contextschemevalues;
+
+    return codeListValues.map(codeListValue => {
+      const contextSchemeValue = new ContextSchemeValue();
+      contextSchemeValue.meaning = codeListValue.name;
+      contextSchemeValue.value = codeListValue.value;
+      this.selection.select(contextSchemeValue);
+      return contextSchemeValue;
+    });
   }
 
   resetCreateForm(event: MatCheckboxChange) {

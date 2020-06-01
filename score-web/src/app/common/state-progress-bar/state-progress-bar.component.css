@@ -1,0 +1,20 @@
+.state-progress-bar {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.state-progress {
+  display: inline-block;
+  height: 100%;
+  text-align: center;
+}
+
+.state-progress a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.state-progress-text {
+  padding: 8px;
+}

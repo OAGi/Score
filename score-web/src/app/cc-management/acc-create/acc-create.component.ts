@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 
 
 @Component({
-  selector: 'srt-acc-create',
+  selector: 'score-acc-create',
   templateUrl: './acc-create.component.html',
   styleUrls: ['./acc-create.component.css']
 })

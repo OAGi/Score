@@ -8,12 +8,14 @@ import {JoinComponent} from './join/join.component';
 import {NavbarComponent} from './navbar/navbar.component';
 import {FooterComponent} from './footer/footer.component';
 import {NotFoundComponent} from './not-found/not-found.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {MaterialModule} from '../material.module';
 import {AboutComponent} from './about/about.component';
 import {AuthService} from '../authentication/auth.service';
 import {AboutService} from './about/domain/about.service';
+import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 const routes: Routes = [
   {
@@ -32,9 +34,12 @@ const routes: Routes = [
   imports: [
     RouterModule.forChild(routes),
     FormsModule,
+    ReactiveFormsModule,
     RouterModule,
     MaterialModule,
     TranslateModule,
+    StateProgressBarModule,
+    NgxMatSelectSearchModule,
     CommonModule
   ],
   exports: [

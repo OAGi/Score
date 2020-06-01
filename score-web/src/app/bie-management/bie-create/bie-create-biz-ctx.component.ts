@@ -1,19 +1,20 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
-import {BieList} from '../bie-list/domain/bie-list';
+import {Location} from '@angular/common';
+import {finalize} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-bie-create',
+  selector: 'score-bie-create',
   templateUrl: './bie-create-biz-ctx.component.html',
   styleUrls: ['./bie-create-biz-ctx.component.css']
 })
@@ -38,18 +39,21 @@ export class BieCreateBizCtxComponent implements OnInit {
 
   constructor(private bizCtxService: BusinessContextService,
               private accountService: AccountListService,
-              private router: Router) {
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.request = new BusinessContextListRequest();
+    this.request = new BusinessContextListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('name', 'asc', 0, 10));
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'name';
-    this.sort.direction = 'asc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
@@ -59,7 +63,8 @@ export class BieCreateBizCtxComponent implements OnInit {
       this.loginIdList.push(...loginIds);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.loadBusinessContextList(true);
   }
 
   onPageChange(event: PageEvent) {
@@ -93,23 +98,30 @@ export class BieCreateBizCtxComponent implements OnInit {
     }
   }
 
-  loadBusinessContextList() {
+  loadBusinessContextList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.bizCtxService.getBusinessContextList(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list.map((elm: BusinessContext) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          elm.bizCtxValues = [];
-          return elm;
-        });
+    this.bizCtxService.getBusinessContextList(this.request).pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list.map((elm: BusinessContext) => {
+        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        elm.bizCtxValues = [];
+        return elm;
       });
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */

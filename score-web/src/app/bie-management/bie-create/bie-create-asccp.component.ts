@@ -1,10 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from './domain/bie-create-list';
 import {BieCreateService} from './domain/bie-create.service';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {switchMap} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContext} from '../../context-management/business-context/domain/business-context';
 import {ReleaseService} from '../../release-management/domain/release.service';
@@ -16,11 +17,19 @@ import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {Location} from '@angular/common';
 
 @Component({
-  selector: 'srt-bie-create-asccp',
+  selector: 'score-bie-create-asccp',
   templateUrl: './bie-create-asccp.component.html',
-  styleUrls: ['./bie-create-asccp.component.css']
+  styleUrls: ['./bie-create-asccp.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class BieCreateAsccpComponent implements OnInit {
   title = 'Create BIE';
@@ -32,10 +41,11 @@ export class BieCreateAsccpComponent implements OnInit {
   releases: Release[] = [];
 
   displayedColumns: string[] = [
-    'select', 'den', 'lastUpdateTimestamp'
+    'select', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
+  expandedElement: CcList | null;
   loading = false;
 
   loginIdList: string[] = [];
@@ -53,8 +63,9 @@ export class BieCreateAsccpComponent implements OnInit {
               private ccListService: CcListService,
               private accountService: AccountListService,
               private service: BieCreateService,
-              private route: ActivatedRoute,
+              private location: Location,
               private router: Router,
+              private route: ActivatedRoute,
               private snackBar: MatSnackBar) {
   }
 
@@ -72,16 +83,17 @@ export class BieCreateAsccpComponent implements OnInit {
       });
 
     // Init ASCCP table
-    this.request = new CcListRequest();
+    this.request = new CcListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('den', 'asc', 0, 10));
     this.request.types = ['ASCCP'];
     this.request.states = ['Published'];
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'den';
-    this.sort.direction = 'asc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadData();
@@ -100,7 +112,7 @@ export class BieCreateAsccpComponent implements OnInit {
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         this.releaseId = this.releases[0].releaseId;
-        this.loadData();
+        this.loadData(true);
       }
     });
   }
@@ -131,12 +143,12 @@ export class BieCreateAsccpComponent implements OnInit {
     }
   }
 
-  onChange() {
+  onChange(isInit?: boolean) {
     this.paginator.pageIndex = 0;
-    this.loadData();
+    this.loadData(isInit);
   }
 
-  loadData() {
+  loadData(isInit?: boolean) {
     this.loading = true;
 
     this.request.releaseId = this.releaseId;
@@ -144,7 +156,11 @@ export class BieCreateAsccpComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.ccListService.getCcList(this.request).subscribe(resp => {
+    this.ccListService.getCcList(this.request).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe(resp => {
       this.paginator.length = resp.length;
 
       const list = resp.list.map((elm: CcList) => {
@@ -163,7 +179,11 @@ export class BieCreateAsccpComponent implements OnInit {
       });
 
       this.dataSource.data = list;
-      this.loading = false;
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
     });
   }
 

@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ContextSchemeValue} from '../domain/context-scheme';
 
 @Component({
-  selector: 'srt-context-scheme-value-dialog',
+  selector: 'score-context-scheme-value-dialog',
   templateUrl: './context-scheme-value-dialog.component.html',
   styleUrls: ['./context-scheme-value-dialog.component.css']
 })

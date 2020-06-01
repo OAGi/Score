@@ -1,15 +1,29 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest} from './cc-list';
+import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode, BieEditNodeDetail} from '../../../bie-management/bie-edit/domain/bie-edit-node';
 import {Base64} from 'js-base64';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class CcListService {
 
   constructor(private http: HttpClient) {
+  }
+
+  getSummaryCcExtList(): Observable<SummaryCcExtInfo> {
+    return this.http.get<SummaryCcExtInfo>('/api/info/cc_ext_summary').pipe(map(
+      e => {
+        if (e.myExtensionsUnusedInBIEs) {
+          e.myExtensionsUnusedInBIEs = e.myExtensionsUnusedInBIEs.map(elm => {
+            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+            return elm;
+          });
+        }
+        return e;
+      }));
   }
 
   getCcList(request: CcListRequest): Observable<PageResponse<CcList>> {
@@ -34,9 +48,9 @@ export class CcListService {
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
-
-    params = params.set('deprecated', '' + request.deprecated);
-
+    if (request.deprecated !== undefined) {
+      params = params.set('deprecated', '' + request.deprecated);
+    }
     if (request.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
     }
@@ -48,6 +62,9 @@ export class CcListService {
     }
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    }
+    if (request.componentType.length > 0) {
+      params = params.set('componentType', request.componentType.join(',').replace(/ /gi, ''));
     }
 
     return this.http.get<PageResponse<CcList>>('/api/core_component', {params: params});

@@ -34,9 +34,11 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     private static final String OAGI_NS = "http://www.openapplications.org/oagis/10";
     private static org.jdom2.Namespace XSD_NAMESPACE = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private Document document;
     private Element schemaNode;
     private Element rootElementNode;
+
     private GenerateExpressionOption option;
 
     private Map<String, Element> processedElements = new HashMap();
@@ -68,11 +70,22 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     @Override
+    public GenerationContext generateContext(List<TopLevelAbie> topLevelAbies, GenerateExpressionOption option) {
+        return applicationContext.getBean(GenerationContext.class, topLevelAbies);
+    }
+
+    @Override
+    public void reset() {
+        this.afterPropertiesSet();
+    }
+
+    @Override
     public void generate(TopLevelAbie topLevelAbie,
+                         GenerationContext generationContext,
                          GenerateExpressionOption option) {
+        this.generationContext = generationContext;
         this.option = option;
 
-        generationContext = applicationContext.getBean(GenerationContext.class, topLevelAbie);
         generateTopLevelAbie(topLevelAbie);
     }
 

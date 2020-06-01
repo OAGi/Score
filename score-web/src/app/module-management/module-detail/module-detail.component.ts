@@ -14,7 +14,7 @@ import {ModuleDependencyDialogComponent} from '../module-dependency-dialog/modul
 import {PageEvent} from '@angular/material/paginator';
 
 @Component({
-  selector: 'srt-module-detail',
+  selector: 'score-module-detail',
   templateUrl: './module-detail.component.html',
   styleUrls: ['./module-detail.component.css']
 })

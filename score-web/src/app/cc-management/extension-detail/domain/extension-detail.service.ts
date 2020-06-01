@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {AsccpForAppendAsccp, BccpForAppendBccp} from './extension-detail';
 import {HttpClient} from '@angular/common/http';
-import {CcAsccpNodeDetail, CcNode, CcNodeDetail} from '../../domain/core-component-node';
+import {CcNode, CcNodeDetail} from '../../domain/core-component-node';
 
 @Injectable()
 export class ExtensionDetailService {

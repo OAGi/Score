@@ -1,7 +1,7 @@
 body {
-  font-family: "Noto Sans", "Montserrat", Roboto, Helvetica, Arial, sans-serif, -apple-system, BlinkMacSystemFont, "Apple Color Emoji";
-  font-size: 14px;
-  line-height: 1.5;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 20px;
   color: #333;
   background-color: #fff;
   word-wrap: break-word;
@@ -98,6 +98,26 @@ b {
   color: #000;
 }
 
+.mat-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.mat-table .mat-column-select {
+  width: 66px;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: 12px !important;
+  color: #767676 !important;
+}
+
 .dropdown-item:active {
   color: #16181b;
   text-decoration: none;
@@ -130,6 +150,10 @@ div.context-section > .mat-card {
 
 .mat-card-container > * {
   width: 100%;
+}
+
+.mat-card-container .mat-card {
+  margin-bottom: 24px;
 }
 
 .context-section mat-card-actions .mat-raised-button:first-child {
@@ -239,12 +263,6 @@ div.mat-form-field-wrapper div.mat-form-field-infix mat-icon.datepicker-cancel {
   cursor: pointer;
 }
 
-span.den {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 span.cc-state, span.bie-state {
   font-size: 12px;
   padding: .15em 4px;
@@ -294,4 +312,29 @@ span.Deprecated {
 
 mat-checkbox.hide-unused > .mat-checkbox-layout {
   margin-bottom: 0 !important;
+}
+
+.center-dialog {
+  position: fixed !important;
+  top: 8%;
+  left: 3%;
+  right: 3%;
+  bottom: 8%;
+  max-width: 100% !important;
+}
+
+.confirm-dialog .mat-dialog-container {
+  padding: 18px 24px 18px 24px;
+}
+
+.mat-card-actions button {
+  outline: none;
+}
+
+td.mat-cell {
+  padding-right: 8px !important;
+}
+
+td.mat-cell:last-child {
+  padding-right: 0 !important;
 }

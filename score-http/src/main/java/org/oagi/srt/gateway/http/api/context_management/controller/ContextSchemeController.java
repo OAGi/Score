@@ -59,6 +59,29 @@ public class ContextSchemeController {
         return service.getContextSchemeList(request);
     }
 
+    @RequestMapping(value = "/context_scheme_values", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public PageResponse<ContextSchemeValue> getContextSchemeValueList(
+            @RequestParam(name = "value", required = false) String value,
+            @RequestParam(name = "sortActive") String sortActive,
+            @RequestParam(name = "sortDirection") String sortDirection,
+            @RequestParam(name = "pageIndex") int pageIndex,
+            @RequestParam(name = "pageSize") int pageSize) {
+
+        ContextSchemeValueListRequest request = new ContextSchemeValueListRequest();
+
+        request.setValue(value);
+
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setSortActive(sortActive);
+        pageRequest.setSortDirection(sortDirection);
+        pageRequest.setPageIndex(pageIndex);
+        pageRequest.setPageSize(pageSize);
+        request.setPageRequest(pageRequest);
+
+        return service.getContextSchemeValueList(request);
+    }
+
     @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ContextScheme getContextScheme(@PathVariable("id") long id) {

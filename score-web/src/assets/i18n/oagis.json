@@ -57,9 +57,6 @@
   "BIE_CREATE": {
     "TITLE": "Create BIE (Profiled Component, Noun, BOD)"
   },
-  "BIE_CREATE_2": {
-    "TITLE": "Create BIE (Profiled Component, Noun, BOD)"
-  },
   "BIE_EDIT": {
     "TITLE": "Edit BIE (Profiled Component, Noun, BOD)",
     "MAX": "Cardinality Max (-1 for unbounded)"

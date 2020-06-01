@@ -12,7 +12,7 @@ import {NamespaceService} from '../../namespace-management/domain/namespace.serv
 import {ModuleDependencyDialogComponent} from '../module-dependency-dialog/module-dependency-dialog.component';
 
 @Component({
-  selector: 'srt-module-create',
+  selector: 'score-module-create',
   templateUrl: './module-create.component.html',
   styleUrls: ['./module-create.component.css']
 })

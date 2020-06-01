@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextSchemeService} from '../domain/context-scheme.service';
@@ -6,7 +6,6 @@ import {ContextScheme, ContextSchemeValue, SimpleContextCategory, SimpleContextS
 import {BusinessContextService} from '../../business-context/domain/business-context.service';
 import {BusinessContextValue} from '../../business-context/domain/business-context';
 import {
-  MAT_DIALOG_DATA,
   MatCheckboxChange,
   MatDialog,
   MatDialogConfig,
@@ -24,9 +23,11 @@ import {CodeList, CodeListValue} from '../../../code-list-management/domain/code
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
+import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'srt-context-scheme-detail',
+  selector: 'score-context-scheme-detail',
   templateUrl: './context-scheme-detail.component.html',
   styleUrls: ['./context-scheme-detail.component.css']
 })
@@ -70,23 +71,26 @@ export class ContextSchemeDetailComponent implements OnInit {
   ngOnInit() {
     this.contextScheme = new ContextScheme();
     const contextSchemeId = this.route.snapshot.params.id;
+
     forkJoin(
       this.service.getSimpleContextCategories(),
       this.service.getCodeLists(),
       this.service.getSimpleContextSchemes(),
       this.bizCtxService.getBusinessContextValues(),
-      this.service.getContextScheme(contextSchemeId))
-      .subscribe(([simpleContextCategories, codeLists, simpleContextSchemes, businessContextValues, contextScheme]) => {
-        this.ctxCategories = simpleContextCategories;
-        this.codeLists = codeLists.list;
-        this.contextSchemes = simpleContextSchemes;
-        this.bizCtxValues = businessContextValues;
-        this.contextScheme = contextScheme;
-        this.importFromCodeList = this.contextScheme.codeListId ? true : false;
-        this.hashCode = hashCode(contextScheme);
-        this.dataSource.data = this.contextScheme.ctxSchemeValues;
-        this.filteredCodeLists.next(this.codeLists.slice());
-      });
+      this.service.getContextScheme(contextSchemeId)
+    ).subscribe(([simpleContextCategories, codeLists,
+                   simpleContextSchemes, businessContextValues,
+                   contextScheme]) => {
+      this.ctxCategories = simpleContextCategories;
+      this.codeLists = codeLists.list;
+      this.contextSchemes = simpleContextSchemes;
+      this.bizCtxValues = businessContextValues;
+      this.contextScheme = contextScheme;
+      this.importFromCodeList = this.contextScheme.codeListId ? true : false;
+      this.hashCode = hashCode(contextScheme);
+      this.dataSource.data = this.contextScheme.ctxSchemeValues;
+      this.filteredCodeLists.next(this.codeLists.slice());
+    });
 
     this.codeListFilterCtrl.valueChanges
       .subscribe(() => {
@@ -95,7 +99,6 @@ export class ContextSchemeDetailComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
-
   }
 
   filterCodeLists() {
@@ -140,7 +143,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(ContextSchemeValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for ( const value of this.dataSource.data) {
+        for (const value of this.dataSource.data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
@@ -168,19 +171,31 @@ export class ContextSchemeDetailComponent implements OnInit {
       }
       this.disabled = false;
     });
-
   }
 
   removeSchemeValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Context Scheme Value?';
+    dialogConfig.data.content = 'Are you sure you want to remove the context scheme value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
 
@@ -271,18 +286,22 @@ export class ContextSchemeDetailComponent implements OnInit {
 
   update() {
     if (this.checkUniqueness(this.contextScheme)) {
-      this.openDialogContextSchemeUpdate();
+      this.alertInvalidParameters();
     } else if (this.checkSchemeAgencyName(this.contextScheme)) {
-      this.openDialogContextSchemeUpdateCreate();
+      this.alertDuplicatedProperties();
     } else {
-      this.service.update(this.contextScheme).subscribe(_ => {
-        this.hashCode = hashCode(this.contextScheme);
-        this.snackBar.open('Updated', '', {
-          duration: 1000,
-        });
-        this.router.navigateByUrl('/context_management/context_scheme');
-      });
+      this.doUpdate();
     }
+  }
+
+  doUpdate() {
+    this.service.update(this.contextScheme).subscribe(_ => {
+      this.hashCode = hashCode(this.contextScheme);
+      this.snackBar.open('Updated', '', {
+        duration: 1000,
+      });
+      this.router.navigateByUrl('/context_management/context_scheme');
+    });
   }
 
   completeInputAgencyAndVersion(event: MatSelectChange) {
@@ -296,68 +315,93 @@ export class ContextSchemeDetailComponent implements OnInit {
   }
 
   convertCodeListValuesIntoContextSchemeValues(codeListValues: CodeListValue[]) {
-    let _contextschemevalues: ContextSchemeValue[];
-    _contextschemevalues = [];
-    for (const codelistvalue of codeListValues) {
-      let _contextschemevalue: ContextSchemeValue;
-      _contextschemevalue = new ContextSchemeValue();
-      _contextschemevalue.meaning = codelistvalue.name;
-      _contextschemevalue.value = codelistvalue.value;
-      _contextschemevalues.push(_contextschemevalue);
-      this.selection.select(_contextschemevalue);
+    if (!codeListValues || codeListValues.length === 0) {
+      return [];
     }
-    return _contextschemevalues;
-  }
 
-    openDialogContextScheme() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {list: this.listDisplayed, bizCtx: this.bizCtx};
-    const dialogRef = this.dialog.open(DialogContentContextSchemeDialogDetailComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(result => {
+    return codeListValues.map(codeListValue => {
+      const contextSchemeValue = new ContextSchemeValue();
+      contextSchemeValue.meaning = codeListValue.name;
+      contextSchemeValue.value = codeListValue.value;
+      this.selection.select(contextSchemeValue);
+      return contextSchemeValue;
     });
   }
 
-  openDialogContextSchemeUpdate() {
+  openDialogContextScheme(listDisplayed: string[]) {
     const dialogConfig = new MatDialogConfig();
-    const dialogRef = this.dialog.open(DialogContentContextSchemeUpdateDialogDetailComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'The context scheme cannot be deleted!';
+    dialogConfig.data.content = [
+      'The business contexts with the following IDs depend on it. They need to be deleted first.'
+    ];
+    dialogConfig.data.list = listDisplayed;
 
-    dialogRef.afterClosed().subscribe(result => {
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {
     });
   }
 
-  openDialogContextSchemeUpdateCreate() {
+  alertInvalidParameters() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {contextScheme: this.contextScheme};
-    const dialogRef = this.dialog.open(DialogContentContextSchemeUpdateCreateDialogDetailComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Invalid parameters';
+    dialogConfig.data.content = [
+      'Another context scheme with the triplet (schemeID, AgencyID, Version) already exist!'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.update(this.contextScheme).subscribe(_ => {
-          this.hashCode = hashCode(this.contextScheme);
-          this.snackBar.open('Updated', '', {
-            duration: 1000,
-          });
-          this.router.navigateByUrl('/context_management/context_scheme');
-        });
-      }
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {
     });
+  }
+
+  alertDuplicatedProperties() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Duplicated Properties';
+    dialogConfig.data.content = [
+      'Another context scheme with the same properties already exists.',
+      'Are you sure you want to update the context scheme?'
+    ];
+
+    dialogConfig.data.action = 'Update anyway';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.doUpdate();
+        }
+      });
   }
 
   openDialogContextSchemeDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const dialogRef = this.dialog.open(DialogContentContextSchemeDiscardComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard Context Scheme?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard the context scheme?',
+      'The context scheme will be permanently removed.'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.delete(this.contextScheme.ctxSchemeId).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    dialogConfig.data.action = 'Discard';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(this.contextScheme.ctxSchemeId).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.router.navigateByUrl('/context_management/context_scheme');
           });
-          this.router.navigateByUrl('/context_management/context_scheme');
-        });
-      }
-    });
+        }
+      });
   }
 
   discard() {
@@ -382,10 +426,7 @@ export class ContextSchemeDetailComponent implements OnInit {
             displayedList.push(data.guid);
           });
         });
-        const A: String = displayedList.toString().replace(/,/g, ',\n ');
-        this.listDisplayed = displayedList;
-        this.bizCtx = uniqueBizCtxIds.length;
-        this.openDialogContextScheme();
+        this.openDialogContextScheme(displayedList);
       } else {
         this.openDialogContextSchemeDiscard();
       }
@@ -398,6 +439,7 @@ export class ContextSchemeDetailComponent implements OnInit {
       this.selection.clear();
       this._updateDataSource([]);
     }
+
     this.contextScheme.schemeId = undefined;
     this.contextScheme.schemeAgencyId = undefined;
     this.contextScheme.schemeVersionId = undefined;
@@ -416,49 +458,4 @@ export class ContextSchemeDetailComponent implements OnInit {
       return true;
     }
   }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-context-scheme-dialog-detail',
-  templateUrl: 'dialog-content-context-scheme-detail-dialog.html',
-})
-export class DialogContentContextSchemeDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-context-scheme-update-dialog-detail',
-  templateUrl: 'dialog-content-context-scheme-update-detail-dialog.html',
-})
-export class DialogContentContextSchemeUpdateDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-context-scheme-update-create-dialog-detail',
-  templateUrl: 'dialog-content-context-scheme-update-create-detail-dialog.html',
-})
-export class DialogContentContextSchemeUpdateCreateDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-context-scheme-discard-dialog',
-  templateUrl: 'dialog-content-context-scheme-discard-dialog.html',
-})
-export class DialogContentContextSchemeDiscardComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
 }

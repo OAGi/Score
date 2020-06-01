@@ -6,7 +6,7 @@ import {AccountListService} from '../domain/account-list.service';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-account-detail',
+  selector: 'score-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.css']
 })

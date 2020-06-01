@@ -7,7 +7,10 @@ import org.oagi.srt.entity.jooq.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ASBIERepository implements SrtRepository<ASBIE> {
@@ -59,6 +62,16 @@ public class ASBIERepository implements SrtRepository<ASBIE> {
     }
 
     public List<ASBIE> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        if (ownerTopLevelAbieId <= 0L) {
+            return Collections.emptyList();
+        }
+        return findByOwnerTopLevelAbieIds(Arrays.asList(ownerTopLevelAbieId));
+    }
+
+    public List<ASBIE> findByOwnerTopLevelAbieIds(List<Long> ownerTopLevelAbieIds) {
+        if (ownerTopLevelAbieIds == null || ownerTopLevelAbieIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return dslContext.select(Tables.ASBIE.ASBIE_ID,
                 Tables.ASBIE.GUID,
                 Tables.ASBIE.FROM_ABIE_ID,
@@ -76,7 +89,13 @@ public class ASBIERepository implements SrtRepository<ASBIE> {
                 Tables.ASBIE.LAST_UPDATE_TIMESTAMP,
                 Tables.ASBIE.SEQ_KEY,
                 Tables.ASBIE.OWNER_TOP_LEVEL_ABIE_ID).from(Tables.ASBIE)
-                .where(Tables.ASBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(ULong.valueOf(ownerTopLevelAbieId)))
+                .where(
+                        (ownerTopLevelAbieIds.size() == 1) ?
+                                Tables.ASBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(
+                                        ULong.valueOf(ownerTopLevelAbieIds.get(0))) :
+                                Tables.ASBIE.OWNER_TOP_LEVEL_ABIE_ID.in(
+                                        ownerTopLevelAbieIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList()))
+                )
                 .fetchInto(ASBIE.class);
 
     }

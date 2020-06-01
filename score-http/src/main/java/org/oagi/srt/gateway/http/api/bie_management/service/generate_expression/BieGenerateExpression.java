@@ -14,7 +14,11 @@ import java.util.stream.Stream;
 
 public interface BieGenerateExpression {
 
-    void generate(TopLevelAbie topLevelAbie, GenerateExpressionOption option);
+    GenerationContext generateContext(List<TopLevelAbie> topLevelAbies, GenerateExpressionOption option);
+
+    void reset() throws Exception;
+
+    void generate(TopLevelAbie topLevelAbie, GenerationContext generationContext, GenerateExpressionOption option);
 
     File asFile(String filename) throws IOException;
 

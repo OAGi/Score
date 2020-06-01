@@ -1,0 +1,15 @@
+.mat-dialog-content {
+  display: flex;
+  flex-direction: row;
+  max-height: none;
+}
+
+
+.mat-card-container .mat-card {
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
+.mat-card-container .mat-card:last-child {
+  margin-top: 3px;
+}

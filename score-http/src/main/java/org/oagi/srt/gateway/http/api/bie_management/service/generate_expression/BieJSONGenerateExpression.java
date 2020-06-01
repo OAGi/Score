@@ -32,6 +32,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     private static final String ID_KEYWORD = "$id";
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private ObjectMapper mapper;
+
     private Map<String, Object> root;
     private GenerateExpressionOption option;
 
@@ -47,12 +48,38 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     public void afterPropertiesSet() throws Exception {
         mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        root = null;
     }
 
     @Override
-    public void generate(TopLevelAbie topLevelAbie, GenerateExpressionOption option) {
+    public void reset() throws Exception {
+        this.afterPropertiesSet();
+    }
+
+    @Override
+    public GenerationContext generateContext(List<TopLevelAbie> topLevelAbies, GenerateExpressionOption option) {
+        List<TopLevelAbie> mergedTopLevelAbies = new ArrayList(topLevelAbies);
+
+        /* Issue 587 */
+        if (option.isIncludeMetaHeaderForJson()) {
+            TopLevelAbie metaHeaderTopLevelAbie =
+                    topLevelAbieRepository.findById(option.getMetaHeaderTopLevelAbieId());
+            mergedTopLevelAbies.add(metaHeaderTopLevelAbie);
+        }
+        if (option.isIncludePaginationResponseForJson()) {
+            TopLevelAbie paginationResponseTopLevelAbie =
+                    topLevelAbieRepository.findById(option.getPaginationResponseTopLevelAbieId());
+            mergedTopLevelAbies.add(paginationResponseTopLevelAbie);
+        }
+
+        return applicationContext.getBean(GenerationContext.class, mergedTopLevelAbies);
+    }
+
+    @Override
+    public void generate(TopLevelAbie topLevelAbie, GenerationContext generationContext, GenerateExpressionOption option) {
+        this.generationContext = generationContext;
         this.option = option;
-        this.generationContext = applicationContext.getBean(GenerationContext.class, topLevelAbie);
 
         generateTopLevelAbie(topLevelAbie);
     }
@@ -85,16 +112,12 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         if (option.isIncludeMetaHeaderForJson()) {
             TopLevelAbie metaHeaderTopLevelAbie =
                     topLevelAbieRepository.findById(option.getMetaHeaderTopLevelAbieId());
-            GenerationContext metaHeaderGenerationContext =
-                    applicationContext.getBean(GenerationContext.class, metaHeaderTopLevelAbie);
-            fillProperties(root, definitions, metaHeaderGenerationContext);
+            fillProperties(root, definitions, metaHeaderTopLevelAbie, generationContext);
         }
         if (option.isIncludePaginationResponseForJson()) {
             TopLevelAbie paginationResponseTopLevelAbie =
                     topLevelAbieRepository.findById(option.getPaginationResponseTopLevelAbieId());
-            GenerationContext paginationResponseGenerationContext =
-                    applicationContext.getBean(GenerationContext.class, paginationResponseTopLevelAbie);
-            fillProperties(root, definitions, paginationResponseGenerationContext);
+            fillProperties(root, definitions, paginationResponseTopLevelAbie, generationContext);
         }
 
         fillProperties(root, definitions, asbiep, typeAbie, generationContext);
@@ -127,9 +150,9 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     }
 
     private void fillProperties(Map<String, Object> parent, Map<String, Object> definitions,
+                                TopLevelAbie topLevelAbie,
                                 GenerationContext generationContext) {
 
-        TopLevelAbie topLevelAbie = generationContext.getTopLevelAbie();
         ABIE abie = generationContext.findAbie(topLevelAbie.getAbieId());
         ASBIEP asbiep = generationContext.receiveASBIEP(abie);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);

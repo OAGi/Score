@@ -3,6 +3,7 @@ package org.oagi.srt.gateway.http.api.context_management.service;
 import com.google.common.base.Functions;
 import org.jooq.*;
 import org.jooq.types.ULong;
+import org.oagi.srt.entity.jooq.tables.records.CtxSchemeValueRecord;
 import org.oagi.srt.gateway.http.api.common.data.PageRequest;
 import org.oagi.srt.gateway.http.api.common.data.PageResponse;
 import org.oagi.srt.gateway.http.api.context_management.data.*;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.*;
 import static org.oagi.srt.entity.jooq.Tables.*;
-import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.*;
+import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 
 @Service
 @Transactional(readOnly = true)
@@ -156,6 +157,56 @@ public class ContextSchemeService {
         response.setLength(dslContext.selectCount()
                 .from(CTX_SCHEME)
                 .join(APP_USER).on(CTX_SCHEME.LAST_UPDATED_BY.eq(APP_USER.APP_USER_ID))
+                .where(conditions)
+                .fetchOptionalInto(Integer.class).orElse(0));
+
+        return response;
+    }
+
+    public PageResponse<ContextSchemeValue> getContextSchemeValueList(ContextSchemeValueListRequest request) {
+
+        SelectWhereStep<CtxSchemeValueRecord> step = dslContext.selectFrom(CTX_SCHEME_VALUE);
+
+        List<Condition> conditions = new ArrayList();
+        if (!StringUtils.isEmpty(request.getValue())) {
+            conditions.addAll(contains(request.getValue(), CTX_SCHEME_VALUE.VALUE));
+        }
+
+        SelectConditionStep<CtxSchemeValueRecord> conditionStep = step.where(conditions);
+
+        PageRequest pageRequest = request.getPageRequest();
+        String sortDirection = pageRequest.getSortDirection();
+        SortField sortField = null;
+        switch (pageRequest.getSortActive()) {
+            case "value":
+                if ("asc".equals(sortDirection)) {
+                    sortField = CTX_SCHEME_VALUE.VALUE.asc();
+                } else if ("desc".equals(sortDirection)) {
+                    sortField = CTX_SCHEME_VALUE.VALUE.desc();
+                }
+
+                break;
+        }
+
+        SelectWithTiesAfterOffsetStep<CtxSchemeValueRecord> offsetStep = null;
+        if (sortField != null) {
+            offsetStep = conditionStep.orderBy(sortField)
+                    .limit(pageRequest.getOffset(), pageRequest.getPageSize());
+        } else {
+            if (pageRequest.getPageIndex() >= 0 && pageRequest.getPageSize() > 0) {
+                offsetStep = conditionStep
+                        .limit(pageRequest.getOffset(), pageRequest.getPageSize());
+            }
+        }
+        PageResponse<ContextSchemeValue> response = new PageResponse();
+        List<ContextSchemeValue> result = (offsetStep != null) ?
+                offsetStep.fetchInto(ContextSchemeValue.class) : conditionStep.fetchInto(ContextSchemeValue.class);
+
+        response.setList(result);
+        response.setPage(pageRequest.getPageIndex());
+        response.setSize(pageRequest.getPageSize());
+        response.setLength(dslContext.selectCount()
+                .from(CTX_SCHEME_VALUE)
                 .where(conditions)
                 .fetchOptionalInto(Integer.class).orElse(0));
 

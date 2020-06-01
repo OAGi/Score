@@ -21,9 +21,8 @@ import {ReleaseService} from '../release-management/domain/release.service';
 
 import {TranslateModule} from '@ngx-translate/core';
 import {GrowlModule} from 'ngx-growl';
-import {MatDialogModule} from '@angular/material';
 import {BieEditModule} from './bie-edit/bie-edit.module';
-import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 
 const routes: Routes = [
   {
@@ -74,6 +73,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    ConfirmDialogModule,
     BieExpressModule,
     BieEditModule,
     TransferOwnershipDialogModule,

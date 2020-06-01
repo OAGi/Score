@@ -166,7 +166,7 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
 }
 
 @Component({
-  selector: 'srt-acc-detail',
+  selector: 'score-acc-detail',
   templateUrl: './acc-detail.component.html',
   styleUrls: ['./acc-detail.component.css']
 })

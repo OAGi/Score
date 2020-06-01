@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {ModuleList} from '../domain/module';
 
 @Component({
-  selector: 'srt-module-list',
+  selector: 'score-module-list',
   templateUrl: './module-list.component.html',
   styleUrls: ['./module-list.component.css']
 })

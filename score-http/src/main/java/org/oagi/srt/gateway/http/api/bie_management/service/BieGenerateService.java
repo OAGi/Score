@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,8 @@ public class BieGenerateService {
     private DSLContext dslContext;
 
     public BieGenerateExpressionResult generate(
-            User user, List<Long> topLevelAbieIds, GenerateExpressionOption option) throws BieGenerateFailureException {
+            User user, List<Long> topLevelAbieIds,
+            GenerateExpressionOption option) throws BieGenerateFailureException {
 
         List<TopLevelAbie> topLevelAbies = topLevelAbieRepository.findByIdIn(topLevelAbieIds);
         File file = generateSchema(topLevelAbies, option);
@@ -71,7 +71,8 @@ public class BieGenerateService {
         return result;
     }
 
-    public File generateSchema(List<TopLevelAbie> topLevelAbies, GenerateExpressionOption option) throws BieGenerateFailureException {
+    public File generateSchema(List<TopLevelAbie> topLevelAbies,
+                               GenerateExpressionOption option) throws BieGenerateFailureException {
         if (topLevelAbies == null || topLevelAbies.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -108,9 +109,10 @@ public class BieGenerateService {
     public File generateSchemaForAll(List<TopLevelAbie> topLevelAbieList,
                                      GenerateExpressionOption option) throws BieGenerateFailureException {
         BieGenerateExpression generateExpression = createBieGenerateExpression(option);
+        GenerationContext generationContext = generateExpression.generateContext(topLevelAbieList, option);
 
         for (TopLevelAbie topLevelAbie : topLevelAbieList) {
-            generateExpression.generate(topLevelAbie, option);
+            generateExpression.generate(topLevelAbie, generationContext, option);
         }
 
         String filename;
@@ -132,10 +134,17 @@ public class BieGenerateService {
     public Map<Long, File> generateSchemaForEach(List<TopLevelAbie> topLevelAbies,
                                                  GenerateExpressionOption option) throws BieGenerateFailureException {
         Map<Long, File> targetFiles = new HashMap();
-        for (TopLevelAbie topLevelAbie : topLevelAbies) {
-            BieGenerateExpression generateExpression = createBieGenerateExpression(option);
+        BieGenerateExpression generateExpression = createBieGenerateExpression(option);
+        GenerationContext generationContext = generateExpression.generateContext(topLevelAbies, option);
 
-            generateExpression.generate(topLevelAbie, option);
+        for (TopLevelAbie topLevelAbie : topLevelAbies) {
+            try {
+                generateExpression.reset();
+            } catch (Exception e) {
+                throw new BieGenerateFailureException("Unexpected error occurs during initialization of the expression processor.");
+            }
+
+            generateExpression.generate(topLevelAbie, generationContext, option);
             String filename = getFilenameByTopLevelAbie(topLevelAbie);
 
             File schemaExpressionFile;
@@ -181,7 +190,7 @@ public class BieGenerateService {
             expressionOption = expressionOption.trim();
         }
 
-        BieGenerateExpression generateExpression = null;
+        BieGenerateExpression generateExpression;
         switch (expressionOption.toUpperCase()) {
             case "XML":
                 generateExpression = applicationContext.getBean(BieXMLGenerateExpression.class);

@@ -6,7 +6,7 @@ import {NamespaceList} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 
 @Component({
-  selector: 'srt-namespace-list',
+  selector: 'score-namespace-list',
   templateUrl: './namespace-list.component.html',
   styleUrls: ['./namespace-list.component.css']
 })

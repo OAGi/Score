@@ -9,7 +9,9 @@ import org.oagi.srt.entity.jooq.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 
@@ -61,8 +63,17 @@ public class BBIESCRepository implements SrtRepository<BBIESC> {
     }
 
     public List<BBIESC> findByOwnerTopLevelAbieIdAndUsed(long ownerTopLevelAbieId, boolean used) {
+        return findByOwnerTopLevelAbieIdsAndUsed(Arrays.asList(ownerTopLevelAbieId), used);
+    }
+
+    public List<BBIESC> findByOwnerTopLevelAbieIdsAndUsed(List<Long> ownerTopLevelAbieIds, boolean used) {
         return getSelectJoinStep()
-                .where(and(Tables.BBIE_SC.OWNER_TOP_LEVEL_ABIE_ID.eq(ULong.valueOf(ownerTopLevelAbieId)),
+                .where(and(
+                        (ownerTopLevelAbieIds.size() == 1) ?
+                                Tables.BBIE_SC.OWNER_TOP_LEVEL_ABIE_ID.eq(
+                                        ULong.valueOf(ownerTopLevelAbieIds.get(0))) :
+                                Tables.BBIE_SC.OWNER_TOP_LEVEL_ABIE_ID.in(
+                                        ownerTopLevelAbieIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())),
                         Tables.BBIE_SC.IS_USED.eq((byte) (used ? 1 : 0))))
                 .fetchInto(BBIESC.class);
     }

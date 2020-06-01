@@ -5,7 +5,7 @@ import {ProductInfo} from './domain/about';
 import * as pkg from '../../../../package.json';
 
 @Component({
-  selector: 'srt-about',
+  selector: 'score-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.css']
 })

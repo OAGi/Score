@@ -1,13 +1,27 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {BieList, BieListRequest} from './bie-list';
+import {map} from 'rxjs/operators';
+import {BieList, BieListRequest, SummaryBieInfo} from './bie-list';
 import {PageResponse} from '../../../basis/basis';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
 
 @Injectable()
 export class BieListService {
   constructor(private http: HttpClient) {
+  }
+
+  getSummaryBieList(): Observable<SummaryBieInfo> {
+    return this.http.get<SummaryBieInfo>('/api/info/bie_summary').pipe(map(
+      e => {
+        if (e.myRecentBIEs) {
+          e.myRecentBIEs = e.myRecentBIEs.map(elm => {
+            elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+            return elm;
+          });
+        }
+        return e;
+      }));
   }
 
   getBieListWithRequest(request: BieListRequest): Observable<PageResponse<BieList>> {

@@ -5,7 +5,7 @@ import WebFont from 'webfontloader';
 import {MatIconRegistry} from '@angular/material';
 
 @Component({
-  selector: 'srt-webapp',
+  selector: 'score-webapp',
   templateUrl: './score-web.component.html',
   styleUrls: ['./score-web.component.css']
 })
@@ -19,7 +19,7 @@ export class ScoreWebComponent implements OnInit {
   ngOnInit(): void {
     WebFont.load({
       google: {
-        families: ['Noto Sans', 'Roboto', 'Montserrat']
+        families: ['Roboto']
       }
     });
 

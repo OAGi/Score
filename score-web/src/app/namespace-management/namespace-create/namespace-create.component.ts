@@ -7,7 +7,7 @@ import {Namespace} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 
 @Component({
-  selector: 'srt-namespace-create',
+  selector: 'score-namespace-create',
   templateUrl: './namespace-create.component.html',
   styleUrls: ['./namespace-create.component.css']
 })

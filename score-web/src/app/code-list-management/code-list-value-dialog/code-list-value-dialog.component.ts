@@ -1,20 +1,24 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {CodeListValue} from '../domain/code-list';
+import {hashCode} from '../../common/utility';
 
 @Component({
-  selector: 'srt-code-list-value-dialog',
+  selector: 'score-code-list-value-dialog',
   templateUrl: './code-list-value-dialog.component.html',
   styleUrls: ['./code-list-value-dialog.component.css']
 })
 export class CodeListValueDialogComponent implements OnInit {
 
+  _hashCode;
   isAddAction;
   actionName;
 
   constructor(
     public dialogRef: MatDialogRef<CodeListValueDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public codeListValue: CodeListValue) {
+
+    this._hashCode = hashCode(codeListValue);
   }
 
   onNoClick(): void {
@@ -37,7 +41,8 @@ export class CodeListValueDialogComponent implements OnInit {
 
   isDisabled() {
     return (this.codeListValue.value === undefined || this.codeListValue.value === '') ||
-      (this.codeListValue.name === undefined || this.codeListValue.name === '');
+      (this.codeListValue.name === undefined || this.codeListValue.name === '') ||
+      !this.isDirty();
   }
 
   color(codeListValue: CodeListValue): string {
@@ -62,6 +67,10 @@ export class CodeListValueDialogComponent implements OnInit {
 
   isAvailable(codeListValue: CodeListValue): boolean {
     return this.color(codeListValue) !== 'bright-red' || this.color(codeListValue) !== 'dull-red';
+  }
+
+  isDirty(): boolean {
+    return this._hashCode !== hashCode(this.codeListValue);
   }
 
 }

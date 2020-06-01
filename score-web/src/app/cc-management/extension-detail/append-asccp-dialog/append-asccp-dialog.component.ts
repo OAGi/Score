@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
 import {ExtensionDetailComponent} from '../extension-detail.component';
 import {ExtensionDetailService} from '../domain/extension-detail.service';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -12,14 +12,17 @@ import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
+import {finalize} from 'rxjs/operators';
+import {Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
-  selector: 'srt-append-asccp-dialog',
+  selector: 'score-append-asccp-dialog',
   templateUrl: './append-asccp-dialog.component.html',
   styleUrls: ['./append-asccp-dialog.component.css'],
   animations: [
     trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
+      state('collapsed', style({height: '0px', minHeight: '0'})),
       state('expanded', style({height: '*'})),
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
@@ -28,10 +31,11 @@ import {initFilter} from '../../../common/utility';
 export class AppendAsccpDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'den', 'lastUpdateTimestamp'
+    'select', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<number>(false, []);
+  expandedElement: CcList | null;
   loading = false;
 
   loginIdList: string[] = [];
@@ -47,22 +51,26 @@ export class AppendAsccpDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<ExtensionDetailComponent>,
               private ccListService: CcListService,
               private accountService: AccountListService,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute,
               @Inject(MAT_DIALOG_DATA) public data: any,
               private service: ExtensionDetailService) {
   }
 
   ngOnInit() {
-    this.request = new CcListRequest();
+    this.request = new CcListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.releaseId = this.data.releaseId;
     this.request.types = ['ASCCP'];
     this.request.states = ['Published'];
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'den';
-    this.sort.direction = 'asc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadData();
@@ -73,6 +81,7 @@ export class AppendAsccpDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
+
     this.loadData();
   }
 
@@ -114,10 +123,13 @@ export class AppendAsccpDialogComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.ccListService.getCcList(this.request).subscribe(resp => {
+    this.ccListService.getCcList(this.request).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe(resp => {
       this.paginator.length = resp.length;
-
-      const list = resp.list.map((elm: CcList) => {
+      this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
           elm.module = elm.module.replace(
@@ -131,9 +143,6 @@ export class AppendAsccpDialogComponent implements OnInit {
         }
         return elm;
       });
-
-      this.dataSource.data = list;
-      this.loading = false;
     });
   }
 

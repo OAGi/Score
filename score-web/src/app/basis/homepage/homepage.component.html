@@ -1,26 +1,369 @@
 <div class="container">
-  <div class="markdown-body">
-    <h2>Objective</h2>
-    <p>To advance semantic precision of interface definitions exposing OAGIS</p>
+  <mat-tab-group>
+    <mat-tab label="BIEs">
+      <div class="row m-0">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box total-bies-by-states">
+            <div class="header">
+              <p>Total BIEs by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfTotalBieByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box my-bies-by-states">
+            <div class="header">
+              <p>My BIEs by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfMyBieByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
 
-    <h2>Scope</h2>
-    <p>Develop a meta-model for holding OAGIS data model</p>
-    <ul>
-      <li>Allow for import of OAGIS developer schemas</li>
-      <li>Allow for precise content contextualization</li>
-    </ul>
-    <p>Implement a prototype, open source tool, which in addition to above requirements</p>
-    <ul>
-      <li>Allow for export of OAGIS contextualized profile schema</li>
-      <li>Allow for import of OAGIS contextualized profile schema</li>
-    </ul>
-    <h2>Future scope</h2>
-    <ul>
-      <li>Round trip export of OAGIS developer schemas</li>
-      <li>OWL/RDF model</li>
-      <li>OAGIS semantic content life-cycle management</li>
-    </ul>
-    <img [src]="['assets/images/oag_main.png']" width="800" height="450"
-         style="border:0; margin-top: 20px; padding:0;"/>
-  </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="box bies-by-users-and-states">
+            <div class="header">
+              <p>BIEs by users and states</p>
+            </div>
+            <div class="content">
+              <div class="container" *ngIf="numberOfBiesByUsers_usernameList.length > 0">
+                <div class="row">
+                  <div class="col-md-2 col-sm-12" style="padding-bottom: 0;">
+                    <mat-form-field>
+                      <mat-label>User</mat-label>
+                      <mat-select [(ngModel)]="numberOfBiesByUsers_usernameModel" multiple
+                                  (ngModelChange)="applyFilter(numberOfBiesByUsersAndStates, numberOfBiesByUsers_usernameModel)">
+                        <ngx-mat-select-search [formControl]="numberOfBiesByUsers_usernameListFilterCtrl"
+                                               [placeholderLabel]="'Search...'"
+                                               [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        <mat-option *ngFor="let loginId of numberOfBiesByUsers_usernameFilteredList | async" [value]="loginId">
+                          {{ loginId }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <table mat-table matSort #numberOfBiesByUsersAndStatesSort="matSort"
+                     matSortActive="username"
+                     matSortDirection="asc"
+                     [dataSource]="numberOfBiesByUsersAndStates">
+                <ng-container matColumnDef="username">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/profile_bie']"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.username }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Editing">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Editing</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/profile_bie']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Editing'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.Editing }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Candidate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/profile_bie']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Candidate'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.Candidate }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Published">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Published</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/profile_bie']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Published'},
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.Published }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="total">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/profile_bie']"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username}]) }">
+                      {{ element.total }}
+                    </a>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['username', 'Editing', 'Candidate', 'Published', 'total']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'Editing', 'Candidate', 'Published', 'total'];"></tr>
+              </table>
+              <mat-paginator #numberOfBiesByUsersAndStatesPaginator
+                             [hidden]="numberOfBiesByUsersAndStates.data.length <= 5"
+                             [pageSizeOptions]="[5, 10, 20]"
+                             showFirstLastButtons></mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row m-0">
+        <div class="col-lg-12">
+          <div class="box my-recent-bies">
+            <div class="header">
+              <p>My recent BIEs</p>
+            </div>
+            <div class="content">
+              <table mat-table matSort #myRecentBIEsSort="matSort"
+                     matSortActive="lastUpdateTimestamp"
+                     matSortDirection="desc"
+                     [dataSource]="myRecentBIEs">
+                <ng-container matColumnDef="propertyTerm">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis" style="display: flex;">
+                      <a routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                        <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
+                      </a>
+                      <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+                    </div>
+                    <div class="bie-guid ellipsis">{{ element.guid }}</div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="release">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Release</th>
+                  <td mat-cell *matCellDef="let element">{{ element.releaseNum }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="businessContexts">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Business Contexts</th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-chip-list class="ellipsis" *ngIf="element.businessContexts.length > 0" selectable="false">
+                      <a target="_blank" rel="noopener noreferrer" *ngIf="element.businessContexts.length > 0"
+                         href="/context_management/business_context/{{ element.businessContexts[0].bizCtxId }}">
+                        <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
+                      </a>
+                      <a target="_blank" rel="noopener noreferrer"
+                         routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                        <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }} more...</mat-chip>
+                      </a>
+                    </mat-chip-list>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="lastUpdateTimestamp">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp'];"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="User Extensions">
+      <div class="row m-0">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box">
+            <div class="header">
+              <p>Total User Extensions by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfTotalCcExtByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="box">
+            <div class="header">
+              <p>My User Extensions by states</p>
+            </div>
+            <div class="content">
+              <score-state-progress-bar [data]="numberOfMyCcExtByStates"></score-state-progress-bar>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="box cc-exts-by-users-and-states">
+            <div class="header">
+              <p>User Extensions by users and states</p>
+            </div>
+            <div class="content">
+              <div class="container" *ngIf="numberOfCcExtsByUsers_usernameList.length > 0">
+                <div class="row">
+                  <div class="col-md-2 col-sm-12" style="padding-bottom: 0;">
+                    <mat-form-field>
+                      <mat-label>User</mat-label>
+                      <mat-select [(ngModel)]="numberOfCcExtsByUsers_usernameModel" multiple
+                                  (ngModelChange)="applyFilter(numberOfCcExtsByUsersAndStates, numberOfCcExtsByUsers_usernameModel)">
+                        <ngx-mat-select-search [formControl]="numberOfCcExtsByUsers_usernameListFilterCtrl"
+                                               [placeholderLabel]="'Search...'"
+                                               [noEntriesFoundLabel]="'No matching user found.'"></ngx-mat-select-search>
+                        <mat-option *ngFor="let loginId of numberOfCcExtsByUsers_usernameFilteredList | async" [value]="loginId">
+                          {{ loginId }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <table mat-table matSort #numberOfCcExtsByUsersAndStatesSort="matSort"
+                     matSortActive="username"
+                     matSortDirection="asc"
+                     [dataSource]="numberOfCcExtsByUsersAndStates">
+                <ng-container matColumnDef="username">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: '1'},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.username }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Editing">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Editing</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Editing'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: '1'},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.Editing }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Candidate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Candidate'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: '1'},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.Candidate }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Published">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Published</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Published'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: '1'},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.Published }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="total">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [queryParams]="{q: q([
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: '1'},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.total }}
+                    </a>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="['username', 'Editing', 'Candidate', 'Published', 'total']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'Editing', 'Candidate', 'Published', 'total'];"></tr>
+              </table>
+              <mat-paginator #numberOfCcExtsByUsersAndStatesPaginator
+                             [hidden]="numberOfCcExtsByUsersAndStates.data.length <= 5"
+                             [pageSizeOptions]="[5, 10, 20]"
+                             showFirstLastButtons></mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row m-0">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="box">
+            <div class="header">
+              <p>My unused extensions in BIEs</p>
+            </div>
+            <div class="content">
+              <table mat-table matSort #myExtensionsUnusedInBIEsSort="matSort"
+                     matSortActive="lastUpdateTimestamp"
+                     matSortDirection="desc"
+                     [dataSource]="myExtensionsUnusedInBIEs">
+                <ng-container matColumnDef="objectClassTerm">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> User Extension</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis" style="display: flex;">
+                      <a routerLink="{{ '/core_component/extension/' + 1 + '/' + element.accId }}">
+                        <span class="den ellipsis" style="margin-right: 10px;">{{ element.objectClassTerm }}</span>
+                      </a>
+                      <span class="cc-state {{ element.state }}">{{ element.state }}</span>
+                    </div>
+                    <div class="cc-guid ellipsis">{{ element.guid }}</div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="lastUpdateTimestamp">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="topLevelBIE">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Top-Level BIE</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis" style="display: flex;">
+                      <a routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                        <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
+                      </a>
+                      <span class="bie-state {{ element.bieState }}">{{ element.bieState }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="associationPropertyTerm">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Association Property Term</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div class="ellipsis">{{ element.associationPropertyTerm }}</div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['objectClassTerm', 'lastUpdateTimestamp', 'topLevelBIE', 'associationPropertyTerm']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['objectClassTerm', 'lastUpdateTimestamp', 'topLevelBIE', 'associationPropertyTerm'];"></tr>
+              </table>
+              <mat-paginator #myExtensionsUnusedInBIEsPaginator
+                             [hidden]="myExtensionsUnusedInBIEs.data.length <= 5"
+                             [pageSizeOptions]="[5, 10, 20]"
+                             showFirstLastButtons></mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
 </div>

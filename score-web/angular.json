@@ -7,7 +7,7 @@
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
-      "prefix": "srt",
+      "prefix": "score",
       "schematics": {},
       "architect": {
         "build": {
@@ -20,8 +20,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              { "glob": "**/*", "input": "node_modules/ngx-monaco-editor/assets/monaco", "output": "./assets/monaco/" }
+              "src/assets"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -34,7 +33,16 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.js"
-            ]
+            ],
+            "optimization": false,
+            "outputHashing": "none",
+            "sourceMap": true,
+            "extractCss": false,
+            "namedChunks": false,
+            "aot": false,
+            "extractLicenses": false,
+            "vendorChunk": false,
+            "buildOptimizer": false
           },
           "configurations": {
             "production": {

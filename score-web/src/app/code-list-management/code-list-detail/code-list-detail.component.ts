@@ -1,27 +1,21 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {CodeListService} from '../domain/code-list.service';
 import {CodeList, CodeListValue, SimpleAgencyIdListValue} from '../domain/code-list';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource
-} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
 import {CodeListValueDialogComponent} from '../code-list-value-dialog/code-list-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {switchMap} from 'rxjs/operators';
-import {Md5} from 'ts-md5';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
+import {hashCode} from '../../common/utility';
+import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'srt-code-list-detail',
+  selector: 'score-code-list-detail',
   templateUrl: './code-list-detail.component.html',
   styleUrls: ['./code-list-detail.component.css']
 })
@@ -79,7 +73,7 @@ export class CodeListDetailComponent implements OnInit {
         codeListValue.guid = uuid();
       });
 
-      this.hashCode = this._hashCode(resp);
+      this.hashCode = hashCode(resp);
       this.codeList = resp;
 
       this._updateDataSource(this.codeList.codeListValues);
@@ -118,12 +112,8 @@ export class CodeListDetailComponent implements OnInit {
     return 'dull-red';
   }
 
-  _hashCode(obj) {
-    return Md5.hashStr(JSON.stringify(obj));
-  }
-
   isChanged() {
-    return this.hashCode !== this._hashCode(this.codeList);
+    return this.hashCode !== hashCode(this.codeList);
   }
 
   isDisabled(codeList: CodeList) {
@@ -155,39 +145,46 @@ export class CodeListDetailComponent implements OnInit {
     this.disabled = true;
     const dialogRef = this.dialog.open(CodeListValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined && result.value !== undefined && result.value !== '') {
-        for ( const value of this.dataSource.data) {
+      this.disabled = false;
+
+      if (!result) {
+        return;
+      }
+
+      const data = this.dataSource.data;
+      if (isAddAction) {
+        for (const value of data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
             });
-            this.disabled = false;
+
             return;
           }
         }
-        if (isAddAction) {
-          const data = this.dataSource.data;
-          result.guid = uuid();
-          data.push(result);
 
-          this._updateDataSource(data);
-        } else {
-          const newData = [];
+        result.guid = uuid();
+        data.push(result);
 
-          this.dataSource.data.forEach(row => {
-            if (row.guid === result.guid) {
-              newData.push(result);
-            } else {
-              newData.push(row);
-            }
-          });
+        this._updateDataSource(data);
+      } else {
+        for (const value of data) {
+          if (value.guid !== result.guid && value.value === result.value) {
+            this.snackBar.open(result.value + ' already exist', '', {
+              duration: 4000,
+            });
 
-          this._updateDataSource(newData);
+            return;
+          }
         }
 
-        this.disabled = false;
-      } else {
-        this.disabled = false;
+        this._updateDataSource(data.map(row => {
+          if (row.guid === result.guid) {
+            return result;
+          } else {
+            return row;
+          }
+        }));
       }
     });
   }
@@ -234,15 +231,28 @@ export class CodeListDetailComponent implements OnInit {
   }
 
   removeCodeListValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Code List Value?';
+    dialogConfig.data.content = 'Are you sure you want to remove the code list value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
   back() {
@@ -291,56 +301,90 @@ export class CodeListDetailComponent implements OnInit {
     return this.sum(listUniqueness) > 0;
   }
 
-  openDialogCodeList() {
+  alertInvalidParameters() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codeList: this.codeList};
-    const dialogRef = this.dialog.open(DialogContentCodelistDialogDetailComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Invalid parameters';
+    dialogConfig.data.content = [
+      'Another code list with the triplet (ListID, AgencyID, Version) already exist!'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.update(this.codeList).subscribe(_ => {
-          this.hashCode = this._hashCode(this.codeList);
-          this.snackBar.open('Updated', '', {
-            duration: 1000,
-          });
-        });
-        this.router.navigateByUrl('/code_list');
-      }
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
+  }
+
+  alertDuplicatedProperties() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Duplicated Properties';
+    dialogConfig.data.content = [
+      'Another code list with the same name already exists.',
+      'Are you sure you want to update the code list?'
+    ];
+
+    dialogConfig.data.action = 'Update anyway';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.doUpdate();
+        }
+      });
+  }
+
+  doUpdate() {
+    this.disabled = true;
+
+    this.service.update(this.codeList).subscribe(_ => {
+      this.hashCode = hashCode(this.codeList);
+      this.snackBar.open('Updated', '', {
+        duration: 1000,
+      });
+      this.disabled = false;
     });
   }
 
   update() {
     if (this.checkUniqueness(this.codeList)) {
-      this.snackBar.open('Another code list with the triplet (ListID, AgencyID, Version) already exist', 'Close');
+      this.alertInvalidParameters();
     } else if (this.checkNameUniqueness(this.codeList)) {
-      this.openDialogCodeList();
+      this.alertDuplicatedProperties();
     } else {
-      this.service.update(this.codeList).subscribe(_ => {
-        this.hashCode = this._hashCode(this.codeList);
-        this.snackBar.open('Updated', '', {
-          duration: 1000,
-        });
-      });
-      this.router.navigateByUrl('/code_list');
+      this.doUpdate();
     }
   }
 
   publish() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = {codeList: this.codeList.codeListName};
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Update state to Published?';
+    dialogConfig.data.content = [
+      'Do you really want to move ' + this.codeList.codeListName + ' to the Published state?',
+      'Once in the Published state it can no longer be changed or discarded.'
+    ];
 
-    const dialogRef = this.dialog.open(DialogPublishCodelistDialogDetailComponent, dialogConfig);
+    dialogConfig.data.action = 'Update anyway';
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.publish(this.codeList).subscribe(_ => {
-          this.snackBar.open('Published', '', {
-            duration: 1000,
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.disabled = true;
+
+          this.service.publish(this.codeList).subscribe(_ => {
+            this.snackBar.open('Published', '', {
+              duration: 1000,
+            });
+            this.disabled = false;
+
+            this.router.navigateByUrl('/code_list');
           });
-          this.router.navigateByUrl('/code_list');
-        });
-      }
-    });
+        }
+      });
   }
 
   discard() {
@@ -349,51 +393,32 @@ export class CodeListDetailComponent implements OnInit {
 
   openDialogCodeListDiscard() {
     const dialogConfig = new MatDialogConfig();
-    const dialogRef = this.dialog.open(DialogDiscardCodeListDetailDialogComponent, dialogConfig);
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard Code List?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard the code list?',
+      'The code list will be permanently removed.'
+    ];
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.delete(this.codeList.codeListId).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    dialogConfig.data.action = 'Discard';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.disabled = true;
+
+          this.service.delete(this.codeList.codeListId).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.disabled = false;
+
+            this.router.navigateByUrl('/code_list');
           });
-          this.router.navigateByUrl('/code_list');
-        });
-      }
-    });
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-content-code-list-dialog-detail',
-  templateUrl: 'dialog-content-code-list-detail-dialog.html',
-})
-export class DialogContentCodelistDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-discard-code-list-detail-dialog',
-  templateUrl: 'dialog-discard-code-list-detail-dialog.html',
-})
-export class DialogDiscardCodeListDetailDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
-}
-
-@Component({
-  selector: 'srt-dialog-publish-code-list-dialog-detail',
-  templateUrl: 'dialog-publish-code-list-detail-dialog.html',
-})
-export class DialogPublishCodelistDialogDetailComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+        }
+      });
   }
 
 }

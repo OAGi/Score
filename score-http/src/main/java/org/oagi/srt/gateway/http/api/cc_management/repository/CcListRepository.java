@@ -43,6 +43,7 @@ public class CcListRepository {
                 .filter(e -> request.getStates().isEmpty() || request.getStates().contains(CcState.valueOf(e.getState())))
                 .filter(e -> request.getOwnerLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getOwnerUserId())))
                 .filter(e -> request.getUpdaterLoginIds().isEmpty() || request.getOwnerLoginIds().contains(usernameMap.get(e.getLastUpdatedBy())))
+                .filter(e -> request.getComponentType().isEmpty() || request.getComponentType().contains(OagisComponentType.valueOf(e.getOagisComponentType()).name()))
                 .filter(contains(request.getDen(), ACC::getDen))
                 .filter(contains(request.getDefinition(), ACC::getDefinition))
                 .filter(contains(request.getModule(), ACC::getModule))

@@ -7,7 +7,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {AuthService} from '../../authentication/auth.service';
 
 @Component({
-  selector: 'srt-transfer-ownership-dialog',
+  selector: 'score-transfer-ownership-dialog',
   templateUrl: './transfer-ownership-dialog.component.html',
   styleUrls: ['./transfer-ownership-dialog.component.css']
 })

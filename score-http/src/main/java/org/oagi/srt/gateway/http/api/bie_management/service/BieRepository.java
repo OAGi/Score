@@ -1,8 +1,6 @@
 package org.oagi.srt.gateway.http.api.bie_management.service;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record2;
+import org.jooq.*;
 import org.jooq.tools.StringUtils;
 import org.jooq.types.ULong;
 import org.oagi.srt.data.BieState;
@@ -11,6 +9,7 @@ import org.oagi.srt.entity.jooq.tables.records.*;
 import org.oagi.srt.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.srt.gateway.http.api.cc_management.data.CcState;
 import org.oagi.srt.gateway.http.api.cc_management.helper.CcUtility;
+import org.oagi.srt.gateway.http.api.info.data.SummaryBie;
 import org.oagi.srt.gateway.http.configuration.security.SessionService;
 import org.oagi.srt.gateway.http.helper.SrtGuid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,31 @@ public class BieRepository {
 
     @Autowired
     private SessionService sessionService;
+
+    public List<SummaryBie> getSummaryBieList() {
+        return dslContext.select(
+                TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID,
+                TOP_LEVEL_ABIE.LAST_UPDATE_TIMESTAMP,
+                TOP_LEVEL_ABIE.STATE,
+                TOP_LEVEL_ABIE.OWNER_USER_ID,
+                APP_USER.LOGIN_ID,
+                ASCCP.PROPERTY_TERM)
+                .from(TOP_LEVEL_ABIE)
+                .join(APP_USER).on(TOP_LEVEL_ABIE.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .join(ABIE).on(TOP_LEVEL_ABIE.ABIE_ID.eq(ABIE.ABIE_ID))
+                .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID))
+                .join(ASCCP).on(ASBIEP.BASED_ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .fetchStream().map(e -> {
+            SummaryBie item = new SummaryBie();
+            item.setTopLevelAbieId(e.get(TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID).longValue());
+            item.setLastUpdateTimestamp(e.get(TOP_LEVEL_ABIE.LAST_UPDATE_TIMESTAMP));
+            item.setState(BieState.valueOf(e.get(TOP_LEVEL_ABIE.STATE)));
+            item.setOwnerUserId(e.get(TOP_LEVEL_ABIE.OWNER_USER_ID).longValue());
+            item.setOwnerUsername(e.get(APP_USER.LOGIN_ID));
+            item.setPropertyTerm(e.get(ASCCP.PROPERTY_TERM));
+            return item;
+        }).collect(Collectors.toList());
+    }
 
     public long getCurrentAccIdByTopLevelAbieId(long topLevelAbieId) {
         return dslContext.select(ACC.CURRENT_ACC_ID)
@@ -521,7 +545,7 @@ public class BieRepository {
                 .set(BBIE.CARDINALITY_MIN, bccRecord.getCardinalityMin())
                 .set(BBIE.CARDINALITY_MAX, bccRecord.getCardinalityMax())
                 .set(BBIE.IS_NILLABLE, bccRecord.getIsNillable())
-                .set(BBIE.IS_NULL, (byte) ((0)))
+                .set(BBIE.IS_NULL, (byte) 0)
                 .set(BBIE.CREATED_BY, ULong.valueOf(userId))
                 .set(BBIE.LAST_UPDATED_BY, ULong.valueOf(userId))
                 .set(BBIE.CREATION_TIMESTAMP, timestamp)
@@ -535,12 +559,34 @@ public class BieRepository {
     }
 
     public long getDefaultBdtPriRestriIdByBdtId(long bdtId) {
-        return dslContext.select(
+        ULong dtId = ULong.valueOf(bdtId);
+        String bdtDataTypeTerm = dslContext.select(DT.DATA_TYPE_TERM)
+                .from(DT)
+                .where(DT.DT_ID.eq(dtId))
+                .fetchOneInto(String.class);
+
+        /*
+         * Issue #808
+         */
+        List<Condition> conds = new ArrayList();
+        conds.add(DT.DT_ID.eq(dtId));
+        if ("Date Time".equals(bdtDataTypeTerm)) {
+            conds.add(XBT.NAME.eq("date time"));
+        } else if ("Date".equals(bdtDataTypeTerm)) {
+            conds.add(XBT.NAME.eq("date"));
+        } else if ("Time".equals(bdtDataTypeTerm)) {
+            conds.add(XBT.NAME.eq("time"));
+        } else {
+            conds.add(BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1));
+        }
+
+        SelectOnConditionStep<Record1<ULong>> step = dslContext.select(
                 BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID)
                 .from(BDT_PRI_RESTRI)
-                .where(and(
-                        BDT_PRI_RESTRI.BDT_ID.eq(ULong.valueOf(bdtId))),
-                        BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) ((1))))
+                .join(DT).on(BDT_PRI_RESTRI.BDT_ID.eq(DT.DT_ID))
+                .join(CDT_AWD_PRI_XPS_TYPE_MAP).on(BDT_PRI_RESTRI.CDT_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_AWD_PRI_XPS_TYPE_MAP.CDT_AWD_PRI_XPS_TYPE_MAP_ID))
+                .join(XBT).on(CDT_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID));
+        return step.where(conds)
                 .fetchOptionalInto(Long.class).orElse(0L);
     }
 
@@ -558,7 +604,7 @@ public class BieRepository {
                 .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, ULong.valueOf(getDefaultDtScPriRestriIdByDtScId(dtScId)))
                 .set(BBIE_SC.CARDINALITY_MIN, dtScRecord.getCardinalityMin())
                 .set(BBIE_SC.CARDINALITY_MAX, dtScRecord.getCardinalityMax())
-                .set(BBIE_SC.IS_USED, (byte)(dtScRecord.getCardinalityMin() > 0 ? 1 : 0))
+                .set(BBIE_SC.IS_USED, (byte) (dtScRecord.getCardinalityMin() > 0 ? 1 : 0))
                 .set(BBIE_SC.OWNER_TOP_LEVEL_ABIE_ID, ULong.valueOf(topLevelAbieId))
                 .set(BBIE_SC.DEFAULT_VALUE, dtScRecord.getDefaultValue())
                 .set(BBIE_SC.FIXED_VALUE, dtScRecord.getFixedValue())
@@ -566,13 +612,34 @@ public class BieRepository {
     }
 
     public long getDefaultDtScPriRestriIdByDtScId(long dtScId) {
-        return dslContext.select(
+        ULong bdtScId = ULong.valueOf(dtScId);
+        String bdtScRepresentationTerm = dslContext.select(DT_SC.REPRESENTATION_TERM)
+                .from(DT_SC)
+                .where(DT_SC.DT_SC_ID.eq(bdtScId))
+                .fetchOneInto(String.class);
+
+        /*
+         * Issue #808
+         */
+        List<Condition> conds = new ArrayList();
+        conds.add(DT_SC.DT_SC_ID.eq(bdtScId));
+        if ("Date Time".equals(bdtScRepresentationTerm)) {
+            conds.add(XBT.NAME.eq("date time"));
+        } else if ("Date".equals(bdtScRepresentationTerm)) {
+            conds.add(XBT.NAME.eq("date"));
+        } else if ("Time".equals(bdtScRepresentationTerm)) {
+            conds.add(XBT.NAME.eq("time"));
+        } else {
+            conds.add(BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1));
+        }
+
+        SelectOnConditionStep<Record1<ULong>> step = dslContext.select(
                 BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID)
                 .from(BDT_SC_PRI_RESTRI)
-                .where(and(
-                        BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(ULong.valueOf(dtScId)),
-                        BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)
-                ))
+                .join(DT_SC).on(BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(DT_SC.DT_SC_ID))
+                .join(CDT_SC_AWD_PRI_XPS_TYPE_MAP).on(BDT_SC_PRI_RESTRI.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID.eq(CDT_SC_AWD_PRI_XPS_TYPE_MAP.CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID))
+                .join(XBT).on(CDT_SC_AWD_PRI_XPS_TYPE_MAP.XBT_ID.eq(XBT.XBT_ID));
+        return step.where(conds)
                 .fetchOptionalInto(Long.class).orElse(0L);
     }
 

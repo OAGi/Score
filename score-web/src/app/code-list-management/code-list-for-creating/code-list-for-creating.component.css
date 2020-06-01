@@ -22,3 +22,11 @@ span.Deprecated {
   background-color: #fc2929;
   color: #000000;
 }
+
+.mat-column-basedCodeListName, .mat-column-agencyId, .mat-column-versionId {
+  width: 10%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}

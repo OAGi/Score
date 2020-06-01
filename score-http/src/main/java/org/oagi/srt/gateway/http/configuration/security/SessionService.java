@@ -18,6 +18,9 @@ public class SessionService {
     private DSLContext dslContext;
 
     public long userId(User user) {
+        if (user == null) {
+            return 0L;
+        }
         return dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(user.getUsername()))
@@ -34,5 +37,9 @@ public class SessionService {
         ).from(APP_USER)
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(username))
                 .fetchOneInto(AppUser.class);
+    }
+
+    public AppUser getAppUser(User user) {
+        return getAppUser(user.getUsername());
     }
 }

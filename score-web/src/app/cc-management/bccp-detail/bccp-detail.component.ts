@@ -144,7 +144,7 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
 }
 
 @Component({
-  selector: 'srt-bccp-detail',
+  selector: 'score-bccp-detail',
   templateUrl: './bccp-detail.component.html',
   styleUrls: ['./bccp-detail.component.css']
 })

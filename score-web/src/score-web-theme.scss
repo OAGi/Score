@@ -9,16 +9,22 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$srt-webapp-primary: mat-palette($mat-blue-grey);
-$srt-webapp-accent: mat-palette($mat-amber);
+$score-webapp-primary: mat-palette($mat-blue-grey);
+$score-webapp-accent: mat-palette($mat-amber);
 
 // The warn palette is optional (defaults to red).
-$srt-webapp-warn: mat-palette($mat-deep-orange);
+$score-webapp-warn: mat-palette($mat-deep-orange);
 
 // Create the theme object (a Sass map containing all of the palettes).
-$srt-webapp-theme: mat-light-theme($srt-webapp-primary, $srt-webapp-accent, $srt-webapp-warn);
+$score-webapp-theme: mat-light-theme($score-webapp-primary, $score-webapp-accent, $score-webapp-warn);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-@include angular-material-theme($srt-webapp-theme);
+@include angular-material-theme($score-webapp-theme);
+
+$score-webapp-typography: mat-typography-config(
+  $font-family: 'Roboto, Helvetica, Arial, sans-serif'
+);
+
+@include angular-material-typography($score-webapp-typography);

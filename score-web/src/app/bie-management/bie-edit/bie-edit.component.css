@@ -84,8 +84,17 @@
   text-overflow: ellipsis;
 }
 
+.bie-edit-tree-menu {
+  margin-bottom: 8px;
+  padding: 8px 8px 8px 20px;
+}
+
 .bie-edit-tree-panel {
   margin-bottom: 24px;
+}
+
+.bie-edit-tree-panel .mat-card-content {
+  margin-bottom: 0;
 }
 
 .bie-edit-detail-container div.checkbox {
@@ -113,6 +122,9 @@ span.context-menu-item {
 
 .left-panel, .right-panel {
   margin-bottom: 0;
+}
+
+.scroll {
   overflow-y: scroll;
 }
 

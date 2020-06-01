@@ -9,26 +9,30 @@
     <mat-card-content>
       <mat-form-field>
         <mat-label>Code</mat-label>
-        <input matInput [disabled]="isDisabledColor(codeListValue)" required [(ngModel)]="codeListValue.value"
-               maxlength="255">
+        <input matInput required maxlength="255"
+               [disabled]="isDisabledColor(codeListValue)"
+               [(ngModel)]="codeListValue.value">
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Short Name</mat-label>
-        <input matInput [disabled]="isDisabledColor(codeListValue)" required [(ngModel)]="codeListValue.name"
-               maxlength="100">
+        <input matInput required maxlength="100"
+               [disabled]="isDisabledColor(codeListValue)"
+               [(ngModel)]="codeListValue.name">
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition</mat-label>
-        <textarea rows="6" cols="30" matInput [disabled]="isDisabledColor(codeListValue)"
+        <textarea matInput rows="6" cols="30"
+                  [disabled]="isDisabledColor(codeListValue)"
                   [(ngModel)]="codeListValue.definition"></textarea>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Definition Source</mat-label>
-        <input matInput [disabled]="isDisabledColor(codeListValue)" [(ngModel)]="codeListValue.definitionSource"
-               maxlength="100">
+        <input matInput maxlength="100"
+               [disabled]="isDisabledColor(codeListValue)"
+               [(ngModel)]="codeListValue.definitionSource">
       </mat-form-field>
 
       <div class="row">
@@ -48,6 +52,6 @@
           [disabled]="isDisabled()"
           [mat-dialog-close]="codeListValue">
     <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
-    {{ actionName }}
+    {{ (actionName === 'Add') ? 'Add' : 'Save' }}
   </button>
 </mat-dialog-actions>

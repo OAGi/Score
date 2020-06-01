@@ -138,7 +138,8 @@
       </mat-card-content>
 
       <mat-card-actions style="padding: 8px 0 8px 12px;" *ngIf="codeList.state === 'Editing'">
-        <button mat-raised-button (click)="openDialog()" color="primary" [disabled]="isDisabled(codeList)">
+        <button mat-raised-button (click)="openDialog()" color="primary"
+                [disabled]="isDisabled(codeList)">
           <mat-icon>add</mat-icon>
           Add
         </button>
@@ -155,6 +156,7 @@
   <mat-card>
     <mat-card-actions class="fab-container">
       <button mat-mini-fab color="accent" (click)="create()"
+              [disabled]="disabled"
               *ngIf="codeList.state === 'Published' && codeList.extensible">
         <mat-icon style="transform: scaleX(-1);" matTooltip="Derive Code List based on this">reply</mat-icon>
       </button>

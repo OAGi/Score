@@ -7,18 +7,11 @@ import {MaterialModule} from '../../material.module';
 
 import {ContextSchemeService} from '../context-scheme/domain/context-scheme.service';
 import {BusinessContextService} from './domain/business-context.service';
-import {
-  BusinessContextListComponent,
-  DialogContentBizContextListDiscardComponent
-} from './business-context-list/business-context-list.component';
+import {BusinessContextListComponent} from './business-context-list/business-context-list.component';
 import {BusinessContextCreateComponent} from './business-context-create/business-context-create.component';
-import {
-  BusinessContextDetailComponent,
-  DialogContentBizContextDialogDetailComponent,
-  DialogContentBizContextDialogDiscardComponent
-} from './business-context-detail/business-context-detail.component';
+import {BusinessContextDetailComponent} from './business-context-detail/business-context-detail.component';
 import {BusinessContextValueDialogComponent} from './business-context-value-dialog/business-context-value-dialog.component';
-import {MatDialogModule} from '@angular/material';
+import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 
 const routes: Routes = [
   {
@@ -49,22 +42,17 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    ConfirmDialogModule,
     CommonModule
   ],
   declarations: [
     BusinessContextListComponent,
     BusinessContextCreateComponent,
     BusinessContextDetailComponent,
-    DialogContentBizContextDialogDetailComponent,
-    DialogContentBizContextDialogDiscardComponent,
-    DialogContentBizContextListDiscardComponent,
     BusinessContextValueDialogComponent,
   ],
   entryComponents: [
     BusinessContextValueDialogComponent,
-    DialogContentBizContextDialogDiscardComponent,
-    DialogContentBizContextListDiscardComponent,
-    DialogContentBizContextDialogDetailComponent
   ],
   providers: [
     ContextSchemeService,

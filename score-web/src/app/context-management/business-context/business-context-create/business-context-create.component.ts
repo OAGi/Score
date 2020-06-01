@@ -7,9 +7,11 @@ import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable
 import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
+import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-  selector: 'srt-business-context-create',
+  selector: 'score-business-context-create',
   templateUrl: './business-context-create.component.html',
   styleUrls: ['./business-context-create.component.css']
 })
@@ -137,15 +139,28 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   removeBizCtxValues() {
-    const newData = [];
-    this.dataSource.data.forEach(row => {
-      if (!this.selection.isSelected(row)) {
-        newData.push(row);
-      }
-    });
-    this.selection.clear();
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove Business Context?';
+    dialogConfig.data.content = 'Are you sure you want to remove the business context value?';
+    dialogConfig.data.action = 'Remove';
 
-    this._updateDataSource(newData);
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          const newData = [];
+          this.dataSource.data.forEach(row => {
+            if (!this.selection.isSelected(row)) {
+              newData.push(row);
+            }
+          });
+          this.selection.clear();
+
+          this._updateDataSource(newData);
+        }
+      });
   }
 
   back() {

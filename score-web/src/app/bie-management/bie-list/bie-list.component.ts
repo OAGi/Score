@@ -1,17 +1,17 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieListService} from './domain/bie-list.service';
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogConfig,
   MatPaginator,
   MatSnackBar,
   MatSort,
   MatTableDataSource,
-  PageEvent
+  PageEvent,
+  SortDirection
 } from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {BieList, BieListRequest} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
@@ -22,17 +22,22 @@ import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
+import {Location} from '@angular/common';
+import {finalize} from 'rxjs/operators';
+import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 
 @Component({
-  selector: 'srt-bie-list',
+  selector: 'score-bie-list',
   templateUrl: './bie-list.component.html',
   styleUrls: ['./bie-list.component.css']
 })
 export class BieListComponent implements OnInit {
   title = 'BIEs';
 
-  displayedColumns: string[] = [
-    'select', 'propertyTerm', 'version', 'status', 'lastUpdateTimestamp'
+  displayedColumns: string[] = ['select', 'propertyTerm', 'release', 'owner', 'transferOwnership', 'businessContexts', 'version',
+    'status', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
@@ -48,24 +53,29 @@ export class BieListComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
   constructor(private service: BieListService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
-              private router: Router) {
+              private contextMenuService: ContextMenuService,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.request = new BieListRequest();
+    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'lastUpdateTimestamp';
-    this.sort.direction = 'desc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
@@ -76,7 +86,8 @@ export class BieListComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.loadBieList(true);
   }
 
   get currentUser(): string {
@@ -115,22 +126,29 @@ export class BieListComponent implements OnInit {
     }
   }
 
-  loadBieList() {
+  loadBieList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getBieListWithRequest(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list.map((elm: BieList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+    this.service.getBieListWithRequest(this.request).pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list.map((elm: BieList) => {
+        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        return elm;
       });
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
@@ -165,31 +183,60 @@ export class BieListComponent implements OnInit {
     return this.selection.isSelected(row.topLevelAbieId);
   }
 
+  isEditable(element: BieList) {
+    return element.owner === this.currentUser && element.state === 'Editing';
+  }
+
+  onContextMenu($event: MouseEvent, item: BieList): void {
+    if (!this.isEditable(item)) {
+      return;
+    }
+
+    this.contextMenuService.show.next({
+      contextMenu: this.contextMenu,
+      event: $event,
+      item: item,
+    });
+
+    $event.preventDefault();
+    $event.stopPropagation();
+  }
+
   discard() {
     this.openDialogBieDiscard();
   }
 
   openDialogBieDiscard() {
     const topLevelAbieIds = this.selection.selected;
-    const dialogConfig = new MatDialogConfig();
-    const dialogRef = this.dialog.open(DialogDiscardBieDialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.service.delete(topLevelAbieIds).subscribe(_ => {
-          this.snackBar.open('Discarded', '', {
-            duration: 1000,
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Discard ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + '?';
+    dialogConfig.data.content = [
+      'Are you sure you want to discard selected ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + '?',
+      'The ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
+    ];
+
+    dialogConfig.data.action = 'Discard';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.service.delete(topLevelAbieIds).subscribe(_ => {
+            this.snackBar.open('Discarded', '', {
+              duration: 1000,
+            });
+            this.selection.clear();
+            this.loadBieList();
           });
-          this.selection.clear();
-          this.loadBieList();
-        });
-      }
-    });
+        }
+      });
   }
 
-  openTransferDialog(topLevelAbieId, $event) {
-    $event.preventDefault();
-    $event.stopPropagation();
+  openTransferDialog(topLevelAbieId: number, $event) {
+    console.log('openTransferDialog(' + topLevelAbieId + ', ' + $event + ')');
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
@@ -207,15 +254,4 @@ export class BieListComponent implements OnInit {
       }
     });
   }
-}
-
-@Component({
-  selector: 'srt-dialog-bie-dialog-detail',
-  templateUrl: 'dialog-discard-bie-dialog.html',
-})
-export class DialogDiscardBieDialogComponent {
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-  }
-
 }

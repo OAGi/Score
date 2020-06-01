@@ -7,11 +7,15 @@ import org.oagi.srt.data.ACC;
 import org.oagi.srt.data.ASCC;
 import org.oagi.srt.data.ASCCP;
 import org.oagi.srt.data.BCCP;
+import org.oagi.srt.data.*;
+import org.oagi.srt.entity.jooq.Tables;
 import org.oagi.srt.gateway.http.api.cc_management.data.*;
 import org.oagi.srt.gateway.http.api.cc_management.helper.CcUtility;
 import org.oagi.srt.gateway.http.api.cc_management.repository.CcListRepository;
 import org.oagi.srt.gateway.http.api.common.data.PageRequest;
 import org.oagi.srt.gateway.http.api.common.data.PageResponse;
+import org.oagi.srt.gateway.http.api.info.data.SummaryCcExt;
+import org.oagi.srt.gateway.http.configuration.security.SessionService;
 import org.oagi.srt.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +24,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.max;
 import static org.oagi.srt.entity.jooq.Tables.*;
 
 @Service
@@ -42,6 +44,9 @@ public class CcListService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private DSLContext dslContext;
@@ -200,6 +205,122 @@ public class CcListService {
         return dslContext.selectFrom(BCC)
                 .where(BCC.BCC_ID.eq(ULong.valueOf(id)))
                 .fetchOneInto(org.oagi.srt.data.BCC.class);
+    }
+
+    public List<SummaryCcExt> getMyExtensionsUnusedInBIEs(User user) {
+        long requesterId = sessionService.userId(user);
+
+        List<ULong> uegIds = dslContext.select(max(Tables.ACC.CURRENT_ACC_ID).as("id"))
+                .from(Tables.ACC)
+                .where(and(
+                        Tables.ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue()),
+                        Tables.ACC.RELEASE_ID.greaterThan(ULong.valueOf(0L)),
+                        Tables.ACC.OWNER_USER_ID.eq(ULong.valueOf(requesterId))
+                ))
+                .groupBy(Tables.ACC.GUID)
+                .fetchInto(ULong.class);
+
+        byte isUsed = (byte) 0;
+
+        List<SummaryCcExt> summaryCcExtListForAscc = dslContext.select(
+                Tables.ACC.ACC_ID,
+                Tables.ACC.GUID,
+                Tables.ACC.OBJECT_CLASS_TERM,
+                Tables.ACC.STATE,
+                Tables.ACC.LAST_UPDATE_TIMESTAMP,
+                APP_USER.LOGIN_ID,
+                APP_USER.APP_USER_ID,
+                APP_USER.as("updater").LOGIN_ID,
+                TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID,
+                TOP_LEVEL_ABIE.STATE,
+                ASCCP.as("bie").PROPERTY_TERM,
+                ASCCP.PROPERTY_TERM,
+                ASBIE.SEQ_KEY)
+                .from(ASCC)
+                .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                .join(ASBIE).on(and(ASCC.ASCC_ID.eq(ASBIE.BASED_ASCC_ID), ASBIE.IS_USED.eq(isUsed)))
+                .join(ASCCP).on(ASCC.TO_ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .join(TOP_LEVEL_ABIE).on(ASBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID))
+                .join(ABIE).on(TOP_LEVEL_ABIE.ABIE_ID.eq(ABIE.ABIE_ID))
+                .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID))
+                .join(ASCCP.as("bie")).on(ASBIEP.BASED_ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
+                .where(ACC.ACC_ID.in(uegIds))
+                .fetchStream().map(e -> {
+                    SummaryCcExt item = new SummaryCcExt();
+                    item.setAccId(e.get(Tables.ACC.ACC_ID).longValue());
+                    item.setGuid(e.get(Tables.ACC.GUID));
+                    item.setObjectClassTerm(e.get(Tables.ACC.OBJECT_CLASS_TERM));
+                    item.setState(CcState.valueOf(e.get(Tables.ACC.STATE)));
+                    item.setLastUpdateTimestamp(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP));
+                    item.setLastUpdateUser(e.get(APP_USER.as("updater").LOGIN_ID));
+                    item.setOwnerUsername(e.get(APP_USER.LOGIN_ID));
+                    item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).longValue());
+                    item.setTopLevelAbieId(e.get(TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID).longValue());
+                    item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ABIE.STATE).intValue()));
+                    item.setPropertyTerm(e.get(ASCCP.as("bie").PROPERTY_TERM));
+                    item.setAssociationPropertyTerm(e.get(ASCCP.PROPERTY_TERM));
+                    item.setSeqKey(e.get(ASBIE.SEQ_KEY).intValue());
+                    return item;
+                }).collect(Collectors.toList());
+
+        List<SummaryCcExt> summaryCcExtListForBcc = dslContext.select(
+                Tables.ACC.ACC_ID,
+                Tables.ACC.GUID,
+                Tables.ACC.OBJECT_CLASS_TERM,
+                Tables.ACC.STATE,
+                Tables.ACC.LAST_UPDATE_TIMESTAMP,
+                APP_USER.LOGIN_ID,
+                APP_USER.APP_USER_ID,
+                APP_USER.as("updater").LOGIN_ID,
+                TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID,
+                TOP_LEVEL_ABIE.STATE,
+                ASCCP.as("bie").PROPERTY_TERM,
+                BCCP.PROPERTY_TERM,
+                BBIE.SEQ_KEY)
+                .from(BCC)
+                .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                .join(BBIE).on(and(BCC.BCC_ID.eq(BBIE.BASED_BCC_ID), BBIE.IS_USED.eq(isUsed)))
+                .join(BCCP).on(BCC.TO_BCCP_ID.eq(BCCP.BCCP_ID))
+                .join(APP_USER).on(ACC.OWNER_USER_ID.eq(APP_USER.APP_USER_ID))
+                .join(APP_USER.as("updater")).on(ACC.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID))
+                .join(TOP_LEVEL_ABIE).on(BBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID))
+                .join(ABIE).on(TOP_LEVEL_ABIE.ABIE_ID.eq(ABIE.ABIE_ID))
+                .join(ASBIEP).on(ABIE.ABIE_ID.eq(ASBIEP.ROLE_OF_ABIE_ID))
+                .join(ASCCP.as("bie")).on(ASBIEP.BASED_ASCCP_ID.eq(ASCCP.as("bie").ASCCP_ID))
+                .where(ACC.ACC_ID.in(uegIds))
+                .fetchStream().map(e -> {
+                    SummaryCcExt item = new SummaryCcExt();
+                    item.setAccId(e.get(Tables.ACC.ACC_ID).longValue());
+                    item.setGuid(e.get(Tables.ACC.GUID));
+                    item.setObjectClassTerm(e.get(Tables.ACC.OBJECT_CLASS_TERM));
+                    item.setState(CcState.valueOf(e.get(Tables.ACC.STATE)));
+                    item.setLastUpdateTimestamp(e.get(Tables.ACC.LAST_UPDATE_TIMESTAMP));
+                    item.setLastUpdateUser(e.get(APP_USER.as("updater").LOGIN_ID));
+                    item.setOwnerUsername(e.get(APP_USER.LOGIN_ID));
+                    item.setOwnerUserId(e.get(APP_USER.APP_USER_ID).longValue());
+                    item.setTopLevelAbieId(e.get(TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID).longValue());
+                    item.setBieState(BieState.valueOf(e.get(TOP_LEVEL_ABIE.STATE).intValue()));
+                    item.setPropertyTerm(e.get(ASCCP.as("bie").PROPERTY_TERM));
+                    item.setAssociationPropertyTerm(e.get(BCCP.PROPERTY_TERM));
+                    item.setSeqKey(e.get(BBIE.SEQ_KEY).intValue());
+                    return item;
+                }).collect(Collectors.toList());
+
+        Set<SummaryCcExt> set = new HashSet();
+        set.addAll(summaryCcExtListForAscc);
+        set.addAll(summaryCcExtListForBcc);
+
+        List<SummaryCcExt> result = new ArrayList(set);
+        result.sort((o1, o2) -> {
+            int compFirst = Long.compare(o1.getAccId(), o2.getAccId());
+            if (compFirst == 0) {
+                return Integer.compare(o1.getSeqKey(), o2.getSeqKey());
+            }
+            return compFirst;
+        });
+        return result;
     }
 }
 

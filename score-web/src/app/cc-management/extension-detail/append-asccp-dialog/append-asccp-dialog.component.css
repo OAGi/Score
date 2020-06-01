@@ -41,3 +41,25 @@ tr.element-row:not(.expanded-row):active {
   font-size: 20px;
   margin-right: 6px;
 }
+
+.mat-column-revision {
+  width: 70px;
+}
+
+.mat-column-owner {
+  width: 10%;
+}
+
+.mat-column-module {
+  width: 25%;
+  font-size: 12px;
+  padding-right: 12px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.element-detail {
+  font-size: 12px;
+}

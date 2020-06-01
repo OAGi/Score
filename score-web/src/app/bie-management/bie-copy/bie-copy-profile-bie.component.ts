@@ -1,9 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieCopyService} from './domain/bie-copy.service';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
-import {switchMap} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContext} from '../../context-management/business-context/domain/business-context';
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
@@ -14,9 +14,10 @@ import {PageRequest, PageResponse} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {Location} from '@angular/common';
 
 @Component({
-  selector: 'srt-bie-create-asccp',
+  selector: 'score-bie-create-asccp',
   templateUrl: './bie-copy-profile-bie.component.html',
   styleUrls: ['./bie-copy-profile-bie.component.css']
 })
@@ -28,7 +29,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxList: BusinessContext[] = [];
 
   displayedColumns: string[] = [
-    'select', 'propertyTerm', 'releaseNum', 'bizCtxName', 'owner', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(false, []);
@@ -49,21 +50,23 @@ export class BieCopyProfileBieComponent implements OnInit {
               private service: BieCopyService,
               private bieListService: BieListService,
               private accountService: AccountListService,
-              private route: ActivatedRoute,
+              private location: Location,
               private router: Router,
+              private route: ActivatedRoute,
               private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
-    this.request = new BieListRequest();
+    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('propertyTerm', 'asc', 0, 10));
     this.request.access = 'CanView';
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'propertyTerm';
-    this.sort.direction = 'asc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
@@ -83,7 +86,7 @@ export class BieCopyProfileBieComponent implements OnInit {
       })).subscribe((resp: PageResponse<BusinessContext>) => {
       this.bizCtxIds = resp.list.map(e => e.bizCtxId);
       this.bizCtxList = resp.list;
-      this.onChange();
+      this.loadBieList(true);
     }, err => {
       console.error(err);
     });
@@ -120,22 +123,29 @@ export class BieCopyProfileBieComponent implements OnInit {
     }
   }
 
-  loadBieList() {
+  loadBieList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.bieListService.getBieListWithRequest(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list.map((elm: BieList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+    this.bieListService.getBieListWithRequest(this.request).pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list.map((elm: BieList) => {
+        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        return elm;
       });
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   back() {

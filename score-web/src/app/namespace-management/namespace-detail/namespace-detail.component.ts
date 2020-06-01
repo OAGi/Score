@@ -8,7 +8,7 @@ import {NamespaceService} from '../domain/namespace.service';
 import {switchMap} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-namespace-detail',
+  selector: 'score-namespace-detail',
   templateUrl: './namespace-detail.component.html',
   styleUrls: ['./namespace-detail.component.css']
 })

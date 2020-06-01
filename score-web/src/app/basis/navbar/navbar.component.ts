@@ -4,7 +4,7 @@ import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {UserToken} from '../../authentication/domain/auth';
 
 @Component({
-  selector: 'srt-navbar',
+  selector: 'score-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })

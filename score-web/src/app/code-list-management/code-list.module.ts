@@ -7,14 +7,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
 import {CodeListService} from './domain/code-list.service';
 import {CodeListValueDialogComponent} from './code-list-value-dialog/code-list-value-dialog.component';
-import {
-  CodeListDetailComponent,
-  DialogContentCodelistDialogDetailComponent,
-  DialogDiscardCodeListDetailDialogComponent,
-  DialogPublishCodelistDialogDetailComponent
-} from './code-list-detail/code-list-detail.component';
-import {CodeListCreateComponent, DialogContentCodeListDialogComponent} from './code-list-create/code-list-create.component';
+import {CodeListDetailComponent} from './code-list-detail/code-list-detail.component';
+import {CodeListCreateComponent} from './code-list-create/code-list-create.component';
 import {CodeListForCreatingComponent} from './code-list-for-creating/code-list-for-creating.component';
+import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 
 const routes: Routes = [
   {
@@ -60,6 +56,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    ConfirmDialogModule,
     CommonModule
   ],
   declarations: [
@@ -67,18 +64,10 @@ const routes: Routes = [
     CodeListCreateComponent,
     CodeListDetailComponent,
     CodeListForCreatingComponent,
-    CodeListValueDialogComponent,
-    DialogContentCodeListDialogComponent,
-    DialogContentCodelistDialogDetailComponent,
-    DialogPublishCodelistDialogDetailComponent,
-    DialogDiscardCodeListDetailDialogComponent
+    CodeListValueDialogComponent
   ],
   entryComponents: [
-    CodeListValueDialogComponent,
-    DialogContentCodeListDialogComponent,
-    DialogContentCodelistDialogDetailComponent,
-    DialogPublishCodelistDialogDetailComponent,
-    DialogDiscardCodeListDetailDialogComponent
+    CodeListValueDialogComponent
   ],
   providers: [
     CodeListService

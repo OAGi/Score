@@ -4,7 +4,7 @@ import {BieEditService} from './domain/bie-edit.service';
 import {CollectionViewer, SelectionChange, SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {BehaviorSubject, merge, Observable, ReplaySubject} from 'rxjs';
-import {map, startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {
   BieEditAbieNode,
@@ -19,7 +19,8 @@ import {
   BieEditNodeDetail,
   BieEditUpdateResponse,
   CardinalityAware,
-  DynamicBieFlatNode, Primitive,
+  DynamicBieFlatNode,
+  Primitive,
   PrimitiveType
 } from './domain/bie-edit-node';
 import {ReleaseService} from '../../release-management/domain/release.service';
@@ -51,6 +52,7 @@ export class DynamicDataSource {
   }
 
   clear() {
+    this.dataChange.next([]);
     this.dataChildrenMap.clear();
     this.dataDetailMap.clear();
   }
@@ -301,7 +303,7 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
 }
 
 @Component({
-  selector: 'srt-bie-edit',
+  selector: 'score-bie-edit',
   templateUrl: './bie-edit.component.html',
   styleUrls: ['./bie-edit.component.css']
 })
@@ -687,14 +689,22 @@ export class BieEditComponent implements OnInit {
   }
 
   onHideUnusedChange() {
+    // Issue #768
+    this.updateDetails();
     this.dataSource.clear();
-    this.onClick(this.rootNode);
 
-    const expanded = this.treeControl.isExpanded(this.rootNode);
-    this.dataSource.toggleNode(this.rootNode, false);
-    if (expanded) {
-      this.dataSource.toggleNode(this.rootNode, true);
-    }
+    this.service.getRootNode(this.rootNode.item.topLevelAbieId).subscribe((resp: BieEditAbieNode) => {
+      this.rootNode = new DynamicBieFlatNode(resp);
+      this.dataSource.data = [this.rootNode];
+
+      this.onClick(this.rootNode);
+
+      const expanded = this.treeControl.isExpanded(this.rootNode);
+      this.dataSource.toggleNode(this.rootNode, false);
+      if (expanded) {
+        this.dataSource.toggleNode(this.rootNode, true);
+      }
+    });
   }
 
   get details(): DynamicBieFlatNode[] {
@@ -1116,7 +1126,7 @@ export class BieEditComponent implements OnInit {
 }
 
 @Component({
-  selector: 'srt-bie-edit-publish-dialog.component',
+  selector: 'score-bie-edit-publish-dialog.component',
   templateUrl: 'bie-edit-publish-dialog.component.html',
 })
 export class BieEditPublishDialogDetailComponent {

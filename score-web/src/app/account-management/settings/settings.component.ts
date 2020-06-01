@@ -4,7 +4,7 @@ import {MatSnackBar} from '@angular/material';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'srt-settings',
+  selector: 'score-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })

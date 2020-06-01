@@ -2,25 +2,15 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-
 import {MaterialModule} from '../../material.module';
-
 import {AuthService} from '../../authentication/auth.service';
 import {ContextSchemeService} from './domain/context-scheme.service';
-import {
-  ContextSchemeListComponent,
-  DialogContentContextSchemeListDiscardComponent
-} from './context-scheme-list/context-scheme-list.component';
+import {ContextSchemeListComponent} from './context-scheme-list/context-scheme-list.component';
 import {ContextSchemeCreateComponent} from './context-scheme-create/context-scheme-create.component';
-import {
-  ContextSchemeDetailComponent,
-  DialogContentContextSchemeDiscardComponent,
-  DialogContentContextSchemeUpdateCreateDialogDetailComponent,
-  DialogContentContextSchemeUpdateDialogDetailComponent
-} from './context-scheme-detail/context-scheme-detail.component';
-import {ContextSchemeValueDialogComponent} from './context-scheme-value-dialog/context-scheme-value-dialog.component';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {ContextSchemeDetailComponent} from './context-scheme-detail/context-scheme-detail.component';
 import {GrowlModule} from 'ngx-growl';
+import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
+import {ContextSchemeValueDialogComponent} from './context-scheme-value-dialog/context-scheme-value-dialog.component';
 
 const routes: Routes = [
   {
@@ -51,6 +41,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    ConfirmDialogModule,
     GrowlModule.forRoot({maxMessages: 2, displayTimeMs: 5000}),
     CommonModule,
   ],
@@ -58,23 +49,13 @@ const routes: Routes = [
     ContextSchemeListComponent,
     ContextSchemeCreateComponent,
     ContextSchemeDetailComponent,
-    ContextSchemeValueDialogComponent,
-    DialogContentContextSchemeUpdateDialogDetailComponent,
-    DialogContentContextSchemeDiscardComponent,
-    DialogContentContextSchemeListDiscardComponent,
-    DialogContentContextSchemeUpdateCreateDialogDetailComponent
+    ContextSchemeValueDialogComponent
   ],
   entryComponents: [
-    ContextSchemeValueDialogComponent,
-    DialogContentContextSchemeUpdateDialogDetailComponent,
-    DialogContentContextSchemeListDiscardComponent,
-    DialogContentContextSchemeDiscardComponent,
-    DialogContentContextSchemeUpdateCreateDialogDetailComponent
+    ContextSchemeValueDialogComponent
   ],
   providers: [
-    ContextSchemeService,
-    {provide: MatDialogRef, useValue: {}},
-    {provide: MAT_DIALOG_DATA, useValue: []},
+    ContextSchemeService
   ]
 })
 export class ContextSchemeModule {

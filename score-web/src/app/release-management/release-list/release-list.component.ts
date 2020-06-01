@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {ReleaseList} from '../domain/release';
 
 @Component({
-  selector: 'srt-release-list',
+  selector: 'score-release-list',
   templateUrl: './release-list.component.html',
   styleUrls: ['./release-list.component.css']
 })

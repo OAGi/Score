@@ -7,6 +7,7 @@ import org.oagi.srt.gateway.http.api.common.data.PageResponse;
 import org.oagi.srt.gateway.http.api.context_management.data.BusinessContext;
 import org.oagi.srt.gateway.http.api.context_management.data.BusinessContextListRequest;
 import org.oagi.srt.gateway.http.api.context_management.data.BusinessContextValue;
+import org.oagi.srt.gateway.http.api.context_management.data.FindBizCtxIdsByTopLevelAbieIdsResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -15,8 +16,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.oagi.srt.entity.jooq.Tables.*;
 import static org.oagi.srt.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 
@@ -163,7 +166,8 @@ public class BusinessContextRepository {
     }
 
     private SelectOnConditionStep
-            <Record8<ULong, ULong, ULong, String, ULong, String, ULong, String>>
+            <Record9<ULong, ULong, ULong, String, ULong,
+                    String, ULong, String, String>>
     getSelectOnConditionStepForBusinessContextValue() {
         return dslContext.select(
                 BIZ_CTX_VALUE.BIZ_CTX_VALUE_ID,
@@ -173,7 +177,8 @@ public class BusinessContextRepository {
                 CTX_SCHEME.CTX_SCHEME_ID,
                 CTX_SCHEME.SCHEME_NAME.as("ctx_scheme_name"),
                 CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID,
-                CTX_SCHEME_VALUE.VALUE.as("ctx_scheme_value")
+                CTX_SCHEME_VALUE.VALUE.as("ctx_scheme_value"),
+                CTX_SCHEME_VALUE.MEANING.as("ctx_scheme_value_meaning")
         ).from(BIZ_CTX_VALUE)
                 .join(CTX_SCHEME_VALUE).on(BIZ_CTX_VALUE.CTX_SCHEME_VALUE_ID.equal(CTX_SCHEME_VALUE.CTX_SCHEME_VALUE_ID))
                 .join(CTX_SCHEME).on(CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID.equal(CTX_SCHEME.CTX_SCHEME_ID))
@@ -189,6 +194,26 @@ public class BusinessContextRepository {
                 .from(BIZ_CTX_ASSIGNMENT)
                 .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ABIE_ID.eq(ULong.valueOf(topLevelAbieId)))
                 .fetchInto(Long.class);
+    }
+
+    public Map<Long, List<FindBizCtxIdsByTopLevelAbieIdsResult>> findBizCtxIdsByTopLevelAbieIds(List<Long> topLevelAbieIds) {
+        if (topLevelAbieIds == null || topLevelAbieIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return dslContext.select(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ABIE_ID, BIZ_CTX.BIZ_CTX_ID, BIZ_CTX.NAME)
+                .from(BIZ_CTX)
+                .join(BIZ_CTX_ASSIGNMENT).on(BIZ_CTX.BIZ_CTX_ID.eq(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID))
+                .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ABIE_ID.in(topLevelAbieIds))
+                .fetchStream()
+                .map(e -> {
+                    FindBizCtxIdsByTopLevelAbieIdsResult r = new FindBizCtxIdsByTopLevelAbieIdsResult();
+                    r.setTopLevelAbieId(e.get(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ABIE_ID).longValue());
+                    r.setBizCtxId(e.get(BIZ_CTX.BIZ_CTX_ID).longValue());
+                    r.setName(e.get(BIZ_CTX.NAME));
+                    return r;
+                })
+                .collect(groupingBy(FindBizCtxIdsByTopLevelAbieIdsResult::getTopLevelAbieId));
     }
 
     public List<BusinessContextValue> findBusinessContextValues() {

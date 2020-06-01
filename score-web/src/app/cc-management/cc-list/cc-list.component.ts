@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {Location} from '@angular/common';
+import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {CcListService} from './domain/cc-list.service';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, PageEvent} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, PageEvent, SortDirection} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CcList, CcListRequest} from './domain/cc-list';
 import {PageRequest} from '../../basis/basis';
@@ -16,14 +18,17 @@ import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../common/utility';
+import {finalize} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 
 @Component({
-  selector: 'srt-cc-list',
+  selector: 'score-cc-list',
   templateUrl: './cc-list.component.html',
   styleUrls: ['./cc-list.component.css'],
   animations: [
     trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
+      state('collapsed', style({height: '0px', minHeight: '0'})),
       state('expanded', style({height: '*'})),
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
@@ -35,12 +40,14 @@ export class CcListComponent implements OnInit {
 
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'ASCC', 'BCC'];
   stateList: string[] = ['Editing', 'Candidate', 'Published'];
+  componentTypeList: OagisComponentType[] = OagisComponentTypes;
 
   displayedColumns: string[] = [
-    'type', 'den', 'lastUpdateTimestamp'
+    'type', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   data: CcList[] = [];
   selection = new SelectionModel<CcList>(true, []);
+  expandedElement: CcList | null;
   loading = false;
 
   releases: Release[];
@@ -53,25 +60,31 @@ export class CcListComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
 
   constructor(private service: CcListService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private contextMenuService: ContextMenuService,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute) {
   }
 
   ngOnInit() {
     // Init CcList table
-    this.request = new CcListRequest();
+    this.request = new CcListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'lastUpdateTimestamp';
-    this.sort.direction = 'desc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadCcList();
@@ -91,7 +104,7 @@ export class CcListComponent implements OnInit {
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
 
-    this.loadCcList();
+    this.loadCcList(true);
   }
 
   get currentUser(): string {
@@ -99,17 +112,20 @@ export class CcListComponent implements OnInit {
     return (userToken) ? userToken.username : undefined;
   }
 
-  loadCcList() {
+  loadCcList(isInit?: boolean) {
     this.loading = true;
 
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.service.getCcList(this.request).subscribe(resp => {
+    this.service.getCcList(this.request).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe(resp => {
       this.paginator.length = resp.length;
-
-      const list = resp.list.map((elm: CcList) => {
+      this.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
           elm.module = elm.module.replace(
@@ -123,12 +139,11 @@ export class CcListComponent implements OnInit {
         }
         return elm;
       });
-
-      this.data = list;
-      this.loading = false;
+      if (!isInit) {
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+      }
     }, error => {
       this.data = [];
-      this.loading = false;
     });
   }
 
@@ -187,10 +202,29 @@ export class CcListComponent implements OnInit {
     }
   }
 
-  openTransferDialog(extensionId, $event) {
+  isEditable(element: CcList) {
+    return element.type === 'ACC' &&
+      element.oagisComponentType === 'UserExtensionGroup' &&
+      element.owner === this.currentUser &&
+      element.state === 'Editing';
+  }
+
+  onContextMenu($event: MouseEvent, item: CcList): void {
+    if (!this.isEditable(item)) {
+      return;
+    }
+
+    this.contextMenuService.show.next({
+      contextMenu: this.contextMenu,
+      event: $event,
+      item: item,
+    });
+
     $event.preventDefault();
     $event.stopPropagation();
+  }
 
+  openTransferDialog(extensionId: number, $event) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);

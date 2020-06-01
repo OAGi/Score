@@ -18,3 +18,7 @@ mat-chip-list:focus {
   outline: 0;
   border: 0;
 }
+
+.mat-column-value, .mat-column-name {
+  width: 10%;
+}

@@ -61,9 +61,6 @@
   "BIE_CREATE": {
     "TITLE": "Create BIE"
   },
-  "BIE_CREATE_2": {
-    "TITLE": "Create BIE"
-  },
   "BIE_EDIT": {
     "TITLE": "Edit BIE",
     "MAX": "Cardinality Max (-1 for unbounded)"

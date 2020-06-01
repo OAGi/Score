@@ -430,6 +430,7 @@
                     <div class="checkbox">
                       <mat-checkbox color="primary"
                                     [(ngModel)]="asBccpDetail().bcc.deprecated"
+                                    (ngModelChange)="onChange()"
                                     [disabled]="!isChildOfUserExtensionGroup() || state !== 'Editing' || access !== 'CanEdit' || asBccpDetail().bcc.revisionNum == 1">
                         Deprecated
                       </mat-checkbox>

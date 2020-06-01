@@ -4,7 +4,7 @@ import {ModuleDependency, SimpleModule} from '../domain/module';
 import {hashCode} from '../../common/utility';
 
 @Component({
-  selector: 'srt-module-dependency-dialog',
+  selector: 'score-module-dependency-dialog',
   templateUrl: './module-dependency-dialog.component.html',
   styleUrls: ['./module-dependency-dialog.component.css']
 })

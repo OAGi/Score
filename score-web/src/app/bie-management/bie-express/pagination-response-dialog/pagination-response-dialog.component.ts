@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
 import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
@@ -9,16 +9,19 @@ import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
+import {Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {finalize} from 'rxjs/operators';
 
 @Component({
-  selector: 'srt-pagination-response-dialog',
+  selector: 'score-pagination-response-dialog',
   templateUrl: './pagination-response-dialog.component.html',
   styleUrls: ['./pagination-response-dialog.component.css']
 })
 export class PaginationResponseDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'propertyTerm', 'releaseNum', 'bizCtxName', 'owner', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(false, []);
@@ -39,20 +42,24 @@ export class PaginationResponseDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<PaginationResponseDialogComponent>,
     private bieListService: BieListService,
     private accountService: AccountListService,
+    private location: Location,
+    private router: Router,
+    private route: ActivatedRoute,
     @Inject(MAT_DIALOG_DATA) public paginationResponseProfileBieLists: BieList[]) {
   }
 
   ngOnInit() {
-    this.request = new BieListRequest();
+    this.request = new BieListRequest(this.route.snapshot.queryParamMap,
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.propertyTerm = 'Pagination Response';
     this.request.access = 'CanView';
 
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
+    this.paginator.pageIndex = this.request.page.pageIndex;
+    this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
 
-    this.sort.active = 'lastUpdateTimestamp';
-    this.sort.direction = 'desc';
+    this.sort.active = this.request.page.sortActive;
+    this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.onChange();
@@ -63,7 +70,8 @@ export class PaginationResponseDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    this.onChange();
+
+    this.loadBieList();
   }
 
   onPageChange(event: PageEvent) {
@@ -104,15 +112,19 @@ export class PaginationResponseDialogComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.bieListService.getBieListWithRequest(this.request)
-      .subscribe(resp => {
-        this.paginator.length = resp.length;
-        this.dataSource.data = resp.list.map((elm: BieList) => {
-          elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-          return elm;
-        });
+    this.bieListService.getBieListWithRequest(this.request).pipe(
+      finalize(() => {
         this.loading = false;
+      })
+    ).subscribe(resp => {
+      this.paginator.length = resp.length;
+      this.dataSource.data = resp.list.map((elm: BieList) => {
+        elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
+        return elm;
       });
+    }, error => {
+      this.dataSource.data = [];
+    });
   }
 
   onNoClick(): void {

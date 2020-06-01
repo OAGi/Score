@@ -10,7 +10,7 @@ import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
 import {PageRequest} from '../../basis/basis';
 
 @Component({
-  selector: 'srt-bccp-create',
+  selector: 'score-bccp-create',
   templateUrl: './bccp-create.component.html',
   styleUrls: ['./bccp-create.component.css']
 })

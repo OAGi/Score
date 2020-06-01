@@ -15,3 +15,159 @@
 .markdown-body p, .markdown-body blockquote, .markdown-body ul, .markdown-body ol, .markdown-body dl, .markdown-body table, .markdown-body pre {
   margin: 15px 0;
 }
+
+.row > div {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.box {
+  font-family: "Google Sans", Roboto, Helvetica, Arial, sans-serif;
+  position: relative;
+  color: #24292e;
+  background-color: #fff;
+  border: 1px solid #d1d5da;
+  border-radius: 3px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.header {
+  align-items: center;
+  padding-right: 16px;
+  padding-left: 16px;
+  color: #586069;
+  background-color: whitesmoke;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.header p {
+  min-width: 0;
+  padding: 12px 0 12px;
+  margin-bottom: 1px;
+  flex: 1 1 auto;
+
+  color: rgba(0, 0, 0, .54);
+  font-size: 14px;
+  letter-spacing: .3px;
+}
+
+.content {
+  position: relative;
+  color: #24292e;
+  background-color: #fff;
+  border-radius: 3px;
+}
+
+.ht200 {
+  height: 200px;
+}
+
+.mat-list {
+  padding-bottom: 8px;
+}
+
+.mat-line {
+  font-size: 13px !important;
+}
+
+a {
+  color: rgba(0, 0, 0, .87);
+  text-decoration: none;
+}
+
+.state {
+  width: 10%;
+}
+
+.propertyTerm {
+  width: 20%;
+}
+
+.lastUpdateTimestamp {
+  width: 30%;
+  margin-left: auto;
+  text-align: right;
+}
+
+.content .state-box {
+  margin: 0 5%;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.content .state-bar {
+  float: left;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.content .state-bar.Editing {
+  background-color: #A8385D;
+}
+
+.content .state-bar.Candidate {
+  background-color: #7aa3e5;
+}
+
+.content .state-bar.Published {
+  background-color: #a27ea8;
+}
+
+.content .state-bar .number {
+  margin-left: 10px;
+  font-size: 50px;
+}
+
+.content .state-bar .text {
+  margin-left: 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.mat-column-Editing, .mat-column-Candidate, .mat-column-Published, .mat-column-Total {
+  width: 15%;
+}
+
+.cc-guid, .bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.mat-card-content p {
+  font-family: 'Roboto', 'sans-serif';
+  margin-bottom: 0.5rem;
+}
+
+.mat-card-content {
+  margin-bottom: 0;
+}
+
+.mat-icon-button {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  outline: none;
+}
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+td.mat-cell {
+  border-bottom-width: 0;
+}
+
+.mat-column-topLevelBIE, .mat-column-associationPropertyTerm {
+  width: 20%;
+}
+
+.mat-tab-body-content {
+  overflow-x: hidden !important;
+}

@@ -36,12 +36,17 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .bie-guid {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #767676 !important;
 }
 
 .mat-card-content p {
   font-family: 'Roboto', 'sans-serif';
+  margin-bottom: 0.5rem;
+}
+
+.mat-card-content {
+  margin-bottom: 0;
 }
 
 .mat-icon-button {
@@ -49,4 +54,43 @@ tr.element-row:not(.expanded-row):active {
   height: 20px;
   line-height: 20px;
   outline: none;
+}
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 100px;
+}
+
+.mat-column-owner {
+  width: 10%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.mat-column-more {
+  width: 40px;
+}
+
+.ngx-contextmenu a {
+  text-decoration: none;
+}
+
+.ngx-contextmenu .dropdown-menu {
+  padding: 0.25rem 0.8rem;
+}
+
+span.context-menu-item {
+  display: block;
+  font-size: 12px;
+  width: 92%;
+  outline: 0;
+  font-weight: 400;
+  border: solid 1px transparent;
+  line-height: 10px;
+  cursor: pointer;
 }

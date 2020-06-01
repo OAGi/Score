@@ -3,14 +3,15 @@ package org.oagi.srt.repository;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectJoinStep;
-import org.jooq.SelectOnConditionStep;
 import org.jooq.types.ULong;
 import org.oagi.srt.data.BBIE;
 import org.oagi.srt.entity.jooq.Tables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 
@@ -64,9 +65,17 @@ public class BBIERepository implements SrtRepository<BBIE> {
     }
 
     public List<BBIE> findByOwnerTopLevelAbieIdAndUsed(long ownerTopLevelAbieId, boolean used) {
+        return findByOwnerTopLevelAbieIdsAndUsed(Arrays.asList(ownerTopLevelAbieId), used);
+    }
+
+    public List<BBIE> findByOwnerTopLevelAbieIdsAndUsed(List<Long> ownerTopLevelAbieIds, boolean used) {
         return getSelectOnConditionStep()
                 .where(and(
-                        Tables.BBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(ULong.valueOf(ownerTopLevelAbieId)),
+                        (ownerTopLevelAbieIds.size() == 1) ?
+                                Tables.BBIE.OWNER_TOP_LEVEL_ABIE_ID.eq(
+                                        ULong.valueOf(ownerTopLevelAbieIds.get(0))) :
+                                Tables.BBIE.OWNER_TOP_LEVEL_ABIE_ID.in(
+                                        ownerTopLevelAbieIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())),
                         Tables.BBIE.IS_USED.eq((byte) (used ? 1 : 0))))
                 .fetchInto(BBIE.class);
     }

@@ -11,7 +11,7 @@ import {PageRequest} from '../../../basis/basis';
 import {CcNodeService} from '../../domain/core-component-node.service';
 
 @Component({
-  selector: 'srt-append-ascc-dialog',
+  selector: 'score-append-ascc-dialog',
   templateUrl: './append-ascc-dialog.component.html',
   styleUrls: ['./append-ascc-dialog.component.css'],
   animations: [
@@ -44,7 +44,8 @@ export class AppendAsccDialogComponent implements OnInit {
               private service: CcNodeService) {
   }
 
-  ngOnInit() {this.request = new CcListRequest();
+  ngOnInit() {
+    this.request = new CcListRequest();
     this.request.releaseId = this.data.releaseId;
     this.request.types = ['ASCC'];
     this.request.states = ['Published'];

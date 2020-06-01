@@ -1,9 +1,6 @@
 package org.oagi.srt.gateway.http.api.bie_management.service.edit_tree;
 
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Record4;
+import org.jooq.*;
 import org.jooq.types.ULong;
 import org.oagi.srt.data.BieState;
 import org.oagi.srt.data.OagisComponentType;
@@ -28,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -153,39 +151,13 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
     @Override
     public List<BieEditNode> getDescendants(BieEditNode node, boolean hideUnused) {
-        /*
-         * If this profile BIE is in Editing state, descendants of given node will create during this process,
-         * and this must be thread-safe.
-         */
-        RLock lock = null;
-        String lockName = getClass().getSimpleName() + ".getDescendants(" +
-                node.getType() + ", " + topLevelAbie.getTopLevelAbieId() + ")";
-        lock = redissonClient.getLock(lockName);
-
-        try {
-            if (lock != null) {
-                try {
-                    boolean locked = lock.tryLock(10, TimeUnit.SECONDS);
-                    if (!locked) {
-                        throw new IllegalStateException("Lock is held by another thread/process.");
-                    }
-                } catch (InterruptedException e) {
-                    throw new IllegalStateException("Lock acquisition is cancelled by interrupt.");
-                }
-            }
-
-            switch (node.getType()) {
-                case "abie":
-                    return getDescendants((BieEditAbieNode) node, hideUnused);
-                case "asbiep":
-                    return getDescendants((BieEditAsbiepNode) node, hideUnused);
-                case "bbiep":
-                    return getDescendants((BieEditBbiepNode) node, hideUnused);
-            }
-        } finally {
-            if (lock != null) {
-                lock.unlock();
-            }
+        switch (node.getType()) {
+            case "abie":
+                return getDescendants((BieEditAbieNode) node, hideUnused);
+            case "asbiep":
+                return getDescendants((BieEditAsbiepNode) node, hideUnused);
+            case "bbiep":
+                return getDescendants((BieEditBbiepNode) node, hideUnused);
         }
 
         return Collections.emptyList();
@@ -717,13 +689,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbiepNode.getBbieId() == 0L) {
-            long defaultBdtPriRestriId = dslContext.select(
-                    Tables.BDT_PRI_RESTRI.BDT_PRI_RESTRI_ID)
-                    .from(Tables.BDT_PRI_RESTRI)
-                    .where(and(Tables.DT.DT_ID.eq(ULong.valueOf(detail.getBdtId())),
-                            Tables.BDT_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)))
-                    .fetchOneInto(Long.class);
-
+            long defaultBdtPriRestriId = repository.getDefaultBdtPriRestriIdByBdtId(detail.getBdtId());
             detail.setBdtPriRestriId(defaultBdtPriRestriId);
         }
 
@@ -873,13 +839,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
 
         if (bbieScNode.getBbieScId() == 0L) {
-            long defaultDtScPriRestriId = dslContext.select(
-                    Tables.BDT_SC_PRI_RESTRI.BDT_SC_PRI_RESTRI_ID)
-                    .from(Tables.BDT_SC_PRI_RESTRI)
-                    .where(and(
-                            Tables.BDT_SC_PRI_RESTRI.BDT_SC_ID.eq(ULong.valueOf(bbieScNode.getDtScId())),
-                            Tables.BDT_SC_PRI_RESTRI.IS_DEFAULT.eq((byte) 1)))
-                    .fetchOneInto(Long.class);
+            long defaultDtScPriRestriId = repository.getDefaultDtScPriRestriIdByDtScId(bbieScNode.getDtScId());
             detail.setDtScPriRestriId(defaultDtScPriRestriId);
         }
 

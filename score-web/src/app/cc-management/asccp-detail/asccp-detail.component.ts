@@ -144,7 +144,7 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
 }
 
 @Component({
-  selector: 'srt-asccp-detail',
+  selector: 'score-asccp-detail',
   templateUrl: './asccp-detail.component.html',
   styleUrls: ['./asccp-detail.component.css']
 })

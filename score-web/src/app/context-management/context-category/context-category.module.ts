@@ -4,20 +4,11 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {ContextCategoryService} from './domain/context-category.service';
-import {
-  ContextCategoryListComponent,
-  DialogDiscardContextCategoryDialogComponent
-} from './context-category-list/context-category-list.component';
+import {ContextCategoryListComponent} from './context-category-list/context-category-list.component';
 import {ContextCategoryCreateComponent} from './context-category-create/context-category-create.component';
-import {
-  ContextCategoryDetailComponent,
-  DialogContentContextCategoryDialogDetailComponent,
-  DialogDiscardContextCategoryDialogDetailComponent
-} from './context-category-detail/context-category-detail.component';
+import {ContextCategoryDetailComponent} from './context-category-detail/context-category-detail.component';
 import {AuthService} from '../../authentication/auth.service';
-import {DialogContentContextSchemeDialogDetailComponent} from '../context-scheme/context-scheme-detail/context-scheme-detail.component';
-import {DialogDiscardBieDialogComponent} from '../../bie-management/bie-list/bie-list.component';
-import {DialogDiscardCodeListDialogComponent} from '../../code-list-management/code-list-list/code-list-list.component';
+import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 
 const routes: Routes = [
   {
@@ -47,26 +38,13 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FormsModule,
     MaterialModule,
+    ConfirmDialogModule,
     CommonModule
   ],
   declarations: [
     ContextCategoryListComponent,
     ContextCategoryCreateComponent,
-    ContextCategoryDetailComponent,
-    DialogContentContextCategoryDialogDetailComponent,
-    DialogDiscardContextCategoryDialogDetailComponent,
-    DialogDiscardBieDialogComponent,
-    DialogDiscardContextCategoryDialogComponent,
-    DialogContentContextSchemeDialogDetailComponent,
-    DialogDiscardCodeListDialogComponent
-  ],
-  entryComponents: [
-    DialogContentContextCategoryDialogDetailComponent,
-    DialogDiscardContextCategoryDialogComponent,
-    DialogDiscardContextCategoryDialogDetailComponent,
-    DialogDiscardBieDialogComponent,
-    DialogDiscardCodeListDialogComponent,
-    DialogContentContextSchemeDialogDetailComponent
+    ContextCategoryDetailComponent
   ],
   providers: [
     ContextCategoryService,

@@ -63,3 +63,19 @@ tr.element-row:not(.expanded-row):active {
 .element-row td {
   border-bottom-width: 0;
 }
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 100px;
+}
+
+.mat-column-owner {
+  width: 10%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}

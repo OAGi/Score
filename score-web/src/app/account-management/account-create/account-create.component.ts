@@ -4,12 +4,9 @@ import {MatSnackBar} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../domain/accounts';
 import {GrowlService} from 'ngx-growl';
-import {HttpErrorResponse} from '@angular/common/http';
-import {catchError} from 'rxjs/operators';
-import {EMPTY, throwError} from 'rxjs';
 
 @Component({
-  selector: 'srt-account-create',
+  selector: 'score-account-create',
   templateUrl: './account-create.component.html',
   styleUrls: ['./account-create.component.css']
 })

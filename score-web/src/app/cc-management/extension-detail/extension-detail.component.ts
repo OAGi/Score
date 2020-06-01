@@ -175,7 +175,7 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
 }
 
 @Component({
-  selector: 'srt-extension-detail',
+  selector: 'score-extension-detail',
   templateUrl: './extension-detail.component.html',
   styleUrls: ['./extension-detail.component.css']
 })
@@ -478,7 +478,7 @@ export class ExtensionDetailComponent implements OnInit {
         releaseId: this.releaseId,
         extensionId: this.extensionId
       },
-      width: window.innerWidth + 'px'
+      panelClass: ['center-dialog']
     });
     dialogRef.afterClosed().subscribe(asccpId => {
       if (!asccpId) {
@@ -497,7 +497,7 @@ export class ExtensionDetailComponent implements OnInit {
         releaseId: this.releaseId,
         extensionId: this.extensionId
       },
-      width: window.innerWidth + 'px'
+      panelClass: ['center-dialog']
     });
     dialogRef.afterClosed().subscribe(bccpId => {
       if (!bccpId) {
