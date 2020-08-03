@@ -25,7 +25,7 @@ import {CcNodeService} from '../../domain/core-component-node.service';
 export class AppendAsccDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'den', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<number>(false, []);

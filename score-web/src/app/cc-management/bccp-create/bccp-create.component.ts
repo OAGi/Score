@@ -17,7 +17,7 @@ import {PageRequest} from '../../basis/basis';
 export class BccpCreateComponent implements OnInit {
   title = 'BCCP';
   displayedColumns: string[] = [
-    'select', 'den', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<number>(false, []);

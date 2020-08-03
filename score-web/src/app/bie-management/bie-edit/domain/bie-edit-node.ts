@@ -5,23 +5,31 @@ import {Md5} from 'ts-md5';
 
 
 export class BieEditNode {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
   releaseId: number;
   type: string;
   guid: string;
   name: string;
   used: boolean;
   required: boolean;
+  locked: boolean;
+  derived: boolean;
   hasChild: boolean;
 
+  releaseNum: string;
+  topLevelAsbiepState: string;
+  ownerLoginId: string;
+
   constructor(obj?: BieEditNode) {
-    this.topLevelAbieId = obj && obj.topLevelAbieId || 0;
+    this.topLevelAsbiepId = obj && obj.topLevelAsbiepId || 0;
     this.releaseId = obj && obj.releaseId || 0;
     this.type = obj && obj.type || '';
     this.guid = obj && obj.guid || '';
     this.name = obj && obj.name || '';
     this.used = obj && obj.used || false;
     this.required = obj && obj.required || false;
+    this.locked = obj && obj.locked || false;
+    this.derived = obj && obj.derived || false;
     this.hasChild = obj && obj.hasChild || false;
   }
 }
@@ -35,7 +43,7 @@ export class BieEditAbieNode extends BieEditNode {
   businessContexts: BusinessContext[] = [];
 
   access: string;
-  topLevelAbieState: string;
+  topLevelAsbiepState: string;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -50,7 +58,7 @@ export class BieEditAbieNode extends BieEditNode {
       this.businessContexts = abie.businessContexts;
 
       this.access = abie.access;
-      this.topLevelAbieState = abie.topLevelAbieState;
+      this.topLevelAsbiepState = abie.topLevelAsbiepState;
     }
   }
 }
@@ -120,14 +128,19 @@ export class BieEditBbieScNode extends BieEditNode {
 }
 
 export interface BieEditNodeDetail {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
   releaseId: number;
   type: string;
   guid: string;
   name: string;
   used: boolean;
   required: boolean;
+  locked: boolean;
+  derived: boolean;
   hasChild: boolean;
+  releaseNum: string;
+  topLevelAsbiepState: string;
+  ownerLoginId: string;
 }
 
 export interface CardinalityAware {
@@ -145,7 +158,12 @@ export class BieEditAbieNodeDetail
   status: string;
   remark: string;
   bizTerm: string;
-  definition: string;
+  contextDefinition: string;
+
+  accDen: string;
+  typeDefinition: string;
+  asccpDen: string;
+  componentDefinition: string;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -157,7 +175,7 @@ export class BieEditAbieNodeDetail
       this.status = abieDetail.status;
       this.remark = abieDetail.remark;
       this.bizTerm = abieDetail.bizTerm;
-      this.definition = abieDetail.definition;
+      this.contextDefinition = abieDetail.contextDefinition;
     }
   }
 }
@@ -172,13 +190,18 @@ export class BieEditAsbiepNodeDetail
   ccCardinalityMax: number;
   ccNillable: boolean;
   bieNillable: boolean;
-  bizTerm: string;
-  remark: string;
 
   contextDefinition: string;
   associationDefinition: string;
   componentDefinition: string;
   typeDefinition: string;
+
+  accDen: string;
+  asccDen: string;
+  asccpDen: string;
+
+  bizTerm: string;
+  remark: string;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -193,13 +216,18 @@ export class BieEditAsbiepNodeDetail
 
       this.ccNillable = asbiepDetail.ccNillable;
       this.bieNillable = asbiepDetail.bieNillable;
-      this.remark = asbiepDetail.remark;
-      this.bizTerm = asbiepDetail.bizTerm;
 
       this.contextDefinition = asbiepDetail.contextDefinition;
       this.associationDefinition = asbiepDetail.associationDefinition;
       this.componentDefinition = asbiepDetail.componentDefinition;
       this.typeDefinition = asbiepDetail.typeDefinition;
+
+      this.accDen = asbiepDetail.accDen;
+      this.asccDen = asbiepDetail.asccDen;
+      this.asccpDen = asbiepDetail.asccpDen;
+
+      this.remark = asbiepDetail.remark;
+      this.bizTerm = asbiepDetail.bizTerm;
     }
   }
 }
@@ -241,6 +269,13 @@ export class BieEditBbiepNodeDetail
   componentDefinition: string;
 
   example: string;
+
+  bccDen: string;
+  bccpDen: string;
+
+  bbiepRemark: string;
+  bbiepBizTerm: string;
+  bbiepDefinition: string;
 
   constructor(obj?: BieEditNode) {
     super(obj);
@@ -419,7 +454,7 @@ export class BieEditCreateExtensionResponse {
 function hashCode(node: BieEditNode) {
   if (node.type === 'abie') {
     const str = JSON.stringify({
-      topLevelAbieId: (node as BieEditAbieNodeDetail).topLevelAbieId,
+      topLevelAsbiepId: (node as BieEditAbieNodeDetail).topLevelAsbiepId,
       releaseId: (node as BieEditAbieNodeDetail).releaseId,
       type: (node as BieEditAbieNodeDetail).type,
       guid: (node as BieEditAbieNodeDetail).guid,
@@ -434,14 +469,14 @@ function hashCode(node: BieEditNode) {
       status: (node as BieEditAbieNodeDetail).status || '',
       remark: (node as BieEditAbieNodeDetail).remark || '',
       bizTerm: (node as BieEditAbieNodeDetail).bizTerm || '',
-      definition: (node as BieEditAbieNodeDetail).definition || '',
+      asbiepDefinition: (node as BieEditAbieNodeDetail).contextDefinition || '',
     });
     return <string>Md5.hashStr(str);
   }
 
   if (node.type === 'asbiep') {
     const str = JSON.stringify({
-      topLevelAbieId: (node as BieEditAsbiepNodeDetail).topLevelAbieId,
+      topLevelAsbiepId: (node as BieEditAsbiepNodeDetail).topLevelAsbiepId,
       releaseId: (node as BieEditAsbiepNodeDetail).releaseId,
       type: (node as BieEditAsbiepNodeDetail).type,
       guid: (node as BieEditAsbiepNodeDetail).guid,
@@ -462,17 +497,18 @@ function hashCode(node: BieEditNode) {
 
       ccNillable: (node as BieEditAsbiepNodeDetail).ccNillable || false,
       bieNillable: (node as BieEditAsbiepNodeDetail).bieNillable || false,
-      bizTerm: (node as BieEditAsbiepNodeDetail).bizTerm || '',
-      remark: (node as BieEditAsbiepNodeDetail).remark || '',
 
       contextDefinition: (node as BieEditAsbiepNodeDetail).contextDefinition || '',
+
+      remark: (node as BieEditAsbiepNodeDetail).remark || '',
+      bizTerm: (node as BieEditAsbiepNodeDetail).bizTerm || '',
     });
     return <string>Md5.hashStr(str);
   }
 
   if (node.type === 'bbiep') {
     const str = JSON.stringify({
-      topLevelAbieId: (node as BieEditBbiepNodeDetail).topLevelAbieId,
+      topLevelAsbiepId: (node as BieEditBbiepNodeDetail).topLevelAsbiepId,
       releaseId: (node as BieEditBbiepNodeDetail).releaseId,
       type: (node as BieEditBbiepNodeDetail).type,
       guid: (node as BieEditBbiepNodeDetail).guid,
@@ -506,13 +542,17 @@ function hashCode(node: BieEditNode) {
 
       contextDefinition: (node as BieEditBbiepNodeDetail).contextDefinition || '',
       example: (node as BieEditBbiepNodeDetail).example || '',
+
+      bbiepBizTerm: (node as BieEditBbiepNodeDetail).bbiepBizTerm || '',
+      bbiepRemark: (node as BieEditBbiepNodeDetail).bbiepRemark || '',
+      bbiepDefinition: (node as BieEditBbiepNodeDetail).bbiepDefinition || '',
     });
     return <string>Md5.hashStr(str);
   }
 
   if (node.type === 'bbie_sc') {
     const str = JSON.stringify({
-      topLevelAbieId: (node as BieEditBbieScNodeDetail).topLevelAbieId,
+      topLevelAsbiepId: (node as BieEditBbieScNodeDetail).topLevelAsbiepId,
       releaseId: (node as BieEditBbieScNodeDetail).releaseId,
       type: (node as BieEditBbieScNodeDetail).type,
       guid: (node as BieEditBbieScNodeDetail).guid,
@@ -589,5 +629,13 @@ export class DynamicBieFlatNode {
 
   reset() {
     this.$hashCode = this.hashCode;
+  }
+
+  get isAsbiep(): boolean {
+    return this.item.type === 'asbiep';
+  }
+
+  get isEditable(): boolean {
+    return !this.item.locked;
   }
 }

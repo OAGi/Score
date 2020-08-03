@@ -135,10 +135,17 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="propertyTerm">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
             <td mat-cell *matCellDef="let element">
-              <div class="ellipsis" style="display: flex;">
+              <div class="ellipsis d-flex">
                 <span class="den ellipsis" style="margin-right: 10px;"
                       *ngIf='element.access === "Prohibited"'
                       matTooltip="This profile BIE only can access by an owner.">{{ element.propertyTerm }}</span>
@@ -146,10 +153,9 @@
                       *ngIf='element.access === "Unprepared"'
                       matTooltip="This profile BIE is in progress.">{{ element.propertyTerm }}</span>
                 <a *ngIf="element.access !== 'Prohibited' && element.access !== 'Unprepared'"
-                   routerLink="edit/{{ element.topLevelAbieId }}">
+                   routerLink="edit/{{ element.topLevelAsbiepId }}">
                   <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
                 </a>
-                <span class="bie-state {{ element.state }}">{{ element.state }}</span>
               </div>
               <div class="bie-guid ellipsis">{{ element.guid }}</div>
             </td>
@@ -172,7 +178,7 @@
             <td mat-cell *matCellDef="let element">
               <button mat-icon-button
                       *ngIf="isEditable(element)"
-                      (click)="openTransferDialog(element.topLevelAbieId, $event)">
+                      (click)="openTransferDialog(element.topLevelAsbiepId, $event)">
                 <mat-icon>swap_horiz</mat-icon>
               </button>
             </td>
@@ -187,7 +193,7 @@
                   <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
                 </a>
                 <a target="_blank" rel="noopener noreferrer"
-                   routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                   routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                   <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }} more...</mat-chip>
                 </a>
               </mat-chip-list>
@@ -196,12 +202,12 @@
 
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element"> {{ element.version }}</td>
+            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.version }}">{{ element.version }}</td>
           </ng-container>
 
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status</th>
-            <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.status }}">{{ element.status }}</td>
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
@@ -238,7 +244,7 @@
     </mat-card-content>
 
     <context-menu #contextMenu>
-      <ng-template contextMenuItem let-item (execute)="openTransferDialog($event.item.topLevelAbieId, $event)">
+      <ng-template contextMenuItem let-item (execute)="openTransferDialog($event.item.topLevelAsbiepId, $event)">
         <span class="context-menu-item" *ngIf="isEditable(item)">Transfer Ownership</span>
       </ng-template>
     </context-menu>

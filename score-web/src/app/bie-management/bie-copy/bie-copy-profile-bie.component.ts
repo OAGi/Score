@@ -29,7 +29,7 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxList: BusinessContext[] = [];
 
   displayedColumns: string[] = [
-    'select', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(false, []);
@@ -169,8 +169,8 @@ export class BieCopyProfileBieComponent implements OnInit {
   }
 
   copy() {
-    const topLevelAbieId: number = this.selection.selected[0].topLevelAbieId;
-    this.service.copy(topLevelAbieId, this.bizCtxIds).subscribe(_ => {
+    const topLevelAsbiepId: number = this.selection.selected[0].topLevelAsbiepId;
+    this.service.copy(topLevelAsbiepId, this.bizCtxIds).subscribe(_ => {
       this.snackBar.open('Copying request queued', '', {
         duration: 1000,
       });

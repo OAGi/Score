@@ -264,8 +264,11 @@ div.mat-form-field-wrapper div.mat-form-field-infix mat-icon.datepicker-cancel {
 }
 
 span.cc-state, span.bie-state {
-  font-size: 12px;
-  padding: .15em 4px;
+  font-size: 13px;
+  padding: .30em 4px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 span.Initiating {
@@ -274,23 +277,23 @@ span.Initiating {
 }
 
 span.Editing {
-  background-color: #fc2929;
-  color: #fcfcfc;
+  background-color: #d32f2f;
+  color: #ffffff;
 }
 
 span.Candidate {
-  background-color: #cc317c;
+  background-color: #303f9f;
   color: #ffffff;
 }
 
 span.Published {
-  background-color: #84b6eb;
-  color: #000000;
+  background-color: #388e3c;
+  color: #ffffff;
 }
 
 span.Deprecated {
-  background-color: #cccccc;
-  color: #000000;
+  background-color: #455a64;
+  color: #ffffff;
 }
 
 .fab-container {
@@ -337,4 +340,34 @@ td.mat-cell {
 
 td.mat-cell:last-child {
   padding-right: 0 !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.ngx-contextmenu a {
+  text-decoration: none;
+}
+
+.ngx-contextmenu .dropdown-menu {
+  padding: 0.25rem 0.8rem;
+}
+
+span.context-menu-item {
+  display: block;
+  font-size: 13px;
+  width: 92%;
+  outline: 0;
+  font-weight: 400;
+  border: solid 1px transparent;
+  cursor: pointer;
+}
+
+span.context-menu-item.disabled {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.text-line-through {
+  text-decoration: line-through !important;
 }

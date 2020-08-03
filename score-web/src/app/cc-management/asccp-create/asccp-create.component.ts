@@ -16,7 +16,7 @@ import {Router} from '@angular/router';
 })
 export class AsccpCreateComponent implements OnInit {
   displayedColumns: string[] = [
-    'select', 'den', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<number>(false, []);

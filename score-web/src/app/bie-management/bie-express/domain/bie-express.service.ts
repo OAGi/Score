@@ -11,9 +11,9 @@ export class BieExpressService {
   constructor(private http: HttpClient) {
   }
 
-  generate(topLevelAbieIds: number[], option: BieExpressOption): Observable<HttpResponse<Blob>> {
+  generate(topLevelAsbiepIds: number[], option: BieExpressOption): Observable<HttpResponse<Blob>> {
     let params: HttpParams = new HttpParams()
-      .set('topLevelAbieIds', topLevelAbieIds.join(','));
+      .set('topLevelAsbiepIds', topLevelAsbiepIds.join(','));
     Object.getOwnPropertyNames(option).forEach(key => {
       const value = option[key];
       if (value) {

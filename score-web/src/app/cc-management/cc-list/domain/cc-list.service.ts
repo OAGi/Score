@@ -90,8 +90,8 @@ export class CcListService {
     return this.http.get<Ascc>('/api/core_component/ascc/' + id);
   }
 
-  getRootNode(topLevelAbieId): Observable<BieEditAbieNode> {
-    return this.http.get<BieEditAbieNode>('/api/profile_bie/node/root/' + topLevelAbieId);
+  getRootNode(topLevelAsbiepId): Observable<BieEditAbieNode> {
+    return this.http.get<BieEditAbieNode>('/api/profile_bie/node/root/' + topLevelAsbiepId);
   }
 
   getChildren(node: BieEditNode): Observable<BieEditNode[]> {

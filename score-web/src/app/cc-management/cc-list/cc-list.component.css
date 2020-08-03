@@ -69,6 +69,10 @@ tr.element-row:not(.expanded-row):active {
   width: 70px;
 }
 
+.mat-column-state {
+  width: 90px;
+}
+
 .mat-column-owner {
   width: 10%;
 }

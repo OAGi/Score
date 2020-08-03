@@ -43,6 +43,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfBiesByUsers_usernameFilteredList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   numberOfBiesByUsers_usernameModel: string[] = [];
 
+  isDeveloper: boolean;
+
   myRecentBIEs = new MatTableDataSource<BieList>();
   @ViewChild('myRecentBIEsSort', {static: false})
   myRecentBIEsSort: MatSort;
@@ -78,6 +80,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const userToken = this.authService.getUserToken();
+    this.isDeveloper = userToken.role === 'developer';
 
     this.initSummaryBIEs(userToken);
     this.initSummaryUserExtensions(userToken);

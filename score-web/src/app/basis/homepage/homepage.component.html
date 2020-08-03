@@ -127,14 +127,21 @@
                      matSortActive="lastUpdateTimestamp"
                      matSortDirection="desc"
                      [dataSource]="myRecentBIEs">
+
+                <ng-container matColumnDef="bieState">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+                  </td>
+                </ng-container>
+
                 <ng-container matColumnDef="propertyTerm">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
                   <td mat-cell *matCellDef="let element">
                     <div class="ellipsis" style="display: flex;">
-                      <a routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                      <a routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
                       </a>
-                      <span class="bie-state {{ element.state }}">{{ element.state }}</span>
                     </div>
                     <div class="bie-guid ellipsis">{{ element.guid }}</div>
                   </td>
@@ -154,7 +161,7 @@
                         <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
                       </a>
                       <a target="_blank" rel="noopener noreferrer"
-                         routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                         routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                         <mat-chip *ngIf="element.businessContexts.length > 1">{{ element.businessContexts.length - 1 }} more...</mat-chip>
                       </a>
                     </mat-chip-list>
@@ -168,8 +175,8 @@
                   </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="['propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp'];"></tr>
+                <tr mat-header-row *matHeaderRowDef="['bieState', 'propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['bieState', 'propertyTerm', 'release', 'businessContexts', 'lastUpdateTimestamp'];"></tr>
               </table>
             </div>
           </div>
@@ -179,7 +186,7 @@
 
     <mat-tab label="User Extensions">
       <div class="row m-0">
-        <div class="col-lg-6 col-md-12 col-sm-12">
+        <div [classList]="isDeveloper ? 'col-lg-12 col-md-12 col-sm-12' : 'col-lg-6 col-md-12 col-sm-12'">
           <div class="box">
             <div class="header">
               <p>Total User Extensions by states</p>
@@ -189,7 +196,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="col-lg-6 col-md-12 col-sm-12" *ngIf="!isDeveloper">
           <div class="box">
             <div class="header">
               <p>My User Extensions by states</p>
@@ -302,7 +309,7 @@
           </div>
         </div>
       </div>
-      <div class="row m-0">
+      <div class="row m-0" *ngIf="!isDeveloper">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="box">
             <div class="header">
@@ -313,6 +320,15 @@
                      matSortActive="lastUpdateTimestamp"
                      matSortDirection="desc"
                      [dataSource]="myExtensionsUnusedInBIEs">
+
+                <ng-container matColumnDef="state">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="cc-state {{ element.state }}">{{ element.state }}</span>
+                    <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+                  </td>
+                </ng-container>
+
                 <ng-container matColumnDef="objectClassTerm">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> User Extension</th>
                   <td mat-cell *matCellDef="let element">
@@ -320,7 +336,6 @@
                       <a routerLink="{{ '/core_component/extension/' + 1 + '/' + element.accId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.objectClassTerm }}</span>
                       </a>
-                      <span class="cc-state {{ element.state }}">{{ element.state }}</span>
                     </div>
                     <div class="cc-guid ellipsis">{{ element.guid }}</div>
                   </td>
@@ -333,14 +348,20 @@
                   </td>
                 </ng-container>
 
+                <ng-container matColumnDef="bieState">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> BIE State</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="bie-state {{ element.state }}">{{ element.state }}</span>
+                  </td>
+                </ng-container>
+
                 <ng-container matColumnDef="topLevelBIE">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Top-Level BIE</th>
                   <td mat-cell *matCellDef="let element">
                     <div class="ellipsis" style="display: flex;">
-                      <a routerLink="/profile_bie/edit/{{ element.topLevelAbieId }}">
+                      <a routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
                       </a>
-                      <span class="bie-state {{ element.bieState }}">{{ element.bieState }}</span>
                     </div>
                   </td>
                 </ng-container>
@@ -352,8 +373,8 @@
                   </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="['objectClassTerm', 'lastUpdateTimestamp', 'topLevelBIE', 'associationPropertyTerm']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['objectClassTerm', 'lastUpdateTimestamp', 'topLevelBIE', 'associationPropertyTerm'];"></tr>
+                <tr mat-header-row *matHeaderRowDef="['state', 'objectClassTerm', 'lastUpdateTimestamp', 'bieState', 'topLevelBIE', 'associationPropertyTerm']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['state', 'objectClassTerm', 'lastUpdateTimestamp', 'bieState', 'topLevelBIE', 'associationPropertyTerm'];"></tr>
               </table>
               <mat-paginator #myExtensionsUnusedInBIEsPaginator
                              [hidden]="myExtensionsUnusedInBIEs.data.length <= 5"

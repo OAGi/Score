@@ -1,0 +1,48 @@
+.mat-paginator {
+  margin-bottom: 20px;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 10%;
+}
+
+.mat-column-bizTerm, .mat-column-remark {
+  width: 10%;
+}
+
+.mat-column-state {
+  width: 90px;
+}
+
+.mat-column-owner {
+  width: 10%;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}

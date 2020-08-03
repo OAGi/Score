@@ -1,3 +1,3 @@
 export interface BieCopyResponse {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
 }

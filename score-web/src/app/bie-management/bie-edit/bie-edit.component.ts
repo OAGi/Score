@@ -3,8 +3,8 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {BieEditService} from './domain/bie-edit.service';
 import {CollectionViewer, SelectionChange, SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
-import {BehaviorSubject, merge, Observable, ReplaySubject} from 'rxjs';
-import {map, startWith, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, forkJoin, merge, Observable, ReplaySubject} from 'rxjs';
+import {finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {
   BieEditAbieNode,
@@ -35,7 +35,11 @@ import {PageRequest} from '../../basis/basis';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
 import {isNumber} from 'util';
 import {UnboundedPipe} from '../../common/utility';
-import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
+import {ConfirmDialogComponent as ExtensionConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
+import {ReuseBieDialogComponent} from './reuse-bie-dialog/reuse-bie-dialog.component';
+import {AuthService} from '../../authentication/auth.service';
+import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
 
 
 @Injectable()
@@ -236,6 +240,18 @@ export class DynamicDataSource {
     this.dataDetailMap.set(node.key, node);
   }
 
+  clearDescendants(node: DynamicBieFlatNode) {
+    this.dataChildrenMap.delete(node.key);
+    this.dataDetailMap.delete(node.key);
+
+    const index = this.data.indexOf(node);
+    for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++) {
+      const child = this.data[i];
+      this.dataChildrenMap.delete(child.key);
+      this.dataDetailMap.delete(child.key);
+    }
+  }
+
   _createNullDetail(node: DynamicBieFlatNode) {
     switch (node.item.type) {
       case 'asbiep':
@@ -317,10 +333,13 @@ export class BieEditComponent implements OnInit {
   releaseNum: string;
   isUpdating: boolean;
 
+  topLevelAsbiepId: number;
   rootNode: DynamicBieFlatNode;
+  reusedRootNode: DynamicBieFlatNode;
   treeControl: CustomTreeControl<DynamicBieFlatNode>;
   dataSource: DynamicDataSource;
   detailNode: DynamicBieFlatNode;
+  reusedDetailNode: BieEditAbieNodeDetail;
   selectedNode: DynamicBieFlatNode;
   checklistSelection = new SelectionModel<DynamicBieFlatNode>(true /* multiple */);
 
@@ -335,6 +354,7 @@ export class BieEditComponent implements OnInit {
   /* Begin business context management */
   businessContextCtrl = new FormControl();
   businessContexts: BusinessContext[] = [];
+  reusedBusinessContexts: BusinessContext[] = [];
   allBusinessContexts: BusinessContext[] = [];
   filteredBusinessContexts: Observable<BusinessContext[]>;
 
@@ -346,9 +366,12 @@ export class BieEditComponent implements OnInit {
   @ViewChild('matAutocomplete', {static: false}) matAutocomplete: MatAutocomplete;
   /* End business context management */
 
-  @ViewChild(ContextMenuComponent, {static: true}) public extensionMenu: ContextMenuComponent;
+  @ViewChild('createBieContextMenu', {static: true}) public createBieContextMenu: ContextMenuComponent;
+  @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
+  @ViewChild('extensionContextMenu', {static: true}) public extensionContextMenu: ContextMenuComponent;
 
   constructor(private service: BieEditService,
+              private authService: AuthService,
               private businessContextService: BusinessContextService,
               private releaseService: ReleaseService,
               private router: Router,
@@ -372,13 +395,15 @@ export class BieEditComponent implements OnInit {
 
     // load context scheme
     this.route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this.service.getRootNode(params.get('id')))
+      switchMap((params: ParamMap) => {
+        this.topLevelAsbiepId = Number(params.get('id'));
+        return this.service.getRootNode(this.topLevelAsbiepId);
+      })
     ).subscribe((resp: BieEditAbieNode) => {
       this.rootNode = new DynamicBieFlatNode(resp);
       this.dataSource.data = [this.rootNode];
 
-      this.businessContextService.getBusinessContextsByTopLevelAbieId(this.rootNode.item.topLevelAbieId)
+      this.businessContextService.getBusinessContextsByTopLevelAsbiepId(this.rootNode.item.topLevelAsbiepId)
         .subscribe(bizCtxResp => {
           this.businessContexts = bizCtxResp.list;
           this.businessContextUpdating = false;
@@ -482,7 +507,7 @@ export class BieEditComponent implements OnInit {
   }
 
   get state(): string {
-    return this.rootNode && (this.rootNode.item as BieEditAbieNode).topLevelAbieState || 'Published';
+    return this.rootNode && (this.rootNode.item as BieEditAbieNode).topLevelAsbiepState || 'Published';
   }
 
   get access(): string {
@@ -498,6 +523,11 @@ export class BieEditComponent implements OnInit {
     } else {
       this.dataSource.onDeselect(node);
     }
+
+    if (node.item.derived || node.item.locked) {
+      return;
+    }
+
     if (!node.item.required) {
       let parent = this.treeControl.getParent(node);
       while (parent !== undefined) {
@@ -522,6 +552,23 @@ export class BieEditComponent implements OnInit {
   }
 
   onClick(node: DynamicBieFlatNode) {
+
+    if (node.item.type === 'asbiep' && node.item.derived) {
+      this.service.getRootNode(node.item.topLevelAsbiepId).subscribe(resp => {
+        this.reusedRootNode = new DynamicBieFlatNode(resp);
+        this.service.getDetail(this.reusedRootNode).subscribe(detail => {
+          this.reusedDetailNode = this.asAbieDetail(detail);
+        });
+      });
+      this.businessContextService.getBusinessContextsByTopLevelAsbiepId(node.item.topLevelAsbiepId)
+        .subscribe(bizCtxResp => {
+          this.reusedBusinessContexts = bizCtxResp.list;
+        });
+    } else {
+      this.reusedRootNode = null;
+      this.reusedDetailNode = null;
+      this.reusedBusinessContexts = [];
+    }
     this.dataSource.loadDetail(node, (detailNode: DynamicBieFlatNode) => {
       this.selectedNode = node;
       this.detailNode = detailNode;
@@ -566,7 +613,7 @@ export class BieEditComponent implements OnInit {
     }
 
     if (detailNode && detailNode.item.type !== 'abie') {
-      const disabled = !this.isEditable() || !detailNode.item.used;
+      const disabled = !this.isEditable() || !detailNode.item.used || detailNode.item.locked;
       const obj = (<unknown>detailNode.item as CardinalityAware);
 
       this.bieCardinalityMin = new FormControl({
@@ -607,7 +654,7 @@ export class BieEditComponent implements OnInit {
     }
 
     if (detailNode && detailNode.item.type !== 'abie') {
-      const disabled = !this.isEditable() || !detailNode.item.used;
+      const disabled = !this.isEditable() || !detailNode.item.used || detailNode.item.locked;
       const obj = (<unknown>detailNode.item as CardinalityAware);
 
       this.bieCardinalityMax = new FormControl({
@@ -693,7 +740,7 @@ export class BieEditComponent implements OnInit {
     this.updateDetails();
     this.dataSource.clear();
 
-    this.service.getRootNode(this.rootNode.item.topLevelAbieId).subscribe((resp: BieEditAbieNode) => {
+    this.service.getRootNode(this.rootNode.item.topLevelAsbiepId).subscribe((resp: BieEditAbieNode) => {
       this.rootNode = new DynamicBieFlatNode(resp);
       this.dataSource.data = [this.rootNode];
 
@@ -744,7 +791,7 @@ export class BieEditComponent implements OnInit {
 
   removeBusinessContext(businessContext: BusinessContext) {
     this.businessContextUpdating = true;
-    this.businessContextService.dismiss(this.rootNode.item.topLevelAbieId, businessContext)
+    this.businessContextService.dismiss(this.rootNode.item.topLevelAsbiepId, businessContext)
       .subscribe(_ => {
         this.businessContexts = this.businessContexts.filter(e => e.bizCtxId !== businessContext.bizCtxId);
         this.businessContextUpdating = false;
@@ -759,7 +806,7 @@ export class BieEditComponent implements OnInit {
 
   addBusinessContext(event: MatAutocompleteSelectedEvent): void {
     const selectedBusinessContext: BusinessContext = event.option.value;
-    this.businessContextService.assign(this.rootNode.item.topLevelAbieId, selectedBusinessContext)
+    this.businessContextService.assign(this.rootNode.item.topLevelAsbiepId, selectedBusinessContext)
       .subscribe(_ => {
         this.businessContexts = this.businessContexts.concat(selectedBusinessContext);
         this.businessContextUpdating = false;
@@ -898,7 +945,7 @@ export class BieEditComponent implements OnInit {
     });
     this.isUpdating = true;
 
-    this.service.updateDetails(this.rootNode.item.topLevelAbieId, details)
+    this.service.updateDetails(this.rootNode.item.topLevelAsbiepId, details)
       .subscribe((resp: BieEditUpdateResponse) => {
         for (const detail of this.details) {
           switch (detail.item.type) {
@@ -952,8 +999,8 @@ export class BieEditComponent implements OnInit {
 
   _doUpdateState(state: string) {
     this.isUpdating = true;
-    this.service.setState(this.rootNode.item.topLevelAbieId, state).subscribe(_ => {
-      (this.rootNode.item as BieEditAbieNode).topLevelAbieState = state;
+    this.service.setState(this.rootNode.item.topLevelAsbiepId, state).subscribe(_ => {
+      (this.rootNode.item as BieEditAbieNode).topLevelAsbiepState = state;
       this.isUpdating = false;
       this.resetCardinalities();
 
@@ -1044,19 +1091,181 @@ export class BieEditComponent implements OnInit {
     return !this.bieCardinalityMin.invalid && !this.bieCardinalityMax.invalid;
   }
 
-  onContextMenu($event: MouseEvent, item: any): void {
-    if (!this.isEditable()) {
+  isAsbiep(node: DynamicBieFlatNode) {
+    const nodeItem: BieEditNode = node.item;
+    let typeStr = nodeItem.type;
+    return typeStr.startsWith('asbiep');
+  }
+
+  get userToken() {
+    return this.authService.getUserToken();
+  }
+
+  get isDeveloper(): boolean {
+    const userToken = this.userToken;
+    return userToken.role === 'developer';
+  }
+
+  canCreateBIEFromThis(node: DynamicBieFlatNode): boolean {
+    return !!node && node.isEditable && node.isAsbiep && !node.item.locked && !node.item.derived;
+  }
+
+  canReuseBIE(node: DynamicBieFlatNode): boolean {
+    return !!node && node.isEditable && node.isAsbiep && !node.item.locked && !node.item.derived;
+  }
+
+  canRemoveReusedBIE(node: DynamicBieFlatNode): boolean {
+    return !!node && node.isEditable && node.isAsbiep && !node.item.locked && node.item.derived;
+  }
+
+  canSeeReuseContextMenus(node: DynamicBieFlatNode): boolean {
+    return !!node && node.isEditable && node.isAsbiep && !node.item.locked;
+  }
+
+  openNewEditBieTab(node: DynamicBieFlatNode) {
+    const asbiepNode = (node.item as BieEditAsbiepNode);
+    window.open('/profile_bie/edit/' + asbiepNode.topLevelAsbiepId, '_blank');
+  }
+
+  onContextMenu($event: MouseEvent, node: DynamicBieFlatNode): void {
+    if (!this.isAsbiep(node) || node.item.locked) {
       return;
+    }
+    let ctxMenu;
+    if (this.isEditable()) {
+      if (!this.isDeveloper && this.type(node) === 'asbiep-extension') {
+        ctxMenu = this.extensionContextMenu;
+      } else {
+        ctxMenu = this.defaultContextMenu;
+      }
+    } else {
+      ctxMenu = this.createBieContextMenu;
     }
 
     this.contextMenuService.show.next({
-      contextMenu: this.extensionMenu,
+      contextMenu: ctxMenu,
       event: $event,
-      item: item,
+      item: node,
     });
 
     $event.preventDefault();
     $event.stopPropagation();
+  }
+
+  reuseBIE(node: DynamicBieFlatNode) {
+    if (!this.canReuseBIE(node)) {
+      return;
+    }
+
+    const asbiepNode = (node.item as BieEditAsbiepNode);
+    const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
+      data: asbiepNode,
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+      if (!selectedTopLevelAsbiepId) {
+        return;
+      }
+
+      this.updateDetails();
+      this.isUpdating = true;
+      this.service.reuseBIE(asbiepNode, selectedTopLevelAsbiepId)
+        .pipe(finalize(() => {
+          this.isUpdating = false;
+        })).subscribe(_ => {
+
+        const parent = this.treeControl.getParent(node);
+        this.dataSource.clearDescendants(parent);
+        // To reload descendants info in the tree and details.
+        this.treeControl.collapse(parent);
+        this.treeControl.expand(parent);
+        this.onClick(this.rootNode); // To clear the current detail state.
+
+        this.snackBar.open('Reused', '', {
+          duration: 1500,
+        });
+      });
+    });
+  }
+
+  createBIEfromThis(node: DynamicBieFlatNode) {
+    if (!this.canReuseBIE(node)) {
+      return;
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Make BIE reusable?';
+    dialogConfig.data.content = ['Are you sure you want to make a BIE reusable?'];
+    dialogConfig.data.action = 'Make';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        } else {
+          const asbiepNode = (node.item as BieEditAsbiepNode);
+          this.updateDetails();
+          this.isUpdating = true;
+          this.service.makeReusableBIE(asbiepNode)
+            .pipe(finalize(() => {
+              this.isUpdating = false;
+            })).subscribe(_ => {
+
+            this.snackBar.open('Making BIE reusable request queued', '', {
+              duration: 1000,
+            });
+
+            this.router.navigateByUrl('/profile_bie');
+          });
+
+        }
+      });
+  }
+
+  removeReusedBIE(node: DynamicBieFlatNode) {
+    if (!this.canRemoveReusedBIE(node)) {
+      return;
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.panelClass = ['confirm-dialog'];
+    dialogConfig.autoFocus = false;
+    dialogConfig.data = new ConfirmDialogConfig();
+    dialogConfig.data.header = 'Remove reused BIE?';
+    dialogConfig.data.content = ['Are you sure you want to remove reused BIE?'];
+    dialogConfig.data.action = 'Remove';
+
+    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.updateDetails();
+        this.isUpdating = true;
+        const asbiepNode = (node.item as BieEditAsbiepNode);
+        this.service.removeReusedBIE(asbiepNode).pipe(finalize(() => {
+          this.isUpdating = false;
+        })).subscribe(_ => {
+          const parent = this.treeControl.getParent(node);
+          this.dataSource.clearDescendants(parent);
+          // To reload descendants info in the tree and details.
+          this.treeControl.collapse(parent);
+          this.treeControl.expand(parent);
+          this.onClick(this.rootNode); // To clear the current detail state.
+
+          this.snackBar.open('Removed', '', {
+            duration: 1500,
+          });
+        });
+      });
   }
 
   createLocalAbieExtension(node: DynamicBieFlatNode) {
@@ -1110,7 +1319,7 @@ export class BieEditComponent implements OnInit {
   }
 
   openConfirmDialog(url: string) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(ExtensionConfirmDialogComponent, {
       data: {}
     });
     dialogRef.afterClosed().subscribe(result => {

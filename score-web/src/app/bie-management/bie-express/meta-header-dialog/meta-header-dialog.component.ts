@@ -21,7 +21,8 @@ import {finalize} from 'rxjs/operators';
 export class MetaHeaderDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'release', 'owner',
+    'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(false, []);
@@ -136,19 +137,19 @@ export class MetaHeaderDialogComponent implements OnInit {
   }
 
   select(row: BieList) {
-    this.selection.select(row.topLevelAbieId);
+    this.selection.select(row.topLevelAsbiepId);
   }
 
   toggle(row: BieList) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAbieId);
+      this.selection.deselect(row.topLevelAsbiepId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BieList) {
-    return this.selection.isSelected(row.topLevelAbieId);
+    return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
 }

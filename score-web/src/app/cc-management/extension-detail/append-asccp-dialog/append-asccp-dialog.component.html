@@ -128,6 +128,14 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="cc-state {{ element.state }}">{{ element.state }}</span>
+          <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="den">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
         <td mat-cell *matCellDef="let element">
@@ -136,9 +144,6 @@
                href="/core_component/asccp/{{ request.releaseId }}/{{ element.id }}">
               <span class="den ellipsis" style="margin-right: 10px;">{{ element.den }}</span>
             </a>
-            <span class="cc-state {{ element.state }}">{{ element.state }}</span>
-            <span *ngIf="element.deprecated" class="cc-state Deprecated"
-                  style="margin-left: 10px;">Deprecated</span>
           </div>
           <div class="description ellipsis">{{ element.guid }}</div>
         </td>

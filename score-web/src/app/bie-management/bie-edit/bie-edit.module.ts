@@ -18,6 +18,7 @@ import {BieEditService} from './domain/bie-edit.service';
 import {AuthService} from '../../authentication/auth.service';
 import {SrtCommonModule} from '../../common/srt-common.module';
 import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
+import {ReuseBieDialogComponent} from './reuse-bie-dialog/reuse-bie-dialog.component';
 
 
 const routes: Routes = [
@@ -54,10 +55,12 @@ const routes: Routes = [
     BieEditPublishDialogDetailComponent,
     ArraySortPipe,
     ConfirmDialogComponent,
+    ReuseBieDialogComponent,
   ],
   entryComponents: [
     BieEditPublishDialogDetailComponent,
     ConfirmDialogComponent,
+    ReuseBieDialogComponent,
   ],
   providers: [
     ReleaseService,

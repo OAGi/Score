@@ -1,7 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {BieEditAbieNode, BieEditCreateExtensionResponse, BieEditNode, BieEditNodeDetail, DynamicBieFlatNode} from './bie-edit-node';
+import {
+  BieEditAbieNode,
+  BieEditAsbiepNode,
+  BieEditCreateExtensionResponse,
+  BieEditNode,
+  BieEditNodeDetail,
+  DynamicBieFlatNode
+} from './bie-edit-node';
 import {CodeList} from '../../../code-list-management/domain/code-list';
 
 @Injectable()
@@ -11,8 +18,8 @@ export class BieEditService {
 
   }
 
-  getRootNode(topLevelAbieId): Observable<BieEditAbieNode> {
-    return this.http.get<BieEditAbieNode>('/api/profile_bie/node/root/' + topLevelAbieId);
+  getRootNode(topLevelAsbiepId: number): Observable<BieEditAbieNode> {
+    return this.http.get<BieEditAbieNode>('/api/profile_bie/node/root/' + topLevelAsbiepId);
   }
 
   getChildren(node: DynamicBieFlatNode, hideUnused: boolean): Observable<BieEditNode[]> {
@@ -27,8 +34,8 @@ export class BieEditService {
     return this.http.get<BieEditNodeDetail>(url, {params: node.toHttpParams()});
   }
 
-  setState(topLevelAbieId: number, state: string): Observable<any> {
-    return this.http.post('/api/profile_bie/node/root/' + topLevelAbieId + '/state', {
+  setState(topLevelAsbiepId: number, state: string): Observable<any> {
+    return this.http.post('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state', {
       state: state
     });
   }
@@ -39,7 +46,7 @@ export class BieEditService {
 
   updateDetails(topLevelAbidId: number, details: BieEditNodeDetail[]): Observable<any> {
     const body = {
-      topLevelAbieId: topLevelAbidId,
+      topLevelAsbiepId: topLevelAbidId,
       abieNodeDetail: undefined,
       asbiepNodeDetails: [],
       bbiepNodeDetails: [],
@@ -72,5 +79,22 @@ export class BieEditService {
 
   createGlobalAbieExtension(node: BieEditNode): Observable<BieEditCreateExtensionResponse> {
     return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/global', node);
+  }
+
+  reuseBIE(asbiepNode: BieEditAsbiepNode, reuseTopLevelAsbiepId: number): Observable<any> {
+    const url = '/api/profile_bie/' + asbiepNode.topLevelAsbiepId + '/asbie/' + asbiepNode.asbieId + '/reuse';
+    return this.http.post<any>(url, {
+      reuseTopLevelAsbiepId
+    });
+  }
+
+  removeReusedBIE(asbiepNode: BieEditAsbiepNode): Observable<any> {
+    const url = '/api/profile_bie/node/asbie/' + asbiepNode.asbieId + '/remove_reuse';
+    return this.http.post<any>(url, {});
+  }
+
+  makeReusableBIE(asbiepNode: BieEditAsbiepNode): Observable<any> {
+    const url = '/api/profile_bie/node/asbie/' + asbiepNode.asbieId + '/make_bie_reusable';
+    return this.http.post<any>(url, {});
   }
 }

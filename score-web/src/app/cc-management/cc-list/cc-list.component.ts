@@ -43,7 +43,7 @@ export class CcListComponent implements OnInit {
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
 
   displayedColumns: string[] = [
-    'type', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
+    'type', 'state', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
   ];
   data: CcList[] = [];
   selection = new SelectionModel<CcList>(true, []);

@@ -29,7 +29,8 @@ export class BieExpressComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'release', 'owner',
+    'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
@@ -73,7 +74,7 @@ export class BieExpressComponent implements OnInit {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
-    this.request.excludes = ['Meta Header', 'Pagination Response'];
+    this.request.excludePropertyTerms = ['Meta Header', 'Pagination Response'];
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -152,26 +153,26 @@ export class BieExpressComponent implements OnInit {
   }
 
   select(row: BieList) {
-    this.selection.select(row.topLevelAbieId);
+    this.selection.select(row.topLevelAsbiepId);
   }
 
   toggle(row: BieList) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAbieId);
+      this.selection.deselect(row.topLevelAsbiepId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BieList) {
-    return this.selection.isSelected(row.topLevelAbieId);
+    return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
   generate() {
-    const selectedTopLevelAbieIds = this.selection.selected;
+    const selectedTopLevelAsbiepIds = this.selection.selected;
 
     this.loading = true;
-    this.service.generate(selectedTopLevelAbieIds, this.option).subscribe(resp => {
+    this.service.generate(selectedTopLevelAsbiepIds, this.option).subscribe(resp => {
 
       const blob = new Blob([resp.body], {type: resp.headers.get('Content-Type')});
       saveAs(blob, this._getFilenameFromContentDisposition(resp));
@@ -190,15 +191,15 @@ export class BieExpressComponent implements OnInit {
 
   toggleMetaHeaderOption(event, disabled: boolean,
                          includeMetaHeaderForJsonPropertyKey: string,
-                         metaHeaderTopLevelAbieIdPropertyKey: string) {
+                         metaHeaderTopLevelAsbiepIdPropertyKey: string) {
     event.preventDefault();
     if (disabled) {
       return;
     }
 
-    if (this.option[metaHeaderTopLevelAbieIdPropertyKey]) {
+    if (this.option[metaHeaderTopLevelAsbiepIdPropertyKey]) {
       this.option[includeMetaHeaderForJsonPropertyKey] = false;
-      this.option[metaHeaderTopLevelAbieIdPropertyKey] = undefined;
+      this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = undefined;
 
       this.option.packageOption = this.previousPackageOption;
     } else {
@@ -208,16 +209,16 @@ export class BieExpressComponent implements OnInit {
       this.bieListService.getMetaHeaderBieList().subscribe(resp => {
         dialogConfig.data = resp;
         const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selectedTopLevelAbieId => {
-          if (selectedTopLevelAbieId) {
+        dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+          if (selectedTopLevelAsbiepId) {
             this.option[includeMetaHeaderForJsonPropertyKey] = true;
-            this.option[metaHeaderTopLevelAbieIdPropertyKey] = selectedTopLevelAbieId;
+            this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
             this.previousPackageOption = this.option.packageOption;
             this.option.packageOption = 'EACH';
           } else {
             this.option[includeMetaHeaderForJsonPropertyKey] = false;
-            this.option[metaHeaderTopLevelAbieIdPropertyKey] = undefined;
+            this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = undefined;
           }
         });
       });
@@ -226,15 +227,15 @@ export class BieExpressComponent implements OnInit {
 
   togglePaginationResponseOption(event, disabled: boolean,
                                  includePaginationResponseForJsonPropertyKey: string,
-                                 paginationResponseTopLevelAbieIdPropertyKey: string) {
+                                 paginationResponseTopLevelAsbiepIdPropertyKey: string) {
     event.preventDefault();
     if (disabled) {
       return;
     }
 
-    if (this.option[paginationResponseTopLevelAbieIdPropertyKey]) {
+    if (this.option[paginationResponseTopLevelAsbiepIdPropertyKey]) {
       this.option[includePaginationResponseForJsonPropertyKey] = false;
-      this.option[paginationResponseTopLevelAbieIdPropertyKey] = undefined;
+      this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = undefined;
 
       this.option.packageOption = this.previousPackageOption;
     } else {
@@ -244,16 +245,16 @@ export class BieExpressComponent implements OnInit {
       this.bieListService.getPaginationResponseBieList().subscribe(resp => {
         dialogConfig.data = resp;
         const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selectedTopLevelAbieId => {
-          if (selectedTopLevelAbieId) {
+        dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+          if (selectedTopLevelAsbiepId) {
             this.option[includePaginationResponseForJsonPropertyKey] = true;
-            this.option[paginationResponseTopLevelAbieIdPropertyKey] = selectedTopLevelAbieId;
+            this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
             this.previousPackageOption = this.option.packageOption;
             this.option.packageOption = 'EACH';
           } else {
             this.option[includePaginationResponseForJsonPropertyKey] = false;
-            this.option[paginationResponseTopLevelAbieIdPropertyKey] = undefined;
+            this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = undefined;
           }
         });
       });

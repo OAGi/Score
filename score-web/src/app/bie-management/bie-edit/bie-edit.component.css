@@ -97,27 +97,12 @@
   margin-bottom: 0;
 }
 
+.bie-edit-detail-container {
+  padding: 10px 15px;
+}
+
 .bie-edit-detail-container div.checkbox {
   padding: 10px 0 20px 0;
-}
-
-.ngx-contextmenu a {
-  text-decoration: none;
-}
-
-.ngx-contextmenu .dropdown-menu {
-  padding: 0.25rem 0.8rem;
-}
-
-span.context-menu-item {
-  display: block;
-  font-size: 12px;
-  width: 92%;
-  outline: 0;
-  font-weight: 400;
-  border: solid 1px transparent;
-  line-height: 10px;
-  cursor: pointer;
 }
 
 .left-panel, .right-panel {
@@ -138,4 +123,17 @@ span.context-menu-item {
 
 .form-field-box {
   padding-bottom: 16px;
+}
+
+.bie-edit-detail-panel {
+  padding: 0 12px;
+}
+
+.detail-reused {
+  border: 1px solid #c8c8c8;
+  padding: 15px;
+  -moz-box-shadow: 1px 1px 2px 1px #ccc;
+  -webkit-box-shadow: 1px 1px 2px 1px #ccc;
+  box-shadow: 1px 1px 2px 1px #ccc;
+  margin-bottom: 15px;
 }

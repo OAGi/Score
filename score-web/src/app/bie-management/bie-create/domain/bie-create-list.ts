@@ -14,5 +14,5 @@ export interface Release {
 }
 
 export interface BieCreateResponse {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
 }

@@ -78,6 +78,6 @@ export class ExtensionDetailService {
   }
 
   getCcLastRevision(releaseId: number, type: String, Ccid: number): Observable<any> {
-    return this.http.get<CcNode>('/api/core_component/extension/' + releaseId + '/' + type + '/' + Ccid + '/reivision');
+    return this.http.get<CcNode>('/api/core_component/extension/' + releaseId + '/' + type + '/' + Ccid + '/revision');
   }
 }

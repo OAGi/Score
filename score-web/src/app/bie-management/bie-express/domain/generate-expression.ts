@@ -16,20 +16,20 @@ export class BieExpressOption {
 
   arrayForJsonExpression: boolean;
   includeMetaHeaderForJson: boolean;
-  metaHeaderTopLevelAbieId: number;
+  metaHeaderTopLevelAsbiepId: number;
   includePaginationResponseForJson: boolean;
-  paginationResponseTopLevelAbieId: number;
+  paginationResponseTopLevelAsbiepId: number;
 
   openAPIExpressionFormat: string;
   openAPI30GetTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30GetTemplate: boolean;
   includeMetaHeaderForJsonForOpenAPI30GetTemplate: boolean;
-  metaHeaderTopLevelAbieIdForOpenAPI30GetTemplate: number;
+  metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate: number;
   includePaginationResponseForJsonForOpenAPI30GetTemplate: boolean;
-  paginationResponseTopLevelAbieIdForOpenAPI30GetTemplate: number;
+  paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate: number;
 
   openAPI30PostTemplate: boolean;
   arrayForJsonExpressionForOpenAPI30PostTemplate: boolean;
   includeMetaHeaderForJsonForOpenAPI30PostTemplate: boolean;
-  metaHeaderTopLevelAbieIdForOpenAPI30PostTemplate: number;
+  metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate: number;
 }

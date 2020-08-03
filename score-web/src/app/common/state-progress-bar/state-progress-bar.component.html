@@ -3,10 +3,12 @@
     <div class="col-12">
       <div class="state-progress-bar">
         <div class="state-progress ellipsis {{ item.name }}" *ngFor="let item of data"
+
              [style.width.%]="getWidth(item)"
              [style.background-color]="item.style.bg_color">
           <a [routerLink]="item.href[0]" [queryParams]="{ q: getParams(item) }">
             <div class="state-progress-text"
+                 title="{{ item.name }} ({{ item.value }})"
                  [style.color]="item.style.text_color">{{ item.name }} ({{ item.value }})</div>
           </a>
         </div>

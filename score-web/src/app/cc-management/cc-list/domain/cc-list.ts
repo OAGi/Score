@@ -263,7 +263,7 @@ export class SummaryCcExt {
   ownerUsername: string;
   ownerUserId: number;
 
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
   propertyTerm: string;
   associationPropertyTerm: string;
   seqKey: number;

@@ -41,7 +41,7 @@ export class BieCreateAsccpComponent implements OnInit {
   releases: Release[] = [];
 
   displayedColumns: string[] = [
-    'select', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
@@ -215,7 +215,7 @@ export class BieCreateAsccpComponent implements OnInit {
         duration: 1000,
       });
 
-      this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAbieId']);
+      this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);
     });
   }
 

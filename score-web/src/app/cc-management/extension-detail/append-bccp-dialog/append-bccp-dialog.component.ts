@@ -31,7 +31,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 export class AppendBccpDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
+    'select', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<number>(false, []);

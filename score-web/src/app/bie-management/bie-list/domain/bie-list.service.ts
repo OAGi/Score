@@ -48,14 +48,26 @@ export class BieListService {
     if (request.filters.businessContext) {
       params = params.set('businessContext', request.filters.businessContext);
     }
+    if (request.filters.releaseId) {
+      params = params.set('releaseId', '' + request.filters.releaseId);
+    }
+    if (request.filters.asccpId) {
+      params = params.set('asccpId', '' + request.filters.asccpId);
+    }
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
     if (request.access) {
       params = params.set('access', request.access);
     }
-    if (request.excludes.length > 0) {
-      params = params.set('excludes', request.excludes.join(','));
+    if (request.excludePropertyTerms.length > 0) {
+      params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
+    }
+    if (request.excludeTopLevelAsbiepIds.length > 0) {
+      params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.map(e => '' + e).join(','));
+    }
+    if (request.ownedByDeveloper) {
+      params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
     return this.http.get<PageResponse<BieList>>('/api/bie_list', {params: params});
   }
@@ -84,14 +96,14 @@ export class BieListService {
     return this.http.get<BieList[]>('/api/profile_bie_list?biz_ctx_id=' + id);
   }
 
-  delete(topLevelAbieIds: number[]): Observable<any> {
+  delete(topLevelAsbiepIds: number[]): Observable<any> {
     return this.http.post<any>('/api/profile_bie_list/delete', {
-      topLevelAbieIds: topLevelAbieIds
+      topLevelAsbiepIds: topLevelAsbiepIds
     });
   }
 
-  transferOwnership(topLevelAbieId: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/profile_bie/' + topLevelAbieId + '/transfer_ownership', {
+  transferOwnership(topLevelAsbiepId: number, targetLoginId: string): Observable<any> {
+    return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepId + '/transfer_ownership', {
       targetLoginId: targetLoginId
     });
   }

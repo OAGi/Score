@@ -36,7 +36,9 @@ import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 export class BieListComponent implements OnInit {
   title = 'BIEs';
 
-  displayedColumns: string[] = ['select', 'propertyTerm', 'release', 'owner', 'transferOwnership', 'businessContexts', 'version',
+  displayedColumns: string[] = [
+    'select', 'state', 'propertyTerm', 'release', 'owner',
+    'transferOwnership', 'businessContexts', 'version',
     'status', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<BieList>();
@@ -167,20 +169,20 @@ export class BieListComponent implements OnInit {
 
   select(row: BieList) {
     if (row.access === 'CanEdit') {
-      this.selection.select(row.topLevelAbieId);
+      this.selection.select(row.topLevelAsbiepId);
     }
   }
 
   toggle(row: BieList) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.topLevelAbieId);
+      this.selection.deselect(row.topLevelAsbiepId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BieList) {
-    return this.selection.isSelected(row.topLevelAbieId);
+    return this.selection.isSelected(row.topLevelAsbiepId);
   }
 
   isEditable(element: BieList) {
@@ -207,16 +209,16 @@ export class BieListComponent implements OnInit {
   }
 
   openDialogBieDiscard() {
-    const topLevelAbieIds = this.selection.selected;
+    const topLevelAsbiepIds = this.selection.selected;
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.panelClass = ['confirm-dialog'];
     dialogConfig.autoFocus = false;
     dialogConfig.data = new ConfirmDialogConfig();
-    dialogConfig.data.header = 'Discard ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + '?';
+    dialogConfig.data.header = 'Discard ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + '?',
-      'The ' + (topLevelAbieIds.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
+      'Are you sure you want to discard selected ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?',
+      'The ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
     ];
 
     dialogConfig.data.action = 'Discard';
@@ -224,7 +226,7 @@ export class BieListComponent implements OnInit {
     this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(topLevelAbieIds).subscribe(_ => {
+          this.service.delete(topLevelAsbiepIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 1000,
             });
@@ -235,8 +237,8 @@ export class BieListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(topLevelAbieId: number, $event) {
-    console.log('openTransferDialog(' + topLevelAbieId + ', ' + $event + ')');
+  openTransferDialog(topLevelAsbiepId: number, $event) {
+    console.log('openTransferDialog(' + topLevelAsbiepId + ', ' + $event + ')');
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
@@ -244,7 +246,7 @@ export class BieListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(topLevelAbieId, result.loginId).subscribe(_ => {
+        this.service.transferOwnership(topLevelAsbiepId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 1000,
           });

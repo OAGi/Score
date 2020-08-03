@@ -8,11 +8,15 @@ export class BieListRequest {
   filters: {
     propertyTerm: string;
     businessContext: string;
+    releaseId: number;
+    asccpId: number;
   };
-  excludes: string[] = [];
+  excludePropertyTerms: string[] = [];
+  excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
   ownerLoginIds: string[] = [];
+  ownedByDeveloper: boolean;
   updaterLoginIds: string[] = [];
   updatedDate: {
     start: Date,
@@ -29,8 +33,10 @@ export class BieListRequest {
     this.page.pageIndex = Number(params.get('pageIndex') || (defaultPageRequest) ? defaultPageRequest.pageIndex : 0);
     this.page.pageSize = Number(params.get('pageSize') || (defaultPageRequest) ? defaultPageRequest.pageSize : 10);
 
-    this.excludes = (params.get('excludes')) ? Array.from(params.get('excludes').split(',')) : [];
+    this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
+    this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access');
+    this.ownedByDeveloper = params.get('ownedByDeveloper') === 'true' || false;
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
@@ -40,7 +46,9 @@ export class BieListRequest {
     };
     this.filters = {
       propertyTerm: params.get('propertyTerm') || '',
-      businessContext: params.get('businessContext') || ''
+      businessContext: params.get('businessContext') || '',
+      releaseId: Number(params.get('releaseId')) || 0,
+      asccpId: Number(params.get('asccpId')) || 0
     };
   }
 
@@ -51,8 +59,11 @@ export class BieListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.excludes && this.excludes.length > 0) {
-      params = params.set('excludes', this.excludes.join(','));
+    if (this.excludePropertyTerms && this.excludePropertyTerms.length > 0) {
+      params = params.set('excludePropertyTerms', this.excludePropertyTerms.join(','));
+    }
+    if (this.excludeTopLevelAsbiepIds && this.excludeTopLevelAsbiepIds.length > 0) {
+      params = params.set('excludeTopLevelAsbiepIds', this.excludeTopLevelAsbiepIds.join(','));
     }
     if (this.states && this.states.length > 0) {
       params = params.set('states', this.states.join(','));
@@ -78,13 +89,19 @@ export class BieListRequest {
     if (this.filters.businessContext && this.filters.businessContext.length > 0) {
       params = params.set('businessContext', '' + this.filters.businessContext);
     }
+    if (this.filters.releaseId) {
+      params = params.set('releaseId', this.filters.releaseId.toString());
+    }
+    if (this.filters.asccpId) {
+      params = params.set('asccpId', this.filters.asccpId.toString());
+    }
     const str = Base64.encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
 }
 
 export class BieList {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
   propertyTerm: string;
   guid: string;
   releaseNum: string;
@@ -94,6 +111,8 @@ export class BieList {
   owner: string;
   version: string;
   status: string;
+  bizTerm: string;
+  remark: string;
   lastUpdateTimestamp: Date;
   lastUpdateUser: string;
   state: string;
@@ -101,7 +120,7 @@ export class BieList {
 }
 
 export class SummaryBie {
-  topLevelAbieId: number;
+  topLevelAsbiepId: number;
   lastUpdateTimestamp: Date;
   state: string;
   ownerUsername: string;
