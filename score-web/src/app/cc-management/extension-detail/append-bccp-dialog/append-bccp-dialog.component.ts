@@ -1,5 +1,8 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ExtensionDetailComponent} from '../extension-detail.component';
 import {ExtensionDetailService} from '../domain/extension-detail.service';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -7,7 +10,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {CcList, CcListRequest} from '../../cc-list/domain/cc-list';
 import {CcListService} from '../../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';

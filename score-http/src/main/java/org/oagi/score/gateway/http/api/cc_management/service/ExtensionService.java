@@ -25,7 +25,7 @@ import org.oagi.score.gateway.http.helper.SrtGuid;
 import org.oagi.score.gateway.http.helper.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +64,7 @@ public class ExtensionService {
     private ACCCachingRepository accRepository;
 
 
-    public CcAccNode getExtensionNode(User user, long extensionId, long releaseId) {
+    public CcAccNode getExtensionNode(AuthenticatedPrincipal user, long extensionId, long releaseId) {
         CcAccNode ueAcc = repository.getAccNodeByAccId(extensionId, null);
         CcAsccpNode asccpNode = repository.getAsccpNodeByRoleOfAccId(ueAcc.getAccId(), null);
         CcAccNode eAcc = repository.getAccNodeFromAsccByAsccpId(asccpNode.getAsccpId(), releaseId);
@@ -138,7 +138,7 @@ public class ExtensionService {
 
     @Transactional
     public long appendUserExtension(BieEditAcc eAcc, ACC ueAcc,
-                                    long releaseId, User user) {
+                                    long releaseId, AuthenticatedPrincipal user) {
         if (ueAcc != null) {
             if (CcState.Published.getValue() == ueAcc.getState()) {
                 return increaseRevisionNum(ueAcc, releaseId, user);
@@ -150,7 +150,7 @@ public class ExtensionService {
         }
     }
 
-    private long increaseRevisionNum(ACC ueAcc, long releaseId, User user) {
+    private long increaseRevisionNum(ACC ueAcc, long releaseId, AuthenticatedPrincipal user) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -317,7 +317,7 @@ public class ExtensionService {
                 .fetch();
     }
 
-    private long createNewUserExtensionGroupACC(ACC eAcc, long releaseId, User user) {
+    private long createNewUserExtensionGroupACC(ACC eAcc, long releaseId, AuthenticatedPrincipal user) {
         AccRecord ueAcc = createACCForExtension(eAcc, user);
         createACCHistoryForExtension(ueAcc, 1, releaseId);
 
@@ -330,7 +330,7 @@ public class ExtensionService {
         return ueAcc.getAccId().longValue();
     }
 
-    private AccRecord createACCForExtension(ACC eAcc, User user) {
+    private AccRecord createACCForExtension(ACC eAcc, AuthenticatedPrincipal user) {
         String objectClassTerm = Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm());
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -404,7 +404,7 @@ public class ExtensionService {
         ).execute();
     }
 
-    private AsccpRecord createASCCPForExtension(ACC eAcc, User user, AccRecord ueAcc) {
+    private AsccpRecord createASCCPForExtension(ACC eAcc, AuthenticatedPrincipal user, AccRecord ueAcc) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -489,7 +489,7 @@ public class ExtensionService {
         ).execute();
     }
 
-    private AsccRecord createASCCForExtension(ACC eAcc, User user, AccRecord ueAcc, AsccpRecord ueAsccp) {
+    private AsccRecord createASCCForExtension(ACC eAcc, AuthenticatedPrincipal user, AccRecord ueAcc, AsccpRecord ueAsccp) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -637,7 +637,7 @@ public class ExtensionService {
 
 
     @Transactional
-    public void appendAsccp(User user, long extensionId, Long releaseId, long asccpId) {
+    public void appendAsccp(AuthenticatedPrincipal user, long extensionId, Long releaseId, long asccpId) {
         int nextSeqKey = getNextSeqKey(extensionId);
 
         asccpId = dslContext.select(ASCCP.CURRENT_ASCCP_ID)
@@ -663,7 +663,7 @@ public class ExtensionService {
         createASCCHistory(ascc, revisionNum, releaseId);
     }
 
-    private AsccRecord createASCC(User user, long accId, long asccpId, int seqKey) {
+    private AsccRecord createASCC(AuthenticatedPrincipal user, long accId, long asccpId, int seqKey) {
         String accObjectClassTerm = dslContext.select(ACC.OBJECT_CLASS_TERM)
                 .from(ACC).where(ACC.ACC_ID.eq(ULong.valueOf(accId)))
                 .fetchOneInto(String.class);
@@ -756,7 +756,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public void appendBccp(User user, long extensionId, Long releaseId, long bccpId) {
+    public void appendBccp(AuthenticatedPrincipal user, long extensionId, Long releaseId, long bccpId) {
         int nextSeqKey = getNextSeqKey(extensionId);
 
         bccpId = dslContext.select(BCCP.CURRENT_BCCP_ID)
@@ -782,7 +782,7 @@ public class ExtensionService {
         createBCCHistory(bcc, revisionNum, releaseId);
     }
 
-    private BccRecord createBCC(User user, long accId, long bccpId, int seqKey) {
+    private BccRecord createBCC(AuthenticatedPrincipal user, long accId, long bccpId, int seqKey) {
         String accObjectClassTerm = dslContext.select(ACC.OBJECT_CLASS_TERM)
                 .from(ACC).where(ACC.ACC_ID.eq(ULong.valueOf(accId)))
                 .fetchOneInto(String.class);
@@ -899,7 +899,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public void discardAscc(User user, long extensionId, Long releaseId, long asccId) {
+    public void discardAscc(AuthenticatedPrincipal user, long extensionId, Long releaseId, long asccId) {
         AsccRecord asccRecord = dslContext.selectFrom(Tables.ASCC)
                 .where(ASCC.ASCC_ID.eq(ULong.valueOf(asccId))).fetchOne();
         dslContext.deleteFrom(Tables.ASCC)
@@ -912,7 +912,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public void discardBcc(User user, long extensionId, Long releaseId, long bccId) {
+    public void discardBcc(AuthenticatedPrincipal user, long extensionId, Long releaseId, long bccId) {
         BccRecord bccRecord = dslContext.selectFrom(Tables.BCC)
                 .where(BCC.BCC_ID.eq(ULong.valueOf(bccId))).fetchOne();
         dslContext.deleteFrom(Tables.BCC)
@@ -943,7 +943,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public void updateState(User user, long extensionId, Long releaseId, CcState state) {
+    public void updateState(AuthenticatedPrincipal user, long extensionId, Long releaseId, CcState state) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -1189,7 +1189,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public ExtensionUpdateResponse updateDetails(User user, ExtensionUpdateRequest request) {
+    public ExtensionUpdateResponse updateDetails(AuthenticatedPrincipal user, ExtensionUpdateRequest request) {
         ExtensionUpdateResponse response = new ExtensionUpdateResponse();
 
         ULong extensionId = ULong.valueOf(request.getExtensionId());
@@ -1333,7 +1333,7 @@ public class ExtensionService {
     }
 
     @Transactional
-    public void transferOwnership(User user, long releaseId, long extensionId, String targetLoginId) {
+    public void transferOwnership(AuthenticatedPrincipal user, long releaseId, long extensionId, String targetLoginId) {
         long targetAppUserId = dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
                 .where(APP_USER.LOGIN_ID.equalIgnoreCase(targetLoginId))
@@ -1505,7 +1505,7 @@ public class ExtensionService {
         }
     }
 
-    public CcNode getLastRevisionCc(User user, String type, long id) {
+    public CcNode getLastRevisionCc(AuthenticatedPrincipal user, String type, long id) {
         if (type.equals("ascc")) {
             ULong currentAsccId = dslContext.select(ASCC.CURRENT_ASCC_ID)
                     .from(ASCC)

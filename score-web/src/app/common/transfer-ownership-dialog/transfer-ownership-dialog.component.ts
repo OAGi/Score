@@ -1,5 +1,8 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatDialogRef, MatPaginator, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {AccountList, AccountListRequest} from '../../account-management/domain/accounts';
 import {PageRequest} from '../../basis/basis';
@@ -28,7 +31,8 @@ export class TransferOwnershipDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<TransferOwnershipDialogComponent>,
     private accountService: AccountListService,
-    private authService: AuthService) {
+    private authService: AuthService,
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   onNoClick(): void {

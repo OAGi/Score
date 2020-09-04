@@ -1,39 +1,43 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AuthService} from '../../authentication/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {environment} from '../../../environments/environment';
+import {OAuth2AppInfo} from '../../authentication/domain/auth';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'score-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements AfterViewChecked {
 
   credentials = {username: '', password: ''};
   next = '';
   err = undefined;
 
-  constructor(private auth: AuthService,
+  paddingTop: string = '10%';
+  observer;
+  @ViewChild('authForm', {static: false, read: ElementRef}) authForm: ElementRef;
+  oauth2AppInfos: Observable<OAuth2AppInfo[]>;
+
+  constructor(public auth: AuthService,
               private http: HttpClient,
               private route: ActivatedRoute,
               private router: Router) {
 
-  }
+    this.route.queryParams.subscribe(params => {
+      this.next = this.auth.nextParam(params['next']);
+      if (!this.next) {
+        this.next = '/';
+      }
 
-  ngOnInit() {
-    this.route.queryParams
-      .subscribe(params => {
-        this.next = params['next'] || '/';
-        if (this.next.indexOf(environment.loginPath) !== -1) {
-          this.next = '/';
-        }
+      if (this.auth.isAuthenticated()) {
+        this.router.navigateByUrl(this.next);
+      }
+    });
 
-        if (this.auth.isAuthenticated()) {
-          this.router.navigateByUrl(this.next);
-        }
-      });
+    this.oauth2AppInfos = this.auth.getOAuth2AppInfos();
   }
 
   login() {
@@ -42,10 +46,25 @@ export class LoginComponent implements OnInit {
     }, err => {
       this.err = err;
     });
+
     return false;
   }
 
   onClose() {
     this.err = undefined;
+  }
+
+  onResize(event?) {
+    this.paddingTop = Math.max(window.innerHeight - this.authForm.nativeElement.offsetHeight, 30) / 2 + 'px';
+  }
+
+  ngAfterViewChecked(): void {
+    setTimeout(() => {
+      this.onResize();
+    }, 0);
+  }
+
+  get role(): string {
+    return this.auth.getUserToken().role;
   }
 }

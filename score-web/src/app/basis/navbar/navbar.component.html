@@ -51,6 +51,7 @@
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
+        <button mat-menu-item routerLink="account/pending">Pending SSO</button>
       </ng-template>
     </mat-menu>
 
@@ -84,7 +85,7 @@
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="settings">Settings</button>
+        <button mat-menu-item routerLink="settings" *ngIf="userToken.role">Settings</button>
         <button mat-menu-item (click)="logout()">Logout</button>
       </ng-template>
     </mat-menu>

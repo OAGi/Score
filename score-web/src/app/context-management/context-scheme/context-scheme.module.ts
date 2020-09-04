@@ -8,7 +8,6 @@ import {ContextSchemeService} from './domain/context-scheme.service';
 import {ContextSchemeListComponent} from './context-scheme-list/context-scheme-list.component';
 import {ContextSchemeCreateComponent} from './context-scheme-create/context-scheme-create.component';
 import {ContextSchemeDetailComponent} from './context-scheme-detail/context-scheme-detail.component';
-import {GrowlModule} from 'ngx-growl';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
 import {ContextSchemeValueDialogComponent} from './context-scheme-value-dialog/context-scheme-value-dialog.component';
 
@@ -42,7 +41,6 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
-    GrowlModule.forRoot({maxMessages: 2, displayTimeMs: 5000}),
     CommonModule,
   ],
   declarations: [

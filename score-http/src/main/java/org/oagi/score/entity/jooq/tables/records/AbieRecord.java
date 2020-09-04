@@ -38,7 +38,7 @@ import org.oagi.score.entity.jooq.tables.Abie;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AbieRecord extends UpdatableRecordImpl<AbieRecord> implements Record13<ULong, String, ULong, ULong, String, ULong, ULong, Timestamp, Timestamp, Integer, String, String, ULong> {
 
-    private static final long serialVersionUID = -375117965;
+    private static final long serialVersionUID = -1045874029;
 
     /**
      * Setter for <code>oagi.abie.abie_id</code>. A internal, primary database key of an ABIE.

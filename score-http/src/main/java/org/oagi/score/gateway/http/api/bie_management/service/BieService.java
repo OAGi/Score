@@ -21,7 +21,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repository.ABIERepository;
 import org.oagi.score.repository.BizCtxRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -90,7 +90,7 @@ public class BieService {
     }
 
     @Transactional
-    public BieCreateResponse createBie(User user, BieCreateRequest request) {
+    public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
 
         long userId = sessionService.userId(user);
         long releaseId = request.getReleaseId();
@@ -169,7 +169,7 @@ public class BieService {
                 .join(Tables.RELEASE).on(Tables.RELEASE.RELEASE_ID.eq(Tables.TOP_LEVEL_ASBIEP.RELEASE_ID));
     }
 
-    public PageResponse<BieList> getBieList(User user, BieListRequest request) {
+    public PageResponse<BieList> getBieList(AuthenticatedPrincipal user, BieListRequest request) {
         SelectOnConditionStep<Record13<
                 ULong, String, String, String, ULong,
                 String, String, String, String, String,
@@ -346,7 +346,7 @@ public class BieService {
         });
     }
 
-    private List<BieList> appendAccessPrivilege(List<BieList> bieLists, User user) {
+    private List<BieList> appendAccessPrivilege(List<BieList> bieLists, AuthenticatedPrincipal user) {
         long userId = sessionService.userId(user);
 
         bieLists.stream().forEach(e -> {
@@ -388,7 +388,7 @@ public class BieService {
         return bieLists;
     }
 
-    private List<BieList> getBieList(User user, Condition condition) {
+    private List<BieList> getBieList(AuthenticatedPrincipal user, Condition condition) {
         SelectOnConditionStep<Record10<
                 ULong, String, String, String,
                 ULong, String, String, String,
@@ -454,16 +454,16 @@ public class BieService {
         return bizCtxRepository.findByTopLevelAsbiep(top).get(0);
     }
 
-    public List<BieList> getMetaHeaderBieList(User user) {
+    public List<BieList> getMetaHeaderBieList(AuthenticatedPrincipal user) {
         return getBieList(user, ASCCP.PROPERTY_TERM.eq("Meta Header"));
     }
 
-    public List<BieList> getPaginationResponseBieList(User user) {
+    public List<BieList> getPaginationResponseBieList(AuthenticatedPrincipal user) {
         return getBieList(user, ASCCP.PROPERTY_TERM.eq("Pagination Response"));
     }
 
     @Transactional
-    public void deleteBieList(User requester, List<Long> topLevelAsbiepIds) {
+    public void deleteBieList(AuthenticatedPrincipal requester, List<Long> topLevelAsbiepIds) {
         if (topLevelAsbiepIds == null || topLevelAsbiepIds.isEmpty()) {
             return;
         }
@@ -489,7 +489,7 @@ public class BieService {
         dslContext.query("SET FOREIGN_KEY_CHECKS = 1").execute();
     }
 
-    private void ensureProperDeleteBieRequest(User requester, List<Long> topLevelAsbiepIds) {
+    private void ensureProperDeleteBieRequest(AuthenticatedPrincipal requester, List<Long> topLevelAsbiepIds) {
         Result<Record2<Integer, ULong>> result =
                 dslContext.select(TOP_LEVEL_ASBIEP.STATE, TOP_LEVEL_ASBIEP.OWNER_USER_ID)
                         .from(TOP_LEVEL_ASBIEP)
@@ -512,10 +512,12 @@ public class BieService {
     }
 
     @Transactional
-    public void transferOwnership(User user, long topLevelAsbiepId, String targetLoginId) {
+    public void transferOwnership(AuthenticatedPrincipal user, long topLevelAsbiepId, String targetLoginId) {
         long ownerAppUserId = dslContext.select(APP_USER.APP_USER_ID)
                 .from(APP_USER)
-                .where(APP_USER.LOGIN_ID.equalIgnoreCase(user.getUsername()))
+                .where(APP_USER.LOGIN_ID.equalIgnoreCase(
+                        sessionService.getAppUser(user).getLoginId()
+                ))
                 .fetchOptionalInto(Long.class).orElse(0L);
         if (ownerAppUserId == 0L) {
             throw new IllegalArgumentException("Not found an owner user.");
@@ -550,7 +552,7 @@ public class BieService {
     }
 
     @Transactional
-    public void assignBizCtx(User user, long topLevelAsbiepId, Collection<Long> biz_ctx_list) {
+    public void assignBizCtx(AuthenticatedPrincipal user, long topLevelAsbiepId, Collection<Long> biz_ctx_list) {
         ArrayList<Long> newList = new ArrayList<>(biz_ctx_list);
         //remove all records of previous assignment if not in the current assignment
         dslContext.delete(BIZ_CTX_ASSIGNMENT)

@@ -2,8 +2,37 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>{{ title }}</mat-card-title>
-      <ngx-growl></ngx-growl>
     </mat-card-header>
+
+    <div *ngIf="isLinkOauth2()" class="detail-pending">
+      <h4 class="mb-2"> Pending Account Information</h4>
+      <div class="row">
+        <div class="col-3" *ngIf="pending.name">
+          <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="pending.name" [disabled]="true">
+          </mat-form-field>
+        </div>
+        <div class="col-3" *ngIf="pending.nickname">
+          <mat-form-field>
+            <mat-label>Nickname</mat-label>
+            <input matInput [(ngModel)]="pending.nickname" [disabled]="true">
+          </mat-form-field>
+        </div>
+        <div class="col-3" *ngIf="pending.preferredUsername">
+          <mat-form-field>
+            <mat-label>Preferred Username</mat-label>
+            <input matInput [(ngModel)]="pending.preferredUsername" [disabled]="true">
+          </mat-form-field>
+        </div>
+        <div class="col-3" *ngIf="pending.email">
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput [(ngModel)]="pending.email" [disabled]="true">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
 
     <mat-card style="margin-bottom: 24px;">
       <mat-card-content class="mat-card-container">
@@ -31,7 +60,7 @@
           </mat-checkbox>
         </div>
 
-        <mat-form-field>
+        <mat-form-field *ngIf="!isLinkOauth2()">
           <mat-label>Password</mat-label>
           <input matInput type="password" required data-id="user.newPassword" autocomplete="new-password"
                  [(ngModel)]="newPassword" minlength="5" maxlength="100"/>
@@ -40,7 +69,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field *ngIf="!isLinkOauth2()">
           <mat-label>Confirm password</mat-label>
           <input matInput type="password" required data-id="user.confirmPassword"
                  [(ngModel)]="confirmPassword" minlength="5" maxlength="100"/>

@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.Asbiep;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AsbiepRecord extends UpdatableRecordImpl<AsbiepRecord> implements Record12<ULong, String, ULong, ULong, String, String, String, ULong, ULong, Timestamp, Timestamp, ULong> {
 
-    private static final long serialVersionUID = -419674888;
+    private static final long serialVersionUID = -79172136;
 
     /**
      * Setter for <code>oagi.asbiep.asbiep_id</code>. A internal, primary database key of an ASBIEP.

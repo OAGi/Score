@@ -1,10 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';

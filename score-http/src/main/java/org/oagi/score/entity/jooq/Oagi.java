@@ -17,6 +17,7 @@ import org.oagi.score.entity.jooq.tables.Abie;
 import org.oagi.score.entity.jooq.tables.Acc;
 import org.oagi.score.entity.jooq.tables.AgencyIdList;
 import org.oagi.score.entity.jooq.tables.AgencyIdListValue;
+import org.oagi.score.entity.jooq.tables.AppOauth2User;
 import org.oagi.score.entity.jooq.tables.AppUser;
 import org.oagi.score.entity.jooq.tables.Asbie;
 import org.oagi.score.entity.jooq.tables.Asbiep;
@@ -51,6 +52,8 @@ import org.oagi.score.entity.jooq.tables.DtUsageRule;
 import org.oagi.score.entity.jooq.tables.Module;
 import org.oagi.score.entity.jooq.tables.ModuleDep;
 import org.oagi.score.entity.jooq.tables.Namespace;
+import org.oagi.score.entity.jooq.tables.Oauth2App;
+import org.oagi.score.entity.jooq.tables.Oauth2AppScope;
 import org.oagi.score.entity.jooq.tables.Release;
 import org.oagi.score.entity.jooq.tables.TopLevelAsbiep;
 import org.oagi.score.entity.jooq.tables.UsageRule;
@@ -71,7 +74,7 @@ import org.oagi.score.entity.jooq.tables.Xbt;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oagi extends SchemaImpl {
 
-    private static final long serialVersionUID = 1953424607;
+    private static final long serialVersionUID = -1780780673;
 
     /**
      * The reference instance of <code>oagi</code>
@@ -103,6 +106,11 @@ In OAGIS, all XSD extensions will be treated as a qualification of an ACC.
      * This table captures the values within an agency identification list.
      */
     public final AgencyIdListValue AGENCY_ID_LIST_VALUE = org.oagi.score.entity.jooq.tables.AgencyIdListValue.AGENCY_ID_LIST_VALUE;
+
+    /**
+     * The table <code>oagi.app_oauth2_user</code>.
+     */
+    public final AppOauth2User APP_OAUTH2_USER = org.oagi.score.entity.jooq.tables.AppOauth2User.APP_OAUTH2_USER;
 
     /**
      * This table captures the user information for authentication and authorization purposes.
@@ -281,6 +289,16 @@ If we use a separate table for each expression, then we need binding all the way
     public final Namespace NAMESPACE = org.oagi.score.entity.jooq.tables.Namespace.NAMESPACE;
 
     /**
+     * The table <code>oagi.oauth2_app</code>.
+     */
+    public final Oauth2App OAUTH2_APP = org.oagi.score.entity.jooq.tables.Oauth2App.OAUTH2_APP;
+
+    /**
+     * The table <code>oagi.oauth2_app_scope</code>.
+     */
+    public final Oauth2AppScope OAUTH2_APP_SCOPE = org.oagi.score.entity.jooq.tables.Oauth2AppScope.OAUTH2_APP_SCOPE;
+
+    /**
      * The is table store the release information.
      */
     public final Release RELEASE = org.oagi.score.entity.jooq.tables.Release.RELEASE;
@@ -331,6 +349,7 @@ If we use a separate table for each expression, then we need binding all the way
             Acc.ACC,
             AgencyIdList.AGENCY_ID_LIST,
             AgencyIdListValue.AGENCY_ID_LIST_VALUE,
+            AppOauth2User.APP_OAUTH2_USER,
             AppUser.APP_USER,
             Asbie.ASBIE,
             Asbiep.ASBIEP,
@@ -365,6 +384,8 @@ If we use a separate table for each expression, then we need binding all the way
             Module.MODULE,
             ModuleDep.MODULE_DEP,
             Namespace.NAMESPACE,
+            Oauth2App.OAUTH2_APP,
+            Oauth2AppScope.OAUTH2_APP_SCOPE,
             Release.RELEASE,
             TopLevelAsbiep.TOP_LEVEL_ASBIEP,
             UsageRule.USAGE_RULE,

@@ -8,7 +8,7 @@ import org.oagi.score.gateway.http.api.release_management.data.ReleaseState;
 import org.oagi.score.gateway.http.api.release_management.data.SimpleRelease;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ public class ReleaseService {
                 .fetchOneInto(SimpleRelease.class);
     }
 
-    public List<ReleaseList> getReleaseList(User user) {
+    public List<ReleaseList> getReleaseList(AuthenticatedPrincipal user) {
         List<ReleaseList> releaseLists = dslContext.select(Tables.RELEASE.RELEASE_ID,
                 Tables.RELEASE.RELEASE_NUM,
                 Tables.RELEASE.LAST_UPDATE_TIMESTAMP,

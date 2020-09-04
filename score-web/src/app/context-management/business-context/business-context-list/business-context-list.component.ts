@@ -1,19 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BusinessContext, BusinessContextListRequest} from '../domain/business-context';
 import {BusinessContextService} from '../domain/business-context.service';
-import {
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource,
-  PageEvent,
-  SortDirection
-} from '@angular/material';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -23,6 +17,7 @@ import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dia
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 
 @Component({
   selector: 'score-business-context',
@@ -31,7 +26,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class BusinessContextListComponent implements OnInit {
 
-  title = 'Business Contexts';
+  title = 'Business Context';
   displayedColumns: string[] = [
     'select', 'name', 'lastUpdateTimestamp'
   ];

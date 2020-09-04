@@ -1,20 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieListService} from './domain/bie-list.service';
-import {
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource,
-  PageEvent,
-  SortDirection
-} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BieList, BieListRequest} from './domain/bie-list';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
@@ -34,7 +29,7 @@ import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
   styleUrls: ['./bie-list.component.css']
 })
 export class BieListComponent implements OnInit {
-  title = 'BIEs';
+  title = 'BIE';
 
   displayedColumns: string[] = [
     'select', 'state', 'propertyTerm', 'release', 'owner',

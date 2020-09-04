@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {StateProgressBarItem} from './state-progress-bar';
 import {HttpParams} from '@angular/common/http';
-import {Base64} from 'js-base64';
+import {base64Encode} from '../utility';
 
 @Component({
   selector: 'score-state-progress-bar',
@@ -27,7 +27,7 @@ export class StateProgressBarComponent implements OnInit {
     for (const param of item.href[1]) {
       params = params.set(param['key'], param['value']);
     }
-    return Base64.encode(params.toString());
+    return base64Encode(params.toString());
   }
 
   getWidth(item: StateProgressBarItem): number {

@@ -3,7 +3,7 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategory} from '../domain/context-category';
-import {MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'score-context-category-create',

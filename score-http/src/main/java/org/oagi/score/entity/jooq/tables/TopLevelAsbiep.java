@@ -45,7 +45,7 @@ import org.oagi.score.entity.jooq.tables.records.TopLevelAsbiepRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
 
-    private static final long serialVersionUID = 1656878145;
+    private static final long serialVersionUID = -1428383906;
 
     /**
      * The reference instance of <code>oagi.top_level_asbiep</code>

@@ -8,6 +8,7 @@ import {JoinComponent} from './join/join.component';
 import {NavbarComponent} from './navbar/navbar.component';
 import {FooterComponent} from './footer/footer.component';
 import {NotFoundComponent} from './not-found/not-found.component';
+import {PendingActivate, PendingComponent} from './pending/pending.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
 import {MaterialModule} from '../material.module';
@@ -57,10 +58,12 @@ const routes: Routes = [
     NavbarComponent,
     FooterComponent,
     NotFoundComponent,
-    AboutComponent
+    AboutComponent,
+    PendingComponent,
   ],
   providers: [
-    AboutService
+    AboutService,
+    PendingActivate,
   ]
 })
 export class BasisModule {

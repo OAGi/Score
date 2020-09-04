@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {AccountList, AccountListRequest} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {AuthService} from '../../authentication/auth.service';
@@ -15,9 +17,9 @@ import {finalize} from 'rxjs/operators';
 })
 export class AccountListComponent implements OnInit {
 
-  title = 'Accounts';
+  title = 'Account';
   displayedColumns: string[] = [
-    'loginId', 'name', 'organization', 'developer'
+    'loginId', 'role', 'name', 'organization'
   ];
   dataSource = new MatTableDataSource<AccountList>();
   loading = false;
@@ -72,6 +74,7 @@ export class AccountListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
+      this.paginator.pageIndex = resp.page;
       this.dataSource.data = resp.list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());

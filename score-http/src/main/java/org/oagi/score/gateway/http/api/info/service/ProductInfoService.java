@@ -29,6 +29,7 @@ public class ProductInfoService {
     private static final String artifactId = "score-http";
     private static final String unknownVersion = "0.0.0.0";
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private DataSource dataSource;
 

@@ -4,7 +4,7 @@ import {AsccpDetailComponent} from './asccp-detail.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
-import {MatInputModule} from '@angular/material';
+import {MatInputModule} from '@angular/material/input';
 import {AuthService} from '../../authentication/auth.service';
 import {AsccpCreateComponent} from '../asccp-create/asccp-create.component';
 import {TranslateModule} from '@ngx-translate/core';

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Base64} from 'js-base64';
+import {base64Encode} from '../../common/utility';
 import {CcAccNode, CcAsccpNode, CcAsccpNodeDetail, CcBccpNode, CcNode, CcNodeDetail} from './core-component-node';
 import {Acc} from '../cc-list/domain/cc-list';
 
@@ -102,7 +102,7 @@ export class CcNodeService {
         }
         return p;
       }, new HttpParams());
-    const data = Base64.encode(params.toString());
+    const data = base64Encode(params.toString());
     return new HttpParams().set('data', data);
   }
 

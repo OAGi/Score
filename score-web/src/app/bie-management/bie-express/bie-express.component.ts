@@ -1,5 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatTableDataSource} from '@angular/material/table';
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {SelectionModel} from '../../../../node_modules/@angular/cdk/collections';
 import {BieExpressService} from './domain/bie-express.service';
@@ -9,7 +12,7 @@ import {saveAs} from 'file-saver/FileSaver';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';

@@ -20,7 +20,7 @@ import org.oagi.score.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,7 +128,7 @@ public class CcListService {
         return pageResponse;
     }
 
-    public List<AsccpForAppendAsccp> getAsccpForAppendAsccpList(User user, long releaseId, long extensionId) {
+    public List<AsccpForAppendAsccp> getAsccpForAppendAsccpList(AuthenticatedPrincipal user, long releaseId, long extensionId) {
         return dslContext.select(
                 ASCCP.ASCCP_ID,
                 ASCCP.CURRENT_ASCCP_ID,
@@ -149,7 +149,7 @@ public class CcListService {
                 .values().stream().map(e -> CcUtility.getLatestEntity(releaseId, e)).collect(Collectors.toList());
     }
 
-    public List<BccpForAppendBccp> getBccpForAppendBccpList(User user, long releaseId, long extensionId) {
+    public List<BccpForAppendBccp> getBccpForAppendBccpList(AuthenticatedPrincipal user, long releaseId, long extensionId) {
         return dslContext.select(
                 BCCP.BCCP_ID,
                 BCCP.CURRENT_BCCP_ID,
@@ -211,7 +211,7 @@ public class CcListService {
                 .fetchOneInto(org.oagi.score.data.BCC.class);
     }
 
-    public List<SummaryCcExt> getMyExtensionsUnusedInBIEs(User user) {
+    public List<SummaryCcExt> getMyExtensionsUnusedInBIEs(AuthenticatedPrincipal user) {
         long requesterId = sessionService.userId(user);
 
         List<ULong> uegIds = dslContext.select(max(Tables.ACC.CURRENT_ACC_ID).as("id"))

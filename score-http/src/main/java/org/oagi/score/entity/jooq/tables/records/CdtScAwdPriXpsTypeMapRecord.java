@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.CdtScAwdPriXpsTypeMap;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtScAwdPriXpsTypeMapRecord extends UpdatableRecordImpl<CdtScAwdPriXpsTypeMapRecord> implements Record3<ULong, ULong, ULong> {
 
-    private static final long serialVersionUID = 387548214;
+    private static final long serialVersionUID = 1485920022;
 
     /**
      * Setter for <code>oagi.cdt_sc_awd_pri_xps_type_map.cdt_sc_awd_pri_xps_type_map_id</code>. Internal, primary database key.

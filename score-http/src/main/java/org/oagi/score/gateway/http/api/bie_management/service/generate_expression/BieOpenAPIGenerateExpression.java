@@ -70,9 +70,14 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
          * Issue #587
          */
         if (option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()) {
-            TopLevelAsbiep metaHeaderTopLevelAsbiep =
+            TopLevelAsbiep getMetaHeaderTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate());
-            mergedTopLevelAsbieps.add(metaHeaderTopLevelAsbiep);
+            mergedTopLevelAsbieps.add(getMetaHeaderTopLevelAsbiep);
+        }
+        if (option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
+            TopLevelAsbiep postMetaHeaderTopLevelAsbiep =
+                    topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate());
+            mergedTopLevelAsbieps.add(postMetaHeaderTopLevelAsbiep);
         }
         if (option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
             TopLevelAsbiep paginationResponseTopLevelAsbiep =

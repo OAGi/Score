@@ -2,11 +2,10 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MaterialModule} from '../../material.module';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
-import {GrowlModule} from 'ngx-growl';
 import {AuthService} from '../../authentication/auth.service';
 import {BieExpressComponent} from './bie-express.component';
 import {BieExpressService} from './domain/bie-express.service';
@@ -28,7 +27,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    GrowlModule.forRoot({maxMessages: 10, displayTimeMs: 5000}),
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),

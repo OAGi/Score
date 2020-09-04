@@ -20,7 +20,6 @@ import {BieCopyService} from './bie-copy/domain/bie-copy.service';
 import {ReleaseService} from '../release-management/domain/release.service';
 
 import {TranslateModule} from '@ngx-translate/core';
-import {GrowlModule} from 'ngx-growl';
 import {BieEditModule} from './bie-edit/bie-edit.module';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 
@@ -77,7 +76,6 @@ const routes: Routes = [
     BieExpressModule,
     BieEditModule,
     TransferOwnershipDialogModule,
-    GrowlModule.forRoot({maxMessages: 10, displayTimeMs: 5000}),
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),

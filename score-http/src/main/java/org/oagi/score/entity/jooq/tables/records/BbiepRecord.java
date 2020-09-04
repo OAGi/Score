@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.Bbiep;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BbiepRecord extends UpdatableRecordImpl<BbiepRecord> implements Record11<ULong, String, ULong, String, String, String, ULong, ULong, Timestamp, Timestamp, ULong> {
 
-    private static final long serialVersionUID = -1315712334;
+    private static final long serialVersionUID = -445737518;
 
     /**
      * Setter for <code>oagi.bbiep.bbiep_id</code>. A internal, primary database key of an BBIEP.

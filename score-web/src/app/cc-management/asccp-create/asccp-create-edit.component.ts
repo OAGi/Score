@@ -1,6 +1,6 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {CcNodeService} from '../domain/core-component-node.service';
-import {MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {
   CcAccNode,
   CcAsccpNodeDetail,
@@ -42,7 +42,7 @@ export class DynamicCcDataSource {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicCcFlatNode[]> {
-    this.treeControl.expansionModel.onChange.subscribe(change => {
+    this.treeControl.expansionModel.changed.subscribe(change => {
       if ((change as SelectionChange<DynamicCcFlatNode>).added ||
         (change as SelectionChange<DynamicCcFlatNode>).removed) {
         this.handleTreeControl(change as SelectionChange<DynamicCcFlatNode>);

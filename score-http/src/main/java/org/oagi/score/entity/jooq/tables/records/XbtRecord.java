@@ -32,7 +32,7 @@ import org.oagi.score.entity.jooq.tables.Xbt;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class XbtRecord extends UpdatableRecordImpl<XbtRecord> implements Record21<ULong, String, String, String, String, ULong, String, ULong, ULong, String, Integer, ULong, ULong, ULong, Timestamp, Timestamp, Integer, Integer, Byte, ULong, Byte> {
 
-    private static final long serialVersionUID = 2092243665;
+    private static final long serialVersionUID = 1167895473;
 
     /**
      * Setter for <code>oagi.xbt.xbt_id</code>. Primary, internal database key.

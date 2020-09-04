@@ -46,7 +46,7 @@ import org.oagi.score.entity.jooq.tables.records.DtUsageRuleRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
 
-    private static final long serialVersionUID = -641424304;
+    private static final long serialVersionUID = 595310009;
 
     /**
      * The reference instance of <code>oagi.dt_usage_rule</code>

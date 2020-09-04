@@ -1,7 +1,8 @@
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatDialogModule} from '@angular/material/dialog';
 import {MaterialModule} from '../../material.module';
-import {MatDialogModule} from '@angular/material';
+
 import {CommonModule} from '@angular/common';
 import {ConfirmDialogComponent} from './confirm-dialog.component';
 

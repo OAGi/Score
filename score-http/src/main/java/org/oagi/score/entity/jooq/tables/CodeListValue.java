@@ -48,7 +48,7 @@ import org.oagi.score.entity.jooq.tables.records.CodeListValueRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CodeListValue extends TableImpl<CodeListValueRecord> {
 
-    private static final long serialVersionUID = -1663464574;
+    private static final long serialVersionUID = -1795271623;
 
     /**
      * The reference instance of <code>oagi.code_list_value</code>

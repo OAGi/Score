@@ -28,6 +28,8 @@ public class SessionConfiguration extends RedisHttpSessionConfiguration {
     public HttpSessionIdResolver httpSessionIdResolver() {
         CookieHttpSessionIdResolver httpSessionIdResolver = new CookieHttpSessionIdResolver();
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
+        cookieSerializer.setDomainNamePattern("^([\\s\\S]+)$");
+        cookieSerializer.setCookiePath("/");
         cookieSerializer.setUseHttpOnlyCookie(true);
         cookieSerializer.setSameSite("Strict");
         httpSessionIdResolver.setCookieSerializer(cookieSerializer);

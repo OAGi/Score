@@ -30,7 +30,7 @@ import org.oagi.score.entity.jooq.tables.CdtAwdPri;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPriRecord extends UpdatableRecordImpl<CdtAwdPriRecord> implements Record4<ULong, ULong, ULong, Byte> {
 
-    private static final long serialVersionUID = 886228202;
+    private static final long serialVersionUID = -828928374;
 
     /**
      * Setter for <code>oagi.cdt_awd_pri.cdt_awd_pri_id</code>. Primary, internal database key.

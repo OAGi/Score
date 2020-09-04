@@ -1,16 +1,17 @@
 import {HttpParams} from '@angular/common/http';
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {Router} from '@angular/router';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {BieList} from '../../bie-management/bie-list/domain/bie-list';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
-import {Base64} from 'js-base64';
 import {StateProgressBarItem} from '../../common/state-progress-bar/state-progress-bar';
 import {AuthService} from '../../authentication/auth.service';
-import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
+import {base64Encode, initFilter} from '../../common/utility';
 import {SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
 
 export interface UserStatesItem {
@@ -279,7 +280,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     for (const param of set) {
       params = params.set(param['key'], param['value']);
     }
-    return Base64.encode(params.toString());
+    return base64Encode(params.toString());
   }
 
   keys(obj) {

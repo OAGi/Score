@@ -5,20 +5,16 @@ import {ContextSchemeService} from '../domain/context-scheme.service';
 import {ContextScheme, ContextSchemeValue, SimpleContextCategory, SimpleContextScheme} from '../domain/context-scheme';
 import {BusinessContextService} from '../../business-context/domain/business-context.service';
 import {BusinessContextValue} from '../../business-context/domain/business-context';
-import {
-  MatCheckboxChange,
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSelectChange,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource
-} from '@angular/material';
+import {MatCheckboxChange} from '@angular/material/checkbox';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSelectChange} from '@angular/material/select';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {ContextSchemeValueDialogComponent} from '../context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {hashCode} from '../../../common/utility';
-import {GrowlService} from 'ngx-growl';
 import {CodeList, CodeListValue} from '../../../code-list-management/domain/code-list';
 import {forkJoin, ReplaySubject} from 'rxjs';
 import {v4 as uuid} from 'uuid';
@@ -33,7 +29,7 @@ import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dia
 })
 export class ContextSchemeDetailComponent implements OnInit {
 
-  title = 'Context Scheme Detail';
+  title = 'Edit Context Scheme';
   ctxCategories: SimpleContextCategory[];
   codeLists: CodeList[];
   currCodeList: CodeList;
@@ -62,7 +58,6 @@ export class ContextSchemeDetailComponent implements OnInit {
               private bizCtxService: BusinessContextService,
               private location: Location,
               private route: ActivatedRoute,
-              private growlService: GrowlService,
               private router: Router,
               private snackBar: MatSnackBar,
               private dialog: MatDialog) {

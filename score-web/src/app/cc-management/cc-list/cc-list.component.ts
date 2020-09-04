@@ -2,7 +2,9 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
 import {CcListService} from './domain/cc-list.service';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, PageEvent, SortDirection} from '@angular/material';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CcList, CcListRequest} from './domain/cc-list';
 import {PageRequest} from '../../basis/basis';
@@ -11,7 +13,7 @@ import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
@@ -21,6 +23,7 @@ import {initFilter} from '../../common/utility';
 import {finalize} from 'rxjs/operators';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'score-cc-list',

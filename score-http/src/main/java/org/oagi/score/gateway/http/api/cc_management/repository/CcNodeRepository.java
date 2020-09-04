@@ -20,7 +20,7 @@ import org.oagi.score.gateway.http.api.common.data.TrackableImpl;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.SrtGuid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -92,7 +92,7 @@ public class CcNodeRepository {
         return getAccNodeByCurrentAccId(asccNode.getFromAccId(), releaseId);
     }
 
-    public void createAscc(User user, long accId, long releaseId, long asccId) {
+    public void createAscc(AuthenticatedPrincipal user, long accId, long releaseId, long asccId) {
         String accObjectClassTerm = dslContext.select(ACC.OBJECT_CLASS_TERM)
                 .from(ACC).where(ACC.ACC_ID.eq(ULong.valueOf(accId)))
                 .fetchOneInto(String.class);
@@ -194,7 +194,7 @@ public class CcNodeRepository {
         return accRecord;
     }
 
-    public void updateAcc(User user, CcAccNode ccAccNode) {
+    public void updateAcc(AuthenticatedPrincipal user, CcAccNode ccAccNode) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -210,7 +210,7 @@ public class CcNodeRepository {
                 .where(ACC.ACC_ID.eq(ULong.valueOf(ccAccNode.getAccId())));
     }
 
-    public void updateAsccp(User user, CcAsccpNodeDetail.Asccp asccpNodeDetail, long id) {
+    public void updateAsccp(AuthenticatedPrincipal user, CcAsccpNodeDetail.Asccp asccpNodeDetail, long id) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -351,7 +351,7 @@ public class CcNodeRepository {
         return asccpNode;
     }
 
-    public void createAsccp(User user, CcAsccpNode ccAsccpNode) {
+    public void createAsccp(AuthenticatedPrincipal user, CcAsccpNode ccAsccpNode) {
         long roleOfAccId = ccAsccpNode.getRoleOfAccId();
 
         String asccpDen = dslContext.select(ACC.DEN)
@@ -446,7 +446,7 @@ public class CcNodeRepository {
         return (dtScCount > 0);
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcAccNode accNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcAccNode accNode) {
         if (accNode == null) {
             return Collections.emptyList();
         }
@@ -520,7 +520,7 @@ public class CcNodeRepository {
         return OagisComponentType.valueOf(oagisComponentType);
     }
 
-    private List<CcAsccpNode> getAsccpNodes(User user, long fromAccId, Long releaseId) {
+    private List<CcAsccpNode> getAsccpNodes(AuthenticatedPrincipal user, long fromAccId, Long releaseId) {
         List<CcAsccNode> asccNodes = dslContext.select(
                 Tables.ASCC.ASCC_ID,
                 Tables.ASCC.CURRENT_ASCC_ID,
@@ -560,7 +560,7 @@ public class CcNodeRepository {
         return asccpNodes;
     }
 
-    private List<CcBccpNode> getBccpNodes(User user, long fromAccId, Long releaseId) {
+    private List<CcBccpNode> getBccpNodes(AuthenticatedPrincipal user, long fromAccId, Long releaseId) {
         List<CcBccNode> bccNodes = dslContext.select(
                 Tables.BCC.BCC_ID,
                 Tables.BCC.CURRENT_BCC_ID,
@@ -599,7 +599,7 @@ public class CcNodeRepository {
         }).collect(Collectors.toList());
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcAsccpNode asccpNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
         long asccpId = asccpNode.getAsccpId();
 
         long roleOfAccId = dslContext.select(Tables.ASCCP.ROLE_OF_ACC_ID).from(Tables.ASCCP)
@@ -614,7 +614,7 @@ public class CcNodeRepository {
         }
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcBccpNode bccpNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcBccpNode bccpNode) {
         long bccpId = bccpNode.getBccpId();
 
         return dslContext.select(
@@ -630,7 +630,7 @@ public class CcNodeRepository {
                         ))).fetchInto(CcBdtScNode.class);
     }
 
-    public CcAccNodeDetail getAccNodeDetail(User user, CcAccNode accNode) {
+    public CcAccNodeDetail getAccNodeDetail(AuthenticatedPrincipal user, CcAccNode accNode) {
         long accId = accNode.getAccId();
 
         return dslContext.select(
@@ -647,7 +647,7 @@ public class CcNodeRepository {
                 .fetchOneInto(CcAccNodeDetail.class);
     }
 
-    public CcAsccpNodeDetail getAsccpNodeDetail(User user, CcAsccpNode asccpNode) {
+    public CcAsccpNodeDetail getAsccpNodeDetail(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
         CcAsccpNodeDetail asccpNodeDetail = new CcAsccpNodeDetail();
 
         long asccId = asccpNode.getAsccId();
@@ -700,7 +700,7 @@ public class CcNodeRepository {
         return asccp;
     }
 
-    public CcBccpNodeDetail getBccpNodeDetail(User user, CcBccpNode bccpNode) {
+    public CcBccpNodeDetail getBccpNodeDetail(AuthenticatedPrincipal user, CcBccpNode bccpNode) {
         CcBccpNodeDetail bccpNodeDetail = new CcBccpNodeDetail();
 
         long bccId = bccpNode.getBccId();
@@ -758,7 +758,7 @@ public class CcNodeRepository {
         return bccpNodeDetail;
     }
 
-    public CcBdtScNodeDetail getBdtScNodeDetail(User user, CcBdtScNode bdtScNode) {
+    public CcBdtScNodeDetail getBdtScNodeDetail(AuthenticatedPrincipal user, CcBdtScNode bdtScNode) {
         long bdtScId = bdtScNode.getBdtScId();
         return dslContext.select(
                 Tables.DT_SC.DT_SC_ID.as("bdt_sc_id"),

@@ -21,7 +21,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -61,12 +61,12 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     private RedissonClient redissonClient;
 
     private boolean initialized;
-    private User user;
+    private AuthenticatedPrincipal user;
     private TopLevelAsbiep topLevelAsbiep;
     private BieState state;
     private boolean forceBieUpdate;
 
-    public void initialize(User user, TopLevelAsbiep topLevelAsbiep) {
+    public void initialize(AuthenticatedPrincipal user, TopLevelAsbiep topLevelAsbiep) {
         this.user = user;
         this.topLevelAsbiep = topLevelAsbiep;
 
@@ -75,7 +75,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         switch (this.state) {
             case Editing:
                 if (sessionService.userId(user) != topLevelAsbiep.getOwnerUserId()) {
-                    throw new DataAccessForbiddenException("'" + user.getUsername() +
+                    throw new DataAccessForbiddenException("'" + sessionService.getAppUser(user).getLoginId() +
                             "' doesn't have an access privilege.");
                 }
                 break;
@@ -161,7 +161,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     }
 
     @Override
-    public List<BieEditNode> getDescendants(User user, BieEditNode node, boolean hideUnused) {
+    public List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditNode node, boolean hideUnused) {
         switch (node.getType()) {
             case "abie":
                 return getDescendants(user, (BieEditAbieNode) node, hideUnused);
@@ -175,7 +175,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     }
 
 
-    private List<BieEditNode> getDescendants(User user, BieEditAbieNode abieNode, boolean hideUnused) {
+    private List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditAbieNode abieNode, boolean hideUnused) {
         Map<Long, BieEditAsbie> asbieMap;
         Map<Long, BieEditBbie> bbieMap;
 
@@ -193,7 +193,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         return children;
     }
 
-    private List<BieEditNode> getDescendants(User user, BieEditAsbiepNode asbiepNode, boolean hideUnused) {
+    private List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditAsbiepNode asbiepNode, boolean hideUnused) {
         Map<Long, BieEditAsbie> asbieMap;
         Map<Long, BieEditBbie> bbieMap;
 
@@ -221,7 +221,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     }
 
     private List<BieEditNode> getChildren(
-            User user,
+            AuthenticatedPrincipal user,
             Map<Long, BieEditAsbie> asbieMap,
             Map<Long, BieEditBbie> bbieMap,
             long fromAbieId, long currentAccId,
@@ -276,7 +276,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         List<BieEditBcc> attributeBccList = new ArrayList();
         List<SeqKeySupportable> assocList = new ArrayList();
 
-        boolean isDeveloper = user.getAuthorities().toString().contains("developer");
+        boolean isDeveloper = sessionService.getAppUser(user).isDeveloper();
 
         while (!accStack.isEmpty()) {
             BieEditAcc acc = accStack.pop();
@@ -511,7 +511,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
         }
     }
 
-    private List<BieEditNode> getDescendants(User user, BieEditBbiepNode bbiepNode, boolean hideUnused) {
+    private List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditBbiepNode bbiepNode, boolean hideUnused) {
         long bbiepId = bbiepNode.getBbiepId();
         long topLevelAsbiepId = bbiepNode.getTopLevelAsbiepId();
         BieEditBccp bccp;

@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.BccpRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Bccp extends TableImpl<BccpRecord> {
 
-    private static final long serialVersionUID = 425697258;
+    private static final long serialVersionUID = -1338128374;
 
     /**
      * The reference instance of <code>oagi.bccp</code>
@@ -69,9 +69,9 @@ public class Bccp extends TableImpl<BccpRecord> {
     public final TableField<BccpRecord, String> GUID = createField(DSL.name("guid"), org.jooq.impl.SQLDataType.VARCHAR(41).nullable(false), this, "A globally unique identifier (GUID). Per OAGIS, a GUID is of the form \"oagis-id-\" followed by a 32 Hex character sequence.',");
 
     /**
-     * The column <code>oagi.bccp.property_term</code>. The property concept that the BCCP models. 
+     * The column <code>oagi.bccp.property_term</code>. The property concept that the BCCP models.
      */
-    public final TableField<BccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), org.jooq.impl.SQLDataType.VARCHAR(60).nullable(false), this, "The property concept that the BCCP models. ");
+    public final TableField<BccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "The property concept that the BCCP models.");
 
     /**
      * The column <code>oagi.bccp.representation_term</code>. The representation term convey the format of the data the BCCP can take. The value is derived from the DT.DATA_TYPE_TERM of the associated BDT as referred to by the BDT_ID column.

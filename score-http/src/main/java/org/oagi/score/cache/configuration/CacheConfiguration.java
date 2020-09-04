@@ -1,7 +1,7 @@
 package org.oagi.score.cache.configuration;
 
-import org.oagi.score.cache.SrtRedisCacheManager;
-import org.oagi.score.cache.SrtRedisCacheWriter;
+import org.oagi.score.cache.ScoreRedisCacheManager;
+import org.oagi.score.cache.ScoreRedisCacheWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +31,8 @@ public class CacheConfiguration {
 
     @Bean
     public RedisCacheManager redisCacheManager() {
-        SrtRedisCacheManager redisCacheManager = new SrtRedisCacheManager(redisConnectionFactory,
-                new SrtRedisCacheWriter(redisConnectionFactory), redisCacheConfiguration());
+        ScoreRedisCacheManager redisCacheManager = new ScoreRedisCacheManager(redisConnectionFactory,
+                new ScoreRedisCacheWriter(redisConnectionFactory), redisCacheConfiguration());
 
         return redisCacheManager;
     }

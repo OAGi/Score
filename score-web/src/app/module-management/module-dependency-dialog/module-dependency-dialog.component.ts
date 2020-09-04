@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {ModuleDependency, SimpleModule} from '../domain/module';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {hashCode} from '../../common/utility';
 
 @Component({

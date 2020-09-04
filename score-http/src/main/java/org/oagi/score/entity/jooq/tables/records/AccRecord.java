@@ -35,7 +35,7 @@ import org.oagi.score.entity.jooq.tables.Acc;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AccRecord extends UpdatableRecordImpl<AccRecord> {
 
-    private static final long serialVersionUID = -257795522;
+    private static final long serialVersionUID = 1423422686;
 
     /**
      * Setter for <code>oagi.acc.acc_id</code>. A internal, primary database key of an ACC.

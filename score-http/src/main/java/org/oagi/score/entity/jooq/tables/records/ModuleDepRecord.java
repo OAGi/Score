@@ -28,7 +28,7 @@ import org.oagi.score.entity.jooq.tables.ModuleDep;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ModuleDepRecord extends UpdatableRecordImpl<ModuleDepRecord> implements Record4<ULong, Integer, ULong, ULong> {
 
-    private static final long serialVersionUID = 2109855068;
+    private static final long serialVersionUID = 771198908;
 
     /**
      * Setter for <code>oagi.module_dep.module_dep_id</code>. Primary, internal database key.

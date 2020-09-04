@@ -1,12 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent} from '@angular/material';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatSort} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {CcList, CcListRequest} from '../cc-list/domain/cc-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CcListService} from '../cc-list/domain/cc-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {Router} from '@angular/router';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 
 @Component({

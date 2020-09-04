@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
 import {BieEditAbieNode, BieEditNode, BieEditNodeDetail} from '../../../bie-management/bie-edit/domain/bie-edit-node';
-import {Base64} from 'js-base64';
+import {base64Encode} from '../../../common/utility';
 import {map} from 'rxjs/operators';
 
 @Injectable()
@@ -112,7 +112,7 @@ export class CcListService {
         }
         return p;
       }, new HttpParams());
-    const data = Base64.encode(params.toString());
+    const data = base64Encode(params.toString());
     return new HttpParams().set('data', data);
   }
 

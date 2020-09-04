@@ -4,7 +4,11 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {BusinessContextService} from '../domain/business-context.service';
 import {BieListService} from '../../../bie-management/bie-list/domain/bie-list.service';
 import {BusinessContext, BusinessContextValue} from '../domain/business-context';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
@@ -20,7 +24,7 @@ import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog
 })
 export class BusinessContextDetailComponent implements OnInit {
 
-  title = 'Business Context Detail';
+  title = 'Edit Business Context';
   disabled: boolean;
   hashCode;
   bizCtx: BusinessContext;
@@ -92,7 +96,7 @@ export class BusinessContextDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(BusinessContextValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined && result.ctxSchemeValueId !== undefined) {
-        for ( const value of this.dataSource.data) {
+        for (const value of this.dataSource.data) {
           if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
             this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
               duration: 4000,

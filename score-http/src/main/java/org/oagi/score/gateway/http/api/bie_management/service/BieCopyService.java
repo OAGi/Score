@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +73,7 @@ public class BieCopyService implements InitializingBean {
     }
 
     @Transactional
-    public void copyBie(User user, BieCopyRequest request) {
+    public void copyBie(AuthenticatedPrincipal user, BieCopyRequest request) {
         long sourceTopLevelAsbiepId = request.getTopLevelAsbiepId();
         List<Long> bizCtxIds = request.getBizCtxIds();
         long userId = sessionService.userId(user);

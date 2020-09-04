@@ -10,7 +10,6 @@ import {ExtensionDetailService} from './domain/extension-detail.service';
 import {AppendAsccpDialogComponent} from './append-asccp-dialog/append-asccp-dialog.component';
 import {AppendBccpDialogComponent} from './append-bccp-dialog/append-bccp-dialog.component';
 import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
-import {GrowlModule} from 'ngx-growl';
 import {TranslateModule} from '@ngx-translate/core';
 import {SrtCommonModule} from '../../common/srt-common.module';
 import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
@@ -39,7 +38,6 @@ const routes: Routes = [
     }),
     CommonModule,
     TranslateModule,
-    GrowlModule,
     SrtCommonModule,
   ],
   declarations: [

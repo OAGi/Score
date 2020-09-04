@@ -50,7 +50,7 @@ import org.oagi.score.entity.jooq.tables.records.BieUserExtRevisionRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
 
-    private static final long serialVersionUID = 1009613121;
+    private static final long serialVersionUID = -955602518;
 
     /**
      * The reference instance of <code>oagi.bie_user_ext_revision</code>

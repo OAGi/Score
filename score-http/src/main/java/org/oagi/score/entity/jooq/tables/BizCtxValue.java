@@ -44,7 +44,7 @@ import org.oagi.score.entity.jooq.tables.records.BizCtxValueRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
 
-    private static final long serialVersionUID = -334477908;
+    private static final long serialVersionUID = -2052357675;
 
     /**
      * The reference instance of <code>oagi.biz_ctx_value</code>

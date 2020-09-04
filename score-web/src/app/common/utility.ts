@@ -1,21 +1,41 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Md5} from 'ts-md5';
+import * as CryptoJS from 'crypto-js';
 import {isString} from 'util';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 
+export function base64Encode(str): string {
+  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(str));
+}
+
+export function base64Decode(str): string {
+  return CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Utf8);
+}
+
+export function md5(str): string {
+  return CryptoJS.MD5(str).toString();
+}
+
+export function sha1(str): string {
+  return CryptoJS.SHA1(str).toString();
+}
+
+export function sha256(str): string {
+  return CryptoJS.SHA256(str).toString();
+}
+
 export function hashCode(obj): string {
   return (typeof obj.hashCode === 'function') ? obj.hashCode() :
-    <string>Md5.hashStr(JSON.stringify(obj, (name, val) => {
-    if (name === '$hashCode') {
-      return undefined;
-    }
-    if (val === '') {
-      return null;
-    }
+    md5(JSON.stringify(obj, (name, val) => {
+      if (name === '$hashCode') {
+        return undefined;
+      }
+      if (val === '') {
+        return null;
+      }
 
-    return val;
-  }));
+      return val;
+    }));
 }
 
 export function initFilter(formControl: FormControl,

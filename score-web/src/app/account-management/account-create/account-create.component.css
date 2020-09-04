@@ -1,0 +1,8 @@
+.detail-pending {
+  border: 1px solid #c8c8c8;
+  padding: 15px;
+  -moz-box-shadow: 1px 1px 2px 1px #ccc;
+  -webkit-box-shadow: 1px 1px 2px 1px #ccc;
+  box-shadow: 1px 1px 2px 1px #ccc;
+  margin-bottom: 15px;
+}

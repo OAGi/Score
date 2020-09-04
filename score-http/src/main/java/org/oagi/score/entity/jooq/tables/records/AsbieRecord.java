@@ -32,7 +32,7 @@ import org.oagi.score.entity.jooq.tables.Asbie;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AsbieRecord extends UpdatableRecordImpl<AsbieRecord> implements Record17<ULong, String, ULong, ULong, ULong, String, Integer, Integer, Byte, String, ULong, ULong, Timestamp, Timestamp, BigDecimal, Byte, ULong> {
 
-    private static final long serialVersionUID = 1188212576;
+    private static final long serialVersionUID = 1744964250;
 
     /**
      * Setter for <code>oagi.asbie.asbie_id</code>. A internal, primary database key of an ASBIE.

@@ -10,6 +10,7 @@ public class AccountListRequest {
     private String name;
     private String organization;
     private String role;
+    private boolean excludeSSO;
     private Boolean excludeRequester;
 
     private PageRequest pageRequest;

@@ -8,7 +8,7 @@ import org.oagi.score.gateway.http.api.module_management.data.Module;
 import org.oagi.score.gateway.http.api.module_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,7 @@ public class ModuleService {
                 .fetchInto(SimpleModule.class);
     }
 
-    public List<ModuleList> getModuleList(User user) {
+    public List<ModuleList> getModuleList(AuthenticatedPrincipal user) {
         AppUser U1 = Tables.APP_USER;
         AppUser U2 = Tables.APP_USER;
         List<ModuleList> moduleLists = dslContext.select(
@@ -65,7 +65,7 @@ public class ModuleService {
         return moduleLists;
     }
 
-    public Module getModule(User user, long moduleId) {
+    public Module getModule(AuthenticatedPrincipal user, long moduleId) {
         Module module = dslContext.select(
                 Tables.MODULE.MODULE_ID,
                 Tables.MODULE.MODULE_,

@@ -48,7 +48,7 @@ import org.oagi.score.entity.jooq.tables.records.BdtPriRestriRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
 
-    private static final long serialVersionUID = 412253914;
+    private static final long serialVersionUID = -573764733;
 
     /**
      * The reference instance of <code>oagi.bdt_pri_restri</code>

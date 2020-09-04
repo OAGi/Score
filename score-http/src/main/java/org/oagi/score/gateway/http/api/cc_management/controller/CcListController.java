@@ -8,8 +8,8 @@ import org.oagi.score.gateway.http.api.common.data.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,7 +90,7 @@ public class CcListController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/asccp_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<AsccpForAppendAsccp> getAsccpForAppendAsccList(@AuthenticationPrincipal User user,
+    public List<AsccpForAppendAsccp> getAsccpForAppendAsccList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                                @PathVariable("releaseId") long releaseId,
                                                                @PathVariable("id") long extensionId) {
         return service.getAsccpForAppendAsccpList(user, releaseId, extensionId);
@@ -99,7 +99,7 @@ public class CcListController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/bccp_list",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<BccpForAppendBccp> getBccpForAppendBccList(@AuthenticationPrincipal User user,
+    public List<BccpForAppendBccp> getBccpForAppendBccList(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                            @PathVariable("releaseId") long releaseId,
                                                            @PathVariable("id") long extensionId) {
         return service.getBccpForAppendBccpList(user, releaseId, extensionId);
@@ -108,7 +108,7 @@ public class CcListController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/transfer_ownership",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity transferOwnership(@AuthenticationPrincipal User user,
+    public ResponseEntity transferOwnership(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @PathVariable("releaseId") long releaseId,
                                             @PathVariable("id") long extensionId,
                                             @RequestBody Map<String, String> request) {

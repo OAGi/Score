@@ -1,7 +1,7 @@
 import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
-import {Base64} from 'js-base64';
+import {base64Decode, base64Encode} from '../../../common/utility';
 
 export class ContextSchemeListRequest {
   filters: {
@@ -16,12 +16,26 @@ export class ContextSchemeListRequest {
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
-    const params = (q) ? new HttpParams({fromString: Base64.decode(q)}) : new HttpParams();
+    const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
 
-    this.page.sortActive = params.get('sortActive') || (defaultPageRequest) ? defaultPageRequest.sortActive : '';
-    this.page.sortDirection = params.get('sortDirection') || (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
-    this.page.pageIndex = Number(params.get('pageIndex') || (defaultPageRequest) ? defaultPageRequest.pageIndex : 0);
-    this.page.pageSize = Number(params.get('pageSize') || (defaultPageRequest) ? defaultPageRequest.pageSize : 10);
+    this.page.sortActive = params.get('sortActive');
+    if (!this.page.sortActive) {
+      this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
+    }
+    this.page.sortDirection = params.get('sortDirection');
+    if (!this.page.sortDirection) {
+      this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
+    }
+    if (params.get('pageIndex')) {
+      this.page.pageIndex = Number(params.get('pageIndex'));
+    } else {
+      this.page.pageIndex = (defaultPageRequest) ? defaultPageRequest.pageIndex : 0;
+    }
+    if (params.get('pageSize')) {
+      this.page.pageSize = Number(params.get('pageSize'));
+    } else {
+      this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
+    }
 
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.updatedDate = {
@@ -52,7 +66,7 @@ export class ContextSchemeListRequest {
     if (this.filters.name && this.filters.name.length > 0) {
       params = params.set('name', '' + this.filters.name);
     }
-    const str = Base64.encode(params.toString());
+    const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
 }

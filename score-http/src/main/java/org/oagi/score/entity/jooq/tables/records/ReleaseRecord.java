@@ -30,7 +30,7 @@ import org.oagi.score.entity.jooq.tables.Release;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReleaseRecord extends UpdatableRecordImpl<ReleaseRecord> implements Record9<ULong, String, String, ULong, ULong, ULong, Timestamp, Timestamp, Integer> {
 
-    private static final long serialVersionUID = -1771017575;
+    private static final long serialVersionUID = -221638983;
 
     /**
      * Setter for <code>oagi.release.release_id</code>. RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.

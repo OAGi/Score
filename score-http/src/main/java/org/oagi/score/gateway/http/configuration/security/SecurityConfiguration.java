@@ -1,25 +1,26 @@
 package org.oagi.score.gateway.http.configuration.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizationRequestRepository;
+import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizationRequestResolver;
+import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2AuthorizedClientService;
+import org.oagi.score.gateway.http.configuration.oauth2.ScoreOAuth2LoginConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -39,10 +38,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private AppUserDetailsService userDetailsService;
 
+    @Autowired
+    private ScoreOAuth2AuthorizationRequestResolver authorizationRequestResolver;
+
+    @Autowired
+    private ScoreOAuth2AuthorizationRequestRepository authorizationRequestRepository;
+
+    @Autowired
+    private ScoreOAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+
+    @Autowired
+    private ScoreAuthenticationSuccessHandler authenticationSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder;
+    }
+
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return new HttpSessionCsrfTokenRepository();
     }
 
     @Bean
@@ -85,35 +101,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/event/**").permitAll()
                 .antMatchers("/info/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new AuthenticationEntryPoint() {
-                    @Override
-                    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                    }
-                })
+                .authenticationEntryPoint((AuthenticationEntryPoint) (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
                 .and()
                 .formLogin()
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .successHandler(new SimpleUrlAuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                                        Authentication authentication) throws IOException, ServletException {
-                        clearAuthenticationAttributes(request);
-
-                        Map<String, String> resp = new HashMap();
-                        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                        resp.put("username", userDetails.getUsername());
-                        resp.put("role", userDetails.getAuthorities().stream().findFirst().get().toString());
-
-                        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
-                        objectMapper.writeValue(response.getOutputStream(), resp);
-                    }
-                })
+                .successHandler(authenticationSuccessHandler)
                 .failureHandler(new SimpleUrlAuthenticationFailureHandler() {
                     @Override
                     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -124,12 +122,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
                 .and()
                 .httpBasic().disable()
                 .cors()
                 .configurationSource(corsConfigurationSource())
                 .and()
+                //.csrf().csrfTokenRepository(csrfTokenRepository())
+                //.and()
                 .csrf().disable()
-                .rememberMe().rememberMeServices(rememberMeServices());
+                .rememberMe().rememberMeServices(rememberMeServices())
+                .and()
+                .apply(new ScoreOAuth2LoginConfigurer<>())
+                .successHandler(authenticationSuccessHandler)
+                .loginProcessingUrl("/oauth2/code/*")
+                .authorizedClientService(oAuth2AuthorizedClientService)
+                .authorizationEndpoint()
+                .authorizationRequestRepository(authorizationRequestRepository)
+                .authorizationRequestResolver(authorizationRequestResolver)
+                .and().loginPage("/login");
     }
 }

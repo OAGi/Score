@@ -9,7 +9,7 @@ import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,43 +25,43 @@ public class CcNodeService {
     @Autowired
     private SessionService sessionService;
 
-    public CcAccNode getAccNode(User user, long accId, Long releaseId) {
+    public CcAccNode getAccNode(AuthenticatedPrincipal user, long accId, Long releaseId) {
         return repository.getAccNodeByAccId(accId, releaseId);
     }
 
-    public CcAsccpNode getAsccpNode(User user, long asccpId, Long releaseId) {
+    public CcAsccpNode getAsccpNode(AuthenticatedPrincipal user, long asccpId, Long releaseId) {
         return repository.getAsccpNodeByAsccpId(asccpId, releaseId);
     }
 
-    public CcBccpNode getBccpNode(User user, long bccpId, Long releaseId) {
+    public CcBccpNode getBccpNode(AuthenticatedPrincipal user, long bccpId, Long releaseId) {
         return repository.getBccpNodeByBccpId(bccpId, releaseId);
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcAccNode accNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcAccNode accNode) {
         return repository.getDescendants(user, accNode);
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcAsccpNode asccpNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
         return repository.getDescendants(user, asccpNode);
     }
 
-    public List<? extends CcNode> getDescendants(User user, CcBccpNode bccpNode) {
+    public List<? extends CcNode> getDescendants(AuthenticatedPrincipal user, CcBccpNode bccpNode) {
         return repository.getDescendants(user, bccpNode);
     }
 
-    public CcAccNodeDetail getAccNodeDetail(User user, CcAccNode accNode) {
+    public CcAccNodeDetail getAccNodeDetail(AuthenticatedPrincipal user, CcAccNode accNode) {
         return repository.getAccNodeDetail(user, accNode);
     }
 
-    public CcAsccpNodeDetail getAsccpNodeDetail(User user, CcAsccpNode asccpNode) {
+    public CcAsccpNodeDetail getAsccpNodeDetail(AuthenticatedPrincipal user, CcAsccpNode asccpNode) {
         return repository.getAsccpNodeDetail(user, asccpNode);
     }
 
-    public CcBccpNodeDetail getBccpNodeDetail(User user, CcBccpNode bccpNode) {
+    public CcBccpNodeDetail getBccpNodeDetail(AuthenticatedPrincipal user, CcBccpNode bccpNode) {
         return repository.getBccpNodeDetail(user, bccpNode);
     }
 
-    public CcBdtScNodeDetail getBdtScNodeDetail(User user, CcBdtScNode bdtScNode) {
+    public CcBdtScNodeDetail getBdtScNodeDetail(AuthenticatedPrincipal user, CcBdtScNode bdtScNode) {
         return repository.getBdtScNodeDetail(user, bdtScNode);
     }
 
@@ -70,29 +70,29 @@ public class CcNodeService {
     }
 
     @Transactional
-    public CcAccNode createAcc(User user) {
+    public CcAccNode createAcc(AuthenticatedPrincipal user) {
         long userId = sessionService.userId(user);
         AccRecord accRecord = repository.createAcc(userId);
         return getAccNode(user, accRecord.getAccId().longValue(), 0L);
     }
 
     @Transactional
-    public void updateAcc(User user, CcAccNode ccAccNode) {
+    public void updateAcc(AuthenticatedPrincipal user, CcAccNode ccAccNode) {
         repository.updateAcc(user, ccAccNode);
     }
 
     @Transactional
-    public void updateAsccp(User user, CcAsccpNodeDetail.Asccp asccpNodeDetail, long id) {
+    public void updateAsccp(AuthenticatedPrincipal user, CcAsccpNodeDetail.Asccp asccpNodeDetail, long id) {
         repository.updateAsccp(user, asccpNodeDetail, id);
     }
 
     @Transactional
-    public void appendAscc(User user, long accId, long releaseId, long asccId) {
+    public void appendAscc(AuthenticatedPrincipal user, long accId, long releaseId, long asccId) {
         repository.createAscc(user, accId, releaseId, asccId);
     }
 
     @Transactional
-    public void discardAscc(User user, long extensionId, Long releaseId, long accId) {
+    public void discardAscc(AuthenticatedPrincipal user, long extensionId, Long releaseId, long accId) {
         // repository method discard specific id
     }
 
@@ -107,12 +107,12 @@ public class CcNodeService {
     }
 
     @Transactional
-    public void createAsccp(User user, CcAsccpNode ccAsccpNode) {
+    public void createAsccp(AuthenticatedPrincipal user, CcAsccpNode ccAsccpNode) {
         repository.createAsccp(user, ccAsccpNode);
     }
 
     @Transactional
-    public CcEditUpdateResponse updateDetails(User user, CcEditUpdateRequest request) {
+    public CcEditUpdateResponse updateDetails(AuthenticatedPrincipal user, CcEditUpdateRequest request) {
         long accId = request.getAccId();
 
         CcEditUpdateResponse response = new CcEditUpdateResponse();

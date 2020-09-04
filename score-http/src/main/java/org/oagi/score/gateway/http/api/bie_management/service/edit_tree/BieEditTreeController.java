@@ -4,7 +4,7 @@ import org.oagi.score.data.BieState;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditNodeDetail;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface BieEditTreeController {
 
     BieEditAbieNode getRootNode(long topLevelAsbiepId);
 
-    List<BieEditNode> getDescendants(User user, BieEditNode node, boolean hideUnused);
+    List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditNode node, boolean hideUnused);
 
     BieEditNodeDetail getDetail(BieEditNode node);
 

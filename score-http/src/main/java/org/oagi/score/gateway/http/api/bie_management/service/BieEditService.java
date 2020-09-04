@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,15 +85,15 @@ public class BieEditService implements InitializingBean {
                 new ChannelTopic(PURGE_BIE_EVENT_NAME));
     }
 
-    private BieEditTreeController getTreeController(User user, BieEditNode node) {
+    private BieEditTreeController getTreeController(AuthenticatedPrincipal user, BieEditNode node) {
         return getTreeController(user, node.getTopLevelAsbiepId(), node.isDerived(), node.isLocked());
     }
 
-    private BieEditTreeController getTreeController(User user, long topLevelAsbiepId) {
+    private BieEditTreeController getTreeController(AuthenticatedPrincipal user, long topLevelAsbiepId) {
         return getTreeController(user, topLevelAsbiepId, false, false);
     }
 
-    private BieEditTreeController getTreeController(User user, long topLevelAsbiepId,
+    private BieEditTreeController getTreeController(AuthenticatedPrincipal user, long topLevelAsbiepId,
                                                     boolean isDerived, boolean isLocked) {
         DefaultBieEditTreeController bieEditTreeController =
                 applicationContext.getBean(DefaultBieEditTreeController.class);
@@ -108,18 +108,18 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public BieEditAbieNode getRootNode(User user, long topLevelAsbiepId) {
+    public BieEditAbieNode getRootNode(AuthenticatedPrincipal user, long topLevelAsbiepId) {
         BieEditTreeController treeController = getTreeController(user, topLevelAsbiepId);
         return treeController.getRootNode(topLevelAsbiepId);
     }
 
     @Transactional
-    public BccForBie getBcc(User user, long bccId) {
+    public BccForBie getBcc(AuthenticatedPrincipal user, long bccId) {
         return bieRepository.getBcc(bccId);
     }
 
     @Transactional
-    public List<BieEditNode> getDescendants(User user, BieEditNode node, boolean hideUnused) {
+    public List<BieEditNode> getDescendants(AuthenticatedPrincipal user, BieEditNode node, boolean hideUnused) {
         BieEditTreeController treeController = getTreeController(user, node);
         return treeController.getDescendants(user, node, hideUnused).stream()
                 .map(e -> {
@@ -131,20 +131,20 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public BieEditNodeDetail getDetail(User user, BieEditNode node) {
+    public BieEditNodeDetail getDetail(AuthenticatedPrincipal user, BieEditNode node) {
         BieEditTreeController treeController = getTreeController(user, node);
         return treeController.getDetail(node);
     }
 
     @Transactional
-    public void updateState(User user, long topLevelAsbiepId, BieState state) {
+    public void updateState(AuthenticatedPrincipal user, long topLevelAsbiepId, BieState state) {
         BieEditTreeController treeController = getTreeController(user, topLevelAsbiepId);
         treeController.updateState(state);
     }
 
 
     @Transactional
-    public BieEditUpdateResponse updateDetails(User user, BieEditUpdateRequest request) {
+    public BieEditUpdateResponse updateDetails(AuthenticatedPrincipal user, BieEditUpdateRequest request) {
         long topLevelAsbiepId = request.getTopLevelAsbiepId();
         BieEditTreeController treeController = getTreeController(user, topLevelAsbiepId);
 
@@ -175,7 +175,7 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public CreateExtensionResponse createLocalAbieExtension(User user, BieEditAsbiepNode extension) {
+    public CreateExtensionResponse createLocalAbieExtension(AuthenticatedPrincipal user, BieEditAsbiepNode extension) {
         long asccpId = extension.getAsccpId();
         long releaseId = extension.getReleaseId();
         long roleOfAccId = bieRepository.getRoleOfAccIdByAsccpId(asccpId);
@@ -211,7 +211,7 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public CreateExtensionResponse createGlobalAbieExtension(User user, BieEditAsbiepNode extension) {
+    public CreateExtensionResponse createGlobalAbieExtension(AuthenticatedPrincipal user, BieEditAsbiepNode extension) {
         long releaseId = extension.getReleaseId();
         long roleOfAccId = dslContext.select(Tables.ACC.ACC_ID)
                 .from(Tables.ACC)
@@ -249,7 +249,7 @@ public class BieEditService implements InitializingBean {
         return response;
     }
 
-    private long createAbieExtension(User user, long roleOfAccId, long releaseId) {
+    private long createAbieExtension(AuthenticatedPrincipal user, long roleOfAccId, long releaseId) {
         BieEditAcc eAcc = bieRepository.getAccByCurrentAccId(roleOfAccId, releaseId);
         ACC ueAcc = extensionService.getExistsUserExtension(roleOfAccId, releaseId);
 
@@ -258,12 +258,12 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public void updateTopLevelAsbiepLastUpdated(User user, long topLevelAsbiepId){
+    public void updateTopLevelAsbiepLastUpdated(AuthenticatedPrincipal user, long topLevelAsbiepId){
         topLevelAsbiepRepository.updateTopLevelAsbiepLastUpdated(sessionService.userId(user), topLevelAsbiepId);
     }
 
     @Transactional
-    public void reuseBIE(User user, ReuseBIERequest request) {
+    public void reuseBIE(AuthenticatedPrincipal user, ReuseBIERequest request) {
         AppUser requester = sessionService.getAppUser(user);
 
         TopLevelAsbiepRecord topLevelAsbiepRecord = dslContext.selectFrom(TOP_LEVEL_ASBIEP)
@@ -424,7 +424,7 @@ public class BieEditService implements InitializingBean {
     }
 
     @Transactional
-    public void removeReusedBIE(User user, RemoveReusedBIERequest request) {
+    public void removeReusedBIE(AuthenticatedPrincipal user, RemoveReusedBIERequest request) {
         AppUser requester = sessionService.getAppUser(user);
         ULong asbieId = ULong.valueOf(request.getAsbieId());
 

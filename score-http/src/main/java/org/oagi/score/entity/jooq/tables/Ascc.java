@@ -44,7 +44,7 @@ import org.oagi.score.entity.jooq.tables.records.AsccRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Ascc extends TableImpl<AsccRecord> {
 
-    private static final long serialVersionUID = -166297063;
+    private static final long serialVersionUID = 334452144;
 
     /**
      * The reference instance of <code>oagi.ascc</code>

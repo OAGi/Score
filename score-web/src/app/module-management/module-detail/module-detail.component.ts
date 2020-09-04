@@ -3,7 +3,11 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {ModuleService} from '../domain/module.service';
 import {Module, ModuleDependency, SimpleModule} from '../domain/module';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatSort} from '@angular/material/sort';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 import {switchMap} from 'rxjs/operators';
 import {hashCode} from '../../common/utility';
@@ -11,7 +15,6 @@ import {v4 as uuid} from 'uuid';
 import {SimpleNamespace} from '../../namespace-management/domain/namespace';
 import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ModuleDependencyDialogComponent} from '../module-dependency-dialog/module-dependency-dialog.component';
-import {PageEvent} from '@angular/material/paginator';
 
 @Component({
   selector: 'score-module-detail',

@@ -32,7 +32,7 @@ import org.oagi.score.entity.jooq.tables.CodeList;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CodeListRecord extends UpdatableRecordImpl<CodeListRecord> implements Record18<ULong, String, String, String, String, ULong, String, String, String, String, ULong, Byte, ULong, ULong, ULong, Timestamp, Timestamp, String> {
 
-    private static final long serialVersionUID = -1975473053;
+    private static final long serialVersionUID = -1979267773;
 
     /**
      * Setter for <code>oagi.code_list.code_list_id</code>. Internal, primary database key.

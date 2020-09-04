@@ -3,14 +3,11 @@ import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ContextMenuModule} from 'ngx-contextmenu';
-
 import {TranslateModule} from '@ngx-translate/core';
-import {GrowlModule} from 'ngx-growl';
-import {MatDialogModule} from '@angular/material';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MaterialModule} from '../../material.module';
 import {ArraySortPipe} from '../sort';
-
+import {MatDialogModule} from '@angular/material/dialog';
 import {BieEditComponent, BieEditPublishDialogDetailComponent} from './bie-edit.component';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListService} from '../bie-list/domain/bie-list.service';
@@ -42,7 +39,6 @@ const routes: Routes = [
     MaterialModule,
     MatDialogModule,
     NgxMatSelectSearchModule,
-    GrowlModule.forRoot({maxMessages: 10, displayTimeMs: 5000}),
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),

@@ -42,7 +42,7 @@ import org.oagi.score.entity.jooq.tables.records.AsccpRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Asccp extends TableImpl<AsccpRecord> {
 
-    private static final long serialVersionUID = 969743717;
+    private static final long serialVersionUID = 1649005927;
 
     /**
      * The reference instance of <code>oagi.asccp</code>
@@ -68,9 +68,9 @@ public class Asccp extends TableImpl<AsccpRecord> {
     public final TableField<AsccpRecord, String> GUID = createField(DSL.name("guid"), org.jooq.impl.SQLDataType.VARCHAR(41).nullable(false), this, "A globally unique identifier (GUID) of an ASCCP. Per OAGIS, a GUID is of the form \"oagis-id-\" followed by a 32 Hex character sequence.");
 
     /**
-     * The column <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \n\nThere must be only one ASCCP without a Property_Term for a particular ACC.
+     * The column <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.
      */
-    public final TableField<AsccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), org.jooq.impl.SQLDataType.VARCHAR(60), this, "The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \\n\\nThere must be only one ASCCP without a Property_Term for a particular ACC.");
+    public final TableField<AsccpRecord, String> PROPERTY_TERM = createField(DSL.name("property_term"), org.jooq.impl.SQLDataType.VARCHAR(100), this, "The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.");
 
     /**
      * The column <code>oagi.asccp.definition</code>. Description of the ASCCP.

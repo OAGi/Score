@@ -27,7 +27,7 @@ import org.oagi.score.entity.jooq.tables.Asccp;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
 
-    private static final long serialVersionUID = 150240302;
+    private static final long serialVersionUID = -40543290;
 
     /**
      * Setter for <code>oagi.asccp.asccp_id</code>. An internal, primary database key of an ASCCP.
@@ -58,14 +58,14 @@ public class AsccpRecord extends UpdatableRecordImpl<AsccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \n\nThere must be only one ASCCP without a Property_Term for a particular ACC.
+     * Setter for <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.
      */
     public void setPropertyTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. \n\nThere must be only one ASCCP without a Property_Term for a particular ACC.
+     * Getter for <code>oagi.asccp.property_term</code>. The role (or property) the ACC as referred to by the Role_Of_ACC_ID play when the ASCCP is used by another ACC. There must be only one ASCCP without a Property_Term for a particular ACC.
      */
     public String getPropertyTerm() {
         return (String) get(2);

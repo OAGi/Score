@@ -1,18 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource,
-  PageEvent,
-  SortDirection
-} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CodeListForList, CodeListForListRequest} from '../domain/code-list';
 import {CodeListService} from '../domain/code-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
@@ -31,7 +26,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class CodeListListComponent implements OnInit {
 
-  title = 'Code Lists';
+  title = 'Code List';
 
   displayedColumns: string[] = [
     'select', 'codeListName', 'basedCodeListName', 'agencyId',

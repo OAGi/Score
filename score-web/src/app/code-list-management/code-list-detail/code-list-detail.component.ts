@@ -3,10 +3,14 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {CodeListService} from '../domain/code-list.service';
 import {CodeList, CodeListValue, SimpleAgencyIdListValue} from '../domain/code-list';
-import {MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {CodeListValueDialogComponent} from '../code-list-value-dialog/code-list-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
-import {switchMap} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
 import {v4 as uuid} from 'uuid';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -21,7 +25,7 @@ import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog
 })
 export class CodeListDetailComponent implements OnInit {
 
-  title = 'Code List Detail';
+  title = 'Edit Code List';
   agencyIdListValues: SimpleAgencyIdListValue[];
   disabled: boolean;
   codeLists: CodeList[];
@@ -173,7 +177,6 @@ export class CodeListDetailComponent implements OnInit {
             this.snackBar.open(result.value + ' already exist', '', {
               duration: 4000,
             });
-
             return;
           }
         }

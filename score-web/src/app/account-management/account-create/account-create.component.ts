@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountListService} from '../domain/account-list.service';
-import {MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AccountList} from '../domain/accounts';
-import {GrowlService} from 'ngx-growl';
+import {PendingAccount} from '../domain/pending-list';
 
 @Component({
   selector: 'score-account-create',
@@ -15,16 +15,17 @@ export class AccountCreateComponent implements OnInit {
   newPassword: string;
   confirmPassword: string;
   account: AccountList;
-  creable = false;
+  pending: PendingAccount;
+  enable = false;
 
   constructor(private service: AccountListService,
               private snackBar: MatSnackBar,
               private route: ActivatedRoute,
-              private growlService: GrowlService,
               private router: Router) {
   }
 
   ngOnInit() {
+    this.pending = new PendingAccount(this.route.snapshot.queryParamMap);
     this.account = new AccountList();
     this.newPassword = '';
     this.confirmPassword = '';
@@ -39,37 +40,51 @@ export class AccountCreateComponent implements OnInit {
   }
 
   isDisabled() {
-    return !this.creable || ((this.newPassword === '') || (this.confirmPassword === '') ||
-      (this.hasMinLengthError(this.newPassword) || this.hasMinLengthError(this.confirmPassword)) || this.hasConfirmPasswordError());
+    if (!this.enable) {
+      return true;
+    }
+    if (this.isLinkOauth2()) {
+      return false;
+    } else {
+      return ((this.newPassword === '') || (this.confirmPassword === '') ||
+        (this.hasMinLengthError(this.newPassword) || this.hasMinLengthError(this.confirmPassword)) || this.hasConfirmPasswordError());
+    }
   }
 
   create() {
-    if (this.creable) {
-      this.service.create(this.account, this.newPassword).subscribe(_ => {
+    if (this.enable) {
+      this.service.create(this.account, this.newPassword, this.pending).subscribe(_ => {
         this.snackBar.open('Created', '', {
           duration: 2000,
         });
         this.router.navigateByUrl('/account');
       });
     } else {
-      this.growlService.addError({heading: 'Oops', message: 'You cannot create the account since this Login ID is already taken.'});
+      this.snackBar.open('You cannot create the account since this Login ID is already taken.', '', {
+        duration: 2000,
+      });
     }
   }
 
-  changeLogin(value) {
-    this.creable = false;
+  changeLogin(loginId: string) {
+    this.enable = false;
 
-    if (!value) {
+    if (!loginId) {
       return;
     }
 
     this.service.getAccountNames().subscribe(resp => {
-      if (resp.indexOf(value) > -1) {
-        this.creable = false;
-        this.growlService.addError({heading: 'Oops', message: 'This Login ID is already taken.'});
+      if (resp.indexOf(loginId) > -1) {
+        this.snackBar.open('This Login ID is already taken.', '', {
+          duration: 2000,
+        });
       } else {
-        this.creable = true;
+        this.enable = true;
       }
     });
+  }
+
+  isLinkOauth2(): boolean {
+    return this.pending && !!this.pending.appOauth2UserId;
   }
 }

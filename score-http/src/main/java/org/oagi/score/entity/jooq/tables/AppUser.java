@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.AppUserRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AppUser extends TableImpl<AppUserRecord> {
 
-    private static final long serialVersionUID = -1006987098;
+    private static final long serialVersionUID = 293055408;
 
     /**
      * The reference instance of <code>oagi.app_user</code>
@@ -71,7 +71,7 @@ public class AppUser extends TableImpl<AppUserRecord> {
     /**
      * The column <code>oagi.app_user.password</code>. Password to authenticate the user.
      */
-    public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "Password to authenticate the user.");
+    public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("password"), org.jooq.impl.SQLDataType.VARCHAR(100), this, "Password to authenticate the user.");
 
     /**
      * The column <code>oagi.app_user.name</code>. Full name of the user.

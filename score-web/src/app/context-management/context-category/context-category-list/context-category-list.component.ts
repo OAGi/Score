@@ -1,16 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategory, ContextCategoryListRequest} from '../domain/context-category';
-import {
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource,
-  PageEvent,
-  SortDirection
-} from '@angular/material';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
 import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
@@ -26,7 +21,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class ContextCategoryListComponent implements OnInit {
 
-  title = 'Context Categories';
+  title = 'Context Category';
   displayedColumns: string[] = ['select', 'name', 'description'];
   dataSource = new MatTableDataSource<ContextCategory>();
   selection = new SelectionModel<number>(true, []);

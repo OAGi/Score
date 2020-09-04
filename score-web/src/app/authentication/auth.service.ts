@@ -11,15 +11,19 @@ import {
 } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {catchError} from 'rxjs/operators';
-import {Observable, throwError} from 'rxjs';
-import {MatSnackBar} from '@angular/material';
-import {UserToken} from './domain/auth';
+import {catchError, map} from 'rxjs/operators';
+import {Observable, of, throwError} from 'rxjs';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {OAuth2AppInfo, UserToken} from './domain/auth';
 
 @Injectable()
 export class AuthService implements OnInit, CanActivate {
 
+  RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
+
   USER_INFO_KEY = 'X-SRT-UserInfo';
+  ROLE_DEVELOPER = 'developer';
+  ROLE_END_USER = 'end-user';
 
   constructor(private http: HttpClient,
               private router: Router) {
@@ -28,13 +32,26 @@ export class AuthService implements OnInit, CanActivate {
   ngOnInit() {
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.isAuthenticated()) {
-      return true;
-    }
-
-    this.logout(getResolvedUrl(route));
-    return false;
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
+      if (!!res) {
+        this.storeUserInfo(res);
+        const role = res.role;
+        if (role === 'pending') {
+          return this.router.parseUrl('/pending');
+        } else if (role === 'reject') {
+          this.logout(getResolvedUrl(route));
+          return false;
+        }
+        return true;
+      } else {
+        this.logout(getResolvedUrl(route));
+        return false;
+      }
+    }), catchError(err => {
+      this.logout(getResolvedUrl(route));
+      return of(false);
+    }));
   }
 
   authenticate(credentials, callback?: (value: any) => void, errCallback?: (error: any) => void) {
@@ -45,28 +62,38 @@ export class AuthService implements OnInit, CanActivate {
     this.http.post<UserToken>('/api/' + environment.loginPath, params, {
       headers: headers
     }).subscribe(res => {
-      localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
+      this.storeUserInfo(res);
       return callback && callback(res);
     }, err => {
       return errCallback && errCallback(err);
     });
   }
 
-  getUserToken() {
-    if (this.isAuthenticated()) {
-      try {
-        return JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
-      } catch (e) {
-        this.logout();
-      }
-    }
+  storeUserInfo(res: UserToken) {
+    localStorage.setItem(this.USER_INFO_KEY, btoa(JSON.stringify(res)));
+  }
 
-    this.logout();
+  getUserToken(): UserToken {
+    let value;
+    try {
+      value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
+    } catch (ignore) {
+      value = new UserToken();
+      this.storeUserInfo(value);
+    }
+    return value;
   }
 
   isAuthenticated() {
-    const value = localStorage.getItem(this.USER_INFO_KEY);
-    return (value);
+    const userToken = this.getUserToken();
+    let value;
+    try {
+      value = JSON.parse(atob(localStorage.getItem(this.USER_INFO_KEY)));
+    } catch (ignore) {
+      value = new UserToken();
+      this.storeUserInfo(value);
+    }
+    return userToken.role === this.ROLE_DEVELOPER || userToken.role === this.ROLE_END_USER;
   }
 
   logout(url?) {
@@ -86,17 +113,34 @@ export class AuthService implements OnInit, CanActivate {
     }
   }
 
+  nextParam(next?: string) : string | undefined {
+    if (!next || next.length === 0 || next === '/') {
+      return undefined;
+    }
+    for (const param of this.RESTRICTED_NEXT_PARAMS) {
+      if (next.indexOf(param) !== -1) {
+        return undefined;
+      }
+    }
+    return next;
+  }
+
   redirectToLogin(url?) {
     const commands = ['/' + environment.loginPath];
-    if (url !== undefined && 'login' !== url && url.length > 0) {
-      this.router.navigate(commands, {
+    const next = this.nextParam(url);
+    if (!!next) {
+      return this.router.navigate(commands, {
         queryParams: {
-          next: url
+          next
         }
       });
     } else {
-      this.router.navigate(commands);
+      return this.router.navigate(commands);
     }
+  }
+
+  getOAuth2AppInfos(): Observable<OAuth2AppInfo[]> {
+    return this.http.get<OAuth2AppInfo[]>('/api/info/oauth2_providers');
   }
 }
 
@@ -104,6 +148,7 @@ export class AuthService implements OnInit, CanActivate {
 export class XhrInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const xhr = req.clone({
+      withCredentials: true,
       headers: req.headers.set('X-Requested-With', 'XMLHttpRequest')
     });
     return next.handle(xhr);
@@ -140,9 +185,11 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
             case 401:
             case 403:
               if (req.url.indexOf(environment.logoutPath) === -1) {
-                this.snackBar.open('Authentication Failure', '', {
-                  duration: 2000,
-                });
+                if (req.url.indexOf(environment.statePath) === -1) {
+                  this.snackBar.open('Authentication Failure', '', {
+                    duration: 2000,
+                  });
+                }
 
                 this.auth.logout(window.location.pathname);
               }
@@ -179,7 +226,7 @@ export class CanActivateDeveloper implements CanActivate {
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
     const userToken = this.authService.getUserToken();
-    if (userToken.role === 'developer') {
+    if (userToken.role === this.authService.ROLE_DEVELOPER) {
       return true;
     }
 
@@ -198,8 +245,7 @@ export class CanActivateUser implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    const userToken = this.authService.getUserToken();
-    if (userToken.role === 'end-user' || userToken.role === 'developer') {
+    if (this.authService.isAuthenticated()) {
       return true;
     }
 

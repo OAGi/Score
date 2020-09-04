@@ -9,8 +9,8 @@ import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class ExtensionController {
     @RequestMapping(value = "/core_component/node/extension/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CcNode getCcNode(@AuthenticationPrincipal User user,
+    public CcNode getCcNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("releaseId") long releaseId,
                             @PathVariable("id") long extensionId) {
         return service.getExtensionNode(user, extensionId, releaseId);
@@ -33,7 +33,7 @@ public class ExtensionController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity doExtensionAction(@AuthenticationPrincipal User user,
+    public ResponseEntity doExtensionAction(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @PathVariable("releaseId") long releaseId,
                                             @PathVariable("id") long extensionId,
                                             @RequestBody CcActionRequest actionRequest) {
@@ -72,7 +72,7 @@ public class ExtensionController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/state",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateExtensionState(@AuthenticationPrincipal User user,
+    public ResponseEntity updateExtensionState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                @PathVariable("releaseId") long releaseId,
                                                @PathVariable("id") long extensionId,
                                                @RequestBody Map<String, Object> body) {
@@ -85,7 +85,7 @@ public class ExtensionController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{id:[\\d]+}/detail",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ExtensionUpdateResponse updateDetails(@AuthenticationPrincipal User user,
+    public ExtensionUpdateResponse updateDetails(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                  @PathVariable("releaseId") long releaseId,
                                                  @PathVariable("id") long extensionId,
                                                  @RequestBody ExtensionUpdateRequest request) {
@@ -97,7 +97,7 @@ public class ExtensionController {
     @RequestMapping(value = "/core_component/extension/{releaseId:[\\d]+}/{type}/{id:[\\d]+}/revision",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CcNode getLastCcNode(@AuthenticationPrincipal User user,
+    public CcNode getLastCcNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                 @PathVariable("releaseId") long releaseId,
                                 @PathVariable("type") String type,
                                 @PathVariable("id") long CcId) {

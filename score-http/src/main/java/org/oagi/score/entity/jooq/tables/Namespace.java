@@ -44,7 +44,7 @@ import org.oagi.score.entity.jooq.tables.records.NamespaceRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Namespace extends TableImpl<NamespaceRecord> {
 
-    private static final long serialVersionUID = 1234298365;
+    private static final long serialVersionUID = -1486920460;
 
     /**
      * The reference instance of <code>oagi.namespace</code>

@@ -9,7 +9,7 @@ import org.oagi.score.gateway.http.api.namespace_management.data.SimpleNamespace
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,7 @@ public class NamespaceService {
                 .fetchInto(SimpleNamespace.class);
     }
 
-    public List<NamespaceList> getNamespaceList(User user) {
+    public List<NamespaceList> getNamespaceList(AuthenticatedPrincipal user) {
         long userId = sessionService.userId(user);
 
         List<NamespaceList> namespaceLists = dslContext.select(Tables.NAMESPACE.fields())
@@ -47,7 +47,7 @@ public class NamespaceService {
         return namespaceLists;
     }
 
-    public Namespace getNamespace(User user, long namespaceId) {
+    public Namespace getNamespace(AuthenticatedPrincipal user, long namespaceId) {
         long userId = sessionService.userId(user);
 
         Namespace namespace =
@@ -67,7 +67,7 @@ public class NamespaceService {
     }
 
     @Transactional
-    public void create(User user, Namespace namespace) {
+    public void create(AuthenticatedPrincipal user, Namespace namespace) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -86,7 +86,7 @@ public class NamespaceService {
     }
 
     @Transactional
-    public void update(User user, Namespace namespace) {
+    public void update(AuthenticatedPrincipal user, Namespace namespace) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 

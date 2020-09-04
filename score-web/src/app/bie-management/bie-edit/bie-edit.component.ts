@@ -3,7 +3,7 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {BieEditService} from './domain/bie-edit.service';
 import {CollectionViewer, SelectionChange, SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
-import {BehaviorSubject, forkJoin, merge, Observable, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, merge, Observable, ReplaySubject} from 'rxjs';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {
@@ -24,9 +24,9 @@ import {
   PrimitiveType
 } from './domain/bie-edit-node';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatSnackBar} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {GrowlService} from 'ngx-growl';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
@@ -71,7 +71,7 @@ export class DynamicDataSource {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicBieFlatNode[]> {
-    this.treeControl.expansionModel.onChange.subscribe(change => {
+    this.treeControl.expansionModel.changed.subscribe(change => {
       if ((change as SelectionChange<DynamicBieFlatNode>).added ||
         (change as SelectionChange<DynamicBieFlatNode>).removed) {
         this.handleTreeControl(change as SelectionChange<DynamicBieFlatNode>);
@@ -377,7 +377,6 @@ export class BieEditComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
-              private growlService: GrowlService,
               private contextMenuService: ContextMenuService,
               private dialog: MatDialog) {
 

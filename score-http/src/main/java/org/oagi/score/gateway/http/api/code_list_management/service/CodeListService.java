@@ -11,7 +11,7 @@ import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.SrtGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -205,7 +205,7 @@ public class CodeListService {
     }
 
     @Transactional
-    public void insert(User user, CodeList codeList) {
+    public void insert(AuthenticatedPrincipal user, CodeList codeList) {
         ULong userId = ULong.valueOf(sessionService.userId(user));
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -274,7 +274,7 @@ public class CodeListService {
     }
 
     @Transactional
-    public void update(User user, CodeList codeList) {
+    public void update(AuthenticatedPrincipal user, CodeList codeList) {
         String state = codeList.getState();
         if (!StringUtils.isEmpty(state)) {
             dslContext.update(CODE_LIST)

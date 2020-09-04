@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {Base64} from 'js-base64';
 import {BieExpressOption} from './generate-expression';
 import {HttpParams} from '../../../../../node_modules/@angular/common/http';
 import {Observable} from 'rxjs';
+import {base64Encode} from '../../../common/utility';
 
 @Injectable()
 export class BieExpressService {
@@ -22,7 +22,7 @@ export class BieExpressService {
     });
 
     return this.http.get('/api/profile_bie/generate', {
-      params: new HttpParams().set('data', Base64.encode(params.toString())),
+      params: new HttpParams().set('data', base64Encode(params.toString())),
       observe: 'response',
       responseType: 'blob'
     });

@@ -7,8 +7,8 @@ import org.oagi.score.gateway.http.api.context_management.service.ContextSchemeS
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -126,7 +126,7 @@ public class ContextSchemeController {
 
     @RequestMapping(value = "/context_scheme", method = RequestMethod.PUT)
     public ResponseEntity create(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody ContextScheme contextScheme) {
         service.insert(user, contextScheme);
         return ResponseEntity.noContent().build();
@@ -135,7 +135,7 @@ public class ContextSchemeController {
     @RequestMapping(value = "/context_scheme/{id}", method = RequestMethod.POST)
     public ResponseEntity update(
             @PathVariable("id") long id,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody ContextScheme contextScheme) {
         contextScheme.setCtxSchemeId(id);
         service.update(user, contextScheme);

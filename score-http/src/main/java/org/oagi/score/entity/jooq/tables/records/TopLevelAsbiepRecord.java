@@ -32,7 +32,7 @@ import org.oagi.score.entity.jooq.tables.TopLevelAsbiep;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TopLevelAsbiepRecord extends UpdatableRecordImpl<TopLevelAsbiepRecord> implements Record9<ULong, ULong, ULong, Timestamp, ULong, ULong, String, String, Integer> {
 
-    private static final long serialVersionUID = -537191762;
+    private static final long serialVersionUID = -2032044338;
 
     /**
      * Setter for <code>oagi.top_level_asbiep.top_level_asbiep_id</code>. A internal, primary database key of an top-level ASBIEP.

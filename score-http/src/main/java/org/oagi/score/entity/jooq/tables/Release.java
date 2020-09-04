@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.ReleaseRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Release extends TableImpl<ReleaseRecord> {
 
-    private static final long serialVersionUID = 1299452035;
+    private static final long serialVersionUID = 1263698182;
 
     /**
      * The reference instance of <code>oagi.release</code>

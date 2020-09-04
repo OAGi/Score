@@ -1,13 +1,13 @@
 import {PageRequest} from '../../../basis/basis';
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
-import {Base64} from 'js-base64';
+import {base64Decode, base64Encode} from '../../../common/utility';
 
 export class CcListRequest {
   releaseId: number;
   types: string[] = [];
   states: string[] = [];
-  deprecated = false;
+  deprecated: boolean[] = [false];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
   componentType: string[] = [];
@@ -24,17 +24,30 @@ export class CcListRequest {
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
-    const params = (q) ? new HttpParams({fromString: Base64.decode(q)}) : new HttpParams();
-
-    this.page.sortActive = params.get('sortActive') || (defaultPageRequest) ? defaultPageRequest.sortActive : '';
-    this.page.sortDirection = params.get('sortDirection') || (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
-    this.page.pageIndex = Number(params.get('pageIndex') || (defaultPageRequest) ? defaultPageRequest.pageIndex : 0);
-    this.page.pageSize = Number(params.get('pageSize') || (defaultPageRequest) ? defaultPageRequest.pageSize : 10);
+    const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
 
     this.releaseId = Number(params.get('releaseId') || 0);
-    this.types = (params.get('types')) ? Array.from(params.get('types').split(',')) : ['ACC', 'ASCCP', 'BCCP'];
+    this.page.sortActive = params.get('sortActive');
+    if (!this.page.sortActive) {
+      this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
+    }
+    this.page.sortDirection = params.get('sortDirection');
+    if (!this.page.sortDirection) {
+      this.page.sortDirection = (defaultPageRequest) ? defaultPageRequest.sortDirection : '';
+    }
+    if (params.get('pageIndex')) {
+      this.page.pageIndex = Number(params.get('pageIndex'));
+    } else {
+      this.page.pageIndex = (defaultPageRequest) ? defaultPageRequest.pageIndex : 0;
+    }
+    if (params.get('pageSize')) {
+      this.page.pageSize = Number(params.get('pageSize'));
+    } else {
+      this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
+    }
+    this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
-    this.deprecated = (params.get('deprecated')) ? (('true' === params.get('deprecated')) ? true : false) : undefined;
+    this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')) ? true : false)] : undefined;
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
     this.componentType = (params.get('componentType')) ? Array.from(params.get('componentType').split(',')) : [];
@@ -49,7 +62,7 @@ export class CcListRequest {
     };
   }
 
-  toQuery(): string {
+  toQuery(extras?): string {
     let params = new HttpParams()
       .set('sortActive', this.page.sortActive)
       .set('sortDirection', this.page.sortDirection)
@@ -90,7 +103,12 @@ export class CcListRequest {
     if (this.componentType && this.componentType.length > 0) {
       params = params.set('componentType', this.componentType.join(','));
     }
-    const str = Base64.encode(params.toString());
+    if (extras) {
+      Object.keys(extras).forEach(key => {
+        params = params.set(key.toString(), extras[key]);
+      })
+    }
+    const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;
   }
 }

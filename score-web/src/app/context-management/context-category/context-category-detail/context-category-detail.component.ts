@@ -4,7 +4,8 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategory} from '../domain/context-category';
-import {MatDialog, MatDialogConfig, MatSnackBar} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from '../../../common/utility';
 import {ContextScheme} from '../../context-scheme/domain/context-scheme';
 import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
@@ -17,7 +18,7 @@ import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dia
 })
 export class ContextCategoryDetailComponent implements OnInit {
 
-  title;
+  title = 'Edit Context Category';
   contextCategory: ContextCategory;
   hashCode;
   contextSchemes: ContextScheme[];
@@ -31,7 +32,6 @@ export class ContextCategoryDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.title = 'Context Category Detail';
     this.contextCategory = new ContextCategory();
 
     this.route.paramMap.pipe(
@@ -59,7 +59,7 @@ export class ContextCategoryDetailComponent implements OnInit {
     this.service.update(this.contextCategory).subscribe(_ => {
       this.hashCode = hashCode(this.contextCategory);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 1500,
       });
       this.router.navigateByUrl('/context_management/context_category');
     });
@@ -114,7 +114,7 @@ export class ContextCategoryDetailComponent implements OnInit {
           listDisplayed.push(ctxScheme.guid);
         });
         // change of the list in order to get displayed by the snackbar, replace all the global comas by newlines
-        const displayedList: String = listDisplayed.toString().replace(/,/g, ',\n ');
+        const displayedList: string = listDisplayed.toString().replace(/,/g, ',\n ');
 
         this.openDialogContextCategory(listDisplayed);
       } else {

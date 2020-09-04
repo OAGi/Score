@@ -44,7 +44,7 @@ import org.oagi.score.entity.jooq.tables.records.CtxSchemeRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CtxScheme extends TableImpl<CtxSchemeRecord> {
 
-    private static final long serialVersionUID = -682908341;
+    private static final long serialVersionUID = 1989696834;
 
     /**
      * The reference instance of <code>oagi.ctx_scheme</code>

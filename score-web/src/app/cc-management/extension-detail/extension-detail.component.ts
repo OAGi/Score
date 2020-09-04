@@ -5,7 +5,8 @@ import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {MatDialog, MatSnackBar} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {hashCode, UnboundedPipe} from '../../common/utility';
 import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
@@ -33,7 +34,6 @@ import {AppendBccpDialogComponent} from './append-bccp-dialog/append-bccp-dialog
 import {ExtensionDetailService} from './domain/extension-detail.service';
 import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
 import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
-import {GrowlService} from 'ngx-growl';
 
 @Injectable()
 export class DynamicCcDataSource {
@@ -55,7 +55,7 @@ export class DynamicCcDataSource {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicCcFlatNode[]> {
-    this.treeControl.expansionModel.onChange.subscribe(change => {
+    this.treeControl.expansionModel.changed.subscribe(change => {
       if ((change as SelectionChange<DynamicCcFlatNode>).added ||
         (change as SelectionChange<DynamicCcFlatNode>).removed) {
         this.handleTreeControl(change as SelectionChange<DynamicCcFlatNode>);
@@ -212,7 +212,6 @@ export class ExtensionDetailComponent implements OnInit {
               private releaseService: ReleaseService,
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
-              private growlService: GrowlService,
               private contextMenuService: ContextMenuService,
               private dialog: MatDialog) {
   }

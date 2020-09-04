@@ -9,15 +9,15 @@ import org.springframework.lang.Nullable;
 
 import java.util.Collections;
 
-public class SrtRedisCacheManager extends RedisCacheManager {
+public class ScoreRedisCacheManager extends RedisCacheManager {
 
     private RedisConnectionFactory connectionFactory;
     private RedisCacheWriter cacheWriter;
     private RedisCacheConfiguration defaultCacheConfig;
 
-    public SrtRedisCacheManager(RedisConnectionFactory connectionFactory,
-                                RedisCacheWriter cacheWriter,
-                                RedisCacheConfiguration defaultCacheConfiguration) {
+    public ScoreRedisCacheManager(RedisConnectionFactory connectionFactory,
+                                  RedisCacheWriter cacheWriter,
+                                  RedisCacheConfiguration defaultCacheConfiguration) {
         super(cacheWriter, defaultCacheConfiguration, Collections.emptyMap(), true);
 
         this.connectionFactory = connectionFactory;
@@ -26,7 +26,7 @@ public class SrtRedisCacheManager extends RedisCacheManager {
     }
 
     protected RedisCache createRedisCache(String name, @Nullable RedisCacheConfiguration cacheConfig) {
-        return new SrtRedisCache(connectionFactory,
+        return new ScoreRedisCache(connectionFactory,
                 name, cacheWriter, cacheConfig != null ? cacheConfig : defaultCacheConfig);
     }
 }

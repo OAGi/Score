@@ -11,7 +11,7 @@ import org.oagi.score.gateway.http.api.info.data.SummaryCcExt;
 import org.oagi.score.gateway.http.api.info.data.SummaryCcExtInfo;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class CcInfoService {
     @Autowired
     private SessionService sessionService;
 
-    public SummaryCcExtInfo getSummaryCcExtInfo(User user) {
+    public SummaryCcExtInfo getSummaryCcExtInfo(AuthenticatedPrincipal user) {
         if (user == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }

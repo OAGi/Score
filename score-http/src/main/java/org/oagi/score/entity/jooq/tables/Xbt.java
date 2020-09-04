@@ -45,7 +45,7 @@ import org.oagi.score.entity.jooq.tables.records.XbtRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Xbt extends TableImpl<XbtRecord> {
 
-    private static final long serialVersionUID = 468839573;
+    private static final long serialVersionUID = -966346882;
 
     /**
      * The reference instance of <code>oagi.xbt</code>

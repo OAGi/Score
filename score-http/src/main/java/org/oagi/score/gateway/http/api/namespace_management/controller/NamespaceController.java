@@ -7,8 +7,8 @@ import org.oagi.score.gateway.http.api.namespace_management.service.NamespaceSer
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,20 +27,20 @@ public class NamespaceController {
 
     @RequestMapping(value = "/namespace_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<NamespaceList> getNamespaceList(@AuthenticationPrincipal User user) {
+    public List<NamespaceList> getNamespaceList(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         return service.getNamespaceList(user);
     }
 
     @RequestMapping(value = "/namespace/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Namespace getNamespace(@AuthenticationPrincipal User user,
+    public Namespace getNamespace(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                   @PathVariable("id") long namespaceId) {
         return service.getNamespace(user, namespaceId);
     }
 
     @RequestMapping(value = "/namespace", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createNamespace(@AuthenticationPrincipal User user,
+    public ResponseEntity createNamespace(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                           @RequestBody Namespace namespace) {
         service.create(user, namespace);
         return ResponseEntity.noContent().build();
@@ -49,7 +49,7 @@ public class NamespaceController {
     @RequestMapping(value = "/namespace/{id}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createNamespace(@PathVariable("id") long namespaceId,
-                                          @AuthenticationPrincipal User user,
+                                          @AuthenticationPrincipal AuthenticatedPrincipal user,
                                           @RequestBody Namespace namespace) {
         namespace.setNamespaceId(namespaceId);
         service.update(user, namespace);

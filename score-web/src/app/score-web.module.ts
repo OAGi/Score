@@ -1,4 +1,6 @@
 import {NgModule} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -22,8 +24,8 @@ import {ReleaseManagementModule} from './release-management/release-management.m
 import {ModuleManagementModule} from './module-management/module-management.module';
 
 import {RouterModule} from '@angular/router';
-import {SRT_WEBAPP_ROUTES} from './basis/routes';
-import {MatIconRegistry} from '@angular/material';
+import {SCORE_WEBAPP_ROUTES} from './basis/routes';
+import {MatIconRegistry} from '@angular/material/icon';
 
 const httpInterceptorsProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true},
@@ -40,7 +42,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
-    RouterModule.forRoot(SRT_WEBAPP_ROUTES),
+    RouterModule.forRoot(SCORE_WEBAPP_ROUTES),
     HttpClientModule,
     TranslateModule.forRoot({
       loader: {
@@ -61,7 +63,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     CodeListModule,
     NamespaceManagementModule,
     ReleaseManagementModule,
-    ModuleManagementModule
+    ModuleManagementModule,
+    MatCardModule,
+    MatButtonModule
   ],
   declarations: [
     ScoreWebComponent

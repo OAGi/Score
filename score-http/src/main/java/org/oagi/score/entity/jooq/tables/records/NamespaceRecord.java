@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.Namespace;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NamespaceRecord extends UpdatableRecordImpl<NamespaceRecord> implements Record10<ULong, String, String, String, Byte, ULong, ULong, ULong, Timestamp, Timestamp> {
 
-    private static final long serialVersionUID = -34738298;
+    private static final long serialVersionUID = -1626611034;
 
     /**
      * Setter for <code>oagi.namespace.namespace_id</code>. Primary, internal database key.

@@ -9,8 +9,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +31,7 @@ public class BieGenerateController {
     private BieGenerateService service;
 
     @RequestMapping(value = "/profile_bie/generate", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal User user,
+    public ResponseEntity<InputStreamResource> generate(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                         @RequestParam("data") String data) throws IOException {
 
         Map<String, Object> params = convertValue(data);

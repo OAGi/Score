@@ -45,7 +45,7 @@ import org.oagi.score.entity.jooq.tables.records.BbieScRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BbieSc extends TableImpl<BbieScRecord> {
 
-    private static final long serialVersionUID = 17809189;
+    private static final long serialVersionUID = -1086238488;
 
     /**
      * The reference instance of <code>oagi.bbie_sc</code>

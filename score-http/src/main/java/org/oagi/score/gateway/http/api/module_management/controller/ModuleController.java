@@ -6,8 +6,8 @@ import org.oagi.score.gateway.http.api.module_management.data.SimpleModule;
 import org.oagi.score.gateway.http.api.module_management.service.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,13 +29,13 @@ public class ModuleController {
 
     @RequestMapping(value = "/module_list", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ModuleList> getModuleList(@AuthenticationPrincipal User user) {
+    public List<ModuleList> getModuleList(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         return moduleService.getModuleList(user);
     }
 
     @RequestMapping(value = "/module/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Module getModule(@AuthenticationPrincipal User user,
+    public Module getModule(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("id") long moduleId) {
         return moduleService.getModule(user, moduleId);
     }

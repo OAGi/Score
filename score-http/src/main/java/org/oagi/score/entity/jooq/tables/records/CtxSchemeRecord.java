@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.CtxScheme;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CtxSchemeRecord extends UpdatableRecordImpl<CtxSchemeRecord> implements Record13<ULong, String, String, String, String, String, String, ULong, ULong, ULong, ULong, Timestamp, Timestamp> {
 
-    private static final long serialVersionUID = -30798572;
+    private static final long serialVersionUID = 398327860;
 
     /**
      * Setter for <code>oagi.ctx_scheme.ctx_scheme_id</code>. Internal, primary, database key.

@@ -13,7 +13,7 @@ import org.oagi.score.gateway.http.api.info.data.SummaryBie;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.SrtGuid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -432,7 +432,7 @@ public class BieRepository {
         });
     }
 
-    public AbieRecord createAbie(User user, long basedAccId, long topLevelAsbiepId) {
+    public AbieRecord createAbie(AuthenticatedPrincipal user, long basedAccId, long topLevelAsbiepId) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -448,7 +448,7 @@ public class BieRepository {
                 .returning().fetchOne();
     }
 
-    public AsbiepRecord createAsbiep(User user, long asccpId, long abieId, long topLevelAsbiepId) {
+    public AsbiepRecord createAsbiep(AuthenticatedPrincipal user, long asccpId, long abieId, long topLevelAsbiepId) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -464,7 +464,7 @@ public class BieRepository {
                 .returning().fetchOne();
     }
 
-    public AsbieRecord createAsbie(User user, long fromAbieId, long toAsbiepId, long basedAsccId,
+    public AsbieRecord createAsbie(AuthenticatedPrincipal user, long fromAbieId, long toAsbiepId, long basedAsccId,
                                    int seqKey, long topLevelAsbiepId) {
 
         long userId = sessionService.userId(user);
@@ -499,7 +499,7 @@ public class BieRepository {
 
     }
 
-    public BbiepRecord createBbiep(User user, long basedBccpId, long topLevelAsbiepId) {
+    public BbiepRecord createBbiep(AuthenticatedPrincipal user, long basedBccpId, long topLevelAsbiepId) {
         long userId = sessionService.userId(user);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -514,7 +514,7 @@ public class BieRepository {
                 .returning().fetchOne();
     }
 
-    public BbieRecord createBbie(User user, long fromAbieId,
+    public BbieRecord createBbie(AuthenticatedPrincipal user, long fromAbieId,
                                  long toBbiepId, long basedBccId, long bdtId,
                                  int seqKey, long topLevelAsbiepId) {
 
@@ -593,7 +593,7 @@ public class BieRepository {
                 .fetchOptionalInto(Long.class).orElse(0L);
     }
 
-    public long createBbieSc(User user, long bbieId, long dtScId,
+    public long createBbieSc(AuthenticatedPrincipal user, long bbieId, long dtScId,
                              long topLevelAsbiepId) {
 
         DtScRecord dtScRecord = dslContext.selectFrom(DT_SC)

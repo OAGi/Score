@@ -3,16 +3,13 @@ import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ContextSchemeService} from '../domain/context-scheme.service';
 import {ContextScheme, ContextSchemeValue, SimpleContextCategory, SimpleContextScheme} from '../domain/context-scheme';
-import {
-  MatCheckboxChange,
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSelectChange,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource
-} from '@angular/material';
+import {MatCheckboxChange} from '@angular/material/checkbox';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSelectChange} from '@angular/material/select';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {ContextSchemeValueDialogComponent} from '../context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {CodeList, CodeListValue} from '../../../code-list-management/domain/code-list';

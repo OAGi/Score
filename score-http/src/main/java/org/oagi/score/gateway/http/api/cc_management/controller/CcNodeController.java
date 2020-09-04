@@ -9,8 +9,8 @@ import org.oagi.score.gateway.http.api.cc_management.service.CcNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/node/{type}/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CcNode getCcNode(@AuthenticationPrincipal User user,
+    public CcNode getCcNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("type") String type,
                             @PathVariable("releaseId") long releaseId,
                             @PathVariable("id") long ccId) {
@@ -43,22 +43,22 @@ public class CcNodeController {
         }
     }
 
-    private CcAccNode getAccNode(User user, long accId, Long releaseId) {
+    private CcAccNode getAccNode(AuthenticatedPrincipal user, long accId, Long releaseId) {
         return service.getAccNode(user, accId, releaseId);
     }
 
-    private CcAsccpNode getAsccpNode(User user, long asccpId, Long releaseId) {
+    private CcAsccpNode getAsccpNode(AuthenticatedPrincipal user, long asccpId, Long releaseId) {
         return service.getAsccpNode(user, asccpId, releaseId);
     }
 
-    private CcBccpNode getBccpNode(User user, long bccpId, Long releaseId) {
+    private CcBccpNode getBccpNode(AuthenticatedPrincipal user, long bccpId, Long releaseId) {
         return service.getBccpNode(user, bccpId, releaseId);
     }
 
     @RequestMapping(value = "/core_component/acc/{id}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void update(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("id") long id,
             @RequestBody CcAccNode ccAccNode) {
         ccAccNode.setAccId(id);
@@ -68,7 +68,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/asccp/{id}", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateAsccp(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @PathVariable("id") long id,
             @RequestBody CcAsccpNodeDetail.Asccp ccAsccpNodeDetail) {
         service.updateAsccp(user, ccAsccpNodeDetail, id);
@@ -93,14 +93,14 @@ public class CcNodeController {
     }
 
     @RequestMapping(value = "/core_component/acc", method = RequestMethod.PUT)
-    public CcAccNode createAcc(@AuthenticationPrincipal User user) {
+    public CcAccNode createAcc(@AuthenticationPrincipal AuthenticatedPrincipal user) {
         return service.createAcc(user);
     }
 
     @RequestMapping(value = "/core_component/node/children/{type}/{releaseId:[\\d]+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<? extends CcNode> getNodeChildren(@AuthenticationPrincipal User user,
+    public List<? extends CcNode> getNodeChildren(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                   @PathVariable("type") String type,
                                                   @PathVariable("releaseId") long releaseId,
                                                   @RequestParam("data") String data) {
@@ -138,7 +138,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/node/detail/{type}/{releaseId:[\\d]+}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CcNodeDetail getNodeDetail(@AuthenticationPrincipal User user,
+    public CcNodeDetail getNodeDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                       @PathVariable("type") String type,
                                       @PathVariable("releaseId") long releaseId,
                                       @RequestParam("data") String data) {
@@ -166,7 +166,7 @@ public class CcNodeController {
 
     @RequestMapping(value = "/core_component/node/detail", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CcEditUpdateResponse updateDetails(@AuthenticationPrincipal User user,
+    public CcEditUpdateResponse updateDetails(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                               @RequestBody CcEditUpdateRequest request) {
         return service.updateDetails(user, request);
     }
@@ -174,7 +174,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/ascc/{releaseId:[\\d]+}/{id:[\\d]+}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity doAsccAction(@AuthenticationPrincipal User user,
+    public ResponseEntity doAsccAction(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                        @PathVariable("releaseId") long releaseId,
                                        @PathVariable("id") long accId,
                                        @RequestBody CcActionRequest actionRequest) {
@@ -195,7 +195,7 @@ public class CcNodeController {
     @RequestMapping(value = "/core_component/asccp/create", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createAsccp(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthenticatedPrincipal user,
             @RequestBody CcAsccpNode ccAsccpNode) {
         service.createAsccp(user, ccAsccpNode);
         return ResponseEntity.noContent().build();

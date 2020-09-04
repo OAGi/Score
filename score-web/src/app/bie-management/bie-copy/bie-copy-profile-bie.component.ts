@@ -1,6 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {BieCopyService} from './domain/bie-copy.service';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource, PageEvent, SortDirection} from '@angular/material';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {finalize, switchMap} from 'rxjs/operators';
@@ -9,11 +12,11 @@ import {BusinessContext} from '../../context-management/business-context/domain/
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {BieListService} from '../bie-list/domain/bie-list.service';
 import {AccountListService} from '../../account-management/domain/account-list.service';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
+import {base64Decode, initFilter} from '../../common/utility';
 import {Location} from '@angular/common';
 
 @Component({
@@ -141,7 +144,9 @@ export class BieCopyProfileBieComponent implements OnInit {
         return elm;
       });
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
+          bizCtxIds: this.bizCtxIds.map(e => '' + e).join(',')
+        }));
       }
     }, error => {
       this.dataSource.data = [];
@@ -172,7 +177,7 @@ export class BieCopyProfileBieComponent implements OnInit {
     const topLevelAsbiepId: number = this.selection.selected[0].topLevelAsbiepId;
     this.service.copy(topLevelAsbiepId, this.bizCtxIds).subscribe(_ => {
       this.snackBar.open('Copying request queued', '', {
-        duration: 1000,
+        duration: 1500,
       });
 
       this.router.navigateByUrl('/profile_bie');

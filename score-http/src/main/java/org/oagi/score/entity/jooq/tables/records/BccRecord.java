@@ -28,7 +28,7 @@ import org.oagi.score.entity.jooq.tables.Bcc;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BccRecord extends UpdatableRecordImpl<BccRecord> {
 
-    private static final long serialVersionUID = -1786915795;
+    private static final long serialVersionUID = 547167629;
 
     /**
      * Setter for <code>oagi.bcc.bcc_id</code>. A internal, primary database key of an BCC.

@@ -15,6 +15,11 @@ import java.util.Arrays;
 @Component
 public class AppUserDetailsService implements UserDetailsService {
 
+    public static String DEVELOPER_GRANTED_AUTHORITY = "developer";
+    public static String END_USER_GRANTED_AUTHORITY = "end-user";
+    public static String PENDING_GRANTED_AUTHORITY = "pending";
+    public static String REJECT_GRANTED_AUTHORITY = "reject";
+
     @Autowired
     private DSLContext dslContext;
 
@@ -31,7 +36,7 @@ public class AppUserDetailsService implements UserDetailsService {
         String password = appUserRecord.getPassword();
         boolean isDeveloper = appUserRecord.getIsDeveloper() == 1;
 
-        return new User(username, password,
-                Arrays.asList(new SimpleGrantedAuthority((isDeveloper) ? "developer" : "end-user")));
+        return new ScoreUser(username, password,
+                Arrays.asList(new SimpleGrantedAuthority((isDeveloper) ? DEVELOPER_GRANTED_AUTHORITY : END_USER_GRANTED_AUTHORITY)));
     }
 }

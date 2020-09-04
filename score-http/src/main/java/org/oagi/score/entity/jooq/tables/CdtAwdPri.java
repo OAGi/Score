@@ -44,7 +44,7 @@ import org.oagi.score.entity.jooq.tables.records.CdtAwdPriRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
 
-    private static final long serialVersionUID = -1741690054;
+    private static final long serialVersionUID = 2097520867;
 
     /**
      * The reference instance of <code>oagi.cdt_awd_pri</code>

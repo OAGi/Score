@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../../authentication/auth.service';
+import {AccountListService} from '../domain/account-list.service';
 import {SettingsService} from './domain/settings.service';
-import {MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 
 @Component({
@@ -15,13 +17,18 @@ export class SettingsComponent implements OnInit {
   oldPassword: string;
   newPassword: string;
   confirmPassword: string;
+  hideChangePassword: boolean;
 
   constructor(private service: SettingsService,
+              private accountService: AccountListService,
               private snackBar: MatSnackBar,
+              private auth: AuthService,
               private router: Router) {
   }
 
   ngOnInit() {
+    const token = this.auth.getUserToken();
+    this.hideChangePassword = token.authentication !== 'basic';
     this.oldPassword = '';
     this.newPassword = '';
     this.confirmPassword = '';

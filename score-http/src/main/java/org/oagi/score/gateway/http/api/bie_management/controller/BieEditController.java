@@ -11,8 +11,8 @@ import org.oagi.score.gateway.http.api.context_management.service.BusinessContex
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -40,7 +40,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/root/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditNode getRootNode(@AuthenticationPrincipal User user,
+    public BieEditNode getRootNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                    @PathVariable("id") long topLevelAsbiepId) {
         BieEditAbieNode rootNode = service.getRootNode(user, topLevelAsbiepId);
         BieState state = BieState.valueOf((Integer) rootNode.getTopLevelAsbiepState());
@@ -83,7 +83,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/root/{id}/state", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void updateState(@AuthenticationPrincipal User user,
+    public void updateState(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("id") long topLevelAsbiepId,
                             @RequestBody Map<String, Object> body) {
         BieState state = BieState.valueOf((String) body.get("state"));
@@ -92,14 +92,14 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/root/bcc/{id}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BccForBie getBcc(@AuthenticationPrincipal User user,
+    public BccForBie getBcc(@AuthenticationPrincipal AuthenticatedPrincipal user,
                             @PathVariable("id") long bccId) {
         return service.getBcc(user, bccId);
     }
 
     @RequestMapping(value = "/profile_bie/node/children/abie", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<BieEditNode> getAbieChildren(@AuthenticationPrincipal User user,
+    public List<BieEditNode> getAbieChildren(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                              @RequestParam("data") String data,
                                              @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
         BieEditAbieNode abieNode = convertValue(data, BieEditAbieNode.class);
@@ -108,7 +108,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/detail/abie", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditNodeDetail getAbieDetail(@AuthenticationPrincipal User user,
+    public BieEditNodeDetail getAbieDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                            @RequestParam("data") String data) {
         BieEditAbieNode abieNode = convertValue(data, BieEditAbieNode.class);
         return service.getDetail(user, abieNode);
@@ -116,7 +116,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/children/asbiep", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<BieEditNode> getAsbiepChildren(@AuthenticationPrincipal User user,
+    public List<BieEditNode> getAsbiepChildren(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                @RequestParam("data") String data,
                                                @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
         BieEditAsbiepNode asbiepNode = convertValue(data, BieEditAsbiepNode.class);
@@ -125,7 +125,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/detail/asbiep", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditNodeDetail getAsbiepDetail(@AuthenticationPrincipal User user,
+    public BieEditNodeDetail getAsbiepDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                              @RequestParam("data") String data) {
         BieEditAsbiepNode asbiepNode = convertValue(data, BieEditAsbiepNode.class);
         return service.getDetail(user, asbiepNode);
@@ -133,7 +133,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/children/bbiep", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<BieEditNode> getBbiepChildren(@AuthenticationPrincipal User user,
+    public List<BieEditNode> getBbiepChildren(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                               @RequestParam("data") String data,
                                               @RequestParam(value = "hideUnused", required = false) Boolean hideUnused) {
         BieEditBbiepNode bbiepNode = convertValue(data, BieEditBbiepNode.class);
@@ -142,7 +142,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/detail/bbiep", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditNodeDetail getBbiepDetail(@AuthenticationPrincipal User user,
+    public BieEditNodeDetail getBbiepDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                             @RequestParam("data") String data) {
         BieEditBbiepNode bbiepNode = convertValue(data, BieEditBbiepNode.class);
         return service.getDetail(user, bbiepNode);
@@ -150,7 +150,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/detail/bbie_sc", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditNodeDetail getBbieScDetail(@AuthenticationPrincipal User user,
+    public BieEditNodeDetail getBbieScDetail(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                              @RequestParam("data") String data) {
         BieEditBbieScNode bbieScNode = convertValue(data, BieEditBbieScNode.class);
         return service.getDetail(user, bbieScNode);
@@ -172,7 +172,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/detail", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BieEditUpdateResponse updateDetails(@AuthenticationPrincipal User user,
+    public BieEditUpdateResponse updateDetails(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                @RequestBody BieEditUpdateRequest request) {
 
         return service.updateDetails(user, request);
@@ -180,7 +180,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/extension/local", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CreateExtensionResponse createLocalAbieExtension(@AuthenticationPrincipal User user,
+    public CreateExtensionResponse createLocalAbieExtension(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                             @RequestBody BieEditAsbiepNode extensionNode) {
         CreateExtensionResponse response = service.createLocalAbieExtension(user, extensionNode);
         return response;
@@ -188,7 +188,7 @@ public class BieEditController {
 
     @RequestMapping(value = "/profile_bie/node/extension/global", method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public CreateExtensionResponse createGlobalAbieExtension(@AuthenticationPrincipal User user,
+    public CreateExtensionResponse createGlobalAbieExtension(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                                              @RequestBody BieEditAsbiepNode extensionNode) {
         CreateExtensionResponse response = service.createGlobalAbieExtension(user, extensionNode);
         return response;
@@ -199,7 +199,7 @@ public class BieEditController {
     @RequestMapping(value = "/profile_bie/{topLevelAsbiepId}/asbie/{asbieId}/reuse",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void reuseBIE(@AuthenticationPrincipal User user,
+    public void reuseBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
                          @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
                          @PathVariable("asbieId") BigInteger asbieId,
                          @RequestBody ReuseBIERequest reuseBIERequest) {
@@ -212,7 +212,7 @@ public class BieEditController {
     @RequestMapping(value = "/profile_bie/node/asbie/{asbieId}/remove_reuse",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void removeReusedBIE(@AuthenticationPrincipal User user,
+    public void removeReusedBIE(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                 @PathVariable("asbieId") BigInteger asbieId) {
 
         RemoveReusedBIERequest removeReusedBIERequest = new RemoveReusedBIERequest();
@@ -223,7 +223,7 @@ public class BieEditController {
     @RequestMapping(value = "/profile_bie/node/asbie/{asbieId}/make_bie_reusable",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void makeBieReusable(@AuthenticationPrincipal User user,
+    public void makeBieReusable(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                 @PathVariable("asbieId") BigInteger asbieId) {
 
         MakeReusableBieRequest request = new MakeReusableBieRequest();

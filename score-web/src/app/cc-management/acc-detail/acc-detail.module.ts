@@ -5,7 +5,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
-import {MatInputModule} from '@angular/material';
+import {MatInputModule} from '@angular/material/input';
 import {AccCreateComponent} from '../acc-create/acc-create.component';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';

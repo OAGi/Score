@@ -31,7 +31,7 @@ import org.oagi.score.entity.jooq.tables.BieUsageRule;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BieUsageRuleRecord extends UpdatableRecordImpl<BieUsageRuleRecord> implements Record7<ULong, ULong, ULong, ULong, ULong, ULong, ULong> {
 
-    private static final long serialVersionUID = 913710383;
+    private static final long serialVersionUID = 1506510927;
 
     /**
      * Setter for <code>oagi.bie_usage_rule.bie_usage_rule_id</code>. Primary key of the table.

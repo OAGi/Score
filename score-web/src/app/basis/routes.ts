@@ -6,8 +6,10 @@ import {JoinComponent} from './join/join.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {AuthService} from '../authentication/auth.service';
 import {environment} from '../../environments/environment';
+import {PendingActivate, PendingComponent} from './pending/pending.component';
 
-export const SRT_WEBAPP_ROUTES: Routes = [
+
+export const SCORE_WEBAPP_ROUTES: Routes = [
   {
     path: '',
     component: HomepageComponent,
@@ -17,6 +19,11 @@ export const SRT_WEBAPP_ROUTES: Routes = [
   {
     path: environment.loginPath,
     component: LoginComponent
+  },
+  {
+    path: 'pending',
+    component: PendingComponent,
+    canActivate: [PendingActivate]
   },
   {
     path: 'join',

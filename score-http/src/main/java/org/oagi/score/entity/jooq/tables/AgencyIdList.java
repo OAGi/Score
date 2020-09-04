@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.AgencyIdListRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AgencyIdList extends TableImpl<AgencyIdListRecord> {
 
-    private static final long serialVersionUID = -843997321;
+    private static final long serialVersionUID = -435204384;
 
     /**
      * The reference instance of <code>oagi.agency_id_list</code>

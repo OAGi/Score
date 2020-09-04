@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.BccRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Bcc extends TableImpl<BccRecord> {
 
-    private static final long serialVersionUID = 135744437;
+    private static final long serialVersionUID = 1989684504;
 
     /**
      * The reference instance of <code>oagi.bcc</code>

@@ -5,7 +5,8 @@ import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {MatDialog, MatSnackBar} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {CcNodeService} from '../domain/core-component-node.service';
 import {
   CcAccNode,
@@ -55,7 +56,7 @@ export class DynamicCcDataSource {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicCcFlatNode[]> {
-    this.treeControl.expansionModel.onChange.subscribe(change => {
+    this.treeControl.expansionModel.changed.subscribe(change => {
       if ((change as SelectionChange<DynamicCcFlatNode>).added ||
         (change as SelectionChange<DynamicCcFlatNode>).removed) {
         this.handleTreeControl(change as SelectionChange<DynamicCcFlatNode>);

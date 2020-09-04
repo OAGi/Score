@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
@@ -25,7 +25,7 @@ export class AccountDetailComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) =>
-        this.service.getAccount(params.get('id')))
+        this.service.getAccount(Number(params.get('id'))))
     ).subscribe(resp => {
       this.account = resp;
     });
@@ -33,7 +33,6 @@ export class AccountDetailComponent implements OnInit {
     this.newPassword = '';
     this.confirmPassword = '';
   }
-
 
   hasMinLengthError(variable: string) {
     return (variable.length < 5);

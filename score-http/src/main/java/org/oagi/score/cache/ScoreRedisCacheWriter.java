@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class SrtRedisCacheWriter implements RedisCacheWriter {
+public class ScoreRedisCacheWriter implements RedisCacheWriter {
 
     private final RedisConnectionFactory connectionFactory;
     private final Duration sleepTime;
@@ -25,7 +25,7 @@ public class SrtRedisCacheWriter implements RedisCacheWriter {
     /**
      * @param connectionFactory must not be {@literal null}.
      */
-    public SrtRedisCacheWriter(RedisConnectionFactory connectionFactory) {
+    public ScoreRedisCacheWriter(RedisConnectionFactory connectionFactory) {
         this(connectionFactory, Duration.ZERO);
     }
 
@@ -34,7 +34,7 @@ public class SrtRedisCacheWriter implements RedisCacheWriter {
      * @param sleepTime         sleep time between lock request attempts. Must not be {@literal null}. Use {@link Duration#ZERO}
      *                          to disable locking.
      */
-    SrtRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime) {
+    ScoreRedisCacheWriter(RedisConnectionFactory connectionFactory, Duration sleepTime) {
 
         Assert.notNull(connectionFactory, "ConnectionFactory must not be null!");
         Assert.notNull(sleepTime, "SleepTime must not be null!");

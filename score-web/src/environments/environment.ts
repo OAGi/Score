@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   loginPath: 'login',
-  logoutPath: 'logout'
+  logoutPath: 'logout',
+  statePath: 'state'
 };
 
 /*

@@ -12,7 +12,7 @@ import org.oagi.score.gateway.http.api.info.data.SummaryBie;
 import org.oagi.score.gateway.http.api.info.data.SummaryBieInfo;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class BieInfoService {
     @Autowired
     private SessionService sessionService;
 
-    public SummaryBieInfo getSummaryBieInfo(User user) {
+    public SummaryBieInfo getSummaryBieInfo(AuthenticatedPrincipal user) {
         if (user == null) {
             throw new DataAccessForbiddenException("Need authentication to access information.");
         }

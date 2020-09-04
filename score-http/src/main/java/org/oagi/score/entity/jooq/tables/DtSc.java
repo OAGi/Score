@@ -45,7 +45,7 @@ import org.oagi.score.entity.jooq.tables.records.DtScRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DtSc extends TableImpl<DtScRecord> {
 
-    private static final long serialVersionUID = 629998207;
+    private static final long serialVersionUID = -936976926;
 
     /**
      * The reference instance of <code>oagi.dt_sc</code>

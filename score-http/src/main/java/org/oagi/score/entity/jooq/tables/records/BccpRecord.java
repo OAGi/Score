@@ -28,7 +28,7 @@ import org.oagi.score.entity.jooq.tables.Bccp;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
 
-    private static final long serialVersionUID = 1750469788;
+    private static final long serialVersionUID = 1279726658;
 
     /**
      * Setter for <code>oagi.bccp.bccp_id</code>. An internal, primary database key.
@@ -59,14 +59,14 @@ public class BccpRecord extends UpdatableRecordImpl<BccpRecord> {
     }
 
     /**
-     * Setter for <code>oagi.bccp.property_term</code>. The property concept that the BCCP models. 
+     * Setter for <code>oagi.bccp.property_term</code>. The property concept that the BCCP models.
      */
     public void setPropertyTerm(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>oagi.bccp.property_term</code>. The property concept that the BCCP models. 
+     * Getter for <code>oagi.bccp.property_term</code>. The property concept that the BCCP models.
      */
     public String getPropertyTerm() {
         return (String) get(2);

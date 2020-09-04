@@ -35,10 +35,10 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card style="margin-bottom: 24px;">
+    <mat-card style="margin-bottom: 24px;" *ngIf="account && account.appOauth2UserId === 0">
       <mat-card-content class="mat-card-container" *ngIf="account !== undefined">
         <mat-form-field>
-          <mat-label>New password</mat-label>
+          <mat-label>New password </mat-label>
           <input matInput type="password" data-id="user.newPassword" autocomplete="new-password"
                  [(ngModel)]="newPassword" minlength="5" maxlength="100"/>
           <mat-error *ngIf="hasMinLengthError(newPassword) && newPassword !== ''">

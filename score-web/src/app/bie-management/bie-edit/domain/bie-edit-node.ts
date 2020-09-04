@@ -1,7 +1,6 @@
-import {Base64} from 'js-base64';
 import {HttpParams} from '@angular/common/http';
+import {base64Encode, md5, sha256} from '../../../common/utility';
 import {BusinessContext} from '../../../context-management/business-context/domain/business-context';
-import {Md5} from 'ts-md5';
 
 
 export class BieEditNode {
@@ -471,7 +470,7 @@ function hashCode(node: BieEditNode) {
       bizTerm: (node as BieEditAbieNodeDetail).bizTerm || '',
       asbiepDefinition: (node as BieEditAbieNodeDetail).contextDefinition || '',
     });
-    return <string>Md5.hashStr(str);
+    return md5(str);
   }
 
   if (node.type === 'asbiep') {
@@ -503,7 +502,7 @@ function hashCode(node: BieEditNode) {
       remark: (node as BieEditAsbiepNodeDetail).remark || '',
       bizTerm: (node as BieEditAsbiepNodeDetail).bizTerm || '',
     });
-    return <string>Md5.hashStr(str);
+    return md5(str);
   }
 
   if (node.type === 'bbiep') {
@@ -547,7 +546,7 @@ function hashCode(node: BieEditNode) {
       bbiepRemark: (node as BieEditBbiepNodeDetail).bbiepRemark || '',
       bbiepDefinition: (node as BieEditBbiepNodeDetail).bbiepDefinition || '',
     });
-    return <string>Md5.hashStr(str);
+    return md5(str);
   }
 
   if (node.type === 'bbie_sc') {
@@ -581,10 +580,10 @@ function hashCode(node: BieEditNode) {
       contextDefinition: (node as BieEditBbieScNodeDetail).contextDefinition || '',
       example: (node as BieEditBbieScNodeDetail).example || '',
     });
-    return <string>Md5.hashStr(str);
+    return md5(str);
   }
 
-  return <string>Md5.hashStr(JSON.stringify(node));
+  return md5(JSON.stringify(node));
 }
 
 /** Flat node with expandable and level information */
@@ -608,7 +607,7 @@ export class DynamicBieFlatNode {
   }
 
   get hashCode() {
-    return (this.isDetail) ? hashCode(this.item) : <string>Md5.hashStr(JSON.stringify(this.item));
+    return (this.isDetail) ? hashCode(this.item) : md5(JSON.stringify(this.item));
   }
 
   toHttpParams(): HttpParams {
@@ -619,7 +618,7 @@ export class DynamicBieFlatNode {
         }
         return p;
       }, new HttpParams());
-    const data = Base64.encode(params.toString());
+    const data = base64Encode(params.toString());
     return new HttpParams().set('data', data);
   }
 

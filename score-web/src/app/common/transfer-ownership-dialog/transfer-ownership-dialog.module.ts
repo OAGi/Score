@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {TransferOwnershipDialogComponent} from './transfer-ownership-dialog.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
-import {MatDialogModule} from '@angular/material';
+import {MatDialogModule} from '@angular/material/dialog';
 import {CommonModule} from '@angular/common';
 
 @NgModule({

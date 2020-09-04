@@ -1,5 +1,3 @@
-import {SortDirection} from '@angular/material/sort/typings/sort-direction';
-
 export class PageRequest {
   sortActive: string;
   sortDirection: string;
@@ -19,4 +17,9 @@ export class PageResponse<T> {
   page: number;
   size: number;
   length: number;
+}
+
+export class PaginationResponse<T> {
+  result: T[];
+  pageCount: number;
 }

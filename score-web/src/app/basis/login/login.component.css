@@ -1,6 +1,5 @@
 .auth-form {
   width: 340px;
-  padding-top: 10%;
   margin: 0 auto;
 }
 
@@ -22,7 +21,7 @@
   letter-spacing: -0.5px;
 }
 
-.auth-form-body {
+.auth-form-body, .oauth2-form-body {
   margin-top: 16px !important;
   padding: 20px;
   font-size: 14px;
@@ -56,6 +55,29 @@ label {
   font-size: 12px;
 }
 
+.auth-form .or-container {
+  align-items: center;
+  color: #ccc;
+  display: flex;
+  margin: 25px 0;
+}
+
+.auth-form .line-separator {
+  background-color: #ccc;
+  flex-grow: 5;
+  height: 1px;
+}
+
+.auth-form .or-label {
+  flex-grow: 1;
+  margin: 0 15px;
+  text-align: center;
+}
+
 .auth-form .btn {
   margin-top: 20px;
+}
+
+.oauth2-form-body div:first-child .btn {
+  margin-top: 0;
 }

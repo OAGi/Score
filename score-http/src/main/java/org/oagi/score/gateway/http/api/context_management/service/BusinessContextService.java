@@ -12,7 +12,7 @@ import org.oagi.score.gateway.http.api.context_management.repository.BusinessCon
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.SrtGuid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -88,7 +88,7 @@ public class BusinessContextService {
     }
 
     @Transactional
-    public void insert(User user, BusinessContext bizCtx) {
+    public void insert(AuthenticatedPrincipal user, BusinessContext bizCtx) {
         if (StringUtils.isEmpty(bizCtx.getGuid())) {
             bizCtx.setGuid(SrtGuid.randomGuid());
         }
@@ -125,7 +125,7 @@ public class BusinessContextService {
     }
 
     @Transactional
-    public void update(User user, BusinessContext bizCtx) {
+    public void update(AuthenticatedPrincipal user, BusinessContext bizCtx) {
         dslContext.update(BIZ_CTX)
                 .set(BIZ_CTX.NAME, bizCtx.getName())
                 .set(BIZ_CTX.LAST_UPDATED_BY, ULong.valueOf(sessionService.userId(user)))

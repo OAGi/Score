@@ -1,19 +1,14 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ContextScheme, ContextSchemeListRequest} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
-import {
-  MatDialog,
-  MatDialogConfig,
-  MatPaginator,
-  MatSnackBar,
-  MatSort,
-  MatTableDataSource,
-  PageEvent,
-  SortDirection
-} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
-import {MatDatepickerInputEvent} from '@angular/material/typings/datepicker';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
@@ -31,7 +26,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class ContextSchemeListComponent implements OnInit {
 
-  title = 'Context Schemes';
+  title = 'Context Scheme';
   displayedColumns: string[] = [
     'select', 'schemeName', 'ctxCategoryName', 'schemeId', 'schemeAgencyId',
     'schemeVersionId', 'lastUpdateTimestamp'

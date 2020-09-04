@@ -29,5 +29,7 @@ logging:
   level:
     org.springframework: INFO
     org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.session: DEBUG
     org.jooq: DEBUG
-    org.oagi.srt: DEBUG
+    org.oagi.score: DEBUG

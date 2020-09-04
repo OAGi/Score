@@ -8,14 +8,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.time.Duration;
 
-import static org.oagi.score.cache.SrtRedisCacheWriter.shouldExpireWithin;
+import static org.oagi.score.cache.ScoreRedisCacheWriter.shouldExpireWithin;
 
-public class SrtRedisCache extends RedisCache {
+public class ScoreRedisCache extends RedisCache {
 
     private RedisConnectionFactory connectionFactory;
 
-    protected SrtRedisCache(RedisConnectionFactory connectionFactory,
-                            String name, RedisCacheWriter cacheWriter, RedisCacheConfiguration cacheConfig) {
+    protected ScoreRedisCache(RedisConnectionFactory connectionFactory,
+                              String name, RedisCacheWriter cacheWriter, RedisCacheConfiguration cacheConfig) {
         super(name, cacheWriter, cacheConfig);
         this.connectionFactory = connectionFactory;
     }
