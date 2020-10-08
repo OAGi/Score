@@ -79,7 +79,7 @@ export class BusinessContextCreateComponent implements OnInit {
         for ( const value of this.dataSource.data) {
           if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
             this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
             this.disabled = false;
             return;
@@ -174,7 +174,7 @@ export class BusinessContextCreateComponent implements OnInit {
   create() {
     this.service.create(this.bizCtx).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/context_management/business_context');
     });

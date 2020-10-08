@@ -125,7 +125,7 @@ export class ContextSchemeCreateComponent implements OnInit {
         for (const value of this.dataSource.data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
             this.disabled = false;
             return;
@@ -252,7 +252,7 @@ export class ContextSchemeCreateComponent implements OnInit {
   doCreate() {
     this.service.create(this.contextScheme).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/context_management/context_scheme');
     });

@@ -8,7 +8,7 @@ import org.oagi.score.gateway.http.api.code_list_management.data.*;
 import org.oagi.score.gateway.http.api.common.data.PageRequest;
 import org.oagi.score.gateway.http.api.common.data.PageResponse;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.AuthenticatedPrincipal;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import static org.jooq.impl.DSL.and;
 import static org.oagi.score.entity.jooq.Tables.*;
 import static org.oagi.score.gateway.http.api.code_list_management.data.CodeListState.Editing;
-import static org.oagi.score.gateway.http.helper.SrtJdbcTemplate.newSqlParameterSource;
+import static org.oagi.score.gateway.http.helper.ScoreJdbcTemplate.newSqlParameterSource;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
 
 @Service
@@ -225,7 +225,7 @@ public class CodeListService {
                 CODE_LIST.LAST_UPDATED_BY,
                 CODE_LIST.CREATION_TIMESTAMP,
                 CODE_LIST.LAST_UPDATE_TIMESTAMP).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 codeList.getCodeListName(),
                 codeList.getListId(),
                 ULong.valueOf(codeList.getAgencyId()),
@@ -275,14 +275,6 @@ public class CodeListService {
 
     @Transactional
     public void update(AuthenticatedPrincipal user, CodeList codeList) {
-        String state = codeList.getState();
-        if (!StringUtils.isEmpty(state)) {
-            dslContext.update(CODE_LIST)
-                    .set(CODE_LIST.STATE, state)
-                    .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())))
-                    .execute();
-        }
-
         dslContext.update(CODE_LIST)
                 .set(CODE_LIST.NAME, codeList.getCodeListName())
                 .set(CODE_LIST.LIST_ID, codeList.getListId())
@@ -297,6 +289,7 @@ public class CodeListService {
                 .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())))
                 .execute();
 
+        String state = codeList.getState();
         List<CodeListValue> codeListValues = codeList.getCodeListValues();
         if (CodeListState.Published.name().equals(state)) {
             codeListValues.stream().forEach(e -> {
@@ -307,6 +300,13 @@ public class CodeListService {
         }
 
         update(codeList.getCodeListId(), codeListValues);
+
+        if (!StringUtils.isEmpty(state)) {
+            dslContext.update(CODE_LIST)
+                    .set(CODE_LIST.STATE, state)
+                    .where(CODE_LIST.CODE_LIST_ID.eq(ULong.valueOf(codeList.getCodeListId())))
+                    .execute();
+        }
     }
 
     @Transactional

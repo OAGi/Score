@@ -3,7 +3,8 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
-import {switchMap} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
+import {of} from "rxjs";
 
 @Component({
   selector: 'score-account-detail',
@@ -12,9 +13,12 @@ import {switchMap} from 'rxjs/operators';
 })
 export class AccountDetailComponent implements OnInit {
   title = 'Edit Account';
+
+  accountId;
   account: AccountList;
   newPassword: string;
   confirmPassword: string;
+  loading: boolean;
 
   constructor(private service: AccountListService,
               private snackBar: MatSnackBar,
@@ -24,10 +28,14 @@ export class AccountDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this.service.getAccount(Number(params.get('id'))))
-    ).subscribe(resp => {
-      this.account = resp;
+        switchMap((params: ParamMap) => of(Number(params.get('id'))))
+    ).subscribe(accountId => {
+      this.loading = true;
+      this.service.getAccount(accountId).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(resp => {
+        this.account = resp;
+      });
     });
 
     this.newPassword = '';
@@ -53,9 +61,19 @@ export class AccountDetailComponent implements OnInit {
   update() {
     this.service.updatePasswordAccount(this.account, this.newPassword).subscribe(_ => {
       this.snackBar.open('Updated', '', {
-        duration: 2000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/account');
+    });
+  }
+
+  setEnable(val: boolean) {
+    this.service.setEnable(this.account, val).subscribe(_ => {
+      this.snackBar.open((val) ? 'Enabled' : 'Disabled', '', {
+        duration: 3000,
+      });
+
+      this.account.enabled = val;
     });
   }
 

@@ -18,9 +18,10 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {base64Decode, initFilter} from '../../common/utility';
 import {Location} from '@angular/common';
+import {HttpParams} from "@angular/common/http";
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -73,18 +74,6 @@ export class BieCreateAsccpComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Load Business Contexts
-    this.route.queryParamMap.pipe(
-      switchMap((params: ParamMap) => {
-        const bizCtxIds: number[] = params.get('bizCtxIds').split(',').map(e => Number(e));
-        return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds);
-      })).subscribe((resp: PageResponse<BusinessContext>) => {
-        this.bizCtxIds = resp.list.map(e => e.bizCtxId);
-        this.bizCtxList = resp.list;
-      }, err => {
-        console.error(err);
-      });
-
     // Init ASCCP table
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('den', 'asc', 0, 10));
@@ -102,21 +91,40 @@ export class BieCreateAsccpComponent implements OnInit {
       this.loadData();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
-
     // Init releases
     this.releaseId = 0;
     this.releases = [];
-    this.releaseService.getSimpleReleases().subscribe(releases => {
+
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([loginIds, releases]) => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
       this.releases.push(...releases);
       if (this.releases.length > 0) {
         this.releaseId = this.releases[0].releaseId;
-        this.loadData(true);
       }
+
+      // Load Business Contexts
+      this.route.queryParamMap.pipe(
+        switchMap((params: ParamMap) => {
+          let bizCtxIds = params.get('bizCtxIds');
+          if (!bizCtxIds) {
+            const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
+            const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
+            bizCtxIds = httpParams.get('bizCtxIds');
+          }
+          return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e)));
+        })).subscribe((resp: PageResponse<BusinessContext>) => {
+        this.bizCtxIds = resp.list.map(e => e.bizCtxId);
+        this.bizCtxList = resp.list;
+        this.loadData(true);
+      }, err => {
+        console.error(err);
+      });
     });
   }
 
@@ -183,7 +191,9 @@ export class BieCreateAsccpComponent implements OnInit {
 
       this.dataSource.data = list;
       if (!isInit) {
-        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
+        this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
+          bizCtxIds: this.bizCtxIds.map(e => '' + e).join(',')
+        }));
       }
     }, error => {
       this.dataSource.data = [];
@@ -215,7 +225,7 @@ export class BieCreateAsccpComponent implements OnInit {
     this.service.create(asccpId, this.releaseId, this.bizCtxIds)
       .subscribe(resp => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
 
       this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);

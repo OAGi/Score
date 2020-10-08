@@ -81,3 +81,7 @@ label {
 .oauth2-form-body div:first-child .btn {
   margin-top: 0;
 }
+
+button.close {
+  padding: 0.65rem 1.25rem;
+}

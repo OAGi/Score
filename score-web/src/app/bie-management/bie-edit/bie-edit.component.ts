@@ -275,7 +275,7 @@ export class DynamicDataSource {
       node.item.used = true;
       const detailNode = this.dataDetailMap.get(node.key);
       detailNode.item.used = true;
-      this.component.onChange(node);
+      this.component.onChange(node.item.type, 'select', node);
     }
 
     this.component.resetCardinalities();
@@ -290,7 +290,7 @@ export class DynamicDataSource {
       node.item.used = false;
       const detailNode = this.dataDetailMap.get(node.key);
       detailNode.item.used = false;
-      this.component.onChange(node);
+      this.component.onChange(node.item.type, 'deselect', node);
     }
 
     this.component.resetCardinalities();
@@ -422,7 +422,7 @@ export class BieEditComponent implements OnInit {
     }, err => {
       if (err.status === 403) {
         this.snackBar.open('Forbidden', '', {
-          duration: 1000,
+          duration: 3000,
         });
         this.router.navigate(['/profile_bie']);
       } else {
@@ -548,10 +548,13 @@ export class BieEditComponent implements OnInit {
       this.checklistSelection.deselect(...descendants);
       this.dataSource.onDeselect(...descendants);
     }
+
+    if (selected) {
+      this.assignVersionToVersionIdIfPossible(this.detailNode);
+    }
   }
 
   onClick(node: DynamicBieFlatNode) {
-
     if (node.item.type === 'asbiep' && node.item.derived) {
       this.service.getRootNode(node.item.topLevelAsbiepId).subscribe(resp => {
         this.reusedRootNode = new DynamicBieFlatNode(resp);
@@ -568,19 +571,25 @@ export class BieEditComponent implements OnInit {
       this.reusedDetailNode = null;
       this.reusedBusinessContexts = [];
     }
+
     this.dataSource.loadDetail(node, (detailNode: DynamicBieFlatNode) => {
       this.selectedNode = node;
       this.detailNode = detailNode;
       this.resetCardinalities(detailNode);
       this.initFixedOrDefault(detailNode.item);
       this.primitiveFilterValues(detailNode.item);
+      this.assignVersionToVersionIdIfPossible(detailNode);
     });
   }
 
   resetCardinalities(detailNode?: DynamicBieFlatNode) {
+    if (!detailNode) {
+      detailNode = this.detailNode;
+    }
+
     this._setCardinalityMinFormControl(detailNode);
     this._setCardinalityMaxFormControl(detailNode);
-    this.onChange(detailNode);
+    this.onChange((!!detailNode) ? detailNode.item.type : undefined, 'cardinalities', detailNode);
   }
 
   initFixedOrDefault(detail?: BieEditNodeDetail) {
@@ -704,19 +713,84 @@ export class BieEditComponent implements OnInit {
     }
   }
 
-  onChange(detail?: DynamicBieFlatNode) {
+  _versionChanged: boolean;
+  _changedVersionValue: string;
+
+  onChange(type: string, propertyName: string, detail?: DynamicBieFlatNode, $event?) {
     if (!detail) {
       detail = this.detailNode;
     }
-
     this.primitiveFilterValues(detail.item);
+
+    // Issue #844
+    if (type === 'abie' && propertyName === 'version') {
+      this._versionChanged = true;
+      this._changedVersionValue = this.asAbieDetail(detail.item).version;
+
+      this.assignVersionToVersionIdIfPossible();
+    }
+  }
+
+  isVersionIdDetail(detail: DynamicBieFlatNode): boolean {
+    if (detail.level !== 1 || !detail.item.used) {
+      return false;
+    }
+    if (!this.isBbiepDetail(detail.item)) {
+      return false;
+    }
+    if (this.asBbiepDetail(detail.item).bccDen !== 'Business Object Document. Version Identifier. Text') {
+      return false;
+    }
+    return true;
+  }
+
+  get versionIdDetail(): DynamicBieFlatNode | undefined {
+    for (const detailValue of this.dataSource.dataDetailMap.values()) {
+      if (this.isVersionIdDetail(detailValue)) {
+        return detailValue;
+      }
+    }
+    return undefined;
+  }
+
+  assignVersionToVersionIdIfPossible(detail?: DynamicBieFlatNode) {
+    if (!this._versionChanged) {
+      return;
+    }
+
+    detail = detail || this.versionIdDetail;
+    if (!detail) {
+      return;
+    }
+    if (!this.isVersionIdDetail(detail)) {
+      return;
+    }
+
+    if (this.asBbiepDetail(detail.item).bieFixedValue !== this._changedVersionValue) {
+      if (!this._changedVersionValue) {
+        this.asBbiepDetail(detail.item).fixedOrDefault = 'none';
+        this.asBbiepDetail(detail.item).bieFixedValue = '';
+        this.asBbiepDetail(detail.item).bieDefaultValue = '';
+      } else {
+        this.asBbiepDetail(detail.item).fixedOrDefault = 'fixed';
+        this.asBbiepDetail(detail.item).bieFixedValue = this._changedVersionValue;
+        this.asBbiepDetail(detail.item).bieDefaultValue = '';
+      }
+
+      this.snackBar.open('Synchronized \'Version\' value with the the fixed value.', '', {
+        duration: 3000,
+      });
+    }
+
+    this._versionChanged = false;
+    this._changedVersionValue = undefined;
   }
 
   onChangeFixedOrDefault(value: string) {
     if (this.isBbiepDetail()) {
       if (value === 'fixed') {
         this.asBbiepDetail().bieDefaultValue = '';
-      } else if ( value === 'default') {
+      } else if (value === 'default') {
         this.asBbiepDetail().bieFixedValue = '';
       } else {
         this.asBbiepDetail().bieDefaultValue = '';
@@ -725,7 +799,7 @@ export class BieEditComponent implements OnInit {
     } else if (this.isBbieScDetail()) {
       if (value === 'fixed') {
         this.asBbieScDetail().bieDefaultValue = '';
-      } else if ( value === 'default') {
+      } else if (value === 'default') {
         this.asBbieScDetail().bieFixedValue = '';
       } else {
         this.asBbieScDetail().bieDefaultValue = '';
@@ -796,7 +870,7 @@ export class BieEditComponent implements OnInit {
         this.businessContextUpdating = false;
         this.businessContextCtrl.setValue(null);
         this.snackBar.open('Updated', '', {
-          duration: 1000,
+          duration: 3000,
         });
       }, err => {
         this.businessContextUpdating = false;
@@ -811,7 +885,7 @@ export class BieEditComponent implements OnInit {
         this.businessContextUpdating = false;
         this.businessContextCtrl.setValue(null);
         this.snackBar.open('Updated', '', {
-          duration: 1000,
+          duration: 3000,
         });
       }, err => {
         this.businessContextUpdating = false;
@@ -972,7 +1046,7 @@ export class BieEditComponent implements OnInit {
         }
 
         this.snackBar.open('Updated', '', {
-          duration: 1000,
+          duration: 3000,
         });
         this.isUpdating = false;
       }, err => {
@@ -1004,7 +1078,7 @@ export class BieEditComponent implements OnInit {
       this.resetCardinalities();
 
       this.snackBar.open('State updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     }, err => {
       this.isUpdating = false;
@@ -1185,7 +1259,7 @@ export class BieEditComponent implements OnInit {
         this.onClick(this.rootNode); // To clear the current detail state.
 
         this.snackBar.open('Reused', '', {
-          duration: 1500,
+          duration: 3000,
         });
       });
     });
@@ -1218,7 +1292,7 @@ export class BieEditComponent implements OnInit {
             })).subscribe(_ => {
 
             this.snackBar.open('Making BIE reusable request queued', '', {
-              duration: 1000,
+              duration: 3000,
             });
 
             this.router.navigateByUrl('/profile_bie');
@@ -1261,7 +1335,7 @@ export class BieEditComponent implements OnInit {
           this.onClick(this.rootNode); // To clear the current detail state.
 
           this.snackBar.open('Removed', '', {
-            duration: 1500,
+            duration: 3000,
           });
         });
       });
@@ -1282,7 +1356,7 @@ export class BieEditComponent implements OnInit {
           this.openConfirmDialog('/core_component/extension/' + nodeItem.releaseId + '/' + resp.extensionId);
         } else {
           this.snackBar.open('Editing extension already exist.', '', {
-            duration: 1000,
+            duration: 3000,
           });
         }
       }
@@ -1307,7 +1381,7 @@ export class BieEditComponent implements OnInit {
           this.openConfirmDialog('/core_component/extension/' + nodeItem.releaseId + '/' + resp.extensionId);
         } else {
           this.snackBar.open('Editing extension already exist.', '', {
-            duration: 1000,
+            duration: 3000,
           });
         }
       }

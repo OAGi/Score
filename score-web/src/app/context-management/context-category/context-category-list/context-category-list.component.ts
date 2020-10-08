@@ -141,7 +141,7 @@ export class ContextCategoryListComponent implements OnInit {
         if (result) {
           this.service.delete(...ctxCategoryIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.selection.clear();
             this.loadContextCategoryList();

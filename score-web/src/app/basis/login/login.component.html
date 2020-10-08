@@ -6,7 +6,7 @@
       </div>
 
       <div [hidden]="err === undefined" class="alert alert-danger alert-dismissible fade show" role="alert">
-        Invalid username or password
+        {{ errorMessage }}
         <button type="button" class="close" aria-label="Close" (click)="onClose()">
           <span aria-hidden="true">&times;</span>
         </button>

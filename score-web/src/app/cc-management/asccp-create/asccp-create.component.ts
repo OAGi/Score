@@ -142,7 +142,7 @@ export class AsccpCreateComponent implements OnInit {
 
     this.service.createAsccp(asccpId, accId, seqKey).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
 
       this.router.navigateByUrl('/core_component/asccp/' + asccpId);

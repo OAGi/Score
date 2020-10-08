@@ -223,7 +223,7 @@ export class BieListComponent implements OnInit {
         if (result) {
           this.service.delete(topLevelAsbiepIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.selection.clear();
             this.loadBieList();
@@ -243,7 +243,7 @@ export class BieListComponent implements OnInit {
       if (result) {
         this.service.transferOwnership(topLevelAsbiepId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
-            duration: 1000,
+            duration: 3000,
           });
           this.selection.clear();
           this.loadBieList();

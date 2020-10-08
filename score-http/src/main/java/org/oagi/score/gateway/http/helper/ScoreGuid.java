@@ -2,9 +2,9 @@ package org.oagi.score.gateway.http.helper;
 
 import java.util.UUID;
 
-public final class SrtGuid {
+public final class ScoreGuid {
 
-    private SrtGuid() {
+    private ScoreGuid() {
     }
 
     public static String randomGuid() {

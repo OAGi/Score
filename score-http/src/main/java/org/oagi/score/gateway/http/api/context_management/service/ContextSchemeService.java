@@ -8,7 +8,7 @@ import org.oagi.score.gateway.http.api.common.data.PageRequest;
 import org.oagi.score.gateway.http.api.common.data.PageResponse;
 import org.oagi.score.gateway.http.api.context_management.data.*;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -315,7 +315,7 @@ public class ContextSchemeService {
     @Transactional
     public void insert(AuthenticatedPrincipal user, ContextScheme contextScheme) {
         if (StringUtils.isEmpty(contextScheme.getGuid())) {
-            contextScheme.setGuid(SrtGuid.randomGuid());
+            contextScheme.setGuid(ScoreGuid.randomGuid());
         }
 
         ULong userId = ULong.valueOf(sessionService.userId(user));
@@ -360,7 +360,7 @@ public class ContextSchemeService {
                 CTX_SCHEME_VALUE.MEANING,
                 CTX_SCHEME_VALUE.OWNER_CTX_SCHEME_ID
         ).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 contextSchemeValue.getValue(),
                 contextSchemeValue.getMeaning(),
                 ULong.valueOf(ctxSchemeId)

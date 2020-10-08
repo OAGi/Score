@@ -112,7 +112,7 @@ export class BieListRequest {
     if (extras) {
       Object.keys(extras).forEach(key => {
         params = params.set(key.toString(), extras[key]);
-      })
+      });
     }
     const str = base64Encode(params.toString());
     return (str) ? 'q=' + str : undefined;

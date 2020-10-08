@@ -462,7 +462,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.$isChanged.clear();
 
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.isUpdating = false;
     }, err => {
@@ -570,7 +570,7 @@ export class ExtensionDetailComponent implements OnInit {
       this.preprocessProperty();
 
       this.snackBar.open('State updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     }, err => {
       this.isUpdating = false;

@@ -349,7 +349,7 @@ export class AsccpCreateEditComponent implements OnInit {
   update(asccpNode: CcAsccpNodeDetail) {
     this.service.updateAsccp(asccpNode).subscribe(_ => {
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     });
   }

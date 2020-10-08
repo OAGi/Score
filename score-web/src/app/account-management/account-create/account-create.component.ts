@@ -55,13 +55,13 @@ export class AccountCreateComponent implements OnInit {
     if (this.enable) {
       this.service.create(this.account, this.newPassword, this.pending).subscribe(_ => {
         this.snackBar.open('Created', '', {
-          duration: 2000,
+          duration: 3000,
         });
         this.router.navigateByUrl('/account');
       });
     } else {
       this.snackBar.open('You cannot create the account since this Login ID is already taken.', '', {
-        duration: 2000,
+        duration: 3000,
       });
     }
   }
@@ -76,7 +76,7 @@ export class AccountCreateComponent implements OnInit {
     this.service.getAccountNames().subscribe(resp => {
       if (resp.indexOf(loginId) > -1) {
         this.snackBar.open('This Login ID is already taken.', '', {
-          duration: 2000,
+          duration: 3000,
         });
       } else {
         this.enable = true;

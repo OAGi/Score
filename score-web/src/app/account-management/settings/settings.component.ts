@@ -51,7 +51,7 @@ export class SettingsComponent implements OnInit {
   update() {
     this.service.updatePassword(this.oldPassword, this.newPassword).subscribe(_ => {
       this.snackBar.open('Updated', '', {
-        duration: 2000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/');
     });

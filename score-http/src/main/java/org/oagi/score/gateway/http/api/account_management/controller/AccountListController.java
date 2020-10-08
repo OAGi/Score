@@ -10,10 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class AccountListController {
@@ -28,6 +31,7 @@ public class AccountListController {
             @RequestParam(name = "loginId", required = false) String loginId,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "organization", required = false) String organization,
+            @RequestParam(name = "status", required = false) String status,
             @RequestParam(name = "role", required = false) String role,
             @RequestParam(name = "excludeSSO", required = false) Boolean excludeSSO,
             @RequestParam(name = "excludeRequester", required = false) Boolean excludeRequester,
@@ -41,6 +45,17 @@ public class AccountListController {
         request.setLoginId(loginId);
         request.setName(name);
         request.setOrganization(organization);
+
+        if (!StringUtils.isEmpty(status)) {
+            List<String> statusList = Arrays.asList(status.split(",")).stream().map(e -> e.trim()).filter(e -> !StringUtils.isEmpty(e)).collect(Collectors.toList());
+            if (statusList.size() == 1) {
+                if ("enable".equalsIgnoreCase(statusList.get(0))) {
+                    request.setEnabled(true);
+                } else {
+                    request.setEnabled(false);
+                }
+            }
+        }
         request.setRole(role);
         request.setExcludeSSO(excludeSSO != null ? excludeSSO : false);
         request.setExcludeRequester(excludeRequester);
@@ -58,7 +73,7 @@ public class AccountListController {
     @RequestMapping(value = "/account/{appUserId}", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUser getAccount(@PathVariable("appUserId") long appUserId) {
-        return service.getAccount(appUserId);
+        return service.getAccountById(appUserId);
     }
 
     @RequestMapping(value = "/account", method = RequestMethod.PUT)

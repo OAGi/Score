@@ -19,7 +19,7 @@ export class AccountListComponent implements OnInit {
 
   title = 'Account';
   displayedColumns: string[] = [
-    'loginId', 'role', 'name', 'organization'
+    'loginId', 'role', 'name', 'organization', 'status'
   ];
   dataSource = new MatTableDataSource<AccountList>();
   loading = false;
@@ -68,6 +68,7 @@ export class AccountListComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
+    this.loading = true;
     this.service.getAccountsList(this.request).pipe(
       finalize(() => {
         this.loading = false;

@@ -7,7 +7,7 @@ import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.BieGenerateExpressionResult;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.service.generate_expression.*;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Zip;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +97,7 @@ public class BieGenerateService {
                 }
 
                 try {
-                    return Zip.compression(files.values(), SrtGuid.randomGuid());
+                    return Zip.compression(files.values(), ScoreGuid.randomGuid());
                 } catch (IOException e) {
                     throw new BieGenerateFailureException("Compression failure.", e);
                 }
@@ -120,7 +120,7 @@ public class BieGenerateService {
         if (topLevelAsbiepList.size() == 1) {
             filename = getFilenameByTopLevelAsbiep(topLevelAsbiepList.get(0));
         } else {
-            filename = SrtGuid.randomGuid();
+            filename = ScoreGuid.randomGuid();
         }
 
         File schemaExpressionFile;

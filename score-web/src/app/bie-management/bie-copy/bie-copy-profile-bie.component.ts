@@ -18,6 +18,7 @@ import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {base64Decode, initFilter} from '../../common/utility';
 import {Location} from '@angular/common';
+import {HttpParams} from "@angular/common/http";
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -84,8 +85,13 @@ export class BieCopyProfileBieComponent implements OnInit {
     // Load Business Contexts
     this.route.queryParamMap.pipe(
       switchMap((params: ParamMap) => {
-        const bizCtxIds: number[] = params.get('bizCtxIds').split(',').map(e => Number(e));
-        return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds);
+        let bizCtxIds = params.get('bizCtxIds');
+        if (!bizCtxIds) {
+          const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
+          const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
+          bizCtxIds = httpParams.get('bizCtxIds');
+        }
+        return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e)));
       })).subscribe((resp: PageResponse<BusinessContext>) => {
       this.bizCtxIds = resp.list.map(e => e.bizCtxId);
       this.bizCtxList = resp.list;
@@ -177,7 +183,7 @@ export class BieCopyProfileBieComponent implements OnInit {
     const topLevelAsbiepId: number = this.selection.selected[0].topLevelAsbiepId;
     this.service.copy(topLevelAsbiepId, this.bizCtxIds).subscribe(_ => {
       this.snackBar.open('Copying request queued', '', {
-        duration: 1500,
+        duration: 3000,
       });
 
       this.router.navigateByUrl('/profile_bie');

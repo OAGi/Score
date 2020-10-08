@@ -15,7 +15,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -43,7 +43,7 @@ import org.oagi.score.entity.jooq.tables.records.AppUserRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AppUser extends TableImpl<AppUserRecord> {
 
-    private static final long serialVersionUID = 293055408;
+    private static final long serialVersionUID = -995129861;
 
     /**
      * The reference instance of <code>oagi.app_user</code>
@@ -87,6 +87,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
      * The column <code>oagi.app_user.is_developer</code>.
      */
     public final TableField<AppUserRecord, Byte> IS_DEVELOPER = createField(DSL.name("is_developer"), org.jooq.impl.SQLDataType.TINYINT, this, "");
+
+    /**
+     * The column <code>oagi.app_user.is_enabled</code>.
+     */
+    public final TableField<AppUserRecord, Byte> IS_ENABLED = createField(DSL.name("is_enabled"), org.jooq.impl.SQLDataType.TINYINT.defaultValue(org.jooq.impl.DSL.inline("1", org.jooq.impl.SQLDataType.TINYINT)), this, "");
 
     /**
      * Create a <code>oagi.app_user</code> table reference
@@ -173,11 +178,11 @@ public class AppUser extends TableImpl<AppUserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<ULong, String, String, String, String, Byte> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<ULong, String, String, String, String, Byte, Byte> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

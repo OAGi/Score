@@ -141,7 +141,7 @@ export class ContextSchemeDetailComponent implements OnInit {
         for (const value of this.dataSource.data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
             this.disabled = false;
             return;
@@ -293,7 +293,7 @@ export class ContextSchemeDetailComponent implements OnInit {
     this.service.update(this.contextScheme).subscribe(_ => {
       this.hashCode = hashCode(this.contextScheme);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/context_management/context_scheme');
     });
@@ -391,7 +391,7 @@ export class ContextSchemeDetailComponent implements OnInit {
         if (result) {
           this.service.delete(this.contextScheme.ctxSchemeId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.router.navigateByUrl('/context_management/context_scheme');
           });

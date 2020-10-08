@@ -32,10 +32,14 @@ export class AuthService implements OnInit, CanActivate {
   ngOnInit() {
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+    Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
       if (!!res) {
         this.storeUserInfo(res);
+        if (!res.enabled) {
+          return this.router.parseUrl('/disabled');
+        }
         const role = res.role;
         if (role === 'pending') {
           return this.router.parseUrl('/pending');
@@ -93,7 +97,7 @@ export class AuthService implements OnInit, CanActivate {
       value = new UserToken();
       this.storeUserInfo(value);
     }
-    return userToken.role === this.ROLE_DEVELOPER || userToken.role === this.ROLE_END_USER;
+    return userToken.enabled && (userToken.role === this.ROLE_DEVELOPER || userToken.role === this.ROLE_END_USER);
   }
 
   logout(url?) {
@@ -170,14 +174,21 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
             case 0:
             case 504:
               this.snackBar.open('Gateway Connection Failure', '', {
-                duration: 2000,
+                duration: 3000,
+              });
+
+              break;
+
+            case 503:
+              this.snackBar.open('Gateway Service Unavailable', '', {
+                duration: 3000,
               });
 
               break;
 
             case 400:
               this.snackBar.open(error.headers.get('x-error-message'), '', {
-                duration: 2000,
+                duration: 3000,
               });
 
               break;
@@ -187,7 +198,7 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
               if (req.url.indexOf(environment.logoutPath) === -1) {
                 if (req.url.indexOf(environment.statePath) === -1) {
                   this.snackBar.open('Authentication Failure', '', {
-                    duration: 2000,
+                    duration: 3000,
                   });
                 }
 
@@ -198,7 +209,7 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
 
             default:
               this.snackBar.open('Server Internal Error: ' + error.message, '', {
-                duration: 2000,
+                duration: 3000,
               });
 
               break;

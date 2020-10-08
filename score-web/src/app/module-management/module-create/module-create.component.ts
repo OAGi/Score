@@ -183,7 +183,7 @@ export class ModuleCreateComponent implements OnInit {
     this.service.create(this.module).subscribe(_ => {
       this.hashCode = hashCode(this.module);
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
     });
   }

@@ -59,7 +59,7 @@ export class ContextCategoryDetailComponent implements OnInit {
     this.service.update(this.contextCategory).subscribe(_ => {
       this.hashCode = hashCode(this.contextCategory);
       this.snackBar.open('Updated', '', {
-        duration: 1500,
+        duration: 3000,
       });
       this.router.navigateByUrl('/context_management/context_category');
     });
@@ -97,7 +97,7 @@ export class ContextCategoryDetailComponent implements OnInit {
         if (result) {
           this.service.delete(this.contextCategory.ctxCategoryId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.router.navigateByUrl('/context_management/context_category');
           });

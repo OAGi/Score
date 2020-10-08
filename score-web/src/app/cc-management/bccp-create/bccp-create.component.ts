@@ -143,7 +143,7 @@ export class BccpCreateComponent implements OnInit {
 
     this.service.createAsccp(bccpId, accId, seqKey).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
 
       this.router.navigateByUrl('/core_component/bccp/' + bccpId);

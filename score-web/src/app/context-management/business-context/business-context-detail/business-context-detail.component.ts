@@ -99,7 +99,7 @@ export class BusinessContextDetailComponent implements OnInit {
         for (const value of this.dataSource.data) {
           if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
             this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
             this.disabled = false;
             return;
@@ -193,7 +193,7 @@ export class BusinessContextDetailComponent implements OnInit {
     this.service.update(this.bizCtx).subscribe(_ => {
       this.hashCode = hashCode(this.bizCtx);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     });
   }
@@ -230,7 +230,7 @@ export class BusinessContextDetailComponent implements OnInit {
         if (result) {
           this.service.delete(this.bizCtx.bizCtxId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.router.navigateByUrl('/context_management/business_context');
           });

@@ -5,7 +5,7 @@
 
     <groupId>org.oagi</groupId>
     <artifactId>score-http</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <packaging>war</packaging>
 
     <name>score-http</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.3.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -24,11 +24,11 @@
         <maven.compiler.release>11</maven.compiler.release>
 
         <cglib.version>3.3.0</cglib.version>
-        <aspectj.version>1.9.5</aspectj.version>
-        <mysql-connector-java.version>8.0.20</mysql-connector-java.version>
-        <lettuce.version>5.2.2.RELEASE</lettuce.version>
-        <redisson.version>3.11.6</redisson.version>
-        <netty.version>4.1.50.Final</netty.version>
+        <aspectj.version>1.9.6</aspectj.version>
+        <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
+        <lettuce.version>5.3.4.RELEASE</lettuce.version>
+        <redisson.version>3.13.4</redisson.version>
+        <netty.version>4.1.52.Final</netty.version>
         <lombok.version>1.18.12</lombok.version>
         <guava.version>29.0-jre</guava.version>
         <jdom2.version>2.0.6</jdom2.version>
@@ -221,12 +221,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>3.9.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.1</version>
             </plugin>
         </plugins>
     </build>

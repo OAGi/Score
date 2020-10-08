@@ -17,6 +17,7 @@ import {AuthService} from '../authentication/auth.service';
 import {AboutService} from './about/domain/about.service';
 import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
 
 const routes: Routes = [
   {
@@ -60,10 +61,12 @@ const routes: Routes = [
     NotFoundComponent,
     AboutComponent,
     PendingComponent,
+    DisabledComponent,
   ],
   providers: [
     AboutService,
     PendingActivate,
+    DisabledActivate,
   ]
 })
 export class BasisModule {

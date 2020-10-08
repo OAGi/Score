@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class SrtJdbcTemplate {
+public class ScoreJdbcTemplate {
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;

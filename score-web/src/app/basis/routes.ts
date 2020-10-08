@@ -7,6 +7,7 @@ import {NotFoundComponent} from './not-found/not-found.component';
 import {AuthService} from '../authentication/auth.service';
 import {environment} from '../../environments/environment';
 import {PendingActivate, PendingComponent} from './pending/pending.component';
+import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
 
 
 export const SCORE_WEBAPP_ROUTES: Routes = [
@@ -24,6 +25,11 @@ export const SCORE_WEBAPP_ROUTES: Routes = [
     path: 'pending',
     component: PendingComponent,
     canActivate: [PendingActivate]
+  },
+  {
+    path: 'disabled',
+    component: DisabledComponent,
+    canActivate: [DisabledActivate]
   },
   {
     path: 'join',

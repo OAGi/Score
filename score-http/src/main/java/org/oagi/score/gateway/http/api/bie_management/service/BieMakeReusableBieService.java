@@ -12,7 +12,7 @@ import org.oagi.score.entity.jooq.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.MakeReusableBieRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.event.BieMakeReusableBieRequestEvent;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.redisson.api.RLock;
@@ -568,7 +568,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertAbie(BieMakeReusableBieAbie abie) {
 
             return dslContext.insertInto(ABIE)
-                    .set(ABIE.GUID, SrtGuid.randomGuid())
+                    .set(ABIE.GUID, ScoreGuid.randomGuid())
                     .set(ABIE.BASED_ACC_ID, ULong.valueOf(abie.getBasedAccId()))
                     .set(ABIE.CREATED_BY, ULong.valueOf(userId))
                     .set(ABIE.LAST_UPDATED_BY, ULong.valueOf(userId))
@@ -582,7 +582,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertAsbiep(BieMakeReusableBieAsbiep asbiep) {
 
             return dslContext.insertInto(ASBIEP)
-                    .set(ASBIEP.GUID, SrtGuid.randomGuid())
+                    .set(ASBIEP.GUID, ScoreGuid.randomGuid())
                     .set(ASBIEP.BASED_ASCCP_ID, ULong.valueOf(asbiep.getBasedAsccpId()))
                     .set(ASBIEP.ROLE_OF_ABIE_ID, ULong.valueOf(asbiep.getRoleOfAbieId()))
                     .set(ASBIEP.DEFINITION, asbiep.getDefinition())
@@ -599,7 +599,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertBbiep(BieMakeReusableBieBbiep bbiep) {
 
             return dslContext.insertInto(BBIEP)
-                    .set(BBIEP.GUID, SrtGuid.randomGuid())
+                    .set(BBIEP.GUID, ScoreGuid.randomGuid())
                     .set(BBIEP.BASED_BCCP_ID, ULong.valueOf(bbiep.getBasedBccpId()))
                     .set(BBIEP.DEFINITION, bbiep.getDefinition())
                     .set(BBIEP.REMARK, bbiep.getRemark())
@@ -615,7 +615,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertAsbie(BieMakeReusableBieAsbie asbie) {
 
             return dslContext.insertInto(ASBIE)
-                    .set(ASBIE.GUID, SrtGuid.randomGuid())
+                    .set(ASBIE.GUID, ScoreGuid.randomGuid())
                     .set(ASBIE.FROM_ABIE_ID, ULong.valueOf(asbie.getFromAbieId()))
                     .set(ASBIE.TO_ASBIEP_ID, ULong.valueOf(asbie.getToAsbiepId()))
                     .set(ASBIE.BASED_ASCC_ID, ULong.valueOf(asbie.getBasedAsccId()))
@@ -637,7 +637,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertBbie(BieMakeReusableBieBbie bbie) {
 
             return dslContext.insertInto(BBIE)
-                    .set(BBIE.GUID, SrtGuid.randomGuid())
+                    .set(BBIE.GUID, ScoreGuid.randomGuid())
                     .set(BBIE.FROM_ABIE_ID, ULong.valueOf(bbie.getFromAbieId()))
                     .set(BBIE.TO_BBIEP_ID, ULong.valueOf(bbie.getToBbiepId()))
                     .set(BBIE.BASED_BCC_ID, ULong.valueOf(bbie.getBasedBccId()))
@@ -666,7 +666,7 @@ public class BieMakeReusableBieService implements InitializingBean {
         private long insertBbieSc(BieMakeReusableBieBbieSc bbieSc) {
 
             return dslContext.insertInto(BBIE_SC)
-                    .set(BBIE_SC.GUID, SrtGuid.randomGuid())
+                    .set(BBIE_SC.GUID, ScoreGuid.randomGuid())
                     .set(BBIE_SC.BBIE_ID, ULong.valueOf(bbieSc.getBbieId()))
                     .set(BBIE_SC.DT_SC_ID, ULong.valueOf(bbieSc.getDtScId()))
                     .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, (bbieSc.getDtScPriRestriId() != null) ? ULong.valueOf(bbieSc.getDtScPriRestriId()) : null)

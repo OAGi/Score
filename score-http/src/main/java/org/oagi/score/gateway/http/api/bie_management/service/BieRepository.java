@@ -11,7 +11,7 @@ import org.oagi.score.gateway.http.api.cc_management.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.helper.CcUtility;
 import org.oagi.score.gateway.http.api.info.data.SummaryBie;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
@@ -437,7 +437,7 @@ public class BieRepository {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         return dslContext.insertInto(ABIE)
-                .set(ABIE.GUID, SrtGuid.randomGuid())
+                .set(ABIE.GUID, ScoreGuid.randomGuid())
                 .set(ABIE.BASED_ACC_ID, ULong.valueOf(basedAccId))
                 .set(ABIE.CREATED_BY, ULong.valueOf(userId))
                 .set(ABIE.LAST_UPDATED_BY, ULong.valueOf(userId))
@@ -453,7 +453,7 @@ public class BieRepository {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         return dslContext.insertInto(ASBIEP)
-                .set(ASBIEP.GUID, SrtGuid.randomGuid())
+                .set(ASBIEP.GUID, ScoreGuid.randomGuid())
                 .set(ASBIEP.BASED_ASCCP_ID, ULong.valueOf(asccpId))
                 .set(ASBIEP.ROLE_OF_ABIE_ID, ULong.valueOf(abieId))
                 .set(ASBIEP.CREATED_BY, ULong.valueOf(userId))
@@ -481,7 +481,7 @@ public class BieRepository {
                 .where(ASCC.ASCC_ID.eq(ULong.valueOf(basedAsccId))).fetchOne().getValue(ASCCP.IS_NILLABLE);
 
         return dslContext.insertInto(ASBIE)
-                .set(ASBIE.GUID, SrtGuid.randomGuid())
+                .set(ASBIE.GUID, ScoreGuid.randomGuid())
                 .set(ASBIE.FROM_ABIE_ID, ULong.valueOf(fromAbieId))
                 .set(ASBIE.TO_ASBIEP_ID, ULong.valueOf(toAsbiepId))
                 .set(ASBIE.BASED_ASCC_ID, ULong.valueOf(basedAsccId))
@@ -504,7 +504,7 @@ public class BieRepository {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         return dslContext.insertInto(BBIEP)
-                .set(BBIEP.GUID, SrtGuid.randomGuid())
+                .set(BBIEP.GUID, ScoreGuid.randomGuid())
                 .set(BBIEP.BASED_BCCP_ID, ULong.valueOf(basedBccpId))
                 .set(BBIEP.CREATED_BY, ULong.valueOf(userId))
                 .set(BBIEP.LAST_UPDATED_BY, ULong.valueOf(userId))
@@ -540,7 +540,7 @@ public class BieRepository {
                 .fetchOneInto(BccpRecord.class);
 
         return dslContext.insertInto(BBIE)
-                .set(BBIE.GUID, SrtGuid.randomGuid())
+                .set(BBIE.GUID, ScoreGuid.randomGuid())
                 .set(BBIE.FROM_ABIE_ID, ULong.valueOf(fromAbieId))
                 .set(BBIE.TO_BBIEP_ID, ULong.valueOf(toBbiepId))
                 .set(BBIE.BASED_BCC_ID, ULong.valueOf(basedBccId))
@@ -601,7 +601,7 @@ public class BieRepository {
                 .fetchOne();
 
         return dslContext.insertInto(BBIE_SC)
-                .set(BBIE_SC.GUID, SrtGuid.randomGuid())
+                .set(BBIE_SC.GUID, ScoreGuid.randomGuid())
                 .set(BBIE_SC.BBIE_ID, ULong.valueOf(bbieId))
                 .set(BBIE_SC.DT_SC_ID, ULong.valueOf(dtScId))
                 .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, ULong.valueOf(getDefaultDtScPriRestriIdByDtScId(dtScId)))

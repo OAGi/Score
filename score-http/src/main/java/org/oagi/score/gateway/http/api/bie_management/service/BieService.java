@@ -93,14 +93,26 @@ public class BieService {
     public BieCreateResponse createBie(AuthenticatedPrincipal user, BieCreateRequest request) {
 
         long userId = sessionService.userId(user);
+        if (userId <= 0L) {
+            throw new IllegalArgumentException("`userId` parameter must not be null.");
+        }
         long releaseId = request.getReleaseId();
+        if (releaseId <= 0L) {
+            throw new IllegalArgumentException("`releaseId` parameter must not be null.");
+        }
         long topLevelAsbiepId = repository.createTopLevelAsbiep(userId, releaseId, Editing);
 
         long asccpId = request.getAsccpId();
+        if (asccpId <= 0L) {
+            throw new IllegalArgumentException("`asccpId` parameter must not be null.");
+        }
         AccForBie accForBie = findRoleOfAccByAsccpId(asccpId, releaseId);
 
         long basedAccId = accForBie.getAccId();
         List<Long> bizCtxIds = request.getBizCtxIds();
+        if (bizCtxIds == null || bizCtxIds.isEmpty()) {
+            throw new IllegalArgumentException("`bizCtxIds` parameter must not be null.");
+        }
 
         AbieRecord abieRecord = repository.createAbie(user, basedAccId, topLevelAsbiepId);
         long abieId = abieRecord.getAbieId().longValue();

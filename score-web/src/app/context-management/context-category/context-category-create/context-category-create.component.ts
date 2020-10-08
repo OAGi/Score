@@ -37,7 +37,7 @@ export class ContextCategoryCreateComponent implements OnInit {
   create() {
     this.service.create(this.contextCategory).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/context_management/context_category');
     });

@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.sql.SQLSyntaxErrorException;
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
-public class SrtResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class ScoreResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -54,6 +57,26 @@ public class SrtResponseEntityExceptionHandler extends ResponseEntityExceptionHa
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.set("X-Error-Message", ex.getMessage());
         return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BadSqlGrammarException.class)
+    public ResponseEntity handleBadSqlGrammarException(
+            BadSqlGrammarException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(SQLSyntaxErrorException.class)
+    public ResponseEntity handleSQLSyntaxErrorException(
+            SQLSyntaxErrorException ex, WebRequest webRequest) {
+        logger.debug(ex.getMessage(), ex);
+
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.set("X-Error-Message", ex.getMessage());
+        return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
 }

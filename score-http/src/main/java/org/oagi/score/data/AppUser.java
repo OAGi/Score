@@ -11,5 +11,6 @@ public class AppUser {
     private String name;
     private String organization;
     private boolean developer;
+    private boolean enabled;
 
 }

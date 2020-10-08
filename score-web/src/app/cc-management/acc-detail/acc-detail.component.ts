@@ -32,7 +32,6 @@ export class DynamicCcDataSource {
 
   dataChange = new BehaviorSubject<DynamicCcFlatNode[]>([]);
 
-
   dataDetailMap: Map<string, DynamicCcFlatNode> = new Map();
   dataChildrenMap: Map<string, DynamicCcFlatNode[]> = new Map();
 
@@ -422,7 +421,7 @@ export class AccDetailComponent implements OnInit {
           }
         }
         this.snackBar.open('Updated', '', {
-          duration: 1000,
+          duration: 3000,
         });
         this.isUpdating = false;
       }, err => {

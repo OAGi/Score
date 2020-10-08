@@ -9,6 +9,7 @@ public class AccountListRequest {
     private String loginId;
     private String name;
     private String organization;
+    private Boolean enabled;
     private String role;
     private boolean excludeSSO;
     private Boolean excludeRequester;

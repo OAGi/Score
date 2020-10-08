@@ -21,7 +21,7 @@ import org.oagi.score.gateway.http.api.cc_management.helper.CcUtility;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
 import org.oagi.score.gateway.http.api.common.data.AccessPrivilege;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -350,7 +350,7 @@ public class ExtensionService {
                 Tables.ACC.REVISION_NUM,
                 Tables.ACC.REVISION_TRACKING_NUM,
                 Tables.ACC.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 objectClassTerm,
                 objectClassTerm + ". Details",
                 "A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".",
@@ -426,7 +426,7 @@ public class ExtensionService {
                 Tables.ASCCP.REVISION_NUM,
                 Tables.ASCCP.REVISION_TRACKING_NUM,
                 Tables.ASCCP.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 ueAcc.getObjectClassTerm(),
                 ueAcc.getAccId(),
                 ueAcc.getObjectClassTerm() + ". " + ueAcc.getObjectClassTerm(),
@@ -511,7 +511,7 @@ public class ExtensionService {
                 Tables.ASCC.REVISION_NUM,
                 Tables.ASCC.REVISION_TRACKING_NUM,
                 Tables.ASCC.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 0,
                 1,
                 1,
@@ -692,7 +692,7 @@ public class ExtensionService {
                 Tables.ASCC.REVISION_NUM,
                 Tables.ASCC.REVISION_TRACKING_NUM,
                 Tables.ASCC.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 0,
                 -1,
                 seqKey,
@@ -812,7 +812,7 @@ public class ExtensionService {
                 Tables.BCC.REVISION_NUM,
                 Tables.BCC.REVISION_TRACKING_NUM,
                 Tables.BCC.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 0,
                 -1,
                 seqKey,

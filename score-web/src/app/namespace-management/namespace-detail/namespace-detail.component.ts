@@ -60,7 +60,7 @@ export class NamespaceDetailComponent implements OnInit {
     this.service.update(this.namespace).subscribe(_ => {
       this.hashCode = hashCode(this.namespace);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     });
   }

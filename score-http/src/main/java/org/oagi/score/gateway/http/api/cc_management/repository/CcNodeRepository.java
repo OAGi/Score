@@ -18,7 +18,7 @@ import org.oagi.score.gateway.http.api.cc_management.data.node.*;
 import org.oagi.score.gateway.http.api.cc_management.helper.CcUtility;
 import org.oagi.score.gateway.http.api.common.data.TrackableImpl;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
@@ -126,7 +126,7 @@ public class CcNodeRepository {
                 Tables.ASCC.REVISION_NUM,
                 Tables.ASCC.REVISION_TRACKING_NUM,
                 Tables.ASCC.REVISION_ACTION).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 0,
                 1,
                 1,
@@ -151,7 +151,7 @@ public class CcNodeRepository {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         AccRecord accRecord = new AccRecord();
-        accRecord.setGuid(SrtGuid.randomGuid());
+        accRecord.setGuid(ScoreGuid.randomGuid());
         accRecord.setObjectClassTerm("A new ACC Object");
         accRecord.setDen(accRecord.getObjectClassTerm() + ". Details");
         accRecord.setOagisComponentType(OagisComponentType.Semantics.getValue());
@@ -379,7 +379,7 @@ public class CcNodeRepository {
                 Tables.ASCCP.REVISION_TRACKING_NUM,
                 Tables.ASCCP.REVISION_ACTION,
                 Tables.ASCCP.RELEASE_ID).values(
-                SrtGuid.randomGuid(),
+                ScoreGuid.randomGuid(),
                 "A new ASCCP property",
                 ULong.valueOf(roleOfAccId),
                 asccpDen,

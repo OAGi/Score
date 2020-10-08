@@ -50,6 +50,22 @@ export class LoginComponent implements AfterViewChecked {
     return false;
   }
 
+  get errorMessage(): string {
+    if (!this.err) {
+      return undefined;
+    }
+
+    switch (this.err.status) {
+      case 401:
+        return 'Invalid username or password';
+
+      case 403:
+        return 'Account is disabled';
+    }
+
+    return 'Error';
+  }
+
   onClose() {
     this.err = undefined;
   }

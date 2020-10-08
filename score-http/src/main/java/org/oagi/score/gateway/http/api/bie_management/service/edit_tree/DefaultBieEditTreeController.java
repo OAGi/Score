@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.inline;
 import static org.oagi.score.entity.jooq.Tables.*;
-import static org.oagi.score.gateway.http.helper.SrtJdbcTemplate.newSqlParameterSource;
+import static org.oagi.score.gateway.http.helper.ScoreJdbcTemplate.newSqlParameterSource;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 @Component

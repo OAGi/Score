@@ -4,11 +4,12 @@ import lombok.Data;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
 import org.oagi.score.data.BieState;
+import org.oagi.score.data.OagisComponentType;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.bie_management.data.BieCopyRequest;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.event.BieCopyRequestEvent;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.redisson.api.RLock;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.jooq.impl.DSL.and;
 import static org.oagi.score.data.BieState.Initiating;
 import static org.oagi.score.entity.jooq.Tables.*;
 
@@ -75,8 +77,17 @@ public class BieCopyService implements InitializingBean {
     @Transactional
     public void copyBie(AuthenticatedPrincipal user, BieCopyRequest request) {
         long sourceTopLevelAsbiepId = request.getTopLevelAsbiepId();
+        if (sourceTopLevelAsbiepId <= 0L) {
+            throw new IllegalArgumentException("`topLevelAsbiepId` parameter must not be null.");
+        }
         List<Long> bizCtxIds = request.getBizCtxIds();
+        if (bizCtxIds == null || bizCtxIds.isEmpty()) {
+            throw new IllegalArgumentException("`bizCtxIds` parameter must not be null.");
+        }
         long userId = sessionService.userId(user);
+        if (userId <= 0L) {
+            throw new IllegalArgumentException("`userId` parameter must not be null.");
+        }
 
         TopLevelAsbiep sourceTopLevelAsbiep = topLevelAsbiepRepository.findById(sourceTopLevelAsbiepId);
         long copiedTopLevelAsbiepId =
@@ -325,7 +336,7 @@ public class BieCopyService implements InitializingBean {
         private TopLevelAsbiep copiedTopLevelAsbiep;
         private List<Long> bizCtxIds;
         private long userId;
-
+        private boolean isDeveloper;
         private Timestamp timestamp;
 
 
@@ -356,6 +367,7 @@ public class BieCopyService implements InitializingBean {
 
             bizCtxIds = bieCopyRequestEvent.getBizCtxIds();
             userId = bieCopyRequestEvent.getUserId();
+            isDeveloper = sessionService.isDeveloper(userId);
 
             abieList = getAbieByOwnerTopLevelAsbiepId(sourceTopLevelAsbiepId);
 
@@ -431,10 +443,41 @@ public class BieCopyService implements InitializingBean {
                 fireChangeEvent("bbie_sc", previousBbieScId, nextBbieScId);
             }
 
+            // Issue #869
+            if (isDeveloper) {
+                removeBIEofEUEG();
+            }
+
             repository.updateState(copiedTopLevelAsbiep.getTopLevelAsbiepId(), BieState.Editing);
 
             logger.debug("End copying from " + sourceTopLevelAsbiep.getTopLevelAsbiepId() +
                     " to " + copiedTopLevelAsbiep.getTopLevelAsbiepId());
+        }
+
+        private void removeBIEofEUEG() {
+            dslContext.deleteFrom(ASBIE)
+                    .where(ASBIE.ASBIE_ID.in(dslContext.select(ASBIE.ASBIE_ID)
+                            .from(ASBIE)
+                            .join(ASCC).on(ASBIE.BASED_ASCC_ID.eq(ASCC.ASCC_ID))
+                            .join(ACC).on(ASCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                            .where(and(
+                                    ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(copiedTopLevelAsbiep.getTopLevelAsbiepId())),
+                                    ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue())
+                            ))
+                            .fetchInto(ULong.class)))
+                    .execute();
+
+            dslContext.deleteFrom(BBIE)
+                    .where(BBIE.BBIE_ID.in(dslContext.select(BBIE.BBIE_ID)
+                            .from(BBIE)
+                            .join(BCC).on(BBIE.BASED_BCC_ID.eq(BCC.BCC_ID))
+                            .join(ACC).on(BCC.FROM_ACC_ID.eq(ACC.ACC_ID))
+                            .where(and(
+                                    BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(copiedTopLevelAsbiep.getTopLevelAsbiepId())),
+                                    ACC.OAGIS_COMPONENT_TYPE.eq(OagisComponentType.UserExtensionGroup.getValue())
+                            ))
+                            .fetchInto(ULong.class)))
+                    .execute();
         }
 
 
@@ -484,7 +527,7 @@ public class BieCopyService implements InitializingBean {
         private long insertAbie(BieCopyAbie abie) {
 
             return dslContext.insertInto(ABIE)
-                    .set(ABIE.GUID, SrtGuid.randomGuid())
+                    .set(ABIE.GUID, ScoreGuid.randomGuid())
                     .set(ABIE.BASED_ACC_ID, ULong.valueOf(abie.getBasedAccId()))
                     .set(ABIE.DEFINITION, abie.getDefinition())
                     .set(ABIE.CREATED_BY, ULong.valueOf(userId))
@@ -501,7 +544,7 @@ public class BieCopyService implements InitializingBean {
         private long insertAsbiep(BieCopyAsbiep asbiep) {
 
             return dslContext.insertInto(ASBIEP)
-                    .set(ASBIEP.GUID, SrtGuid.randomGuid())
+                    .set(ASBIEP.GUID, ScoreGuid.randomGuid())
                     .set(ASBIEP.BASED_ASCCP_ID, ULong.valueOf(asbiep.getBasedAsccpId()))
                     .set(ASBIEP.ROLE_OF_ABIE_ID, ULong.valueOf(asbiep.getRoleOfAbieId()))
                     .set(ASBIEP.DEFINITION, asbiep.getDefinition())
@@ -518,7 +561,7 @@ public class BieCopyService implements InitializingBean {
         private long insertBbiep(BieCopyBbiep bbiep) {
 
             return dslContext.insertInto(BBIEP)
-                    .set(BBIEP.GUID, SrtGuid.randomGuid())
+                    .set(BBIEP.GUID, ScoreGuid.randomGuid())
                     .set(BBIEP.BASED_BCCP_ID, ULong.valueOf(bbiep.getBasedBccpId()))
                     .set(BBIEP.DEFINITION, bbiep.getDefinition())
                     .set(BBIEP.REMARK, bbiep.getRemark())
@@ -534,7 +577,7 @@ public class BieCopyService implements InitializingBean {
         private long insertAsbie(BieCopyAsbie asbie) {
 
             return dslContext.insertInto(ASBIE)
-                    .set(ASBIE.GUID, SrtGuid.randomGuid())
+                    .set(ASBIE.GUID, ScoreGuid.randomGuid())
                     .set(ASBIE.FROM_ABIE_ID, ULong.valueOf(asbie.getFromAbieId()))
                     .set(ASBIE.TO_ASBIEP_ID, ULong.valueOf(asbie.getToAsbiepId()))
                     .set(ASBIE.BASED_ASCC_ID, ULong.valueOf(asbie.getBasedAsccId()))
@@ -556,7 +599,7 @@ public class BieCopyService implements InitializingBean {
         private long insertBbie(BieCopyBbie bbie) {
 
             return dslContext.insertInto(BBIE)
-                    .set(BBIE.GUID, SrtGuid.randomGuid())
+                    .set(BBIE.GUID, ScoreGuid.randomGuid())
                     .set(BBIE.FROM_ABIE_ID, ULong.valueOf(bbie.getFromAbieId()))
                     .set(BBIE.TO_BBIEP_ID, ULong.valueOf(bbie.getToBbiepId()))
                     .set(BBIE.BASED_BCC_ID, ULong.valueOf(bbie.getBasedBccId()))
@@ -585,7 +628,7 @@ public class BieCopyService implements InitializingBean {
         private long insertBbieSc(BieCopyBbieSc bbieSc) {
 
             return dslContext.insertInto(BBIE_SC)
-                    .set(BBIE_SC.GUID, SrtGuid.randomGuid())
+                    .set(BBIE_SC.GUID, ScoreGuid.randomGuid())
                     .set(BBIE_SC.BBIE_ID, ULong.valueOf(bbieSc.getBbieId()))
                     .set(BBIE_SC.DT_SC_ID, ULong.valueOf(bbieSc.getDtScId()))
                     .set(BBIE_SC.DT_SC_PRI_RESTRI_ID, (bbieSc.getDtScPriRestriId() != null) ? ULong.valueOf(bbieSc.getDtScPriRestriId()) : null)

@@ -49,7 +49,7 @@ export class NamespaceCreateComponent implements OnInit {
   create() {
     this.service.create(this.namespace).subscribe(_ => {
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/namespace');
     });

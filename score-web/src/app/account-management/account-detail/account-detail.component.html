@@ -1,4 +1,8 @@
 <div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
   <mat-card>
     <mat-card-header>
       <mat-card-title>{{ title }}</mat-card-title>
@@ -59,6 +63,15 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
+
+    <mat-card-actions>
+      <button mat-raised-button color="warn" *ngIf="!!account && account.enabled" (click)="setEnable(false)">
+        Disable this account
+      </button>
+      <button mat-raised-button color="accent" *ngIf="!!account && !account.enabled" (click)="setEnable(true)">
+        Enable this account
+      </button>
+    </mat-card-actions>
 
     <mat-card-actions class="fab-container">
       <button mat-mini-fab color="primary" (click)="update()"

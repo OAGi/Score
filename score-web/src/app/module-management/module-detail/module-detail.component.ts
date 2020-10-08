@@ -207,7 +207,7 @@ export class ModuleDetailComponent implements OnInit {
     this.service.update(this.module).subscribe(_ => {
       this.hashCode = hashCode(this.module);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
     });
   }

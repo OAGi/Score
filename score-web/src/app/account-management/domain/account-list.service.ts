@@ -29,6 +29,9 @@ export class AccountListService implements OnInit {
     if (request.filters.organization) {
       params = params.set('organization', request.filters.organization);
     }
+    if (request.filters.status) {
+      params = params.set('status', request.filters.status.join(','));
+    }
     if (request.filters.role) {
       params = params.set('role', request.filters.role);
     }
@@ -62,6 +65,10 @@ export class AccountListService implements OnInit {
         newPassword: ''
       });
     }
+  }
+
+  setEnable(account: AccountList, val: boolean): Observable<any> {
+    return this.http.post('/api/accounts/' + account.appUserId + '/' + ((val) ? 'enable' : 'disable'), {});
   }
 
   create(account: AccountList, newPassword?: string, pending?: PendingAccount): Observable<any> {

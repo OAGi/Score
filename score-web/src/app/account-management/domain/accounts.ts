@@ -8,6 +8,7 @@ export class AccountListRequest {
     loginId: string;
     name: string;
     organization: string;
+    status: string[];
     role: string;
     excludeSSO: boolean;
   };
@@ -40,6 +41,7 @@ export class AccountListRequest {
       loginId: params.get('loginId') || '',
       name: params.get('name') || '',
       organization: params.get('organization') || '',
+      status: (params.get('status')) ? Array.from(params.get('status').split(',')) : [],
       role: params.get('role') || '',
       excludeSSO: false
     };
@@ -61,10 +63,12 @@ export class AccountListRequest {
     if (this.filters.organization && this.filters.organization.length > 0) {
       params = params.set('organization', '' + this.filters.organization);
     }
+    if (this.filters.status && this.filters.status.length > 0) {
+      params = params.set('status', this.filters.status.join(','));
+    }
     if (this.filters.role && this.filters.role.length > 0) {
       params = params.set('role', '' + this.filters.role);
     }
-
     if (this.filters.excludeSSO) {
       params = params.set('excludeSSO', '' + this.filters.excludeSSO);
     }
@@ -80,5 +84,6 @@ export class AccountList {
   name: string;
   organization: string;
   developer: boolean;
+  enabled: boolean;
   appOauth2UserId: number;
 }

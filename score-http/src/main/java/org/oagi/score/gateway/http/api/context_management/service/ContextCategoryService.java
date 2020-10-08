@@ -9,7 +9,7 @@ import org.oagi.score.gateway.http.api.context_management.data.ContextCategory;
 import org.oagi.score.gateway.http.api.context_management.data.ContextCategoryListRequest;
 import org.oagi.score.gateway.http.api.context_management.data.ContextScheme;
 import org.oagi.score.gateway.http.api.context_management.data.SimpleContextCategory;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,7 +165,7 @@ public class ContextCategoryService {
     @Transactional
     public void insert(ContextCategory contextCategory) {
         if (StringUtils.isEmpty(contextCategory.getGuid())) {
-            contextCategory.setGuid(SrtGuid.randomGuid());
+            contextCategory.setGuid(ScoreGuid.randomGuid());
         }
 
         dslContext.insertInto(CTX_CATEGORY,

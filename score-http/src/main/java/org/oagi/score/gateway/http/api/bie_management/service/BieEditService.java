@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.Record3;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ACC;
 import org.oagi.score.data.AppUser;
@@ -17,7 +18,7 @@ import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.DefaultB
 import org.oagi.score.gateway.http.api.cc_management.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.redis.event.EventListenerContainer;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.redisson.api.RedissonClient;
@@ -32,6 +33,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -169,6 +171,7 @@ public class BieEditService implements InitializingBean {
                     treeController.updateDetail(bbieScNodeDetail));
         }
 
+        this.updateEnabledVersionIdWithVersionFieldValue(user, topLevelAsbiepId);
         this.updateTopLevelAsbiepLastUpdated(user, topLevelAsbiepId);
 
         return response;
@@ -260,6 +263,41 @@ public class BieEditService implements InitializingBean {
     @Transactional
     public void updateTopLevelAsbiepLastUpdated(AuthenticatedPrincipal user, long topLevelAsbiepId){
         topLevelAsbiepRepository.updateTopLevelAsbiepLastUpdated(sessionService.userId(user), topLevelAsbiepId);
+    }
+
+    @Transactional
+    public void updateEnabledVersionIdWithVersionFieldValue(AuthenticatedPrincipal user, long topLevelAsbiepId) {
+        // Issue #844
+        ULong enabledVersionIdBbieId = dslContext.select(BBIE.BBIE_ID)
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .join(ABIE).on(ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.ABIE_ID))
+                .join(BBIE).on(ABIE.ABIE_ID.eq(BBIE.FROM_ABIE_ID))
+                .join(BCC).on(BBIE.BASED_BCC_ID.eq(BCC.BCC_ID))
+                .where(and(
+                        TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)),
+                        BBIE.IS_USED.eq((byte) 1),
+                        BCC.DEN.eq("Business Object Document. Version Identifier. Text")
+                ))
+                .fetchOptionalInto(ULong.class).orElse(null);
+
+        if (enabledVersionIdBbieId != null) {
+            UpdateSetMoreStep step = dslContext.update(BBIE)
+                    .setNull(BBIE.DEFAULT_VALUE);
+
+            String version = dslContext.select(TOP_LEVEL_ASBIEP.VERSION)
+                    .from(TOP_LEVEL_ASBIEP)
+                    .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
+                    .fetchOneInto(String.class);
+
+            if (StringUtils.isEmpty(version)) {
+                step = step.setNull(BBIE.FIXED_VALUE);
+            } else {
+                step = step.set(BBIE.FIXED_VALUE, version);
+            }
+
+            step.where(BBIE.BBIE_ID.eq(enabledVersionIdBbieId)).execute();
+        }
     }
 
     @Transactional
@@ -477,7 +515,7 @@ public class BieEditService implements InitializingBean {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         AbieRecord abieRecord = new AbieRecord();
-        abieRecord.setGuid(SrtGuid.randomGuid());
+        abieRecord.setGuid(ScoreGuid.randomGuid());
         abieRecord.setBasedAccId(basedAccId);
         abieRecord.setCreatedBy(userId);
         abieRecord.setLastUpdatedBy(userId);
@@ -493,7 +531,7 @@ public class BieEditService implements InitializingBean {
         );
 
         AsbiepRecord asbiepRecord = new AsbiepRecord();
-        asbiepRecord.setGuid(SrtGuid.randomGuid());
+        asbiepRecord.setGuid(ScoreGuid.randomGuid());
         asbiepRecord.setBasedAsccpId(basedAsccpId);
         asbiepRecord.setRoleOfAbieId(abieRecord.getAbieId());
         asbiepRecord.setCreatedBy(userId);

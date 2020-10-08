@@ -10,7 +10,7 @@ import org.oagi.score.gateway.http.api.context_management.data.BusinessContextVa
 import org.oagi.score.gateway.http.api.context_management.data.SimpleContextSchemeValue;
 import org.oagi.score.gateway.http.api.context_management.repository.BusinessContextRepository;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
@@ -90,7 +90,7 @@ public class BusinessContextService {
     @Transactional
     public void insert(AuthenticatedPrincipal user, BusinessContext bizCtx) {
         if (StringUtils.isEmpty(bizCtx.getGuid())) {
-            bizCtx.setGuid(SrtGuid.randomGuid());
+            bizCtx.setGuid(ScoreGuid.randomGuid());
         }
 
         ULong userId = ULong.valueOf(sessionService.userId(user));

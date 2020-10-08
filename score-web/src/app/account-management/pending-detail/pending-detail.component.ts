@@ -49,7 +49,7 @@ export class PendingDetailComponent implements OnInit {
           this.pending = resp;
         });
         this.snackBar.open(msg, '', {
-          duration: 1500,
+          duration: 3000,
         });
       }
     });
@@ -96,7 +96,7 @@ export class PendingDetailComponent implements OnInit {
 
           this.service.update(this.pending).subscribe(resp => {
             this.snackBar.open('Rejected', '', {
-              duration: 1500,
+              duration: 3000,
             });
             this.pending = resp;
             this.router.navigateByUrl('/account/pending');

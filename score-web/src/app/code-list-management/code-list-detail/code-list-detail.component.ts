@@ -160,7 +160,7 @@ export class CodeListDetailComponent implements OnInit {
         for (const value of data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
 
             return;
@@ -175,7 +175,7 @@ export class CodeListDetailComponent implements OnInit {
         for (const value of data) {
           if (value.guid !== result.guid && value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
             return;
           }
@@ -344,7 +344,7 @@ export class CodeListDetailComponent implements OnInit {
     this.service.update(this.codeList).subscribe(_ => {
       this.hashCode = hashCode(this.codeList);
       this.snackBar.open('Updated', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.disabled = false;
     });
@@ -380,7 +380,7 @@ export class CodeListDetailComponent implements OnInit {
 
           this.service.publish(this.codeList).subscribe(_ => {
             this.snackBar.open('Published', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.disabled = false;
 
@@ -414,7 +414,7 @@ export class CodeListDetailComponent implements OnInit {
 
           this.service.delete(this.codeList.codeListId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.disabled = false;
 

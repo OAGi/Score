@@ -236,7 +236,7 @@ export class CcListComponent implements OnInit {
       if (result) {
         this.service.transferOwnership(extensionId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
-            duration: 1000,
+            duration: 3000,
           });
           this.selection.clear();
           this.loadCcList();

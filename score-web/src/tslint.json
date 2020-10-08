@@ -4,13 +4,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "srt",
+      "score",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "srt",
+      "score",
       "kebab-case"
     ]
   }

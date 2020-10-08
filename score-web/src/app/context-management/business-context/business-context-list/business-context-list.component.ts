@@ -183,7 +183,7 @@ export class BusinessContextListComponent implements OnInit {
         if (result) {
           this.service.delete(...bizCtxIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
-              duration: 1000,
+              duration: 3000,
             });
             this.selection.clear();
             this.loadBusinessContextList();

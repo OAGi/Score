@@ -195,7 +195,7 @@ export class CodeListCreateComponent implements OnInit {
         for (const value of data) {
           if (value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
 
             return;
@@ -210,7 +210,7 @@ export class CodeListCreateComponent implements OnInit {
         for (const value of data) {
           if (value.guid !== result.guid && value.value === result.value) {
             this.snackBar.open(result.value + ' already exist', '', {
-              duration: 4000,
+              duration: 3000,
             });
 
             return;
@@ -370,7 +370,7 @@ export class CodeListCreateComponent implements OnInit {
     this.service.create(this.codeList).subscribe(_ => {
       this.hashCode = hashCode(this.codeList);
       this.snackBar.open('Created', '', {
-        duration: 1000,
+        duration: 3000,
       });
       this.router.navigateByUrl('/code_list');
     });

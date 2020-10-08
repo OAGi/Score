@@ -24,6 +24,19 @@
                        placeholder="Organization">
               </mat-form-field>
             </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Status</mat-label>
+                <mat-select [(ngModel)]="request.filters.status" multiple>
+                  <mat-option [value]="'enable'">
+                    Enable
+                  </mat-option>
+                  <mat-option [value]="'disable'">
+                    Disable
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
           </div>
         </div>
       </mat-card-content>
@@ -36,6 +49,10 @@
     </mat-card>
 
     <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
       <div class="mat-elevation-z1">
         <table mat-table matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
                [dataSource]="dataSource">
@@ -66,6 +83,13 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Organization</th>
             <td mat-cell *matCellDef="let element">
               {{ element.organization }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.enabled) ? 'Enable' : 'Disable' }}
             </td>
           </ng-container>
 

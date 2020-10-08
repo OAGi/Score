@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import org.oagi.score.data.*;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.GenerateExpressionOption;
 import org.oagi.score.gateway.http.api.bie_management.data.expression.OpenAPIExpressionFormat;
-import org.oagi.score.gateway.http.helper.SrtGuid;
+import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -827,7 +827,7 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     public File asFile(String filename) throws IOException {
         ensureRoot();
 
-        File tempFile = File.createTempFile(SrtGuid.randomGuid(), null);
+        File tempFile = File.createTempFile(ScoreGuid.randomGuid(), null);
         String extension = (expressionMapper.getFactory() instanceof YAMLFactory) ? "yml" : "json";
 
         tempFile = new File(tempFile.getParentFile(), filename + "." + extension);
