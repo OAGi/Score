@@ -162,17 +162,28 @@ public class GenerationContext implements InitializingBean {
 
         Set<TopLevelAsbiep> topLevelAsbiepSet = new HashSet();
         topLevelAsbiepSet.addAll(topLevelAsbieps);
-        topLevelAsbiepSet.addAll(
-                topLevelAsbiepRepository.findRefTopLevelAsbieps(
-                        topLevelAsbieps.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toSet())
-                )
-        );
+        topLevelAsbiepSet.addAll(findRefTopLevelAsbieps(topLevelAsbiepSet));
 
         topLevelAsbieps = new ArrayList(topLevelAsbiepSet);
         topLevelAsbiepMap = topLevelAsbieps.stream()
                 .collect(Collectors.toMap(TopLevelAsbiep::getTopLevelAsbiepId, Function.identity()));
 
         init(topLevelAsbieps);
+    }
+
+    private Set<TopLevelAsbiep> findRefTopLevelAsbieps(Set<TopLevelAsbiep> topLevelAsbiepSet) {
+        Set<TopLevelAsbiep> refTopLevelAsbiepSet = new HashSet();
+        refTopLevelAsbiepSet.addAll(
+                topLevelAsbiepRepository.findRefTopLevelAsbieps(
+                        topLevelAsbiepSet.stream().map(e -> e.getTopLevelAsbiepId()).collect(Collectors.toSet())
+                )
+        );
+
+        if (!refTopLevelAsbiepSet.isEmpty()) {
+            refTopLevelAsbiepSet.addAll(findRefTopLevelAsbieps(refTopLevelAsbiepSet));
+        }
+
+        return refTopLevelAsbiepSet;
     }
 
     private void init(List<TopLevelAsbiep> topLevelAsbieps) {
