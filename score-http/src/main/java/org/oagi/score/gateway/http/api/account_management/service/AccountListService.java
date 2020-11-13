@@ -8,8 +8,10 @@ import org.oagi.score.gateway.http.api.account_management.data.AccountListReques
 import org.oagi.score.gateway.http.api.account_management.data.AppUser;
 import org.oagi.score.gateway.http.api.common.data.PageRequest;
 import org.oagi.score.gateway.http.api.common.data.PageResponse;
+import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +29,15 @@ import static org.oagi.score.entity.jooq.Tables.APP_USER;
 public class AccountListService {
 
     @Autowired
+    private SessionService sessionService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private DSLContext dslContext;
 
-    public PageResponse<AppUser> getAccounts(org.springframework.security.core.userdetails.User requester,
+    public PageResponse<AppUser> getAccounts(AuthenticatedPrincipal user,
                                              AccountListRequest request) {
         SelectOnConditionStep step = dslContext.select(
                 APP_USER.APP_USER_ID,
@@ -73,7 +78,7 @@ public class AccountListService {
         }
         Boolean excludeRequester = request.getExcludeRequester();
         if (excludeRequester != null && excludeRequester == true) {
-            conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(requester.getUsername().trim()));
+            conditions.add(APP_USER.LOGIN_ID.notEqualIgnoreCase(sessionService.getAppUser(user).getLoginId().trim()));
         }
 
         SelectConditionStep<Record6<ULong, String, String, Byte, String, ULong>> conditionStep = step.where(conditions);

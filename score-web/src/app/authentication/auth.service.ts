@@ -37,15 +37,15 @@ export class AuthService implements OnInit, CanActivate {
     return this.http.get<UserToken>('/api/' + environment.statePath).pipe(map(res => {
       if (!!res) {
         this.storeUserInfo(res);
-        if (!res.enabled) {
-          return this.router.parseUrl('/disabled');
-        }
         const role = res.role;
         if (role === 'pending') {
           return this.router.parseUrl('/pending');
         } else if (role === 'reject') {
           this.logout(getResolvedUrl(route));
           return false;
+        }
+        if (!res.enabled) {
+          return this.router.parseUrl('/disabled');
         }
         return true;
       } else {
