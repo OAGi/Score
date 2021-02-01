@@ -28,54 +28,59 @@ export class BusinessContextValueDialogComponent implements OnInit {
   actionName;
   hashCode;
 
-  ctxCategories: ContextCategory[] = [];
-  ctxCategoryListFilterCtrl: FormControl = new FormControl();
-  filteredCtxCategoryList: ReplaySubject<ContextCategory[]> = new ReplaySubject<ContextCategory[]>(1);
+  contextCategoryList: ContextCategory[] = [];
+  contextCategoryListFilterCtrl: FormControl = new FormControl();
+  filteredContextCategoryList: ReplaySubject<ContextCategory[]> = new ReplaySubject<ContextCategory[]>(1);
 
-  ctxSchemes: ContextScheme[] = [];
-  ctxSchemeListFilterCtrl: FormControl = new FormControl();
-  filteredCtxSchemeList: ReplaySubject<ContextScheme[]> = new ReplaySubject<ContextScheme[]>(1);
+  contextSchemeList: ContextScheme[] = [];
+  contextSchemeListFilterCtrl: FormControl = new FormControl();
+  filteredContextSchemeList: ReplaySubject<ContextScheme[]> = new ReplaySubject<ContextScheme[]>(1);
 
-  ctxSchemeValues: ContextSchemeValue[] = [];
-  ctxSchemeValueListFilterCtrl: FormControl = new FormControl();
-  filteredCtxSchemeValueList: ReplaySubject<ContextSchemeValue[]> = new ReplaySubject<ContextSchemeValue[]>(1);
+  contextSchemeValueList: ContextSchemeValue[] = [];
+  contextSchemeValueListFilterCtrl: FormControl = new FormControl();
+  filteredContextSchemeValueList: ReplaySubject<ContextSchemeValue[]> = new ReplaySubject<ContextSchemeValue[]>(1);
 
   constructor(
     public dialogRef: MatDialogRef<BusinessContextValueDialogComponent>,
     private contextCategoryService: ContextCategoryService,
     private contextSchemeService: ContextSchemeService,
-    @Inject(MAT_DIALOG_DATA) public bizCtxValue: BusinessContextValue) {
+    @Inject(MAT_DIALOG_DATA) public businessContextValue: BusinessContextValue) {
   }
 
-  get ctxCategory(): ContextCategory {
-    if (this.bizCtxValue.ctxCategoryId) {
-      for (const ctxCategory of this.ctxCategories) {
-        if (ctxCategory.ctxCategoryId === this.bizCtxValue.ctxCategoryId) {
-          return ctxCategory;
+  get contextCategory(): ContextCategory {
+    if (this.businessContextValue.contextCategoryId) {
+      for (const contextCategory of this.contextCategoryList) {
+        if (contextCategory.contextCategoryId === this.businessContextValue.contextCategoryId) {
+          return contextCategory;
         }
       }
     }
     return new ContextCategory();
   }
 
-  get ctxScheme(): ContextScheme {
-    if (this.bizCtxValue.ctxCategoryId && this.bizCtxValue.ctxSchemeId) {
-      for (const ctxScheme of this.ctxSchemes) {
-        if (ctxScheme.ctxCategoryId === this.bizCtxValue.ctxCategoryId &&
-          ctxScheme.ctxSchemeId === this.bizCtxValue.ctxSchemeId) {
-          return ctxScheme;
+  get contextScheme(): ContextScheme {
+    if (this.businessContextValue.contextCategoryId &&
+      this.businessContextValue.contextSchemeId) {
+
+      for (const contextScheme of this.contextSchemeList) {
+        if (contextScheme.contextCategoryId === this.businessContextValue.contextCategoryId &&
+          contextScheme.contextSchemeId === this.businessContextValue.contextSchemeId) {
+          return contextScheme;
         }
       }
     }
     return new ContextScheme();
   }
 
-  get ctxSchemeValue(): ContextSchemeValue {
-    if (this.bizCtxValue.ctxCategoryId && this.bizCtxValue.ctxSchemeId && this.bizCtxValue.ctxSchemeValueId) {
-      for (const ctxSchemeValue of this.ctxSchemeValues) {
-        if (ctxSchemeValue.ownerCtxSchemeId === this.bizCtxValue.ctxSchemeId &&
-          ctxSchemeValue.ctxSchemeValueId === this.bizCtxValue.ctxSchemeValueId) {
-          return ctxSchemeValue;
+  get contextSchemeValue(): ContextSchemeValue {
+    if (this.businessContextValue.contextCategoryId &&
+      this.businessContextValue.contextSchemeId &&
+      this.businessContextValue.contextSchemeValueId) {
+
+      for (const contextSchemeValue of this.contextSchemeValueList) {
+        if (contextSchemeValue.ownerContextSchemeId === this.businessContextValue.contextSchemeId &&
+          contextSchemeValue.contextSchemeValueId === this.businessContextValue.contextSchemeValueId) {
+          return contextSchemeValue;
         }
       }
     }
@@ -83,15 +88,15 @@ export class BusinessContextValueDialogComponent implements OnInit {
   }
 
   onClick(): void {
-    this.dialogRef.close(this.bizCtxValue);
+    this.dialogRef.close(this.businessContextValue);
   }
 
   isChanged() {
-    return this.hashCode !== hashCode(this.bizCtxValue);
+    return this.hashCode !== hashCode(this.businessContextValue);
   }
 
   ngOnInit() {
-    this.isAddAction = (this.bizCtxValue.guid === undefined);
+    this.isAddAction = (this.businessContextValue.guid === undefined);
     if (this.isAddAction) {
       this.actionName = 'Add';
     } else {
@@ -100,15 +105,15 @@ export class BusinessContextValueDialogComponent implements OnInit {
 
     const contextCategoryListRequest = new ContextCategoryListRequest();
     contextCategoryListRequest.page = new PageRequest(
-      null, 'asc', 0, 0);
+      'name', 'asc', -1, -1);
 
     const contextSchemeListRequest = new ContextSchemeListRequest();
     contextSchemeListRequest.page = new PageRequest(
-      null, 'asc', 0, 0);
+      undefined, 'asc', -1, -1);
 
     const contextSchemeValueListRequest = new ContextSchemeValueListRequest();
     contextSchemeValueListRequest.page = new PageRequest(
-      null, 'asc', 0, 0);
+      undefined, 'asc', -1, -1);
 
     this.isLoading = true;
     forkJoin([
@@ -118,95 +123,150 @@ export class BusinessContextValueDialogComponent implements OnInit {
     ]).pipe(finalize(() => {
       this.isLoading = false;
     })).subscribe(([contextCategoryPage, contextSchemePage, contextSchemeValuePage]) => {
-      this.ctxCategories = contextCategoryPage.list;
+      this.contextCategoryList = contextCategoryPage.list;
       this.resetCtxCategories();
 
-      this.ctxSchemes = contextSchemePage.list;
+      this.contextSchemeList = contextSchemePage.list;
       this.resetCtxSchemes();
 
-      this.ctxSchemeValues = contextSchemeValuePage.list;
+      this.contextSchemeValueList = contextSchemeValuePage.list;
       this.resetCtxSchemeValues();
 
-      this.hashCode = hashCode(this.bizCtxValue);
+      this.hashCode = hashCode(this.businessContextValue);
     });
+
+    this.contextCategoryListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterCtxCategories();
+      });
+
+    this.contextSchemeListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterCtxSchemes();
+      });
+
+    this.contextSchemeValueListFilterCtrl.valueChanges
+      .subscribe(() => {
+        this.filterCtxSchemeValues();
+      });
+  }
+
+  filterCtxCategories() {
+    let search = this.contextCategoryListFilterCtrl.value;
+    if (!search) {
+      this.filteredContextCategoryList.next(this.contextCategoryList.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredContextCategoryList.next(
+      this.contextCategoryList.filter(contextCategory => contextCategory.name.toLowerCase().indexOf(search) > -1)
+    );
+  }
+
+  filterCtxSchemes() {
+    let search = this.contextSchemeListFilterCtrl.value;
+    if (!search) {
+      this.filteredContextSchemeList.next(this.contextSchemeList.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredContextSchemeList.next(
+      this.contextSchemeList.filter(contextScheme => contextScheme.schemeName.toLowerCase().indexOf(search) > -1)
+    );
+  }
+
+  filterCtxSchemeValues() {
+    let search = this.contextSchemeValueListFilterCtrl.value;
+    if (!search) {
+      this.filteredContextSchemeValueList.next(this.contextSchemeValueList.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.filteredContextSchemeValueList.next(
+      this.contextSchemeValueList.filter(contextSchemeValue => contextSchemeValue.value.toLowerCase().indexOf(search) > -1)
+    );
   }
 
   resetCtxCategories() {
-    this.ctxCategoryListFilterCtrl.valueChanges
+    this.contextCategoryListFilterCtrl.valueChanges
       .subscribe(() => {
-        let search = this.ctxCategoryListFilterCtrl.value;
+        let search = this.contextCategoryListFilterCtrl.value;
         if (!search) {
-          this.filteredCtxCategoryList.next(this.ctxCategories.slice());
+          this.filteredContextCategoryList.next(this.contextCategoryList.slice());
           return;
         } else {
           search = search.toLowerCase();
         }
-        this.filteredCtxCategoryList.next(
-          this.ctxCategories.filter(e => e.name.toLowerCase().indexOf(search) > -1)
+        this.filteredContextCategoryList.next(
+          this.contextCategoryList.filter(e => e.name.toLowerCase().indexOf(search) > -1)
         );
       });
-    this.filteredCtxCategoryList.next(this.ctxCategories.slice());
+    this.filteredContextCategoryList.next(this.contextCategoryList.slice());
   }
 
   resetCtxSchemes() {
-    const ctxScheme = this.ctxSchemes
-      .filter(e => e.ctxCategoryId === this.bizCtxValue.ctxCategoryId);
+    const contextScheme = this.contextSchemeList
+      .filter(e => e.contextCategoryId === this.businessContextValue.contextCategoryId);
 
-    this.ctxSchemeListFilterCtrl.valueChanges
+    this.contextSchemeListFilterCtrl.valueChanges
       .subscribe(() => {
-        let search = this.ctxSchemeListFilterCtrl.value;
+        let search = this.contextSchemeListFilterCtrl.value;
         if (!search) {
-          this.filteredCtxSchemeList.next(ctxScheme.slice());
+          this.filteredContextSchemeList.next(contextScheme.slice());
           return;
         } else {
           search = search.toLowerCase();
         }
-        this.filteredCtxSchemeList.next(
-          ctxScheme.filter(e => e.schemeName.toLowerCase().indexOf(search) > -1)
+        this.filteredContextSchemeList.next(
+          contextScheme.filter(e => e.schemeName.toLowerCase().indexOf(search) > -1)
         );
       });
-    this.filteredCtxSchemeList.next(ctxScheme.slice());
+    this.filteredContextSchemeList.next(contextScheme.slice());
   }
 
   resetCtxSchemeValues() {
-    const ctxSchemeValues = this.ctxSchemeValues
-      .filter(e => e.ownerCtxSchemeId === this.bizCtxValue.ctxSchemeId);
+    const contextSchemeValueList = this.contextSchemeValueList
+      .filter(e => e.ownerContextSchemeId === this.businessContextValue.contextSchemeId);
 
-    this.ctxSchemeValueListFilterCtrl.valueChanges
+    this.contextSchemeValueListFilterCtrl.valueChanges
       .subscribe(() => {
-        let search = this.ctxCategoryListFilterCtrl.value;
+        let search = this.contextCategoryListFilterCtrl.value;
         if (!search) {
-          this.filteredCtxSchemeValueList.next(ctxSchemeValues.slice());
+          this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());
           return;
         } else {
           search = search.toLowerCase();
         }
-        this.filteredCtxSchemeValueList.next(
-          ctxSchemeValues.filter(e => e.value.toLowerCase().indexOf(search) > -1)
+        this.filteredContextSchemeValueList.next(
+          contextSchemeValueList.filter(e => e.value.toLowerCase().indexOf(search) > -1)
         );
       });
-    this.filteredCtxSchemeValueList.next(ctxSchemeValues.slice());
+    this.filteredContextSchemeValueList.next(contextSchemeValueList.slice());
   }
 
   isDisabled() {
-    return (this.bizCtxValue.ctxSchemeValue === undefined || this.bizCtxValue.ctxSchemeValue === '');
+    return (this.businessContextValue.contextSchemeValue === undefined || this.businessContextValue.contextSchemeValue === '');
   }
 
   onCtxCategoryChange() {
-    this.bizCtxValue.ctxCategoryName = this.ctxCategory.name;
-    this.bizCtxValue.ctxSchemeId = undefined;
+    this.businessContextValue.contextCategoryName = this.contextCategory.name;
+    this.businessContextValue.contextSchemeId = undefined;
     this.resetCtxSchemes();
-    this.bizCtxValue.ctxSchemeValue = undefined;
+    this.businessContextValue.contextSchemeValue = undefined;
     this.resetCtxSchemeValues();
   }
 
   onCtxSchemeChange() {
-    this.bizCtxValue.ctxSchemeName = this.ctxScheme.schemeName;
-    this.bizCtxValue.ctxSchemeValue = undefined;
+    this.businessContextValue.contextSchemeName = this.contextScheme.schemeName;
+    this.businessContextValue.contextSchemeValue = undefined;
     this.resetCtxSchemeValues();
   }
 
   onCtxSchemeValueChange() {
-    this.bizCtxValue.ctxSchemeValue = this.ctxSchemeValue.value;
+    this.businessContextValue.contextSchemeValue = this.contextSchemeValue.value;
+    this.businessContextValue.contextSchemeValueMeaning = this.contextSchemeValue.meaning;
   }
 }

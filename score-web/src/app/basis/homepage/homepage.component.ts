@@ -7,17 +7,24 @@ import {Router} from '@angular/router';
 import {BieListService} from '../../bie-management/bie-list/domain/bie-list.service';
 import {BieList} from '../../bie-management/bie-list/domain/bie-list';
 import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service';
+import {OagisComponentTypes, UserExtensionGroup} from '../../cc-management/domain/core-component-node';
 import {StateProgressBarItem} from '../../common/state-progress-bar/state-progress-bar';
 import {AuthService} from '../../authentication/auth.service';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
-import {base64Encode, initFilter} from '../../common/utility';
+import {base64Encode, filter, initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {SummaryCcExt} from '../../cc-management/cc-list/domain/cc-list';
+import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseService} from '../../release-management/domain/release.service';
 
 export interface UserStatesItem {
   username: string;
-  Editing: number;
+  WIP: number;
+  Draft: number;
+  QA: number;
   Candidate: number;
+  Production: number;
+  ReleaseDraft: number;
   Published: number;
   total: number;
 }
@@ -33,6 +40,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfTotalBieByStates: StateProgressBarItem[];
   numberOfMyBieByStates: StateProgressBarItem[];
 
+  stateColorList = [{state: 'WIP', color: '#D32F2F'},
+    {state: 'Draft', color: '#7B1FA2'},
+    {state: 'QA', color: '#7B1FA2'},
+    {state: 'Candidate', color: '#303F9F'},
+    {state: 'Production', color: '#303F9F'},
+    {state: 'ReleaseDraft', color: '#689F38'},
+    {state: 'Published', color: '#388E3C'},
+    {state: 'Deleted', color: '#616161'}];
+
   numberOfBiesByUsersAndStates = new MatTableDataSource<UserStatesItem>();
   @ViewChild('numberOfBiesByUsersAndStatesPaginator', {static: false})
   numberOfBiesByUsersAndStatesPaginator: MatPaginator;
@@ -43,6 +59,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   numberOfBiesByUsers_usernameListFilterCtrl: FormControl = new FormControl();
   numberOfBiesByUsers_usernameFilteredList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   numberOfBiesByUsers_usernameModel: string[] = [];
+  releaseListFilterCtrl: FormControl = new FormControl();
+  releaseFilteredList: ReplaySubject<SimpleRelease[]> = new ReplaySubject<SimpleRelease[]>(1);
+  selectedRelease: SimpleRelease;
 
   isDeveloper: boolean;
 
@@ -73,9 +92,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   myExtensionsUnusedInBIEsSort: MatSort;
   /* End of User Extensions */
 
+  UEGValue = UserExtensionGroup.value;
+
   constructor(private bieService: BieListService,
               private ccService: CcListService,
               private authService: AuthService,
+              private releaseService: ReleaseService,
               private router: Router) {
   }
 
@@ -83,76 +105,83 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     const userToken = this.authService.getUserToken();
     this.isDeveloper = userToken.role === 'developer';
 
+    this.releaseService.getSimpleReleases().subscribe(resp => {
+      resp = [{state: '', releaseId: -1, releaseNum : 'All'}].concat(resp.filter(e => e.releaseNum !== 'Working'));
+      this.releaseListFilterCtrl.valueChanges
+        .subscribe(() => {
+          let search = this.releaseListFilterCtrl.value.releaseNum;
+          if (!search) {
+            this.releaseFilteredList.next(resp.slice());
+            return;
+          } else {
+            search = search.toLowerCase();
+          }
+          this.releaseFilteredList.next(
+            resp.filter(e => e.releaseNum.toLowerCase().indexOf(search) > -1)
+          );
+        });
+      this.releaseFilteredList.next(resp.slice());
+      const branch = loadBranch(userToken, 'CC');
+      if (branch) {
+        this.selectedRelease = resp[resp.findIndex(e => e.releaseId === branch)];
+      }
+      if (this.selectedRelease === undefined) {
+        this.selectedRelease = resp[resp.findIndex(e => e.releaseNum === 'All')];
+      }
+      this.initSummaryBIEs(userToken);
+      this.initSummaryUserExtensions(userToken);
+    });
+  }
+
+  onChangeRelease() {
+    const userToken = this.authService.getUserToken();
     this.initSummaryBIEs(userToken);
     this.initSummaryUserExtensions(userToken);
+    saveBranch(userToken, 'CC', this.selectedRelease.releaseId);
+    saveBranch(userToken, 'BIE', this.selectedRelease.releaseId);
   }
 
   initSummaryBIEs(userToken) {
-    this.bieService.getSummaryBieList().subscribe(summaryBieInfo => {
-      this.numberOfTotalBieByStates = [{
-        name: 'Editing',
-        value: summaryBieInfo.numberOfTotalBieByStates['Editing'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Editing'}]],
-        style: {
-          bg_color: '#fc2929',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Candidate',
-        value: summaryBieInfo.numberOfTotalBieByStates['Candidate'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Candidate'}]],
-        style: {
-          bg_color: '#cc317c',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Published',
-        value: summaryBieInfo.numberOfTotalBieByStates['Published'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Published'}]],
-        style: {
-          bg_color: '#84b6eb',
-          text_color: '#ffffff'
-        }
-      }];
-
-      this.numberOfMyBieByStates = [{
-        name: 'Editing',
-        value: summaryBieInfo.numberOfMyBieByStates['Editing'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Editing'}, {key: 'ownerLoginIds', value: userToken.username}]],
-        style: {
-          bg_color: '#fc2929',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Candidate',
-        value: summaryBieInfo.numberOfMyBieByStates['Candidate'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Candidate'}, {key: 'ownerLoginIds', value: userToken.username}]],
-        style: {
-          bg_color: '#cc317c',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Published',
-        value: summaryBieInfo.numberOfMyBieByStates['Published'] || 0,
-        href: ['/profile_bie', [{key: 'states', value: 'Published'}, {key: 'ownerLoginIds', value: userToken.username}]],
-        style: {
-          bg_color: '#84b6eb',
-          text_color: '#ffffff'
-        }
-      }];
+    const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
+    this.bieService.getSummaryBieList(this.selectedRelease.releaseId).subscribe(summaryBieInfo => {
+      this.numberOfTotalBieByStates = [];
+      this.numberOfMyBieByStates = [];
+      for (const item of this.stateColorList) {
+        this.numberOfTotalBieByStates.push({
+          name: item.state,
+          value: summaryBieInfo.numberOfTotalBieByStates[item.state] || 0,
+          href: ['/profile_bie', [{key: 'states', value: item.state}, releaseParam]],
+          disabled: this.selectedRelease.releaseId < 0,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+        this.numberOfMyBieByStates.push({
+          name: item.state,
+          value: summaryBieInfo.numberOfMyBieByStates[item.state] || 0,
+          href: ['/profile_bie', [{key: 'states', value: item.state}, {key: 'ownerLoginIds', value: userToken.username}, releaseParam]],
+          disabled: this.selectedRelease.releaseId < 0,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+      }
 
       const numberOfBiesByUsersAndStatesData = [];
       this.numberOfBiesByUsers_usernameList = [];
+      let data = {};
+      let total = 0;
       for (const username of this.keys(summaryBieInfo.bieByUsersAndStates)) {
-        numberOfBiesByUsersAndStatesData.push({
-          username,
-          Editing: summaryBieInfo.bieByUsersAndStates[username]['Editing'] || 0,
-          Candidate: summaryBieInfo.bieByUsersAndStates[username]['Candidate'] || 0,
-          Published: summaryBieInfo.bieByUsersAndStates[username]['Published'] || 0,
-          total: (summaryBieInfo.bieByUsersAndStates[username]['Editing'] || 0) +
-            (summaryBieInfo.bieByUsersAndStates[username]['Candidate'] || 0) +
-            (summaryBieInfo.bieByUsersAndStates[username]['Published'] || 0)
-        });
+        total = 0;
+        data = {username};
+        for (const item of this.stateColorList) {
+          data[item.state] = summaryBieInfo.bieByUsersAndStates[username][item.state] || 0;
+          total += data[item.state];
+        }
+        data['total'] = total;
+        numberOfBiesByUsersAndStatesData.push(data);
         this.numberOfBiesByUsers_usernameList.push(username);
       }
       this.numberOfBiesByUsersAndStates.data = numberOfBiesByUsersAndStatesData;
@@ -168,84 +197,58 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   initSummaryUserExtensions(userToken) {
-    this.ccService.getSummaryCcExtList().subscribe(summaryCcExtInfo => {
-      const releaseParam = {key: 'releaseId', value: 1};
+    this.ccService.getSummaryCcExtList(this.selectedRelease.releaseId).subscribe(summaryCcExtInfo => {
+      const releaseParam = {key: 'releaseId', value: this.selectedRelease.releaseId};
       const typeParam = {key: 'types', value: 'ACC'};
-      const componentTypeParam = {key: 'componentType', value: 'User Extension Group'};
+      const componentTypeParam = {key: 'componentTypes', value: UserExtensionGroup.value};
       const ownerLoginIdsParam = {key: 'ownerLoginIds', value: userToken.username};
-
-      this.numberOfTotalCcExtByStates = [{
-        name: 'Editing',
-        value: summaryCcExtInfo.numberOfTotalCcExtByStates['Editing'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Editing'}, releaseParam, typeParam, componentTypeParam]],
-        style: {
-          bg_color: '#fc2929',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Candidate',
-        value: summaryCcExtInfo.numberOfTotalCcExtByStates['Candidate'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Candidate'}, releaseParam, typeParam, componentTypeParam]],
-        style: {
-          bg_color: '#cc317c',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Published',
-        value: summaryCcExtInfo.numberOfTotalCcExtByStates['Published'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Published'}, releaseParam, typeParam, componentTypeParam]],
-        style: {
-          bg_color: '#84b6eb',
-          text_color: '#ffffff'
-        }
-      }];
-
-      this.numberOfMyCcExtByStates = [{
-        name: 'Editing',
-        value: summaryCcExtInfo.numberOfMyCcExtByStates['Editing'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Editing'}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
-        style: {
-          bg_color: '#fc2929',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Candidate',
-        value: summaryCcExtInfo.numberOfMyCcExtByStates['Candidate'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Candidate'}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
-        style: {
-          bg_color: '#cc317c',
-          text_color: '#ffffff'
-        }
-      }, {
-        name: 'Published',
-        value: summaryCcExtInfo.numberOfMyCcExtByStates['Published'] || 0,
-        href: ['/core_component', [{key: 'states', value: 'Published'}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
-        style: {
-          bg_color: '#84b6eb',
-          text_color: '#ffffff'
-        }
-      }];
+      this.numberOfTotalCcExtByStates = [];
+      this.numberOfMyCcExtByStates = [];
+      for (const item of this.stateColorList) {
+        this.numberOfTotalCcExtByStates.push({
+          name: item.state,
+          value: summaryCcExtInfo.numberOfTotalCcExtByStates[item.state] || 0,
+          href: ['/core_component', [{key: 'states', value: item.state} , releaseParam, typeParam, componentTypeParam]],
+          disabled: this.selectedRelease.releaseId < 0,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+        this.numberOfMyCcExtByStates.push({
+          name: item.state,
+          value: summaryCcExtInfo.numberOfMyCcExtByStates[item.state] || 0,
+          href: ['/core_component', [{key: 'states', value: item.state}, releaseParam, typeParam, componentTypeParam, ownerLoginIdsParam]],
+          disabled: this.selectedRelease.releaseId < 0,
+          style: {
+            bg_color: item.color,
+            text_color: '#ffffff'
+          }
+        });
+      }
 
       const numberOfCcExtsByUsersAndStatesData = [];
       this.numberOfCcExtsByUsers_usernameList = [];
+      let data = {};
+      let total = 0;
       for (const username of this.keys(summaryCcExtInfo.ccExtByUsersAndStates)) {
-        numberOfCcExtsByUsersAndStatesData.push({
-          username,
-          Editing: summaryCcExtInfo.ccExtByUsersAndStates[username]['Editing'] || 0,
-          Candidate: summaryCcExtInfo.ccExtByUsersAndStates[username]['Candidate'] || 0,
-          Published: summaryCcExtInfo.ccExtByUsersAndStates[username]['Published'] || 0,
-          total: (summaryCcExtInfo.ccExtByUsersAndStates[username]['Editing'] || 0) +
-            (summaryCcExtInfo.ccExtByUsersAndStates[username]['Candidate'] || 0) +
-            (summaryCcExtInfo.ccExtByUsersAndStates[username]['Published'] || 0)
-        });
+        total = 0;
+        data = {username};
+        for (const item of this.stateColorList) {
+          data[item.state] = summaryCcExtInfo.ccExtByUsersAndStates[username][item.state] || 0;
+          total += data[item.state];
+        }
+        data['total'] = total;
+        numberOfCcExtsByUsersAndStatesData.push(data);
         this.numberOfCcExtsByUsers_usernameList.push(username);
       }
+
       this.numberOfCcExtsByUsersAndStates.data = numberOfCcExtsByUsersAndStatesData;
 
       initFilter(
         this.numberOfCcExtsByUsers_usernameListFilterCtrl,
         this.numberOfCcExtsByUsers_usernameFilteredList,
-        this.numberOfCcExtsByUsers_usernameList
+        this.numberOfCcExtsByUsers_usernameList,
       );
 
       this.myExtensionsUnusedInBIEs.data = summaryCcExtInfo.myExtensionsUnusedInBIEs;

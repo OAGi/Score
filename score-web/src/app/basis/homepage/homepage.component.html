@@ -2,7 +2,7 @@
   <mat-tab-group>
     <mat-tab label="BIEs">
       <div class="row m-0">
-        <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="col-lg-5 col-md-12 col-sm-12">
           <div class="box total-bies-by-states">
             <div class="header">
               <p>Total BIEs by states</p>
@@ -12,7 +12,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="col-lg-5 col-md-12 col-sm-12">
           <div class="box my-bies-by-states">
             <div class="header">
               <p>My BIEs by states</p>
@@ -21,6 +21,19 @@
               <score-state-progress-bar [data]="numberOfMyBieByStates"></score-state-progress-bar>
             </div>
           </div>
+        </div>
+        <div class="col-lg-2 col-md-12 col-sm-12">
+          <mat-form-field>
+            <mat-label>Branch</mat-label>
+            <mat-select [(ngModel)]="selectedRelease" (ngModelChange)="onChangeRelease()">
+              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
+                {{ release.releaseNum }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -55,42 +68,50 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/profile_bie']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId}])}">
                       {{ element.username }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Editing">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Editing</th>
+                <ng-container matColumnDef="WIP">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> WIP</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/profile_bie']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Editing'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
-                      {{ element.Editing }}
+                       {key: 'states', value: 'WIP'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                      {{ element.WIP }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Candidate">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
+                <ng-container matColumnDef="QA">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> QA</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/profile_bie']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Candidate'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
-                      {{ element.Candidate }}
+                       {key: 'states', value: 'QA'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                      {{ element.QA }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Published">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Published</th>
+                <ng-container matColumnDef="Production">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Production</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/profile_bie']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Published'},
-                       {key: 'ownerLoginIds', value: element.username}]) }">
-                      {{ element.Published }}
+                       {key: 'states', value: 'Production'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
+                      {{ element.Production }}
                     </a>
                   </td>
                 </ng-container>
@@ -98,14 +119,16 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/profile_bie']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'ownerLoginIds', value: element.username}]) }">
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId}]) }">
                       {{ element.total }}
                     </a>
                   </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="['username', 'Editing', 'Candidate', 'Published', 'total']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['username', 'Editing', 'Candidate', 'Published', 'total'];"></tr>
+                <tr mat-header-row *matHeaderRowDef="['username', 'WIP', 'QA', 'Production', 'total']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'WIP', 'QA', 'Production', 'total'];"></tr>
               </table>
               <mat-paginator #numberOfBiesByUsersAndStatesPaginator
                              [hidden]="numberOfBiesByUsersAndStates.data.length <= 5"
@@ -127,18 +150,16 @@
                      matSortActive="lastUpdateTimestamp"
                      matSortDirection="desc"
                      [dataSource]="myRecentBIEs">
-
                 <ng-container matColumnDef="bieState">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
                   <td mat-cell *matCellDef="let element">
                     <span class="bie-state {{ element.state }}">{{ element.state }}</span>
                   </td>
                 </ng-container>
-
                 <ng-container matColumnDef="propertyTerm">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Property Term</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis" style="display: flex;">
+                    <div class="ellipsis d-flex">
                       <a routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
                       </a>
@@ -157,8 +178,11 @@
                   <td mat-cell *matCellDef="let element">
                     <mat-chip-list class="ellipsis" *ngIf="element.businessContexts.length > 0" selectable="false">
                       <a target="_blank" rel="noopener noreferrer" *ngIf="element.businessContexts.length > 0"
-                         href="/context_management/business_context/{{ element.businessContexts[0].bizCtxId }}">
-                        <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
+                         href="/context_management/business_context/{{ element.businessContexts[0].businessContextId }}">
+                        <mat-chip [matTooltip]="element.businessContexts[0].name"
+                                  [matTooltipDisabled]="element.businessContexts[0].name.length <= 30">
+                          {{ element.businessContexts[0].name | truncate: 30 }}
+                        </mat-chip>
                       </a>
                       <a target="_blank" rel="noopener noreferrer"
                          routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
@@ -186,7 +210,7 @@
 
     <mat-tab label="User Extensions">
       <div class="row m-0">
-        <div [classList]="isDeveloper ? 'col-lg-12 col-md-12 col-sm-12' : 'col-lg-6 col-md-12 col-sm-12'">
+        <div [classList]="isDeveloper ? 'col-lg-10 col-md-12 col-sm-12' : 'col-lg-5 col-md-12 col-sm-12'">
           <div class="box">
             <div class="header">
               <p>Total User Extensions by states</p>
@@ -196,7 +220,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12" *ngIf="!isDeveloper">
+        <div class="col-lg-5 col-md-12 col-sm-12" *ngIf="!isDeveloper">
           <div class="box">
             <div class="header">
               <p>My User Extensions by states</p>
@@ -205,6 +229,19 @@
               <score-state-progress-bar [data]="numberOfMyCcExtByStates"></score-state-progress-bar>
             </div>
           </div>
+        </div>
+        <div class="col-lg-2 col-md-12 col-sm-12">
+          <mat-form-field>
+            <mat-label>Branch</mat-label>
+            <mat-select [(ngModel)]="selectedRelease" (ngModelChange)="onChangeRelease()">
+              <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                     [placeholderLabel]="'Search...'"
+                                     [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+              <mat-option *ngFor="let release of releaseFilteredList | async" [value]="release">
+                {{ release.releaseNum }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -239,50 +276,70 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: '1'},
-                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                       {key: 'releaseId', value:  selectedRelease.releaseId},
+                       {key: 'types', value:  ['ACC']},
+                       {key: 'componentTypes', value: [UEGValue]}]) }">
                       {{ element.username }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Editing">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Editing</th>
+                <ng-container matColumnDef="WIP">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> WIP</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Editing'},
+                       {key: 'states', value: 'WIP'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: '1'},
-                       {key: 'componentType', value: 'User Extension Group'}]) }">
-                      {{ element.Editing }}
+                       {key: 'releaseId', value:  selectedRelease.releaseId},
+                       {key: 'types', value:  ['ACC']},
+                       {key: 'componentTypes', value: [UEGValue]}]) }">
+                      {{ element.WIP }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Candidate">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Candidate</th>
+                <ng-container matColumnDef="QA">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> QA</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Candidate'},
+                       {key: 'states', value: 'QA'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: '1'},
+                       {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
-                      {{ element.Candidate }}
+                      {{ element.QA }}
                     </a>
                   </td>
                 </ng-container>
-                <ng-container matColumnDef="Published">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Published</th>
+                <ng-container matColumnDef="Production">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Production</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
-                       {key: 'states', value: 'Published'},
+                       {key: 'states', value: 'Production'},
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: '1'},
+                       {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
-                      {{ element.Published }}
+                      {{ element.Production }}
+                    </a>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Deleted">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Deleted</th>
+                  <td mat-cell *matCellDef="let element">
+                    <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
+                       [queryParams]="{q: q([
+                       {key: 'states', value: 'Deleted'},
+                       {key: 'ownerLoginIds', value: element.username},
+                       {key: 'releaseId', value: selectedRelease.releaseId},
+                       {key: 'componentType', value: 'User Extension Group'}]) }">
+                      {{ element.Deleted }}
                     </a>
                   </td>
                 </ng-container>
@@ -290,16 +347,17 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Total</th>
                   <td mat-cell *matCellDef="let element">
                     <a [routerLink]="['/core_component']"
+                       [class.disabled]="selectedRelease.releaseId < 0"
                        [queryParams]="{q: q([
                        {key: 'ownerLoginIds', value: element.username},
-                       {key: 'releaseId', value: '1'},
+                       {key: 'releaseId', value:  selectedRelease.releaseId},
                        {key: 'componentType', value: 'User Extension Group'}]) }">
                       {{ element.total }}
                     </a>
                   </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="['username', 'Editing', 'Candidate', 'Published', 'total']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['username', 'Editing', 'Candidate', 'Published', 'total'];"></tr>
+                <tr mat-header-row *matHeaderRowDef="['username', 'WIP', 'QA', 'Production', 'Deleted','total']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['username', 'WIP', 'QA', 'Production', 'Deleted','total'];"></tr>
               </table>
               <mat-paginator #numberOfCcExtsByUsersAndStatesPaginator
                              [hidden]="numberOfCcExtsByUsersAndStates.data.length <= 5"
@@ -320,7 +378,6 @@
                      matSortActive="lastUpdateTimestamp"
                      matSortDirection="desc"
                      [dataSource]="myExtensionsUnusedInBIEs">
-
                 <ng-container matColumnDef="state">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
                   <td mat-cell *matCellDef="let element">
@@ -328,12 +385,11 @@
                     <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
                   </td>
                 </ng-container>
-
                 <ng-container matColumnDef="objectClassTerm">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> User Extension</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis" style="display: flex;">
-                      <a routerLink="{{ '/core_component/extension/' + 1 + '/' + element.accId }}">
+                    <div class="ellipsis d-flex">
+                      <a routerLink="{{ '/core_component/node/extension/'  + element.manifestId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.objectClassTerm }}</span>
                       </a>
                     </div>
@@ -358,7 +414,7 @@
                 <ng-container matColumnDef="topLevelBIE">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Top-Level BIE</th>
                   <td mat-cell *matCellDef="let element">
-                    <div class="ellipsis" style="display: flex;">
+                    <div class="ellipsis d-flex">
                       <a routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
                         <span class="den ellipsis" style="margin-right: 10px;">{{ element.propertyTerm }}</span>
                       </a>

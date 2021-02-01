@@ -10,7 +10,7 @@ describe('DisabledComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DisabledComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

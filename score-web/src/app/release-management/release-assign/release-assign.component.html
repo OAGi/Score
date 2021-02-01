@@ -1,0 +1,224 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="row action-group m-0">
+    <div class="col-3 title-wrap">
+      <span class="title">{{ releaseDetail.releaseNum }} Release Assignment </span>
+    </div>
+  </div>
+
+  <mat-card class="pt-2 pb-0">
+    <mat-card class="mb-2 search-box">
+      <mat-card-content class="mat-card-container">
+        <div class="container-fluid" style="padding: 0;">
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>DEN</mat-label>
+                <input matInput [(ngModel)]="filter.den"/>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="filter.type" multiple>
+                  <mat-option *ngFor="let type of typeList" [value]="type">
+                    <span>{{ type }}</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Owner</mat-label>
+                <mat-select [(ngModel)]="filter.owner"
+                            multiple>
+                  <ngx-mat-select-search [formControl]="loginIdListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching owner found.'">
+
+                  </ngx-mat-select-search>
+                  <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
+                    {{ loginId }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <div class="row d-flex">
+          <div class="col-md-3 col-sm-12 pb-md-0 pb-3">
+            <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+              <mat-icon>search</mat-icon>
+              Search
+            </button>
+          </div>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card-content>
+      <div class="row">
+        <div class="col-6">
+          <div class="drop-box">
+            <div class="drop-box-head">
+              <span class="drop-box-head-badge">
+                {{ count(itemsList.assignableList) }}
+              </span>
+              <span>
+                Modified
+              </span>
+              <span class="drop-box-head-icon">
+                <mat-icon matTooltip="Assign All"
+                          fontSet="fontawesome"
+                          fontIcon="fa-angle-double-right"
+                          class="pointer ml-2"
+                          (click)="assignAll()"></mat-icon>
+              </span>
+              <span class="drop-box-head-icon float-right">
+                <mat-icon matTooltip="Sort"
+                          fontSet="fontawesome"
+                          fontIcon="fa-sort"
+                          class="pointer"
+                          (click)="sortList(itemsList.assignableList)"></mat-icon>
+              </span>
+            </div>
+            <div class="drop-box-content"
+                 cdkDropList
+                 #assignableListAll="cdkDropList"
+                 [cdkDropListData]="itemsList.assignableList"
+                 [cdkDropListConnectedTo]="[assignedListAll]"
+                 (cdkDropListDropped)="drop($event)">
+              <div class="drop-box-item"
+                   [hidden]="!item.visible"
+                   [class]="item.state === 'Candidate'? 'drop-box-item': 'drop-box-item, disabled'"
+                   [cdkDragDisabled]="item.state !== 'Candidate'"
+                   *ngFor="let item of itemsList.assignableList" cdkDrag>
+                <div class="dragPlaceholder" *cdkDragPlaceholder></div>
+                <div class="head">
+                  <span class="item-type">
+                    <span class="chip">
+                      {{ item.type }}
+                    </span>
+                  </span>
+                  <span class="item-display-name">
+                    <a [routerLink]="[item.type === 'CODE_LIST' ? '' : '/core_component', item.type.toLowerCase(), item.manifestId]" target="_blank">
+                      {{ item.den }}
+                    </a>
+                  </span>
+                </div>
+                <div class="tail">
+                  <span class="item-owner">
+                    <span class="{{ item.state }} cc-state">{{ item.state | separate }}</span>
+                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
+                  </span>
+                  <span class="item-timestamp">
+                    {{ item.timestamp | dateAgo }}
+                  </span>
+                </div>
+                <div class="errors">
+                  <mat-error role="alert" class="item-error"
+                             *ngFor="let error of item.errors">
+                    <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
+                  </mat-error>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="drop-box">
+            <div class="drop-box-head">
+              <span class="drop-box-head-icon">
+                <mat-icon matTooltip="Unassign All"
+                          fontSet="fontawesome"
+                          fontIcon="fa-angle-double-left"
+                          class="pointer"
+                          (click)="unassignAll()"></mat-icon>
+              </span>
+              <span class="drop-box-head-badge ml-2">
+                {{ count(itemsList.assignedList) }}
+              </span>
+              <span>
+                Assign
+              </span>
+              <span class="drop-box-head-icon float-right">
+                <mat-icon matTooltip="Sort"
+                          fontSet="fontawesome"
+                          fontIcon="fa-sort"
+                          class="pointer"
+                          (click)="sortList(itemsList.assignedList)"></mat-icon>
+              </span>
+            </div>
+            <div class="drop-box-content"
+                 cdkDropList
+                 #assignedListAll="cdkDropList"
+                 [cdkDropListData]="itemsList.assignedList"
+                 [cdkDropListConnectedTo]="[assignableListAll]"
+                 (cdkDropListDropped)="drop($event)">
+              <div class="drop-box-item"
+                   *ngFor="let item of itemsList.assignedList" cdkDrag
+                   [class]="item.state === 'Candidate'? 'drop-box-item': 'drop-box-item, disabled'"
+                   [cdkDragDisabled]="item.state !== 'Candidate'"
+                   [hidden]="!item.visible">
+                <div class="dragPlaceholder" *cdkDragPlaceholder></div>
+                <div class="head">
+                  <span class="item-type">
+                    <span class="chip">
+                      {{ item.type }}
+                    </span>
+                  </span>
+                  <span class="item-display-name">
+                    <a [routerLink]="[item.type === 'CODE_LIST' ? '' : '/core_component', item.type.toLowerCase(), item.manifestId]" target="_blank">
+                      {{ item.den }}
+                    </a>
+                  </span>
+                </div>
+                <div class="tail">
+                  <span class="item-owner">
+                    <span class="{{ item.state }} cc-state">{{ item.state }}</span>
+                    &nbsp;Revision <b>{{ item.revision }}</b> owned by <b>{{ item.ownerUserId }}</b>
+                  </span>
+                  <span class="item-timestamp">
+                    {{ item.timestamp | dateAgo }}
+                  </span>
+                </div>
+                <div class="errors">
+                  <mat-error role="alert" class="item-error"
+                             *ngFor="let error of item.errors">
+                    <span class="message {{ error.level.toLowerCase() }}">[{{ error.level }}] {{ error.message }}</span>
+                  </mat-error>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="warn"
+                *ngIf="releaseDetail.state === 'Initialized'"
+                [disabled]="isValidated"
+                (click)="validate()">
+          Validate
+        </button>
+        <button mat-raised-button color="accent"
+                *ngIf="releaseDetail.state === 'Initialized'"
+                (click)="makeDraft()">
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

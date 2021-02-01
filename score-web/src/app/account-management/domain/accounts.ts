@@ -83,7 +83,8 @@ export class AccountList {
   password: string;
   name: string;
   organization: string;
-  developer: boolean;
   enabled: boolean;
+  developer: boolean;
   appOauth2UserId: number;
 }
+

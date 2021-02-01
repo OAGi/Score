@@ -1,29 +1,29 @@
 <div class="context-section">
-  <mat-card>
+  <mat-card class="pt-4 pb-2">
     <mat-card-header>
       <mat-card-title>{{ "BIE_COPY.TITLE" | translate }}</mat-card-title>
       <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
     </mat-card-header>
 
-    <mat-card class="search-box">
+    <mat-card class="mb-2 search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
-                  <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
+                <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
+                  <ngx-mat-select-search [formControl]="updaterUsernameListFilterCtrl"
                                          [placeholderLabel]="'Search...'"
                                          [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
-                  <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
+                  <mat-option *ngFor="let loginId of filteredUpdaterUsernameList | async" [value]="loginId">
                     {{loginId}}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end" [value]="request.updatedDate.start"
@@ -40,7 +40,7 @@
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start" [value]="request.updatedDate.end"
@@ -102,7 +102,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
             <td mat-cell *matCellDef="let element">
               <a target="_blank" rel="noopener noreferrer"
-                 href="/context_management/business_context/{{ element.bizCtxId }}">
+                 href="/context_management/business_context/{{ element.businessContextId }}">
                 <span>{{ element.name }}</span>
               </a>
               <div class="description ellipsis">{{ element.guid }}</div>
@@ -113,7 +113,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
+              <div class="description ellipsis">by <b>{{ element.lastUpdatedBy.username }}</b>
               </div>
             </td>
           </ng-container>
@@ -129,16 +129,19 @@
           showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" (click)="next()"
-              [hidden]="dataSource.data.length == 0"
-              [disabled]="this.selection.selected.length == 0">
-        <mat-icon matTooltip="Next">forward</mat-icon>
-      </button>
-    </mat-card-actions>
-
   </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="next()"
+                [hidden]="dataSource.data.length == 0"
+                [disabled]="this.selection.selected.length == 0">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 

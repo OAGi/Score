@@ -1,0 +1,218 @@
+:host ::ng-deep .mat-horizontal-stepper-header-container {
+  display: none;
+}
+
+:host ::ng-deep .mat-horizontal-content-container {
+  padding: 1px !important;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.mat-column-release {
+  width: 70px;
+}
+
+.mat-column-version, .mat-column-status {
+  width: 5%;
+}
+
+.mat-column-bizTerm, .mat-column-remark {
+  width: 10%;
+}
+
+.mat-column-state, .mat-column-owner {
+  width: 90px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.f12 {
+  font-size: 12px;
+}
+
+.mat-tree-node {
+  font-size: 13px;
+  min-height: 33px;
+  font-family: Roboto;
+  align-items: center;
+}
+
+.mat-tree-node .material-icons {
+  font-size: 20px;
+}
+
+.nav-button.mat-icon-button {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  outline: none;
+}
+
+.nav-button .mat-icon {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 16px;
+}
+
+.mat-tree-node .mat-icon-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  outline: none;
+}
+
+.mat-tree-node div {
+  height: 16px;
+}
+
+.mat-tree-node .abie, .mat-tree-node .asbiep, .mat-tree-node .asbiep-extension {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bbiep {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bbiep-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bbie_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .acc, .mat-tree-node .acc-group {
+  color: #bd2c00 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .asccp {
+  color: #4078c0 !important;
+  font-weight: bold !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bccp {
+  color: #006400 !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bccp-attribute {
+  color: #666 !important;
+  font-style: italic !important;
+  text-shadow: inherit !important;
+}
+
+.mat-tree-node .bdt_sc {
+  color: #bd2c00 !important;
+  text-shadow: inherit !important;
+}
+
+.buttons {
+  display: flex;
+  align-self: center;
+  padding-bottom: 0.5rem;
+}
+
+.tree-search-box .mat-form-field {
+  font-size: 12px;
+}
+
+.tree-search-box .mat-form-field-wrapper {
+  width: 16px;
+  padding-bottom: 0;
+}
+
+.tree-search-box .mat-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.tree-search-box .mat-icon-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  outline: none;
+  margin-right: 0.5rem;
+}
+
+section {
+  display: table;
+}
+
+.example-label {
+  display: table-cell;
+  font-size: 14px;
+  margin-left: 8px;
+  width: 120px;
+}
+
+.example-button-row {
+  display: table-cell;
+}
+
+.example-button-row .mat-button-base {
+  margin: 8px 8px 8px 0;
+}
+
+.example-flex-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.example-button-container {
+  display: flex;
+  justify-content: center;
+  width: 120px;
+}
+
+.bie-node-tree-panel-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.tree-node-uplift {
+  outline: none;
+  border: none;
+  -moz-outline-style: none;
+  cursor: pointer;
+}
+
+.tree-node-selected-uplift {
+  background-color: #a1d9ea;
+}
+
+.tree-node-unmatched-uplift {
+  background-color: #eab994;
+}
+
+.tree-node-matched-uplift {
+  background-color: #94ea83;
+}
+
+.nav-number {
+
+}
+

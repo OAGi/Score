@@ -2,6 +2,12 @@
   margin-left: 30px;
 }
 
+.search-progress-bar {
+  margin-left: 5px;
+  margin-top: 10px;
+  float: left;
+}
+
 .mat-tree-node {
   font-size: 13px;
   min-height: 33px;
@@ -21,6 +27,11 @@
 
 .mat-tree-node div {
   height: 16px;
+}
+
+.mat-tree-node span {
+  cursor: pointer;
+  padding-right: 10px;
 }
 
 .mat-tree-node .acc, .mat-tree-node .acc-group {
@@ -59,12 +70,11 @@
   position: sticky;
   position: -webkit-sticky;
   top: 10px;
-  margin-bottom: 24px;
 }
 
 .cc-node-header {
   display: block;
-  padding: 9px 10px 10px;
+  padding: 4px 10px 5px;
   margin: 0px;
   font-size: 14px;
   line-height: 17px;
@@ -86,38 +96,142 @@
   text-overflow: ellipsis;
 }
 
+.cc-node-title {
+  display: flex;
+  margin: 5px 0;
+}
+
+.comment.mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
 .cc-node-tree-panel {
-  margin-bottom: 24px;
+  margin-bottom: 4px;
+  padding: 8px;
+}
+
+.cc-node-tree-panel mat-card-content {
+  margin-bottom: 0;
+}
+
+.cc-node-detail-container {
+  padding: 1.25em;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 0;
+  background-color: white;
 }
 
 .cc-node-detail-container div.checkbox {
-  padding: 10px 0 20px 0;
-}
-
-.ngx-contextmenu a {
-  text-decoration: none;
-}
-
-.ngx-contextmenu .dropdown-menu {
-  padding: 0.25rem 0.8rem;
-}
-
-span.context-menu-item {
-  display: block;
-  font-size: 12px;
-  width: 92%;
-  outline: 0;
-  font-weight: 400;
-  border: solid 1px transparent;
-  line-height: 10px;
-  cursor: pointer;
+  padding-bottom: 1.25em;
 }
 
 .cc-node-detail-panel {
-  margin-bottom: 24px;
+  padding: 0 12px;
 }
 
 .left-panel, .right-panel {
   margin-bottom: 0;
-  overflow-y: scroll;
+}
+
+.external-link {
+  cursor: pointer;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.tree-search-box {
+}
+
+.tree-search-box .mat-form-field-wrapper {
+  padding: 0 !important;
+}
+
+.tree-search-box .buttons {
+  display: inline-flex;
+  align-items: baseline;
+  padding-top: 4px;
+}
+
+.tree-search-box .buttons button {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  outline: none;
+}
+
+.tree-search-box .options button {
+  font-size: 12px;
+  line-height: 36px;
+  margin: 6px 4px;
+}
+
+.tree-search-box button mat-icon {
+  font-size: 16px;
+  margin: 0;
+}
+
+.tree-search-box .mat-form-field {
+  font-size: 12px;
+}
+
+.tree-search-box .mat-form-field-wrapper {
+  width: 16px;
+  padding-bottom: 0;
+}
+
+.tree-search-box .mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  margin: 12px 4px;
+  cursor: pointer;
+}
+
+.ui.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ui.header .close {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.search-box-container {
+  padding: 0;
+}
+
+.dragHandle {
+  margin-left: auto;
+  cursor: grab;
+}
+
+.cdk-drag:not(.cdk-drag-disabled):active .dragHandle {
+  cursor: grabbing;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .mat-tree-node:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.dragPlaceholder {
+  background: #ccc;
+  border: dashed 2px #999;
+  min-height: 33px;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+button:focus, button:active:focus, button.active:focus {
+  outline: none !important;
+  outline-style: none !important;
 }

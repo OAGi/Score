@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ContextScheme, ContextSchemeListRequest} from '../domain/context-scheme';
 import {ContextSchemeService} from '../domain/context-scheme.service';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
@@ -13,11 +13,10 @@ import {AccountListService} from '../../../account-management/domain/account-lis
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-context-scheme',
@@ -28,7 +27,7 @@ export class ContextSchemeListComponent implements OnInit {
 
   title = 'Context Scheme';
   displayedColumns: string[] = [
-    'select', 'schemeName', 'ctxCategoryName', 'schemeId', 'schemeAgencyId',
+    'select', 'schemeName', 'contextCategoryName', 'schemeId', 'schemeAgencyId',
     'schemeVersionId', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<ContextScheme>();
@@ -46,6 +45,7 @@ export class ContextSchemeListComponent implements OnInit {
   constructor(private service: ContextSchemeService,
               private accountService: AccountListService,
               private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -121,7 +121,7 @@ export class ContextSchemeListComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: ContextScheme) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.ctxSchemeValues = [];
+        elm.contextSchemeValueList = [];
         return elm;
       });
       if (!isInit) {
@@ -148,41 +148,36 @@ export class ContextSchemeListComponent implements OnInit {
 
   select(row: ContextScheme) {
     if (!row.used) {
-      this.selection.select(row.ctxSchemeId);
+      this.selection.select(row.contextSchemeId);
     }
   }
 
   toggle(row: ContextScheme) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.ctxSchemeId);
+      this.selection.deselect(row.contextSchemeId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: ContextScheme) {
-    return this.selection.isSelected(row.ctxSchemeId);
+    return this.selection.isSelected(row.contextSchemeId);
   }
 
   discard() {
-    const ctxSchemeIds = this.selection.selected;
-
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
-    dialogConfig.data.header = 'Discard Context ' + (ctxSchemeIds.length > 1 ? 'Schemes' : 'Scheme') + '?';
+    const contextSchemeIds = this.selection.selected;
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Discard Context ' + (contextSchemeIds.length > 1 ? 'Schemes' : 'Scheme') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected context ' + (ctxSchemeIds.length > 1 ? 'schemes' : 'scheme') + '?',
-      'The context ' + (ctxSchemeIds.length > 1 ? 'schemes' : 'scheme') + ' will be permanently removed.'
+      'Are you sure you want to discard selected context ' + (contextSchemeIds.length > 1 ? 'schemes' : 'scheme') + '?',
+      'The context ' + (contextSchemeIds.length > 1 ? 'schemes' : 'scheme') + ' will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(...ctxSchemeIds).subscribe(_ => {
+          this.service.delete(...contextSchemeIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });

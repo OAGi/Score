@@ -6,6 +6,7 @@
   },
   "ACC_DETAIL": {
     "TITLE": "ACC (Component Type or Group Definition)",
+    "TITLE_CASE": "ACC (Component Type or Group Definition) Detail",
     "OBJECT": "Object Class Term (Space Separated Name)",
     "DEN": "DEN (Dictionary Entry Name)"
   },
@@ -16,30 +17,31 @@
     "DEN": "DEN (Dictionary Entry Name)"
   },
   "ASCC_DETAIL": {
-    "TITLE": "ASCC",
+    "TITLE": "ASCC (Component Association)",
     "TITLE_CASE": "ASCC (Component Association) Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN (Dictionary Entry Name)"
   },
   "BCC_DETAIL": {
-    "TITLE": "BCC ",
+    "TITLE": "BCC (Field Association)",
     "TITLE_CASE": "BCC (Field Association) Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN (Dictionary Entry Name)"
   },
   "BCCP_DETAIL": {
-    "TITLE": "BCCP ",
+    "TITLE": "BCCP (Associated Field)",
     "TITLE_CASE": "BCCP (Associated Field) Detail",
     "PROPERTY_TERM": "Property Term (Field Name)",
     "DEN": "DEN (Dictionary Entry Name)"
   },
   "DATA_TYPE_DETAIL": {
-    "TITLE": "Data Type ",
+    "TITLE": "Data Type",
+    "TITLE_CASE": "Data Type Detail",
     "DEN": "DEN (Dictionary Entry Name)"
   },
   "BDT_SC_DETAIL": {
-    "TITLE": "BDT_SC",
-    "TITLE_CASE": "Supplementary Component (Field Metadata)",
+    "TITLE": "Supplementary Component (Field Metadata)",
+    "TITLE_CASE": "Supplementary Component (Field Metadata) Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN (Dictionary Entry Name)"
   },
@@ -53,6 +55,9 @@
   },
   "BIE_COPY": {
     "TITLE": "Copy BIE (Profiled Component, Noun, BOD)"
+  },
+  "BIE_UPLIFT": {
+    "TITLE": "Uplift BIE (Profiled Component, Noun, BOD)"
   },
   "BIE_CREATE": {
     "TITLE": "Create BIE (Profiled Component, Noun, BOD)"
@@ -72,6 +77,7 @@
     "CREATE": "Profile a Component, Noun, BOD",
     "VIEW": "List of Profiled Components, Nouns, BODs",
     "COPY": "Copy a Profiled Component, Noun, BOD",
+    "UPLIFT": "Uplift a Profiled Component, Noun, BOD",
     "GENERATE": "Generate Expression for a Profiled Component, Noun, BOD"
   },
   "CC_NAV": {

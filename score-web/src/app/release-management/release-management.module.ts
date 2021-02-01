@@ -1,11 +1,17 @@
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {ScoreCommonModule} from '../common/score-common.module';
+import {ReleaseAssignComponent} from './release-assign/release-assign.component';
+import {ReleaseDetailComponent} from './release-detail/release-detail.component';
 import {ReleaseListComponent} from './release-list/release-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
+import {ContextMenuModule} from 'ngx-contextmenu';
 import {AuthService} from '../authentication/auth.service';
 import {ReleaseService} from './domain/release.service';
+import {ReleaseCreateComponent} from './release-create/release-create.component';
 
 const routes: Routes = [
   {
@@ -15,6 +21,21 @@ const routes: Routes = [
         path: '',
         component: ReleaseListComponent,
         canActivate: [AuthService],
+      }, {
+        path: 'create',
+        component: ReleaseCreateComponent,
+        canActivate: [AuthService],
+      }, {
+        path: ':id',
+        children: [{
+          path: '',
+          component: ReleaseDetailComponent,
+          canActivate: [AuthService],
+        }, {
+          path: 'assign',
+          component: ReleaseAssignComponent,
+          canActivate: [AuthService],
+        }]
       }
     ]
   }
@@ -26,10 +47,16 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    CommonModule
+    ContextMenuModule,
+    CommonModule,
+    DragDropModule,
+    ScoreCommonModule
   ],
   declarations: [
-    ReleaseListComponent
+    ReleaseListComponent,
+    ReleaseCreateComponent,
+    ReleaseDetailComponent,
+    ReleaseAssignComponent
   ],
   providers: [
     ReleaseService

@@ -11,6 +11,7 @@ import {BieExpressComponent} from './bie-express.component';
 import {BieExpressService} from './domain/bie-express.service';
 import {MetaHeaderDialogComponent} from './meta-header-dialog/meta-header-dialog.component';
 import {PaginationResponseDialogComponent} from './pagination-response-dialog/pagination-response-dialog.component';
+import {ScoreCommonModule} from '../../common/score-common.module';
 
 
 const routes: Routes = [
@@ -31,7 +32,8 @@ const routes: Routes = [
       useBootstrap4: true,
     }),
     TranslateModule,
-    CommonModule
+    CommonModule,
+    ScoreCommonModule,
   ],
   declarations: [
     BieExpressComponent,

@@ -17,7 +17,7 @@ import {finalize} from 'rxjs/operators';
 })
 export class AccountListComponent implements OnInit {
 
-  title = 'Account';
+  title = 'Accounts';
   displayedColumns: string[] = [
     'loginId', 'role', 'name', 'organization', 'status'
   ];
@@ -50,7 +50,7 @@ export class AccountListComponent implements OnInit {
       this.paginator.pageIndex = 0;
       this.onChange();
     });
-
+    this.loading = true;
     this.loadAccounts(true);
   }
 
@@ -68,7 +68,6 @@ export class AccountListComponent implements OnInit {
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
 
-    this.loading = true;
     this.service.getAccountsList(this.request).pipe(
       finalize(() => {
         this.loading = false;

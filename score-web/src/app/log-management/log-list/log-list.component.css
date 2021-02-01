@@ -1,0 +1,49 @@
+.Added, .Restored {
+  color: darkgreen;
+}
+
+.Modified {
+  color: cornflowerblue;
+}
+
+.Deleted {
+  color: sienna;
+}
+
+.Revised {
+  color: #006400;
+}
+
+.Canceled {
+  color: #bd2c00;
+}
+
+.before {
+  color: sienna;
+  text-decoration: line-through;
+}
+
+.after {
+  color: darkgreen;
+}
+
+.min-height500 {
+  min-height: 500px;
+}
+
+.mat-column-check {
+  width: 100px;
+}
+
+.mat-column-commit {
+  width: 150px;
+}
+
+.mat-column-revisionNum {
+  width: 100px;
+}
+
+.mat-column-revisionAction {
+  width: 10%;
+}
+

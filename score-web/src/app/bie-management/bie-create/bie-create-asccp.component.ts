@@ -2,10 +2,10 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from './domain/bie-create-list';
 import {BieCreateService} from './domain/bie-create.service';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {finalize, switchMap} from 'rxjs/operators';
@@ -17,11 +17,13 @@ import {CcListService} from '../../cc-management/cc-list/domain/cc-list.service'
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {WorkingRelease} from '../../release-management/domain/release';
 import {FormControl} from '@angular/forms';
 import {forkJoin, ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter} from '../../common/utility';
+import {base64Decode, initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
-import {HttpParams} from "@angular/common/http";
+import {HttpParams} from '@angular/common/http';
+import {AuthService} from '../../authentication/auth.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -39,14 +41,15 @@ export class BieCreateAsccpComponent implements OnInit {
   title = 'Create BIE';
   subtitle = 'Select Top-Level Concept';
 
-  bizCtxIds: number[] = [];
-  bizCtxList: BusinessContext[] = [];
+  businessContextIdList: number[] = [];
+  businessContextList: BusinessContext[] = [];
   releaseId: number;
   releases: Release[] = [];
 
   displayedColumns: string[] = [
-    'select', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
+    'select', 'type', 'state', 'den', 'revision', 'owner', 'module', 'lastUpdateTimestamp'
   ];
+  stateList = ['Published'];
   dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(false, []);
   expandedElement: CcList | null;
@@ -59,6 +62,8 @@ export class BieCreateAsccpComponent implements OnInit {
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: CcListRequest;
 
+  workingRelease = WorkingRelease;
+
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -67,6 +72,7 @@ export class BieCreateAsccpComponent implements OnInit {
               private ccListService: CcListService,
               private accountService: AccountListService,
               private service: BieCreateService,
+              private auth: AuthService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -76,9 +82,10 @@ export class BieCreateAsccpComponent implements OnInit {
   ngOnInit() {
     // Init ASCCP table
     this.request = new CcListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('den', 'asc', 0, 10));
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.types = ['ASCCP'];
     this.request.states = ['Published'];
+    this.request.isBIEUsable = true;
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -103,28 +110,42 @@ export class BieCreateAsccpComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
 
-      this.releases.push(...releases);
+      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       if (this.releases.length > 0) {
-        this.releaseId = this.releases[0].releaseId;
-      }
-
-      // Load Business Contexts
-      this.route.queryParamMap.pipe(
-        switchMap((params: ParamMap) => {
-          let bizCtxIds = params.get('bizCtxIds');
-          if (!bizCtxIds) {
-            const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
-            const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-            bizCtxIds = httpParams.get('bizCtxIds');
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
+        if (savedReleaseId) {
+          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+          if (!this.request.release) {
+            this.request.release = this.releases[0];
+            saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
           }
-          return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e)));
-        })).subscribe((resp: PageResponse<BusinessContext>) => {
-        this.bizCtxIds = resp.list.map(e => e.bizCtxId);
-        this.bizCtxList = resp.list;
-        this.loadData(true);
-      }, err => {
-        console.error(err);
-      });
+        } else {
+          this.request.release = this.releases[0];
+        }
+        this.releaseId = this.request.release.releaseId;
+
+        // Load Business Contexts
+        this.route.queryParamMap.pipe(
+          switchMap((params: ParamMap) => {
+            let businessContextIdList = params.get('businessContextIdList');
+            if (!businessContextIdList) {
+              const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
+              const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
+              businessContextIdList = httpParams.get('businessContextIdList');
+            }
+            return this.bizCtxService.getBusinessContextsByBizCtxIds(businessContextIdList.split(',').map(e => Number(e)));
+          })).subscribe((resp: PageResponse<BusinessContext>) => {
+          if (resp.length === 0) {
+            this.router.navigateByUrl('/profile_bie/create');
+          } else {
+            this.businessContextIdList = resp.list.map(e => e.businessContextId);
+            this.businessContextList = resp.list;
+            this.loadData(true);
+          }
+        }, err => {
+          console.error(err);
+        });
+      }
     });
   }
 
@@ -154,15 +175,18 @@ export class BieCreateAsccpComponent implements OnInit {
     }
   }
 
-  onChange(isInit?: boolean) {
+  onChange(property?: string, source?) {
+    if (property === 'branch') {
+      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
+    }
+
     this.paginator.pageIndex = 0;
-    this.loadData(isInit);
+    this.loadData();
   }
 
   loadData(isInit?: boolean) {
     this.loading = true;
 
-    this.request.releaseId = this.releaseId;
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
@@ -173,6 +197,7 @@ export class BieCreateAsccpComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
+      this.paginator.pageIndex = resp.page;
 
       const list = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
@@ -192,7 +217,7 @@ export class BieCreateAsccpComponent implements OnInit {
       this.dataSource.data = list;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery({
-          bizCtxIds: this.bizCtxIds.map(e => '' + e).join(',')
+          businessContextIdList: this.businessContextIdList.map(e => '' + e).join(',')
         }));
       }
     }, error => {
@@ -221,15 +246,15 @@ export class BieCreateAsccpComponent implements OnInit {
   }
 
   create() {
-    const asccpId: number = this.selection.selected[0].id;
-    this.service.create(asccpId, this.releaseId, this.bizCtxIds)
+    const asccpManifestId: number = this.selection.selected[0].manifestId;
+    this.service.create(asccpManifestId, this.businessContextIdList)
       .subscribe(resp => {
-      this.snackBar.open('Created', '', {
-        duration: 3000,
-      });
+        this.snackBar.open('Created', '', {
+          duration: 3000,
+        });
 
-      this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);
-    });
+        this.router.navigateByUrl('/profile_bie/edit/' + resp['topLevelAsbiepId']);
+      });
   }
 
 }

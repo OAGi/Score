@@ -1,9 +1,19 @@
 <div class="context-section">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ title }}</span>
+      <span class="flex-11-auto"></span>
+      <button mat-raised-button class="ml-2" color="primary" routerLink="create">
+        New Business Context
+      </button>
+      <button mat-raised-button class="ml-2" color="warn" (click)="discard()"
+              [disabled]="selection.selected.length === 0">
+        Discard
+      </button>
+    </mat-toolbar>
+  </div>
 
+  <mat-card class="pt-3">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
@@ -11,7 +21,7 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Updater</mat-label>
-                <mat-select [(ngModel)]="request.updaterLoginIds" multiple>
+                <mat-select [(ngModel)]="request.updaterUsernameList" multiple>
                   <ngx-mat-select-search [formControl]="updaterIdListFilterCtrl"
                                          [placeholderLabel]="'Search...'"
                                          [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
@@ -22,7 +32,7 @@
               </mat-form-field>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end" [value]="request.updatedDate.start"
@@ -39,7 +49,7 @@
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start" [value]="request.updatedDate.end"
@@ -102,7 +112,7 @@
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name</th>
             <td mat-cell *matCellDef="let element">
-              <a routerLink="{{ element.bizCtxId }}">
+              <a routerLink="{{ element.businessContextId }}">
                 <span>{{ element.name }}</span>
                 <div class="description ellipsis">
                   {{ element.guid }}
@@ -115,7 +125,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
+              <div class="description ellipsis">by <b>{{ element.lastUpdatedBy.username }}</b>
               </div>
             </td>
           </ng-container>
@@ -131,16 +141,5 @@
           showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" routerLink="create">
-        <mat-icon matTooltip="Create Business Context">create</mat-icon>
-      </button>
-
-      <button mat-mini-fab color="warn" (click)="discard()"
-              [disabled]="selection.selected.length === 0">
-        <mat-icon matTooltip="Discard">delete</mat-icon>
-      </button>
-    </mat-card-actions>
   </mat-card>
 </div>

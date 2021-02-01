@@ -3,8 +3,7 @@
     <mat-card-header>
       <mat-card-title>{{ title }}</mat-card-title>
     </mat-card-header>
-
-    <mat-card style="margin-bottom: 24px;">
+    <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Old password</mat-label>
@@ -34,12 +33,16 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" (click)="update()"
-              [disabled]="isDisabled()">
-        <mat-icon matTooltip="Update">save</mat-icon>
-      </button>
-    </mat-card-actions>
   </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="update()"
+                [disabled]="isDisabled()">
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

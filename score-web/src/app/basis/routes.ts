@@ -1,4 +1,5 @@
 import {Routes} from '@angular/router';
+import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
 
 import {HomepageComponent} from './homepage/homepage.component';
 import {LoginComponent} from './login/login.component';
@@ -7,8 +8,6 @@ import {NotFoundComponent} from './not-found/not-found.component';
 import {AuthService} from '../authentication/auth.service';
 import {environment} from '../../environments/environment';
 import {PendingActivate, PendingComponent} from './pending/pending.component';
-import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
-
 
 export const SCORE_WEBAPP_ROUTES: Routes = [
   {

@@ -15,7 +15,7 @@ export class ContextSchemeValueDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<ContextSchemeValueDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public contextSchemeValue: ContextSchemeValue
-    ) {
+  ) {
   }
 
   onNoClick(): void {
@@ -32,6 +32,6 @@ export class ContextSchemeValueDialogComponent implements OnInit {
   }
 
   isDisabled() {
-    return false;
+    return !this.contextSchemeValue.value;
   }
 }

@@ -6,22 +6,23 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {BccpCreateComponent} from '../bccp-create/bccp-create.component';
 import {TranslateModule} from '@ngx-translate/core';
+import {ContextMenuModule} from 'ngx-contextmenu';
+import {ScoreCommonModule} from '../../common/score-common.module';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import {AngularSplitModule} from 'angular-split';
+import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
+import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
+import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 
 const routes: Routes = [
   {
     path: 'core_component/bccp',
     children: [
       {
-        path: ':releaseId/:bccpId',
+        path: ':manifestId',
         component: BccpDetailComponent,
         canActivate: [AuthService],
-      },
-      {
-        path: 'create',
-        component: BccpCreateComponent,
-        canActivate: [AuthService]
       }
     ]
   }
@@ -35,10 +36,15 @@ const routes: Routes = [
     MaterialModule,
     MatInputModule,
     TranslateModule,
-    CommonModule
+    CommonModule,
+    ContextMenuModule,
+    ScoreCommonModule,
+    SearchOptionsDialogModule,
+    DragDropModule,
+    AngularSplitModule
   ],
   declarations: [
-    BccpDetailComponent
+    BccpDetailComponent,
   ]
 })
 export class BccpDetailModule {

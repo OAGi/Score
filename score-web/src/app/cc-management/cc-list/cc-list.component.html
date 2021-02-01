@@ -1,20 +1,108 @@
 <div class="context-section">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ "CORE_COMPONENT_LIST.TITLE" | translate }}</mat-card-title>
-    </mat-card-header>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{title}}</span>
+      <span class="flex-11-auto"></span>
+      <button mat-icon-button class="ml-2" matTooltip="Create Component"
+              *ngIf="hasCreatePermission()"
+              (click)="onCreateContextMenu($event)">
+        <mat-icon>add</mat-icon>
+      </button>
 
+      <button mat-icon-button class="ml-2" matTooltip="Move to WIP"
+              [hidden]="!canToolbarAction('WIP')"
+              (click)="multipleUpdate('WIP')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to Draft"
+              [hidden]="!canToolbarAction('Draft')"
+              (click)="multipleUpdate('Draft')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to QA"
+              [hidden]="!canToolbarAction('QA')"
+              (click)="multipleUpdate('QA')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to Candidate"
+              [hidden]="!canToolbarAction('Candidate')"
+              (click)="multipleUpdate('Candidate')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Move to Production"
+              [hidden]="!canToolbarAction('Production')"
+              (click)="multipleUpdate('Production')">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button mat-icon-button class="ml-2" matTooltip="Back to WIP"
+              [hidden]="!canToolbarAction('BackWIP')"
+              (click)="multipleUpdate('WIP')">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <button mat-icon-button class="ml-2" matTooltip="Delete"
+              [hidden]="!canToolbarAction('Delete')"
+              (click)="multipleUpdate('Delete')">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Restore"
+              [hidden]="!canToolbarAction('Restore')"
+              (click)="multipleUpdate('Restore')">
+        <mat-icon>restore_from_trash</mat-icon>
+      </button>
+      <button mat-icon-button class="ml-2" matTooltip="Transfer Ownership"
+              [hidden]="!canToolbarAction('Transfer')"
+              (click)="openTransferDialogMultiple()">
+        <mat-icon>swap_horiz</mat-icon>
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <context-menu #createContextMenu>
+    <ng-template contextMenuItem (execute)="createAcc()">
+      <span class="context-menu-item">ACC</span>
+    </ng-template>
+    <ng-template contextMenuItem (execute)="createAsccp('Default')">
+      <span class="context-menu-item">ASCCP</span>
+    </ng-template>
+    <ng-template contextMenuItem (execute)="createBccp()">
+      <span class="context-menu-item">BCCP</span>
+    </ng-template>
+    <ng-template contextMenuItem [divider]="true" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
+    </ng-template>
+    <ng-template contextMenuItem (execute)="createBOD()" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
+      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi BOD Component</span>
+    </ng-template>
+    <ng-template contextMenuItem (execute)="createAsccp('Verb')" *ngIf="request.release.releaseNum === workingRelease.releaseNum">
+      <span class="context-menu-item"><mat-icon fontSet="fontawesome" fontIcon="fa-flask" style="padding-right: 10px;"></mat-icon> Create OAGi Verb Component</span>
+    </ng-template>
+  </context-menu>
+
+  <mat-card class="pt-3">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
-
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <mat-label>Release</mat-label>
-                <mat-select [(ngModel)]="request.releaseId" required>
-                  <mat-option *ngFor="let release of releases" [value]="release.releaseId">
-                    {{release.releaseNum}}
+                <mat-label>Branch</mat-label>
+                <mat-select [(ngModel)]="request.release" (ngModelChange)="onChange('branch', request.release)">
+                  <mat-select-trigger class="d-flex">
+                    <span>{{ request.release.releaseNum }}</span>
+                    <span class="f12 ml-auto {{request.release.state}}"
+                          *ngIf="request.release.releaseNum !== workingRelease.releaseNum">
+                      {{ request.release.state | separate }}
+                    </span>
+                  </mat-select-trigger>
+                  <mat-option *ngFor="let release of releases" [value]="release">
+                    <div class="d-flex">
+                      <span class="release-num">{{release.releaseNum}}</span>
+                      <span class="f12 ml-auto {{release.state}}"
+                            *ngIf="release.releaseNum !== workingRelease.releaseNum">
+                        {{ release.state | separate }}
+                      </span>
+                    </div>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -23,9 +111,9 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Type</mat-label>
-                <mat-select [(ngModel)]="request.types" multiple>
+                <mat-select [(ngModel)]="request.types" class="text-uppercase" multiple>
                   <mat-option *ngFor="let type of typeList" [value]="type">
-                    {{type}}
+                    <span class="text-uppercase">{{ type }}</span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -34,17 +122,25 @@
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>State</mat-label>
-                <mat-select [(ngModel)]="request.states" multiple>
-                  <mat-option *ngFor="let state of stateList" [value]="state">
-                    {{state}}
+                <mat-select *ngIf="request.release.releaseId === workingRelease.releaseId" [(ngModel)]="request.states"
+                            floatlLabel="never" multiple>
+                  <mat-option *ngFor="let state of workingStateList" [value]="state">
+                    <span>{{ state | separate }}</span>
+                  </mat-option>
+                </mat-select>
+                <mat-select *ngIf="request.release.releaseId !== workingRelease.releaseId" [(ngModel)]="request.states"
+                            floatlLabel="never" multiple>
+                  <mat-option *ngFor="let state of releaseStateList" [value]="state">
+                    <span>{{ state | separate }}</span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
+
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Deprecated</mat-label>
-                <mat-select [(ngModel)]="request.deprecated">
+                <mat-select [(ngModel)]="request.deprecated" multiple>
                   <mat-option [value]="true">
                     True
                   </mat-option>
@@ -68,7 +164,7 @@
                                          [placeholderLabel]="'Search...'"
                                          [noEntriesFoundLabel]="'No matching owner found.'"></ngx-mat-select-search>
                   <mat-option *ngFor="let loginId of filteredLoginIdList | async" [value]="loginId">
-                    {{loginId}}
+                    <span>{{ loginId }}</span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -82,13 +178,13 @@
                                          [placeholderLabel]="'Search...'"
                                          [noEntriesFoundLabel]="'No matching updater found.'"></ngx-mat-select-search>
                   <mat-option *ngFor="let loginId of filteredUpdaterIdList | async" [value]="loginId">
-                  {{loginId}}
+                    <span>{{ loginId }}</span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end" [value]="request.updatedDate.start"
@@ -105,7 +201,7 @@
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start" [value]="request.updatedDate.end"
@@ -128,7 +224,8 @@
           <div class="row">
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.den" (keyup.enter)="onChange()" placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
+                <input matInput [(ngModel)]="request.filters.den" (keyup.enter)="onChange()"
+                       placeholder="{{'CORE_COMPONENT_LIST.DEN' | translate}}">
               </mat-form-field>
             </div>
 
@@ -141,14 +238,15 @@
 
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
-                <input matInput [(ngModel)]="request.filters.module" (keyup.enter)="onChange()" placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
+                <input matInput [(ngModel)]="request.filters.module" (keyup.enter)="onChange()"
+                       placeholder="{{'CORE_COMPONENT_LIST.MODULE' | translate}}">
               </mat-form-field>
             </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Component Type</mat-label>
-                <mat-select [(ngModel)]="request.componentType" multiple>
-                  <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType.name">
+                <mat-select [(ngModel)]="request.componentTypes" multiple>
+                  <mat-option *ngFor="let componentType of componentTypeList" [value]="componentType">
                     {{componentType.name}}
                   </mat-option>
                 </mat-select>
@@ -158,10 +256,14 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="onChange()">
-          <mat-icon>search</mat-icon>
-          Search
-        </button>
+        <div class="row d-flex">
+          <div class="col-md-3 col-sm-12 pb-md-0 pb-3">
+            <button mat-raised-button color="primary" type="submit" (click)="onChange()">
+              <mat-icon>search</mat-icon>
+              Search
+            </button>
+          </div>
+        </div>
       </mat-card-actions>
     </mat-card>
 
@@ -173,10 +275,29 @@
       <div class="mat-elevation-z1">
         <table mat-table multiTemplateDataRows
                matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
-               [dataSource]="data">
+               [dataSource]="dataSource">
+
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            [disabled]="row.type === 'ASCC' || row.type === 'BCC'"
+                            matTooltip="This component cannot be modified."
+                            [matTooltipDisabled]="row.state === 'WIP'"
+                            (change)="$event ? toggle(row) : null"
+                            [checked]="isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
 
           <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef> Type</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Type</th>
             <td mat-cell *matCellDef="let element">
               <mat-chip-list [ngSwitch]="element.type">
                 <mat-chip *ngSwitchDefault>{{ element.type }}</mat-chip>
@@ -187,7 +308,7 @@
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> State</th>
             <td mat-cell *matCellDef="let element">
-              <span class="cc-state {{ element.state }}">{{ element.state }}</span>
+              <span class="cc-state {{ element.state }}">{{ element.state | separate }}</span>
               <span *ngIf="element.deprecated" class="cc-state Deprecated">Deprecated</span>
             </td>
           </ng-container>
@@ -195,32 +316,24 @@
           <ng-container matColumnDef="den">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> DEN</th>
             <td mat-cell *matCellDef="let element">
-              <div class="ellipsis" style="display: flex;"
-                   *ngIf="(element.state === 'Editing' && element.owner === currentUser) || element.state !== 'Editing'">
-                <a routerLink="{{ getRouterLink(element) }}">
-                  <span class="den ellipsis" style="margin-right: 10px;">{{ element.den }}</span>
-                </a>
-              </div>
-              <div class="ellipsis" style="display: flex;"
-                   *ngIf="element.state == 'Editing' && element.owner !== currentUser"
-                   matTooltip="This core component only can access by an owner.">
-                  <span class="den ellipsis" style="margin-right: 10px;">{{ element.den }}</span>
+              <div class="den ellipsis" style="margin-right: 10px;">
+                <span class="pointer" (click)="openDetail(element, $event);">{{ element.den }}</span>
               </div>
               <div class="description ellipsis">{{ element.guid }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="revision">
-            <th mat-header-cell *matHeaderCellDef> Revision</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Revision</th>
             <td mat-cell *matCellDef="let element">
               <span>{{ element.revision }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="owner">
-            <th mat-header-cell *matHeaderCellDef> Owner</th>
-            <td mat-cell *matCellDef="let element">
-              <span>{{ element.owner }}</span>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Owner</th>
+            <td mat-cell *matCellDef="let element" class="ellipsis">
+              <span matTooltip="{{ element.owner }}">{{ element.owner }}</span>
             </td>
           </ng-container>
 
@@ -228,15 +341,15 @@
             <th mat-header-cell *matHeaderCellDef style="width: 40px;"></th>
             <td mat-cell *matCellDef="let element">
               <button mat-icon-button
-                      *ngIf="isEditable(element)"
-                      (click)="openTransferDialog(element.id, $event)">
+                      *ngIf="isEditable(element) && !isAssociation(element)"
+                      (click)="openTransferDialog(element, $event)">
                 <mat-icon>swap_horiz</mat-icon>
               </button>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="module">
-            <th mat-header-cell *matHeaderCellDef> Module</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Module</th>
             <td mat-cell *matCellDef="let element">
               <span>{{ element.module }}</span>
             </td>
@@ -251,33 +364,17 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="more">
-            <th mat-header-cell *matHeaderCellDef>
-            </th>
-            <td mat-cell *matCellDef="let element">
-              <button mat-icon-button
-                      [contextMenu]="contextMenu" [contextMenuSubject]="element"
-                      (click)="onContextMenu($event, element)">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="expandedDetail">
             <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
               <div class="element-detail"
-                   *ngIf="element.definitionSource && element.definition"
                    [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                <div *ngIf="element.definition !== null" style="width: 100%; border: 0; padding-right: 24px;">
-                  <mat-card style="margin-bottom: 12px;">
-                    <mat-card-header *ngIf="element.definitionSource !== null"
-                                     style="background-color: #f5f5f5; margin-bottom: 12px;">
-                      <mat-card-subtitle
-                        style="margin: 8px 0 8px; font-size: 12px;">{{ element.definitionSource }}</mat-card-subtitle>
+                <div class="element-detail-wrapper">
+                  <mat-card class="mb-2">
+                    <mat-card-header class="element-detail-header">
+                      <mat-card-subtitle class="element-detail-subtitle">{{ element.definitionSource }}</mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content>
-                      <p [innerHTML]="element.definition" style="color: #545454; margin-bottom: 0px; font-size: 12px;"
-                         *ngIf="element.definition !== null"></p>
+                      <p [innerHTML]="element.definition" class="element-detail-content"></p>
                     </mat-card-content>
                   </mat-card>
                 </div>
@@ -288,8 +385,9 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
               [class.expanded-row]="expandedElement === element"
-              (click)="expandedElement = expandedElement === element ? null : element"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+              (click)="expandedElement = expandedElement === element ? null : element; toggle(element);"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+              (click)="toggle(row);"></tr>
         </table>
 
         <mat-paginator
@@ -298,11 +396,5 @@
           showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>
-
-    <context-menu #contextMenu>
-      <ng-template contextMenuItem (execute)="openTransferDialog($event.item.id, $event)">
-        <span class="context-menu-item">Transfer Ownership</span>
-      </ng-template>
-    </context-menu>
   </mat-card>
 </div>

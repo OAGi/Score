@@ -13,12 +13,31 @@ export class CodeListValueDialogComponent implements OnInit {
   _hashCode;
   isAddAction;
   actionName;
+  codeListValue: CodeListValue;
+  lastRevisionValue: CodeListValue;
+  isEditable = false;
 
   constructor(
     public dialogRef: MatDialogRef<CodeListValueDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public codeListValue: CodeListValue) {
+    @Inject(MAT_DIALOG_DATA) public data: any) {
 
-    this._hashCode = hashCode(codeListValue);
+    this.codeListValue = data.codeListValue;
+    this.lastRevisionValue = data.lastRevisionValue;
+    this.isEditable = data.isEditable;
+
+    this._hashCode = hashCode(this.codeListValue);
+  }
+
+  get hasRevision(): boolean {
+    return this.lastRevisionValue !== undefined;
+  }
+
+  get revisionDeprecated(): boolean {
+    return (!!this.lastRevisionValue && this.lastRevisionValue.deprecated);
+  }
+
+  get isUsedBefore(): boolean {
+    return (!!this.lastRevisionValue && this.lastRevisionValue.used);
   }
 
   onNoClick(): void {
@@ -41,7 +60,7 @@ export class CodeListValueDialogComponent implements OnInit {
 
   isDisabled() {
     return (this.codeListValue.value === undefined || this.codeListValue.value === '') ||
-      (this.codeListValue.name === undefined || this.codeListValue.name === '') ||
+      (this.codeListValue.meaning === undefined || this.codeListValue.meaning === '') ||
       !this.isDirty();
   }
 

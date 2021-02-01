@@ -1,5 +1,25 @@
-.element-detail {
-  font-size: 12px;
+.filter-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.option-header {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.option-body {
+  padding-top: 13px;
+}
+
+.cc-types-checkbox {
+  padding-right: 10px;
+}
+
+.cc-types-button {
+  padding-right: 5px;
 }
 
 tr.detail-row {
@@ -7,7 +27,7 @@ tr.detail-row {
 }
 
 tr.element-row:not(.expanded-row):hover {
-  background: whitesmoke;
+  background: #f5f5f5;
 }
 
 tr.element-row:not(.expanded-row):active {
@@ -34,24 +54,47 @@ tr.element-row:not(.expanded-row):active {
   margin-right: 6px;
 }
 
+.mat-icon-button {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  outline: none;
+}
+
+.mat-column-type {
+  width: 110px;
+}
+
 .mat-column-revision {
   width: 70px;
 }
 
-.mat-column-state {
-  width: 90px;
+.mat-column-state, .mat-column-owner {
+  width: 100px;
 }
 
-.mat-column-owner {
-  width: 10%;
+.den {
+  font-size: 13px;
 }
 
 .mat-column-module {
-  width: 25%;
-  font-size: 12px;
+  width: 15%;
+  font-size: 13px;
   padding-right: 12px;
 }
 
 .mat-column-lastUpdateTimestamp {
   width: 160px;
+}
+
+.mat-column-more {
+  width: 40px;
+}
+
+.element-detail {
+  font-size: 12px;
+}
+
+.f12 {
+  font-size: 12px;
 }

@@ -18,3 +18,8 @@
 .state-progress-text {
   padding: 8px;
 }
+
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+}

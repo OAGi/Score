@@ -14,6 +14,16 @@ export class AccountListService implements OnInit {
   ngOnInit() {
   }
 
+  getAllAccountList(): Observable<PageResponse<AccountList>> {
+    const params = new HttpParams()
+      .set('sortActive', 'loginId')
+      .set('sortDirection', 'asc')
+      .set('pageIndex', '' + 0)
+      .set('pageSize', '' + 1000);
+
+    return this.http.get<PageResponse<AccountList>>('/api/accounts_list', {params: params});
+  }
+
   getAccountsList(request: AccountListRequest, excludeRequester?: boolean): Observable<PageResponse<AccountList>> {
     let params = new HttpParams()
       .set('sortActive', request.page.sortActive)
@@ -67,10 +77,6 @@ export class AccountListService implements OnInit {
     }
   }
 
-  setEnable(account: AccountList, val: boolean): Observable<any> {
-    return this.http.post('/api/accounts/' + account.appUserId + '/' + ((val) ? 'enable' : 'disable'), {});
-  }
-
   create(account: AccountList, newPassword?: string, pending?: PendingAccount): Observable<any> {
     if (pending && pending.appOauth2UserId !== undefined) {
       return this.http.put('/api/account', {
@@ -92,8 +98,11 @@ export class AccountListService implements OnInit {
     }
   }
   link(pending: PendingAccount, account: AccountList): Observable<any> {
-      return this.http.post('/api/pending/link/' + pending.appOauth2UserId, {
-        'appUserId': account.appUserId});
+    return this.http.post('/api/pending/link/' + pending.appOauth2UserId, {
+      'appUserId': account.appUserId});
   }
 
+  setEnable(account: AccountList, val: boolean): Observable<any> {
+    return this.http.post('/api/accounts/' + account.appUserId + '/' + ((val) ? 'enable' : 'disable'), {});
+  }
 }

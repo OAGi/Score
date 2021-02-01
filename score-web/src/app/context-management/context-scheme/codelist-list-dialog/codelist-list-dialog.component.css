@@ -1,0 +1,49 @@
+span.cl-state {
+  font-size: 13px;
+  padding: .30em 4px;
+  border-radius: 4px;
+}
+
+span.release-state {
+  font-size: 12px;
+  padding: .15em 4px;
+  float: right;
+  line-height: 20px;
+  margin-top: 9px;
+}
+
+span.right {
+  float: right;
+}
+
+span.release-state.Draft {
+  background-color: #cc317c;
+  color: #ffffff;
+}
+
+span.release-state.Published {
+  background-color: #84b6eb;
+  color: #000000;
+  padding-bottom: 1px;
+  padding-top: 1px;
+}
+
+.mat-column-basedCodeListName, .mat-column-agencyId {
+  width: 10%;
+}
+
+.mat-column-versionId, .mat-column-extensible, .mat-column-revision {
+  width: 100px;
+}
+
+.mat-column-state, .mat-column-owner {
+  width: 100px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.f12 {
+  font-size: 12px;
+}

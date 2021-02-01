@@ -4,12 +4,11 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {switchMap} from 'rxjs/operators';
 import {ContextCategoryService} from '../domain/context-category.service';
 import {ContextCategory} from '../domain/context-category';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {hashCode} from '../../../common/utility';
 import {ContextScheme} from '../../context-scheme/domain/context-scheme';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-context-category-detail',
@@ -28,7 +27,8 @@ export class ContextCategoryDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService) {
   }
 
   ngOnInit() {
@@ -66,36 +66,29 @@ export class ContextCategoryDetailComponent implements OnInit {
   }
 
   openDialogContextCategory(listDisplayed: string[]) {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'The context category cannot be deleted!';
     dialogConfig.data.content = [
       'The context schemes with the following IDs depend on it. They need to be deleted first.'
     ];
     dialogConfig.data.list = listDisplayed;
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
+    this.confirmDialogService.open(dialogConfig).afterClosed().subscribe(_ => {});
   }
 
   openDialogContextCategoryDiscard() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard Context Category?';
     dialogConfig.data.content = [
       'Are you sure you want to discard the context category?',
       'The context category will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(this.contextCategory.ctxCategoryId).subscribe(_ => {
+          this.service.delete(this.contextCategory.contextCategoryId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
@@ -106,12 +99,12 @@ export class ContextCategoryDetailComponent implements OnInit {
   }
 
   discard() {
-    this.service.getContextSchemeFromCategoryId(this.contextCategory.ctxCategoryId).subscribe(value => {
+    this.service.getContextSchemeFromCategoryId(this.contextCategory.contextCategoryId).subscribe(value => {
       this.contextSchemes = value;
       if (this.contextSchemes.length > 0) {
         const listDisplayed = [];
-        this.contextSchemes.forEach(ctxScheme => {
-          listDisplayed.push(ctxScheme.guid);
+        this.contextSchemes.forEach(contextScheme => {
+          listDisplayed.push(contextScheme.guid);
         });
         // change of the list in order to get displayed by the snackbar, replace all the global comas by newlines
         const displayedList: string = listDisplayed.toString().replace(/,/g, ',\n ');

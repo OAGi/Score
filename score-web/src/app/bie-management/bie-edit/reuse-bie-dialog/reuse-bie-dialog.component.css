@@ -28,14 +28,14 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-version, .mat-column-status {
-  width: 10%;
+  width: 5%;
 }
 
 .mat-column-bizTerm, .mat-column-remark {
   width: 10%;
 }
 
-.mat-column-state {
+.mat-column-state, .mat-column-owner {
   width: 90px;
 }
 
@@ -46,3 +46,4 @@ tr.element-row:not(.expanded-row):active {
 .mat-column-lastUpdateTimestamp {
   width: 160px;
 }
+

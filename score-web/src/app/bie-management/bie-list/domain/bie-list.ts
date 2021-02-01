@@ -3,31 +3,33 @@ import {BusinessContext} from '../../../context-management/business-context/doma
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
+import {SimpleRelease} from '../../../release-management/domain/release';
 
 export class BieListRequest {
+  release: SimpleRelease;
   filters: {
     propertyTerm: string;
     businessContext: string;
-    releaseId: number;
-    asccpId: number;
+    asccpManifestId: number;
   };
   excludePropertyTerms: string[] = [];
   excludeTopLevelAsbiepIds: number[] = [];
   access: string;
   states: string[] = [];
   ownerLoginIds: string[] = [];
-  ownedByDeveloper: boolean;
   updaterLoginIds: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
   };
   page: PageRequest = new PageRequest();
+  ownedByDeveloper: boolean = undefined;
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-
+    this.release = new SimpleRelease();
+    this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
     if (!this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
@@ -50,7 +52,6 @@ export class BieListRequest {
     this.excludePropertyTerms = (params.get('excludePropertyTerms')) ? Array.from(params.get('excludePropertyTerms').split(',')) : [];
     this.excludeTopLevelAsbiepIds = (params.get('excludeTopLevelAsbiepIds')) ? Array.from(params.get('excludeTopLevelAsbiepIds').split(',').map(e => Number(e))) : [];
     this.access = params.get('access');
-    this.ownedByDeveloper = params.get('ownedByDeveloper') === 'true' || false;
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
@@ -61,8 +62,7 @@ export class BieListRequest {
     this.filters = {
       propertyTerm: params.get('propertyTerm') || '',
       businessContext: params.get('businessContext') || '',
-      releaseId: Number(params.get('releaseId')) || 0,
-      asccpId: Number(params.get('asccpId')) || 0
+      asccpManifestId: Number(params.get('asccpManifestId')) || 0
     };
   }
 
@@ -73,6 +73,9 @@ export class BieListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
+    if (this.release) {
+      params = params.set('releaseId', this.release.releaseId.toString());
+    }
     if (this.excludePropertyTerms && this.excludePropertyTerms.length > 0) {
       params = params.set('excludePropertyTerms', this.excludePropertyTerms.join(','));
     }
@@ -103,11 +106,8 @@ export class BieListRequest {
     if (this.filters.businessContext && this.filters.businessContext.length > 0) {
       params = params.set('businessContext', '' + this.filters.businessContext);
     }
-    if (this.filters.releaseId) {
-      params = params.set('releaseId', this.filters.releaseId.toString());
-    }
-    if (this.filters.asccpId) {
-      params = params.set('asccpId', this.filters.asccpId.toString());
+    if (this.filters.asccpManifestId) {
+      params = params.set('asccpManifestId', this.filters.asccpManifestId.toString());
     }
     if (extras) {
       Object.keys(extras).forEach(key => {

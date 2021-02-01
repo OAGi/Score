@@ -1,3 +1,4 @@
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {AccDetailComponent} from './acc-detail.component';
@@ -6,23 +7,22 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
 import {MatInputModule} from '@angular/material/input';
-import {AccCreateComponent} from '../acc-create/acc-create.component';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {TranslateModule} from '@ngx-translate/core';
+import {AppendAssociationDialogComponent} from './append-association-dialog/append-association-dialog.component';
+import {BasedAccDialogComponent} from './based-acc-dialog/based-acc-dialog.component';
+import {ScoreCommonModule} from '../../common/score-common.module';
+import {AngularSplitModule} from 'angular-split';
+import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 
 const routes: Routes = [
   {
     path: 'core_component/acc',
     children: [
       {
-        path: ':releaseId/:accId',
+        path: ':manifestId',
         component: AccDetailComponent,
         canActivate: [AuthService],
-      },
-      {
-        path: 'create',
-        component: AccCreateComponent,
-        canActivate: [AuthService]
       }
     ]
   }
@@ -39,10 +39,20 @@ const routes: Routes = [
       useBootstrap4: true,
     }),
     CommonModule,
-    TranslateModule
+    TranslateModule,
+    ScoreCommonModule,
+    SearchOptionsDialogModule,
+    DragDropModule,
+    AngularSplitModule
   ],
   declarations: [
-    AccDetailComponent
+    AccDetailComponent,
+    AppendAssociationDialogComponent,
+    BasedAccDialogComponent
+  ],
+  entryComponents: [
+    AppendAssociationDialogComponent,
+    BasedAccDialogComponent
   ]
 })
 export class AccDetailModule {

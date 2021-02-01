@@ -27,6 +27,16 @@ export class NavbarComponent implements OnInit {
     return this.auth.getUserToken();
   }
 
+  get username(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.username : undefined;
+  }
+
+  get role(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.role : undefined;
+  }
+
   logout() {
     this.auth.logout();
   }

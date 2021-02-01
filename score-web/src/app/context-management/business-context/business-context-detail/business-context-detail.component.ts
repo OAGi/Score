@@ -14,8 +14,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
 import {switchMap} from 'rxjs/operators';
 import {hashCode} from '../../../common/utility';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-business-context-detail',
@@ -27,9 +26,9 @@ export class BusinessContextDetailComponent implements OnInit {
   title = 'Edit Business Context';
   disabled: boolean;
   hashCode;
-  bizCtx: BusinessContext;
+  businessContext: BusinessContext;
   displayedColumns: string[] = [
-    'select', 'ctxCategoryName', 'ctxSchemeName', 'ctxSchemeValue'
+    'select', 'contextCategoryName', 'contextSchemeName', 'contextSchemeValue'
   ];
   dataSource = new MatTableDataSource<BusinessContextValue>();
   selection = new SelectionModel<BusinessContextValue>(true, []);
@@ -43,62 +42,64 @@ export class BusinessContextDetailComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService) {
   }
 
   ngOnInit() {
     this.disabled = false;
-    this.bizCtx = new BusinessContext();
+    this.businessContext = new BusinessContext();
+    this.businessContext.used = true;
 
     // load business context
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) =>
         this.service.getBusinessContext(params.get('id')))
     ).subscribe(resp => {
-      resp.bizCtxValues.forEach((bizCtxValue: BusinessContextValue) => {
-        bizCtxValue.guid = uuid();
+      resp.businessContextValueList.forEach((businessContextValue: BusinessContextValue) => {
+        businessContextValue.guid = uuid();
       });
       this.hashCode = hashCode(resp);
-      this.bizCtx = resp;
+      this.businessContext = resp;
 
-      this._updateDataSource(this.bizCtx.bizCtxValues);
+      this._updateDataSource(this.businessContext.businessContextValueList);
     });
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
 
   isChanged() {
-    return this.hashCode !== hashCode(this.bizCtx);
+    return this.hashCode !== hashCode(this.businessContext);
   }
 
   _updateDataSource(data: BusinessContextValue[]) {
     this.dataSource.data = data;
-    this.bizCtx.bizCtxValues = data;
+    this.businessContext.businessContextValueList = data;
   }
 
-  isDisabled(bizCtx: BusinessContext) {
+  isDisabled(businessContext: BusinessContext) {
     return (this.disabled) ||
-      (bizCtx.name === undefined || bizCtx.name === '');
+      (businessContext.name === undefined || businessContext.name === '');
   }
 
-  openDialog(bizCtxValue?: BusinessContextValue) {
+  openDialog(businessContextValue?: BusinessContextValue) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.panelClass = ['center-dialog'];
     dialogConfig.data = new BusinessContextValue();
 
-    if (bizCtxValue) { // deep copy
-      dialogConfig.data = JSON.parse(JSON.stringify(bizCtxValue));
+    if (businessContextValue) { // deep copy
+      dialogConfig.data = JSON.parse(JSON.stringify(businessContextValue));
     }
-    const isAddAction: boolean = (bizCtxValue === undefined);
+    const isAddAction: boolean = (businessContextValue === undefined);
 
     this.disabled = true;
     const dialogRef = this.dialog.open(BusinessContextValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined && result.ctxSchemeValueId !== undefined) {
+      if (result !== undefined && result.contextSchemeValueId !== undefined) {
         for (const value of this.dataSource.data) {
-          if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
-            this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
+          if (value.contextSchemeValueId === result.contextSchemeValueId) {
+            this.snackBar.open(result.contextSchemeValue + ' already exist', '', {
               duration: 3000,
             });
             this.disabled = false;
@@ -161,15 +162,12 @@ export class BusinessContextDetailComponent implements OnInit {
   }
 
   removeBizCtxValues() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove Business Context?';
-    dialogConfig.data.content = 'Are you sure you want to remove the business context value?';
+    dialogConfig.data.content = ['Are you sure you want to remove the business context value?'];
     dialogConfig.data.action = 'Remove';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
           const newData = [];
@@ -190,45 +188,27 @@ export class BusinessContextDetailComponent implements OnInit {
   }
 
   update() {
-    this.service.update(this.bizCtx).subscribe(_ => {
-      this.hashCode = hashCode(this.bizCtx);
+    this.service.update(this.businessContext).subscribe(_ => {
+      this.hashCode = hashCode(this.businessContext);
       this.snackBar.open('Updated', '', {
         duration: 3000,
       });
     });
   }
 
-  openDialogBizContext(listDisplayed: string[]) {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
-    dialogConfig.data.header = 'The business context cannot be deleted!';
-    dialogConfig.data.content = [
-      'The BIEs with the following IDs depend on it. They need to be deleted first.'
-    ];
-    dialogConfig.data.list = listDisplayed;
-
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed().subscribe(_ => {});
-  }
-
-  openDialogBusinessContextDiscard() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+  discard() {
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard Business Context?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard the business context?',
+      'Are you sure you want to discard this business context?',
       'The business context will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(this.bizCtx.bizCtxId).subscribe(_ => {
+          this.service.delete(this.businessContext.businessContextId).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
@@ -236,20 +216,6 @@ export class BusinessContextDetailComponent implements OnInit {
           });
         }
       });
-  }
-
-  discard() {
-    this.bieListService.getBieListByBizCtxId(this.bizCtx.bizCtxId).subscribe(value => {
-      if (value.length > 0) {
-        const displayedList = [];
-        value.forEach(el => {
-          displayedList.push(el.guid);
-        });
-        this.openDialogBizContext(displayedList);
-      } else {
-        this.openDialogBusinessContextDiscard();
-      }
-    });
   }
 
 }

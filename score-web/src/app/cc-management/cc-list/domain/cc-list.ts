@@ -1,16 +1,28 @@
 import {PageRequest} from '../../../basis/basis';
+import {OagisComponentType, OagisComponentTypes} from '../../domain/core-component-node';
+import {SimpleRelease} from '../../../release-management/domain/release';
 import {HttpParams} from '@angular/common/http';
 import {ParamMap} from '@angular/router';
 import {base64Decode, base64Encode} from '../../../common/utility';
 
 export class CcListRequest {
-  releaseId: number;
+  release: SimpleRelease;
   types: string[] = [];
   states: string[] = [];
   deprecated: boolean[] = [false];
+  commonlyUsed: boolean[] = [true];
   ownerLoginIds: string[] = [];
   updaterLoginIds: string[] = [];
-  componentType: string[] = [];
+  excludes: string[] = [];
+  findUsages: {
+    type: string,
+    manifestId: number
+  };
+  componentTypes: OagisComponentType[];
+
+  dtTypes: string[] = [];
+  asccpTypes: string[] = [];
+
   updatedDate: {
     start: Date,
     end: Date,
@@ -20,13 +32,14 @@ export class CcListRequest {
     definition: string;
     module: string;
   };
+  isBIEUsable: boolean;
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
     const q = (paramMap) ? paramMap.get('q') : undefined;
     const params = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
-
-    this.releaseId = Number(params.get('releaseId') || 0);
+    this.release = new SimpleRelease();
+    this.release.releaseId = Number(params.get('releaseId') || 0);
     this.page.sortActive = params.get('sortActive');
     if (!this.page.sortActive) {
       this.page.sortActive = (defaultPageRequest) ? defaultPageRequest.sortActive : '';
@@ -48,9 +61,11 @@ export class CcListRequest {
     this.types = (params.get('types')) ? Array.from(params.get('types').split(',').map(e => e.toUpperCase())) : ['ACC', 'ASCCP', 'BCCP'];
     this.states = (params.get('states')) ? Array.from(params.get('states').split(',')) : [];
     this.deprecated = (params.get('deprecated')) ? [(('true' === params.get('deprecated')) ? true : false)] : undefined;
+    this.commonlyUsed = (params.get('commonlyUsed')) ? [(('true' === params.get('commonlyUsed')) ? true : false)] : [true];
     this.ownerLoginIds = (params.get('ownerLoginIds')) ? Array.from(params.get('ownerLoginIds').split(',')) : [];
     this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
-    this.componentType = (params.get('componentType')) ? Array.from(params.get('componentType').split(',')) : [];
+    this.componentTypes = (params.get('componentTypes')) ? Array.from(params.get('componentTypes').split(','))
+      .map(elm => OagisComponentTypes[elm]) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -60,6 +75,12 @@ export class CcListRequest {
       definition: params.get('definition') || '',
       module: params.get('module') || '',
     };
+    this.excludes = [];
+    this.findUsages = {
+      type: '',
+      manifestId: 0
+    };
+    this.isBIEUsable = false;
   }
 
   toQuery(extras?): string {
@@ -69,7 +90,7 @@ export class CcListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    params = params.set('releaseId', '' + this.releaseId);
+    params = params.set('releaseId', '' + this.release.releaseId);
     if (this.types && this.types.length > 0) {
       params = params.set('types', this.types.join(','));
     }
@@ -78,6 +99,9 @@ export class CcListRequest {
     }
     if (this.deprecated !== undefined) {
       params = params.set('deprecated', (this.deprecated) ? 'true' : 'false');
+    }
+    if (this.commonlyUsed !== undefined) {
+      params = params.set('commonlyUsed', (this.commonlyUsed) ? 'true' : 'false');
     }
     if (this.ownerLoginIds && this.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', this.ownerLoginIds.join(','));
@@ -100,8 +124,13 @@ export class CcListRequest {
     if (this.filters.module && this.filters.module.length > 0) {
       params = params.set('module', '' + this.filters.module);
     }
-    if (this.componentType && this.componentType.length > 0) {
-      params = params.set('componentType', this.componentType.join(','));
+    if (this.componentTypes && this.componentTypes.length > 0) {
+      params = params.set('componentTypes', this.componentTypes
+        .map((elm: OagisComponentType) => elm.value).join(','));
+    }
+    if (this.findUsages.type && this.findUsages.manifestId > 0) {
+      params = params.set('findUsagesType', this.findUsages.type)
+        .set('findUsagesManifestId', '' + this.findUsages.manifestId);
     }
     if (extras) {
       Object.keys(extras).forEach(key => {
@@ -115,20 +144,28 @@ export class CcListRequest {
 
 export class CcList {
   type: string;
-  id: number;
+  manifestId: number;
   guid: string;
+  name: string;
   den: string;
   definition: string;
   module: string;
   definitionSource: string;
   oagisComponentType: string;
+  dtType: string;
   owner: string;
   state: string;
   revision: string;
+  releaseNum: string;
   deprecated: boolean;
-  currentId: number;
   lastUpdateUser: string;
   lastUpdateTimestamp: Date;
+  id: number;
+}
+
+export class CcUpdateStateListRequest {
+  type: string;
+  manifestId: number;
 }
 
 export class Asccp {
@@ -154,7 +191,6 @@ export class Asccp {
   revisionNum: string;
   revisionAction: string;
   releaseId: number;
-  currentAsccpId: number;
   nillable: boolean;
 }
 
@@ -180,7 +216,6 @@ export class Acc {
   revisionNum: string;
   revisionAction: string;
   releaseId: number;
-  currentAccId: number;
   deprecated: boolean;
   abstract: boolean;
 }
@@ -208,7 +243,6 @@ export class Bcc {
   revisionTrackingNum: string;
   revisionAction: string;
   releaseId: number;
-  currentBccId: number;
   deprecated: boolean;
   nillable: boolean;
   defaultValue: string;
@@ -238,7 +272,6 @@ export class Bccp {
   revisionTrackingNum: string;
   revisionAction: string;
   releaseId: number;
-  currentBccpId: number;
   nillable: boolean;
   defaultValue: string;
 }
@@ -267,7 +300,6 @@ export class Ascc {
   revisionTrackingNum: string;
   revisionAction: string;
   releaseId: number;
-  currentAsccId: number;
 }
 
 export class SummaryCcExt {

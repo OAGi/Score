@@ -5,14 +5,17 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 import {PageRequest} from '../../../basis/basis';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
+import {MatDatepickerInputEvent} from '@angular/material/datepicker';
+import {FormControl} from '@angular/forms';
+import {ReplaySubject} from 'rxjs';
+import {initFilter} from '../../../common/utility';
+import {AccountListService} from '../../../account-management/domain/account-list.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-context-category',
@@ -22,18 +25,22 @@ import {finalize} from 'rxjs/operators';
 export class ContextCategoryListComponent implements OnInit {
 
   title = 'Context Category';
-  displayedColumns: string[] = ['select', 'name', 'description'];
+  displayedColumns: string[] = ['select', 'name', 'description', 'lastUpdateTimestamp'];
   dataSource = new MatTableDataSource<ContextCategory>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
+  loginIdList: string[] = [];
+  updaterIdListFilterCtrl: FormControl = new FormControl();
+  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: ContextCategoryListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private service: ContextCategoryService,
-              private dialog: MatDialog,
+              private accountService: AccountListService,
+              private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -42,12 +49,11 @@ export class ContextCategoryListComponent implements OnInit {
 
   ngOnInit() {
     this.request = new ContextCategoryListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('name', 'asc', 0, 10));
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
     this.paginator.length = 0;
-
     this.sort.active = this.request.page.sortActive;
     this.sort.direction = this.request.page.sortDirection as SortDirection;
     this.sort.sortChange.subscribe(() => {
@@ -55,16 +61,43 @@ export class ContextCategoryListComponent implements OnInit {
       this.onChange();
     });
 
-    this.loadContextCategoryList(true);
+    this.accountService.getAccountNames().subscribe(loginIds => {
+      this.loginIdList.push(...loginIds);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+    });
+
+    this.onChange();
   }
 
   onPageChange(event: PageEvent) {
-    this.loadContextCategoryList();
+    this.loadContextCategoryList(true);
   }
 
   onChange() {
     this.paginator.pageIndex = 0;
     this.loadContextCategoryList();
+  }
+
+  onDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = new Date(event.value);
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = new Date(event.value);
+        break;
+    }
+  }
+
+  reset(type: string) {
+    switch (type) {
+      case 'startDate':
+        this.request.updatedDate.start = null;
+        break;
+      case 'endDate':
+        this.request.updatedDate.end = null;
+        break;
+    }
   }
 
   loadContextCategoryList(isInit?: boolean) {
@@ -105,41 +138,36 @@ export class ContextCategoryListComponent implements OnInit {
 
   select(row: ContextCategory) {
     if (!row.used) {
-      this.selection.select(row.ctxCategoryId);
+      this.selection.select(row.contextCategoryId);
     }
   }
 
   toggle(row: ContextCategory) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.ctxCategoryId);
+      this.selection.deselect(row.contextCategoryId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: ContextCategory) {
-    return this.selection.isSelected(row.ctxCategoryId);
+    return this.selection.isSelected(row.contextCategoryId);
   }
 
   discard() {
-    const ctxCategoryIds = this.selection.selected;
-
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
-    dialogConfig.data.header = 'Discard Context ' + (ctxCategoryIds.length > 1 ? 'Categories' : 'Category') + '?';
+    const contextCategoryIds = this.selection.selected;
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Discard Context ' + (contextCategoryIds.length > 1 ? 'Categories' : 'Category') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected context ' + (ctxCategoryIds.length > 1 ? 'categories' : 'category') + '?',
-      'The context ' + (ctxCategoryIds.length > 1 ? 'categories' : 'category') + ' will be permanently removed.'
+      'Are you sure you want to discard selected context ' + (contextCategoryIds.length > 1 ? 'categories' : 'category') + '?',
+      'The context ' + (contextCategoryIds.length > 1 ? 'categories' : 'category') + ' will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(...ctxCategoryIds).subscribe(_ => {
+          this.service.delete(...contextCategoryIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });

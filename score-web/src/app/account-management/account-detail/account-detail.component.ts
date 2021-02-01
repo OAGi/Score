@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {of} from 'rxjs';
 import {AccountList} from '../domain/accounts';
 import {AccountListService} from '../domain/account-list.service';
 import {finalize, switchMap} from 'rxjs/operators';
-import {of} from "rxjs";
 
 @Component({
   selector: 'score-account-detail',
@@ -13,7 +13,6 @@ import {of} from "rxjs";
 })
 export class AccountDetailComponent implements OnInit {
   title = 'Edit Account';
-
   accountId;
   account: AccountList;
   newPassword: string;
@@ -28,7 +27,7 @@ export class AccountDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.pipe(
-        switchMap((params: ParamMap) => of(Number(params.get('id'))))
+      switchMap((params: ParamMap) => of(Number(params.get('id'))))
     ).subscribe(accountId => {
       this.loading = true;
       this.service.getAccount(accountId).pipe(finalize(() => {
@@ -37,6 +36,7 @@ export class AccountDetailComponent implements OnInit {
         this.account = resp;
       });
     });
+
 
     this.newPassword = '';
     this.confirmPassword = '';
@@ -76,5 +76,6 @@ export class AccountDetailComponent implements OnInit {
       this.account.enabled = val;
     });
   }
+
 
 }

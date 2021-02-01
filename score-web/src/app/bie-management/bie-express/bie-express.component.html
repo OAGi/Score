@@ -1,19 +1,47 @@
 <div class="context-section">
-
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner [diameter]="40"></mat-spinner>
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">{{ "BIE_EXPRESS.TITLE" | translate }}</span>
+      <span class="flex-11-auto"></span>
+    </mat-toolbar>
   </div>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ "BIE_EXPRESS.TITLE" | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
-    </mat-card-header>
-
+  <mat-card class="pt-3">
     <mat-card class="search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Branch</mat-label>
+                <mat-select [(ngModel)]="request.release" (ngModelChange)="onChange('branch', request.release)">
+                  <mat-select-trigger class="d-flex">
+                    <span>{{request.release.releaseNum}}</span>
+                    <span class="f12 ml-auto {{request.release.state}}">
+                      {{ request.release.state | separate }}
+                    </span>
+                  </mat-select-trigger>
+                  <mat-option *ngFor="let release of releases" [value]="release">
+                    <div class="d-flex">
+                      <span class="release-num">{{release.releaseNum}}</span>
+                      <span class="f12 ml-auto {{release.state}}">
+                        {{ release.state | separate }}
+                      </span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>State</mat-label>
+                <mat-select [(ngModel)]="request.states" multiple>
+                  <mat-option *ngFor="let state of states" [value]="state">
+                    {{state}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
             <div class="col-md-2 col-sm-12">
               <mat-form-field>
                 <mat-label>Owner</mat-label>
@@ -41,40 +69,6 @@
                 </mat-select>
               </mat-form-field>
             </div>
-
-            <div class="col-md-2 col-sm-12" style="display: flex;">
-              <mat-form-field>
-                <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
-                       [max]="request.updatedDate.end" [value]="request.updatedDate.start"
-                       (dateInput)="onDateEvent('startDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
-                <mat-datepicker #dateStart></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-2 col-sm-12" style="display: flex;">
-              <mat-form-field>
-                <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
-                       [min]="request.updatedDate.start" [value]="request.updatedDate.end"
-                       (dateInput)="onDateEvent('endDate', $event)">
-                <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
-                <mat-datepicker #dateEnd></mat-datepicker>
-              </mat-form-field>
-              <div class="mat-form-field-wrapper" style="width: 14px;">
-                <div class="mat-form-field-flex">
-                  <div class="mat-form-field-infix">
-                    <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="container-fluid" style="padding: 0;">
@@ -91,15 +85,38 @@
                          placeholder="Business Context">
                 </mat-form-field>
               </div>
-              <div class="col-md-2 col-sm-12">
+              <div class="col-md-2 col-sm-12 d-flex">
                 <mat-form-field>
-                  <mat-label>State</mat-label>
-                  <mat-select [(ngModel)]="request.states" multiple>
-                    <mat-option *ngFor="let state of states" [value]="state">
-                      {{state}}
-                    </mat-option>
-                  </mat-select>
+                  <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
+                         [max]="request.updatedDate.end" [value]="request.updatedDate.start"
+                         (dateInput)="onDateEvent('startDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateStart"></mat-datepicker-toggle>
+                  <mat-datepicker #dateStart></mat-datepicker>
                 </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('startDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-sm-12 d-flex">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
+                         [min]="request.updatedDate.start" [value]="request.updatedDate.end"
+                         (dateInput)="onDateEvent('endDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="dateEnd"></mat-datepicker-toggle>
+                  <mat-datepicker #dateEnd></mat-datepicker>
+                </mat-form-field>
+                <div class="mat-form-field-wrapper" style="width: 14px;">
+                  <div class="mat-form-field-flex">
+                    <div class="mat-form-field-infix">
+                      <mat-icon class="datepicker-cancel" (click)="reset('endDate')">cancel</mat-icon>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -114,10 +131,14 @@
     </mat-card>
 
     <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
       <div class="mat-elevation-z1">
-          <table mat-table multiTemplateDataRows
-                 matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
-                 [dataSource]="dataSource">
+        <table mat-table multiTemplateDataRows
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+               [dataSource]="dataSource">
 
           <!-- Checkbox Column -->
           <ng-container matColumnDef="select">
@@ -149,11 +170,6 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="release">
-            <th mat-header-cell *matHeaderCellDef> Release</th>
-            <td mat-cell *matCellDef="let element">{{ element.releaseNum }}</td>
-          </ng-container>
-
           <ng-container matColumnDef="owner">
             <th mat-header-cell *matHeaderCellDef> Owner</th>
             <td mat-cell *matCellDef="let element">
@@ -166,8 +182,11 @@
             <td mat-cell *matCellDef="let element">
               <mat-chip-list class="ellipsis" *ngIf="element.businessContexts.length > 0" selectable="false">
                 <a target="_blank" rel="noopener noreferrer" *ngIf="element.businessContexts.length > 0"
-                   href="/context_management/business_context/{{ element.businessContexts[0].bizCtxId }}">
-                  <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
+                   href="/context_management/business_context/{{ element.businessContexts[0].businessContextId }}">
+                  <mat-chip [matTooltip]="element.businessContexts[0].name"
+                            [matTooltipDisabled]="element.businessContexts[0].name.length <= 30">
+                    {{ element.businessContexts[0].name | truncate: 30 }}
+                  </mat-chip>
                 </a>
                 <a target="_blank" rel="noopener noreferrer"
                    routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
@@ -177,14 +196,34 @@
             </td>
           </ng-container>
 
+
+
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.version }}">{{ element.version }}</td>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.version }}</div>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status</th>
-            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.status }}">{{ element.status }}</td>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.status }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="bizTerm">
+            <th mat-header-cell *matHeaderCellDef> Business Term</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.bizTerm }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.remark }}</div>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
@@ -209,11 +248,9 @@
     </mat-card-content>
   </mat-card>
 
-
-  <mat-card class="filter-container">
+  <mat-card class="pt-2 pb-0 filter-container">
     <mat-card-content>
-      <div class="container-fluid" style="padding-bottom: 20px;">
-
+      <div class="container-fluid">
         <div class="row">
           <div class="col-md-10 col-sm-12">
             <span class="option-header">Select annotation to generate for BIEs</span>
@@ -251,15 +288,15 @@
                     </mat-checkbox>
                   </div>
                   <div class="generate-option">
-                    <mat-checkbox [(ngModel)]="option.bieOagiSrtMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'">BIE OAGi/SRT Meta Data
+                    <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
+                                  [disabled]="option.expressionOption !== 'XML'">BIE OAGi/Score Meta Data
                     </mat-checkbox>
                   </div>
                   <div class="generate-option dependent-option">
                     <mat-checkbox [(ngModel)]="option.includeWhoColumns"
-                                  [disabled]="option.expressionOption !== 'XML' || option.bieOagiSrtMetaData !== true">
+                                  [disabled]="option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true">
                       <span
-                        class="{{ (option.expressionOption !== 'XML' || option.bieOagiSrtMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
+                        class="{{ (option.expressionOption !== 'XML' || option.bieOagiScoreMetaData !== true) ? 'toggle-disabled' : '' }}">Include WHO Columns</span>
                     </mat-checkbox>
                   </div>
                   <div class="generate-option">
@@ -288,20 +325,17 @@
                     <mat-radio-button class="option-radio-button" value="JSON">
                       JSON Schema
                     </mat-radio-button>
-                    <div class="generate-option dependent-option">
-                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpression"
-                                    [disabled]="option.expressionOption !== 'JSON'">
+                    <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'JSON'">
+                      <mat-checkbox [(ngModel)]="option.arrayForJsonExpression">
                         <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Make as an array</span>
                       </mat-checkbox>
                       <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJson"
-                                    [disabled]="option.expressionOption !== 'JSON'"
                                     (click)="toggleMetaHeaderOption($event, option.expressionOption !== 'JSON',
                                              'includeMetaHeaderForJson',
                                              'metaHeaderTopLevelAsbiepId')">
                         <span class="{{ (option.expressionOption !== 'JSON') ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                       </mat-checkbox>
                       <mat-checkbox [(ngModel)]="option.includePaginationResponseForJson"
-                                    [disabled]="option.expressionOption !== 'JSON'"
                                     (click)="togglePaginationResponseOption($event, option.expressionOption !== 'JSON',
                                              'includePaginationResponseForJson',
                                              'paginationResponseTopLevelAsbiepId')">
@@ -311,42 +345,40 @@
                     <mat-radio-button class="option-radio-button" value="OpenAPI30">
                       Open API 3.0 (Early prototype)
                     </mat-radio-button>
-                    <div class="generate-option dependent-option">
+                    <div class="generate-option dependent-option" *ngIf="option.expressionOption === 'OpenAPI30'">
                       <mat-form-field>
                         <mat-label>Format</mat-label>
                         <mat-select [(ngModel)]="option.openAPIExpressionFormat"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30'"
                                     required="true">
                           <mat-option *ngFor="let openApiFormat of openApiFormats" [value]="openApiFormat">
                             {{ openApiFormat }}
                           </mat-option>
                         </mat-select>
                       </mat-form-field>
-                      <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30'">
+                      <mat-checkbox [(ngModel)]="option.openAPI30GetTemplate">
                         <span class="{{ (option.expressionOption !== 'OpenAPI30') ? 'toggle-disabled' : '' }}">GET Operation Template</span>
                       </mat-checkbox>
 
                       <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30GetTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    [disabled]="option.openAPI30GetTemplate != true"
                                     class="generate-second-option">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                       </mat-checkbox>
                       <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30GetTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    [disabled]="option.openAPI30GetTemplate != true"
                                     class="generate-second-option"
-                                    (click)="toggleMetaHeaderOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true),
+                                    (click)="toggleMetaHeaderOption($event, (option.openAPI30GetTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30GetTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate')">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                       </mat-checkbox>
                       <mat-checkbox [(ngModel)]="option.includePaginationResponseForJsonForOpenAPI30GetTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true"
+                                    [disabled]="option.openAPI30GetTemplate != true"
                                     class="generate-second-option"
-                                    (click)="togglePaginationResponseOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true),
+                                    (click)="togglePaginationResponseOption($event, (option.openAPI30GetTemplate != true),
                                              'includePaginationResponseForJsonForOpenAPI30GetTemplate',
                                              'paginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate')">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
+                        <span class="{{ (option.openAPI30GetTemplate != true) ? 'toggle-disabled' : '' }}">Include Pagination Response</span>
                       </mat-checkbox>
 
                       <mat-checkbox [(ngModel)]="option.openAPI30PostTemplate"
@@ -355,17 +387,17 @@
                       </mat-checkbox>
 
                       <mat-checkbox [(ngModel)]="option.arrayForJsonExpressionForOpenAPI30PostTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true"
+                                    [disabled]="option.openAPI30PostTemplate != true"
                                     class="generate-second-option">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
+                        <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Make as an array</span>
                       </mat-checkbox>
                       <mat-checkbox [(ngModel)]="option.includeMetaHeaderForJsonForOpenAPI30PostTemplate"
-                                    [disabled]="option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true"
+                                    [disabled]="option.openAPI30PostTemplate != true"
                                     class="generate-second-option"
-                                    (click)="toggleMetaHeaderOption($event, (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true),
+                                    (click)="toggleMetaHeaderOption($event, (option.openAPI30PostTemplate != true),
                                              'includeMetaHeaderForJsonForOpenAPI30PostTemplate',
                                              'metaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate')">
-                        <span class="{{ (option.expressionOption !== 'OpenAPI30' || option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
+                        <span class="{{ (option.openAPI30PostTemplate != true) ? 'toggle-disabled' : '' }}">Include Meta Header</span>
                       </mat-checkbox>
                     </div>
                   </mat-radio-group>
@@ -390,16 +422,18 @@
             </div>
           </div>
         </div>
-
       </div>
     </mat-card-content>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" (click)="generate()"
-              [disabled]="selection.selected.length === 0">
-        <mat-icon matTooltip="Generate" fontSet="fontawesome" fontIcon="fa-file" style="color: white;"></mat-icon>
-      </button>
-    </mat-card-actions>
   </mat-card>
 
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="generate()"
+                [disabled]="selection.selected.length === 0">
+          Generate
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

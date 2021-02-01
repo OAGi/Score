@@ -1,0 +1,59 @@
+.Added {
+  color: darkgreen;
+}
+
+.Modified {
+  color: cornflowerblue;
+}
+
+.Deleted {
+  color: sienna;
+}
+
+.before {
+  color: sienna;
+  text-decoration: line-through;
+}
+
+.after {
+  color: darkgreen;
+}
+
+.min-height500 {
+  min-height: 500px;
+}
+
+.mat-input-element:disabled {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+input {
+  padding: 2px;
+}
+
+span {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.Deleted {
+  background-color: #ffe7e7;
+  border-color: #df9898;
+}
+
+.Added {
+  background-color: #ddfade;
+  border-color: #93c49f;
+}
+
+.Modified {
+  background-color: #d6f0ff;
+  border-color: #9eb6d4;
+}
+
+.overflow-unset {
+  overflow: unset;
+}
+
+.association-box:last-child {
+  padding-bottom: 12px;
+}

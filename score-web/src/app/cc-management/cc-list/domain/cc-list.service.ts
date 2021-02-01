@@ -1,11 +1,13 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {Acc, Ascc, Asccp, Bcc, Bccp, CcList, CcListRequest, SummaryCcExtInfo} from './cc-list';
 import {PageResponse} from '../../../basis/basis';
-import {BieEditAbieNode, BieEditNode, BieEditNodeDetail} from '../../../bie-management/bie-edit/domain/bie-edit-node';
+import {BieEditAbieNode, BieEditNode} from '../../../bie-management/bie-edit/domain/bie-edit-node';
+import {OagisComponentType} from '../../domain/core-component-node';
 import {base64Encode} from '../../../common/utility';
-import {map} from 'rxjs/operators';
+import {BieEditNodeDetail} from '../../../bie-management/domain/bie-flat-tree';
 
 @Injectable()
 export class CcListService {
@@ -13,8 +15,8 @@ export class CcListService {
   constructor(private http: HttpClient) {
   }
 
-  getSummaryCcExtList(): Observable<SummaryCcExtInfo> {
-    return this.http.get<SummaryCcExtInfo>('/api/info/cc_ext_summary').pipe(map(
+  getSummaryCcExtList(releaseId: number): Observable<SummaryCcExtInfo> {
+    return this.http.get<SummaryCcExtInfo>('/api/info/cc_ext_summary?releaseId=' + releaseId).pipe(map(
       e => {
         if (e.myExtensionsUnusedInBIEs) {
           e.myExtensionsUnusedInBIEs = e.myExtensionsUnusedInBIEs.map(elm => {
@@ -27,7 +29,7 @@ export class CcListService {
   }
 
   getCcList(request: CcListRequest): Observable<PageResponse<CcList>> {
-    let params = new HttpParams().set('releaseId', '' + request.releaseId)
+    let params = new HttpParams().set('releaseId', '' + request.release.releaseId)
       .set('sortActive', request.page.sortActive)
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
@@ -43,13 +45,16 @@ export class CcListService {
       params = params.set('module', request.filters.module);
     }
     if (request.types.length > 0) {
-      params = params.set('types', request.types.join(','));
+      params = params.set('types', request.types.map(e => e.toLowerCase()).join(','));
     }
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
     }
-    if (request.deprecated !== undefined) {
-      params = params.set('deprecated', '' + request.deprecated);
+    if (request.deprecated && request.deprecated.length === 1) {
+      params = params.set('deprecated', '' + request.deprecated[0]);
+    }
+    if (request.commonlyUsed && request.commonlyUsed.length === 1) {
+      params = params.set('commonlyUsed', '' + request.commonlyUsed[0]);
     }
     if (request.ownerLoginIds.length > 0) {
       params = params.set('ownerLoginIds', request.ownerLoginIds.join(','));
@@ -57,17 +62,34 @@ export class CcListService {
     if (request.updaterLoginIds.length > 0) {
       params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
     }
+    if (request.excludes.length > 0) {
+      params = params.set('excludes', request.excludes.join(','));
+    }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
     }
     if (request.updatedDate.end) {
       params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
     }
-    if (request.componentType.length > 0) {
-      params = params.set('componentType', request.componentType.join(',').replace(/ /gi, ''));
+    if (request.componentTypes && request.componentTypes.length > 0) {
+      params = params.set('componentTypes', request.componentTypes
+        .map((elm: OagisComponentType) => elm.value).join(','));
+    }
+    if (request.dtTypes && request.dtTypes.length > 0) {
+      params = params.set('dtTypes', request.dtTypes.join(','));
+    }
+    if (request.asccpTypes && request.asccpTypes.length > 0) {
+      params = params.set('asccpTypes', request.asccpTypes.join(','));
+    }
+    if (request.findUsages.type && request.findUsages.manifestId > 0) {
+      params = params.set('findUsagesType', request.findUsages.type)
+        .set('findUsagesManifestId', '' + request.findUsages.manifestId);
+    }
+    if (request.isBIEUsable) {
+      params = params.set('isBIEUsable', '' + request.isBIEUsable);
     }
 
-    return this.http.get<PageResponse<CcList>>('/api/core_component', {params: params});
+    return this.http.get<PageResponse<CcList>>('/api/core_component', {params});
   }
 
   getAsccp(id): Observable<Asccp> {
@@ -95,12 +117,12 @@ export class CcListService {
   }
 
   getChildren(node: BieEditNode): Observable<BieEditNode[]> {
-    const url = '/api/profile_bie/node/children/' + node.type;
+    const url = '/api/profile_bie/node/children/' + node.ccType.toLowerCase();
     return this.http.get<BieEditNode[]>(url, {params: this.toHttpParams(node)});
   }
 
   getDetail(node: BieEditNode): Observable<BieEditNodeDetail> {
-    const url = '/api/profile_bie/node/detail/' + node.type;
+    const url = '/api/profile_bie/node/detail/' + node.ccType.toLowerCase();
     return this.http.get<BieEditNodeDetail>(url, {params: this.toHttpParams(node)});
   }
 
@@ -118,13 +140,68 @@ export class CcListService {
 
   create(accId: number): Observable<any> {
     return this.http.put('/api/core_component/acc/create', {
-      accId: accId
+      accId
     });
   }
 
-  transferOwnership(extensionId: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/core_component/extension/' + 1 + '/' + extensionId + '/transfer_ownership', {
-      targetLoginId: targetLoginId
+  transferOwnership(type: string, manifestId: number, targetLoginId: string): Observable<any> {
+    return this.http.post<any>('/api/core_component/' +
+      type.toLowerCase() + '/' + manifestId + '/transfer_ownership', {
+      targetLoginId
+    });
+  }
+
+  transferOwnershipOnList(ccLists: CcList[], targetLoginId: string): Observable<any> {
+    const accManifestIds = [];
+    const asccpManifestIds = [];
+    const bccpManifestIds = [];
+
+    for (const item of ccLists) {
+      switch (item.type.toUpperCase()) {
+        case 'ACC':
+          accManifestIds.push(item.manifestId);
+          break;
+        case 'ASCCP':
+          asccpManifestIds.push(item.manifestId);
+          break;
+        case 'BCCP':
+          bccpManifestIds.push(item.manifestId);
+          break;
+      }
+    }
+    return this.http.post<any>('/api/core_component/transfer_ownership/multiple', {
+      targetLoginId,
+      accManifestIds,
+      asccpManifestIds,
+      bccpManifestIds,
+    });
+  }
+
+  updateStateOnList(actionType: string, toState: string, ccLists: CcList[]): Observable<any> {
+    const accManifestIds = [];
+    const asccpManifestIds = [];
+    const bccpManifestIds = [];
+
+    for (const item of ccLists) {
+      switch (item.type.toUpperCase()) {
+        case 'ACC':
+          accManifestIds.push(item.manifestId);
+          break;
+        case 'ASCCP':
+          asccpManifestIds.push(item.manifestId);
+          break;
+        case 'BCCP':
+          bccpManifestIds.push(item.manifestId);
+          break;
+      }
+    }
+
+    return this.http.post<any>('/api/core_component/state/multiple', {
+      action: actionType,
+      toState,
+      accManifestIds,
+      asccpManifestIds,
+      bccpManifestIds,
     });
   }
 

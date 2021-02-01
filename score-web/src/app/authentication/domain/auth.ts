@@ -1,3 +1,9 @@
+export class ScoreUser {
+  userId: number;
+  username: string;
+  roles: string[];
+}
+
 export class UserToken {
   username: string;
   role: string;

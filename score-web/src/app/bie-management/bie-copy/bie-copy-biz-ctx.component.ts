@@ -32,8 +32,8 @@ export class BieCopyBizCtxComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  updaterUsernameListFilterCtrl: FormControl = new FormControl();
+  filteredUpdaterUsernameList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -63,7 +63,7 @@ export class BieCopyBizCtxComponent implements OnInit {
 
     this.accountService.getAccountNames().subscribe(loginIds => {
       this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      initFilter(this.updaterUsernameListFilterCtrl, this.filteredUpdaterUsernameList, this.loginIdList);
     });
 
     this.loadBusinessContextList(true);
@@ -115,7 +115,7 @@ export class BieCopyBizCtxComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: BusinessContext) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.bizCtxValues = [];
+        elm.businessContextValueList = [];
         return elm;
       });
       if (!isInit) {
@@ -141,19 +141,19 @@ export class BieCopyBizCtxComponent implements OnInit {
   }
 
   select(row: BusinessContext) {
-    this.selection.select(row.bizCtxId);
+    this.selection.select(row.businessContextId);
   }
 
   toggle(row: BusinessContext) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.bizCtxId);
+      this.selection.deselect(row.businessContextId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BusinessContext) {
-    return this.selection.isSelected(row.bizCtxId);
+    return this.selection.isSelected(row.businessContextId);
   }
 
   next() {

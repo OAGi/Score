@@ -16,7 +16,6 @@ import {initFilter} from '../../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {BieEditAsbiepNode} from '../domain/bie-edit-node';
 
 @Component({
   selector: 'score-reuse-bie-dialog',
@@ -47,20 +46,23 @@ export class ReuseBieDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<ReuseBieDialogComponent>,
     private bieListService: BieListService,
     private accountService: AccountListService,
-    private authService: AuthService,
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
-    @Inject(MAT_DIALOG_DATA) public asbiepNode: BieEditAsbiepNode) {
+    private auth: AuthService,
+    @Inject(MAT_DIALOG_DATA) public asbiepNode: any) {
   }
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
-    this.request.filters.asccpId = this.asbiepNode.asccpId;
-    this.request.filters.releaseId = this.asbiepNode.releaseId;
+    this.request.filters.asccpManifestId = this.asbiepNode.asccpManifestId;
+    this.request.release.releaseId = this.asbiepNode.releaseId;
     this.request.excludeTopLevelAsbiepIds = [this.asbiepNode.topLevelAsbiepId,];
-    this.request.states = ['Published'];
+    this.request.states = ['Production'];
+    if (this.isDeveloper) {
+      this.request.ownedByDeveloper = true;
+    }
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -78,12 +80,13 @@ export class ReuseBieDialogComponent implements OnInit {
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
     });
-    const userToken = this.authService.getUserToken()
-    if (userToken) {
-      this.request.ownedByDeveloper = userToken.role === 'developer';
-    }
 
     this.loadBieList();
+  }
+
+  get isDeveloper() {
+    const userToken = this.auth.getUserToken();
+    return userToken.role === 'developer';
   }
 
   onPageChange(event: PageEvent) {

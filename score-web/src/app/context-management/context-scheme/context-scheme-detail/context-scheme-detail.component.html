@@ -1,15 +1,17 @@
 <div class="context-section">
-  <mat-card>
+  <mat-card class="pt-4 pb-2">
     <mat-card-header>
       <mat-card-title>{{ title }}</mat-card-title>
     </mat-card-header>
-
-    <mat-card>
+    <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <mat-form-field>
-          <mat-select placeholder="Context Category" required [(ngModel)]="contextScheme.ctxCategoryId">
-            <mat-option *ngFor="let ctxCategory of ctxCategories" [value]="ctxCategory.ctxCategoryId">
-              {{ctxCategory.name}}
+          <mat-select placeholder="Context Category" required [(ngModel)]="contextScheme.contextCategoryId">
+            <ngx-mat-select-search [formControl]="ctxCategoriesFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
+            <mat-option *ngFor="let contextCategory of filteredCtxCategories | async" [value]="contextCategory.contextCategoryId">
+              {{contextCategory.name}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -19,46 +21,27 @@
           <input matInput required [(ngModel)]="contextScheme.schemeName" maxlength="255"/>
         </mat-form-field>
 
-        <mat-checkbox label="Import from Code List"
-                      [(ngModel)]="importFromCodeList"
-                      (change)="resetCreateForm($event)"
-                      matTooltip="It cannot be modified if some Context Scheme Values are specified or using by Business Context."
-                      [matTooltipDisabled]="canImport()"
-                      [disabled]="!canImport()">
-          Import from Code List
-        </mat-checkbox>
-
-        <mat-form-field *ngIf="importFromCodeList">
-          <mat-select placeholder="Code List" [(ngModel)]="contextScheme.codeListId"
-                      (selectionChange)="completeInputAgencyAndVersion($event)"
-                      [disabled]="!canImport()">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="codeListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching Code List found.'">
-              </ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let codeList of filteredCodeLists | async" [value]="codeList.codeListId">
-            {{codeList?.codeListName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="row" style="padding: 8px 0 8px 12px;">
+          <button mat-raised-button
+                  *ngIf="canImport()"
+                  (click)="openCodeListDialog()" color="primary">
+            Load from Code List
+          </button>
+        </div>
 
         <mat-form-field>
           <mat-label>Scheme ID</mat-label>
-          <input matInput required [(ngModel)]="contextScheme.schemeId" maxlength="45" [disabled]="importFromCodeList"/>
+          <input matInput required [(ngModel)]="contextScheme.schemeId" maxlength="45"/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Agency ID</mat-label>
-          <input matInput required [(ngModel)]="contextScheme.schemeAgencyId" maxlength="45"
-                 [disabled]="importFromCodeList"/>
+          <input matInput required [(ngModel)]="contextScheme.schemeAgencyId" maxlength="45"/>
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Version</mat-label>
-          <input matInput required [(ngModel)]="contextScheme.schemeVersionId" maxlength="45"
-                 [disabled]="importFromCodeList"/>
+          <input matInput required [(ngModel)]="contextScheme.schemeVersionId" maxlength="45"/>
         </mat-form-field>
 
         <mat-form-field>
@@ -81,10 +64,10 @@
             <!-- Checkbox Column -->
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox [checked]="selection.hasValue() && isAllSelected()"
-                              [indeterminate]="selection.hasValue() && !isAllSelected()"
+                <mat-checkbox (click)="$event.stopPropagation()"
+                              [checked]="selection.hasValue() && isAllSelected()"
                               (change)="masterToggle()"
-                              [disabled]="importFromCodeList">
+                              [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
@@ -93,7 +76,7 @@
                               matTooltip="It is currently in use by another component."
                               [matTooltipDisabled]="!row.used"
                               [checked]="isSelected(row)"
-                              [disabled]="importFromCodeList || row.used">
+                              [disabled]="row.used">
                 </mat-checkbox>
               </td>
             </ng-container>
@@ -119,30 +102,32 @@
         </div>
       </mat-card-content>
       <mat-card-actions style="padding: 8px 0 8px 12px;">
-        <button mat-raised-button (click)="openDialog()" color="primary" [disabled]="importFromCodeList">
+        <button mat-raised-button (click)="openDialog()" color="primary">
           <mat-icon>add</mat-icon>
           Add
         </button>
         <button mat-raised-button (click)="removeSchemeValues()" [hidden]="dataSource.data.length === 0"
-                [disabled]="this.selection.selected.length === 0 || importFromCodeList"
+                [disabled]="this.selection.selected.length === 0"
                 color="warn">
           <mat-icon>delete</mat-icon>
           Remove
         </button>
       </mat-card-actions>
-
     </mat-card>
   </mat-card>
 
-  <mat-card>
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" (click)="update()"
-              [disabled]="!isChanged() || isDisabled(contextScheme)">
-        <mat-icon matTooltip="Update">save</mat-icon>
-      </button>
-      <button mat-mini-fab color="warn" (click)="discard()">
-        <mat-icon matTooltip="Discard">delete</mat-icon>
-      </button>
-    </mat-card-actions>
-  </mat-card>
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="update()"
+                [disabled]="!isChanged() || isDisabled(contextScheme)">
+          Update
+        </button>
+        <button mat-raised-button color="warn" (click)="discard()"
+                *ngIf="!this.contextScheme.used">
+          Discard
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

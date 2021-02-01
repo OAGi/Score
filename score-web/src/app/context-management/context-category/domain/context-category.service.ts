@@ -20,6 +20,15 @@ export class ContextCategoryService implements OnInit {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
+    if (request.updaterUsernameList.length > 0) {
+      params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
+    }
+    if (request.updatedDate.start) {
+      params = params.set('updateStart', '' + request.updatedDate.start.getTime());
+    }
+    if (request.updatedDate.end) {
+      params = params.set('updateEnd', '' + request.updatedDate.end.getTime());
+    }
     if (request.filters.name) {
       params = params.set('name', request.filters.name);
     }
@@ -46,18 +55,18 @@ export class ContextCategoryService implements OnInit {
   }
 
   update(contextCategory: ContextCategory): Observable<any> {
-    return this.http.post('/api/context_category/' + contextCategory.ctxCategoryId, {
+    return this.http.post('/api/context_category/' + contextCategory.contextCategoryId, {
       'name': contextCategory.name,
       'description': contextCategory.description
     });
   }
 
-  delete(...ctxCategoryIds): Observable<any> {
-    if (ctxCategoryIds.length === 1) {
-      return this.http.delete('/api/context_category/' + ctxCategoryIds[0]);
+  delete(...contextCategoryIds): Observable<any> {
+    if (contextCategoryIds.length === 1) {
+      return this.http.delete('/api/context_category/' + contextCategoryIds[0]);
     } else {
       return this.http.post<any>('/api/context_category/delete', {
-        ctxCategoryIds: ctxCategoryIds
+        contextCategoryIdList: contextCategoryIds
       });
     }
   }

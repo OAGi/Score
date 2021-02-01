@@ -1,11 +1,11 @@
 <div class="context-section">
-  <mat-card>
+  <mat-card class="pt-4 pb-2">
     <mat-card-header>
       <mat-card-title>{{ "BIE_COPY.TITLE" | translate }}</mat-card-title>
       <mat-card-subtitle>{{ subtitle }}</mat-card-subtitle>
     </mat-card-header>
 
-    <mat-card class="search-box">
+    <mat-card class="mb-2 search-box">
       <mat-card-content class="mat-card-container">
         <div class="container-fluid" style="padding: 0;">
           <div class="row">
@@ -13,8 +13,29 @@
               <mat-form-field>
                 <mat-label>Selected Business Contexts</mat-label>
                 <mat-select [(ngModel)]="bizCtxIds" multiple required>
-                  <mat-option *ngFor="let bizCtx of bizCtxList" [value]="bizCtx.bizCtxId" [disabled]="true">
+                  <mat-option *ngFor="let bizCtx of bizCtxList" [value]="bizCtx.businessContextId" [disabled]="true">
                     {{ bizCtx.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <mat-form-field>
+                <mat-label>Branch</mat-label>
+                <mat-select [(ngModel)]="request.release" (ngModelChange)="onReleaseChange('copyBIE', request.release)">
+                  <mat-select-trigger class="d-flex">
+                    <span>{{ request.release.releaseNum }}</span>
+                    <span class="f12 ml-auto {{ request.release.state }}">
+                      {{ request.release.state | separate }}
+                    </span>
+                  </mat-select-trigger>
+                  <mat-option *ngFor="let release of releases" [value]="release">
+                    <div class="d-flex">
+                      <span class="release-num">{{ release.releaseNum }}</span>
+                      <span class="f12 ml-auto {{ release.state }}">
+                        {{ release.state | separate }}
+                      </span>
+                    </div>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -52,7 +73,7 @@
               </mat-form-field>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateStart" placeholder="Updated start date"
                        [max]="request.updatedDate.end" [value]="request.updatedDate.start"
@@ -69,7 +90,7 @@
               </div>
             </div>
 
-            <div class="col-md-2 col-sm-12" style="display: flex;">
+            <div class="col-md-2 col-sm-12 d-flex">
               <mat-form-field>
                 <input matInput [matDatepicker]="dateEnd" placeholder="Updated end date"
                        [min]="request.updatedDate.start" [value]="request.updatedDate.end"
@@ -165,11 +186,6 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="release">
-            <th mat-header-cell *matHeaderCellDef> Release</th>
-            <td mat-cell *matCellDef="let element">{{ element.releaseNum }}</td>
-          </ng-container>
-
           <ng-container matColumnDef="owner">
             <th mat-header-cell *matHeaderCellDef> Owner</th>
             <td mat-cell *matCellDef="let element">
@@ -182,8 +198,11 @@
             <td mat-cell *matCellDef="let element">
               <mat-chip-list class="ellipsis" *ngIf="element.businessContexts.length > 0" selectable="false">
                 <a target="_blank" rel="noopener noreferrer" *ngIf="element.businessContexts.length > 0"
-                   href="/context_management/business_context/{{ element.businessContexts[0].bizCtxId }}">
-                  <mat-chip>{{ element.businessContexts[0].name }}</mat-chip>
+                   href="/context_management/business_context/{{ element.businessContexts[0].businessContextId }}">
+                  <mat-chip [matTooltip]="element.businessContexts[0].name"
+                            [matTooltipDisabled]="element.businessContexts[0].name.length <= 30">
+                    {{ element.businessContexts[0].name | truncate: 30 }}
+                  </mat-chip>
                 </a>
                 <a target="_blank" rel="noopener noreferrer"
                    routerLink="/profile_bie/edit/{{ element.topLevelAsbiepId }}">
@@ -193,14 +212,34 @@
             </td>
           </ng-container>
 
+
+
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef> Version</th>
-            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.version }}">{{ element.version }}</td>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis" title="{{ element.version }}">{{ element.version }}</div>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status</th>
-            <td mat-cell *matCellDef="let element" class="ellipsis" title="{{ element.status }}">{{ element.status }}</td>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis" title="{{ element.status }}">{{ element.status }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="bizTerm">
+            <th mat-header-cell *matHeaderCellDef> Business Term</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.bizTerm }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="remark">
+            <th mat-header-cell *matHeaderCellDef> Remark</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="ellipsis">{{ element.remark }}</div>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="lastUpdateTimestamp">
@@ -224,19 +263,20 @@
       </div>
 
     </mat-card-content>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="warn" (click)="back()">
-        <mat-icon matTooltip="Back">reply</mat-icon>
-      </button>
-      <button mat-mini-fab color="primary" (click)="copy()"
-              [hidden]="dataSource.data.length == 0"
-              [disabled]="this.selection.selected.length == 0">
-        <mat-icon matTooltip="{{ (this.selection.selected.length > 0) ?
-        'Copy BIE from ' + this.selection.selected[0].propertyTerm : '' }}">file_copy
-        </mat-icon>
-      </button>
-    </mat-card-actions>
-
   </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="warn" (click)="back()">
+          Back
+        </button>
+        <button mat-raised-button color="primary" (click)="copy()"
+                [hidden]="dataSource.data.length == 0"
+                [disabled]="this.selection.selected.length == 0">
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

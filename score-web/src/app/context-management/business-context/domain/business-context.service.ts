@@ -20,8 +20,8 @@ export class BusinessContextService implements OnInit {
       .set('sortDirection', request.page.sortDirection)
       .set('pageIndex', '' + request.page.pageIndex)
       .set('pageSize', '' + request.page.pageSize);
-    if (request.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', request.updaterLoginIds.join(','));
+    if (request.updaterUsernameList.length > 0) {
+      params = params.set('updaterUsernameList', request.updaterUsernameList.join(','));
     }
     if (request.updatedDate.start) {
       params = params.set('updateStart', '' + request.updatedDate.start.getTime());
@@ -40,9 +40,9 @@ export class BusinessContextService implements OnInit {
     return this.http.get<BusinessContext>('/api/business_context/' + id);
   }
 
-  getBusinessContextsByBizCtxIds(bizCtxIds: number[]): Observable<PageResponse<BusinessContext>> {
+  getBusinessContextsByBizCtxIds(businessContextIdList: number[]): Observable<PageResponse<BusinessContext>> {
     const params = new HttpParams()
-      .set('bizCtxIds', bizCtxIds.join(','));
+      .set('businessContextIdList', businessContextIdList.join(','));
 
     return this.http.get<PageResponse<BusinessContext>>('/api/business_contexts', {params: params});
   }
@@ -58,40 +58,40 @@ export class BusinessContextService implements OnInit {
     return this.http.get<BusinessContextValue[]>('/api/business_context_values');
   }
 
-  create(bizCtx: BusinessContext): Observable<any> {
+  create(businessContext: BusinessContext): Observable<any> {
     return this.http.put('/api/business_context', {
-      'name': bizCtx.name,
-      'bizCtxValues': bizCtx.bizCtxValues
+      'name': businessContext.name,
+      'businessContextValueList': businessContext.businessContextValueList
     });
   }
 
-  update(bizCtx: BusinessContext): Observable<any> {
-    return this.http.post('/api/business_context/' + bizCtx.bizCtxId, {
-      'name': bizCtx.name,
-      'bizCtxValues': bizCtx.bizCtxValues
+  update(businessContext: BusinessContext): Observable<any> {
+    return this.http.post('/api/business_context/' + businessContext.businessContextId, {
+      'name': businessContext.name,
+      'businessContextValueList': businessContext.businessContextValueList
     });
   }
 
-  assign(topLevelAsbiepId: number, bizCtx: BusinessContext): Observable<any> {
+  assign(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
-    return this.http.put('/api/business_context/' + bizCtx.bizCtxId, null, {params: params});
+    return this.http.put('/api/business_context/' + businessContext.businessContextId, null, {params: params});
   }
 
-  dismiss(topLevelAsbiepId: number, bizCtx: BusinessContext): Observable<any> {
+  dismiss(topLevelAsbiepId: number, businessContext: BusinessContext): Observable<any> {
     const params = new HttpParams()
       .set('topLevelAsbiepId', '' + topLevelAsbiepId);
 
-    return this.http.delete('/api/business_context/' + bizCtx.bizCtxId, {params: params});
+    return this.http.delete('/api/business_context/' + businessContext.businessContextId, {params: params});
   }
 
-  delete(...bizCtxIds): Observable<any> {
-    if (bizCtxIds.length === 1) {
-      return this.http.delete('/api/business_context/' + bizCtxIds[0]);
+  delete(...businessContextIds): Observable<any> {
+    if (businessContextIds.length === 1) {
+      return this.http.delete('/api/business_context/' + businessContextIds[0]);
     } else {
       return this.http.post<any>('/api/business_context/delete', {
-        bizCtxIds: bizCtxIds
+        businessContextIds: businessContextIds
       });
     }
   }
@@ -100,9 +100,9 @@ export class BusinessContextService implements OnInit {
     return this.http.get<BusinessContextRule[]>('/api/profile_bie/' + id + '/biz_ctx');
   }
 
-  assignBizCtx(bie: BieEditAbieNode, bizCtxList: number[]): Observable<any> {
+  assignBizCtx(bie: BieEditAbieNode, businessContextList: number[]): Observable<any> {
     return this.http.post('/api/profile_bie/' + bie.topLevelAsbiepId + '/assign_biz_ctx', {
-      bizCtxList: bizCtxList
+      businessContextList: businessContextList
     });
   }
 }

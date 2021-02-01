@@ -1,0 +1,822 @@
+<div class="row" *ngIf="component === 'ACC'">
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ before.component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="before.guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="before.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Based ACC" maxlength="41"
+                     [class]="diffClass(asAcc(before).basedAccObjectClassTerm, asAcc(after).basedAccObjectClassTerm)"
+                     [value]="asAcc(before).basedAccObjectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="before.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Object Class Term" maxlength="100"
+                     [class]="diffClass(asAcc(before).objectClassTerm, asAcc(after).objectClassTerm)"
+                     [value]="asAcc(before).objectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="before.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Component Type"
+                     [class]="diffClass(asAcc(before).componentType, asAcc(after).componentType)"
+                     [value]="asAcc(before).componentType || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAcc(before).abstract"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAcc(before).abstract, asAcc(after).abstract)">Abstract</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAcc(before).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAcc(before).deprecated, asAcc(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asAcc(before).namespaceUrl, asAcc(after).namespaceUrl)"
+                     [value]="asAcc(before).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [value]="before.definitionSource || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="before.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div *ngFor="let assoc of associations;" class="association-box">
+        <mat-card class="mb-2" [class]="assoc.revisionActionAssociation !== 'Modified' ? assoc.revisionActionAssociation : ''">
+          <mat-card-title>{{ assoc.component | uppercase }}</mat-card-title>
+          <mat-card-content>
+            <div class="cc-node-detail-container"
+                 [style]="'visibility: ' + ((!assoc.before.guid) ? 'hidden' : 'inherit')">
+              <mat-form-field>
+                <input matInput placeholder="GUID" maxlength="41"
+                       [value]="assoc.before.guid || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="DEN" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(before.den, after.den)"
+                       [value]="asAssociation(assoc.before).den || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Entity Type" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(asAssociation(assoc.before).entityType, asAssociation(assoc.after).entityType)"
+                       [value]="asAssociation(assoc.before).entityType || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min"
+                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                            diffClass(asAssociation(assoc.before).cardinalityMin, asAssociation(assoc.after).cardinalityMin)"
+                           [value]="asAssociation(assoc.before).cardinalityMin"
+                           [disabled]="true">
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Max"
+                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                            diffClass(asAssociation(assoc.before).cardinalityMax, asAssociation(assoc.after).cardinalityMax)"
+                           [value]="asAssociation(assoc.before).cardinalityMax | unbounded"
+                           [disabled]="true">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [checked]="asAssociation(assoc.before).deprecated"
+                                  [disabled]="true">
+                    <span [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(asAssociation(assoc.before).deprecated, asAssociation(assoc.after).deprecated)">Deprecated</span>
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Default Value" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(asAssociation(assoc.before).defaultValue, asAssociation(assoc.after).defaultValue)"
+                       [value]="asAssociation(assoc.before).defaultValue || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Fixed value" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(asAssociation(assoc.before).fixedValue, asAssociation(assoc.after).fixedValue)"
+                       [value]="asAssociation(assoc.before).fixedValue || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                        diffClass(asAssociation(assoc.before).definitionSource, asAssociation(assoc.after).definitionSource)"
+                       [disabled]="true" [value]="assoc.before.definitionSource || ' '">
+              </mat-form-field>
+
+              <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).definition, asAssociation(assoc.after).definition)"
+                          [value]="assoc.before.definition || ' '"
+                          [disabled]="true"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-dialog-content>
+  </div>
+
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ after.component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="after.guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="after.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Based ACC" maxlength="41"
+                     [class]="diffClass(asAcc(before).basedAccObjectClassTerm, asAcc(after).basedAccObjectClassTerm)"
+                     [value]="asAcc(after).basedAccObjectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="after.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Object Class Term" maxlength="100"
+                     [class]="diffClass(asAcc(before).objectClassTerm, asAcc(after).objectClassTerm)"
+                     [value]="asAcc(after).objectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="after.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Component Type"
+                     [class]="diffClass(asAcc(before).componentType, asAcc(after).componentType)"
+                     [value]="asAcc(after).componentType || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAcc(after).abstract"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAcc(before).abstract, asAcc(after).abstract)">Abstract</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAcc(after).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAcc(before).deprecated, asAcc(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asAcc(before).namespaceUrl, asAcc(after).namespaceUrl)"
+                     [value]="asAcc(after).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [value]="after.definitionSource || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="after.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div *ngFor="let assoc of associations;" class="association-box">
+        <mat-card class="mb-2" [class]="assoc.revisionActionAssociation !== 'Modified' ? assoc.revisionActionAssociation : ''">
+          <mat-card-title>{{ assoc.component | uppercase }}</mat-card-title>
+          <mat-card-content>
+            <div class="cc-node-detail-container"
+                 [style]="'visibility: ' + (!(assoc.after.guid) ? 'hidden' : 'inherit')">
+              <mat-form-field>
+                <input matInput placeholder="GUID" maxlength="41"
+                       [value]="assoc.after.guid || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="DEN" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).den, asAssociation(assoc.after).den)"
+                       [value]="assoc.after.den || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Entity Type" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).entityType, asAssociation(assoc.after).entityType)"
+                       [value]="asAssociation(assoc.after).entityType || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Min"
+                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).cardinalityMin, asAssociation(assoc.after).cardinalityMin)"
+                           [value]="asAssociation(assoc.after).cardinalityMin"
+                           [disabled]="true">
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field>
+                    <input matInput placeholder="Cardinality Max"
+                           [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).cardinalityMax, asAssociation(assoc.after).cardinalityMax)"
+                           [value]="asAssociation(assoc.after).cardinalityMax | unbounded"
+                           [disabled]="true">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="checkbox">
+                    <mat-checkbox color="primary"
+                                  [checked]="assoc.after.deprecated"
+                                  [disabled]="true">
+                    <span [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).deprecated, asAssociation(assoc.after).deprecated)">Deprecated</span>
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Default Value" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).defaultValue, asAssociation(assoc.after).defaultValue)"
+                       [value]="asAssociation(assoc.after).defaultValue || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field *ngIf="assoc.component === 'BCC'">
+                <input matInput placeholder="Fixed value" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).fixedValue, asAssociation(assoc.after).fixedValue)"
+                       [value]="asAssociation(assoc.after).fixedValue || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <input matInput placeholder="Definition Source" maxlength="200"
+                       [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).definitionSource, asAssociation(assoc.after).definitionSource)"
+                       [value]="assoc.after.definitionSource || ' '"
+                       [disabled]="true">
+              </mat-form-field>
+
+              <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="asAssociation(assoc.before).color !== 'Modified' ? asAssociation(assoc.before).color :
+                              diffClass(asAssociation(assoc.before).definition, asAssociation(assoc.after).definition)"
+                          [value]="assoc.after.definition || ' '"
+                          [disabled]="true"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-dialog-content>
+  </div>
+</div>
+
+<!-- ASCCP -->
+<div class="row" *ngIf="component === 'ASCCP'">
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ before.component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="before.guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="before.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Role Of ACC" maxlength="41"
+                     [class]="diffClass(asAsccp(before).roleOfAccObjectClassTerm, asAsccp(after).roleOfAccObjectClassTerm)"
+                     [value]="asAsccp(before).roleOfAccObjectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="before.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Property Term" maxlength="100"
+                     [class]="diffClass(asAsccp(before).propertyTerm, asAsccp(after).propertyTerm)"
+                     [value]="asAsccp(before).propertyTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="before.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(before).reusable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).reusable, asAsccp(after).reusable)">Reusable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(before).nillable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).nillable, asAsccp(after).nillable)">Nillable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(before).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).deprecated, asAsccp(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asAsccp(before).namespaceUrl, asAsccp(after).namespaceUrl)"
+                     [value]="asAsccp(before).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [disabled]="true" [value]="before.definitionSource || ' '">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="before.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-dialog-content>
+  </div>
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ after.component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="after.guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="after.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Role Of ACC" maxlength="41"
+                     [class]="diffClass(asAsccp(before).roleOfAccObjectClassTerm, asAsccp(after).roleOfAccObjectClassTerm)"
+                     [value]="asAsccp(after).roleOfAccObjectClassTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="after.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Property Term" maxlength="100"
+                     [class]="diffClass(asAsccp(before).propertyTerm, asAsccp(after).propertyTerm)"
+                     [value]="asAsccp(after).propertyTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="after.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(after).reusable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).reusable, asAsccp(after).reusable)">Reusable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(after).nillable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).nillable, asAsccp(after).nillable)">Nillable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asAsccp(after).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asAsccp(before).deprecated, asAsccp(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asAsccp(before).namespaceUrl, asAsccp(after).namespaceUrl)"
+                     [value]="asAsccp(after).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [disabled]="true" [value]="after.definitionSource || ' '">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="after.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-dialog-content>
+  </div>
+</div>
+
+
+<!-- BCCP -->
+<div class="row" *ngIf="component === 'BCCP'">
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ asBccp(before).component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="asBccp(before).guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="before.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Business Data Type" maxlength="41"
+                     [class]="diffClass(asBccp(before).bdtDen, asBccp(after).bdtDen)"
+                     [value]="asBccp(before).bdtDen || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="before.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Property Term" maxlength="100"
+                     [class]="diffClass(asBccp(before).propertyTerm, asBccp(after).propertyTerm)"
+                     [value]="asBccp(before).propertyTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="before.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asBccp(before).nillable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asBccp(before).nillable, asBccp(after).nillable)">Nillable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asBccp(before).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asBccp(before).deprecated, asBccp(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Default Value"
+                     [class]="diffClass(asBccp(before).defaultValue, asBccp(after).defaultValue)"
+                     [value]="asBccp(before).defaultValue || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Fixed Value"
+                     [class]="diffClass(asBccp(before).fixedValue, asBccp(after).fixedValue)"
+                     [value]="asBccp(before).fixedValue || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asBccp(before).namespaceUrl, asBccp(after).namespaceUrl)"
+                     [value]="asBccp(before).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [disabled]="true" [value]="before.definitionSource || ' '">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="before.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-dialog-content>
+  </div>
+  <div class="col-6">
+    <mat-dialog-content class="overflow-unset">
+      <mat-card class="mb-2">
+        <mat-card-title>{{ asBccp(before).component | uppercase }}</mat-card-title>
+        <mat-card-content>
+          <div class="cc-node-detail-container">
+            <mat-form-field>
+              <input matInput placeholder="GUID" maxlength="41"
+                     [value]="asBccp(after).guid || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Owner" maxlength="41"
+                     [class]="diffClass(before.ownerUserLoginId, after.ownerUserLoginId)"
+                     [value]="after.ownerUserLoginId || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Business Data Type" maxlength="41"
+                     [class]="diffClass(asBccp(before).bdtDen, asBccp(after).bdtDen)"
+                     [value]="asBccp(after).bdtDen || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="State" maxlength="41"
+                     [class]="diffClass(before.state, after.state)"
+                     [value]="after.state || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Property Term" maxlength="100"
+                     [class]="diffClass(asBccp(before).propertyTerm, asBccp(after).propertyTerm)"
+                     [value]="asBccp(after).propertyTerm || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="DEN" maxlength="200"
+                     [class]="diffClass(before.den, after.den)"
+                     [value]="after.den || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asBccp(after).nillable"
+                                [disabled]="true">
+                    <span [class]="diffClass(asBccp(before).nillable, asBccp(after).nillable)">Nillable</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="checkbox">
+                  <mat-checkbox color="primary"
+                                [checked]="asBccp(after).deprecated"
+                                [disabled]="true">
+                    <span [class]="diffClass(asBccp(before).deprecated, asBccp(after).deprecated)">Deprecated</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <mat-form-field>
+              <input matInput placeholder="Default Value"
+                     [class]="diffClass(asBccp(before).defaultValue, asBccp(after).defaultValue)"
+                     [value]="asBccp(after).defaultValue || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Fixed Value"
+                     [class]="diffClass(asBccp(before).fixedValue, asBccp(after).fixedValue)"
+                     [value]="asBccp(after).fixedValue || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Namespace"
+                     [class]="diffClass(asBccp(before).namespaceUrl, asBccp(after).namespaceUrl)"
+                     [value]="asBccp(after).namespaceUrl || ' '"
+                     [disabled]="true">
+            </mat-form-field>
+
+            <mat-form-field>
+              <input matInput placeholder="Definition Source" maxlength="200"
+                     [class]="diffClass(before.definitionSource, after.definitionSource)"
+                     [disabled]="true" [value]="after.definitionSource || ' '">
+            </mat-form-field>
+
+            <mat-form-field>
+                <textarea matInput rows="6" cols="30" placeholder="Definition"
+                          [class]="diffClass(before.definition, after.definition)"
+                          [value]="after.definition || ' '"
+                          [disabled]="true"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-dialog-content>
+  </div>
+</div>
+

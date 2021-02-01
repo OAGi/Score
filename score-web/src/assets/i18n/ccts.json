@@ -6,23 +6,24 @@
   },
   "ACC_DETAIL": {
     "TITLE": "ACC",
+    "TITLE_CASE": "ACC Detail",
     "OBJECT": "Object Class Term",
     "DEN": "DEN"
   },
   "ASCCP_DETAIL": {
-    "TITLE": "ASCCP ",
+    "TITLE": "ASCCP",
     "TITLE_CASE": "ASCCP Detail",
     "PROPERTY_TERM": "Property Term",
     "DEN": "DEN"
   },
   "ASCC_DETAIL": {
-    "TITLE": "ASCC ",
+    "TITLE": "ASCC",
     "TITLE_CASE": "ASCC Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN"
   },
   "BCC_DETAIL": {
-    "TITLE": "BCC ",
+    "TITLE": "BCC",
     "TITLE_CASE": "BCC Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN"
@@ -34,14 +35,15 @@
     "DEN": "DEN"
   },
   "DATA_TYPE_DETAIL": {
-    "TITLE": "Data Type ",
+    "TITLE": "Data Type",
+    "TITLE_CASE": "Data Type Detail",
     "DEN": "DEN",
     "DEFAULT_VALUE": "Default Value",
     "FIXED_VALUE": "Fixed Value"
   },
   "BDT_SC_DETAIL": {
-    "TITLE": "BDT_SC",
-    "TITLE_CASE": "Supplementary Component",
+    "TITLE": "Supplementary Component",
+    "TITLE_CASE": "Supplementary Component Detail",
     "MAX": "Cardinality Max (-1 for unbounded)",
     "DEN": "DEN",
     "DEFAULT_VALUE": "Default Value",
@@ -57,6 +59,9 @@
   },
   "BIE_COPY": {
     "TITLE": "Copy BIE"
+  },
+  "BIE_UPLIFT": {
+    "TITLE": "Uplift BIE"
   },
   "BIE_CREATE": {
     "TITLE": "Create BIE"
@@ -76,6 +81,7 @@
     "CREATE": "",
     "VIEW": "",
     "COPY": "",
+    "UPLIFT": "",
     "GENERATE": ""
   },
   "CC_NAV": {

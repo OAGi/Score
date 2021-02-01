@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {ContextCategoryService} from './domain/context-category.service';
 import {ContextCategoryListComponent} from './context-category-list/context-category-list.component';
@@ -37,6 +37,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forChild(routes),
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
     CommonModule

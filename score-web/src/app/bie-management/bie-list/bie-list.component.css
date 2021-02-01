@@ -26,10 +26,6 @@ tr.element-row:not(.expanded-row):active {
   background: #efefef;
 }
 
-.element-row td {
-  border-bottom-width: 0;
-}
-
 .element-detail {
   overflow: hidden;
   display: flex;
@@ -61,15 +57,15 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .mat-column-version, .mat-column-status {
-  width: 100px;
-}
-
-.mat-column-state {
-  width: 90px;
-}
-
-.mat-column-owner {
   width: 5%;
+}
+
+.mat-column-bizTerm, .mat-column-remark {
+  width: 10%;
+}
+
+.mat-column-state, .mat-column-owner {
+  width: 90px;
 }
 
 .mat-column-lastUpdateTimestamp {
@@ -80,21 +76,6 @@ tr.element-row:not(.expanded-row):active {
   width: 40px;
 }
 
-.ngx-contextmenu a {
-  text-decoration: none;
-}
-
-.ngx-contextmenu .dropdown-menu {
-  padding: 0.25rem 0.8rem;
-}
-
-span.context-menu-item {
-  display: block;
+.f12 {
   font-size: 12px;
-  width: 92%;
-  outline: 0;
-  font-weight: 400;
-  border: solid 1px transparent;
-  line-height: 10px;
-  cursor: pointer;
 }

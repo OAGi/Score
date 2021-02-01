@@ -2,14 +2,16 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ScoreCommonModule} from '../../common/score-common.module';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
+import {CodelistListDialogComponent} from './codelist-list-dialog/codelist-list-dialog.component';
+import {ContextSchemeValueDialogComponent} from './context-scheme-value-dialog/context-scheme-value-dialog.component';
 import {ContextSchemeService} from './domain/context-scheme.service';
 import {ContextSchemeListComponent} from './context-scheme-list/context-scheme-list.component';
 import {ContextSchemeCreateComponent} from './context-scheme-create/context-scheme-create.component';
 import {ContextSchemeDetailComponent} from './context-scheme-detail/context-scheme-detail.component';
 import {ConfirmDialogModule} from '../../common/confirm-dialog/confirm-dialog.module';
-import {ContextSchemeValueDialogComponent} from './context-scheme-value-dialog/context-scheme-value-dialog.component';
 
 const routes: Routes = [
   {
@@ -42,15 +44,18 @@ const routes: Routes = [
     MaterialModule,
     ConfirmDialogModule,
     CommonModule,
+    ScoreCommonModule
   ],
   declarations: [
     ContextSchemeListComponent,
     ContextSchemeCreateComponent,
     ContextSchemeDetailComponent,
-    ContextSchemeValueDialogComponent
+    ContextSchemeValueDialogComponent,
+    CodelistListDialogComponent
   ],
   entryComponents: [
-    ContextSchemeValueDialogComponent
+    ContextSchemeValueDialogComponent,
+    CodelistListDialogComponent
   ],
   providers: [
     ContextSchemeService

@@ -1,4 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseService} from '../../release-management/domain/release.service';
 import {BieListService} from './domain/bie-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -15,13 +17,13 @@ import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
-import {ConfirmDialogConfig} from '../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../common/confirm-dialog/confirm-dialog.component';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {finalize} from 'rxjs/operators';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {UserToken} from '../../authentication/domain/auth';
 
 @Component({
   selector: 'score-bie-list',
@@ -32,20 +34,21 @@ export class BieListComponent implements OnInit {
   title = 'BIE';
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'release', 'owner',
+    'select', 'state', 'propertyTerm', 'owner',
     'transferOwnership', 'businessContexts', 'version',
-    'status', 'lastUpdateTimestamp', 'more'
+    'status', 'bizTerm', 'remark', 'lastUpdateTimestamp', 'more'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
+  releases: SimpleRelease[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['Initiating', 'Editing', 'Candidate', 'Published'];
+  states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -54,9 +57,11 @@ export class BieListComponent implements OnInit {
 
   constructor(private service: BieListService,
               private accountService: AccountListService,
+              private releaseService: ReleaseService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService,
               private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
@@ -78,25 +83,58 @@ export class BieListComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([loginIds, releases]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadBieList(true);
+      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      if (this.releases.length > 0) {
+        if (this.request.release.releaseId) {
+          this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
+        } else {
+          const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
+          if (savedReleaseId) {
+            this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+            if (!this.request.release) {
+              this.request.release = this.releases[0];
+              saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+            }
+          } else {
+            this.request.release = this.releases[0];
+          }
+        }
+      }
+      this.loadBieList(true);
+    });
   }
 
-  get currentUser(): string {
-    const userToken = this.auth.getUserToken();
+  get username(): string {
+    const userToken = this.userToken;
     return (userToken) ? userToken.username : undefined;
+  }
+
+  get role(): string {
+    const userToken = this.userToken;
+    return (userToken) ? userToken.role : undefined;
+  }
+
+  get userToken(): UserToken {
+    return this.auth.getUserToken();
   }
 
   onPageChange(event: PageEvent) {
     this.loadBieList();
   }
 
-  onChange() {
+  onChange(property?: string, source?) {
+    if (property === 'branch') {
+      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
+    }
+
     this.paginator.pageIndex = 0;
     this.loadBieList();
   }
@@ -181,14 +219,10 @@ export class BieListComponent implements OnInit {
   }
 
   isEditable(element: BieList) {
-    return element.owner === this.currentUser && element.state === 'Editing';
+    return element.owner === this.username && element.state === 'WIP';
   }
 
   onContextMenu($event: MouseEvent, item: BieList): void {
-    if (!this.isEditable(item)) {
-      return;
-    }
-
     this.contextMenuService.show.next({
       contextMenu: this.contextMenu,
       event: $event,
@@ -199,29 +233,30 @@ export class BieListComponent implements OnInit {
     $event.stopPropagation();
   }
 
-  discard() {
-    this.openDialogBieDiscard();
+  discardAllSelected() {
+    this.openDialogBieDiscard(this.selection.selected);
   }
 
-  openDialogBieDiscard() {
-    const topLevelAsbiepIds = this.selection.selected;
+  discard(bieList: BieList, $event) {
+    this.openDialogBieDiscard([bieList.topLevelAsbiepId,]);
+  }
 
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+  openDialogBieDiscard(topLevelAsbiepIds: number[]) {
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Discard ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?',
+      'Are you sure you want to discard the ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + '?',
       'The ' + (topLevelAsbiepIds.length > 1 ? 'BIEs' : 'BIE') + ' will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(topLevelAsbiepIds).subscribe(_ => {
+          this.loading = true;
+          this.service.delete(topLevelAsbiepIds).pipe(finalize(() => {
+            this.loading = false;
+          })).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
@@ -232,16 +267,22 @@ export class BieListComponent implements OnInit {
       });
   }
 
-  openTransferDialog(topLevelAsbiepId: number, $event) {
-    console.log('openTransferDialog(' + topLevelAsbiepId + ', ' + $event + ')');
+  openTransferDialog(bieList: BieList, $event) {
+    if (!this.isEditable(bieList)) {
+      return;
+    }
 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {role: this.auth.getUserToken().role};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(topLevelAsbiepId, result.loginId).subscribe(_ => {
+        this.loading = true;
+        this.service.transferOwnership(bieList.topLevelAsbiepId, result.loginId).pipe(finalize(() => {
+          this.loading = false;
+        })).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });

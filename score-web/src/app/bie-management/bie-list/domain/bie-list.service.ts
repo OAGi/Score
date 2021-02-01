@@ -11,8 +11,8 @@ export class BieListService {
   constructor(private http: HttpClient) {
   }
 
-  getSummaryBieList(): Observable<SummaryBieInfo> {
-    return this.http.get<SummaryBieInfo>('/api/info/bie_summary').pipe(map(
+  getSummaryBieList(releaseId: number): Observable<SummaryBieInfo> {
+    return this.http.get<SummaryBieInfo>('/api/info/bie_summary?releaseId=' + releaseId).pipe(map(
       e => {
         if (e.myRecentBIEs) {
           e.myRecentBIEs = e.myRecentBIEs.map(elm => {
@@ -48,11 +48,8 @@ export class BieListService {
     if (request.filters.businessContext) {
       params = params.set('businessContext', request.filters.businessContext);
     }
-    if (request.filters.releaseId) {
-      params = params.set('releaseId', '' + request.filters.releaseId);
-    }
-    if (request.filters.asccpId) {
-      params = params.set('asccpId', '' + request.filters.asccpId);
+    if (request.filters.asccpManifestId) {
+      params = params.set('asccpManifestId', '' + request.filters.asccpManifestId);
     }
     if (request.states.length > 0) {
       params = params.set('states', request.states.join(','));
@@ -64,9 +61,12 @@ export class BieListService {
       params = params.set('excludePropertyTerms', request.excludePropertyTerms.join(','));
     }
     if (request.excludeTopLevelAsbiepIds.length > 0) {
-      params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.map(e => '' + e).join(','));
+      params = params.set('excludeTopLevelAsbiepIds', request.excludeTopLevelAsbiepIds.join(','));
     }
-    if (request.ownedByDeveloper) {
+    if (request.release) {
+      params = params.set('releaseId', request.release.releaseId.toString());
+    }
+    if (request.ownedByDeveloper !== undefined) {
       params = params.set('ownedByDeveloper', request.ownedByDeveloper.toString());
     }
     return this.http.get<PageResponse<BieList>>('/api/bie_list', {params: params});
@@ -74,22 +74,6 @@ export class BieListService {
 
   findBizCtxFromAbieId(id): Observable<BusinessContext> {
     return this.http.get<BusinessContext>('/api/profile_bie/business_ctx_from_abie/' + id);
-  }
-
-  getBieList(): Observable<BieList[]> {
-    return this.http.get<BieList[]>('/api/profile_bie_list');
-  }
-
-  getBieListExcludeJsonRelated(): Observable<BieList[]> {
-    return this.http.get<BieList[]>('/api/profile_bie_list?exclude_json_related=true');
-  }
-
-  getMetaHeaderBieList(): Observable<BieList[]> {
-    return this.http.get<BieList[]>('/api/profile_bie_list/meta_header');
-  }
-
-  getPaginationResponseBieList(): Observable<BieList[]> {
-    return this.http.get<BieList[]>('/api/profile_bie_list/pagination_response');
   }
 
   getBieListByBizCtxId(id): Observable<BieList[]> {
@@ -102,9 +86,10 @@ export class BieListService {
     });
   }
 
-  transferOwnership(topLevelAsbiepId: number, targetLoginId: string): Observable<any> {
-    return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepId + '/transfer_ownership', {
-      targetLoginId: targetLoginId
+  transferOwnership(topLevelAsbiepIds: number, targetLoginId: string): Observable<any> {
+    return this.http.post<any>('/api/profile_bie/' + topLevelAsbiepIds + '/transfer_ownership', {
+      topLevelAsbiepIds: topLevelAsbiepIds,
+      targetLoginId
     });
   }
 }

@@ -1,16 +1,7 @@
-export class BieCreateList {
-  asccpId: number;
-  releaseId: number;
-  propertyTerm: string;
-  guid: string;
-  module: string;
-  lastUpdateTimestamp: Date;
-  lastUpdateUser: string;
-}
-
 export interface Release {
   releaseId: number;
   releaseNum: string;
+  state: string;
 }
 
 export interface BieCreateResponse {

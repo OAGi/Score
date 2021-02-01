@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
@@ -32,8 +32,8 @@ export class BieCreateBizCtxComponent implements OnInit {
   loading = false;
 
   loginIdList: string[] = [];
-  updaterIdListFilterCtrl: FormControl = new FormControl();
-  filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
+  updaterUsernameListFilterCtrl: FormControl = new FormControl();
+  filteredUpdaterUsernameList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   request: BusinessContextListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -63,7 +63,7 @@ export class BieCreateBizCtxComponent implements OnInit {
 
     this.accountService.getAccountNames().subscribe(loginIds => {
       this.loginIdList.push(...loginIds);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      initFilter(this.updaterUsernameListFilterCtrl, this.filteredUpdaterUsernameList, this.loginIdList);
     });
 
     this.loadBusinessContextList(true);
@@ -115,7 +115,7 @@ export class BieCreateBizCtxComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: BusinessContext) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.bizCtxValues = [];
+        elm.businessContextValueList = [];
         return elm;
       });
       if (!isInit) {
@@ -141,24 +141,24 @@ export class BieCreateBizCtxComponent implements OnInit {
   }
 
   select(row: BusinessContext) {
-    this.selection.select(row.bizCtxId);
+    this.selection.select(row.businessContextId);
   }
 
   toggle(row: BusinessContext) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.bizCtxId);
+      this.selection.deselect(row.businessContextId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BusinessContext) {
-    return this.selection.isSelected(row.bizCtxId);
+    return this.selection.isSelected(row.businessContextId);
   }
 
   next() {
     const selectedBizCtxIds = this.selection.selected.join(',');
-    this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {bizCtxIds: selectedBizCtxIds}});
+    this.router.navigate(['/profile_bie/create/asccp'], {queryParams: {businessContextIdList: selectedBizCtxIds}});
   }
 
 }

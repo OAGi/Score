@@ -25,13 +25,11 @@ export class LoginComponent implements AfterViewChecked {
               private http: HttpClient,
               private route: ActivatedRoute,
               private router: Router) {
-
     this.route.queryParams.subscribe(params => {
       this.next = this.auth.nextParam(params['next']);
       if (!this.next) {
         this.next = '/';
       }
-
       if (this.auth.isAuthenticated()) {
         this.router.navigateByUrl(this.next);
       }

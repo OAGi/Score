@@ -15,39 +15,49 @@
         <button mat-menu-item routerLink="profile_bie/create" title="{{ 'BIE_NAV.CREATE' | translate}}">
           Create BIE
         </button>
-        <button mat-menu-item routerLink="profile_bie/copy" title="{{'BIE_NAV.COPY'| translate}}">Copy BIE</button>
-        <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE'| translate}}">
+        <button mat-menu-item routerLink="profile_bie/copy" title="{{'BIE_NAV.COPY' | translate}}">
+          Copy BIE
+        </button>
+        <button mat-menu-item routerLink="profile_bie/uplift" title="{{'BIE_NAV.UPLIFT' | translate}}">
+          Uplift BIE
+        </button>
+        <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}">
           Express BIE
         </button>
-      </ng-template>
-    </mat-menu>
-
-    <button mat-button [matMenuTriggerFor]="codeListMenu">Code List</button>
-    <mat-menu #codeListMenu="matMenu" [overlapTrigger]="false">
-      <ng-template matMenuContent>
+        <mat-divider></mat-divider>
         <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
-        <button mat-menu-item routerLink="code_list/create">Create Code List</button>
-        <button mat-menu-item routerLink="code_list/create/from_another">Derive Code List</button>
+        <button mat-menu-item routerLink="code_list/uplift" [disabled]="role === 'developer'">Uplift Code List</button>
       </ng-template>
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="contextMenu">Context</button>
     <mat-menu #contextMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
-        <button mat-menu-item routerLink="context_management/context_category">Context Category</button>
-        <button mat-menu-item routerLink="context_management/context_scheme">Context Scheme</button>
-        <button mat-menu-item routerLink="context_management/business_context">Business Context</button>
+        <button mat-menu-item routerLink="context_management/context_category">View/Edit Context Category</button>
+        <button mat-menu-item routerLink="context_management/context_scheme">View/Edit Context Scheme</button>
+        <button mat-menu-item routerLink="context_management/business_context">View/Edit Business Context</button>
       </ng-template>
     </mat-menu>
 
     <button mat-button [matMenuTriggerFor]="ccMenu" title="{{'CC_NAV.TITLE' | translate}}">Core Component</button>
     <mat-menu #ccMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
-        <button mat-menu-item routerLink="core_component">View CC</button>
+        <button mat-menu-item routerLink="core_component">View/Edit Core Component</button>
+        <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
+        <button mat-menu-item routerLink="release">View/Edit Release</button>
+        <button mat-menu-item routerLink="namespace">View/Edit Namespace</button>
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="userToken.role === 'developer'">Admin</button>
+<!--    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>-->
+<!--    <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">-->
+<!--      <ng-template matMenuContent>-->
+<!--        <button mat-menu-item routerLink="module_management/module_set">View/Edit Module Set</button>-->
+<!--        <button mat-menu-item routerLink="module_management/module_set_release">View/Edit Module Set Release</button>-->
+<!--      </ng-template>-->
+<!--    </mat-menu>-->
+
+    <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="role === 'developer'">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
         <button mat-menu-item routerLink="account">Accounts</button>
@@ -69,10 +79,10 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="settingMenu">{{ userToken.username }}</button>
+    <button mat-button [matMenuTriggerFor]="settingMenu">{{ username }}</button>
     <mat-menu #settingMenu="matMenu" [overlapTrigger]="false">
       <ng-template matMenuContent>
-        <button mat-menu-item class="disabled" disabled="disabled">Signed in as {{ userToken.username }}</button>
+        <button mat-menu-item class="disabled" disabled="disabled">Signed in as {{ username }}</button>
         <mat-divider></mat-divider>
         <button mat-menu-item (click)="languageCurrentOagis(translate)">
           <mat-icon *ngIf="!getActiveCcts(translate)">done</mat-icon>

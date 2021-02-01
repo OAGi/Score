@@ -1,0 +1,81 @@
+<div class="context-section">
+  <div class="pl-2 pr-2">
+    <mat-toolbar class="bg-white">
+      <span class="title">History</span>
+      <span class="flex-11-auto"></span>
+      <button mat-raised-button class="ml-2" color="primary"
+              [disabled]="selection.selected.length != 2"
+              (click)="openCompareDialog()">
+        <mat-icon matTooltip="Compare">compare</mat-icon> Compare
+      </button>
+    </mat-toolbar>
+  </div>
+
+  <mat-card class="pt-3">
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+
+      <div class="mat-elevation-z1">
+        <table mat-table multiTemplateDataRows
+               matSort [matSortActive]="sort.active" [matSortDirection]="sort.direction"
+               [dataSource]="dataSource">
+
+          <ng-container matColumnDef="check">
+            <th mat-header-cell *matHeaderCellDef>Compare</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-checkbox [disabled]="!this.selection.isSelected(element) && this.selection.selected.length > 1"
+                            (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(element) : null"
+                            [checked]="selection.isSelected(element)"></mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="commit">
+            <th mat-header-cell *matHeaderCellDef> Commit</th>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.hash">
+              {{ element.hash.substring(0, 8) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="revisionNum">
+            <th mat-header-cell *matHeaderCellDef> Revision</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.revisionNum }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="revisionAction">
+            <th mat-header-cell *matHeaderCellDef> Action</th>
+            <td mat-cell *matCellDef="let element">
+              <span [class]="element.logAction">{{ logAction(element) }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="loginId">
+            <th mat-header-cell *matHeaderCellDef> Actor</th>
+            <td mat-cell *matCellDef="let element">
+              <span>{{ element.loginId }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created at</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.timestamp | dateAgo }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"></tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

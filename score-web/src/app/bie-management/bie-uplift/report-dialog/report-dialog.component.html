@@ -1,0 +1,77 @@
+<mat-card style="box-shadow: none; padding: 0;">
+  <mat-card-header>
+    <mat-card-title>Uplift BIE Reports</mat-card-title>
+  </mat-card-header>
+</mat-card>
+
+<mat-dialog-content class="mat-card-container">
+  <mat-card>
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+      <div class="container-fluid" [hidden]="loading">
+        <div class="row">
+          <div class="col-md-12">
+            <mat-checkbox class="checklist-leaf-node"
+                          [(ngModel)]="hideSystemMatched"
+                          (ngModelChange)="onToggleHide()">Hide System Mapped / Not Reused Nodes</mat-checkbox>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <table mat-table matSort [dataSource]="dataSource">
+              <ng-container matColumnDef="sourceDisplayPath" size="30">
+                <th mat-header-cell *matHeaderCellDef>Source path</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.sourceDisplayPath.replace(' ', '') }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="targetDisplayPath" size="30">
+                <th mat-header-cell *matHeaderCellDef>Target path</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.targetDisplayPath.replace(' ', '') }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="match" size="10">
+                <th mat-header-cell *matHeaderCellDef>Matched</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.match }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reuse" size="10">
+                <th mat-header-cell *matHeaderCellDef>Reused</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.reuse }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="validCode" size="10">
+                <th mat-header-cell *matHeaderCellDef>Code List Issue</th>
+                <td mat-cell *matCellDef="let row">
+                  <span *ngIf="!row.valid && row.message">{{ row.message }}</span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>
+
+<mat-dialog-actions class="mt-2">
+  <button mat-raised-button color="warn" (click)="onClose()">
+    <mat-icon>close</mat-icon>
+    Cancel
+  </button>
+  <button mat-raised-button color="primary" (click)="onDownload()">
+    Download
+  </button>
+</mat-dialog-actions>

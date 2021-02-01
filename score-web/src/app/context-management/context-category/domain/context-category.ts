@@ -2,12 +2,15 @@ import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
+import {ScoreUser} from '../../../authentication/domain/auth';
 
 export class ContextCategory {
-  ctxCategoryId: number;
+  contextCategoryId: number;
   guid: string;
   name: string;
   description?: string;
+  lastUpdateTimestamp: Date;
+  lastUpdatedBy: ScoreUser;
   used: boolean;
 }
 
@@ -16,6 +19,12 @@ export class ContextCategoryListRequest {
     name: string;
     description: string;
   };
+  updaterUsernameList: string[] = [];
+  updatedDate: {
+    start: Date,
+    end: Date,
+  };
+
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
@@ -44,6 +53,11 @@ export class ContextCategoryListRequest {
     this.filters = {
       name: params.get('name') || '',
       description: params.get('description') || ''
+    };
+
+    this.updatedDate = {
+      start: undefined,
+      end: undefined
     };
   }
 

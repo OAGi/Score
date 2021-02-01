@@ -11,8 +11,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {BusinessContextValueDialogComponent} from '../business-context-value-dialog/business-context-value-dialog.component';
 import {SelectionModel} from '@angular/cdk/collections';
 import {v4 as uuid} from 'uuid';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-business-context-create',
@@ -24,9 +23,9 @@ export class BusinessContextCreateComponent implements OnInit {
   title = 'Create Business Context';
   disabled: boolean;
 
-  bizCtx: BusinessContext;
+  businessContext: BusinessContext;
   displayedColumns: string[] = [
-    'select', 'ctxCategoryName', 'ctxSchemeName', 'ctxSchemeValue'
+    'select', 'contextCategoryName', 'contextSchemeName', 'contextSchemeValue'
   ];
   dataSource = new MatTableDataSource<BusinessContextValue>();
   selection = new SelectionModel<BusinessContextValue>(true, []);
@@ -39,46 +38,47 @@ export class BusinessContextCreateComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService) {
   }
 
   ngOnInit() {
     this.disabled = false;
 
-    this.bizCtx = new BusinessContext();
+    this.businessContext = new BusinessContext();
 
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
 
-  isDisabled(bizCtx: BusinessContext) {
+  isDisabled(businessContext: BusinessContext) {
     return (this.disabled) ||
-      (bizCtx.name === undefined || bizCtx.name === '');
+      (businessContext.name === undefined || businessContext.name === '');
   }
 
   _updateDataSource(data: BusinessContextValue[]) {
     this.dataSource.data = data;
-    this.bizCtx.bizCtxValues = data;
+    this.businessContext.businessContextValueList = data;
   }
 
-  openDialog(bizCtxValue?: BusinessContextValue) {
+  openDialog(businessContextValue?: BusinessContextValue) {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.data = new BusinessContextValue();
 
-    if (bizCtxValue) { // deep copy
-      dialogConfig.data = JSON.parse(JSON.stringify(bizCtxValue));
+    if (businessContextValue) { // deep copy
+      dialogConfig.data = JSON.parse(JSON.stringify(businessContextValue));
     }
 
-    const isAddAction: boolean = (bizCtxValue === undefined);
+    const isAddAction: boolean = (businessContextValue === undefined);
 
     this.disabled = true;
     const dialogRef = this.dialog.open(BusinessContextValueDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
-      if (result !== undefined && result.ctxSchemeValueId !== undefined) {
-        for ( const value of this.dataSource.data) {
-          if (value.ctxSchemeValueId === result.ctxSchemeValueId) {
-            this.snackBar.open(result.ctxSchemeValue + ' already exist', '', {
+      if (result !== undefined && result.contextSchemeValueId !== undefined) {
+        for (const value of this.dataSource.data) {
+          if (value.contextSchemeValueId === result.contextSchemeValueId) {
+            this.snackBar.open(result.contextSchemeValue + ' already exist', '', {
               duration: 3000,
             });
             this.disabled = false;
@@ -143,15 +143,12 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   removeBizCtxValues() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
+    const dialogConfig = this.confirmDialogService.newConfig();
     dialogConfig.data.header = 'Remove Business Context?';
-    dialogConfig.data.content = 'Are you sure you want to remove the business context value?';
+    dialogConfig.data.content = ['Are you sure you want to remove the business context value?'];
     dialogConfig.data.action = 'Remove';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
           const newData = [];
@@ -172,7 +169,7 @@ export class BusinessContextCreateComponent implements OnInit {
   }
 
   create() {
-    this.service.create(this.bizCtx).subscribe(_ => {
+    this.service.create(this.businessContext).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,
       });

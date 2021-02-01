@@ -69,9 +69,12 @@ export class TransferOwnershipDialogComponent implements OnInit {
     this.request.page = new PageRequest(
       this.sort.active, this.sort.direction,
       this.paginator.pageIndex, this.paginator.pageSize);
-
+    if (this.data && this.data.role) {
+      this.request.filters.role = this.data.role;
+    }
     this.accountService.getAccountsList(this.request, true).subscribe(resp => {
       this.paginator.length = resp.length;
+      this.paginator.pageIndex = resp.page;
       this.dataSource.data = resp.list;
     });
   }

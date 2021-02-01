@@ -14,12 +14,12 @@
     <li *ngFor="let item of config.list">{{ item }}</li>
   </ul>
 </div>
-<div class="actions">
-  <button mat-flat-button class="btn" color="primary" *ngIf="config.action"
+<div class="actions ml-auto">
+  <button mat-button class="btn btn-outline-primary" color="primary" *ngIf="config.action"
           [mat-dialog-close]="true">
     {{ config.action }}
   </button>
-  <button mat-flat-button class="btn" color="warn" (click)="onNoClick()">
+  <button mat-button class="btn" color="warn" (click)="onNoClick()">
     {{ (config.action) ? 'Cancel' : 'Close' }}
   </button>
 </div>

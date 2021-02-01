@@ -1,15 +1,19 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {CcGraph} from '../../../cc-management/domain/core-component-node';
+import {sha256} from '../../../common/utility';
 import {
-  BieEditAbieNode,
-  BieEditAsbiepNode,
+  AgencyIdList,
+  BdtPriRestri,
+  BdtScPriRestri,
+  BieDetailUpdateRequest,
+  BieDetailUpdateResponse,
   BieEditCreateExtensionResponse,
-  BieEditNode,
-  BieEditNodeDetail,
-  DynamicBieFlatNode
-} from './bie-edit-node';
-import {CodeList} from '../../../code-list-management/domain/code-list';
+  CodeList
+} from '../../bie-edit/domain/bie-edit-node';
+import {BieEditAbieNode, RefBie, UsedBie} from './bie-edit-node';
+import {AsbiepFlatNode, BieEditNodeDetail} from '../../domain/bie-flat-tree';
 
 @Injectable()
 export class BieEditService {
@@ -18,83 +22,111 @@ export class BieEditService {
 
   }
 
-  getRootNode(topLevelAsbiepId: number): Observable<BieEditAbieNode> {
+  getGraphNode(topLevelAsbiepId: number): Observable<CcGraph> {
+    return this.http.get<CcGraph>('/api/graphs/top_level_asbiep/' + topLevelAsbiepId);
+  }
+
+  getRootNode(topLevelAsbiepId): Observable<BieEditAbieNode> {
     return this.http.get<BieEditAbieNode>('/api/profile_bie/node/root/' + topLevelAsbiepId);
   }
 
-  getChildren(node: DynamicBieFlatNode, hideUnused: boolean): Observable<BieEditNode[]> {
-    const url = '/api/profile_bie/node/children/' + node.item.type;
-    const params = node.toHttpParams()
-      .set('hideUnused', (hideUnused) ? 'true' : 'false');
-    return this.http.get<BieEditNode[]>(url, {params: params});
+  getUsedBieList(topLevelAsbiepId: number): Observable<UsedBie[]> {
+    return this.http.get<UsedBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/used_list/');
   }
 
-  getDetail(node: DynamicBieFlatNode): Observable<BieEditNodeDetail> {
-    const url = '/api/profile_bie/node/detail/' + node.item.type;
-    return this.http.get<BieEditNodeDetail>(url, {params: node.toHttpParams()});
+  getRefBieList(topLevelAsbiepId: number): Observable<RefBie[]> {
+    return this.http.get<RefBie[]>('/api/profile_bie/' + topLevelAsbiepId + '/ref_list/');
+  }
+
+  getBbiepBdtPriRestriList(topLevelAsbiepId: number, manifestId: number): Observable<BdtPriRestri[]> {
+    return this.http.get<BdtPriRestri[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbiep/' + manifestId + '/bdt_pri_restri');
+  }
+
+  getBbiepCodeList(topLevelAsbiepId: number, manifestId: number): Observable<CodeList[]> {
+    return this.http.get<CodeList[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbiep/' + manifestId + '/code_list');
+  }
+
+  getBbiepAgencyIdList(topLevelAsbiepId: number, manifestId: number): Observable<AgencyIdList[]> {
+    return this.http.get<AgencyIdList[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbiep/' + manifestId + '/agency_id_list');
+  }
+
+  getBbieScBdtScPriRestriList(topLevelAsbiepId: number, manifestId: number): Observable<BdtScPriRestri[]> {
+    return this.http.get<BdtScPriRestri[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbie_sc/' + manifestId + '/bdt_sc_pri_restri');
+  }
+
+  getBbieScCodeList(topLevelAsbiepId: number, manifestId: number): Observable<CodeList[]> {
+    return this.http.get<CodeList[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbie_sc/' + manifestId + '/code_list');
+  }
+
+  getBbieScAgencyIdList(topLevelAsbiepId: number, manifestId: number): Observable<AgencyIdList[]> {
+    return this.http.get<AgencyIdList[]>('/api/profile_bie/' + topLevelAsbiepId + '/bbie_sc/' + manifestId + '/agency_id_list');
+  }
+
+  getDetail(topLevelAsbiepId: number, bieType: string, ccManifestId: number, path: string): Observable<BieEditNodeDetail> {
+    const url = '/api/profile_bie/' + topLevelAsbiepId + '/' + bieType.toLowerCase() + '/' + ccManifestId;
+    let params;
+    if (path.length > 0) {
+      params = new HttpParams().set('hashPath', sha256(path));
+    }
+    return this.http.get<BieEditNodeDetail>(url, {params});
+  }
+
+  updateDetails(topLevelAsbiepId: number, request: BieDetailUpdateRequest): Observable<BieDetailUpdateResponse> {
+    return this.http.post<BieDetailUpdateResponse>('/api/profile_bie/' + topLevelAsbiepId + '/detail', request.json);
   }
 
   setState(topLevelAsbiepId: number, state: string): Observable<any> {
     return this.http.post('/api/profile_bie/node/root/' + topLevelAsbiepId + '/state', {
-      state: state
+      state
     });
   }
 
-  getPublishedCodeLists(): Observable<CodeList[]> {
-    return this.http.get<CodeList[]>('/api/code_list_published');
-  }
-
-  updateDetails(topLevelAbidId: number, details: BieEditNodeDetail[]): Observable<any> {
-    const body = {
-      topLevelAsbiepId: topLevelAbidId,
-      abieNodeDetail: undefined,
-      asbiepNodeDetails: [],
-      bbiepNodeDetails: [],
-      bbieScNodeDetails: []
-    };
-
-    for (const detail of details) {
-      switch (detail.type) {
-        case 'abie':
-          body.abieNodeDetail = detail;
-          break;
-        case 'asbiep':
-          body.asbiepNodeDetails.push(detail);
-          break;
-        case 'bbiep':
-          body.bbiepNodeDetails.push(detail);
-          break;
-        case 'bbie_sc':
-          body.bbieScNodeDetails.push(detail);
-          break;
-      }
-    }
-
-    return this.http.post('/api/profile_bie/node/detail', body);
-  }
-
-  createLocalAbieExtension(node: BieEditNode): Observable<BieEditCreateExtensionResponse> {
-    return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/local', node);
-  }
-
-  createGlobalAbieExtension(node: BieEditNode): Observable<BieEditCreateExtensionResponse> {
-    return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/global', node);
-  }
-
-  reuseBIE(asbiepNode: BieEditAsbiepNode, reuseTopLevelAsbiepId: number): Observable<any> {
-    const url = '/api/profile_bie/' + asbiepNode.topLevelAsbiepId + '/asbie/' + asbiepNode.asbieId + '/reuse';
+  reuseBIE(asbiepNode: AsbiepFlatNode, reuseTopLevelAsbiepId: number): Observable<any> {
+    const url = '/api/profile_bie/' + asbiepNode.topLevelAsbiepId + '/asbiep/' + asbiepNode.asccpNode.manifestId + '/reuse';
     return this.http.post<any>(url, {
+      asbieHashPath: asbiepNode.asbieHashPath,
       reuseTopLevelAsbiepId
     });
   }
 
-  removeReusedBIE(asbiepNode: BieEditAsbiepNode): Observable<any> {
-    const url = '/api/profile_bie/node/asbie/' + asbiepNode.asbieId + '/remove_reuse';
-    return this.http.post<any>(url, {});
+  removeReusedBIE(topLevelAsbiepId: number, asbieHashPath: string): Observable<any> {
+    const url = '/api/profile_bie/' + topLevelAsbiepId + '/remove_reuse';
+    return this.http.post<any>(url, {asbieHashPath});
   }
 
-  makeReusableBIE(asbiepNode: BieEditAsbiepNode): Observable<any> {
-    const url = '/api/profile_bie/node/asbie/' + asbiepNode.asbieId + '/make_bie_reusable';
-    return this.http.post<any>(url, {});
+  makeReusableBIE(asbieHashPath: string, topLevelAsbiepId: number): Observable<any> {
+    const url = '/api/profile_bie/node/create_bie_from_existing_bie';
+    return this.http.post<any>(url, {
+      asbieHashPath,
+      topLevelAsbiepId
+    });
+  }
+
+  createLocalAbieExtension(node: AsbiepFlatNode): Observable<BieEditCreateExtensionResponse> {
+    const params = {
+      accManifestId: node.accNode.manifestId,
+      asccManifestId: node.asccNode.manifestId,
+      asccpManifestId: node.asccpNode.manifestId,
+      releaseId: 0,
+      abieId: 0,
+      asbiepId: 0,
+      asbieId: 0,
+      topLevelAsbiepId: node.topLevelAsbiepId
+    };
+    return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/local', params);
+  }
+
+  createGlobalAbieExtension(node: AsbiepFlatNode): Observable<BieEditCreateExtensionResponse> {
+    const params = {
+      accManifestId: node.accNode.manifestId,
+      asccManifestId: node.asccNode.manifestId,
+      asccpManifestId: node.asccpNode.manifestId,
+      releaseId: 0,
+      abieId: 0,
+      asbiepId: 0,
+      asbieId: 0,
+      topLevelAsbiepId: node.topLevelAsbiepId
+    };
+    return this.http.put<BieEditCreateExtensionResponse>('/api/profile_bie/node/extension/global', params);
   }
 }

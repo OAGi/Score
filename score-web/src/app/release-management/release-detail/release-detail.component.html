@@ -1,0 +1,78 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="row action-group m-0">
+    <div class="col-3 title-wrap">
+      <mat-label class="title">{{ title }}</mat-label>
+    </div>
+  </div>
+
+  <mat-card class="pt-2 pb-0">
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>Release Number</mat-label>
+          <input matInput [(ngModel)]="releaseDetail.releaseNum" maxlength="45"
+                 [required]="true"
+                 [disabled]="isDisabled()"/>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Release Namespace</mat-label>
+          <mat-select [(ngModel)]="selectedNamespace" (ngModelChange)="onChangeNamespace()"
+                      [required]="true"
+                      [disabled]="isDisabled()">
+            <ngx-mat-select-search [formControl]="namespaceListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching namespace found.'"></ngx-mat-select-search>
+            <mat-option *ngFor="let namespace of filteredNamespaceList | async" [value]="namespace">
+              {{ namespace.uri }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Release Note</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseNote"
+                    [disabled]="isDisabled()"></textarea>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Release License</mat-label>
+          <textarea rows="6" cols="30" matInput [(ngModel)]="releaseDetail.releaseLicense"
+                    [disabled]="isDisabled()"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <div class="row action-group m-0" *ngIf="userToken.role === 'developer'">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary"
+                *ngIf="releaseDetail.state === 'Initialized' || releaseDetail.state === 'Draft'"
+                [disabled]="!isChanged || !canUpdate()"
+                (click)="update()">
+          Update
+        </button>
+        <button mat-raised-button color="warn"
+                *ngIf="releaseDetail.state === 'Initialized'"
+                (click)="createDraft()">
+          Create Draft
+        </button>
+        <button mat-raised-button color="warn"
+                *ngIf="releaseDetail.state === 'Draft'"
+                (click)="updateState('Initialized')">
+          Back to Initialized
+        </button>
+        <button mat-raised-button color="accent"
+                *ngIf="releaseDetail.state === 'Draft'"
+                (click)="updateState('Published')">
+          Publish
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

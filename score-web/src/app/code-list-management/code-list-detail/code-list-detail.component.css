@@ -22,3 +22,20 @@ mat-chip-list:focus {
 .mat-column-value, .mat-column-name {
   width: 10%;
 }
+
+.w70 {
+  width: 70px;
+}
+
+.btn-comment {
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.close {
+  cursor: pointer;
+}
+
+.display-flow-root {
+  display: flow-root;
+}

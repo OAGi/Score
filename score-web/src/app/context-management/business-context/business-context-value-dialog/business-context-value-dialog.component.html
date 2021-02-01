@@ -9,18 +9,18 @@
     <mat-card-content>
       <mat-form-field>
         <mat-label>Context Category</mat-label>
-        <mat-select [(ngModel)]="bizCtxValue.ctxCategoryId" (selectionChange)="onCtxCategoryChange()">
-          <ngx-mat-select-search [formControl]="ctxCategoryListFilterCtrl"
+        <mat-select [(ngModel)]="businessContextValue.contextCategoryId" (selectionChange)="onCtxCategoryChange()">
+          <ngx-mat-select-search [formControl]="contextCategoryListFilterCtrl"
                                  [placeholderLabel]="'Search...'"
                                  [noEntriesFoundLabel]="'No matching context category found.'"></ngx-mat-select-search>
-          <mat-option *ngFor="let ctxCategory of filteredCtxCategoryList | async" [value]="ctxCategory.ctxCategoryId">
-            {{ ctxCategory.name }}
+          <mat-option *ngFor="let contextCategory of filteredContextCategoryList | async" [value]="contextCategory.contextCategoryId">
+            {{ contextCategory.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Description</mat-label>
-        <textarea rows="6" cols="30" matInput [(ngModel)]="ctxCategory.description" [disabled]="true"></textarea>
+        <textarea rows="6" cols="30" matInput [(ngModel)]="contextCategory.description" [disabled]="true"></textarea>
       </mat-form-field>
     </mat-card-content>
   </mat-card>
@@ -28,38 +28,38 @@
     <mat-card-content>
       <mat-form-field>
         <mat-label>Context Scheme</mat-label>
-        <mat-select [disabled]="bizCtxValue.ctxCategoryId === undefined" placeholder="Context Scheme" required
-                    [(ngModel)]="bizCtxValue.ctxSchemeId" (selectionChange)="onCtxSchemeChange()">
-          <ngx-mat-select-search [formControl]="ctxSchemeListFilterCtrl"
+        <mat-select [disabled]="businessContextValue.contextCategoryId === undefined" placeholder="Context Scheme" required
+                    [(ngModel)]="businessContextValue.contextSchemeId" (selectionChange)="onCtxSchemeChange()">
+          <ngx-mat-select-search [formControl]="contextSchemeListFilterCtrl"
                                  [placeholderLabel]="'Search...'"
                                  [noEntriesFoundLabel]="'No matching context scheme found.'"></ngx-mat-select-search>
-          <mat-option *ngFor="let ctxScheme of filteredCtxSchemeList | async" [value]="ctxScheme.ctxSchemeId">
-            {{ ctxScheme.schemeName }}
+          <mat-option *ngFor="let contextScheme of filteredContextSchemeList | async" [value]="contextScheme.contextSchemeId">
+            {{ contextScheme.schemeName }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Scheme ID</mat-label>
-        <input matInput [(ngModel)]="ctxScheme.schemeId" maxlength="45"
+        <input matInput [(ngModel)]="contextScheme.schemeId" maxlength="45"
                [disabled]="true"/>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Agency ID</mat-label>
-        <input matInput [(ngModel)]="ctxScheme.schemeAgencyId" maxlength="45"
+        <input matInput [(ngModel)]="contextScheme.schemeAgencyId" maxlength="45"
                [disabled]="true"/>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Version</mat-label>
-        <input matInput [(ngModel)]="ctxScheme.schemeVersionId" maxlength="45"
+        <input matInput [(ngModel)]="contextScheme.schemeVersionId" maxlength="45"
                [disabled]="true"/>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Description</mat-label>
-        <textarea rows="6" cols="30" matInput [(ngModel)]="ctxScheme.description"
+        <textarea rows="6" cols="30" matInput [(ngModel)]="contextScheme.description"
                   [disabled]="true"></textarea>
       </mat-form-field>
     </mat-card-content>
@@ -68,20 +68,20 @@
     <mat-card-content>
       <mat-form-field>
         <mat-label>Context Scheme Value</mat-label>
-        <mat-select [disabled]="bizCtxValue.ctxSchemeId === undefined" placeholder="Context Scheme Value" required
-                    [(ngModel)]="bizCtxValue.ctxSchemeValueId" (selectionChange)="onCtxSchemeValueChange()">
-          <ngx-mat-select-search [formControl]="ctxSchemeValueListFilterCtrl"
+        <mat-select [disabled]="businessContextValue.contextSchemeId === undefined" placeholder="Context Scheme Value" required
+                    [(ngModel)]="businessContextValue.contextSchemeValueId" (selectionChange)="onCtxSchemeValueChange()">
+          <ngx-mat-select-search [formControl]="contextSchemeValueListFilterCtrl"
                                  [placeholderLabel]="'Search...'"
                                  [noEntriesFoundLabel]="'No matching context scheme value found.'"></ngx-mat-select-search>
-          <mat-option *ngFor="let ctxSchemeValue of filteredCtxSchemeValueList | async" [value]="ctxSchemeValue.ctxSchemeValueId">
-            {{ ctxSchemeValue.value }}
+          <mat-option *ngFor="let contextSchemeValue of filteredContextSchemeValueList | async" [value]="contextSchemeValue.contextSchemeValueId">
+            {{ contextSchemeValue.value }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Meaning</mat-label>
-        <textarea rows="6" cols="30" matInput [(ngModel)]="ctxSchemeValue.meaning"
+        <textarea rows="6" cols="30" matInput [(ngModel)]="contextSchemeValue.meaning"
                   [disabled]="true"></textarea>
       </mat-form-field>
     </mat-card-content>
@@ -91,7 +91,7 @@
 <mat-dialog-actions>
   <button mat-raised-button color="primary"
           [disabled]="!isChanged() || isDisabled()"
-          [mat-dialog-close]="bizCtxValue" >
+          [mat-dialog-close]="businessContextValue">
     <mat-icon>{{ (actionName === 'Add') ? 'add' : 'save' }}</mat-icon>
     {{ (actionName === 'Add') ? 'Add' : 'Save' }}
   </button>

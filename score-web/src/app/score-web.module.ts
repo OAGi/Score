@@ -1,6 +1,4 @@
 import {NgModule} from '@angular/core';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -9,7 +7,11 @@ import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
+import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
+import {scoreRxStompConfig} from './common/score-rx-stomp-config';
+
 import {AuthService, ErrorAlertInterceptor, XhrInterceptor} from './authentication/auth.service';
+import {LogManagementModule} from './log-management/log-management.module';
 
 import {ScoreWebComponent} from './score-web.component';
 
@@ -51,21 +53,18 @@ export function HttpLoaderFactory(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
-
     FormsModule,
     ReactiveFormsModule,
-
     BasisModule,
     AccountManagementModule,
     BieManagementModule,
     ContextManagementModule,
     CcManagementModule,
     CodeListModule,
+    LogManagementModule,
     NamespaceManagementModule,
     ReleaseManagementModule,
-    ModuleManagementModule,
-    MatCardModule,
-    MatButtonModule
+    ModuleManagementModule
   ],
   declarations: [
     ScoreWebComponent
@@ -74,6 +73,15 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatIconRegistry,
     AuthService,
     httpInterceptorsProviders,
+    {
+      provide: InjectableRxStompConfig,
+      useValue: scoreRxStompConfig
+    },
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+      deps: [InjectableRxStompConfig]
+    },
   ],
   bootstrap: [
     ScoreWebComponent

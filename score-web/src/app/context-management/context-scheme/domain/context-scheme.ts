@@ -2,12 +2,13 @@ import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
+import {ScoreUser} from '../../../authentication/domain/auth';
 
 export class ContextSchemeListRequest {
   filters: {
     name: string;
   };
-  updaterLoginIds: string[] = [];
+  updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -37,7 +38,7 @@ export class ContextSchemeListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -54,8 +55,8 @@ export class ContextSchemeListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
+      params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -72,11 +73,11 @@ export class ContextSchemeListRequest {
 }
 
 export class ContextScheme {
-  ctxSchemeId: number;
+  contextSchemeId: number;
   guid: string;
   schemeName: string;
-  ctxCategoryId: number;
-  ctxCategoryName: string;
+  contextCategoryId: number;
+  contextCategoryName: string;
   codeListId: number;
   codeListName: string;
   schemeId?: string;
@@ -84,8 +85,8 @@ export class ContextScheme {
   schemeVersionId?: string;
   description?: string;
   lastUpdateTimestamp: Date;
-  lastUpdateUser: string;
-  ctxSchemeValues: ContextSchemeValue[];
+  lastUpdatedBy: ScoreUser;
+  contextSchemeValueList: ContextSchemeValue[];
   used: boolean;
 }
 
@@ -103,31 +104,31 @@ export class ContextSchemeValueListRequest {
 }
 
 export class ContextSchemeValue {
-  ctxSchemeValueId: number;
+  contextSchemeValueId: number;
   guid: string;
   value: string;
   meaning: string;
   used: boolean;
-  ownerCtxSchemeId: number;
+  ownerContextSchemeId: number;
 }
 
 export interface SimpleContextCategory {
-  ctxCategoryId: number;
+  contextCategoryId: number;
   name: string;
 }
 
 export interface SimpleContextScheme {
-  ctxSchemeId: number;
+  contextSchemeId: number;
   schemeName: string;
   codeListId: number;
-  codeListIdName;
+  codeListIdName: string;
   schemeId: string;
   schemeAgencyId: string;
   schemeVersionId: string;
 }
 
 export interface SimpleContextSchemeValue {
-  ctxSchemeValueId: number;
+  contextSchemeValueId: number;
   value: string;
   meaning: string;
 }

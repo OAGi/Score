@@ -5,7 +5,7 @@ export class BieExpressOption {
   bieCctsMetaData: boolean;
   includeCctsDefinitionTag: boolean;
 
-  bieOagiSrtMetaData: boolean;
+  bieOagiScoreMetaData: boolean;
   includeWhoColumns: boolean;
 
   bieGuid: boolean;

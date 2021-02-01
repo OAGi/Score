@@ -1,25 +1,25 @@
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ExtensionDetailComponent} from './extension-detail.component';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../../material.module';
 import {AuthService} from '../../authentication/auth.service';
+import {MatInputModule} from '@angular/material/input';
 import {ContextMenuModule} from 'ngx-contextmenu';
-import {ExtensionDetailService} from './domain/extension-detail.service';
-import {AppendAsccpDialogComponent} from './append-asccp-dialog/append-asccp-dialog.component';
-import {AppendBccpDialogComponent} from './append-bccp-dialog/append-bccp-dialog.component';
-import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
 import {TranslateModule} from '@ngx-translate/core';
-import {SrtCommonModule} from '../../common/srt-common.module';
-import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
+import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {ScoreCommonModule} from '../../common/score-common.module';
+import {AngularSplitModule} from 'angular-split';
+import {ExtensionDetailComponent} from './extension-detail.component';
+import {SearchOptionsDialogModule} from '../search-options-dialog/search-options-dialog.module';
 
 const routes: Routes = [
   {
     path: 'core_component/extension',
     children: [
       {
-        path: ':releaseId/:extensionId',
+        path: ':manifestId',
         component: ExtensionDetailComponent,
         canActivate: [AuthService],
       }
@@ -33,28 +33,22 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    MatInputModule,
     ContextMenuModule.forRoot({
       useBootstrap4: true,
     }),
     CommonModule,
     TranslateModule,
-    SrtCommonModule,
+    ScoreCommonModule,
+    SearchOptionsDialogModule,
+    DragDropModule,
+    AngularSplitModule
   ],
   declarations: [
     ExtensionDetailComponent,
-    AppendAsccpDialogComponent,
-    AppendBccpDialogComponent,
-    ConfirmDialogComponent,
-    DefinitionConfirmDialogComponent
   ],
   entryComponents: [
-    AppendAsccpDialogComponent,
-    AppendBccpDialogComponent,
-    ConfirmDialogComponent,
-    DefinitionConfirmDialogComponent
-  ],
-  providers: [
-    ExtensionDetailService
+    AppendAssociationDialogComponent,
   ]
 })
 export class ExtensionDetailModule {

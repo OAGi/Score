@@ -20,7 +20,7 @@ export class StateProgressBarComponent implements OnInit {
   }
 
   getParams(item: StateProgressBarItem): string {
-    if (item.href.length == 1) {
+    if (item.href.length === 1) {
       return '';
     }
     let params = new HttpParams();

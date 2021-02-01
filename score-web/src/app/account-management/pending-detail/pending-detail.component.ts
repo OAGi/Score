@@ -39,7 +39,8 @@ export class PendingDetailComponent implements OnInit {
 
   linkToAccount() {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.maxWidth = '100vw !important';
+    dialogConfig.height = '100%';
     dialogConfig.data = this.pending;
     const dialogRef = this.dialog.open(AccountListDialogComponent, dialogConfig);
 

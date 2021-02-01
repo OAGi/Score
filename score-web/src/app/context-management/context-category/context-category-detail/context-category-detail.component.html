@@ -1,10 +1,9 @@
 <div class="context-section">
-  <mat-card>
+  <mat-card class="pt-4 pb-2">
     <mat-card-header>
       <mat-card-title>{{ title }}</mat-card-title>
     </mat-card-header>
-
-    <mat-card style="margin-bottom: 24px;">
+    <mat-card class="mb-2">
       <mat-card-content class="mat-card-container">
         <mat-form-field>
           <mat-label>Name</mat-label>
@@ -17,15 +16,19 @@
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="primary" (click)="update()"
-              [disabled]="!isChanged() || isDisabled(contextCategory)">
-        <mat-icon matTooltip="Update">save</mat-icon>
-      </button>
-      <button mat-mini-fab color="warn" (click)="discard()">
-        <mat-icon matTooltip="Discard">delete</mat-icon>
-      </button>
-    </mat-card-actions>
   </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="update()"
+                [disabled]="!isChanged() || isDisabled(contextCategory)">
+          Update
+        </button>
+        <button mat-raised-button color="warn" (click)="discard()">
+          Discard
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

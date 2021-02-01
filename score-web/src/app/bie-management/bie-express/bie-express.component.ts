@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {BieList, BieListRequest} from '../bie-list/domain/bie-list';
 import {SelectionModel} from '../../../../node_modules/@angular/cdk/collections';
@@ -15,11 +15,14 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
+import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseService} from '../../release-management/domain/release.service';
+import {AuthService} from '../../authentication/auth.service';
 
 @Component({
   selector: 'score-bie-express',
@@ -32,19 +35,20 @@ export class BieExpressComponent implements OnInit {
   subtitle = 'Selected Top-Level ABIEs';
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'release', 'owner',
-    'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(true, []);
   loading = false;
 
   loginIdList: string[] = [];
+  releases: SimpleRelease[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['Editing', 'Candidate', 'Published'];
+  states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
 
   option: BieExpressOption;
@@ -59,6 +63,8 @@ export class BieExpressComponent implements OnInit {
   constructor(private service: BieExpressService,
               private bieListService: BieListService,
               private accountService: AccountListService,
+              private releaseService: ReleaseService,
+              private auth: AuthService,
               private dialog: MatDialog,
               private location: Location,
               private router: Router,
@@ -90,21 +96,41 @@ export class BieExpressComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
+    forkJoin([
+      this.accountService.getAccountNames(),
+      this.releaseService.getSimpleReleases()
+    ]).subscribe(([loginIds, releases]) => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
 
-    this.loadBieList(true);
+      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
+      if (savedReleaseId) {
+        this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+        if (!this.request.release) {
+          this.request.release = this.releases[0];
+          saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
+        }
+      } else {
+        this.request.release = this.releases[0];
+      }
+
+      this.loadBieList(true);
+    });
   }
 
   onPageChange(event: PageEvent) {
     this.loadBieList();
   }
 
-  onChange() {
+  onChange(property?: string, source?) {
+    if (property === 'branch') {
+      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
+    }
+
     this.paginator.pageIndex = 0;
+    this.selection.clear();
     this.loadBieList();
   }
 
@@ -208,22 +234,18 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
+      const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
+      dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+        if (selectedTopLevelAsbiepId) {
+          this.option[includeMetaHeaderForJsonPropertyKey] = true;
+          this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
-      this.bieListService.getMetaHeaderBieList().subscribe(resp => {
-        dialogConfig.data = resp;
-        const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
-          if (selectedTopLevelAsbiepId) {
-            this.option[includeMetaHeaderForJsonPropertyKey] = true;
-            this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
-
-            this.previousPackageOption = this.option.packageOption;
-            this.option.packageOption = 'EACH';
-          } else {
-            this.option[includeMetaHeaderForJsonPropertyKey] = false;
-            this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = undefined;
-          }
-        });
+          this.previousPackageOption = this.option.packageOption;
+          this.option.packageOption = 'EACH';
+        } else {
+          this.option[includeMetaHeaderForJsonPropertyKey] = false;
+          this.option[metaHeaderTopLevelAsbiepIdPropertyKey] = undefined;
+        }
       });
     }
   }
@@ -244,22 +266,18 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
+      const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
+      dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
+        if (selectedTopLevelAsbiepId) {
+          this.option[includePaginationResponseForJsonPropertyKey] = true;
+          this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
 
-      this.bieListService.getPaginationResponseBieList().subscribe(resp => {
-        dialogConfig.data = resp;
-        const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
-          if (selectedTopLevelAsbiepId) {
-            this.option[includePaginationResponseForJsonPropertyKey] = true;
-            this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = selectedTopLevelAsbiepId;
-
-            this.previousPackageOption = this.option.packageOption;
-            this.option.packageOption = 'EACH';
-          } else {
-            this.option[includePaginationResponseForJsonPropertyKey] = false;
-            this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = undefined;
-          }
-        });
+          this.previousPackageOption = this.option.packageOption;
+          this.option.packageOption = 'EACH';
+        } else {
+          this.option[includePaginationResponseForJsonPropertyKey] = false;
+          this.option[paginationResponseTopLevelAsbiepIdPropertyKey] = undefined;
+        }
       });
     }
   }

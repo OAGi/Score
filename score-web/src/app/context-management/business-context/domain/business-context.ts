@@ -2,12 +2,13 @@ import {PageRequest} from '../../../basis/basis';
 import {ParamMap} from '@angular/router';
 import {HttpParams} from '@angular/common/http';
 import {base64Decode, base64Encode} from '../../../common/utility';
+import {ScoreUser} from '../../../authentication/domain/auth';
 
 export class BusinessContextListRequest {
   filters: {
     name: string;
   };
-  updaterLoginIds: string[] = [];
+  updaterUsernameList: string[] = [];
   updatedDate: {
     start: Date,
     end: Date,
@@ -37,7 +38,7 @@ export class BusinessContextListRequest {
       this.page.pageSize = (defaultPageRequest) ? defaultPageRequest.pageSize : 0;
     }
 
-    this.updaterLoginIds = (params.get('updaterLoginIds')) ? Array.from(params.get('updaterLoginIds').split(',')) : [];
+    this.updaterUsernameList = (params.get('updaterUsernameList')) ? Array.from(params.get('updaterUsernameList').split(',')) : [];
     this.updatedDate = {
       start: (params.get('updatedDateStart')) ? new Date(params.get('updatedDateStart')) : null,
       end: (params.get('updatedDateEnd')) ? new Date(params.get('updatedDateEnd')) : null
@@ -54,8 +55,8 @@ export class BusinessContextListRequest {
       .set('pageIndex', '' + this.page.pageIndex)
       .set('pageSize', '' + this.page.pageSize);
 
-    if (this.updaterLoginIds && this.updaterLoginIds.length > 0) {
-      params = params.set('updaterLoginIds', this.updaterLoginIds.join(','));
+    if (this.updaterUsernameList && this.updaterUsernameList.length > 0) {
+      params = params.set('updaterUsernameList', this.updaterUsernameList.join(','));
     }
     if (this.updatedDate.start) {
       params = params.set('updatedDateStart', '' + this.updatedDate.start.toUTCString());
@@ -72,30 +73,30 @@ export class BusinessContextListRequest {
 }
 
 export class BusinessContext {
-  bizCtxId: number;
+  businessContextId: number;
   guid: string;
   name: string;
   lastUpdateTimestamp: Date;
-  lastUpdateUser: string;
-  bizCtxValues: BusinessContextValue[];
+  lastUpdatedBy: ScoreUser;
+  businessContextValueList: BusinessContextValue[];
   used: boolean;
 }
 
 export class BusinessContextValue {
-  bizCtxValueId: number;
+  businessContextValueId: number;
   guid: string;
-  ctxCategoryId: number;
-  ctxCategoryName: string;
-  ctxSchemeId: number;
-  ctxSchemeName: string;
-  ctxSchemeValueId: number;
-  ctxSchemeValue: string;
-  ctxSchemeValueMeaning: string;
-  bizCtxId: number;
+  contextCategoryId: number;
+  contextCategoryName: string;
+  contextSchemeId: number;
+  contextSchemeName: string;
+  contextSchemeValueId: number;
+  contextSchemeValue: string;
+  contextSchemeValueMeaning: string;
+  businessContextId: number;
 }
 
 export class BusinessContextRule {
-  bizCtxRuleId: number;
-  fromBizCtxId: number;
+  businessContextRuleId: number;
+  fromBusinessContextId: number;
   topLevelBieId: number;
 }

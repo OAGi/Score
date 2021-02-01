@@ -20,7 +20,6 @@ import {OAuth2AppInfo, UserToken} from './domain/auth';
 export class AuthService implements OnInit, CanActivate {
 
   RESTRICTED_NEXT_PARAMS = ['login', 'pending', 'reject'];
-
   USER_INFO_KEY = 'X-SRT-UserInfo';
   ROLE_DEVELOPER = 'developer';
   ROLE_END_USER = 'end-user';
@@ -117,18 +116,6 @@ export class AuthService implements OnInit, CanActivate {
     }
   }
 
-  nextParam(next?: string) : string | undefined {
-    if (!next || next.length === 0 || next === '/') {
-      return undefined;
-    }
-    for (const param of this.RESTRICTED_NEXT_PARAMS) {
-      if (next.indexOf(param) !== -1) {
-        return undefined;
-      }
-    }
-    return next;
-  }
-
   redirectToLogin(url?) {
     const commands = ['/' + environment.loginPath];
     const next = this.nextParam(url);
@@ -139,8 +126,21 @@ export class AuthService implements OnInit, CanActivate {
         }
       });
     } else {
+      this.router.navigate(commands);
       return this.router.navigate(commands);
     }
+  }
+
+  nextParam(next?: string): string | undefined {
+    if (!next || next.length === 0 || next === '/') {
+      return undefined;
+    }
+    for (const param of this.RESTRICTED_NEXT_PARAMS) {
+      if (next.indexOf(param) !== -1) {
+        return undefined;
+      }
+    }
+    return next;
   }
 
   getOAuth2AppInfos(): Observable<OAuth2AppInfo[]> {
@@ -196,11 +196,9 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
             case 401:
             case 403:
               if (req.url.indexOf(environment.logoutPath) === -1) {
-                if (req.url.indexOf(environment.statePath) === -1) {
-                  this.snackBar.open('Authentication Failure', '', {
-                    duration: 3000,
-                  });
-                }
+                this.snackBar.open('Authentication Failure', '', {
+                  duration: 3000,
+                });
 
                 this.auth.logout(window.location.pathname);
               }
@@ -256,6 +254,7 @@ export class CanActivateUser implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
     Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
+    const userToken = this.authService.getUserToken();
     if (this.authService.isAuthenticated()) {
       return true;
     }

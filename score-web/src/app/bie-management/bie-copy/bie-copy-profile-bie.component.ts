@@ -15,10 +15,13 @@ import {AccountListService} from '../../account-management/domain/account-list.s
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {PageRequest, PageResponse} from '../../basis/basis';
 import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {base64Decode, initFilter} from '../../common/utility';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {base64Decode, initFilter, loadBranch, saveBranch} from '../../common/utility';
 import {Location} from '@angular/common';
-import {HttpParams} from "@angular/common/http";
+import {HttpParams} from '@angular/common/http';
+import {SimpleRelease} from '../../release-management/domain/release';
+import {ReleaseService} from '../../release-management/domain/release.service';
+import {AuthService} from '../../authentication/auth.service';
 
 @Component({
   selector: 'score-bie-create-asccp',
@@ -33,7 +36,8 @@ export class BieCopyProfileBieComponent implements OnInit {
   bizCtxList: BusinessContext[] = [];
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'release', 'owner', 'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<BieList>(false, []);
@@ -44,8 +48,10 @@ export class BieCopyProfileBieComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['Editing', 'Candidate', 'Published'];
+  states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
+
+  releases: SimpleRelease[] = [];
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -54,6 +60,8 @@ export class BieCopyProfileBieComponent implements OnInit {
               private service: BieCopyService,
               private bieListService: BieListService,
               private accountService: AccountListService,
+              private releaseService: ReleaseService,
+              private auth: AuthService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -62,7 +70,7 @@ export class BieCopyProfileBieComponent implements OnInit {
 
   ngOnInit() {
     this.request = new BieListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('propertyTerm', 'asc', 0, 10));
+      new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.access = 'CanView';
 
     this.paginator.pageIndex = this.request.page.pageIndex;
@@ -76,12 +84,6 @@ export class BieCopyProfileBieComponent implements OnInit {
       this.onChange();
     });
 
-    this.accountService.getAccountNames().subscribe(loginIds => {
-      this.loginIdList.push(...loginIds);
-      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
-      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
-    });
-
     // Load Business Contexts
     this.route.queryParamMap.pipe(
       switchMap((params: ParamMap) => {
@@ -91,10 +93,35 @@ export class BieCopyProfileBieComponent implements OnInit {
           const httpParams = (q) ? new HttpParams({fromString: base64Decode(q)}) : new HttpParams();
           bizCtxIds = httpParams.get('bizCtxIds');
         }
-        return this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e)));
-      })).subscribe((resp: PageResponse<BusinessContext>) => {
-      this.bizCtxIds = resp.list.map(e => e.bizCtxId);
+
+        return forkJoin([
+          this.bizCtxService.getBusinessContextsByBizCtxIds(bizCtxIds.split(',').map(e => Number(e))),
+          this.accountService.getAccountNames(),
+          this.releaseService.getSimpleReleases()
+        ]);
+      })).subscribe(([resp, loginIds, releases]) => {
+
+      this.loginIdList.push(...loginIds);
+      initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
+      initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+
+      this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
+      if (this.releases.length > 0) {
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'copyBIE');
+        if (savedReleaseId) {
+          this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+          if (!this.request.release) {
+            this.request.release = this.releases[0];
+            saveBranch(this.auth.getUserToken(), 'copyBIE', this.request.release.releaseId);
+          }
+        } else {
+          this.request.release = this.releases[0];
+        }
+      }
+
+      this.bizCtxIds = resp.list.map(e => e.businessContextId);
       this.bizCtxList = resp.list;
+
       this.loadBieList(true);
     }, err => {
       console.error(err);
@@ -106,6 +133,15 @@ export class BieCopyProfileBieComponent implements OnInit {
   }
 
   onChange() {
+    this.paginator.pageIndex = 0;
+    this.loadBieList();
+  }
+
+  onReleaseChange(property?: string, source?) {
+    if (property === 'branch') {
+      saveBranch(this.auth.getUserToken(), 'copyBIE', source.releaseId);
+    }
+
     this.paginator.pageIndex = 0;
     this.loadBieList();
   }

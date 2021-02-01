@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
+import {FormControl, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
-import {hashCode} from '../../common/utility';
+import {AuthService} from '../../authentication/auth.service';
 import {Namespace} from '../domain/namespace';
 import {NamespaceService} from '../domain/namespace.service';
 
@@ -17,29 +17,29 @@ export class NamespaceCreateComponent implements OnInit {
   title = 'Create Namespace';
   disabled: boolean;
   namespace: Namespace;
+  uriForm: FormControl;
   hashCode;
 
   constructor(private service: NamespaceService,
               private location: Location,
               private route: ActivatedRoute,
               private router: Router,
-              private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private auth: AuthService,
+              private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
     this.disabled = false;
     this.namespace = new Namespace();
-    this.hashCode = hashCode(this.namespace);
-  }
-
-  isChanged() {
-    return this.hashCode !== hashCode(this.namespace);
+    this.uriForm = new FormControl(this.namespace.uri, Validators.pattern('\\w+:(\\/?\\/?)[^\\s]+'));
   }
 
   isDisabled() {
-    return (this.disabled) ||
-      (this.namespace.uri === undefined || this.namespace.uri === '');
+    return !this.uriForm.valid;
+  }
+
+  get isDeveloper(): boolean {
+    return this.auth.getUserToken().role === 'developer';
   }
 
   back() {
@@ -47,6 +47,7 @@ export class NamespaceCreateComponent implements OnInit {
   }
 
   create() {
+    this.namespace.uri = this.uriForm.value;
     this.service.create(this.namespace).subscribe(_ => {
       this.snackBar.open('Created', '', {
         duration: 3000,

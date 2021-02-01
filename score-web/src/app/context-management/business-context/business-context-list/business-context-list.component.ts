@@ -12,12 +12,10 @@ import {PageRequest} from '../../../basis/basis';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {initFilter} from '../../../common/utility';
-import {ConfirmDialogConfig} from '../../../common/confirm-dialog/confirm-dialog.domain';
-import {ConfirmDialogComponent} from '../../../common/confirm-dialog/confirm-dialog.component';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {ConfirmDialogService} from '../../../common/confirm-dialog/confirm-dialog.service';
 
 @Component({
   selector: 'score-business-context',
@@ -44,7 +42,7 @@ export class BusinessContextListComponent implements OnInit {
 
   constructor(private service: BusinessContextService,
               private accountService: AccountListService,
-              private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService,
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
@@ -120,7 +118,7 @@ export class BusinessContextListComponent implements OnInit {
       this.paginator.length = resp.length;
       this.dataSource.data = resp.list.map((elm: BusinessContext) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
-        elm.bizCtxValues = [];
+        elm.businessContextValueList = [];
         return elm;
       });
       if (!isInit) {
@@ -147,49 +145,44 @@ export class BusinessContextListComponent implements OnInit {
 
   select(row: BusinessContext) {
     if (!row.used) {
-      this.selection.select(row.bizCtxId);
+      this.selection.select(row.businessContextId);
     }
   }
 
   toggle(row: BusinessContext) {
     if (this.isSelected(row)) {
-      this.selection.deselect(row.bizCtxId);
+      this.selection.deselect(row.businessContextId);
     } else {
       this.select(row);
     }
   }
 
   isSelected(row: BusinessContext) {
-    return this.selection.isSelected(row.bizCtxId);
+    return this.selection.isSelected(row.businessContextId);
   }
 
   discard() {
-    const bizCtxIds = this.selection.selected;
-
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = ['confirm-dialog'];
-    dialogConfig.autoFocus = false;
-    dialogConfig.data = new ConfirmDialogConfig();
-    dialogConfig.data.header = 'Discard Business ' + (bizCtxIds.length > 1 ? 'Contexts' : 'Context') + '?';
+    const businessContextIds = this.selection.selected;
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Discard Business ' + (businessContextIds.length > 1 ? 'Contexts' : 'Context') + '?';
     dialogConfig.data.content = [
-      'Are you sure you want to discard selected business ' + (bizCtxIds.length > 1 ? 'contexts' : 'context') + '?',
-      'The business ' + (bizCtxIds.length > 1 ? 'contexts' : 'context') + ' will be permanently removed.'
+      'Are you sure you want to discard selected business ' + (businessContextIds.length > 1 ? 'contexts' : 'context') + '?',
+      'The business ' + (businessContextIds.length > 1 ? 'contexts' : 'context') + ' will be permanently removed.'
     ];
-
     dialogConfig.data.action = 'Discard';
 
-    this.dialog.open(ConfirmDialogComponent, dialogConfig).afterClosed()
+    this.confirmDialogService.open(dialogConfig).afterClosed()
       .subscribe(result => {
         if (result) {
-          this.service.delete(...bizCtxIds).subscribe(_ => {
+          this.service.delete(...businessContextIds).subscribe(_ => {
             this.snackBar.open('Discarded', '', {
               duration: 3000,
             });
             this.selection.clear();
             this.loadBusinessContextList();
           });
-        }
-      });
+      }
+    });
   }
 
 }

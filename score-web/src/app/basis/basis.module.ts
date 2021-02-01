@@ -1,6 +1,8 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
 import {TranslateModule} from '@ngx-translate/core';
+import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
 
 import {HomepageComponent} from './homepage/homepage.component';
 import {LoginComponent} from './login/login.component';
@@ -17,7 +19,7 @@ import {AuthService} from '../authentication/auth.service';
 import {AboutService} from './about/domain/about.service';
 import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
-import {DisabledActivate, DisabledComponent} from './disabled/disabled.component';
+import {ScoreCommonModule} from '../common/score-common.module';
 
 const routes: Routes = [
   {
@@ -37,12 +39,14 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FormsModule,
     ReactiveFormsModule,
+    MatCardModule,
     RouterModule,
     MaterialModule,
     TranslateModule,
     StateProgressBarModule,
     NgxMatSelectSearchModule,
-    CommonModule
+    CommonModule,
+    ScoreCommonModule
   ],
   exports: [
     HomepageComponent,
@@ -50,7 +54,10 @@ const routes: Routes = [
     JoinComponent,
     NavbarComponent,
     FooterComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    AboutComponent,
+    PendingComponent,
+    DisabledComponent,
   ],
   declarations: [
     HomepageComponent,

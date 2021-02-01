@@ -1,0 +1,38 @@
+server:
+  port: 9000
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+spring:
+  aop:
+    proxy-target-class: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_DATABASE:oagi}?useSSL=false
+    username: ${DB_USERNAME:oagi}
+    password: ${DB_PASSWORD:oagi}
+
+  jooq:
+    sql-dialect: mysql
+
+  session:
+    store-type: redis
+
+  cache:
+    type: redis
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
+
+logging:
+  level:
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.springframework.websocket: DEBUG
+    org.springframework.messaging: DEBUG
+    org.jooq: DEBUG
+    org.oagi.score: DEBUG

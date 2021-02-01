@@ -22,7 +22,7 @@ export class AccountListDialogComponent implements OnInit {
 
   title = 'Link to existing account';
   displayedColumns: string[] = [
-    'select', 'loginId', 'role', 'name', 'organization'
+    'select', 'loginId', 'name', 'organization', 'developer', 'appOauth2UserId'
   ];
   dataSource = new MatTableDataSource<AccountList>();
   loading = false;
@@ -44,8 +44,9 @@ export class AccountListDialogComponent implements OnInit {
 
   ngOnInit() {
     this.request = new AccountListRequest(this.route.snapshot.queryParamMap,
-      new PageRequest('loginId', 'asc', 0, 10));
+      new PageRequest('name', 'asc', 0, 10));
     this.request.filters.excludeSSO = true;
+    this.request.filters.role = 'end-user';
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;
@@ -99,7 +100,6 @@ export class AccountListDialogComponent implements OnInit {
       });
     }
   }
-
   close() {
     this.dialogRef.close('');
   }
@@ -115,7 +115,6 @@ export class AccountListDialogComponent implements OnInit {
       this.select(row);
     }
   }
-
   isSelected(row: AccountList) {
     return this.selection.isSelected(row);
   }

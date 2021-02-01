@@ -1,180 +1,394 @@
-<div class="context-section">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ title }}</mat-card-title>
-    </mat-card-header>
-
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <mat-form-field *ngIf="codeList.basedCodeListId !== undefined && codeList.basedCodeListId > 0">
-          <mat-label>Based Code List</mat-label>
-          <input matInput required data-id="codeList.basedCodeList" [(ngModel)]="codeList.basedCodeListName"
-                 maxlength="100" [disabled]="true"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Name</mat-label>
-          <input matInput required data-id="codeList.name" [(ngModel)]="codeList.codeListName" maxlength="100"
-                 [disabled]="codeList.state !== 'Editing'"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>List ID</mat-label>
-          <input matInput required data-id="codeList.listId" [(ngModel)]="codeList.listId" maxlength="100"
-                 [disabled]="codeList.state !== 'Editing'"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-select data-id="codeList.agencyId" [(ngModel)]="codeList.agencyId" placeholder="Agency ID" required
-                      [disabled]="codeList.state !== 'Editing'">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="agencyListFilterCtrl"
-                                     [placeholderLabel]="'Search...'"
-                                     [noEntriesFoundLabel]="'No matching Agency List found.'">
-              </ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let agencyIdListValue of filteredAgencyLists | async"
-                        [value]="agencyIdListValue.agencyIdListValueId">
-              {{ agencyIdListValue.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Version</mat-label>
-          <input matInput required data-id="codeList.version" [(ngModel)]="codeList.versionId" maxlength="10"
-                 [disabled]="codeList.state !== 'Editing'"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Definition</mat-label>
-          <textarea rows="6" cols="30" matInput data-id="codeList.definition" [(ngModel)]="codeList.definition"
-                    [disabled]="codeList.state !== 'Editing'"></textarea>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Definition Source</mat-label>
-          <input matInput data-id="codeList.definitionSource" [(ngModel)]="codeList.definitionSource" maxlength="100"
-                 [disabled]="codeList.state !== 'Editing'"/>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Remark</mat-label>
-          <input matInput data-id="codeList.remark" [(ngModel)]="codeList.remark" maxlength="225"
-                 [disabled]="codeList.state !== 'Editing'"/>
-        </mat-form-field>
-
-        <div class="row" style="padding: 14px 0 22px 0;">
-          <div class="col-12">
-            <mat-checkbox color="primary"
-                          data-id="codeList.extensible" [(ngModel)]="codeList.extensible"
-                          [disabled]="codeList.state !== 'Editing'">
-              <span>Extensible</span>
-            </mat-checkbox>
+<mat-sidenav-container class="example-container" [hasBackdrop]="false">
+  <mat-sidenav #sidenav [mode]="'over'" position="end" class="pd-15">
+    <div class="ui header">
+      <h3 class="dividing">Comment</h3>
+      <mat-icon class="close" (click)="commentControl.closeCommentSlide()">close</mat-icon>
+    </div>
+    <div class="ui feed">
+      <div class="event" *ngFor="let comment of commentControl.comments" [class]="comment.isNew ? 'new-message': ''">
+        <div class="content" [class]="comment.prevCommentId ? 'pl-4' : ''">
+          <div class="summary">
+            <a>{{ comment.loginId }}</a>
+            <div class="date">{{ comment.timestamp | dateAgo }}</div>
+            <mat-icon class="pointer icon"
+                      *ngIf="comment.loginId === currentUser && !comment.hidden"
+                      [inline]="true"
+                      (click)="commentControl.deleteComment(comment)">close</mat-icon>
+          </div>
+          <div class="extra text">
+            <div *ngIf="!comment.isEditing">
+              <span *ngIf="!comment.hidden">{{ comment.text }}</span>
+              <span *ngIf="comment.hidden" class="text-muted">(This message has been deleted.)</span>
+              <mat-icon class="pointer icon mt-1"
+                        *ngIf="comment.loginId === currentUser && !comment.hidden"
+                        [inline]="true"
+                        (click)="commentControl.openEditComment(comment)">edit</mat-icon>
+            </div>
+            <div *ngIf="comment.isEditing">
+              <mat-form-field>
+                <textarea matInput rows="3" [(ngModel)]="comment.textTemp"></textarea>
+              </mat-form-field>
+              <button mat-stroked-button (click)="commentControl.editComment(comment)">Edit</button>&nbsp;
+              <button mat-stroked-button (click)="commentControl.cancelEditComment(comment)">Cancel</button>
+            </div>
+          </div>
+          <div class="meta" *ngIf="comment.prevCommentId === null && commentControl.replyCommentId !== comment.commentId">
+            <a class="like" (click)="commentControl.openReply(comment)">Reply</a>
+          </div>
+          <div class="reply-box" *ngIf="commentControl.replyCommentId === comment.commentId">
+            <mat-form-field>
+              <textarea matInput rows="3" [(ngModel)]="commentControl.replyMessage"></textarea>
+            </mat-form-field>
+            <button mat-stroked-button (click)="commentControl.addComment(comment)">Reply</button>&nbsp;
+            <button mat-stroked-button (click)="commentControl.closeReply()">Cancel</button>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Code List Values</mat-card-title>
-    </mat-card-header>
-
-    <mat-card>
-      <mat-card-content class="mat-card-container">
-        <div class="mat-elevation-z1">
-          <table mat-table matSort [dataSource]="dataSource">
-            <!-- Checkbox Column -->
-            <ng-container matColumnDef="select">
-              <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? masterToggle() : null"
-                              [disabled]="codeList.state !== 'Editing'"
-                              [checked]="selection.hasValue() && isAllSelected()"
-                              [indeterminate]="selection.hasValue() && !isAllSelected()">
-                </mat-checkbox>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()"
-                              [disabled]="!isAvailable(row)"
-                              (change)="$event ? toggle(row) : null"
-                              [checked]="isSelected(row)">
-                </mat-checkbox>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="value">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Code</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="{{ color(element) }}">{{ element.value }}</span>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Short Name</th>
-              <td mat-cell *matCellDef="let element"> {{ element.name }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="definition">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
-              <td mat-cell *matCellDef="let element"> {{ element.definition }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="definitionSource">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition Source</th>
-              <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                (click)="openDialog(row)"></tr>
-          </table>
-
-          <mat-paginator
-            [pageSizeOptions]="[10, 25, 50]"
-            showFirstLastButtons></mat-paginator>
-        </div>
-      </mat-card-content>
-
-      <mat-card-actions style="padding: 8px 0 8px 12px;" *ngIf="codeList.state === 'Editing'">
-        <button mat-raised-button (click)="openDialog()" color="primary"
-                [disabled]="isDisabled(codeList)">
-          <mat-icon>add</mat-icon>
-          Add
+      </div>
+      <div *ngIf="commentControl.replyOpened === false">
+        <mat-form-field>
+          <textarea matInput rows="3" [(ngModel)]="commentControl.commentMessage"></textarea>
+        </mat-form-field>
+        <button mat-stroked-button (click)="commentControl.addComment()">
+          Comment
         </button>
-        <button mat-raised-button (click)="removeCodeListValues()" [hidden]="dataSource.data.length == 0"
-                [disabled]="isDisabled(codeList) || this.selection.selected.length == 0"
-                color="warn">
-          <mat-icon>delete</mat-icon>
-          Remove
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </mat-card>
+      </div>
+    </div>
+  </mat-sidenav>
 
-  <mat-card>
-    <mat-card-actions class="fab-container">
-      <button mat-mini-fab color="accent" (click)="create()"
-              [disabled]="disabled"
-              *ngIf="codeList.state === 'Published' && codeList.extensible">
-        <mat-icon style="transform: scaleX(-1);" matTooltip="Derive Code List based on this">reply</mat-icon>
-      </button>
-      <button mat-mini-fab color="primary" (click)="update()"
-              [disabled]="!isChanged() || isDisabled(codeList)"
-              *ngIf="codeList.state === 'Editing'">
-        <mat-icon matTooltip="Update">save</mat-icon>
-      </button>
-      <button mat-mini-fab color="accent" (click)="publish()"
-              [disabled]="isDisabled(codeList)"
-              *ngIf="codeList.state === 'Editing'">
-        <mat-icon matTooltip="Publish" fontSet="fontawesome" fontIcon="fa-share-square" style="color: white;"></mat-icon>
-      </button>
-      <button mat-mini-fab color="warn" (click)="discard()"
-              [disabled]="isDisabled(codeList)"
-              *ngIf="codeList.state === 'Editing'">
-        <mat-icon matTooltip="Discard">delete</mat-icon>
-      </button>
-    </mat-card-actions>
-  </mat-card>
-</div>
+  <mat-sidenav-content (click)="sidenav.close();">
+    <div class="context-section">
+      <div class="loading-container" *ngIf="isUpdating">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+      <mat-card class="pt-4 pb-2">
+        <mat-card-header class="display-flow-root">
+          <mat-card-title class="float-left">
+            <span>{{ title }}</span>
+            <span><mat-icon class="btn-comment" (click)="openComments()">comments</mat-icon></span>
+          </mat-card-title>
+          <div class="action-group float-right mt-n2">
+            <div class="col-12 actions-wrap" *ngIf="isWorkingRelease()">
+              <button mat-raised-button color="primary" (click)="update()"
+                      *ngIf="state === 'WIP' && access === 'CanEdit'"
+                      [disabled]="!isChanged">
+                Update
+              </button>
+              <button mat-raised-button color="accent" (click)="updateState('Draft')"
+                      *ngIf="state === 'WIP' && isEditable()"
+                      [disabled]="isUpdating || isChanged">
+                Move to Draft
+              </button>
+              <button mat-raised-button color="warn" (click)="updateState('WIP')"
+                      *ngIf="(state === 'Draft' || state === 'Candidate') && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                Back to WIP
+              </button>
+              <button mat-raised-button color="accent" (click)="updateState('Candidate')"
+                      *ngIf="state === 'Draft' && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                Move to Candidate
+              </button>
+              <button mat-raised-button color="warn" (click)="makeNewRevision()"
+                      *ngIf="(state === 'Published' && userRole === 'developer') && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+              </button>
+              <button mat-raised-button color="warn" (click)="delete()"
+                      *ngIf="state === 'WIP' && !hasRevision && access === 'CanEdit'"
+                      [disabled]="isUpdating || isChanged">
+                Delete
+              </button>
+              <button mat-raised-button color="primary" (click)="restore()"
+                      *ngIf="state === 'Deleted' && access === 'CanMove'">
+                Restore
+              </button>
+              <button mat-raised-button color="primary" (click)="cancelRevision()"
+                      *ngIf="state === 'WIP' && hasRevision && access === 'CanEdit'">
+                Cancel
+              </button>
+            </div>
+            <div class="col-12 actions-wrap" *ngIf="!isWorkingRelease()">
+              <button mat-raised-button color="accent" (click)="derive()"
+                      *ngIf="codeList.state === 'Published' && codeList.extensible && userRole !== 'developer'">
+                Derive Code List based on this
+              </button>
+              <button mat-raised-button color="primary" (click)="update()"
+                      *ngIf="state === 'WIP' && access === 'CanEdit'"
+                      [disabled]="!isChanged">
+                Update
+              </button>
+              <button mat-raised-button color="accent" (click)="updateState('QA')"
+                      *ngIf="state === 'WIP' && isEditable()"
+                      [disabled]="isUpdating || isChanged">
+                Move to QA
+              </button>
+              <button mat-raised-button color="warn" (click)="updateState('WIP')"
+                      *ngIf="state === 'QA' && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                Back to WIP
+              </button>
+              <button mat-raised-button color="accent" (click)="updateState('Production')"
+                      *ngIf="state === 'QA' && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                Move to Production
+              </button>
+              <button mat-raised-button color="warn" (click)="makeNewRevision()"
+                      *ngIf="(state === 'Published' || state === 'Production') && access === 'CanMove'"
+                      [disabled]="isUpdating">
+                {{ userRole === 'developer' ? 'Revise' : 'Amend' }}
+              </button>
+              <button mat-raised-button color="warn" (click)="delete()"
+                      *ngIf="state === 'WIP' && !hasRevision && access === 'CanEdit'"
+                      [disabled]="isUpdating || isChanged">
+                Delete
+              </button>
+              <button mat-raised-button color="primary" (click)="restore()"
+                      *ngIf="state === 'Deleted' && access === 'CanMove'">
+                Restore
+              </button>
+              <button mat-raised-button color="primary" (click)="cancelRevision()"
+                      *ngIf="state === 'WIP' && hasRevision && access === 'CanEdit'">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <mat-card class="mb-2">
+          <mat-card-content class="mat-card-container">
+            <div class="row">
+              <div class="col-2">
+                <mat-form-field matTooltip="Code List">
+                  <mat-label>Core Component</mat-label>
+                  <input matInput value="Code List" [disabled]="true">
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Release</mat-label>
+                  <input matInput [(ngModel)]="codeList.releaseNum" [disabled]="true">
+                </mat-form-field>
+              </div>
+              <div class="col-2">
+                <mat-form-field>
+                  <mat-label>Revision</mat-label>
+                  <input matInput [(ngModel)]="codeList.revisionNum" [disabled]="true">
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field>
+                  <mat-label>State</mat-label>
+                  <input matInput [(ngModel)]="codeList.state" [disabled]="true">
+                </mat-form-field>
+              </div>
+              <div class="col-3">
+                <mat-form-field>
+                  <mat-label>Owner</mat-label>
+                  <input matInput [(ngModel)]="codeList.owner" [disabled]="true">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <mat-form-field>
+                  <mat-label>GUID</mat-label>
+                  <input matInput maxlength="41"
+                         [(ngModel)]="codeList.guid" [disabled]="true">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <mat-form-field *ngIf="codeList.basedCodeListManifestId !== undefined && codeList.basedCodeListManifestId > 0">
+              <mat-label>Based Code List</mat-label>
+              <input matInput required data-id="codeList.basedCodeList" [(ngModel)]="codeList.basedCodeListName"
+                     maxlength="100" [disabled]="true"/>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Name</mat-label>
+              <input matInput required data-id="codeList.name" [(ngModel)]="codeList.codeListName" maxlength="100"
+                     [disabled]="access !== 'CanEdit' || hasRevision"/>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>List ID</mat-label>
+              <input matInput required data-id="codeList.listId" [(ngModel)]="codeList.listId" maxlength="100"
+                     [disabled]="access !== 'CanEdit' || hasRevision"/>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-select data-id="codeList.agencyId" [(ngModel)]="codeList.agencyId" placeholder="Agency ID" required
+                          [disabled]="access !== 'CanEdit' || hasRevision">
+                <mat-option>
+                  <ngx-mat-select-search [formControl]="agencyListFilterCtrl"
+                                         [placeholderLabel]="'Search...'"
+                                         [noEntriesFoundLabel]="'No matching Agency List found.'">
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option *ngFor="let agencyIdListValue of filteredAgencyLists | async"
+                            [value]="agencyIdListValue.agencyIdListValueId">
+                  {{ agencyIdListValue.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Version</mat-label>
+              <input matInput required data-id="codeList.version" [(ngModel)]="codeList.versionId" maxlength="100"
+                     [disabled]="access !== 'CanEdit'"/>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Namespace</mat-label>
+              <mat-select data-id="codeList.namespace" [(ngModel)]="codeList.namespaceId" placeholder="Namespace" required
+                          [disabled]="access !== 'CanEdit' || hasRevision">
+                <mat-option *ngFor="let namespace of getSelectableNamespaces(codeList.namespaceId)"
+                            [value]="namespace.namespaceId">{{ namespace.uri }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Definition</mat-label>
+              <textarea rows="6" cols="30" matInput data-id="codeList.definition" [(ngModel)]="codeList.definition"
+                        [disabled]="access !== 'CanEdit'"></textarea>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Definition Source</mat-label>
+              <input matInput data-id="codeList.definitionSource" [(ngModel)]="codeList.definitionSource" maxlength="100"
+                     [disabled]="access !== 'CanEdit'"/>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="userRole !== 'developer'">
+              <mat-label>Remark</mat-label>
+              <input matInput data-id="codeList.remark" [(ngModel)]="codeList.remark" maxlength="225"
+                     [disabled]="access !== 'CanEdit'"/>
+            </mat-form-field>
+
+            <div class="row" style="padding: 14px 0 22px 0;">
+              <div class="col-12">
+                <mat-checkbox color="primary" class="mr-3"
+                              data-id="codeList.extensible" [(ngModel)]="codeList.extensible"
+                              [disabled]="access !== 'CanEdit' || !canExtensible">
+                  <span>Extensible</span>
+                </mat-checkbox>
+                <mat-checkbox color="primary"
+                              data-id="codeList.deprecated" [(ngModel)]="codeList.deprecated"
+                              [disabled]="access !== 'CanEdit' || !canDeprecate">
+                  <span>Deprecated</span>
+                </mat-checkbox>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Code List Values</mat-card-title>
+        </mat-card-header>
+
+        <mat-card>
+          <mat-card-header>
+            <mat-card-subtitle>
+              <mat-form-field>
+                <mat-label>Search</mat-label>
+                <input matInput [(ngModel)]="valueSearch" (keyup.enter)="applyFilter(valueSearch)" maxlength="100"/>
+                <button mat-icon-button matSuffix (click)="applyFilter(valueSearch)">
+                  <mat-icon>search</mat-icon>
+                </button>
+                <button mat-icon-button matSuffix *ngIf="valueSearch && valueSearch.length > 0" (click)="clearFilter()">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-form-field>
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="mat-card-container">
+            <div class="mat-elevation-z1">
+              <table mat-table matSort [dataSource]="dataSource">
+                <!-- Checkbox Column -->
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                  *ngIf="access === 'CanEdit'"
+                                  [checked]="selection.hasValue() && isAllSelected()"
+                                  [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                  *ngIf="access === 'CanEdit'"
+                                  [disabled]="!isAvailable(row) || isRevisionValue(row)"
+                                  (change)="$event ? toggle(row) : null"
+                                  [checked]="isSelected(row)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Code</th>
+                  <td mat-cell *matCellDef="let element">
+                    <span class="{{ color(element) }}">{{ element.value }}</span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="meaning">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Meaning</th>
+                  <td mat-cell *matCellDef="let element"> {{ element.meaning }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="used">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="w70"> Used</th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-icon *ngIf="element.used">done</mat-icon>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="deprecated">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="w70"> Deprecated</th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-icon *ngIf="element.deprecated">done</mat-icon>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="definition">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition</th>
+                  <td mat-cell *matCellDef="let element"> {{ element.definition }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="definitionSource">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Definition Source</th>
+                  <td mat-cell *matCellDef="let element"> {{ element.definitionSource }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    (click)="openDialog(row)"></tr>
+              </table>
+
+              <mat-paginator
+                [pageSizeOptions]="[10, 25, 50]"
+                showFirstLastButtons></mat-paginator>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions style="padding: 8px 0 8px 12px;" *ngIf="state === 'WIP' && access === 'CanEdit'">
+            <button mat-raised-button (click)="openDialog()" color="primary"
+                    [disabled]="access !== 'CanEdit' || isDisabled(codeList)">
+              <mat-icon>add</mat-icon>
+              Add
+            </button>
+            <button mat-raised-button (click)="removeCodeListValues()" [hidden]="dataSource.data.length == 0"
+                    [disabled]="isDisabled(codeList) || this.selection.selected.length == 0"
+                    color="warn">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-card>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+

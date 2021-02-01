@@ -11,7 +11,7 @@ import {MatIconRegistry} from '@angular/material/icon';
 })
 export class ScoreWebComponent implements OnInit {
 
-  constructor(public auth: AuthService,
+  constructor(private auth: AuthService,
               private router: Router,
               private matIconRegistry: MatIconRegistry) {
   }
@@ -28,11 +28,6 @@ export class ScoreWebComponent implements OnInit {
 
   isAuthenticated() {
     return this.auth.isAuthenticated();
-  }
-
-  get role(): string {
-    const token = this.auth.getUserToken();
-    return token ? token.role : '';
   }
 
 }

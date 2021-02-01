@@ -1,178 +1,55 @@
-import {Component, Injectable, OnInit, ViewChild} from '@angular/core';
-import {CollectionViewer, SelectionChange, SelectionModel} from '@angular/cdk/collections';
-import {FlatTreeControl} from '@angular/cdk/tree';
-import {BehaviorSubject, merge, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
-import {ActivatedRoute, ParamMap} from '@angular/router';
+import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {MatSidenav} from '@angular/material/sidenav';
+import {finalize, switchMap} from 'rxjs/operators';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {DataSourceSearcher, VSFlatTreeControl} from '../../common/flat-tree';
+import {SimpleNamespace} from '../../namespace-management/domain/namespace';
+import {NamespaceService} from '../../namespace-management/domain/namespace.service';
 import {ReleaseService} from '../../release-management/domain/release.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {AccFlatNode, AsccpFlatNode, BccpFlatNode, CcFlatNode, CcFlatNodeFlattener, VSCcTreeDataSource} from '../domain/cc-flat-tree';
 import {CcNodeService} from '../domain/core-component-node.service';
-import {hashCode, UnboundedPipe} from '../../common/utility';
-import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
-import {isNumber} from 'util';
-
 import {
-  CcAccNode,
+  Attribute,
+  Base,
   CcAccNodeDetail,
-  CcAsccpNode,
   CcAsccpNodeDetail,
-  CcBccpNode,
   CcBccpNodeDetail,
   CcBdtScNodeDetail,
-  CcNode,
+  CcId,
   CcNodeDetail,
-  DynamicCcFlatNode,
+  CcRevisionResponse,
+  CcSeqUpdateRequest,
+  Comment,
+  Embedded,
   EntityType,
   EntityTypes,
+  Extension,
+  OAGIS10BODs,
+  OAGIS10Nouns,
   OagisComponentType,
-  OagisComponentTypes
+  OagisComponentTypes,
+  Semantics,
+  UserExtensionGroup
 } from '../domain/core-component-node';
+import {UnboundedPipe} from '../../common/utility';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {AppendAsccpDialogComponent} from './append-asccp-dialog/append-asccp-dialog.component';
-import {AppendBccpDialogComponent} from './append-bccp-dialog/append-bccp-dialog.component';
-import {ExtensionDetailService} from './domain/extension-detail.service';
-import {ConfirmDialogComponent} from './confirm-dialog/confirm-dialog.component';
-import {DefinitionConfirmDialogComponent} from './definition-confirm-dialog/definition-confirm-dialog.component';
-
-@Injectable()
-export class DynamicCcDataSource {
-
-  dataChange = new BehaviorSubject<DynamicCcFlatNode[]>([]);
-
-  constructor(private component: ExtensionDetailComponent,
-              private treeControl: FlatTreeControl<DynamicCcFlatNode>,
-              private service: CcNodeService) {
-  }
-
-  get data(): DynamicCcFlatNode[] {
-    return this.dataChange.value;
-  }
-
-  set data(value: DynamicCcFlatNode[]) {
-    this.treeControl.dataNodes = value;
-    this.dataChange.next(value);
-  }
-
-  connect(collectionViewer: CollectionViewer): Observable<DynamicCcFlatNode[]> {
-    this.treeControl.expansionModel.changed.subscribe(change => {
-      if ((change as SelectionChange<DynamicCcFlatNode>).added ||
-        (change as SelectionChange<DynamicCcFlatNode>).removed) {
-        this.handleTreeControl(change as SelectionChange<DynamicCcFlatNode>);
-      }
-    });
-
-    return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
-  }
-
-  /** Handle expand/collapse behaviors */
-  handleTreeControl(change: SelectionChange<DynamicCcFlatNode>) {
-    if (change.added) {
-      change.added.forEach(node => this.toggleNode(node, true));
-    }
-    if (change.removed) {
-      change.removed.slice().reverse().forEach(node => this.toggleNode(node, false));
-    }
-  }
-
-  /**
-   * Toggle the node, remove from display list
-   */
-  toggleNode(node: DynamicCcFlatNode, expand: boolean) {
-    const index = this.data.indexOf(node);
-    // If it cannot find the node, no op
-    if (index < 0) {
-      return;
-    }
-
-    if (expand) {
-      node.isLoading = true;
-      this.service.getChildren(node.item, this.component.releaseId).subscribe(children => {
-        if (!children) { // If no children, no op
-          return;
-        }
-
-        const nodes = children.map(item =>
-          new DynamicCcFlatNode(item, node.level + 1));
-        this.data.splice(index + 1, 0, ...nodes);
-
-        // notify the change
-        this.dataChange.next(this.data);
-        node.isLoading = false;
-      }, err => {
-        node.isLoading = false;
-      });
-
-    } else {
-      this.treeControl.getDescendants(node).forEach((e: DynamicCcFlatNode) => {
-        if (this.treeControl.isExpanded(e)) {
-          this.treeControl.collapse(e);
-        }
-      });
-
-      let count = 0;
-      for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++, count++) {
-      }
-      this.data.splice(index + 1, count);
-
-      // notify the change
-      this.dataChange.next(this.data);
-    }
-  }
-
-  loadDetail(node: DynamicCcFlatNode, callbackFn?) {
-    this.service.getDetail(node.item, this.component.releaseId).subscribe(detail => {
-      detail = this.resetHashCode(detail);
-      return callbackFn && callbackFn(detail);
-    });
-  }
-
-  resetHashCode(detail: CcNodeDetail) {
-    if (detail.type === 'acc') {
-      (detail as CcAccNodeDetail).$hashCode = hashCode(detail);
-    } else if (detail.type === 'asccp') {
-      const asccpDetail = (detail as CcAsccpNodeDetail);
-      asccpDetail.ascc.$hashCode = hashCode(asccpDetail.ascc);
-      asccpDetail.asccp.$hashCode = hashCode(asccpDetail.asccp);
-    } else if (detail.type === 'bccp') {
-      const bccpDetail = (detail as CcBccpNodeDetail);
-      bccpDetail.bcc.$hashCode = hashCode(bccpDetail.bcc);
-      bccpDetail.bccp.$hashCode = hashCode(bccpDetail.bccp);
-      bccpDetail.bdt.$hashCode = hashCode(bccpDetail.bdt);
-    } else if (detail.type === 'bdt_sc') {
-      (detail as CcBdtScNodeDetail).$hashCode = hashCode(detail);
-    }
-    return detail;
-  }
-
-  onSelect(...nodes: DynamicCcFlatNode[]) {
-    this.component.preprocessProperty();
-  }
-
-  onDeselect(...nodes: DynamicCcFlatNode[]) {
-    this.component.preprocessProperty();
-  }
-}
-
-export class CustomTreeControl<T> extends FlatTreeControl<T> {
-  getParent(node: T) {
-    const currentLevel = this.getLevel(node);
-
-    if (currentLevel <= 0) {
-      return undefined;
-    }
-
-    const startIndex = this.dataNodes.indexOf(node) - 1;
-
-    for (let i = startIndex; i >= 0; i--) {
-      const currentNode = this.dataNodes[i];
-
-      if (this.getLevel(currentNode) < currentLevel) {
-        return currentNode;
-      }
-    }
-  }
-}
+import {AppendAssociationDialogComponent} from '../acc-detail/append-association-dialog/append-association-dialog.component';
+import {AbstractControl, FormControl, ValidationErrors, Validators} from '@angular/forms';
+import {AuthService} from '../../authentication/auth.service';
+import {WorkingRelease} from '../../release-management/domain/release';
+import {CommentControl} from '../tree-detail/comment-component';
+import {forkJoin} from 'rxjs';
+import {Message} from '@stomp/stompjs';
+import {RxStompService} from '@stomp/ng2-stompjs';
+import {Location} from '@angular/common';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {CcList} from '../cc-list/domain/cc-list';
+import {SearchOptionsService} from '../search-options-dialog/domain/search-options-service';
+import {SearchOptionsDialogComponent} from '../search-options-dialog/search-options-dialog.component';
 
 @Component({
   selector: 'score-extension-detail',
@@ -180,573 +57,1154 @@ export class CustomTreeControl<T> extends FlatTreeControl<T> {
   styleUrls: ['./extension-detail.component.css']
 })
 export class ExtensionDetailComponent implements OnInit {
-
   title: string;
   _innerHeight: number = window.innerHeight;
-  paddingPixel = 15;
-  releaseId: number;
-  extensionId: number;
-  private $isChanged: Map<string, CcNodeDetail> = new Map();
+  paddingPixel = 12;
+  manifestId: number;
+  type = 'ACC';
   isUpdating: boolean;
   componentTypes: OagisComponentType[] = OagisComponentTypes;
   entityTypes: EntityType[] = EntityTypes;
-  rootNode: DynamicCcFlatNode;
-  treeControl: CustomTreeControl<DynamicCcFlatNode>;
-  dataSource: DynamicCcDataSource;
+  private entityTypeChanged: Map<number, boolean> = new Map();
 
-  detail: CcNodeDetail;
-  selectedNode: DynamicCcFlatNode;
+  rootNode: AccFlatNode;
+  dataSource: VSCcTreeDataSource<CcFlatNode>;
+  treeControl: VSFlatTreeControl<CcFlatNode> = new VSFlatTreeControl<CcFlatNode>();
+  searcher: DataSourceSearcher<CcFlatNode>;
+
+  lastRevision: CcRevisionResponse;
+  selectedNode: CcFlatNode;
+  cursorNode: CcFlatNode;
 
   /* Begin cardinality management */
   ccCardinalityMin: FormControl;
   ccCardinalityMax: FormControl;
   /* End cardinality management */
 
-  editNillable: boolean;
+  workingRelease = WorkingRelease;
+  namespaces: SimpleNamespace[];
+  commentControl: CommentControl;
 
-  checklistSelection = new SelectionModel<DynamicCcFlatNode>(true /* multiple */);
-  @ViewChild(ContextMenuComponent, {static: true}) public appendingMenu: ContextMenuComponent;
+  @ViewChild('sidenav', {static: true}) sidenav: MatSidenav;
+  @ViewChild('defaultContextMenu', {static: true}) public defaultContextMenu: ContextMenuComponent;
+  @ViewChild('rootNodeContextMenu', {static: true}) public rootNodeContextMenu: ContextMenuComponent;
+  @ViewChild('basedAccNodeContextMenu', {static: true}) public basedAccNodeContextMenu: ContextMenuComponent;
+  @ViewChild('associationNodeContextMenu', {static: true}) public associationNodeContextMenu: ContextMenuComponent;
+  @ViewChild('associationAppendAbleNodeContextMenu', {static: true}) public associationAppendAbleNodeContextMenu: ContextMenuComponent;
+  @ViewChild('virtualScroll', {static: true}) public virtualScroll: CdkVirtualScrollViewport;
+  virtualScrollItemSize: number = 33;
+
+  get minBufferPx(): number {
+    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * this.virtualScrollItemSize;
+  }
+
+  get maxBufferPx(): number {
+    return Math.max((this.rootNode) ? this.rootNode.children.length : 0, 20) * 20 * this.virtualScrollItemSize;
+  }
 
   constructor(private service: CcNodeService,
-              private extensionDetailService: ExtensionDetailService,
+              private searchOptionsService: SearchOptionsService,
               private releaseService: ReleaseService,
-              private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               private contextMenuService: ContextMenuService,
-              private dialog: MatDialog) {
+              private namespaceService: NamespaceService,
+              private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService,
+              private location: Location,
+              private router: Router,
+              private route: ActivatedRoute,
+              private auth: AuthService,
+              private stompService: RxStompService) {
   }
 
   ngOnInit() {
-    this.treeControl = new CustomTreeControl<DynamicCcFlatNode>(this.getLevel, this.isExpandable);
-    this.dataSource = new DynamicCcDataSource(this, this.treeControl, this.service);
+    this.commentControl = new CommentControl(this.sidenav, this.service);
 
+    this.isUpdating = true;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
-        this.releaseId = parseInt(params.get('releaseId'), 10);
-        this.extensionId = parseInt(params.get('extensionId'), 10);
-        return this.service.getExtensionNode(this.extensionId, this.releaseId);
-      })).subscribe(resp => {
-      this.title = 'Structure of ' + resp.objectClassTerm;
-      this.rootNode = new DynamicCcFlatNode(resp);
-      this.dataSource.data = [this.rootNode];
-      this.onClick(this.rootNode);
-    });
+        this.manifestId = parseInt(params.get('manifestId'), 10);
+        return forkJoin([
+          this.service.getGraphNode(this.type, this.manifestId),
+          this.service.getLastPublishedRevision(this.type, this.manifestId),
+          this.service.getAccNode(this.manifestId),
+          this.namespaceService.getSimpleNamespaces()
+        ]);
+      })).subscribe(([ccGraph, revisionResponse, rootNode, namespaces]) => {
+      this.lastRevision = revisionResponse;
+      this.namespaces = namespaces;
 
-    this.isUpdating = false;
+      // subscribe an event
+      this.stompService.watch('/topic/acc/' + this.manifestId).subscribe((message: Message) => {
+        const data = JSON.parse(message.body);
+        if (data.properties.actor !== this.currentUser) {
+          let noti;
+          if (data.action === 'UpdateDetail') {
+            noti = 'Acc updated by ' + data.properties.actor;
+          } else if (data.action === 'ChangeState') {
+            noti = 'State changed to \'' + data.properties.State + '\' by ' + data.properties.actor;
+          } else if (data.action === 'AddComment' && this.sidenav.opened) {
+            this.receiveCommentEvent(data);
+          } else {
+            return;
+          }
+
+          if (noti) {
+            const snackBarRef = this.snackBar.open(noti, 'Reload');
+            snackBarRef.onAction().subscribe(() => {
+              this.ngOnInit();
+            });
+          }
+        }
+      });
+
+      const flattener = new CcFlatNodeFlattener(ccGraph, 'ACC', this.manifestId);
+      setTimeout(() => {
+        const nodes = flattener.flatten();
+        this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
+        this.isUpdating = false;
+        this.rootNode = nodes[0] as AccFlatNode;
+        this.rootNode.access = rootNode.access;
+        this.rootNode.state = rootNode.state;
+        this.rootNode.reset();
+
+        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.onClick(this.rootNode);
+      }, 0);
+    });
   }
 
-  getLevel = (node: DynamicCcFlatNode) => node.level;
-  isExpandable = (node: DynamicCcFlatNode) => node.expandable;
-  hasChild = (_: number, _nodeData: DynamicCcFlatNode) => _nodeData.expandable;
+  receiveCommentEvent(evt) {
+    const comment = new Comment();
+    comment.commentId = evt.properties.commentId;
+    comment.prevCommentId = evt.properties.prevCommentId;
+    comment.text = evt.properties.text;
+    comment.loginId = evt.properties.actor;
+    comment.timestamp = evt.properties.timestamp;
+    comment.isNew = true;
+
+    if (comment.prevCommentId) {
+      let idx = this.commentControl.comments.findIndex(e => e.commentId === comment.prevCommentId);
+      let childrenCnt = this.commentControl.comments.filter(e => e.prevCommentId === comment.prevCommentId).length;
+      this.commentControl.comments.splice(idx + childrenCnt + 1, 0, comment);
+    } else {
+      this.commentControl.comments.push(comment);
+    }
+  }
+
+  getSelectableNamespaces(namespaceId?: number): SimpleNamespace[] {
+    return this.namespaces.filter(e => {
+      if (!!namespaceId && e.namespaceId === namespaceId) {
+        return true;
+      }
+      return (this.userRole === 'developer') ? e.standard : !e.standard;
+    });
+  }
+
+  getGraph(callbackFn) {
+    this.service.getGraphNode(this.rootNode.type, this.manifestId).subscribe(graph => {
+      const flattener = new CcFlatNodeFlattener(
+        graph, 'ACC', this.manifestId);
+      setTimeout(() => {
+        const nodes = flattener.flatten();
+        return callbackFn(nodes);
+      });
+    });
+  }
+
+  reload(snackMsg?: string) {
+    this.isUpdating = true;
+    forkJoin([
+      this.service.getAccNode(this.manifestId),
+      this.service.getGraphNode(this.rootNode.type, this.manifestId)
+    ]).subscribe(([rootNode, graph]) => {
+      const flattener = new CcFlatNodeFlattener(graph, 'ACC', this.manifestId);
+      setTimeout(() => {
+        const nodes = flattener.flatten();
+        this.dataSource = new VSCcTreeDataSource(this.treeControl, nodes, this.service, []);
+        this.isUpdating = false;
+        this.rootNode = nodes[0] as AccFlatNode;
+        this.rootNode.access = rootNode.access;
+        this.rootNode.state = rootNode.state;
+        this.rootNode.reset();
+        this.searcher = new DataSourceSearcher(this.dataSource);
+        this.treeControl.expand(this.dataSource.getRootNode());
+        this.onClick(this.dataSource.getRootNode());
+      }, 0);
+      if (snackMsg) {
+        this.snackBar.open(snackMsg, '', {duration: 3000});
+      }
+      this.isUpdating = false;
+    }, err => {
+      this.isUpdating = false;
+    });
+  }
+
+  getLevel = (node: CcFlatNode) => node.level;
+  isExpandable = (node: CcFlatNode) => node.expandable;
+  hasChild = (_: number, _nodeData: CcFlatNode) => _nodeData.expandable;
 
   onResize(event) {
     this._innerHeight = window.innerHeight;
   }
 
   get innerHeight(): number {
-    return this._innerHeight - 160;
+    return this._innerHeight - 180;
   }
 
-  type(node: DynamicCcFlatNode) {
-    const nodeItem: CcNode = node.item;
-    let typeStr = nodeItem.type;
-    if (typeStr === 'acc') {
-      const accNode: CcAccNode = nodeItem as CcAccNode;
-      if (accNode.group) {
-        typeStr = typeStr + '-group';
-      }
-    } else if (typeStr === 'bccp') {
-      const bccpNode: CcBccpNode = nodeItem as CcBccpNode;
-      if (bccpNode.attribute) {
-        typeStr = typeStr + '-attribute';
-      }
+  get state(): string {
+    return (this.rootNode) ? this.rootNode.state : '';
+  }
+
+  get access(): string {
+    return (this.rootNode) ? this.rootNode.access : '';
+  }
+
+  hasRevision() {
+    return this.lastRevision && this.lastRevision.ccId !== null;
+  }
+
+  isEditable() {
+    return this.state === 'WIP' && this.access === 'CanEdit';
+  }
+
+  isExtension() {
+    return this.rootNode && (this.rootNode.detail as CcAccNodeDetail).type === 'Extension';
+  }
+
+  onClick(node: CcFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
     }
-    return typeStr;
-  }
-
-  isChildOfUserExtensionGroup(node?: DynamicCcFlatNode) {
-    const targetNode = (node) ? node : this.selectedNode;
-    const typeStr = targetNode.item.type;
-    return (targetNode.level === 1) && (typeStr.startsWith('asccp') || typeStr.startsWith('bccp'));
-  }
-
-  get state() {
-    return (this.rootNode) ? this.rootNode.item.state : '';
-  }
-
-  get access() {
-    return (this.rootNode) ? this.rootNode.item.access : '';
-  }
-
-  itemSelectionToggle(node: DynamicCcFlatNode) {
-    this.checklistSelection.toggle(node);
-
-    const selected: boolean = this.checklistSelection.isSelected(node);
-    if (selected) {
-      this.dataSource.onSelect(node);
-    } else {
-      this.dataSource.onDeselect(node);
-    }
-
-    let parent = this.treeControl.getParent(node);
-    while (parent !== undefined) {
-
-      if (selected) {
-
-        this.checklistSelection.select(parent);
-        this.dataSource.onSelect(parent);
-
-      } else {
-
-        if (this.treeControl.getDescendants(parent).length === 0) {
-          this.checklistSelection.deselect(parent);
-          this.dataSource.onDeselect(parent);
-        }
-
-      }
-
-      parent = this.treeControl.getParent(parent);
-    }
-
-    if (!selected) {
-      const descendants = this.treeControl.getDescendants(node);
-      this.checklistSelection.deselect(...descendants);
-      this.dataSource.onDeselect(...descendants);
-    }
-  }
-
-  onClick(node: DynamicCcFlatNode) {
+    this.commentControl.closeCommentSlide();
     this.dataSource.loadDetail(node, (detail: CcNodeDetail) => {
       this.selectedNode = node;
-      this.detail = detail;
-      this.preprocessProperty(this.detail);
+      this.cursorNode = node;
+      this.resetCardinalities(node);
     });
   }
 
+  toggle(node: CcFlatNode, $event?: MouseEvent) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    this.treeControl.toggle(node);
+  }
+
+  hasRevisionAssociation() {
+    const key = this.getKey(this.selectedNode);
+    if (key.length > 0 && this.lastRevision.associations && this.lastRevision.associations[key]) {
+      return this.lastRevision.associations[key] !== undefined;
+    }
+    return false;
+  }
+
+  isDeprecateAble() {
+    const key = this.getKey(this.selectedNode);
+    if (key.length > 0) {
+      if (this.lastRevision.associations && this.lastRevision.associations[key]) {
+        return !this.lastRevision.associations[key].deprecated;
+      }
+    }
+    return false;
+  }
+
+  getKey(node: CcFlatNode) {
+    return node.type + '-' + node.manifestId;
+  }
+
+  isDraggable(node: CcFlatNode) {
+    if (node.level !== 1) {
+      return false;
+    }
+    const type = node.type.toUpperCase();
+    if (type === 'BCCP') {
+      return (node as BccpFlatNode).bccNode.entityType !== 'Attribute';
+    } else if (type === 'ASCCP') {
+      return true;
+    }
+    return false;
+  }
+
   /* For type casting of detail property */
-  isAccDetail(detail?: CcNodeDetail): boolean {
-    if (!detail) {
-      detail = this.detail;
+  isAccDetail(node?: CcFlatNode): boolean {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return (detail !== undefined) && (detail.type === 'acc');
+    return (node !== undefined) && (node.type.toUpperCase() === 'ACC');
   }
 
-  asAccDetail(detail?: CcNodeDetail): CcAccNodeDetail {
-    if (!detail) {
-      detail = this.detail;
+  asAccDetail(node?: CcFlatNode): CcAccNodeDetail {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return detail as CcAccNodeDetail;
+    return node.detail as CcAccNodeDetail;
   }
 
-  isAsccpDetail(detail?: CcNodeDetail): boolean {
-    if (!detail) {
-      detail = this.detail;
+  isAsccpDetail(node?: CcFlatNode): boolean {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return (detail !== undefined) && (detail.type === 'asccp');
+    return (node !== undefined) && (node.type.toUpperCase() === 'ASCCP');
   }
 
-  asAsccpDetail(detail?: CcNodeDetail): CcAsccpNodeDetail {
-    if (!detail) {
-      detail = this.detail;
+  asAsccpDetail(node?: CcFlatNode): CcAsccpNodeDetail {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return detail as CcAsccpNodeDetail;
+    return node.detail as CcAsccpNodeDetail;
   }
 
-  isBccpDetail(detail?: CcNodeDetail): boolean {
-    if (!detail) {
-      detail = this.detail;
+  isBccpDetail(node?: CcFlatNode): boolean {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return (detail !== undefined) && (detail.type === 'bccp');
+    return (node !== undefined) && (node.type.toUpperCase() === 'BCCP');
   }
 
-  asBccpDetail(detail?: CcNodeDetail): CcBccpNodeDetail {
-    if (!detail) {
-      detail = this.detail;
+  asBccpDetail(node?: CcFlatNode): CcBccpNodeDetail {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return detail as CcBccpNodeDetail;
+    return node.detail as CcBccpNodeDetail;
   }
 
-  isBdtScDetail(detail?: CcNodeDetail): boolean {
-    if (!detail) {
-      detail = this.detail;
+  isBdtScDetail(node?: CcFlatNode): boolean {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return (detail !== undefined) && (detail.type === 'bdt_sc');
+    return (node !== undefined) && (node.type.toUpperCase() === 'BDT_SC');
   }
 
-  asBdtScDetail(detail?: CcNodeDetail): CcBdtScNodeDetail {
-    if (!detail) {
-      detail = this.detail;
+  asBdtScDetail(node?: CcFlatNode): CcBdtScNodeDetail {
+    if (!node) {
+      node = this.selectedNode;
     }
-    return detail as CcBdtScNodeDetail;
+    return node.detail as CcBdtScNodeDetail;
   }
 
-  onContextMenu($event: MouseEvent, item: any): void {
+  get isChanged() {
+    return this.dataSource.changedNodes.length > 0;
+  }
+
+  _updateDetails(details: CcFlatNode[]) {
+    this.isUpdating = true;
+    this.service.updateDetails(this.manifestId, details)
+      .pipe(finalize(() => {
+        this.isUpdating = false;
+      }))
+      .subscribe(_ => {
+        if (this.entityTypeChanged.size > 0) {
+          this.reload('Updated');
+          this.entityTypeChanged.clear();
+        } else {
+          this.dataSource.resetChanged();
+          if (this.selectedNode) {
+            this.onClick(this.selectedNode);
+          }
+          this.snackBar.open('Updated', '', {
+            duration: 3000,
+          });
+        }
+      }, err => {
+      });
+  }
+
+  updateDetails() {
+    if (!this.isChanged || this.isUpdating) {
+      return;
+    }
+
+    const details = this.dataSource.changedNodes;
+    let emptyDefinition = false;
+    let emptyObjectClassTerm = false;
+    let emptyNamespace = false;
+    for (const detail of details) {
+      if (detail.type.toUpperCase() === 'ACC') {
+        if (!this.asAccDetail(detail).objectClassTerm || this.asAccDetail(detail).objectClassTerm.length === 0) {
+          emptyObjectClassTerm = true;
+        }
+        if (!this.asAccDetail(detail).definition || this.asAccDetail(detail).definition.length === 0) {
+          emptyDefinition = true;
+        }
+        if (!this.asAccDetail(detail).namespaceId) {
+          emptyNamespace = true;
+        }
+      } else if (detail.type.toUpperCase() === 'ASCCP') {
+        if (!this.asAsccpDetail(detail).ascc.definition || this.asAsccpDetail(detail).ascc.definition.length === 0) {
+          emptyDefinition = true;
+        }
+      } else if (detail.type.toUpperCase() === 'BCCP') {
+        if (!this.asBccpDetail(detail).bcc.definition || this.asBccpDetail(detail).bcc.definition.length === 0) {
+          emptyDefinition = true;
+        }
+      }
+    }
+
+    if (emptyObjectClassTerm) {
+      this.snackBar.open('Object Class Term is required', '', {
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (emptyNamespace) {
+      this.snackBar.open('Namespace is required', '', {
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (emptyDefinition) {
+      const dialogConfig = this.confirmDialogService.newConfig();
+      dialogConfig.data.header = 'Update without definitions.';
+      dialogConfig.data.content = ['Are you sure you want to update this without definitions?'];
+      dialogConfig.data.action = 'Update anyway';
+
+      this.confirmDialogService.open(dialogConfig).afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this._updateDetails(details);
+          }
+        });
+    } else {
+      this._updateDetails(details);
+    }
+  }
+
+  onContextMenu($event: MouseEvent, node: CcFlatNode): void {
+    let contextMenu;
+    contextMenu = this.defaultContextMenu;
+    if (node.level === 0) {
+      contextMenu = this.rootNodeContextMenu;
+    } else if (node.level === 1 && node.type.toUpperCase() === 'ACC') {
+      contextMenu = this.defaultContextMenu;
+    } else if (this.discardAble(node)) {
+      contextMenu = this.associationNodeContextMenu;
+    } else {
+      contextMenu = this.associationAppendAbleNodeContextMenu;
+    }
+
     this.contextMenuService.show.next({
-      contextMenu: this.appendingMenu,
+      contextMenu,
       event: $event,
-      item: item,
+      item: node,
     });
     $event.preventDefault();
     $event.stopPropagation();
   }
 
-  onChange(node?: CcNodeDetail) {
-    if (!node) {
-      node = this.detail;
-    }
+  openSearchOptions() {
+    const dialogRef = this.dialog.open(SearchOptionsDialogComponent, {
+      data: {},
+      width: '600px',
+      autoFocus: false
+    });
 
-    if (this.isAsccpDetail(node)) {
-      const asccpDetail = this.asAsccpDetail(node);
-      const changed = asccpDetail.ascc.$hashCode !== hashCode(asccpDetail.ascc);
-      const key = 'ascc-' + asccpDetail.ascc.asccId;
-      if (changed) {
-        this.$isChanged.set(key, asccpDetail);
-      } else if (this.$isChanged.has(key)) {
-        this.$isChanged.delete(key);
-      }
-
-    } else if (this.isBccpDetail(node)) {
-      const bccpDetail = this.asBccpDetail(node);
-      const changed = bccpDetail.bcc.$hashCode !== hashCode(bccpDetail.bcc);
-      const key = 'bcc-' + bccpDetail.bcc.bccId;
-      if (changed) {
-        this.$isChanged.set(key, bccpDetail);
-      } else if (this.$isChanged.has(key)) {
-        this.$isChanged.delete(key);
-      }
-    }
+    dialogRef.afterClosed().subscribe(_ => {
+    });
   }
 
-  get isChanged() {
-    return this.$isChanged.size > 0;
+  pos(node: CcFlatNode): number {
+    if (!node.parent) {
+      return 0;
+    }
+    return node.parent.children.indexOf(node);
   }
 
-  validateDetails() {
-    if (!this.isChanged || this.isUpdating) {
+  appendAssociation(node: CcFlatNode, pos: number) {
+    if (pos === 0 && this.hasRevision()) {
+      pos = Object.getOwnPropertyNames(this.lastRevision.associations).length;
+    }
+    const dialogRef = this.dialog.open(AppendAssociationDialogComponent, {
+      data: {
+        releaseId: this.rootNode.releaseId,
+        manifestId: this.rootNode.manifestId,
+        state: this.rootNode.state,
+        action: (pos === -1) ? 'Append' : 'Insert'
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((association: CcList | undefined) => {
+      if (!association) {
+        return;
+      }
+
+      this.isUpdating = true;
+      this.service.appendAssociation(
+        this.rootNode.releaseId,
+        this.rootNode.manifestId,
+        association.manifestId,
+        association.type,
+        pos).subscribe(_ => {
+        this.getGraph((nodes: CcFlatNode[]) => {
+          const targetNodes = this.dataSource.getNodesByLevelAndIndex(nodes, pos);
+          this.dataSource.insertNodes(targetNodes, pos);
+          this.snackBar.open((pos === -1) ? 'Appended' : 'Inserted', '', {
+            duration: 3000,
+          });
+          this.isUpdating = false;
+        });
+      }, err => {
+        this.isUpdating = false;
+      });
+    });
+  }
+
+  _updateState(state: string) {
+    if (!state) {
       return;
     }
 
-    const details = Array.from(this.$isChanged.values());
-    let emptyDefinition = false;
-    for (const detail of details) {
-      if (this.isAsccpDetail(detail)) {
-        if (this.asAsccpDetail(detail).ascc.definition == null || this.asAsccpDetail(detail).ascc.definition.length === 0) {
-          emptyDefinition = true;
-        }
-      }
-      if (this.isBccpDetail(detail)) {
-        if (this.asBccpDetail(detail).bcc.definition == null || this.asBccpDetail(detail).bcc.definition.length === 0) {
-          emptyDefinition = true;
-        }
-      }
-    }
-    if (emptyDefinition) {
-      const dialogRef = this.dialog.open(DefinitionConfirmDialogComponent, {});
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.updateDetails();
-        }
-      });
-    } else {
-      this.updateDetails();
-    }
-  }
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Update state to \'' + state + '\'?';
+    dialogConfig.data.content = ['Are you sure you want to update the state to \'' + state + '\'?'];
+    dialogConfig.data.action = 'Update';
 
-  updateDetails() {
-    const details = Array.from(this.$isChanged.values());
-    this.isUpdating = true;
-    this.extensionDetailService.updateDetails(details, this.releaseId, this.extensionId).subscribe(_ => {
-      for (const detail of details) {
-        this.dataSource.resetHashCode(detail);
-      }
-      this.$isChanged.clear();
-
-      this.snackBar.open('Updated', '', {
-        duration: 3000,
-      });
-      this.isUpdating = false;
-    }, err => {
-
-      this.isUpdating = false;
-    });
-  }
-
-  appendAscc(node: DynamicCcFlatNode) {
-    const dialogRef = this.dialog.open(AppendAsccpDialogComponent, {
-      data: {
-        releaseId: this.releaseId,
-        extensionId: this.extensionId
-      },
-      panelClass: ['center-dialog']
-    });
-    dialogRef.afterClosed().subscribe(asccpId => {
-      if (!asccpId) {
-        return;
-      }
-      if (this.treeControl.isExpanded(this.rootNode)) {
-        this.treeControl.toggle(this.rootNode);
-      }
-      this.treeControl.toggle(this.rootNode);
-    });
-  }
-
-  appendBcc(node: DynamicCcFlatNode) {
-    const dialogRef = this.dialog.open(AppendBccpDialogComponent, {
-      data: {
-        releaseId: this.releaseId,
-        extensionId: this.extensionId
-      },
-      panelClass: ['center-dialog']
-    });
-    dialogRef.afterClosed().subscribe(bccpId => {
-      if (!bccpId) {
-        return;
-      }
-      if (this.treeControl.isExpanded(this.rootNode)) {
-        this.treeControl.toggle(this.rootNode);
-      }
-      this.treeControl.toggle(this.rootNode);
-    });
-  }
-
-  onClickDiscard($event: MouseEvent, node: DynamicCcFlatNode): void {
-    const nodeItem: CcNode = node.item;
-    const typeStr = nodeItem.type;
-    switch (typeStr) {
-      case 'asccp':
-        this.isUpdating = true;
-
-        const asccpNode: CcAsccpNode = nodeItem as CcAsccpNode;
-        this.extensionDetailService.discardAscc(asccpNode.asccId, this.releaseId, this.extensionId).subscribe(_ => {
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .pipe(
+        finalize(() => {
           this.isUpdating = false;
-
-          this.selectedNode = undefined;
-          this.detail = undefined;
-          this.$isChanged.delete('ascc-' + asccpNode.asccId);
-
-          if (this.treeControl.isExpanded(this.rootNode)) {
-            this.treeControl.toggle(this.rootNode);
-          }
-          this.treeControl.toggle(this.rootNode);
-        });
-
-        break;
-
-      case 'bccp':
-        this.isUpdating = true;
-
-        const bccpNode: CcBccpNode = nodeItem as CcBccpNode;
-        this.extensionDetailService.discardBcc(bccpNode.bccId, this.releaseId, this.extensionId).subscribe(_ => {
-          this.isUpdating = false;
-
-          this.selectedNode = undefined;
-          this.detail = undefined;
-          this.$isChanged.delete('bcc-' + bccpNode.bccId);
-
-          if (this.treeControl.isExpanded(this.rootNode)) {
-            this.treeControl.toggle(this.rootNode);
-          }
-          this.treeControl.toggle(this.rootNode);
-        });
-
-        break;
-    }
-  }
-
-  delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  numberOnly(event): boolean {
-    const charCode = (event.which) ? event.which : event.keyCode;
-    return !(charCode > 31 && (charCode < 45 || charCode > 57));
+        })
+      )
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
+          .subscribe(resp => {
+            this.afterStateChanged(resp.state, resp.access);
+            this.snackBar.open('Updated', '', {
+              duration: 3000,
+            });
+          }, err => {
+          });
+      });
   }
 
   updateState(state: string) {
-    this.isUpdating = true;
-    this.extensionDetailService.setState(this.releaseId, this.extensionId, state).subscribe(_ => {
-      this.rootNode.item.state = state;
-      this.isUpdating = false;
-      this.preprocessProperty();
-
-      this.snackBar.open('State updated', '', {
-        duration: 3000,
-      });
-    }, err => {
-      this.isUpdating = false;
-    });
-  }
-
-  openConfirmDialog() {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {}
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.updateState('Published');
-      }
-    });
-  }
-
-  preprocessProperty(nodeDetail?: CcNodeDetail) {
-    if (!nodeDetail) {
-      nodeDetail = this.detail;
-    }
-    if (!nodeDetail) {
+    if (!state) {
       return;
     }
-    this.editNillable = true;
-    if (this.isAsccpDetail(nodeDetail)) {
-      const asccId = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc.asccId;
-      this.extensionDetailService.getCcLastRevision(this.rootNode.item.releaseId, 'ascc', asccId).subscribe(result => {
-        if (result) {
-          this._setCardinalityMinFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
-          this._setCardinalityMaxFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
+    const rootNode = this.dataSource.getRootNode();
+
+    if (state !== 'WIP') {
+      this.dataSource.loadDetail(rootNode, (detail) => {
+        if (!this.asAccDetail(detail).namespaceId) {
+          this.snackBar.open('Namespace is required', '', {
+            duration: 3000,
+          });
+          this.onClick(rootNode);
+          return;
         } else {
-          this._setCardinalityMinFormControl(nodeDetail);
-          this._setCardinalityMaxFormControl(nodeDetail);
-        }
-      });
-    } else if (this.isBccpDetail(nodeDetail)) {
-      const bccId = (<unknown>nodeDetail as CcBccpNodeDetail).bcc.bccId;
-      this.extensionDetailService.getCcLastRevision(this.rootNode.item.releaseId, 'bcc', bccId).subscribe(result => {
-        if (result) {
-          if (result.nillable) {
-            this.editNillable = false;
-          }
-          this._setCardinalityMinFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
-          this._setCardinalityMaxFormControl(nodeDetail, result.cardinalityMin, result.cardinalityMax);
-        } else {
-          this._setCardinalityMinFormControl(nodeDetail);
-          this._setCardinalityMaxFormControl(nodeDetail);
+          return this._updateState(state);
         }
       });
     } else {
-      this._setCardinalityMinFormControl(nodeDetail);
-      this._setCardinalityMaxFormControl(nodeDetail);
+      return this._updateState(state);
     }
   }
 
-  _setCardinalityMinFormControl(nodeDetail?: CcNodeDetail, revisionCardinalityMin?: number, revisionCardinalityMax?: number) {
-    if (!revisionCardinalityMin) {
-      revisionCardinalityMin = 0;
+  afterStateChanged(state: string, access: string) {
+    this.rootNode.state = state;
+    this.rootNode.access = access;
+    const root = this.dataSource.getRootNode();
+    (root.detail as CcAccNodeDetail).state = state;
+    root.children.forEach(child => {
+      if ((child as CcFlatNode).type === 'ASCCP' && (child as AsccpFlatNode).detail) {
+        ((child as AsccpFlatNode).detail as CcAsccpNodeDetail).ascc.state = state;
+      } else if ((child as CcFlatNode).type === 'BCCP' && (child as BccpFlatNode).detail) {
+        ((child as BccpFlatNode).detail as CcBccpNodeDetail).bcc.state = state;
+      }
+    })
+  }
+
+  makeNewRevision() {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = (this.userRole === 'developer') ? 'Revise this ACC?' : 'Amend this ACC?';
+    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to revise this ACC?' : 'Are you sure you want to amend this ACC?'];
+    dialogConfig.data.action = (this.userRole === 'developer') ? 'Revise' : 'Amend';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.isUpdating = true;
+        this.service.makeNewRevision(this.rootNode.type, this.rootNode.manifestId).pipe(
+          finalize(() => {
+            this.isUpdating = false;
+          })
+        ).subscribe(resp => {
+            this.manifestId = resp.manifestId;
+            this.afterStateChanged(resp.state, resp.access);
+            this.service.getLastPublishedRevision(this.type, this.manifestId).subscribe(revision => {
+              this.lastRevision = revision;
+              this.snackBar.open((this.userRole === 'developer') ? 'Revised' : 'Amended', '', {
+                duration: 3000,
+              });
+            });
+            if (this.selectedNode) {
+              this.onClick(this.selectedNode);
+            }
+          });
+      });
+  }
+
+  discardAble(node: CcFlatNode): boolean {
+    if (this.state !== 'WIP') {
+      return false;
+    }
+    if (this.access !== 'CanEdit') {
+      return false;
+    }
+    if (node.level !== 1) {
+      return false;
+    }
+    if (node.type.toUpperCase() === 'ACC') {
+      if (this.hasRevision() && this.lastRevision.hasBaseCc) {
+        return false;
+      }
+    }
+    return !(this.hasRevision() && this.lastRevision.associations[this.getKey(node)]);
+  }
+
+  get userRole(): string {
+    const userToken = this.auth.getUserToken();
+    return userToken.role;
+  }
+
+  get currentUser(): string {
+    const userToken = this.auth.getUserToken();
+    return (userToken) ? userToken.username : undefined;
+  }
+
+  onClickDiscard(node: CcFlatNode): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Remove association?';
+    dialogConfig.data.content = ['Are you sure you want to remove this association?'];
+    dialogConfig.data.action = 'Remove anyway';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        const type = node.type.toUpperCase();
+        switch (type) {
+          case 'ASCCP':
+            this.isUpdating = true;
+            this.service.deleteNode('ascc', (node as AsccpFlatNode).asccManifestId).pipe(
+              finalize(() => {
+                this.isUpdating = false;
+              })
+            ).subscribe(_ => {
+              this.getGraph((nodes: CcFlatNode[]) => {
+                const index = this.dataSource.getRootNode().children.indexOf(node);
+                this.dataSource.removeNodes(index);
+                this.isUpdating = false;
+              });
+            }, error => {
+            });
+            break;
+
+          case 'BCCP':
+            this.isUpdating = true;
+            this.service.deleteNode('BCC', (node as BccpFlatNode).bccManifestId).pipe(
+              finalize(() => {
+                this.isUpdating = false;
+              })
+            ).subscribe(_ => {
+              const index = this.dataSource.getRootNode().children.indexOf(node);
+              this.dataSource.removeNodes(index);
+              this.isUpdating = false;
+            }, error => {
+            });
+            break;
+        }
+      });
+  }
+
+  componentTypeAble(componentType: number) {
+    if (this.userRole === 'developer') {
+      if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
+        return false;
+      }
+    } else {
+      if ([UserExtensionGroup.value, OAGIS10BODs.value, OAGIS10Nouns.value, Embedded.value, Extension.value].indexOf(componentType) > -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  abstractAble(detail: CcAccNodeDetail) {
+    if (this.lastRevision && this.lastRevision.ccId) {
+      if (detail.oagisComponentType === Base.value) {
+        return false;
+      } else {
+        if (this.lastRevision.isAbstract) {
+          return true;
+        }
+        return false;
+      }
+    } else {
+      if (detail.oagisComponentType === Semantics.value) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  isChildOfUserExtensionGroup(node?: CcFlatNode) {
+    const targetNode = (node) ? node : this.selectedNode;
+    const typeStr = targetNode.type.toUpperCase();
+    return (targetNode.level === 1) && (typeStr.startsWith('ASCCP') || typeStr.startsWith('BCCP'));
+  }
+
+  resetCardinalities(node?: CcFlatNode) {
+    this._setCardinalityMinFormControl(node);
+    this._setCardinalityMaxFormControl(node);
+  }
+
+  _setCardinalityMinFormControl(node?: CcFlatNode) {
+    if (!node) {
+      node = this.selectedNode;
+    }
+    if (!node) {
+      return;
     }
 
     let obj;
-    let revisionNum = 0;
-    if (this.isAsccpDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc;
-      revisionNum = obj.revisionNum;
-    } else if (this.isBccpDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcBccpNodeDetail).bcc;
-      revisionNum = obj.revisionNum;
-    } else if (this.isBdtScDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcBdtScNodeDetail);
+    let prevRevision = null;
+    if (this.isAsccpDetail(node)) {
+      const detail = node.detail as CcAsccpNodeDetail;
+      obj = detail.ascc;
+      if (this.lastRevision && this.lastRevision.associations) {
+        prevRevision = this.lastRevision.associations[node.type + '-' + detail.asccp.manifestId];
+      }
+    } else if (this.isBccpDetail(node)) {
+      const detail = node.detail as CcBccpNodeDetail;
+      obj = detail.bcc;
+      if (this.lastRevision && this.lastRevision.associations) {
+        prevRevision = this.lastRevision.associations[node.type + '-' + detail.bccp.manifestId];
+      }
+    } else if (this.isBdtScDetail(node)) {
+      obj = node.detail;
     } else {
       return false;
+    }
+
+    const validators = [];
+    validators.push(Validators.required);
+    validators.push(Validators.pattern('[0-9]+'));
+    if (this.isBccpDetail(node)) {
+      if (this.asBccpDetail(node).bcc.entityType === 0) { // is_attribute
+        validators.push((control: AbstractControl): ValidationErrors | null => {
+          if (obj.cardinalityMin > 1) {
+            return {min: 'Cardinality Min must be less than or equals to ' + 1};
+          }
+          return null;
+        });
+      }
+    }
+
+    let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
+    if (prevRevision) {
+      if (prevRevision.cardinalityMin === 0) {
+        disabled = true;
+      }
+      validators.push((control: AbstractControl): ValidationErrors | null => {
+        if (obj.cardinalityMax === -1) {
+          return null;
+        }
+        if (Number(control.value) < 0) {
+          return {min: 'Cardinality Min must be bigger than or equals to ' + 0};
+        }
+        if (Number(control.value) > prevRevision.cardinalityMin) {
+          return {max: 'Cardinality Min must be less than or equals to ' + prevRevision.cardinalityMin};
+        }
+        if (Number(control.value) > obj.cardinalityMax) {
+          return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
+        }
+        return null;
+      });
+    } else {
+      validators.push((control: AbstractControl): ValidationErrors | null => {
+        if (obj.cardinalityMax === -1) {
+          return null;
+        }
+        if (Number(control.value) > obj.cardinalityMax) {
+          return {max: 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
+        }
+        return null;
+      });
     }
 
     this.ccCardinalityMin = new FormControl({
         value: obj.cardinalityMin,
-      // tslint:disable-next-line:max-line-length
-      disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup() || (revisionNum > 1 && revisionCardinalityMin === 0) )
-      }, [
-        Validators.required,
-        Validators.pattern('[0-9]+'),
-        // validatorFn for maximum value
-        (control: AbstractControl): ValidationErrors | null => {
-          if (revisionCardinalityMin !== 0) {
-            if (Number(control.value) > revisionCardinalityMin) {
-              return {'max': 'Cardinality Min must be less than or equals to ' + revisionCardinalityMin};
-            }
-          }
-          if (obj.cardinalityMax === -1) {
-            return null;
-          }
-          if (Number(control.value) > obj.cardinalityMax) {
-            return {'max': 'Cardinality Min must be less than or equals to ' + obj.cardinalityMax};
-          }
-          return null;
-        }
-      ]
+        disabled
+      }, validators
     );
     this.ccCardinalityMin.valueChanges.subscribe(value => {
       if (this.ccCardinalityMin.valid) {
-        value = isNumber(value) ? value : Number.parseInt(value, 10);
+        value = typeof value === 'number' ? value : Number.parseInt(value, 10);
         obj.cardinalityMin = Number(value);
         this.ccCardinalityMax.updateValueAndValidity({onlySelf: true, emitEvent: false});
-
-        this.onChange(nodeDetail);
       }
     });
   }
 
-  _setCardinalityMaxFormControl(nodeDetail?: CcNodeDetail, revisionCardinalityMin?: number, revisionCardinalityMax?: number) {
-
-    if (!revisionCardinalityMax) {
-      revisionCardinalityMax = -1;
+  _setCardinalityMaxFormControl(node?: CcFlatNode) {
+    if (!node) {
+      node = this.selectedNode;
+    }
+    if (!node) {
+      return;
     }
 
     let obj;
-    let revisionNum = 0;
-    if (this.isAsccpDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcAsccpNodeDetail).ascc;
-      revisionNum = obj.revisionNum;
-    } else if (this.isBccpDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcBccpNodeDetail).bcc;
-      revisionNum = obj.revisionNum;
-    } else if (this.isBdtScDetail(nodeDetail)) {
-      obj = (<unknown>nodeDetail as CcBdtScNodeDetail);
+    let prevRevision = null;
+    if (this.isAsccpDetail(node)) {
+      const detail = node.detail as CcAsccpNodeDetail;
+      obj = detail.ascc;
+      if (this.lastRevision && this.lastRevision.associations) {
+        prevRevision = this.lastRevision.associations[node.type + '-' + detail.asccp.manifestId];
+      }
+    } else if (this.isBccpDetail(node)) {
+      const detail = node.detail as CcBccpNodeDetail;
+      obj = detail.bcc;
+      if (this.lastRevision && this.lastRevision.associations) {
+        prevRevision = this.lastRevision.associations[node.type + '-' + detail.bccp.manifestId];
+      }
+    } else if (this.isBdtScDetail(node)) {
+      obj = node.detail;
     } else {
       return false;
     }
 
-    this.ccCardinalityMax = new FormControl({
-        value: new UnboundedPipe().transform(obj.cardinalityMax),
-      // tslint:disable-next-line:max-line-length
-        disabled: (this.state !== 'Editing' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup() || (revisionNum > 1 && revisionCardinalityMax === -1) )
-      }, [
-        Validators.required,
-        Validators.pattern('[0-9]+|-1|unbounded'),
-        // validatorFn for minimum value
-        (control: AbstractControl): ValidationErrors | null => {
-          let controlValue = control.value;
-          controlValue = (controlValue === 'unbounded') ? -1 : (isNumber(controlValue) ? controlValue : Number.parseInt(controlValue, 10));
-
-          if (revisionCardinalityMax !== -1) {
-            if ( controlValue === -1 ) {
-              return null;
-            } else {
-              if (controlValue < revisionCardinalityMax) {
-                return {'min': 'Cardinality Max must be greater than or equal to ' + revisionCardinalityMax};
-              }
-            }
+    const validators = [];
+    validators.push(Validators.required);
+    validators.push(Validators.pattern('[0-9]+|-1|unbounded'));
+    if (this.isBccpDetail(node)) {
+      if (this.asBccpDetail(node).bcc.entityType === 0) { // is_attribute
+        validators.push((control: AbstractControl): ValidationErrors | null => {
+          if (Number(control.value) < 0) {
+            return {max: 'Cardinality Max must be greater than or equals to ' + 0};
           }
-          if (!controlValue || controlValue === -1) {
-            return null;
-          }
-          if (controlValue < obj.cardinalityMin) {
-            return {'min': 'Cardinality Max must be greater than ' + obj.cardinalityMin};
+          if (Number(control.value) > 1) {
+            return {max: 'Cardinality Max must be less than or equals to ' + 1};
           }
           return null;
-        },
-      ]
+        });
+      }
+    }
+
+    let disabled = (this.state !== 'WIP' || this.access !== 'CanEdit' || !this.isChildOfUserExtensionGroup());
+    if (prevRevision) {
+      if (prevRevision.cardinalityMax === -1) {
+        disabled = true;
+      }
+      validators.push((control: AbstractControl): ValidationErrors | null => {
+        let controlValue = control.value;
+        controlValue = (controlValue === 'unbounded') ? -1 : (typeof controlValue === 'number' ? controlValue : Number.parseInt(controlValue, 10));
+
+        if (controlValue === -1) {
+          return null;
+        }
+        if (prevRevision.cardinalityMax === -1) {
+          return {max: 'Cardinality Max can not be changed'};
+        }
+        if (controlValue < prevRevision.cardinalityMax) {
+          return {min: 'Cardinality Max must be greater than ' + prevRevision.cardinalityMax};
+        }
+        if (controlValue < obj.cardinalityMin) {
+          return {min: 'Cardinality Max must be greater than ' + obj.cardinalityMin};
+        }
+        return null;
+      });
+    } else {
+      validators.push((control: AbstractControl): ValidationErrors | null => {
+        let controlValue = control.value;
+        controlValue = (controlValue === 'unbounded') ? -1 : (typeof controlValue === 'number' ? controlValue : Number.parseInt(controlValue, 10));
+
+        if (!controlValue || controlValue === -1) {
+          return null;
+        }
+        if (controlValue < obj.cardinalityMin) {
+          return {min: 'Cardinality Max must be greater than ' + obj.cardinalityMin};
+        }
+        return null;
+      });
+    }
+    this.ccCardinalityMax = new FormControl({
+        value: new UnboundedPipe().transform(obj.cardinalityMax),
+        disabled
+      }, validators
     );
     this.ccCardinalityMax.valueChanges.subscribe(value => {
       if (this.ccCardinalityMax.valid) {
-        value = (value === 'unbounded') ? -1 : (isNumber(value) ? value : Number.parseInt(value, 10));
+        value = (value === 'unbounded') ? -1 : (typeof value === 'number' ? value : Number.parseInt(value, 10));
         obj.cardinalityMax = value;
         this.ccCardinalityMin.updateValueAndValidity({onlySelf: true, emitEvent: false});
-
-        this.onChange(nodeDetail);
       }
     });
   }
 
-  isValid() {
-    if (this.ccCardinalityMin === undefined || this.ccCardinalityMax === undefined) {
-      return true;
+  onChangeEntityType(nodeDetail: CcBccpNodeDetail) {
+    if (this.entityTypeChanged.get(nodeDetail.bcc.manifestId) === undefined) {
+      this.entityTypeChanged.set(nodeDetail.bcc.manifestId, true);
+    } else {
+      this.entityTypeChanged.delete(nodeDetail.bcc.manifestId);
     }
-    return !this.ccCardinalityMin.invalid && !this.ccCardinalityMax.invalid;
+    if (EntityTypes[nodeDetail.bcc.entityType].name === 'Element') {
+      nodeDetail.bcc.defaultValue = '';
+      nodeDetail.bcc.fixedValue = '';
+      nodeDetail.bcc.fixedOrDefault = 'none';
+    } else {
+      // Issue #919
+      if (nodeDetail.bcc.cardinalityMin < 0 || nodeDetail.bcc.cardinalityMin > 1) {
+        nodeDetail.bcc.cardinalityMin = 0;
+      }
+      if (nodeDetail.bcc.cardinalityMax < 0 || nodeDetail.bcc.cardinalityMax > 1) {
+        nodeDetail.bcc.cardinalityMax = 1;
+      }
+    }
+  }
+
+  isWorkingRelease(): boolean {
+    if (this.rootNode) {
+      return this.rootNode.releaseId === this.workingRelease.releaseId;
+    }
+    return false;
+  }
+
+  get username(): string {
+    return this.auth.getUserToken().username;
+  }
+
+  deleteNode(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Delete core component?';
+    dialogConfig.data.content = ['Are you sure you want to delete this core component?'];
+    dialogConfig.data.action = 'Delete anyway';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.isUpdating = true;
+        this.service.deleteNode(this.type, this.manifestId)
+          .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+          )
+          .subscribe(_ => {
+            this.router.navigateByUrl('/core_component');
+          }, error => {
+          });
+      });
+  }
+
+  restoreNode(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = 'Restore this core component?';
+    dialogConfig.data.content = ['Are you sure you want to restore this core component?'];
+    dialogConfig.data.action = 'Restore';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.isUpdating = true;
+        const state = 'WIP';
+        this.service.updateState(this.rootNode.type, this.rootNode.manifestId, state)
+          .pipe(
+            finalize(() => {
+              this.isUpdating = false;
+            })
+          )
+          .subscribe(resp => {
+            this.afterStateChanged(resp.state, resp.access);
+            this.snackBar.open('Restored', '', {duration: 3000});
+          }, err => {
+          });
+      });
+  }
+
+  openCoreComponent(node: CcFlatNode) {
+    window.open('/core_component/' + node.type.toLowerCase() + '/' + node.manifestId, '_blank');
+  }
+
+  openHistory(node: CcFlatNode) {
+    window.open('/log/core-component/' + node.guid, '_blank');
+  }
+
+  openComments(type: string, node?: CcFlatNode) {
+    if (!node) {
+      node = this.selectedNode;
+    }
+    this.commentControl.toggleCommentSlide(type, node.detail);
+  }
+
+  canDrop() {
+    return true;
+  }
+
+  getAfterNodeForSeq(nodes: CcFlatNode[], currentIndex: number, prevIndex: number) {
+    const isDown = (currentIndex - prevIndex > 0);
+    currentIndex = isDown ? currentIndex + 1 : currentIndex;
+    let after: CcFlatNode;
+    if (currentIndex > 0) {
+      const justBefore = nodes[currentIndex - 1];
+      if (justBefore.level === 0) {
+        return null;
+      } else if (justBefore.level === 1) {
+        after = justBefore;
+      } else {
+        currentIndex -= 1;
+        while (currentIndex > 0) {
+          if (nodes[currentIndex].level === 1) {
+            after = nodes[currentIndex];
+            break;
+          }
+          currentIndex = currentIndex - 1;
+        }
+      }
+    }
+    if (after && after.type === 'ACC') {
+      return null;
+    }
+    return after;
+  }
+
+  isValidIndex(nodes: CcFlatNode[], currentIndex: number, prevIndex: number) {
+    const isUp = (currentIndex - prevIndex < 0);
+    if (currentIndex === prevIndex || currentIndex === 0) {
+      return false;
+    }
+    currentIndex = isUp ? currentIndex - 1 : currentIndex;
+    const nextNode = nodes.length > currentIndex ? nodes[currentIndex + 1] : null;
+    if (nextNode) {
+      //  middle of other node || before Base ACC
+      if (nextNode.level !== 1 || nextNode.type === 'ACC') {
+        return false;
+      }
+      if (nextNode.type.toUpperCase() === 'BCCP' && (nextNode as BccpFlatNode).entityType === 'Attribute') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  drop(event: CdkDragDrop<CcFlatNode>) {
+    if (!event.isPointerOverContainer) {
+      return;
+    }
+    const nodes = this.dataSource.data;
+    if (!this.isValidIndex(this.dataSource.data, event.currentIndex, event.previousIndex)) {
+      return;
+    }
+    const currentItem = nodes[event.previousIndex];
+    const request = new CcSeqUpdateRequest();
+    request.item = new CcId(currentItem.type, currentItem.manifestId);
+    const after = this.getAfterNodeForSeq(nodes, event.currentIndex, event.previousIndex);
+    if (after) {
+      request.after = new CcId(after.type, after.manifestId);
+      if (request.item.id === request.after.id) {
+        return;
+      }
+    }
+    this.isUpdating = true;
+    this.service.updateCcSeq(request, this.manifestId).subscribe(_ => {
+      this.reload('Updated');
+    }, error => {
+      this.reload('Failed');
+    });
+  }
+
+  scrollToNode(node: CcFlatNode) {
+    const index = this.searcher.getNodeIndex(node);
+    this.scrollTree(index);
+    this.cursorNode = node;
+  }
+
+  keyNavigation($event: KeyboardEvent) {
+    if ($event.key === 'ArrowDown') {
+      this.cursorNode = this.searcher.next(this.cursorNode);
+    } else if ($event.key === 'ArrowUp') {
+      this.cursorNode = this.searcher.prev(this.cursorNode);
+    } else if ($event.key === 'ArrowLeft' || $event.key === 'ArrowRight') {
+      this.treeControl.toggle(this.cursorNode);
+    } else if ($event.key === 'Enter') {
+      this.onClick(this.cursorNode);
+    }
+    $event.preventDefault();
+    $event.stopPropagation();
+  }
+
+  scrollBreadcrumb(elementId: string) {
+    const breadcrumbs = document.getElementById(elementId);
+    if (breadcrumbs.scrollWidth > breadcrumbs.clientWidth) {
+      breadcrumbs.scrollLeft = breadcrumbs.scrollWidth - breadcrumbs.clientWidth;
+      breadcrumbs.classList.add('inner-box');
+    } else {
+      breadcrumbs.scrollLeft = 0;
+      breadcrumbs.classList.remove('inner-box');
+    }
+    return '';
+  }
+
+  scrollTree(index: number) {
+    const range = this.virtualScroll.getRenderedRange();
+    if (range.start > index || range.end < index) {
+      this.virtualScroll.scrollToOffset(index * 33);
+    }
+  }
+
+  cancelRevision(): void {
+    const dialogConfig = this.confirmDialogService.newConfig();
+    dialogConfig.data.header = (this.userRole === 'developer') ? 'Cancel this revision?' : 'Cancel this amendment?';
+    dialogConfig.data.content = [(this.userRole === 'developer') ? 'Are you sure you want to cancel this revision?' : 'Are you sure you want to cancel this amendment?'];
+    dialogConfig.data.action = 'Okay';
+
+    this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+
+        this.isUpdating = true;
+        this.service.cancelRevision(this.rootNode.type, this.rootNode.manifestId)
+          .subscribe(resp => {
+            this.reload('Canceled');
+          }, err => {
+            this.isUpdating = false;
+          });
+      });
+  }
+
+  search(inputKeyword, backward?: boolean, force?: boolean) {
+    this.searcher.search(inputKeyword, this.selectedNode, backward, force).subscribe(index => {
+      this.virtualScroll.scrollToIndex(index);
+    });
+  }
+
+  move(val: number) {
+    this.searcher.go(val).subscribe(index => {
+      this.virtualScroll.scrollToIndex(index);
+    });
   }
 }

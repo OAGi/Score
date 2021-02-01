@@ -1,0 +1,288 @@
+<div class="context-section">
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header>
+
+      <mat-card-title-group>
+        <mat-card-title>{{ "BIE_UPLIFT.TITLE" | translate }}</mat-card-title>
+        <mat-card-subtitle>Verification</mat-card-subtitle>
+      </mat-card-title-group>
+    </mat-card-header>
+
+    <mat-card-content class="mat-card-container">
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner [diameter]="40"></mat-spinner>
+      </div>
+      <div class="row" [hidden]="loading">
+        <div class="col-md-12 ml-3 pt-2 pb-2 d-flex">
+          <button mat-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(-1)"
+                  [hidden]="unmatchedSource.length === 0">
+            <mat-icon>arrow_back_ios</mat-icon>
+          </button>
+          <button mat-icon-button class="nav-button mr-2" (click)="lookUpUnmatched(1)"
+                  [hidden]="unmatchedSource.length === 0">
+            <mat-icon>arrow_forward_ios</mat-icon>
+          </button>
+          <div>
+            <span *ngIf="unmatchedSource.length === 0">All contents are mapped.</span>
+            <span *ngIf="unmatchedSource.length > 0" class="nav-number">
+              {{unmatchedSource.indexOf(this.currentUnmatchedSource) + 1}}/{{unmatchedSource.length}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row pt-2 ml-0 mr-0" (window:resize)="onResize($event)">
+        <div class="col-6">
+          <div class="row tree-search-box" *ngIf="sourceSearcher && sourceDataSource">
+            <div class="col-9">
+              <mat-form-field>
+                <mat-placeholder *ngIf="!sourceSelectedNode">Search</mat-placeholder>
+                <mat-placeholder *ngIf="sourceSelectedNode">Search > {{sourceSelectedNode.name}}</mat-placeholder>
+                <input matInput type="search" [(ngModel)]="sourceSearcher.inputKeyword"
+                       (keyup.enter)="search('source')">
+                <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length > 0"
+                          align="end">{{sourceSearcher.searchIndex + 1}}/{{sourceSearcher.searchResult.length}}</mat-hint>
+                <mat-hint matSuffix *ngIf="sourceSearcher.searchResult.length === 0"
+                          align="end">0/0</mat-hint>
+              </mat-form-field>
+            </div>
+            <div class="col-3 buttons">
+              <button mat-icon-button
+                      [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
+                      (click)="move('source', -1)">
+                <mat-icon>keyboard_arrow_up</mat-icon>
+              </button>
+              <button mat-icon-button
+                      [disabled]="!sourceSearcher.searchResult || sourceSearcher.searchResult.length === 0"
+                      (click)="move('source', 1)">
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              </button>
+              <button mat-icon-button
+                      (click)="search('source', false, true)">
+                <mat-icon>search</mat-icon>
+              </button>
+              <button mat-icon-button
+                      [hidden]="!sourceSearcher.inputKeyword"
+                      (click)="sourceSearcher.resetSearch()">
+                <mat-icon>close</mat-icon>
+              </button>
+              <div style="height: 19px;">
+                <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                                      [hidden]="!sourceSearcher.isSearching"></mat-progress-spinner>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="padding: 0 15px;">
+            <div class="tree-breadcrumbs-wrap" id="bc-source" *ngIf="sourceSelectedNode">
+              <div class="tree-breadcrumb"
+                   *ngFor="let bread of sourceSelectedNode.parents; let last = last;">
+                <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                <span *ngIf="last"
+                      class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('bc-source') : '' }}</span>
+                <span *ngIf="!last" class="tree-breadcrumb-item"
+                      (click)="onSourceBreadCrumbClick(bread)">{{ bread.name }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Source BIE -->
+          <mat-card class="bie-node-tree-panel overflow-auto">
+            <mat-card-content class="mat-card-container">
+              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx(sourceDataSource) }}" maxBufferPx="{{ maxBufferPx(sourceDataSource) }}"
+                                           [style.height.px]="innerHeight" #sourceVirtualScroll>
+                <div *cdkVirtualFor="let node of sourceDataSource" class="example-item">
+                  <div class="mat-tree-node d-flex pointer"
+                       tabIndex="0"
+                       [attr.data-path]="node.path"
+                       [class]="{'tree-node-selected': sourceSelectedNode === node}"
+                       (click)="onSourceClick(node)"
+                       [style.padding-left]="node.level * paddingPixel + 'px'">
+                    <button *ngIf="sourceTreeControl.isExpandable(node); else disabledRef;"
+                            (click)="sourceTreeControl.toggle(node)"
+                            class="align-self-center"
+                            mat-icon-button>
+                      <mat-icon class="mat-icon-rtl-mirror">
+                        {{ sourceTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                      </mat-icon>
+                    </button>
+                    <ng-template #disabledRef>
+                      <button mat-icon-button disabled></button>
+                    </ng-template>
+
+                    <mat-checkbox class="pr-2"
+                                  *ngIf="(node.level > 0 && !node.fixed)"
+                                  [checked]="node.target !== undefined"
+                                  [disabled]="true"></mat-checkbox>
+                    <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
+                          this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
+                          this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex ? 'search-index' : 'asd']"
+                          [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
+                    </span>
+                    <mat-icon matTooltip="Reused"
+                              fontSet="fontawesome"
+                              fontIcon="fa-recycle"
+                              class="pointer" *ngIf="node.derived"></mat-icon>
+                    <mat-icon class="align-self-center ml-auto"
+                              *ngIf="sourceTreeControl.isExpandable(node)"
+                              (click)="onContextMenu($event, node)">more_vert
+                    </mat-icon>
+                  </div>
+                </div>
+              </cdk-virtual-scroll-viewport>
+            </mat-card-content>
+          </mat-card>
+          <div class="row">
+            <div class="col-12 text-center"
+                 matTooltip="All nodes in the Source BIE tree are used nodes. An unchecked checkbox means the node is not mapped.">
+              <span>Source BIE Tree <mat-icon [inline]="true">live_help</mat-icon></span>
+              </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="row tree-search-box" *ngIf="targetSearcher && targetDataSource">
+            <div class="col-9">
+              <mat-form-field>
+                <mat-placeholder *ngIf="!targetSelectedNode">Search</mat-placeholder>
+                <mat-placeholder *ngIf="targetSelectedNode">Search > {{targetSelectedNode.name}}</mat-placeholder>
+                <input matInput type="search" [(ngModel)]="targetSearcher.inputKeyword"
+                       (keyup.enter)="search('target')">
+                <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length > 0"
+                          align="end">{{targetSearcher.searchIndex + 1}}/{{targetSearcher.searchResult.length}}</mat-hint>
+                <mat-hint matSuffix *ngIf="targetSearcher.searchResult.length === 0"
+                          align="end">0/0</mat-hint>
+              </mat-form-field>
+            </div>
+            <div class="col-3 buttons">
+              <button mat-icon-button
+                      [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
+                      (click)="move('target', -1)">
+                <mat-icon>keyboard_arrow_up</mat-icon>
+              </button>
+              <button mat-icon-button
+                      [disabled]="!targetSearcher.searchResult || targetSearcher.searchResult.length === 0"
+                      (click)="move('target', 1)">
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              </button>
+              <button mat-icon-button
+                      (click)="search('target', false, true)">
+                <mat-icon>search</mat-icon>
+              </button>
+              <button mat-icon-button
+                      [hidden]="!targetSearcher.inputKeyword"
+                      (click)="targetSearcher.resetSearch()">
+                <mat-icon>close</mat-icon>
+              </button>
+              <div style="height: 19px;">
+                <mat-progress-spinner mode="indeterminate" [diameter]="15" class="search-progress-bar"
+                                      [hidden]="!targetSearcher.isSearching"></mat-progress-spinner>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="padding: 0 15px;">
+            <div class="tree-breadcrumbs-wrap" id="bc-target" *ngIf="targetSelectedNode">
+              <div class="tree-breadcrumb"
+                   *ngFor="let bread of targetSelectedNode.parents; let last = last;">
+                <span aria-hidden="true" class="tree-breadcrumb-separator">/</span>
+                <span *ngIf="last"
+                      class="tree-breadcrumb-item-last">{{ bread.name }} {{ last ? scrollBreadcrumb('bc-target') : '' }}</span>
+                <span *ngIf="!last" class="tree-breadcrumb-item"
+                      (click)="onTargetBreadCrumbClick(bread)">{{ bread.name }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Target BIE -->
+          <mat-card class="bie-node-tree-panel overflow-auto">
+            <mat-card-content class="mat-card-container">
+              <cdk-virtual-scroll-viewport itemSize="{{ virtualScrollItemSize }}" minBufferPx="{{ minBufferPx(targetDataSource) }}" maxBufferPx="{{ maxBufferPx(targetDataSource) }}"
+                                           [style.height.px]="innerHeight" #targetVirtualScroll>
+                <div *cdkVirtualFor="let node of targetDataSource" class="example-item">
+                  <div class="mat-tree-node d-flex pointer"
+                       tabIndex="0"
+                       [attr.data-path]="node.path"
+                       [class]="{'tree-node-selected': targetSelectedNode === node}"
+                       (click)="onTargetClick(node)"
+                       [style.padding-left]="node.level * paddingPixel + 'px'">
+                    <button *ngIf="targetTreeControl.isExpandable(node); else disabledRef;"
+                            (click)="targetTreeControl.toggle(node)"
+                            class="align-self-center"
+                            mat-icon-button>
+                      <mat-icon class="mat-icon-rtl-mirror">
+                        {{ targetTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                      </mat-icon>
+                    </button>
+                    <ng-template #disabledRef>
+                      <button mat-icon-button disabled></button>
+                    </ng-template>
+                    <mat-checkbox class="pr-2"
+                                  *ngIf="node.level > 0"
+                                  [checked]="node.source !== undefined"
+                                  (change)="checkMatch($event, node)"
+                                  [disabled]="!canMatch(node)"></mat-checkbox>
+                    <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
+                          this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
+                          this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex ? 'search-index' : 'asd']"
+                          [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
+                    </span>
+                    <mat-icon matTooltip="Select BIE"
+                              (click)="matchReused(node)"
+                              class="pointer" *ngIf="node.source && node.source.derived && !node.reusedTolevelAsbiepId">priority_high</mat-icon>
+                    <mat-icon matTooltip="Reused"
+                              fontSet="fontawesome"
+                              fontIcon="fa-recycle"
+                              (click)="matchReused(node)"
+                              class="pointer" *ngIf="node.reusedTolevelAsbiepId"></mat-icon>
+                    <mat-icon class="align-self-center ml-auto"
+                              *ngIf="targetTreeControl.isExpandable(node)"
+                              (click)="onContextMenu($event, node)">more_vert
+                    </mat-icon>
+                  </div>
+                </div>
+              </cdk-virtual-scroll-viewport>
+            </mat-card-content>
+          </mat-card>
+          <div class="row">
+            <div class="col-12 text-center">Target BIE Tree</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Context Menu Area -->
+      <context-menu #defaultSourceContextMenu>
+        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item, 2)">
+          <span class="context-menu-item">Expand 2</span>
+        </ng-template>
+        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item, 3)">
+          <span class="context-menu-item">Expand 3</span>
+        </ng-template>
+        <ng-template contextMenuItem (execute)="sourceTreeControl.expandDescendants($event.item)">
+          <span class="context-menu-item">Expand All</span>
+        </ng-template>
+      </context-menu>
+      <context-menu #defaultTargetContextMenu>
+        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item, 2)">
+          <span class="context-menu-item">Expand 2</span>
+        </ng-template>
+        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item, 3)">
+          <span class="context-menu-item">Expand 3</span>
+        </ng-template>
+        <ng-template contextMenuItem (execute)="targetTreeControl.expandDescendants($event.item)">
+          <span class="context-menu-item">Expand All</span>
+        </ng-template>
+      </context-menu>
+
+      <div class="row action-group m-0">
+        <div class="actions">
+          <button mat-raised-button color="warn" (click)="back()">
+            Back
+          </button>
+
+          <button mat-raised-button color="default" (click)="report()">
+            Report
+          </button>
+          <button mat-raised-button color="primary" (click)="createUpliftBIE()">
+            Uplift
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

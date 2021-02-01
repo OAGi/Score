@@ -5,6 +5,7 @@ import {MaterialModule} from '../../material.module';
 
 import {CommonModule} from '@angular/common';
 import {ConfirmDialogComponent} from './confirm-dialog.component';
+import {ConfirmDialogService} from './confirm-dialog.service';
 
 @NgModule({
   imports: [
@@ -20,6 +21,9 @@ import {ConfirmDialogComponent} from './confirm-dialog.component';
   entryComponents: [
     ConfirmDialogComponent
   ],
+  providers: [
+    ConfirmDialogService
+  ]
 })
 export class ConfirmDialogModule {
 }

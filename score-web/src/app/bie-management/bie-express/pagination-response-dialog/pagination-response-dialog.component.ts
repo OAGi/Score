@@ -1,8 +1,8 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSort, SortDirection} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
 import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {BieListService} from '../../bie-list/domain/bie-list.service';
@@ -24,8 +24,8 @@ import {finalize} from 'rxjs/operators';
 export class PaginationResponseDialogComponent implements OnInit {
 
   displayedColumns: string[] = [
-    'select', 'state', 'propertyTerm', 'release', 'owner',
-    'businessContexts', 'version', 'status', 'lastUpdateTimestamp'
+    'select', 'state', 'propertyTerm', 'owner', 'businessContexts',
+    'version', 'status', 'bizTerm', 'remark', 'lastUpdateTimestamp'
   ];
   dataSource = new MatTableDataSource<BieList>();
   selection = new SelectionModel<number>(false, []);
@@ -36,7 +36,7 @@ export class PaginationResponseDialogComponent implements OnInit {
   updaterIdListFilterCtrl: FormControl = new FormControl();
   filteredLoginIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   filteredUpdaterIdList: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
-  states: string[] = ['Editing', 'Candidate', 'Published'];
+  states: string[] = ['WIP', 'QA', 'Production'];
   request: BieListRequest;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;

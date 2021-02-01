@@ -1,29 +1,36 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Location} from '@angular/common';
-import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
-import {CcListService} from './domain/cc-list.service';
-import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {CreateBodDialogComponent} from './create-bod-dialog/create-bod-dialog.component';
+import {CcListService} from './domain/cc-list.service';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSort, SortDirection} from '@angular/material/sort';
 import {CcList, CcListRequest} from './domain/cc-list';
 import {PageRequest} from '../../basis/basis';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Release} from '../../bie-management/bie-create/domain/bie-create-list';
 import {ReleaseService} from '../../release-management/domain/release.service';
-import {SimpleRelease} from '../../release-management/domain/release';
 import {AccountListService} from '../../account-management/domain/account-list.service';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {AuthService} from '../../authentication/auth.service';
 import {TransferOwnershipDialogComponent} from '../../common/transfer-ownership-dialog/transfer-ownership-dialog.component';
 import {AccountList} from '../../account-management/domain/accounts';
-import {FormControl} from '@angular/forms';
-import {ReplaySubject} from 'rxjs';
-import {initFilter} from '../../common/utility';
-import {finalize} from 'rxjs/operators';
+import {CcNodeService} from '../domain/core-component-node.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {CreateAsccpDialogComponent} from './create-asccp-dialog/create-asccp-dialog.component';
+import {CreateBccpDialogComponent} from './create-bccp-dialog/create-bccp-dialog.component';
+import {MatTableDataSource} from '@angular/material/table';
+import {FormControl} from '@angular/forms';
+import {initFilter, loadBranch, saveBranch} from '../../common/utility';
+import {WorkingRelease} from '../../release-management/domain/release';
+import {OagisComponentType, OagisComponentTypes} from '../domain/core-component-node';
+import {finalize} from 'rxjs/operators';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {Location} from '@angular/common';
+import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
+import {CreateVerbDialogComponent} from './create-verb-dialog/create-verb-dialog.component';
 
 @Component({
   selector: 'score-cc-list',
@@ -42,18 +49,20 @@ export class CcListComponent implements OnInit {
   title = 'Core Component';
 
   typeList: string[] = ['ACC', 'ASCCP', 'BCCP', 'ASCC', 'BCC'];
-  stateList: string[] = ['Editing', 'Candidate', 'Published'];
+  workingStateList = ['WIP', 'Draft', 'Candidate', 'ReleaseDraft', 'Published', 'Deleted'];
+  releaseStateList = ['WIP', 'QA', 'Production', 'Published', 'Deleted'];
   componentTypeList: OagisComponentType[] = OagisComponentTypes;
+  workingRelease = WorkingRelease;
 
   displayedColumns: string[] = [
-    'type', 'state', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp', 'more'
+    'select', 'type', 'state', 'den', 'revision', 'owner', 'transferOwnership', 'module', 'lastUpdateTimestamp'
   ];
-  data: CcList[] = [];
+  dataSource = new MatTableDataSource<CcList>();
   selection = new SelectionModel<CcList>(true, []);
   expandedElement: CcList | null;
   loading = false;
 
-  releases: Release[];
+  releases: Release[] = [];
   loginIdList: string[] = [];
   loginIdListFilterCtrl: FormControl = new FormControl();
   updaterIdListFilterCtrl: FormControl = new FormControl();
@@ -63,14 +72,16 @@ export class CcListComponent implements OnInit {
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-  @ViewChild(ContextMenuComponent, {static: true}) public contextMenu: ContextMenuComponent;
+  @ViewChild('createContextMenu', {static: true}) public createContextMenu: ContextMenuComponent;
 
   constructor(private service: CcListService,
+              private nodeService: CcNodeService,
               private releaseService: ReleaseService,
               private accountService: AccountListService,
               private auth: AuthService,
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
+              private confirmDialogService: ConfirmDialogService,
               private contextMenuService: ContextMenuService,
               private location: Location,
               private router: Router,
@@ -93,21 +104,36 @@ export class CcListComponent implements OnInit {
       this.loadCcList();
     });
 
-    this.releases = [];
-    const workingRelease = new SimpleRelease();
-    workingRelease.releaseId = 0;
-    workingRelease.releaseNum = 'Working';
-    this.releases.push(workingRelease);
+    this.loading = true;
+    forkJoin([
+      this.releaseService.getSimpleReleases(['Draft', 'Published']),
+      this.accountService.getAccountNames()
+    ]).subscribe(([releases, loginIds]) => {
+      this.releases.push(...releases);
+      if (this.releases.length > 0) {
+        if (this.request.release.releaseId === 0) {
+          const savedReleaseId = loadBranch(this.auth.getUserToken(), 'CC');
+          if (savedReleaseId) {
+            this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
+            if (!this.request.release) {
+              this.request.release = this.releases[0];
+              saveBranch(this.auth.getUserToken(), 'CC', this.request.release.releaseId);
+            }
+          } else {
+            this.request.release = this.releases[0];
+          }
+        } else {
+          this.request.release = this.releases.filter(e => e.releaseId === this.request.release.releaseId)[0];
+        }
+      }
 
-    this.releaseService.getSimpleReleases().subscribe(releases => this.releases.push(...releases));
-
-    this.accountService.getAccountNames().subscribe(loginIds => {
       this.loginIdList.push(...loginIds);
       initFilter(this.loginIdListFilterCtrl, this.filteredLoginIdList, this.loginIdList);
       initFilter(this.updaterIdListFilterCtrl, this.filteredUpdaterIdList, this.loginIdList);
+      this.loadCcList(true);
+    }, error => {
+      this.loading = false;
     });
-
-    this.loadCcList(true);
   }
 
   get currentUser(): string {
@@ -128,7 +154,9 @@ export class CcListComponent implements OnInit {
       })
     ).subscribe(resp => {
       this.paginator.length = resp.length;
-      this.data = resp.list.map((elm: CcList) => {
+      this.paginator.pageIndex = resp.page;
+
+      this.dataSource.data = resp.list.map((elm: CcList) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         if (this.request.filters.module.length > 0) {
           elm.module = elm.module.replace(
@@ -145,8 +173,9 @@ export class CcListComponent implements OnInit {
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
       }
+      this.selection.clear();
     }, error => {
-      this.data = [];
+      this.dataSource.data = [];
     });
   }
 
@@ -154,7 +183,11 @@ export class CcListComponent implements OnInit {
     this.loadCcList();
   }
 
-  onChange() {
+  onChange(property?: string, source?) {
+    if (property === 'branch') {
+      saveBranch(this.auth.getUserToken(), 'CC', source.releaseId);
+    }
+
     this.paginator.pageIndex = 0;
     this.loadCcList();
   }
@@ -182,23 +215,19 @@ export class CcListComponent implements OnInit {
   }
 
   getRouterLink(ccList: CcList) {
-    switch (ccList.type) {
+    switch (ccList.type.toUpperCase()) {
       case 'ACC':
         if (ccList.oagisComponentType === 'UserExtensionGroup') {
-          if (this.request.releaseId === 0) {
-            return 'extension/1/' + ccList.id;
-          } else {
-            return 'extension/' + this.request.releaseId + '/' + ccList.currentId;
-          }
+          return 'extension/' + ccList.manifestId;
         } else {
-          return 'acc/' + this.request.releaseId + '/' + ccList.id;
+          return 'acc/' + ccList.manifestId;
         }
 
       case 'ASCCP':
-        return 'asccp/' + this.request.releaseId + '/' + ccList.id;
+        return 'asccp/' + ccList.manifestId;
 
       case 'BCCP':
-        return 'bccp/' + this.request.releaseId + '/' + ccList.id;
+        return 'bccp/' + ccList.manifestId;
 
       default:
         return window.location.pathname;
@@ -206,43 +235,378 @@ export class CcListComponent implements OnInit {
   }
 
   isEditable(element: CcList) {
-    return element.type === 'ACC' &&
-      element.oagisComponentType === 'UserExtensionGroup' &&
-      element.owner === this.currentUser &&
-      element.state === 'Editing';
+    return element.owner === this.currentUser && element.state === 'WIP';
   }
 
-  onContextMenu($event: MouseEvent, item: CcList): void {
-    if (!this.isEditable(item)) {
-      return;
-    }
+  isAssociation(element: CcList) {
+    return element.type.toUpperCase() === 'ASCC' || element.type.toUpperCase() === 'BCC';
+  }
 
+  onCreateContextMenu($event: MouseEvent): void {
     this.contextMenuService.show.next({
-      contextMenu: this.contextMenu,
+      contextMenu: this.createContextMenu,
       event: $event,
-      item: item,
+      item: null
     });
 
     $event.preventDefault();
     $event.stopPropagation();
   }
 
-  openTransferDialog(extensionId: number, $event) {
+  openTransferDialog(item: CcList, $event) {
+    if (!this.isEditable(item)) {
+      return;
+    }
+
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {role: this.auth.getUserToken().role};
     const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result: AccountList) => {
       if (result) {
-        this.service.transferOwnership(extensionId, result.loginId).subscribe(_ => {
+        this.service.transferOwnership(item.type, item.manifestId, result.loginId).subscribe(_ => {
           this.snackBar.open('Transferred', '', {
             duration: 3000,
           });
-          this.selection.clear();
           this.loadCcList();
         });
       }
     });
   }
 
+  openTransferDialogMultiple() {
+    if (this.selection.selected.length === 0) {
+      return;
+    }
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {role: this.auth.getUserToken().role};
+    const dialogRef = this.dialog.open(TransferOwnershipDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe((result: AccountList) => {
+      if (result) {
+        this.service.transferOwnershipOnList(this.selection.selected, result.loginId).subscribe(_ => {
+          this.snackBar.open('Transferred', '', {
+            duration: 3000,
+          });
+          this.loadCcList();
+        });
+      }
+    });
+  }
+
+  multipleUpdate(action: string) {
+  if (this.selection.selected.length === 0) {
+    return;
+  }
+  const dialogConfig = this.confirmDialogService.newConfig();
+  let notiMsg = 'Updated';
+  let toState = action;
+  let actionType = 'Update';
+
+  switch (action) {
+    case 'WIP':
+    case 'Draft':
+    case 'QA':
+    case 'Candidate':
+    case 'Production':
+      dialogConfig.data.header = 'Update state to \'' + action + '\'?';
+      dialogConfig.data.content = ['Are you sure you want to update the state to \'' + action + '\'?'];
+      dialogConfig.data.action = 'Update';
+      break;
+    case 'Delete':
+      toState = 'Deleted';
+      notiMsg = 'Deleted';
+      actionType = 'Delete';
+      dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
+      dialogConfig.data.content = [
+        'Are you sure you want to ' + action + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
+      ];
+      dialogConfig.data.action = action;
+      break;
+    case 'Restore':
+      toState = 'WIP';
+      notiMsg = 'Restored';
+      actionType = 'Restore';
+      dialogConfig.data.header = action + ' Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?';
+      dialogConfig.data.content = [
+        'Are you sure you want to ' + action + ' selected Core ' + (this.selection.selected.length > 1 ? 'Components' : 'Component') + '?'
+      ];
+      dialogConfig.data.action = action;
+      break;
+    default :
+      return false;
+  }
+
+  this.confirmDialogService.open(dialogConfig).afterClosed()
+      .subscribe(result => {
+        if (!result) {
+          return;
+        }
+        this.loading = true;
+        this.service.updateStateOnList(actionType, toState, this.selection.selected)
+            .pipe(
+                finalize(() => {
+                  this.loading = false;
+                })
+            )
+            .subscribe(_ => {
+              this.loadCcList();
+              this.snackBar.open(notiMsg, '', {
+                duration: 3000
+              });
+              this.selection.clear();
+            }, error => {
+            });
+      });
+  }
+
+  hasCreatePermission(): boolean {
+    const userToken = this.auth.getUserToken();
+    if (this.request.release.state !== 'Published') {
+      return false;
+    }
+    if (userToken.role === 'developer') {
+      if (this.request.release.releaseId !== WorkingRelease.releaseId) {
+        return false;
+      }
+    } else {
+      if (this.request.release.releaseId === WorkingRelease.releaseId) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  createAcc() {
+    this.loading = true;
+    this.nodeService.createAcc(this.request.release.releaseId).pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe(resp => {
+      return this.router.navigateByUrl('/core_component/acc/' + resp.manifestId);
+    });
+  }
+
+  createAsccp(asccpType: string) {
+    let component;
+    if ('Verb' === asccpType) {
+      component = CreateVerbDialogComponent;
+    } else {
+      component = CreateAsccpDialogComponent;
+    }
+
+    const dialogRef = this.dialog.open(component, {
+      data: {
+        releaseId: this.request.release.releaseId,
+        action: 'create',
+        stateList: (this.request.release.releaseId === this.workingRelease.releaseId)
+          ? this.workingStateList : this.releaseStateList
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe(accManifestId => {
+      if (!accManifestId) {
+        return;
+      }
+
+      this.loading = true;
+      this.nodeService.createAsccp(this.request.release.releaseId, accManifestId, asccpType).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(resp => {
+        return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
+      });
+    });
+  }
+
+  createBccp() {
+    this.loading = true;
+
+    const dialogRef = this.dialog.open(CreateBccpDialogComponent, {
+      data: {
+        releaseId: this.request.release.releaseId,
+        action: 'create',
+        stateList: (this.request.release.releaseId === this.workingRelease.releaseId)
+          ? this.workingStateList : this.releaseStateList
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().pipe(finalize(() => {
+      this.loading = false;
+    })).subscribe(bdtManifestId => {
+      if (!bdtManifestId) {
+        return;
+      }
+
+      this.loading = true;
+      this.nodeService.createBccp(this.request.release.releaseId, bdtManifestId).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(resp => {
+        return this.router.navigateByUrl('/core_component/bccp/' + resp.manifestId);
+      });
+    });
+  }
+
+  createBOD() {
+    if (this.request.release.releaseId !== this.workingRelease.releaseId) {
+      return;
+    }
+    this.loading = true;
+
+    const dialogRef = this.dialog.open(CreateBodDialogComponent, {
+      data: {
+        releaseId: this.request.release.releaseId,
+        action: 'create',
+      },
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(pair => {
+      if (!pair) {
+        this.loading = false;
+        return;
+      }
+      this.loading = true;
+      this.nodeService.createBOD(pair.verbManifestId, pair.nounManifestId).pipe(finalize(() => {
+        this.loading = false;
+      })).subscribe(resp => {
+        return this.router.navigateByUrl('/core_component/asccp/' + resp.manifestId);
+      });
+    });
+  }
+
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.filter(e => ['ASCC', 'BCC'].indexOf(e.type) === -1).length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.data.forEach(row => {
+        if (['ASCC', 'BCC'].indexOf(row.type) === -1) {
+          this.select(row);
+        }
+    });
+  }
+
+  select(row: CcList) {
+    this.selection.select(row);
+  }
+
+  toggle(row: CcList) {
+    if (this.isSelected(row)) {
+      this.selection.deselect(row);
+    } else {
+      this.select(row);
+    }
+  }
+
+  isSelected(row: CcList) {
+    return this.selection.isSelected(row);
+  }
+
+  get showDiscardBtn(): boolean {
+    return this.selection.selected.length > 0 ?
+      this.selection.selected.filter(e => e.state === 'Deleted' ).length === 0 :
+      false;
+  }
+
+  get showRestoreBtn(): boolean {
+    return this.selection.selected.length > 0 ?
+      this.selection.selected.filter(e => e.state === 'WIP' ).length === 0 :
+      false;
+  }
+
+  openDetail(ccList: CcList, $event?) {
+    if (!!$event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    this.router.navigateByUrl('/core_component/' + this.getRouterLink(ccList));
+    return;
+  }
+
+  isInitialRevision(ccList: CcList): boolean {
+    return !!ccList && ccList.revision === '1';
+  }
+
+  canToolbarAction(action: string) {
+    if (this.selection.selected.length === 0) {
+      return false;
+    }
+    switch (action) {
+      case 'BackWIP':
+        return this.selection.selected.filter(e => {
+          if (['Draft', 'QA', 'Candidate'].indexOf(e.state) > -1 && e.owner === this.currentUser) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Draft':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.currentUser && e.releaseNum === this.workingRelease.releaseNum) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'QA':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.currentUser && e.releaseNum !== this.workingRelease.releaseNum) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Transfer':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.currentUser) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Candidate':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'Draft' && e.owner === this.currentUser && e.releaseNum === this.workingRelease.releaseNum) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Production':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'QA' && e.owner === this.currentUser && e.releaseNum !== this.workingRelease.releaseNum) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Restore':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'Deleted') {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      case 'Delete':
+        return this.selection.selected.filter(e => {
+          if (e.state === 'WIP' && e.owner === this.currentUser && this.isInitialRevision(e)) {
+            return e;
+          }
+        }).length === this.selection.selected.length;
+      default :
+        return false;
+    }
+  }
 }

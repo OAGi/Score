@@ -128,7 +128,7 @@ a {
 }
 
 .mat-column-state, .mat-column-bieState {
-  width: 90px;
+  width: 108px;
 }
 
 .mat-column-Editing, .mat-column-Candidate, .mat-column-Published, .mat-column-Total {
@@ -174,4 +174,9 @@ td.mat-cell {
 
 .mat-tab-body-content {
   overflow-x: hidden !important;
+}
+
+a.disabled {
+  pointer-events: none;
+  cursor: default;
 }

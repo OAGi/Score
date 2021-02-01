@@ -1,5 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {ContextMenuModule} from 'ngx-contextmenu';
 import {CodeListListComponent} from './code-list-list/code-list-list.component';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthService} from '../authentication/auth.service';
@@ -8,9 +9,10 @@ import {MaterialModule} from '../material.module';
 import {CodeListService} from './domain/code-list.service';
 import {CodeListValueDialogComponent} from './code-list-value-dialog/code-list-value-dialog.component';
 import {CodeListDetailComponent} from './code-list-detail/code-list-detail.component';
-import {CodeListCreateComponent} from './code-list-create/code-list-create.component';
-import {CodeListForCreatingComponent} from './code-list-for-creating/code-list-for-creating.component';
+import {CodeListForDerivingComponent} from './code-list-for-deriving/code-list-for-deriving.component';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
+import {ScoreCommonModule} from '../common/score-common.module';
+import { CodeListUpliftComponent } from './code-list-uplift/code-list-uplift.component';
 
 const routes: Routes = [
   {
@@ -25,24 +27,19 @@ const routes: Routes = [
         path: 'create',
         children: [
           {
-            path: '',
-            component: CodeListCreateComponent,
-            canActivate: [AuthService],
-          },
-          {
             path: 'from_another',
-            component: CodeListForCreatingComponent,
+            component: CodeListForDerivingComponent,
             canActivate: [AuthService],
-          },
-          {
-            path: ':basedCodeListId',
-            component: CodeListCreateComponent,
-            canActivate: [AuthService],
-          },
+          }
         ],
       },
       {
-        path: ':id',
+        path: 'uplift',
+        component: CodeListUpliftComponent,
+        canActivate: [AuthService],
+      },
+      {
+        path: ':manifestId',
         component: CodeListDetailComponent,
         canActivate: [AuthService],
       }
@@ -57,14 +54,16 @@ const routes: Routes = [
     ReactiveFormsModule,
     MaterialModule,
     ConfirmDialogModule,
-    CommonModule
+    CommonModule,
+    ScoreCommonModule,
+    ContextMenuModule
   ],
   declarations: [
     CodeListListComponent,
-    CodeListCreateComponent,
     CodeListDetailComponent,
-    CodeListForCreatingComponent,
-    CodeListValueDialogComponent
+    CodeListForDerivingComponent,
+    CodeListValueDialogComponent,
+    CodeListUpliftComponent
   ],
   entryComponents: [
     CodeListValueDialogComponent

@@ -1,5 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {MatBadgeModule} from '@angular/material/badge';
 import {RouterModule, Routes} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from '../material.module';
@@ -22,6 +23,11 @@ import {ReleaseService} from '../release-management/domain/release.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {BieEditModule} from './bie-edit/bie-edit.module';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
+import {ScoreCommonModule} from '../common/score-common.module';
+import {BieUpliftComponent} from './bie-uplift/bie-uplift.component';
+import {BieUpliftService} from './bie-uplift/domain/bie-uplift.service';
+import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.component';
+import {ReportDialogComponent} from './bie-uplift/report-dialog/report-dialog.component';
 
 const routes: Routes = [
   {
@@ -61,6 +67,21 @@ const routes: Routes = [
             canActivate: [AuthService]
           }
         ]
+      },
+      {
+        path: 'uplift',
+        children: [
+          {
+            path: '',
+            component: BieUpliftProfileBieComponent,
+            canActivate: [AuthService]
+          },
+          {
+            path: ':topLevelAsbiepId',
+            component: BieUpliftComponent,
+            canActivate: [AuthService]
+          }
+        ]
       }
     ]
   }
@@ -81,19 +102,25 @@ const routes: Routes = [
     }),
     TranslateModule,
     CommonModule,
+    ScoreCommonModule,
+    MatBadgeModule,
   ],
   declarations: [
     BieCreateBizCtxComponent,
     BieCreateAsccpComponent,
     BieCopyBizCtxComponent,
     BieCopyProfileBieComponent,
+    BieUpliftProfileBieComponent,
     BieListComponent,
+    BieUpliftComponent,
+    ReportDialogComponent,
   ],
   providers: [
     ReleaseService,
     BieCreateService,
     BieCopyService,
     BieListService,
+    BieUpliftService,
   ]
 })
 export class BieManagementModule {
