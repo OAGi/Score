@@ -21,7 +21,7 @@
         <jOOQ.version>3.14.4</jOOQ.version>
         <jOOQ.configuration.skip>true</jOOQ.configuration.skip>
 
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <junit.platform.version>1.6.2</junit.platform.version>
         <junit.jupiter.version>5.6.2</junit.jupiter.version>
         <org.apache.commons.lang3.version>3.11</org.apache.commons.lang3.version>
