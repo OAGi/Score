@@ -1928,10 +1928,10 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
   }
 
   detectCycle(node: AsbiepFlatNode): boolean {
-    const asccpPropertyTerm = node.asccpNode.propertyTerm;
+    const asccpManifestId = node.asccpNode.manifestId;
     let cur = node.parent;
     while (cur) {
-      if ((cur as AbieFlatNode).asccpNode.propertyTerm === asccpPropertyTerm) {
+      if ((cur as AbieFlatNode).asccpNode.manifestId === asccpManifestId) {
         return true;
       }
       cur = cur.parent;
