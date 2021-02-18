@@ -28,7 +28,7 @@ import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {CreateBccpDialogComponent} from '../cc-list/create-bccp-dialog/create-bccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
-import {CommentControl} from '../tree-detail/comment-component';
+import {CommentControl} from '../domain/comment-component';
 import {forkJoin} from 'rxjs';
 import {Message} from '@stomp/stompjs';
 import {RxStompService} from '@stomp/ng2-stompjs';
@@ -512,7 +512,7 @@ export class BccpDetailComponent implements OnInit {
     this.rootNode.state = state;
     this.rootNode.access = access;
     const root = this.dataSource.getRootNode();
-    (root.detail as CcAsccpNodeDetail).asccp.state = state;
+    (root.detail as CcBccpNodeDetail).bccp.state = state;
   }
 
   makeNewRevision() {
@@ -541,9 +541,7 @@ export class BccpDetailComponent implements OnInit {
                 duration: 3000,
               });
             });
-            if (this.selectedNode) {
-              this.onClick(this.selectedNode);
-            }
+            this.reload();
           });
       });
   }

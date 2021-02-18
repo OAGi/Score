@@ -135,8 +135,8 @@
                                       [checked]="node.used"
                                       [disabled]="!isUsable(node)"
                                       (click)="toggleTreeUsed(node, $event)"
-                                      matTooltip="{{ (node.isCycle) ? 'This component is disabled by a circular reference.' : node.required ? 'This component is required.' : '' }}"
-                                      [matTooltipDisabled]="!node.required && !node.isCycle">
+                                      [matTooltip]="getNodeTooltip(node)"
+                                      [matTooltipDisabled]="getNodeTooltip(node) === ''">
                         </mat-checkbox>
 
                         <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
@@ -167,6 +167,11 @@
                     </ng-template>
                     <ng-template contextMenuItem (execute)="treeControl.expandDescendants($event.item)">
                       <span class="context-menu-item">Expand All</span>
+                    </ng-template>
+                    <ng-template contextMenuItem divider="true" [visible]="canCreateBIEFromThis">
+                    </ng-template>
+                    <ng-template contextMenuItem (execute)="createBIEfromThis($event.item)" [visible]="canCreateBIEFromThis">
+                      <span class="context-menu-item">Make BIE reusable</span>
                     </ng-template>
                   </context-menu>
 

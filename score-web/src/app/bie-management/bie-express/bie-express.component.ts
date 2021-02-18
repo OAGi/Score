@@ -234,6 +234,7 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
+      dialogConfig.data = this.request.release;
       const dialogRef = this.dialog.open(MetaHeaderDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
@@ -266,6 +267,7 @@ export class BieExpressComponent implements OnInit {
     } else {
       const dialogConfig = new MatDialogConfig();
       dialogConfig.minWidth = 1000;
+      dialogConfig.data = this.request.release;
       const dialogRef = this.dialog.open(PaginationResponseDialogComponent, dialogConfig);
       dialogRef.afterClosed().subscribe(selectedTopLevelAsbiepId => {
         if (selectedTopLevelAsbiepId) {
@@ -282,4 +284,31 @@ export class BieExpressComponent implements OnInit {
     }
   }
 
+  expressionOptionChange() {
+    if (this.option.expressionOption === 'JSON') {
+      if (this.option.includeMetaHeaderForJson || this.option.includePaginationResponseForJson) {
+        this.option.packageOption = 'EACH';
+      }
+    }
+
+    if (this.option.expressionOption !== 'XML') {
+      this.option.bieCctsMetaData = false;
+      this.option.includeCctsDefinitionTag = false;
+      this.option.bieGuid = false;
+      this.option.businessContext = false;
+      this.option.bieOagiScoreMetaData = false;
+      this.option.includeWhoColumns = false;
+      this.option.basedCcMetaData = false;
+    }
+  }
+
+  bieAnnotationChange() {
+    if (!this.option.bieCctsMetaData) {
+      this.option.includeCctsDefinitionTag = false;
+    }
+
+    if (!this.option.bieOagiScoreMetaData) {
+      this.option.includeWhoColumns = false;
+    }
+  }
 }

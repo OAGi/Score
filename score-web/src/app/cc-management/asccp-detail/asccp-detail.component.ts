@@ -28,7 +28,7 @@ import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {CreateAsccpDialogComponent} from '../cc-list/create-asccp-dialog/create-asccp-dialog.component';
 import {AuthService} from '../../authentication/auth.service';
 import {WorkingRelease} from '../../release-management/domain/release';
-import {CommentControl} from '../tree-detail/comment-component';
+import {CommentControl} from '../domain/comment-component';
 import {forkJoin} from 'rxjs';
 import {Message} from '@stomp/stompjs';
 import {RxStompService} from '@stomp/ng2-stompjs';
@@ -549,9 +549,7 @@ export class AsccpDetailComponent implements OnInit {
                 duration: 3000,
               });
             });
-            if (this.selectedNode) {
-              this.onClick(this.selectedNode);
-            }
+            this.reload();
           });
       });
   }

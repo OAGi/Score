@@ -32,7 +32,6 @@ import {RefBie, UsedBie} from '../bie-edit/domain/bie-edit-node';
 import {ReportDialogComponent} from './report-dialog/report-dialog.component';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {VSFlatTreeDataSource} from '../../common/flat-tree';
-import {DataSource} from '@angular/cdk/collections';
 
 
 class BieUpliftSourceFlatNodeFlattener extends BieFlatNodeFlattener {
@@ -542,7 +541,14 @@ export class BieUpliftComponent implements OnInit {
 
   createUpliftBIE() {
     this.loading = true;
-    const source = this.sourceDataSource.cachedData.filter(e => !e.fixed);
+    const source = this.sourceDataSource.cachedData.filter(e => {
+      if (e.derived) {
+        return true
+      }
+      if (!e.fixed) {
+        return !e.locked;
+      }
+    });
     const matched = [];
     source.forEach(e => {
       let upliftNode;
@@ -580,7 +586,7 @@ export class BieUpliftComponent implements OnInit {
           upliftNode.sourceManifestId = (e._node as BbieScFlatNode).bdtScNode.manifestId;
         }
       }
-      
+
       matched.push(upliftNode);
     });
 
@@ -617,7 +623,7 @@ export class BieUpliftComponent implements OnInit {
     if (node.source && node.source.derived) {
       const dialogRef = this.dialog.open(ReuseBieDialogComponent, {
         data: {
-          accManifestId: (node._node as unknown as AsbiepFlatNode).accNode.manifestId,
+          asccpManifestId: (node._node as unknown as AsbiepFlatNode).asccpNode.manifestId,
           releaseId: this.targetReleaseId,
           topLevelAsbiepId: this.topLevelAsbiepId
         },

@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.configuration.security;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.types.ULong;
+import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
@@ -141,8 +142,13 @@ public class SessionService {
     }
 
     public org.oagi.score.repo.api.user.model.ScoreUser asScoreUser(AuthenticatedPrincipal user) {
-        return scoreRepositoryFactory.createScoreUserReadRepository()
-                .getScoreUser(new GetScoreUserRequest().withUserName(user.getName()))
-                .getUser();
+        ScoreUserReadRepository repo = scoreRepositoryFactory.createScoreUserReadRepository();
+        GetScoreUserRequest request;
+        if (user instanceof OAuth2User) {
+            request = new GetScoreUserRequest().withOidcSub(user.getName());
+        } else {
+            request = new GetScoreUserRequest().withUserName(user.getName());
+        }
+        return repo.getScoreUser(request).getUser();
     }
 }

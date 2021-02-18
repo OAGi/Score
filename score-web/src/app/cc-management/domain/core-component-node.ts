@@ -1,6 +1,5 @@
 import {ChangeListener} from '../../bie-management/domain/bie-flat-tree';
 import {emptyToUndefined, hashCode, hashCode4String, toCamelCase,} from '../../common/utility';
-import {DynamicCcDataSource} from '../tree-detail/tree-component';
 import {AccFlatNode, AsccpFlatNode, BccpFlatNode, BdtScFlatNode, CcFlatNode} from './cc-flat-tree';
 
 export class CcNode {
@@ -474,7 +473,7 @@ class AsccpDetail {
   revisionId: number;
   revisionNum: number;
   revisionTrackingNum: number;
-
+  _den: string;
   constructor(node: CcFlatNode, obj: any) {
     this._node = node;
     this.manifestId = obj.manifestId;
@@ -487,6 +486,7 @@ class AsccpDetail {
     this.namespaceId = obj.namespaceId;
     this.definition = obj.definition;
     this.definitionSource = obj.definitionSource;
+    this._den = obj.den;
 
     this.state = obj.state;
     this.owner = obj.owner;
@@ -548,7 +548,12 @@ class AsccpDetail {
   }
 
   get den(): string {
-    return this.propertyTerm + '. ' + this.roleOfAccNode.accNode.objectClassTerm;
+    if (this.roleOfAccNode && this.roleOfAccNode.accNode) {
+      return this.propertyTerm + '. ' + this.roleOfAccNode.accNode.objectClassTerm;
+    } else {
+      return this._den ? this._den : this.propertyTerm;
+    }
+
   }
 
   set den(val: string) { // do nothing
@@ -1252,57 +1257,6 @@ export class CcNodeUpdateResponse {
   manifestId: number;
   state: string;
   access: string;
-}
-
-/** Flat node with expandable and level information */
-export class CcFlatNode2 {
-  private $hashCode;
-  children: CcFlatNode2[] = undefined;
-
-  constructor(private dataSource: DynamicCcDataSource,
-              public item: CcNode,
-              public level = 0,
-              public pos = 0,
-              public isLoading = false,
-              public isNullObject = false,
-              public path = '') {
-    if (!path) {
-      this.path = this.id;
-    }
-    this.reset();
-  }
-
-  get id() {
-    return this.item.type + '-' + this.item.manifestId;
-  }
-
-  get expandable() {
-    if (this.children === undefined) {
-      return this.dataSource.getChildren(this).length > 0;
-    } else {
-      return this.children.length > 0;
-    }
-  }
-
-  get key() {
-    return this.$hashCode;
-  }
-
-  get guid() {
-    return this.item.guid;
-  }
-
-  get hashCode() {
-    return hashCode(this.item);
-  }
-
-  isChanged() {
-    return this.$hashCode !== this.hashCode;
-  }
-
-  reset() {
-    this.$hashCode = hashCode(this.item);
-  }
 }
 
 export class CcCreateResponse {

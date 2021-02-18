@@ -606,8 +606,23 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
         if (!result) {
           return;
         } else {
-          this.updateDetails(node.parents, () => {
-            this.service.makeReusableBIE((node as AsbiepFlatNode).asbieHashPath, node.topLevelAsbiepId)
+          const asbiepNode = node as AsbiepFlatNode;
+          if (this.canEdit) {
+            this.updateDetails(node.parents, () => {
+              this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
+                .pipe(finalize(() => {
+                  this.isUpdating = false;
+                })).subscribe(_ => {
+
+                this.snackBar.open('Making BIE reusable request queued', '', {
+                  duration: 3000,
+                });
+
+                this.router.navigateByUrl('/profile_bie');
+              });
+            });
+          } else {
+            this.service.makeReusableBIE(asbiepNode.asbieHashPath, asbiepNode.topLevelAsbiepId, asbiepNode.asccpNode.manifestId)
               .pipe(finalize(() => {
                 this.isUpdating = false;
               })).subscribe(_ => {
@@ -618,7 +633,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
               this.router.navigateByUrl('/profile_bie');
             });
-          });
+          }
+
           this.isUpdating = true;
         }
       });
@@ -1457,5 +1473,37 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.isUpdating = false;
         });
       });
+  }
+
+  isPublished(node: BieFlatNode): boolean {
+    const validState = ['Published', 'Production'];
+    if (this.isAbieDetail(node)) {
+      return validState.indexOf((node as AbieFlatNode).accNode.state) > -1;
+    } else if (this.isAsbiepDetail(node)) {
+      return validState.indexOf((node as AsbiepFlatNode).asccNode.state) > -1
+        && validState.indexOf((node as AsbiepFlatNode).asccpNode.state) > -1
+        && validState.indexOf((node as AsbiepFlatNode).accNode.state) > -1;
+    } else if (this.isBbiepDetail(node)) {
+      return validState.indexOf((node as BbiepFlatNode).bccNode.state) > -1
+        && validState.indexOf((node as BbiepFlatNode).bccpNode.state) > -1
+        && validState.indexOf((node as BbiepFlatNode).bdtNode.state) > -1;
+    } else if (this.isBbieScDetail(node)) {
+      return validState.indexOf((node as BbieScFlatNode).bdtScNode.state) > -1
+        && validState.indexOf((node as BbieScFlatNode).bccNode.state) > -1;
+    }
+    return true;
+  }
+
+  getNodeTooltip(node: BieFlatNode): string {
+    if (node.isCycle) {
+      return 'This component is disabled by a circular reference.';
+    }
+    if (node.required) {
+      return 'This component is required.';
+    }
+    if (!this.isPublished(node)) {
+      return 'This component is not in Published or Production state.';
+    }
+    return '';
   }
 }

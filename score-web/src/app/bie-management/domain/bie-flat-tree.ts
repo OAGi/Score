@@ -1779,12 +1779,14 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
   private _topLevelAsbiepId: number;
   private _asccpManifestId: number;
   private _listeners: FlatNodeFlattenerListener<BieFlatNode>[] = [];
+  private _validState: string[];
 
   constructor(ccGraph: CcGraph, asccpManifestId: number,
               topLevelAsbiepId?: number) {
     this._ccGraph = ccGraph;
     this._asccpManifestId = asccpManifestId;
     this._topLevelAsbiepId = topLevelAsbiepId;
+    this._validState = ['Published', 'Production'];
   }
 
   addListener(listener: FlatNodeFlattenerListener<BieFlatNode>) {
@@ -1816,7 +1818,10 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = ascc.intermediateAccNodes;
-    if (parent.derived) {
+    const usable = this._validState.indexOf(node.asccNode.state) > -1
+      && this._validState.indexOf(node.asccpNode.state) > -1
+      && this._validState.indexOf(node.accNode.state) > -1;
+    if (parent.derived || !usable) {
       node.locked = true;
     } else {
       node.locked = parent.locked;
@@ -1843,7 +1848,10 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
       node.parent = parent;
     }
     node.intermediateAccNodes = bcc.intermediateAccNodes;
-    if (parent.derived) {
+    const usable = this._validState.indexOf(node.bccNode.state) > -1
+      && this._validState.indexOf(node.bccpNode.state) > -1
+      && this._validState.indexOf(node.bdtNode.state) > -1;
+    if (parent.derived || !usable) {
       node.locked = true;
     } else {
       node.locked = parent.locked;
@@ -1860,7 +1868,9 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
     node.name = node.bdtScNode.propertyTerm + '. ' + node.bdtScNode.representationTerm;
     node.level = parent.level + 1;
     node.parent = parent;
-    if (parent.derived) {
+    const usable = this._validState.indexOf(node.bccNode.state) > -1
+      && this._validState.indexOf(node.bdtScNode.state) > -1;
+    if (parent.derived || !usable) {
       node.locked = true;
     } else {
       node.locked = parent.locked;

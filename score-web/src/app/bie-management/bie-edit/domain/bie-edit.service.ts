@@ -94,11 +94,12 @@ export class BieEditService {
     return this.http.post<any>(url, {asbieHashPath});
   }
 
-  makeReusableBIE(asbieHashPath: string, topLevelAsbiepId: number): Observable<any> {
+  makeReusableBIE(asbieHashPath: string, topLevelAsbiepId: number, asccpManifestId: number): Observable<any> {
     const url = '/api/profile_bie/node/create_bie_from_existing_bie';
     return this.http.post<any>(url, {
       asbieHashPath,
-      topLevelAsbiepId
+      topLevelAsbiepId,
+      asccpManifestId
     });
   }
 

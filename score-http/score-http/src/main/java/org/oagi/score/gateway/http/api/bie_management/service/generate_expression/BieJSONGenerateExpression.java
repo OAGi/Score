@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,15 +61,26 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
     public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, GenerateExpressionOption option) {
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
+        if (mergedTopLevelAsbieps.size() == 0) {
+            throw new IllegalArgumentException("Can not found BIEs.");
+        }
+        BigInteger releaseId = mergedTopLevelAsbieps.get(0).getReleaseId();
+
         /* Issue 587 */
         if (option.isIncludeMetaHeaderForJson()) {
             TopLevelAsbiep metaHeaderTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepId());
+            if (!releaseId.equals(metaHeaderTopLevelAsbiep.getReleaseId())) {
+                throw new IllegalArgumentException("Meta Header release does not match.");
+            }
             mergedTopLevelAsbieps.add(metaHeaderTopLevelAsbiep);
         }
         if (option.isIncludePaginationResponseForJson()) {
             TopLevelAsbiep paginationResponseTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getPaginationResponseTopLevelAsbiepId());
+            if (!releaseId.equals(paginationResponseTopLevelAsbiep.getReleaseId())) {
+                throw new IllegalArgumentException("Pagination Response release does not match.");
+            }
             mergedTopLevelAsbieps.add(paginationResponseTopLevelAsbiep);
         }
 

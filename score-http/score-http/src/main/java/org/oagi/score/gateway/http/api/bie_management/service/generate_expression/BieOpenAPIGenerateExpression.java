@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,22 +66,35 @@ public class BieOpenAPIGenerateExpression implements BieGenerateExpression, Init
     public GenerationContext generateContext(List<TopLevelAsbiep> topLevelAsbieps, GenerateExpressionOption option) {
         List<TopLevelAsbiep> mergedTopLevelAsbieps = new ArrayList(topLevelAsbieps);
 
+        if (mergedTopLevelAsbieps.size() == 0) {
+            throw new IllegalArgumentException("Can not found BIEs.");
+        }
+        BigInteger releaseId = mergedTopLevelAsbieps.get(0).getReleaseId();
         /*
          * Issue #587
          */
         if (option.isIncludeMetaHeaderForJsonForOpenAPI30GetTemplate()) {
             TopLevelAsbiep getMetaHeaderTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30GetTemplate());
+            if (!releaseId.equals(getMetaHeaderTopLevelAsbiep.getReleaseId())) {
+                throw new IllegalArgumentException("Meta Header release does not match.");
+            }
             mergedTopLevelAsbieps.add(getMetaHeaderTopLevelAsbiep);
         }
         if (option.isIncludeMetaHeaderForJsonForOpenAPI30PostTemplate()) {
             TopLevelAsbiep postMetaHeaderTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getMetaHeaderTopLevelAsbiepIdForOpenAPI30PostTemplate());
+            if (!releaseId.equals(postMetaHeaderTopLevelAsbiep.getReleaseId())) {
+                throw new IllegalArgumentException("Meta Header release does not match.");
+            }
             mergedTopLevelAsbieps.add(postMetaHeaderTopLevelAsbiep);
         }
         if (option.isIncludePaginationResponseForJsonForOpenAPI30GetTemplate()) {
             TopLevelAsbiep paginationResponseTopLevelAsbiep =
                     topLevelAsbiepRepository.findById(option.getPaginationResponseTopLevelAsbiepIdForOpenAPI30GetTemplate());
+            if (!releaseId.equals(paginationResponseTopLevelAsbiep.getReleaseId())) {
+                throw new IllegalArgumentException("Pagination Response release does not match.");
+            }
             mergedTopLevelAsbieps.add(paginationResponseTopLevelAsbiep);
         }
 

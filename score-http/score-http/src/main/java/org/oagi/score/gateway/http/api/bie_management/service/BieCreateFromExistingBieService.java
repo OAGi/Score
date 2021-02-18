@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import lombok.Data;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.data.TopLevelAsbiep;
@@ -67,6 +68,9 @@ public class BieCreateFromExistingBieService implements InitializingBean {
     @Autowired
     private EventListenerContainer eventListenerContainer;
 
+    @Autowired
+    private BieService bieService;
+
     private final String INTERESTED_EVENT_NAME = "bieCreateFromExistingBieRequestEvent";
 
     @Override
@@ -100,18 +104,32 @@ public class BieCreateFromExistingBieService implements InitializingBean {
         }
 
         TopLevelAsbiep sourceTopLevelAsbiep = topLevelAsbiepRepository.findById(topLevelAsbiepId.toBigInteger());
-        BigInteger copiedTopLevelAsbiepId =
-                repository.createTopLevelAsbiep(requester.getAppUserId(), sourceTopLevelAsbiep.getReleaseId(), Initiating);
 
-        BieCreateFromExistingBieRequestEvent event = new BieCreateFromExistingBieRequestEvent(
-                topLevelAsbiepId.toBigInteger(), copiedTopLevelAsbiepId, asbiepId.toBigInteger(),
-                Collections.emptyList(), requester.getAppUserId()
-        );
-
-        /*
-         * Message Publishing
-         */
-        redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, event);
+        if (asbiepId != null) {
+            BigInteger copiedTopLevelAsbiepId =
+                    repository.createTopLevelAsbiep(requester.getAppUserId(), sourceTopLevelAsbiep.getReleaseId(), Initiating);
+            BieCreateFromExistingBieRequestEvent event = new BieCreateFromExistingBieRequestEvent(
+                    topLevelAsbiepId.toBigInteger(), copiedTopLevelAsbiepId, asbiepId.toBigInteger(),
+                    Collections.emptyList(), requester.getAppUserId()
+            );
+            /*
+             * Message Publishing
+             */
+            redisTemplate.convertAndSend(INTERESTED_EVENT_NAME, event);
+        } else {
+            // Create empty BIE.
+            if (request.getAsccpManifestId() == null) {
+                throw new IllegalArgumentException("Unable to find data to create BIE.");
+            }
+            BieCreateRequest bieRequest = new BieCreateRequest();
+            bieRequest.setAsccpManifestId(request.getAsccpManifestId());
+            List<BigInteger> bizCtxIds = dslContext.select(BIZ_CTX_ASSIGNMENT.BIZ_CTX_ID)
+            .from(BIZ_CTX_ASSIGNMENT)
+            .where(BIZ_CTX_ASSIGNMENT.TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepRecord.getTopLevelAsbiepId()))
+            .fetchStreamInto(BigInteger.class).collect(Collectors.toList());
+            bieRequest.setBizCtxIds(bizCtxIds);
+            bieService.createBie(user, bieRequest);
+        }
     }
 
 
@@ -708,6 +726,10 @@ public class BieCreateFromExistingBieService implements InitializingBean {
                     .set(BBIE_SC.CARDINALITY_MAX, bbieSc.getCardinalityMax())
                     .set(BBIE_SC.IS_USED, (byte) ((bbieSc.isUsed()) ? 1 : 0))
                     .set(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID, ULong.valueOf(targetTopLevelAsbiep.getTopLevelAsbiepId()))
+                    .set(BBIE.CREATED_BY, ULong.valueOf(userId))
+                    .set(BBIE.LAST_UPDATED_BY, ULong.valueOf(userId))
+                    .set(BBIE.CREATION_TIMESTAMP, timestamp)
+                    .set(BBIE.LAST_UPDATE_TIMESTAMP, timestamp)
                     .returning(BBIE_SC.BBIE_SC_ID).fetchOne().getValue(BBIE_SC.BBIE_SC_ID).toBigInteger();
         }
 

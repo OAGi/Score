@@ -7,8 +7,8 @@ import {
   CcBdtScNodeDetail,
   CcNodeDetail,
   Comment
-} from '../domain/core-component-node';
-import {CcNodeService} from '../domain/core-component-node.service';
+} from './core-component-node';
+import {CcNodeService} from './core-component-node.service';
 
 @Injectable()
 export class CommentControl {

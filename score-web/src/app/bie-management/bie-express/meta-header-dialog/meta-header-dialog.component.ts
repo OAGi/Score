@@ -3,6 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort, SortDirection} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
+import {SimpleRelease} from '../../../release-management/domain/release';
 import {BieList, BieListRequest} from '../../bie-list/domain/bie-list';
 import {SelectionModel} from '@angular/cdk/collections';
 import {MatDatepickerInputEvent} from '@angular/material/datepicker';
@@ -49,7 +50,7 @@ export class MetaHeaderDialogComponent implements OnInit {
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
-    @Inject(MAT_DIALOG_DATA) public metaHeaderProfileBieLists: BieList[]) {
+    @Inject(MAT_DIALOG_DATA) public release: SimpleRelease) {
   }
 
   ngOnInit() {
@@ -57,6 +58,7 @@ export class MetaHeaderDialogComponent implements OnInit {
       new PageRequest('lastUpdateTimestamp', 'desc', 0, 10));
     this.request.filters.propertyTerm = 'Meta Header';
     this.request.access = 'CanView';
+    this.request.release = this.release;
 
     this.paginator.pageIndex = this.request.page.pageIndex;
     this.paginator.pageSize = this.request.page.pageSize;

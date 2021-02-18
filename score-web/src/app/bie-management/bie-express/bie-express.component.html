@@ -264,7 +264,8 @@
                   </div>
                   <div class="generate-option">
                     <mat-checkbox [(ngModel)]="option.bieCctsMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'">BIE CCTS Meta Data
+                                  [disabled]="option.expressionOption !== 'XML'"
+                                  (change)="bieAnnotationChange()">BIE CCTS Meta Data
                     </mat-checkbox>
                   </div>
                   <div class="generate-option dependent-option">
@@ -289,7 +290,8 @@
                   </div>
                   <div class="generate-option">
                     <mat-checkbox [(ngModel)]="option.bieOagiScoreMetaData"
-                                  [disabled]="option.expressionOption !== 'XML'">BIE OAGi/Score Meta Data
+                                  [disabled]="option.expressionOption !== 'XML'"
+                                  (change)="bieAnnotationChange()">BIE OAGi/Score Meta Data
                     </mat-checkbox>
                   </div>
                   <div class="generate-option dependent-option">
@@ -318,7 +320,7 @@
               <div class="col-md-5 col-sm-12" style="padding-top: 20px">
                 <span class="option-header">Select Expressions</span>
                 <div class="option-body">
-                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption">
+                  <mat-radio-group class="option-radio-group" [(ngModel)]="option.expressionOption" (change)="expressionOptionChange()">
                     <mat-radio-button class="option-radio-button" value="XML">
                       XML Schema
                     </mat-radio-button>
