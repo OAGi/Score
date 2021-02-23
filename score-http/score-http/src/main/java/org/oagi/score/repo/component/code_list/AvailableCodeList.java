@@ -13,5 +13,6 @@ public class AvailableCodeList {
     private BigInteger codeListManifestId;
     private BigInteger basedCodeListManifestId;
     private String codeListName;
+    private String state;
 
 }

@@ -4,6 +4,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ACC;
+import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
 import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.data.TopLevelAsbiep;
@@ -74,6 +75,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -452,12 +455,22 @@ public class BieEditService implements InitializingBean {
 
     public List<AvailableCodeList> availableCodeListListByBccpManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bccpManifestId) {
-        return codeListReadRepository.availableCodeListByBccpManifestId(bccpManifestId);
+        AppUser requester = sessionService.getAppUser(user);
+        List<CodeListState> states = Collections.emptyList();
+        if (requester.isDeveloper()) {
+            states = Arrays.asList(CodeListState.Published);
+        }
+        return codeListReadRepository.availableCodeListByBccpManifestId(bccpManifestId, states);
     }
 
     public List<AvailableCodeList> availableCodeListListByBdtScManifestId(
             AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BigInteger bdtScManifestId) {
-        return codeListReadRepository.availableCodeListByBdtScManifestId(bdtScManifestId);
+        AppUser requester = sessionService.getAppUser(user);
+        List<CodeListState> states = Collections.emptyList();
+        if (requester.isDeveloper()) {
+            states = Arrays.asList(CodeListState.Published);
+        }
+        return codeListReadRepository.availableCodeListByBdtScManifestId(bdtScManifestId, states);
     }
 
     @Autowired

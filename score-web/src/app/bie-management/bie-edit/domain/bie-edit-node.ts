@@ -118,10 +118,12 @@ export enum ValueDomainType {
 export class ValueDomain {
   readonly id: number;
   readonly name: string;
+  readonly state: string;
 
-  constructor(id: number, name: string) {
+  constructor(id: number, name: string, state?: string) {
     this.id = id;
     this.name = name;
+    this.state = state;
   }
 }
 
@@ -144,6 +146,7 @@ export class CodeList {
   codeListManifestId: number;
   basedCodeListManifestId: number;
   codeListName: string;
+  state: string;
 }
 
 export class AgencyIdList {

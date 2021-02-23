@@ -168,7 +168,7 @@ public class BieJSONGenerateExpression implements BieGenerateExpression, Initial
         ASBIEP asbiep = generationContext.receiveASBIEP(abie);
         ABIE typeAbie = generationContext.queryTargetABIE(asbiep);
 
-        fillProperties(parent, definitions, asbiep, typeAbie, generationContext);
+        fillProperties(parent, definitions, asbiep, typeAbie, generationContext, isArray);
     }
 
     private void fillProperties(Map<String, Object> parent,

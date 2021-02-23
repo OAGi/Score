@@ -782,7 +782,11 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    {{ codeList.name }}
+                                    <span [class]="!isValidState(codeList.state) ? 'text-warning' : 'dummy'"
+                                    [matTooltip]="'This code list is usable but unstable'"
+                                    [matTooltipDisabled]="isValidState(codeList.state)">
+                                      {{ codeList.name }}
+                                    </span>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>
@@ -1028,7 +1032,11 @@
 
                                   <mat-option *ngFor="let codeList of filteredValueDomains | async"
                                               [value]="codeList.id">
-                                    {{ codeList.name }}
+                                    <span [class]="!isValidState(codeList.state) ? 'text-warning' : 'dummy'"
+                                          [matTooltip]="'This code list is usable but unstable'"
+                                          [matTooltipDisabled]="isValidState(codeList.state)">
+                                      {{ codeList.name }}
+                                    </span>
                                   </mat-option>
                                 </mat-select>
                               </mat-form-field>

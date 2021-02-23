@@ -6,7 +6,7 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/a
 import {MatDialog} from '@angular/material/dialog';
 import {PageRequest} from '../../basis/basis';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {UnboundedPipe} from '../../common/utility';
+import {initFilter, UnboundedPipe} from '../../common/utility';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
 import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
@@ -1254,7 +1254,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
       if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Code') {
         this.service.getBbiepCodeList(this.topLevelAsbiepId, bccpManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName));
+          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbiepDetail(detail).bbie.valueDomainType === 'Agency') {
@@ -1278,7 +1278,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       }
       if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Code') {
         this.service.getBbieScCodeList(this.topLevelAsbiepId, bdtScManifestId).subscribe(list => {
-          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName));
+          valueDomains = list.map(e => new ValueDomain(e.codeListId, e.codeListName, e.state));
           this._setFilteredValueDomains(valueDomains);
         });
       } else if (this.asBbieScDetail(detail).bbieSc.valueDomainType === 'Agency') {
@@ -1301,17 +1301,20 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   _setFilteredValueDomains(list: ValueDomain[]) {
-    let search = this.valueDomainFilterCtrl.value;
-    if (!search) {
-      this.filteredValueDomains.next(list.slice());
-      return;
-    } else {
-      search = search.toLowerCase();
-    }
+    this.valueDomainFilterCtrl.valueChanges.subscribe(() => {
+      let search = this.valueDomainFilterCtrl.value;
+      if (!search) {
+        this.filteredValueDomains.next(list.slice());
+        return;
+      } else {
+        search = search.toLowerCase();
+      }
 
-    this.filteredValueDomains.next(
-      list.filter(e => e.name.toLowerCase().indexOf(search) > -1)
-    );
+      this.filteredValueDomains.next(
+        list.filter(e => e.name.toLowerCase().indexOf(search) > -1)
+      );
+    });
+    this.filteredValueDomains.next(list.slice());
   }
 
   _hasPath(base: string, path): boolean {
@@ -1505,5 +1508,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       return 'This component is not in Published or Production state.';
     }
     return '';
+  }
+
+  isValidState(state: string): boolean {
+    const validState = ['Published', 'Production'];
+    return validState.indexOf(state) > -1;
   }
 }

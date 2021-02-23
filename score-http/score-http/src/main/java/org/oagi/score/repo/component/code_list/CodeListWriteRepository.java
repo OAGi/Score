@@ -12,6 +12,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -627,6 +628,11 @@ public class CodeListWriteRepository {
 
         responseCodeListManifestId = codeListManifestRecord.getCodeListManifestId();
 
+        // #1094 keep update BIE's code list id
+        updateBIECodeListId(codeListManifestRecord.getReleaseId().toBigInteger(),
+                prevCodeListRecord.getCodeListId().toBigInteger(),
+                nextCodeListRecord.getCodeListId().toBigInteger());
+
         return new ReviseCodeListRepositoryResponse(responseCodeListManifestId.toBigInteger());
     }
 
@@ -655,6 +661,11 @@ public class CodeListWriteRepository {
         codeListManifestRecord.setCodeListId(codeListRecord.getPrevCodeListId());
         codeListManifestRecord.update(CODE_LIST_MANIFEST.CODE_LIST_ID);
 
+        // #1094 keep update BIE's code list id
+        updateBIECodeListId(codeListManifestRecord.getReleaseId().toBigInteger(),
+                codeListRecord.getCodeListId().toBigInteger(),
+                codeListRecord.getPrevCodeListId().toBigInteger());
+
         discardLogCodeListValues(codeListManifestRecord, codeListRecord);
 
         // unlink prev CODE_LIST
@@ -668,6 +679,31 @@ public class CodeListWriteRepository {
         codeListRecord.delete();
 
         return new CancelRevisionCodeListRepositoryResponse(request.getCodeListManifestId());
+    }
+
+    private void updateBIECodeListId(BigInteger releaseId, BigInteger prevCodeListId, BigInteger nextCodeListId) {
+        dslContext.update(BBIE)
+                .set(BBIE.CODE_LIST_ID, ULong.valueOf(nextCodeListId))
+                .where(BBIE.BBIE_ID.in(
+                        dslContext.select(BBIE.BBIE_ID)
+                        .from(BBIE)
+                        .join(TOP_LEVEL_ASBIEP)
+                                .on(BBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                        .where(and(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                BBIE.CODE_LIST_ID.eq(ULong.valueOf(prevCodeListId))))))
+                .execute();
+
+        dslContext.update(BBIE_SC)
+                .set(BBIE_SC.CODE_LIST_ID, ULong.valueOf(nextCodeListId))
+                .where(BBIE_SC.BBIE_SC_ID.in(
+                        dslContext.select(BBIE_SC.BBIE_SC_ID)
+                                .from(BBIE_SC)
+                                .join(TOP_LEVEL_ASBIEP)
+                                .on(BBIE_SC.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                                .where(and(TOP_LEVEL_ASBIEP.RELEASE_ID.eq(ULong.valueOf(releaseId)),
+                                        BBIE_SC.CODE_LIST_ID.eq(ULong.valueOf(prevCodeListId))))))
+                .execute();
+
     }
 
     private void discardLogCodeListValues(CodeListManifestRecord codeListManifestRecord, CodeListRecord codeListRecord) {

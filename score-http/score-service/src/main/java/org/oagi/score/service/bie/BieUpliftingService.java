@@ -454,7 +454,7 @@ public class BieUpliftingService {
         private Map<BigInteger, WrappedAsbiep> asbiepMap;
         private Map<BigInteger, WrappedAsbiep> roleOfAbieToAsbiepMap;
         private Map<BigInteger, Abie> abieIdToAbieMap;
-        private Map<BigInteger, WrappedAsbie> toAsbiepToAsbieMap;
+        private Map<BigInteger, List<WrappedAsbie>> toAsbiepToAsbieMap;
         private Map<BigInteger, WrappedBbie> toBbiepToBbieMap;
         private Map<BigInteger, Bbie> bbieMap;
         private List<WrappedBbieSc> bbieScList;
@@ -706,9 +706,13 @@ public class BieUpliftingService {
             createBieRequest.setStatus(topLevelAsbiep.getStatus());
             createBieRequest.setVersion(topLevelAsbiep.getVersion());
             createBieRequest.setTopLevelAsbiep(this.asbiepMap.get(topLevelAsbiep.getAsbiepId()));
+            List<WrappedAsbie> wrappedAsbieList = new ArrayList<WrappedAsbie>();
+            toAsbiepToAsbieMap.values().forEach(list -> {
+                wrappedAsbieList.addAll(list);
+            });
+            wrappedAsbieList.addAll(emptySourceAsbieList);
             createBieRequest.setAsbieList(
-                    Stream.concat(toAsbiepToAsbieMap.values().stream(),
-                            emptySourceAsbieList.stream())
+                    wrappedAsbieList.stream()
                             .map(asbie -> {
                                 if (asbie.getFromAbie() == null) {
                                     String targetFromAbiePath = extractAbiePath(asbie.getAsbie().getPath());
@@ -784,6 +788,7 @@ public class BieUpliftingService {
         public void visitAbie(Abie abie, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             if (abie == null) {
+                targetAccManifestQueue.poll();
                 return;
             }
             AccManifest sourceAccManifest = sourceCcDocument.getAccManifest(
@@ -870,7 +875,20 @@ public class BieUpliftingService {
                 upliftingAsbie.setFromAbie(this.abieIdToAbieMap.get(asbie.getFromAbieId()));
                 upliftingAsbie.setAsbie(targetAsbie);
 
-                this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), upliftingAsbie);
+                if(targetAsccMapping != null) {
+                    upliftingAsbie.setRefTopLevelAsbiepId(targetAsccMapping.getRefTopLevelAsbiepId());
+                }
+                List<WrappedAsbie> wrappedAsbieList = this.toAsbiepToAsbieMap.get(asbie.getToAsbiepId());
+                if (wrappedAsbieList != null && wrappedAsbieList.size() > 0) {
+                    wrappedAsbieList.add(upliftingAsbie);
+                    this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), wrappedAsbieList);
+                } else {
+                    List<WrappedAsbie> newWrappedAsbieList = new ArrayList<>();
+                    newWrappedAsbieList.add(upliftingAsbie);
+                    this.toAsbiepToAsbieMap.put(asbie.getToAsbiepId(), newWrappedAsbieList);
+                }
+
+
             }
         }
 
@@ -956,6 +974,7 @@ public class BieUpliftingService {
         public void visitAsbiep(Asbiep asbiep, BieVisitContext context) {
             CcDocument sourceCcDocument = context.getBieDocument().getCcDocument();
             if (asbiep == null) {
+                targetAsccpManifestQueue.poll();
                 return;
             }
             AsccpManifest sourceAsccpManifest = sourceCcDocument.getAsccpManifest(
@@ -985,9 +1004,12 @@ public class BieUpliftingService {
                 WrappedAsbiep upliftingAsbiep = new WrappedAsbiep();
                 upliftingAsbiep.setAsbiep(targetAsbiep);
 
-                WrappedAsbie upliftingAsbie = this.toAsbiepToAsbieMap.get(asbiep.getAsbiepId());
-                if (upliftingAsbie != null) {
-                    upliftingAsbie.setToAsbiep(upliftingAsbiep);
+                List<WrappedAsbie> upliftingAsbieList = this.toAsbiepToAsbieMap.get(asbiep.getAsbiepId());
+                if (upliftingAsbieList != null) {
+                    upliftingAsbieList.forEach(upliftingAsbie -> {
+                        upliftingAsbie.setToAsbiep(upliftingAsbiep);
+                    });
+
                 }
                 this.asbiepMap.put(asbiep.getAsbiepId(), upliftingAsbiep);
                 this.roleOfAbieToAsbiepMap.put(asbiep.getRoleOfAbieId(), upliftingAsbiep);
