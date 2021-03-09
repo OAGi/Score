@@ -122,7 +122,7 @@ export class ModuleSetEditComponent implements OnInit {
       this.paginator.length = resp.length;
       this.paginator.pageIndex = resp.page;
 
-      this.dataSource.data = resp.list.map((elm: ModuleSetModule) => {
+      this.dataSource.data = resp.results.map((elm: ModuleSetModule) => {
         elm.lastUpdateTimestamp = new Date(elm.lastUpdateTimestamp);
         return elm;
       });

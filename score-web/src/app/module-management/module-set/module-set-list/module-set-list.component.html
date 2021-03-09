@@ -113,7 +113,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated on</th>
             <td mat-cell *matCellDef="let element">
               <div class="ellipsis">{{ element.lastUpdateTimestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
-              <div class="description ellipsis">by <b>{{ element.lastUpdateUser }}</b>
+              <div class="description ellipsis">by <b>{{ element.lastUpdatedBy.username }}</b>
               </div>
             </td>
           </ng-container>
@@ -137,6 +137,7 @@
 
         <mat-paginator
           [pageSizeOptions]="[10, 25, 50]"
+          (page)="onPageChange($event)"
           showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>

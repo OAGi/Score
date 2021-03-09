@@ -276,7 +276,7 @@ export class BieEditFlatNodeFlattener extends BieFlatNodeFlattener {
 })
 export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
-  loading: boolean;
+  loading: boolean = false;
   paddingPixel = 12;
 
   topLevelAsbiepId: number;
@@ -289,7 +289,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   cursorNode: BieFlatNode;
   selectedNode: BieFlatNode;
-  isUpdating: boolean;
+  isUpdating: boolean = false;
   _versionChanged: boolean;
   _changedVersionValue: string;
 
@@ -408,6 +408,20 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   get canEdit(): boolean {
     return this.state === 'WIP' && this.access === 'CanEdit';
+  }
+
+  get isValid(): boolean {
+    if (!!this.bieCardinalityMin) {
+      if (!this.bieCardinalityMin.valid) {
+        return false;
+      }
+    }
+    if (!!this.bieCardinalityMax) {
+      if (!this.bieCardinalityMax.valid) {
+        return false;
+      }
+    }
+    return true;
   }
 
   isEditable(node: BieFlatNode): boolean {
@@ -1062,6 +1076,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
       bieCardinalityMax = this.asBbieScDetail(detailNode).bbieSc.cardinalityMax;
       ccCardinalityMin = this.asBbieScDetail(detailNode).bdtSc.cardinalityMin;
+    } else {
+      return;
     }
 
     this.bieCardinalityMin = new FormControl({
@@ -1092,8 +1108,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.asBbiepDetail(detailNode).bbie.cardinalityMin = value;
         } else if (this.isBbieScDetail(detailNode)) {
           this.asBbieScDetail(detailNode).bbieSc.cardinalityMin = value;
+        } else {
+          return;
         }
-        this.bieCardinalityMax.updateValueAndValidity({onlySelf: true, emitEvent: false});
+        this._setCardinalityMaxFormControl(detailNode);
       }
     });
   }
@@ -1124,6 +1142,8 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       bieCardinalityMin = this.asBbieScDetail(detailNode).bbieSc.cardinalityMin;
       bieCardinalityMax = this.asBbieScDetail(detailNode).bbieSc.cardinalityMax;
       ccCardinalityMax = this.asBbieScDetail(detailNode).bdtSc.cardinalityMax;
+    } else {
+      return;
     }
 
     this.bieCardinalityMax = new FormControl({
@@ -1173,8 +1193,10 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
           this.asBbiepDetail(detailNode).bbie.cardinalityMax = value;
         } else if (this.isBbieScDetail(detailNode)) {
           this.asBbieScDetail(detailNode).bbieSc.cardinalityMax = value;
+        } else {
+          return;
         }
-        this.bieCardinalityMin.updateValueAndValidity({onlySelf: true, emitEvent: false});
+        this._setCardinalityMinFormControl(detailNode);
       }
     });
   }

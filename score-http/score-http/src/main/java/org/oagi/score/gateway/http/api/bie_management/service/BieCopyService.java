@@ -102,6 +102,8 @@ public class BieCopyService implements InitializingBean {
         ULong copiedTopLevelAsbiepId = bieRepository.insertTopLevelAsbiep()
                 .setReleaseId(sourceTopLevelAsbiep.getReleaseId())
                 .setBieState(Initiating)
+                .setVersion(sourceTopLevelAsbiep.getVersion())
+                .setStatus(sourceTopLevelAsbiep.getStatus())
                 .setUserId(userId)
                 .setTimestamp(millis)
                 .execute();

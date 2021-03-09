@@ -4,7 +4,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {FormControl} from '@angular/forms';
 import {ReplaySubject} from 'rxjs';
 import {MatSort, SortDirection} from '@angular/material/sort';
-import {MatPaginator} from '@angular/material/paginator';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {Location} from '@angular/common';
@@ -108,6 +108,10 @@ export class ModuleSetListComponent implements OnInit {
     this.loadModuleSetList();
   }
 
+  onPageChange(event: PageEvent) {
+    this.loadModuleSetList();
+  }
+
   loadModuleSetList(isInit?: boolean) {
     this.loading = true;
 
@@ -120,7 +124,7 @@ export class ModuleSetListComponent implements OnInit {
         this.loading = false;
       })
     ).subscribe(resp => {
-      this.dataSource.data = resp.list;
+      this.dataSource.data = resp.results;
       this.paginator.length = resp.length;
       if (!isInit) {
         this.location.replaceState(this.router.url.split('?')[0], this.request.toQuery());
@@ -189,7 +193,7 @@ export class ModuleSetListComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.loading = true;
-          this.service.discard(item.moduleSetId).pipe(finalize(() => {
+          this.service.discardModuleSet(item.moduleSetId).pipe(finalize(() => {
             this.loading = false;
           })).subscribe(_ => {
             this.snackBar.open('Discarded', '', {

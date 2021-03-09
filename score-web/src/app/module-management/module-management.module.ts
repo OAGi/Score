@@ -1,14 +1,14 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {ModuleSetReleaseModule} from './module-set-release/module-set-release.module';
 import {ModuleSetListModule} from './module-set/module-set-list.module';
-import {ModuleSetReleaseListModule} from './module-set-release-list/module-set-release-list.module';
 import {ModuleService} from './domain/module.service';
 
 
 @NgModule({
   imports: [
     ModuleSetListModule,
-    ModuleSetReleaseListModule,
+    ModuleSetReleaseModule,
     CommonModule
   ],
   providers: [

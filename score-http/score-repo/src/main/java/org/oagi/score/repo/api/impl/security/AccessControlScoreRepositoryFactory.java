@@ -10,6 +10,7 @@ import org.oagi.score.repo.api.corecomponent.CcReadRepository;
 import org.oagi.score.repo.api.corecomponent.CodeListReadRepository;
 import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyReadRepository;
 import org.oagi.score.repo.api.corecomponent.seqkey.SeqKeyWriteRepository;
+import org.oagi.score.repo.api.module.*;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.security.AccessControl;
 import org.oagi.score.repo.api.security.AccessControlException;
@@ -142,5 +143,35 @@ public abstract class AccessControlScoreRepositoryFactory implements ScoreReposi
     @Override
     public BieWriteRepository createBieWriteRepository() throws ScoreDataAccessException {
         return wrapForAccessControl(delegate.createBieWriteRepository(), BieWriteRepository.class);
+    }
+
+    @Override
+    public ModuleReadRepository createModuleReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleReadRepository(), ModuleReadRepository.class);
+    }
+
+    @Override
+    public ModuleWriteRepository createModuleWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleWriteRepository(), ModuleWriteRepository.class);
+    }
+
+    @Override
+    public ModuleSetReadRepository createModuleSetReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleSetReadRepository(), ModuleSetReadRepository.class);
+    }
+
+    @Override
+    public ModuleSetWriteRepository createModuleSetWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleSetWriteRepository(), ModuleSetWriteRepository.class);
+    }
+
+    @Override
+    public ModuleSetReleaseReadRepository createModuleSetReleaseReadRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleSetReleaseReadRepository(), ModuleSetReleaseReadRepository.class);
+    }
+
+    @Override
+    public ModuleSetReleaseWriteRepository createModuleSetReleaseWriteRepository() throws ScoreDataAccessException {
+        return wrapForAccessControl(delegate.createModuleSetReleaseWriteRepository(), ModuleSetReleaseWriteRepository.class);
     }
 }

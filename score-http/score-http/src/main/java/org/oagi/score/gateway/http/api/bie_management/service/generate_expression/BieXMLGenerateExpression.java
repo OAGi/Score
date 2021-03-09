@@ -115,7 +115,7 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
         rootElementNode = generateTopLevelASBIEP(asbiep, topLevelAsbiep);
 
         ABIE abie = generationContext.queryTargetABIE(asbiep);
-        Element rootSeqNode = generateABIE(abie, rootElementNode, false);
+        Element rootSeqNode = generateABIE(abie, rootElementNode);
         generateBIEs(abie, rootSeqNode);
     }
 
@@ -549,14 +549,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
     }
 
     private Element generateABIE(ABIE abie, Element parentNode) {
-        return generateABIE(abie, parentNode, true);
-    }
-
-    private Element generateABIE(ABIE abie, Element parentNode, boolean useCache) {
-        if (useCache && isProcessed(abie)) {
-            return parentNode;
-        }
-
         Element complexType = newElement("complexType");
         if (option.isBieGuid()) {
             complexType.setAttribute("id", getGuidWithPrefix(abie.getGuid()));
@@ -569,9 +561,6 @@ public class BieXMLGenerateExpression implements BieGenerateExpression, Initiali
 
         Element sequenceElement = newElement("sequence");
         complexType.addContent(sequenceElement);
-        if (useCache) {
-            setProcessedElement(abie, sequenceElement);
-        }
 
         return sequenceElement;
     }

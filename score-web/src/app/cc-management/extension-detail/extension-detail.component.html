@@ -568,9 +568,10 @@
                             <input matInput placeholder="{{ 'ASCC_DETAIL.MAX' | translate }}" required
                                    [formControl]="ccCardinalityMax"
                                    [value]="ccCardinalityMax.value | unbounded">
-                            <mat-hint *ngIf="ccCardinalityMax.valid && asAsccpDetail().ascc.cardinalityMax === 0"
+                            <mat-hint *ngIf="ccCardinalityMax.valid && asAsccpDetail().ascc.cardinalityMax === 0 &&
+                                            (!asAsccpDetail().ascc.definition || asAsccpDetail().ascc.definition === '')"
                                       style="color: #ff5722;">
-                              Context Definition should define why Cardinality Max is zero (0)
+                              Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
                             <mat-error *ngIf="ccCardinalityMax.hasError('required')">
                               Cardinality Max is <strong>required</strong>
@@ -844,9 +845,10 @@
                             <input matInput placeholder="{{ 'BCC_DETAIL.MAX' | translate }}" required
                                    [formControl]="ccCardinalityMax"
                                    [value]="ccCardinalityMax.value | unbounded" />
-                            <mat-hint *ngIf="ccCardinalityMax.valid && asBccpDetail().bcc.cardinalityMax === 0"
+                            <mat-hint *ngIf="ccCardinalityMax.valid && asBccpDetail().bcc.cardinalityMax === 0 &&
+                                            (!asBccpDetail().bcc.definition || asBccpDetail().bcc.definition === '')"
                                       style="color: #ff5722;">
-                              Context Definition should define why Cardinality Max is zero (0)
+                              Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
                             <mat-error *ngIf="ccCardinalityMax.hasError('required')">
                               Cardinality Max is <strong>required</strong>

@@ -20,6 +20,8 @@ export class PageResponse<T> {
 }
 
 export class PaginationResponse<T> {
-  result: T[];
-  pageCount: number;
+  results: T[];
+  page: number;
+  size: number;
+  length: number;
 }

@@ -37,6 +37,8 @@ public class BusinessInformationEntityRepository {
         private ULong releaseId;
         private ULong userId;
         private BieState bieState = WIP;
+        private String version;
+        private String status;
         private LocalDateTime timestamp = new Timestamp(System.currentTimeMillis()).toLocalDateTime();
 
         public InsertTopLevelAsbiepArguments setReleaseId(BigInteger releaseId) {
@@ -50,6 +52,16 @@ public class BusinessInformationEntityRepository {
 
         public InsertTopLevelAsbiepArguments setBieState(BieState bieState) {
             this.bieState = bieState;
+            return this;
+        }
+
+        public InsertTopLevelAsbiepArguments setVersion(String version) {
+            this.version = version;
+            return this;
+        }
+
+        public InsertTopLevelAsbiepArguments setStatus(String status) {
+            this.status = status;
             return this;
         }
 
@@ -83,6 +95,14 @@ public class BusinessInformationEntityRepository {
             return bieState;
         }
 
+        public String getVersion() {
+            return version;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
         public ULong getUserId() {
             return userId;
         }
@@ -105,6 +125,8 @@ public class BusinessInformationEntityRepository {
         record.setOwnerUserId(arguments.getUserId());
         record.setReleaseId(arguments.getReleaseId());
         record.setState(arguments.getBieState().name());
+        record.setVersion(arguments.getVersion());
+        record.setStatus(arguments.getStatus());
         record.setLastUpdatedBy(arguments.getUserId());
         record.setLastUpdateTimestamp(arguments.getTimestamp());
 

@@ -1,0 +1,56 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="isUpdating">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <mat-card class="pt-4 pb-2">
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+    </mat-card-header>
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <mat-form-field>
+          <mat-label>Module Set</mat-label>
+          <mat-select [(ngModel)]="moduleSetRelease.moduleSetId">
+            <ngx-mat-select-search [formControl]="moduleSetListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+            <mat-option *ngFor="let moduleSet of filteredModuleSetList | async" [value]="moduleSet.moduleSetId">
+              {{ moduleSet.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Release</mat-label>
+          <mat-select [(ngModel)]="moduleSetRelease.releaseId">
+            <ngx-mat-select-search [formControl]="releaseListFilterCtrl"
+                                   [placeholderLabel]="'Search...'"
+                                   [noEntriesFoundLabel]="'No matching release found.'"></ngx-mat-select-search>
+            <mat-option *ngFor="let release of filteredReleaseList | async" [value]="release.releaseId">
+              <div class="d-flex">
+                <span class="release-num">{{release.releaseNum}}</span>
+                <span class="f12 ml-auto {{release.state}}"
+                      *ngIf="release.releaseNum !== 'Working'">
+                        {{ release.state | separate }}
+                      </span>
+              </div>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="moduleSetRelease.default">Default</mat-checkbox>
+
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+
+  <div class="row action-group m-0">
+    <div class="col-12 actions-wrap">
+      <button mat-raised-button color="primary" (click)="createModuleSet()"
+              [disabled]="!canCreate">
+        Create
+      </button>
+    </div>
+  </div>
+</div>

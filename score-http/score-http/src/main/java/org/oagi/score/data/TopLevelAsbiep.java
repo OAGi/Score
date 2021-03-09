@@ -13,6 +13,8 @@ public class TopLevelAsbiep {
     private BigInteger asbiepId = BigInteger.ZERO;
     private BigInteger ownerUserId = BigInteger.ZERO;
     private BigInteger releaseId = BigInteger.ZERO;
+    private String version;
+    private String status;
     private BieState state;
     private BigInteger lastUpdatedBy = BigInteger.ZERO;
     private Date lastUpdateTimestamp;

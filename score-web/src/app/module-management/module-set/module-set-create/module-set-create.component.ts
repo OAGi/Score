@@ -60,7 +60,7 @@ export class ModuleSetCreateComponent implements OnInit {
         this.snackBar.open('Created', '', {
           duration: 3000,
         });
-        this.router.navigateByUrl('/module_management/module_set/' + moduleSet.moduleSetId);
+        this.router.navigateByUrl('/module_management/module_set');
       });
   }
 

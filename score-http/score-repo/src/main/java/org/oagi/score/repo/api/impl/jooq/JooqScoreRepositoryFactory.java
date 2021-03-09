@@ -17,8 +17,10 @@ import org.oagi.score.repo.api.impl.jooq.corecomponent.JooqCcReadRepository;
 import org.oagi.score.repo.api.impl.jooq.corecomponent.JooqCodeListReadRepository;
 import org.oagi.score.repo.api.impl.jooq.corecomponent.JooqSeqKeyReadRepository;
 import org.oagi.score.repo.api.impl.jooq.corecomponent.JooqSeqKeyWriteRepository;
+import org.oagi.score.repo.api.impl.jooq.module.*;
 import org.oagi.score.repo.api.impl.jooq.release.JooqReleaseReadRepository;
 import org.oagi.score.repo.api.impl.jooq.user.JooqScoreUserReadRepository;
+import org.oagi.score.repo.api.module.*;
 import org.oagi.score.repo.api.release.ReleaseReadRepository;
 import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 
@@ -102,5 +104,35 @@ public class JooqScoreRepositoryFactory implements ScoreRepositoryFactory {
     @Override
     public BieWriteRepository createBieWriteRepository() throws ScoreDataAccessException {
         return new JooqBieWriteRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleReadRepository createModuleReadRepository() throws ScoreDataAccessException {
+        return new JooqModuleReadRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleWriteRepository createModuleWriteRepository() throws ScoreDataAccessException {
+        return new JooqModuleWriteRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleSetReadRepository createModuleSetReadRepository() throws ScoreDataAccessException {
+        return new JooqModuleSetReadRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleSetWriteRepository createModuleSetWriteRepository() throws ScoreDataAccessException {
+        return new JooqModuleSetWriteRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleSetReleaseReadRepository createModuleSetReleaseReadRepository() throws ScoreDataAccessException {
+        return new JooqModuleSetReleaseReadRepository(this.dslContext);
+    }
+
+    @Override
+    public ModuleSetReleaseWriteRepository createModuleSetReleaseWriteRepository() throws ScoreDataAccessException {
+        return new JooqModuleSetReleaseWriteRepository(this.dslContext);
     }
 }

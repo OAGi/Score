@@ -63,12 +63,12 @@
                       </mat-checkbox>
                       <button mat-raised-button color="primary" (click)="updateDetails()"
                               *ngIf="state === 'WIP'"
-                              [disabled]="isUpdating || !isChanged || access !== 'CanEdit'">
+                              [disabled]="isUpdating || !isChanged || access !== 'CanEdit' || !isValid">
                         Update
                       </button>
                       <button mat-raised-button color="accent" (click)="updateState('QA')"
                               *ngIf="state === 'WIP'"
-                              [disabled]="isUpdating || isChanged || access !== 'CanEdit'">
+                              [disabled]="isUpdating || isChanged || access !== 'CanEdit' || !isValid">
                         Move to QA
                       </button>
                       <button mat-raised-button color="warn" (click)="updateState('WIP')"
@@ -429,9 +429,9 @@
                             <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
-                            <mat-hint
-                              *ngIf="bieCardinalityMax.valid && asAsbiepDetail().asbie && asAsbiepDetail().asbie.cardinalityMax === 0"
-                              style="color: #ff5722;">
+                            <mat-hint *ngIf="bieCardinalityMax.valid && asAsbiepDetail().asbie && asAsbiepDetail().asbie.cardinalityMax === 0 &&
+                                            (!asAsbiepDetail().asbie.definition || asAsbiepDetail().asbie.definition === '')"
+                                      style="color: #ff5722;">
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
 
@@ -650,7 +650,8 @@
                             <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
-                            <mat-hint *ngIf="bieCardinalityMax.valid && asBbiepDetail().bbie.cardinalityMax === 0"
+                            <mat-hint *ngIf="bieCardinalityMax.valid && asBbiepDetail().bbie.cardinalityMax === 0 &&
+                                            (!asBbiepDetail().bbie.definition || asBbiepDetail().bbie.definition === '')"
                                       style="color: #ff5722;">
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
@@ -898,7 +899,8 @@
                             <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
-                            <mat-hint *ngIf="bieCardinalityMax.valid && asBbieScDetail().bbieSc.cardinalityMax === 0"
+                            <mat-hint *ngIf="bieCardinalityMax.valid && asBbieScDetail().bbieSc.cardinalityMax === 0 &&
+                                            (!asBbieScDetail().bbieSc.definition || asBbieScDetail().bbieSc.definition === '')"
                                       style="color: #ff5722;">
                               Context Definition should define why Cardinality Max is zero (0)
                             </mat-hint>
