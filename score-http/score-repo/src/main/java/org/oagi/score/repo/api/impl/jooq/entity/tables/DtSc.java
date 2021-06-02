@@ -186,16 +186,29 @@ public class DtSc extends TableImpl<DtScRecord> {
         return Arrays.<ForeignKey<DtScRecord, ?>>asList(Keys.DT_SC_OWNER_DT_ID_FK, Keys.DT_SC_BASED_DT_SC_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK);
     }
 
+    private transient Dt _dt;
+    private transient DtSc _dtScBasedDtScIdFk;
+    private transient DtSc _dtScReplacementDtScIdFk;
+
     public Dt dt() {
-        return new Dt(this, Keys.DT_SC_OWNER_DT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.DT_SC_OWNER_DT_ID_FK);
+
+        return _dt;
     }
 
     public DtSc dtScBasedDtScIdFk() {
-        return new DtSc(this, Keys.DT_SC_BASED_DT_SC_ID_FK);
+        if (_dtScBasedDtScIdFk == null)
+            _dtScBasedDtScIdFk = new DtSc(this, Keys.DT_SC_BASED_DT_SC_ID_FK);
+
+        return _dtScBasedDtScIdFk;
     }
 
     public DtSc dtScReplacementDtScIdFk() {
-        return new DtSc(this, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK);
+        if (_dtScReplacementDtScIdFk == null)
+            _dtScReplacementDtScIdFk = new DtSc(this, Keys.DT_SC_REPLACEMENT_DT_SC_ID_FK);
+
+        return _dtScReplacementDtScIdFk;
     }
 
     @Override

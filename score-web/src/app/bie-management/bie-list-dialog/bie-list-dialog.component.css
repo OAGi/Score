@@ -1,0 +1,77 @@
+.filter-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.option-header {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.option-body {
+  padding-top: 13px;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: #f5f5f5;
+}
+
+tr.element-row:not(.expanded-row):active {
+  background: #efefef;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+.bie-guid {
+  font-size: 11px !important;
+  color: #767676 !important;
+}
+
+.mat-card-content p {
+  font-family: 'Roboto', 'sans-serif';
+  margin-bottom: 0.5rem;
+}
+
+.mat-card-content {
+  margin-bottom: 0;
+}
+
+.mat-icon-button {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  outline: none;
+}
+
+.mat-column-releaseNum {
+  width: 100px;
+}
+
+.mat-column-reusedVersion, .mat-column-reusedStatus, .mat-column-reusingVersion, .mat-column-reusingStatus {
+  width: 5%;
+}
+
+.mat-column-reusedState, .mat-column-reusedOwner, .mat-column-reusingState, .mat-column-reusingOwner {
+  width: 90px;
+}
+
+.mat-column-lastUpdateTimestamp {
+  width: 160px;
+}
+
+.mat-column-arrow {
+  width: 40px;
+}
+
+.f12 {
+  font-size: 12px;
+}

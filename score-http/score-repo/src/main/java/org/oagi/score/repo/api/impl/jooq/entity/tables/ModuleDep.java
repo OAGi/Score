@@ -126,12 +126,21 @@ public class ModuleDep extends TableImpl<ModuleDepRecord> {
         return Arrays.<ForeignKey<ModuleDepRecord, ?>>asList(Keys.MODULE_DEP_DEPENDING_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_DEP_DEPENDED_MODULE_SET_ASSIGNMENT_ID_FK);
     }
 
+    private transient ModuleSetAssignment _moduleDepDependingModuleSetAssignmentIdFk;
+    private transient ModuleSetAssignment _moduleDepDependedModuleSetAssignmentIdFk;
+
     public ModuleSetAssignment moduleDepDependingModuleSetAssignmentIdFk() {
-        return new ModuleSetAssignment(this, Keys.MODULE_DEP_DEPENDING_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleDepDependingModuleSetAssignmentIdFk == null)
+            _moduleDepDependingModuleSetAssignmentIdFk = new ModuleSetAssignment(this, Keys.MODULE_DEP_DEPENDING_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleDepDependingModuleSetAssignmentIdFk;
     }
 
     public ModuleSetAssignment moduleDepDependedModuleSetAssignmentIdFk() {
-        return new ModuleSetAssignment(this, Keys.MODULE_DEP_DEPENDED_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleDepDependedModuleSetAssignmentIdFk == null)
+            _moduleDepDependedModuleSetAssignmentIdFk = new ModuleSetAssignment(this, Keys.MODULE_DEP_DEPENDED_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleDepDependedModuleSetAssignmentIdFk;
     }
 
     @Override

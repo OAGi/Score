@@ -160,24 +160,45 @@ In the history record, this should always be the user who is editing the entity 
         return Arrays.<ForeignKey<ModuleRecord, ?>>asList(Keys.MODULE_MODULE_DIR_ID_FK, Keys.MODULE_NAMESPACE_ID_FK, Keys.MODULE_CREATED_BY_FK, Keys.MODULE_LAST_UPDATED_BY_FK, Keys.MODULE_OWNER_USER_ID_FK);
     }
 
+    private transient ModuleDir _moduleDir;
+    private transient Namespace _namespace;
+    private transient AppUser _moduleCreatedByFk;
+    private transient AppUser _moduleLastUpdatedByFk;
+    private transient AppUser _moduleOwnerUserIdFk;
+
     public ModuleDir moduleDir() {
-        return new ModuleDir(this, Keys.MODULE_MODULE_DIR_ID_FK);
+        if (_moduleDir == null)
+            _moduleDir = new ModuleDir(this, Keys.MODULE_MODULE_DIR_ID_FK);
+
+        return _moduleDir;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.MODULE_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.MODULE_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public AppUser moduleCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_CREATED_BY_FK);
+        if (_moduleCreatedByFk == null)
+            _moduleCreatedByFk = new AppUser(this, Keys.MODULE_CREATED_BY_FK);
+
+        return _moduleCreatedByFk;
     }
 
     public AppUser moduleLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_LAST_UPDATED_BY_FK);
+        if (_moduleLastUpdatedByFk == null)
+            _moduleLastUpdatedByFk = new AppUser(this, Keys.MODULE_LAST_UPDATED_BY_FK);
+
+        return _moduleLastUpdatedByFk;
     }
 
     public AppUser moduleOwnerUserIdFk() {
-        return new AppUser(this, Keys.MODULE_OWNER_USER_ID_FK);
+        if (_moduleOwnerUserIdFk == null)
+            _moduleOwnerUserIdFk = new AppUser(this, Keys.MODULE_OWNER_USER_ID_FK);
+
+        return _moduleOwnerUserIdFk;
     }
 
     @Override

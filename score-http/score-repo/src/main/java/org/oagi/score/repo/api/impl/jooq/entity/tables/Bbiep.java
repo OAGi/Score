@@ -180,20 +180,37 @@ public class Bbiep extends TableImpl<BbiepRecord> {
         return Arrays.<ForeignKey<BbiepRecord, ?>>asList(Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK, Keys.BBIEP_CREATED_BY_FK, Keys.BBIEP_LAST_UPDATED_BY_FK, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient BccpManifest _bccpManifest;
+    private transient AppUser _bbiepCreatedByFk;
+    private transient AppUser _bbiepLastUpdatedByFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public BccpManifest bccpManifest() {
-        return new BccpManifest(this, Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK);
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifest(this, Keys.BBIEP_BASED_BCCP_MANIFEST_ID_FK);
+
+        return _bccpManifest;
     }
 
     public AppUser bbiepCreatedByFk() {
-        return new AppUser(this, Keys.BBIEP_CREATED_BY_FK);
+        if (_bbiepCreatedByFk == null)
+            _bbiepCreatedByFk = new AppUser(this, Keys.BBIEP_CREATED_BY_FK);
+
+        return _bbiepCreatedByFk;
     }
 
     public AppUser bbiepLastUpdatedByFk() {
-        return new AppUser(this, Keys.BBIEP_LAST_UPDATED_BY_FK);
+        if (_bbiepLastUpdatedByFk == null)
+            _bbiepLastUpdatedByFk = new AppUser(this, Keys.BBIEP_LAST_UPDATED_BY_FK);
+
+        return _bbiepLastUpdatedByFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

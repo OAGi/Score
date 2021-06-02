@@ -463,6 +463,19 @@ export class WrappedBieFlatNode implements BieFlatNode {
     return this._node.bieType;
   }
 
+  get typeClass(): string {
+    switch (this.type.toUpperCase()) {
+      case 'ASBIEP':
+        return (this._node as AsbiepFlatNode).type;
+      case 'BBIEP':
+        return (this._node as BbiepFlatNode).type;
+      case 'BBIE_SC':
+        return (this._node as BbieScFlatNode).type;
+      default:
+        return this._node.bieType;
+    }
+  }
+
   get topLevelAsbiepId(): number {
     return this._node.topLevelAsbiepId;
   }
@@ -1865,7 +1878,7 @@ export class BieFlatNodeFlattener implements FlatNodeFlattener<BieFlatNode> {
     node.bccNode = bccNode;
     node.bdtScNode = this._ccGraph.graph.nodes[getKey(bdtScNode)];
     node.required = node.bdtScNode.cardinalityMin > 0;
-    node.name = node.bdtScNode.propertyTerm + '. ' + node.bdtScNode.representationTerm;
+    node.name = node.bdtScNode.propertyTerm + ' ' + node.bdtScNode.representationTerm;
     node.level = parent.level + 1;
     node.parent = parent;
     const usable = this._validState.indexOf(node.bccNode.state) > -1

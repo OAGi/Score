@@ -144,8 +144,13 @@ public class Exception extends TableImpl<ExceptionRecord> {
         return Arrays.<ForeignKey<ExceptionRecord, ?>>asList(Keys.EXCEPTION_CREATED_BY_FK);
     }
 
+    private transient AppUser _appUser;
+
     public AppUser appUser() {
-        return new AppUser(this, Keys.EXCEPTION_CREATED_BY_FK);
+        if (_appUser == null)
+            _appUser = new AppUser(this, Keys.EXCEPTION_CREATED_BY_FK);
+
+        return _appUser;
     }
 
     @Override

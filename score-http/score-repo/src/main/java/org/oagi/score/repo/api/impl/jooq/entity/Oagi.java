@@ -61,6 +61,7 @@ import org.oagi.score.repo.api.impl.jooq.entity.tables.DtScManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.DtUsageRule;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Exception;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Log;
+import org.oagi.score.repo.api.impl.jooq.entity.tables.Message;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.Module;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAccManifest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.ModuleAgencyIdListManifest;
@@ -368,6 +369,11 @@ If we use a separate table for each expression, then we need binding all the way
     public final Log LOG = Log.LOG;
 
     /**
+     * The table <code>oagi.message</code>.
+     */
+    public final Message MESSAGE = Message.MESSAGE;
+
+    /**
      * The module table stores information about a physical file, into which CC components will be generated during the expression generation.
      */
     public final Module MODULE = Module.MODULE;
@@ -554,6 +560,7 @@ If we use a separate table for each expression, then we need binding all the way
             DtUsageRule.DT_USAGE_RULE,
             Exception.EXCEPTION,
             Log.LOG,
+            Message.MESSAGE,
             Module.MODULE,
             ModuleAccManifest.MODULE_ACC_MANIFEST,
             ModuleAgencyIdListManifest.MODULE_AGENCY_ID_LIST_MANIFEST,

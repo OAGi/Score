@@ -3,14 +3,15 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import org.jooq.*;
 import org.jooq.tools.StringUtils;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.BieState;
-import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.info.data.SummaryBie;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.service.bie.BieReuseReport;
+import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.common.data.OagisComponentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.stereotype.Repository;
@@ -18,11 +19,11 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
+import static org.jooq.impl.DSL.concat;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -731,6 +732,87 @@ public class BieRepository {
                 .where(ASCCP_MANIFEST.ASCCP_MANIFEST_ID.eq(ULong.valueOf(asccpManifestId)))
                 .fetchOneInto(Integer.class);
         return OagisComponentType.valueOf(oagisComponentType);
+    }
+
+    public List<BieReuseReport> getBieReuseReport(BigInteger reusedTopLevelAsbiepId) {
+        List<Record2<String, String>> propertyTermList = dslContext.select(
+                concat("ASCCP-", ASCCP_MANIFEST.ASCCP_MANIFEST_ID.cast(String.class)),
+                ASCCP.PROPERTY_TERM)
+                .from(ASCCP_MANIFEST)
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
+                .fetch();
+        Map<String, String> propertyTermMap = new HashMap<>();
+        for (Record2<String, String> item : propertyTermList) {
+            propertyTermMap.put(item.value1(), item.value2());
+        }
+
+        SelectOnConditionStep step = dslContext.select(
+                TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.as("reusingTopLevelAsbiepId"),
+                TOP_LEVEL_ASBIEP.STATE.as("reusingState"),
+                ASCCP.as("reusing_asccp").PROPERTY_TERM.as("reusingPropertyTerm"),
+                ABIE.as("reusing_abie").GUID.as("reusingGuid"),
+                APP_USER.as("reusing_app_user").LOGIN_ID.as("reusingOwner"),
+                TOP_LEVEL_ASBIEP.VERSION.as("reusingVersion"),
+                TOP_LEVEL_ASBIEP.STATUS.as("reusingStatus"),
+                ASBIE.PATH,
+
+                TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").TOP_LEVEL_ASBIEP_ID.as("reusedTopLevelAsbiepId"),
+                TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").STATE.as("reusedState"),
+                ASCCP.as("reused_asccp").PROPERTY_TERM.as("reusedPropertyTerm"),
+                ABIE.as("reused_abie").GUID.as("reusedGuid"),
+                APP_USER.as("reused_app_user").LOGIN_ID.as("reusedOwner"),
+                TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").VERSION.as("reusedVersion"),
+                TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").STATUS.as("reusedStatus"),
+
+                RELEASE.RELEASE_NUM)
+
+                .from(TOP_LEVEL_ASBIEP)
+                .join(ASBIE).on(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID))
+                .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .join(TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep")).on(TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").TOP_LEVEL_ASBIEP_ID.eq(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID))
+
+                .join(ASBIEP.as("reusing_asbiep")).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.as("reusing_asbiep").ASBIEP_ID))
+                .join(ABIE.as("reusing_abie")).on(ASBIEP.as("reusing_asbiep").ROLE_OF_ABIE_ID.eq(ABIE.as("reusing_abie").ABIE_ID))
+                .join(ASCCP_MANIFEST.as("reusing_asccp_manifest")).on(ASBIEP.as("reusing_asbiep").BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("reusing_asccp_manifest").ASCCP_MANIFEST_ID))
+                .join(ASCCP.as("reusing_asccp")).on(ASCCP_MANIFEST.as("reusing_asccp_manifest").ASCCP_ID.eq(ASCCP.as("reusing_asccp").ASCCP_ID))
+                .join(APP_USER.as("reusing_app_user")).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.as("reusing_app_user").APP_USER_ID))
+
+                .join(ABIE.as("reused_abie")).on(ASBIEP.ROLE_OF_ABIE_ID.eq(ABIE.as("reused_abie").ABIE_ID))
+                .join(ASCCP_MANIFEST.as("reused_asccp_manifest")).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.as("reused_asccp_manifest").ASCCP_MANIFEST_ID))
+                .join(ASCCP.as("reused_asccp")).on(ASCCP_MANIFEST.as("reused_asccp_manifest").ASCCP_ID.eq(ASCCP.as("reused_asccp").ASCCP_ID))
+                .join(APP_USER.as("reused_app_user")).on(TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").OWNER_USER_ID.eq(APP_USER.as("reused_app_user").APP_USER_ID))
+                .join(RELEASE).on(RELEASE.RELEASE_ID.eq(ASCCP_MANIFEST.as("reusing_asccp_manifest").RELEASE_ID));
+
+        List<BieReuseReport> reports;
+
+        if (reusedTopLevelAsbiepId != null) {
+            reports = step
+                    .where(and(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID),
+                            TOP_LEVEL_ASBIEP.as("reused_top_level_asbiep").TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(reusedTopLevelAsbiepId))))
+                    .fetchInto(BieReuseReport.class);
+        } else {
+            reports = step
+                    .where(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID))
+                    .fetchInto(BieReuseReport.class);
+        }
+
+        reports.forEach(r -> {
+            r.setDisplayPath(pathToDisplay(r, propertyTermMap));
+        });
+
+        return reports;
+    }
+
+    private String pathToDisplay(BieReuseReport report, Map<String, String> nameMap) {
+        List<String> tokens = Arrays.stream(report.getPath().split(">")).filter(e -> e.startsWith("ASCCP-")).collect(Collectors.toList());
+        StringBuilder displays = new StringBuilder();
+        for (String token : tokens) {
+            if (nameMap.get(token) != null && !nameMap.get(token).contains("Group")) {
+                displays.append("/").append(nameMap.get(token)).append(" ");
+            }
+        }
+        displays.append("/").append(report.getReusedPropertyTerm());
+        return displays.toString();
     }
 
 }

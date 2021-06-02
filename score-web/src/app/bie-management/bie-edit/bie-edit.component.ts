@@ -6,10 +6,10 @@ import {MatAutocomplete, MatAutocompleteSelectedEvent} from '@angular/material/a
 import {MatDialog} from '@angular/material/dialog';
 import {PageRequest} from '../../basis/basis';
 import {ConfirmDialogService} from '../../common/confirm-dialog/confirm-dialog.service';
-import {initFilter, UnboundedPipe} from '../../common/utility';
+import {base64Decode, base64Encode, initFilter, UnboundedPipe} from '../../common/utility';
 import {BusinessContext, BusinessContextListRequest} from '../../context-management/business-context/domain/business-context';
 import {BusinessContextService} from '../../context-management/business-context/domain/business-context.service';
-import {ReuseBieDialogComponent} from '../bie-edit/reuse-bie-dialog/reuse-bie-dialog.component';
+import {ReuseBieDialogComponent} from './reuse-bie-dialog/reuse-bie-dialog.component';
 import {BieEditNode, UsedBie, ValueDomain, ValueDomainType} from './domain/bie-edit-node';
 import {BieEditService} from './domain/bie-edit.service';
 import {finalize, map, startWith, switchMap} from 'rxjs/operators';
@@ -22,9 +22,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ContextMenuComponent, ContextMenuService} from 'ngx-contextmenu';
 import {BieDetailUpdateRequest, BieEditAbieNode, BieEditCreateExtensionResponse, RefBie} from '../bie-edit/domain/bie-edit-node';
 import {
-  AbieFlatNode,
+  AbieFlatNode, AsbiepDetail,
   AsbiepFlatNode,
-  BbiepFlatNode,
+  BbiepFlatNode, BbieScDetail,
   BbieScFlatNode,
   BdtDetail,
   BieDataSourceSearcher,
@@ -112,19 +112,18 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
           this.service.getDetail(node.topLevelAsbiepId, 'ABIE',
             (node as AsbiepFlatNode).accNode.manifestId, (node as AsbiepFlatNode).abiePath),
         ]).subscribe(([asbieDetail, asbiepDetail, abieDetail]) => {
+          const stored = (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax;
           (node.detail as BieEditAsbiepNodeDetail).ascc = (asbieDetail as unknown as BieEditAsbiepNodeDetail).ascc;
           (node.detail as BieEditAsbiepNodeDetail).asbie.update((asbieDetail as unknown as BieEditAsbiepNodeDetail).asbie);
           (node.detail as BieEditAsbiepNodeDetail).asccp = (asbiepDetail as unknown as BieEditAsbiepNodeDetail).asccp;
           (node.detail as BieEditAsbiepNodeDetail).asbiep.update((asbiepDetail as unknown as BieEditAsbiepNodeDetail).asbiep);
           (node.detail as BieEditAsbiepNodeDetail).acc = (abieDetail as unknown as BieEditAsbiepNodeDetail).acc;
           (node.detail as BieEditAsbiepNodeDetail).abie.update((abieDetail as unknown as BieEditAsbiepNodeDetail).abie);
-          // setup default values for asbie
-          if (!(node.detail as BieEditAsbiepNodeDetail).asbie.asbieId) {
-            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMin = (node.detail as BieEditAsbiepNodeDetail).ascc.cardinalityMin;
-            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = (node.detail as BieEditAsbiepNodeDetail).ascc.cardinalityMax;
-          }
           (node.detail as BieEditAsbiepNodeDetail).reset();
           node.detail.isLoaded = true;
+          if (stored != undefined) {
+            (node.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = stored;
+          }
           return callbackFn && callbackFn(node);
         });
         break;
@@ -137,14 +136,17 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
           this.service.getDetail(node.topLevelAsbiepId, 'BDT',
             (node as BbiepFlatNode).bdtNode.manifestId, ''),
         ]).subscribe(([bbieDetail, bbiepDetail, bdtDetail]) => {
+          const stored = (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax;
           (node.detail as BieEditBbiepNodeDetail).bcc = (bbieDetail as unknown as BieEditBbiepNodeDetail).bcc;
           (node.detail as BieEditBbiepNodeDetail).bbie.update((bbieDetail as unknown as BieEditBbiepNodeDetail).bbie);
           (node.detail as BieEditBbiepNodeDetail).bccp = (bbiepDetail as unknown as BieEditBbiepNodeDetail).bccp;
           (node.detail as BieEditBbiepNodeDetail).bbiep.update((bbiepDetail as unknown as BieEditBbiepNodeDetail).bbiep);
           (node.detail as BieEditBbiepNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
           (node.detail as BieEditBbiepNodeDetail).reset();
-
           node.detail.isLoaded = true;
+          if (stored != undefined) {
+            (node.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = stored;
+          }
           return callbackFn && callbackFn(node);
         });
         break;
@@ -155,12 +157,15 @@ export class VSBieEditTreeDataSource<T extends BieFlatNode> extends VSBieFlatTre
           this.service.getDetail(node.topLevelAsbiepId, 'BDT',
             (node as BbieScFlatNode).bccNode.manifestId, ''),
         ]).subscribe(([bbieScDetail, bdtDetail]) => {
+          const stored = (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax;
           (node.detail as BieEditBbieScNodeDetail).bdtSc = (bbieScDetail as unknown as BieEditBbieScNodeDetail).bdtSc;
           (node.detail as BieEditBbieScNodeDetail).bbieSc.update((bbieScDetail as unknown as BieEditBbieScNodeDetail).bbieSc);
           (node.detail as BieEditBbieScNodeDetail).bdt = bdtDetail as unknown as BdtDetail;
           (node.detail as BieEditBbieScNodeDetail).reset();
-
           node.detail.isLoaded = true;
+          if (stored != undefined) {
+            (node.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = stored;
+          }
           return callbackFn && callbackFn(node);
         });
         break;
@@ -348,6 +353,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   ngOnInit(): void {
     this.loading = true;
+    const q = (this.route.snapshot.queryParamMap) ? this.route.snapshot.queryParamMap.get('q') : undefined;
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         this.topLevelAsbiepId = parseInt(params.get('id'), 10);
@@ -394,6 +400,11 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
         this.searcher = new BieDataSourceSearcher(this.dataSource);
         this.onClick(nodes[0]);
+        if(q != undefined) {
+          this.selectedNode = nodes[0];
+          this.searcher.inputKeyword = base64Decode(q);
+          this.search(this.searcher.inputKeyword);
+        }
       }, 0);
     });
   }
@@ -411,14 +422,16 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
   }
 
   get isValid(): boolean {
-    if (!!this.bieCardinalityMin) {
-      if (!this.bieCardinalityMin.valid) {
-        return false;
+    if (this.selectedNode && this.selectedNode.used) {
+      if (!!this.bieCardinalityMin) {
+        if (!this.bieCardinalityMin.valid) {
+          return false;
+        }
       }
-    }
-    if (!!this.bieCardinalityMax) {
-      if (!this.bieCardinalityMax.valid) {
-        return false;
+      if (!!this.bieCardinalityMax) {
+        if (!this.bieCardinalityMax.valid) {
+          return false;
+        }
       }
     }
     return true;
@@ -434,6 +447,14 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
 
   isUsable(node: BieFlatNode): boolean {
     return this.canEdit && !node.locked && !node.required && !node.isCycle;
+  }
+
+  isUsableChildren(node: BieFlatNode): boolean {
+    return !node.locked && !node.required && !node.isCycle && !node.derived;
+  }
+
+  isCardinalityEditable(node: BieFlatNode): boolean {
+    return !node.locked && !node.isCycle && !node.derived;
   }
 
   get isChanged(): boolean {
@@ -715,6 +736,48 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
       this.isUpdating = false;
     });
   }
+
+  enableChildren(node: BieFlatNode) {
+    this.treeControl.expand(node);
+    node.children.forEach(e => {
+      if ((e as BieFlatNode).isGroup) {
+        this.enableChildren(e as BieFlatNode);
+      } else {
+        if ((e as BieFlatNode).used) {
+          return;
+        }
+        this.toggleTreeUsed(e as BieFlatNode);
+      }
+    })
+  }
+
+  setMaxCardinality(node: BieFlatNode) {
+
+    this.resetCardinalities(this.selectedNode);
+
+    node.children.forEach(e => {
+      const child = e as BieFlatNode;
+      if (child.isGroup) {
+        this.setMaxCardinality(child);
+      } else {
+        if (child.used) {
+          switch (child.bieType) {
+            case 'ASBIEP':
+              (child.detail as BieEditAsbiepNodeDetail).asbie.cardinalityMax = 1;
+              break;
+            case 'BBIEP':
+              (child.detail as BieEditBbiepNodeDetail).bbie.cardinalityMax = 1;
+              break;
+            case 'BBIE_SC':
+              (child.detail as BieEditBbieScNodeDetail).bbieSc.cardinalityMax = 1;
+              break;
+          }
+          this.setMaxCardinality(child);
+        }
+      }
+    })
+  }
+
 
   openConfirmDialog(url: string) {
     const dialogConfig = this.confirmDialogService.newConfig();
@@ -1410,7 +1473,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               case 'Primitive':
                 if (!((node.detail as BieEditBbieScNodeDetail).bbieSc.bdtScPriRestriId)) {
                   // tslint:disable-next-line:max-line-length
-                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + '. ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
+                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + ' ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
                   this.snackBar.open(message, '', {
                     duration: 3000,
                   });
@@ -1420,7 +1483,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               case 'Code':
                 if (!((node.detail as BieEditBbieScNodeDetail).bbieSc.codeListId)) {
                   // tslint:disable-next-line:max-line-length
-                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + '. ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
+                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + ' ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
                   this.snackBar.open(message, '', {
                     duration: 3000,
                   });
@@ -1430,7 +1493,7 @@ export class BieEditComponent implements OnInit, ChangeListener<BieFlatNode> {
               case 'Agency':
                 if (!((node.detail as BieEditBbieScNodeDetail).bbieSc.agencyIdListId)) {
                   // tslint:disable-next-line:max-line-length
-                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + '. ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
+                  const message = 'Value Domain is required in ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.propertyTerm + ' ' + (node.detail as BieEditBbieScNodeDetail).bdtSc.representationTerm;
                   this.snackBar.open(message, '', {
                     duration: 3000,
                   });

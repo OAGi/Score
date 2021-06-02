@@ -1,13 +1,13 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAsbiepNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditRef;
 import org.oagi.score.gateway.http.api.bie_management.service.BieCreateFromExistingBieService;
 import org.oagi.score.gateway.http.api.bie_management.service.BieEditService;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.component.abie.AbieNode;
@@ -51,40 +51,6 @@ public class BieEditController {
     public BieEditNode getRootNode(@AuthenticationPrincipal AuthenticatedPrincipal user,
                                    @PathVariable("id") BigInteger topLevelAsbiepId) {
         BieEditAbieNode rootNode = service.getRootNode(user, topLevelAsbiepId);
-        BieState state = rootNode.getTopLevelAsbiepState();
-        rootNode.setTopLevelAsbiepState(state);
-
-        BigInteger userId = sessionService.userId(user);
-        AccessPrivilege accessPrivilege = AccessPrivilege.Prohibited;
-        switch (state) {
-            case Initiating:
-                accessPrivilege = AccessPrivilege.Unprepared;
-                break;
-
-            case WIP:
-                if (rootNode.getOwnerUserId().equals(userId)) {
-                    accessPrivilege = AccessPrivilege.CanEdit;
-                } else {
-                    accessPrivilege = AccessPrivilege.Prohibited;
-                }
-                break;
-
-            case QA:
-                if (rootNode.getOwnerUserId().equals(userId)) {
-                    accessPrivilege = AccessPrivilege.CanMove;
-                } else {
-                    accessPrivilege = AccessPrivilege.CanView;
-                }
-
-                break;
-
-            case Production:
-                accessPrivilege = AccessPrivilege.CanView;
-                break;
-        }
-
-        rootNode.setAccess(accessPrivilege.name());
-
         return rootNode;
     }
 

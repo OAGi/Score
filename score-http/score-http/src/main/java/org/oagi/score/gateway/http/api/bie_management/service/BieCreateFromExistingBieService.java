@@ -3,10 +3,8 @@ package org.oagi.score.gateway.http.api.bie_management.service;
 import lombok.Data;
 import org.jooq.DSLContext;
 import org.jooq.types.ULong;
-import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
-import org.oagi.score.service.common.data.AppUser;
-import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.data.TopLevelAsbiep;
+import org.oagi.score.gateway.http.api.bie_management.data.BieCreateRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.CreateBieFromExistingBieRequest;
 import org.oagi.score.gateway.http.api.cc_management.data.CcType;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
@@ -14,9 +12,11 @@ import org.oagi.score.gateway.http.event.BieCreateFromExistingBieRequestEvent;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
 import org.oagi.score.gateway.http.helper.Utility;
 import org.oagi.score.redis.event.EventListenerContainer;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
+import org.oagi.score.service.common.data.AppUser;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.jooq.impl.DSL.and;
-import static org.oagi.score.service.common.data.BieState.Initiating;
+import static org.oagi.score.repo.api.bie.model.BieState.Initiating;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Service

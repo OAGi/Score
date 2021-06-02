@@ -159,12 +159,21 @@ public class Comment extends TableImpl<CommentRecord> {
         return Arrays.<ForeignKey<CommentRecord, ?>>asList(Keys.COMMENT_PREV_COMMENT_ID_FK, Keys.COMMENT_CREATED_BY_FK);
     }
 
+    private transient Comment _comment;
+    private transient AppUser _appUser;
+
     public Comment comment() {
-        return new Comment(this, Keys.COMMENT_PREV_COMMENT_ID_FK);
+        if (_comment == null)
+            _comment = new Comment(this, Keys.COMMENT_PREV_COMMENT_ID_FK);
+
+        return _comment;
     }
 
     public AppUser appUser() {
-        return new AppUser(this, Keys.COMMENT_CREATED_BY_FK);
+        if (_appUser == null)
+            _appUser = new AppUser(this, Keys.COMMENT_CREATED_BY_FK);
+
+        return _appUser;
     }
 
     @Override

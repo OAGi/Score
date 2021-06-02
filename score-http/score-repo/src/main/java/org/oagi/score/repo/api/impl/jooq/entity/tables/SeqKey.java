@@ -143,24 +143,45 @@ public class SeqKey extends TableImpl<SeqKeyRecord> {
         return Arrays.<ForeignKey<SeqKeyRecord, ?>>asList(Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
     }
 
+    private transient AccManifest _accManifest;
+    private transient AsccManifest _asccManifest;
+    private transient BccManifest _bccManifest;
+    private transient SeqKey _seqKeyPrevSeqKeyIdFk;
+    private transient SeqKey _seqKeyNextSeqKeyIdFk;
+
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.SEQ_KEY_FROM_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public AsccManifest asccManifest() {
-        return new AsccManifest(this, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK);
+        if (_asccManifest == null)
+            _asccManifest = new AsccManifest(this, Keys.SEQ_KEY_ASCC_MANIFEST_ID_FK);
+
+        return _asccManifest;
     }
 
     public BccManifest bccManifest() {
-        return new BccManifest(this, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK);
+        if (_bccManifest == null)
+            _bccManifest = new BccManifest(this, Keys.SEQ_KEY_BCC_MANIFEST_ID_FK);
+
+        return _bccManifest;
     }
 
     public SeqKey seqKeyPrevSeqKeyIdFk() {
-        return new SeqKey(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK);
+        if (_seqKeyPrevSeqKeyIdFk == null)
+            _seqKeyPrevSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_PREV_SEQ_KEY_ID_FK);
+
+        return _seqKeyPrevSeqKeyIdFk;
     }
 
     public SeqKey seqKeyNextSeqKeyIdFk() {
-        return new SeqKey(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
+        if (_seqKeyNextSeqKeyIdFk == null)
+            _seqKeyNextSeqKeyIdFk = new SeqKey(this, Keys.SEQ_KEY_NEXT_SEQ_KEY_ID_FK);
+
+        return _seqKeyNextSeqKeyIdFk;
     }
 
     @Override

@@ -147,24 +147,45 @@ public class ModuleBccpManifest extends TableImpl<ModuleBccpManifestRecord> {
         return Arrays.<ForeignKey<ModuleBccpManifestRecord, ?>>asList(Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient BccpManifest _bccpManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleBccpManifestCreatedByFk;
+    private transient AppUser _moduleBccpManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public BccpManifest bccpManifest() {
-        return new BccpManifest(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK);
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifest(this, Keys.MODULE_BCCP_MANIFEST_BCCP_MANIFEST_ID_FK);
+
+        return _bccpManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_BCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleBccpManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK);
+        if (_moduleBccpManifestCreatedByFk == null)
+            _moduleBccpManifestCreatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_CREATED_BY_FK);
+
+        return _moduleBccpManifestCreatedByFk;
     }
 
     public AppUser moduleBccpManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleBccpManifestLastUpdatedByFk == null)
+            _moduleBccpManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_BCCP_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleBccpManifestLastUpdatedByFk;
     }
 
     @Override

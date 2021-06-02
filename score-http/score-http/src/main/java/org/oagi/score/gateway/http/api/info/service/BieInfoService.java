@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.info.service;
 
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.service.common.data.AppUser;
-import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;

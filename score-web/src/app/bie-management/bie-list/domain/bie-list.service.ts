@@ -76,6 +76,16 @@ export class BieListService {
     return this.http.get<BusinessContext>('/api/profile_bie/business_ctx_from_abie/' + id);
   }
 
+  getBieUsageList(request: BieListRequest, topLevelAsbiepId: number): Observable<PageResponse<BieList>> {
+    let params = new HttpParams()
+      .set('sortActive', request.page.sortActive)
+      .set('sortDirection', request.page.sortDirection)
+      .set('pageIndex', '' + request.page.pageIndex)
+      .set('pageSize', '' + request.page.pageSize);
+
+    return this.http.get<PageResponse<BieList>>('/api/bie_list/' + topLevelAsbiepId + '/usage', {params: params});
+  }
+
   getBieListByBizCtxId(id): Observable<BieList[]> {
     return this.http.get<BieList[]>('/api/profile_bie_list?biz_ctx_id=' + id);
   }

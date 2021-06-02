@@ -151,32 +151,61 @@ public class BccpManifest extends TableImpl<BccpManifestRecord> {
         return Arrays.<ForeignKey<BccpManifestRecord, ?>>asList(Keys.BCCP_MANIFEST_RELEASE_ID_FK, Keys.BCCP_MANIFEST_BCCP_ID_FK, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_LOG_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Bccp _bccp;
+    private transient DtManifest _dtManifest;
+    private transient Log _log;
+    private transient BccpManifest _bccpReplacementBccpManifestIdFk;
+    private transient BccpManifest _bccpManifestPrevBccpManifestIdFk;
+    private transient BccpManifest _bccpManifestNextBccpManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.BCCP_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Bccp bccp() {
-        return new Bccp(this, Keys.BCCP_MANIFEST_BCCP_ID_FK);
+        if (_bccp == null)
+            _bccp = new Bccp(this, Keys.BCCP_MANIFEST_BCCP_ID_FK);
+
+        return _bccp;
     }
 
     public DtManifest dtManifest() {
-        return new DtManifest(this, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK);
+        if (_dtManifest == null)
+            _dtManifest = new DtManifest(this, Keys.BCCP_MANIFEST_BDT_MANIFEST_ID_FK);
+
+        return _dtManifest;
     }
 
     public Log log() {
-        return new Log(this, Keys.BCCP_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.BCCP_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public BccpManifest bccpReplacementBccpManifestIdFk() {
-        return new BccpManifest(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK);
+        if (_bccpReplacementBccpManifestIdFk == null)
+            _bccpReplacementBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_REPLACEMENT_BCCP_MANIFEST_ID_FK);
+
+        return _bccpReplacementBccpManifestIdFk;
     }
 
     public BccpManifest bccpManifestPrevBccpManifestIdFk() {
-        return new BccpManifest(this, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK);
+        if (_bccpManifestPrevBccpManifestIdFk == null)
+            _bccpManifestPrevBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_MANIFEST_PREV_BCCP_MANIFEST_ID_FK);
+
+        return _bccpManifestPrevBccpManifestIdFk;
     }
 
     public BccpManifest bccpManifestNextBccpManifestIdFk() {
-        return new BccpManifest(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
+        if (_bccpManifestNextBccpManifestIdFk == null)
+            _bccpManifestNextBccpManifestIdFk = new BccpManifest(this, Keys.BCCP_MANIFEST_NEXT_BCCP_MANIFEST_ID_FK);
+
+        return _bccpManifestNextBccpManifestIdFk;
     }
 
     @Override

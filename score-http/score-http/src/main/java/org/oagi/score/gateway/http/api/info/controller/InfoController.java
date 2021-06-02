@@ -8,6 +8,7 @@ import org.oagi.score.gateway.http.api.info.service.BieInfoService;
 import org.oagi.score.gateway.http.api.info.service.CcInfoService;
 import org.oagi.score.gateway.http.api.info.service.OAuth2AppInfoService;
 import org.oagi.score.gateway.http.api.info.service.ProductInfoService;
+import org.oagi.score.service.message.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

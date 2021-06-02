@@ -156,36 +156,69 @@ public class AsccManifest extends TableImpl<AsccManifestRecord> {
         return Arrays.<ForeignKey<AsccManifestRecord, ?>>asList(Keys.ASCC_MANIFEST_RELEASE_ID_FK, Keys.ASCC_MANIFEST_ASCC_ID_FK, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Ascc _ascc;
+    private transient SeqKey _seqKey;
+    private transient AccManifest _accManifest;
+    private transient AsccpManifest _asccpManifest;
+    private transient AsccManifest _asccReplacementAsccManifestIdFk;
+    private transient AsccManifest _asccManifestPrevAsccManifestIdFk;
+    private transient AsccManifest _asccManifestNextAsccManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.ASCC_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.ASCC_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Ascc ascc() {
-        return new Ascc(this, Keys.ASCC_MANIFEST_ASCC_ID_FK);
+        if (_ascc == null)
+            _ascc = new Ascc(this, Keys.ASCC_MANIFEST_ASCC_ID_FK);
+
+        return _ascc;
     }
 
     public SeqKey seqKey() {
-        return new SeqKey(this, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK);
+        if (_seqKey == null)
+            _seqKey = new SeqKey(this, Keys.ASCC_MANIFEST_SEQ_KEY_ID_FK);
+
+        return _seqKey;
     }
 
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.ASCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public AsccpManifest asccpManifest() {
-        return new AsccpManifest(this, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK);
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifest(this, Keys.ASCC_MANIFEST_TO_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpManifest;
     }
 
     public AsccManifest asccReplacementAsccManifestIdFk() {
-        return new AsccManifest(this, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK);
+        if (_asccReplacementAsccManifestIdFk == null)
+            _asccReplacementAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_REPLACEMENT_ASCC_MANIFEST_ID_FK);
+
+        return _asccReplacementAsccManifestIdFk;
     }
 
     public AsccManifest asccManifestPrevAsccManifestIdFk() {
-        return new AsccManifest(this, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK);
+        if (_asccManifestPrevAsccManifestIdFk == null)
+            _asccManifestPrevAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_PREV_ASCC_MANIFEST_ID_FK);
+
+        return _asccManifestPrevAsccManifestIdFk;
     }
 
     public AsccManifest asccManifestNextAsccManifestIdFk() {
-        return new AsccManifest(this, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
+        if (_asccManifestNextAsccManifestIdFk == null)
+            _asccManifestNextAsccManifestIdFk = new AsccManifest(this, Keys.ASCC_MANIFEST_NEXT_ASCC_MANIFEST_ID_FK);
+
+        return _asccManifestNextAsccManifestIdFk;
     }
 
     @Override

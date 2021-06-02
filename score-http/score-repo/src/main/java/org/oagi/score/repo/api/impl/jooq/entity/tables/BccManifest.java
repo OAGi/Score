@@ -156,36 +156,69 @@ public class BccManifest extends TableImpl<BccManifestRecord> {
         return Arrays.<ForeignKey<BccManifestRecord, ?>>asList(Keys.BCC_MANIFEST_RELEASE_ID_FK, Keys.BCC_MANIFEST_BCC_ID_FK, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Bcc _bcc;
+    private transient SeqKey _seqKey;
+    private transient AccManifest _accManifest;
+    private transient BccpManifest _bccpManifest;
+    private transient BccManifest _bccReplacementBccManifestIdFk;
+    private transient BccManifest _bccManifestPrevBccManifestIdFk;
+    private transient BccManifest _bccManifestNextBccManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.BCC_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.BCC_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Bcc bcc() {
-        return new Bcc(this, Keys.BCC_MANIFEST_BCC_ID_FK);
+        if (_bcc == null)
+            _bcc = new Bcc(this, Keys.BCC_MANIFEST_BCC_ID_FK);
+
+        return _bcc;
     }
 
     public SeqKey seqKey() {
-        return new SeqKey(this, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK);
+        if (_seqKey == null)
+            _seqKey = new SeqKey(this, Keys.BCC_MANIFEST_SEQ_KEY_ID_FK);
+
+        return _seqKey;
     }
 
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.BCC_MANIFEST_FROM_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public BccpManifest bccpManifest() {
-        return new BccpManifest(this, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK);
+        if (_bccpManifest == null)
+            _bccpManifest = new BccpManifest(this, Keys.BCC_MANIFEST_TO_BCCP_MANIFEST_ID_FK);
+
+        return _bccpManifest;
     }
 
     public BccManifest bccReplacementBccManifestIdFk() {
-        return new BccManifest(this, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK);
+        if (_bccReplacementBccManifestIdFk == null)
+            _bccReplacementBccManifestIdFk = new BccManifest(this, Keys.BCC_REPLACEMENT_BCC_MANIFEST_ID_FK);
+
+        return _bccReplacementBccManifestIdFk;
     }
 
     public BccManifest bccManifestPrevBccManifestIdFk() {
-        return new BccManifest(this, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK);
+        if (_bccManifestPrevBccManifestIdFk == null)
+            _bccManifestPrevBccManifestIdFk = new BccManifest(this, Keys.BCC_MANIFEST_PREV_BCC_MANIFEST_ID_FK);
+
+        return _bccManifestPrevBccManifestIdFk;
     }
 
     public BccManifest bccManifestNextBccManifestIdFk() {
-        return new BccManifest(this, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
+        if (_bccManifestNextBccManifestIdFk == null)
+            _bccManifestNextBccManifestIdFk = new BccManifest(this, Keys.BCC_MANIFEST_NEXT_BCC_MANIFEST_ID_FK);
+
+        return _bccManifestNextBccManifestIdFk;
     }
 
     @Override

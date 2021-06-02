@@ -1,0 +1,15 @@
+.mat-column-sender {
+  width: 15%;
+}
+
+.mat-column-timestamp {
+  width: 160px;
+}
+
+.read {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.unread {
+  font-weight: 900;
+}

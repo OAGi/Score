@@ -227,36 +227,69 @@ State change can't be undone. But the history record can still keep the records 
         return Arrays.<ForeignKey<AsccRecord, ?>>asList(Keys.ASCC_FROM_ACC_ID_FK, Keys.ASCC_TO_ASCCP_ID_FK, Keys.ASCC_REPLACEMENT_ASCC_ID_FK, Keys.ASCC_CREATED_BY_FK, Keys.ASCC_OWNER_USER_ID_FK, Keys.ASCC_LAST_UPDATED_BY_FK, Keys.ASCC_PREV_ASCC_ID_FK, Keys.ASCC_NEXT_ASCC_ID_FK);
     }
 
+    private transient Acc _acc;
+    private transient Asccp _asccp;
+    private transient Ascc _asccReplacementAsccIdFk;
+    private transient AppUser _asccCreatedByFk;
+    private transient AppUser _asccOwnerUserIdFk;
+    private transient AppUser _asccLastUpdatedByFk;
+    private transient Ascc _asccPrevAsccIdFk;
+    private transient Ascc _asccNextAsccIdFk;
+
     public Acc acc() {
-        return new Acc(this, Keys.ASCC_FROM_ACC_ID_FK);
+        if (_acc == null)
+            _acc = new Acc(this, Keys.ASCC_FROM_ACC_ID_FK);
+
+        return _acc;
     }
 
     public Asccp asccp() {
-        return new Asccp(this, Keys.ASCC_TO_ASCCP_ID_FK);
+        if (_asccp == null)
+            _asccp = new Asccp(this, Keys.ASCC_TO_ASCCP_ID_FK);
+
+        return _asccp;
     }
 
     public Ascc asccReplacementAsccIdFk() {
-        return new Ascc(this, Keys.ASCC_REPLACEMENT_ASCC_ID_FK);
+        if (_asccReplacementAsccIdFk == null)
+            _asccReplacementAsccIdFk = new Ascc(this, Keys.ASCC_REPLACEMENT_ASCC_ID_FK);
+
+        return _asccReplacementAsccIdFk;
     }
 
     public AppUser asccCreatedByFk() {
-        return new AppUser(this, Keys.ASCC_CREATED_BY_FK);
+        if (_asccCreatedByFk == null)
+            _asccCreatedByFk = new AppUser(this, Keys.ASCC_CREATED_BY_FK);
+
+        return _asccCreatedByFk;
     }
 
     public AppUser asccOwnerUserIdFk() {
-        return new AppUser(this, Keys.ASCC_OWNER_USER_ID_FK);
+        if (_asccOwnerUserIdFk == null)
+            _asccOwnerUserIdFk = new AppUser(this, Keys.ASCC_OWNER_USER_ID_FK);
+
+        return _asccOwnerUserIdFk;
     }
 
     public AppUser asccLastUpdatedByFk() {
-        return new AppUser(this, Keys.ASCC_LAST_UPDATED_BY_FK);
+        if (_asccLastUpdatedByFk == null)
+            _asccLastUpdatedByFk = new AppUser(this, Keys.ASCC_LAST_UPDATED_BY_FK);
+
+        return _asccLastUpdatedByFk;
     }
 
     public Ascc asccPrevAsccIdFk() {
-        return new Ascc(this, Keys.ASCC_PREV_ASCC_ID_FK);
+        if (_asccPrevAsccIdFk == null)
+            _asccPrevAsccIdFk = new Ascc(this, Keys.ASCC_PREV_ASCC_ID_FK);
+
+        return _asccPrevAsccIdFk;
     }
 
     public Ascc asccNextAsccIdFk() {
-        return new Ascc(this, Keys.ASCC_NEXT_ASCC_ID_FK);
+        if (_asccNextAsccIdFk == null)
+            _asccNextAsccIdFk = new Ascc(this, Keys.ASCC_NEXT_ASCC_ID_FK);
+
+        return _asccNextAsccIdFk;
     }
 
     @Override

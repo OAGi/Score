@@ -107,12 +107,12 @@ export class BieCopyProfileBieComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working' && e.state === 'Published');
       if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'copyBIE');
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
         if (savedReleaseId) {
           this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
           if (!this.request.release) {
             this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'copyBIE', this.request.release.releaseId);
+            saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
           }
         } else {
           this.request.release = this.releases[0];
@@ -137,10 +137,8 @@ export class BieCopyProfileBieComponent implements OnInit {
     this.loadBieList();
   }
 
-  onReleaseChange(property?: string, source?) {
-    if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'copyBIE', source.releaseId);
-    }
+  onReleaseChange(source) {
+    saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
 
     this.paginator.pageIndex = 0;
     this.loadBieList();

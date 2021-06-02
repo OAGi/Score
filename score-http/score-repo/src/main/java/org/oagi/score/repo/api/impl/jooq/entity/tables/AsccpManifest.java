@@ -151,32 +151,61 @@ public class AsccpManifest extends TableImpl<AsccpManifestRecord> {
         return Arrays.<ForeignKey<AsccpManifestRecord, ?>>asList(Keys.ASCCP_MANIFEST_RELEASE_ID_FK, Keys.ASCCP_MANIFEST_ASCCP_ID_FK, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_LOG_ID_FK, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK, Keys.ASCCP_MANIFEST_NEXT_ASCCP_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Asccp _asccp;
+    private transient AccManifest _accManifest;
+    private transient Log _log;
+    private transient AsccpManifest _asccpReplacementAsccpManifestIdFk;
+    private transient AsccpManifest _asccpManifestPrevAsccpManifestIdFk;
+    private transient AsccpManifest _asccpManifestNextAsccpManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.ASCCP_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.ASCCP_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Asccp asccp() {
-        return new Asccp(this, Keys.ASCCP_MANIFEST_ASCCP_ID_FK);
+        if (_asccp == null)
+            _asccp = new Asccp(this, Keys.ASCCP_MANIFEST_ASCCP_ID_FK);
+
+        return _asccp;
     }
 
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.ASCCP_MANIFEST_ROLE_OF_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public Log log() {
-        return new Log(this, Keys.ASCCP_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.ASCCP_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public AsccpManifest asccpReplacementAsccpManifestIdFk() {
-        return new AsccpManifest(this, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK);
+        if (_asccpReplacementAsccpManifestIdFk == null)
+            _asccpReplacementAsccpManifestIdFk = new AsccpManifest(this, Keys.ASCCP_REPLACEMENT_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpReplacementAsccpManifestIdFk;
     }
 
     public AsccpManifest asccpManifestPrevAsccpManifestIdFk() {
-        return new AsccpManifest(this, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK);
+        if (_asccpManifestPrevAsccpManifestIdFk == null)
+            _asccpManifestPrevAsccpManifestIdFk = new AsccpManifest(this, Keys.ASCCP_MANIFEST_PREV_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpManifestPrevAsccpManifestIdFk;
     }
 
     public AsccpManifest asccpManifestNextAsccpManifestIdFk() {
-        return new AsccpManifest(this, Keys.ASCCP_MANIFEST_NEXT_ASCCP_MANIFEST_ID_FK);
+        if (_asccpManifestNextAsccpManifestIdFk == null)
+            _asccpManifestNextAsccpManifestIdFk = new AsccpManifest(this, Keys.ASCCP_MANIFEST_NEXT_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpManifestNextAsccpManifestIdFk;
     }
 
     @Override

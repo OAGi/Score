@@ -3,6 +3,7 @@ package org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.BieEditNode;
+import org.oagi.score.service.common.data.AccessPrivilege;
 
 import java.math.BigInteger;
 
@@ -17,6 +18,6 @@ public class BieEditAbieNode extends BieEditNode {
     private BigInteger ownerUserId;
     private String loginId;
     private String releaseNum;
-    private String access;
+    private AccessPrivilege access;
 
 }

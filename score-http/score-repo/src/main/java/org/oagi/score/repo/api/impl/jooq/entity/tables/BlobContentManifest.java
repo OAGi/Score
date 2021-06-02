@@ -136,20 +136,37 @@ public class BlobContentManifest extends TableImpl<BlobContentManifestRecord> {
         return Arrays.<ForeignKey<BlobContentManifestRecord, ?>>asList(Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
     }
 
+    private transient BlobContent _blobContent;
+    private transient Release _release;
+    private transient BlobContentManifest _blobContentManifestPrevBlobContentManifestIdFk;
+    private transient BlobContentManifest _blobContentManifestNextBlobContentManifestIdFk;
+
     public BlobContent blobContent() {
-        return new BlobContent(this, Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK);
+        if (_blobContent == null)
+            _blobContent = new BlobContent(this, Keys.BLOB_CONTENT_MANIFEST_BLOB_CONTENT_ID_FK);
+
+        return _blobContent;
     }
 
     public Release release() {
-        return new Release(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.BLOB_CONTENT_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public BlobContentManifest blobContentManifestPrevBlobContentManifestIdFk() {
-        return new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK);
+        if (_blobContentManifestPrevBlobContentManifestIdFk == null)
+            _blobContentManifestPrevBlobContentManifestIdFk = new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_PREV_BLOB_CONTENT_MANIFEST_ID_FK);
+
+        return _blobContentManifestPrevBlobContentManifestIdFk;
     }
 
     public BlobContentManifest blobContentManifestNextBlobContentManifestIdFk() {
-        return new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
+        if (_blobContentManifestNextBlobContentManifestIdFk == null)
+            _blobContentManifestNextBlobContentManifestIdFk = new BlobContentManifest(this, Keys.BLOB_CONTENT_MANIFEST_NEXT_BLOB_CONTENT_MANIFEST_ID_FK);
+
+        return _blobContentManifestNextBlobContentManifestIdFk;
     }
 
     @Override

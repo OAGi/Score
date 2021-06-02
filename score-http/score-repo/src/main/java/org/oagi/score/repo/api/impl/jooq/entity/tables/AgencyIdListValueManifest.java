@@ -146,28 +146,53 @@ public class AgencyIdListValueManifest extends TableImpl<AgencyIdListValueManife
         return Arrays.<ForeignKey<AgencyIdListValueManifestRecord, ?>>asList(Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK);
     }
 
+    private transient Release _release;
+    private transient AgencyIdListValue _agencyIdListValue;
+    private transient AgencyIdListManifest _agencyIdListManifest;
+    private transient AgencyIdListValueManifest _agencyIdListValueReplacementAgencyIdListManifFk;
+    private transient AgencyIdListValueManifest _agencyIdListValueManifestPrevAgencyIdListValueManifFk;
+    private transient AgencyIdListValueManifest _agencyIdListValueManifestNextAgencyIdListValueManifFk;
+
     public Release release() {
-        return new Release(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public AgencyIdListValue agencyIdListValue() {
-        return new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK);
+        if (_agencyIdListValue == null)
+            _agencyIdListValue = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValue;
     }
 
     public AgencyIdListManifest agencyIdListManifest() {
-        return new AgencyIdListManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+
+        return _agencyIdListManifest;
     }
 
     public AgencyIdListValueManifest agencyIdListValueReplacementAgencyIdListManifFk() {
-        return new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK);
+        if (_agencyIdListValueReplacementAgencyIdListManifFk == null)
+            _agencyIdListValueReplacementAgencyIdListManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_MANIF_FK);
+
+        return _agencyIdListValueReplacementAgencyIdListManifFk;
     }
 
     public AgencyIdListValueManifest agencyIdListValueManifestPrevAgencyIdListValueManifFk() {
-        return new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK);
+        if (_agencyIdListValueManifestPrevAgencyIdListValueManifFk == null)
+            _agencyIdListValueManifestPrevAgencyIdListValueManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_PREV_AGENCY_ID_LIST_VALUE_MANIF_FK);
+
+        return _agencyIdListValueManifestPrevAgencyIdListValueManifFk;
     }
 
     public AgencyIdListValueManifest agencyIdListValueManifestNextAgencyIdListValueManifFk() {
-        return new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK);
+        if (_agencyIdListValueManifestNextAgencyIdListValueManifFk == null)
+            _agencyIdListValueManifestNextAgencyIdListValueManifFk = new AgencyIdListValueManifest(this, Keys.AGENCY_ID_LIST_VALUE_MANIFEST_NEXT_AGENCY_ID_LIST_VALUE_MANIF_FK);
+
+        return _agencyIdListValueManifestNextAgencyIdListValueManifFk;
     }
 
     @Override

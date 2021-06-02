@@ -22,6 +22,7 @@ export class CodeListForListRequest {
     end: Date,
   };
   ownedByDeveloper: boolean;
+  cookieType: string;
   page: PageRequest = new PageRequest();
 
   constructor(paramMap?: ParamMap, defaultPageRequest?: PageRequest) {
@@ -62,6 +63,7 @@ export class CodeListForListRequest {
       definition: params.get('definition') || '',
       module: params.get('module') || ''
     };
+    this.cookieType = params.get('cookieType') || 'CC';
   }
 
   toQuery(): string {

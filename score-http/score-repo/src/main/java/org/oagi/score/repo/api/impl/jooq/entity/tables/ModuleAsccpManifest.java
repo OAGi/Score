@@ -147,24 +147,45 @@ public class ModuleAsccpManifest extends TableImpl<ModuleAsccpManifestRecord> {
         return Arrays.<ForeignKey<ModuleAsccpManifestRecord, ?>>asList(Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient AsccpManifest _asccpManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleAsccpManifestCreatedByFk;
+    private transient AppUser _moduleAsccpManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public AsccpManifest asccpManifest() {
-        return new AsccpManifest(this, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK);
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifest(this, Keys.MODULE_ASCCP_MANIFEST_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_ASCCP_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleAsccpManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK);
+        if (_moduleAsccpManifestCreatedByFk == null)
+            _moduleAsccpManifestCreatedByFk = new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_CREATED_BY_FK);
+
+        return _moduleAsccpManifestCreatedByFk;
     }
 
     public AppUser moduleAsccpManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleAsccpManifestLastUpdatedByFk == null)
+            _moduleAsccpManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_ASCCP_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleAsccpManifestLastUpdatedByFk;
     }
 
     @Override

@@ -141,24 +141,45 @@ public class XbtManifest extends TableImpl<XbtManifestRecord> {
         return Arrays.<ForeignKey<XbtManifestRecord, ?>>asList(Keys.XBT_MANIFEST_RELEASE_ID_FK, Keys.XBT_MANIFEST_XBT_ID_FK, Keys.XBT_MANIFEST_LOG_ID_FK, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Xbt _xbt;
+    private transient Log _log;
+    private transient XbtManifest _xbtManifestPrevXbtManifestIdFk;
+    private transient XbtManifest _xbtManifestNextXbtManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.XBT_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.XBT_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Xbt xbt() {
-        return new Xbt(this, Keys.XBT_MANIFEST_XBT_ID_FK);
+        if (_xbt == null)
+            _xbt = new Xbt(this, Keys.XBT_MANIFEST_XBT_ID_FK);
+
+        return _xbt;
     }
 
     public Log log() {
-        return new Log(this, Keys.XBT_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.XBT_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public XbtManifest xbtManifestPrevXbtManifestIdFk() {
-        return new XbtManifest(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK);
+        if (_xbtManifestPrevXbtManifestIdFk == null)
+            _xbtManifestPrevXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_PREV_XBT_MANIFEST_ID_FK);
+
+        return _xbtManifestPrevXbtManifestIdFk;
     }
 
     public XbtManifest xbtManifestNextXbtManifestIdFk() {
-        return new XbtManifest(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
+        if (_xbtManifestNextXbtManifestIdFk == null)
+            _xbtManifestNextXbtManifestIdFk = new XbtManifest(this, Keys.XBT_MANIFEST_NEXT_XBT_MANIFEST_ID_FK);
+
+        return _xbtManifestNextXbtManifestIdFk;
     }
 
     @Override

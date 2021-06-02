@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.data;
 
 import lombok.Data;
-import org.oagi.score.service.common.data.BieState;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 
@@ -16,6 +16,7 @@ public class BieListRequest {
     private String propertyTerm;
     private String businessContext;
     private BigInteger asccpManifestId;
+    private BigInteger usageTopLevelAsbiepId;
     private AccessPrivilege access;
     private List<String> excludePropertyTerms = Collections.emptyList();
     private List<BigInteger> excludeTopLevelAsbiepIds = Collections.emptyList();

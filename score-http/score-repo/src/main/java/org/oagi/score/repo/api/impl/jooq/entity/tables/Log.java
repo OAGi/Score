@@ -171,16 +171,29 @@ public class Log extends TableImpl<LogRecord> {
         return Arrays.<ForeignKey<LogRecord, ?>>asList(Keys.LOG_PREV_LOG_ID_FK, Keys.LOG_NEXT_LOG_ID_FK, Keys.LOG_CREATED_BY_FK);
     }
 
+    private transient Log _logPrevLogIdFk;
+    private transient Log _logNextLogIdFk;
+    private transient AppUser _appUser;
+
     public Log logPrevLogIdFk() {
-        return new Log(this, Keys.LOG_PREV_LOG_ID_FK);
+        if (_logPrevLogIdFk == null)
+            _logPrevLogIdFk = new Log(this, Keys.LOG_PREV_LOG_ID_FK);
+
+        return _logPrevLogIdFk;
     }
 
     public Log logNextLogIdFk() {
-        return new Log(this, Keys.LOG_NEXT_LOG_ID_FK);
+        if (_logNextLogIdFk == null)
+            _logNextLogIdFk = new Log(this, Keys.LOG_NEXT_LOG_ID_FK);
+
+        return _logNextLogIdFk;
     }
 
     public AppUser appUser() {
-        return new AppUser(this, Keys.LOG_CREATED_BY_FK);
+        if (_appUser == null)
+            _appUser = new AppUser(this, Keys.LOG_CREATED_BY_FK);
+
+        return _appUser;
     }
 
     @Override

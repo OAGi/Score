@@ -252,36 +252,69 @@ Indicate whether the field can have a NULL This is corresponding to the nillable
         return Arrays.<ForeignKey<BccRecord, ?>>asList(Keys.BCC_TO_BCCP_ID_FK, Keys.BCC_FROM_ACC_ID_FK, Keys.BCC_CREATED_BY_FK, Keys.BCC_OWNER_USER_ID_FK, Keys.BCC_LAST_UPDATED_BY_FK, Keys.BCC_REPLACEMENT_BCC_ID_FK, Keys.BCC_PREV_BCC_ID_FK, Keys.BCC_NEXT_BCC_ID_FK);
     }
 
+    private transient Bccp _bccp;
+    private transient Acc _acc;
+    private transient AppUser _bccCreatedByFk;
+    private transient AppUser _bccOwnerUserIdFk;
+    private transient AppUser _bccLastUpdatedByFk;
+    private transient Bcc _bccReplacementBccIdFk;
+    private transient Bcc _bccPrevBccIdFk;
+    private transient Bcc _bccNextBccIdFk;
+
     public Bccp bccp() {
-        return new Bccp(this, Keys.BCC_TO_BCCP_ID_FK);
+        if (_bccp == null)
+            _bccp = new Bccp(this, Keys.BCC_TO_BCCP_ID_FK);
+
+        return _bccp;
     }
 
     public Acc acc() {
-        return new Acc(this, Keys.BCC_FROM_ACC_ID_FK);
+        if (_acc == null)
+            _acc = new Acc(this, Keys.BCC_FROM_ACC_ID_FK);
+
+        return _acc;
     }
 
     public AppUser bccCreatedByFk() {
-        return new AppUser(this, Keys.BCC_CREATED_BY_FK);
+        if (_bccCreatedByFk == null)
+            _bccCreatedByFk = new AppUser(this, Keys.BCC_CREATED_BY_FK);
+
+        return _bccCreatedByFk;
     }
 
     public AppUser bccOwnerUserIdFk() {
-        return new AppUser(this, Keys.BCC_OWNER_USER_ID_FK);
+        if (_bccOwnerUserIdFk == null)
+            _bccOwnerUserIdFk = new AppUser(this, Keys.BCC_OWNER_USER_ID_FK);
+
+        return _bccOwnerUserIdFk;
     }
 
     public AppUser bccLastUpdatedByFk() {
-        return new AppUser(this, Keys.BCC_LAST_UPDATED_BY_FK);
+        if (_bccLastUpdatedByFk == null)
+            _bccLastUpdatedByFk = new AppUser(this, Keys.BCC_LAST_UPDATED_BY_FK);
+
+        return _bccLastUpdatedByFk;
     }
 
     public Bcc bccReplacementBccIdFk() {
-        return new Bcc(this, Keys.BCC_REPLACEMENT_BCC_ID_FK);
+        if (_bccReplacementBccIdFk == null)
+            _bccReplacementBccIdFk = new Bcc(this, Keys.BCC_REPLACEMENT_BCC_ID_FK);
+
+        return _bccReplacementBccIdFk;
     }
 
     public Bcc bccPrevBccIdFk() {
-        return new Bcc(this, Keys.BCC_PREV_BCC_ID_FK);
+        if (_bccPrevBccIdFk == null)
+            _bccPrevBccIdFk = new Bcc(this, Keys.BCC_PREV_BCC_ID_FK);
+
+        return _bccPrevBccIdFk;
     }
 
     public Bcc bccNextBccIdFk() {
-        return new Bcc(this, Keys.BCC_NEXT_BCC_ID_FK);
+        if (_bccNextBccIdFk == null)
+            _bccNextBccIdFk = new Bcc(this, Keys.BCC_NEXT_BCC_ID_FK);
+
+        return _bccNextBccIdFk;
     }
 
     @Override

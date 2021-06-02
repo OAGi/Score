@@ -524,7 +524,8 @@ export class ExtensionDetailComponent implements OnInit {
         releaseId: this.rootNode.releaseId,
         manifestId: this.rootNode.manifestId,
         state: this.rootNode.state,
-        action: (pos === -1) ? 'Append' : 'Insert'
+        action: (pos === -1) ? 'Append' : 'Insert',
+        isGlobal: this.rootNode.den === 'All User Extension Group. Details'
       },
       width: '100%',
       maxWidth: '100%',

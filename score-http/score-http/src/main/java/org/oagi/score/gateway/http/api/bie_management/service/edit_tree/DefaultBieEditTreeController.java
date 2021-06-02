@@ -5,8 +5,6 @@ import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record4;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.BieState;
-import org.oagi.score.service.common.data.OagisComponentType;
 import org.oagi.score.data.SeqKeySupportable;
 import org.oagi.score.data.TopLevelAsbiep;
 import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
@@ -16,7 +14,13 @@ import org.oagi.score.gateway.http.api.bie_management.service.BieRepository;
 import org.oagi.score.gateway.http.api.cc_management.repository.CcNodeRepository;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.repo.BusinessInformationEntityRepository;
+import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.bie.BieReadRepository;
+import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.*;
+import org.oagi.score.service.common.data.AccessPrivilege;
+import org.oagi.score.service.common.data.OagisComponentType;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +66,15 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
     private BusinessInformationEntityRepository bieRepository;
 
     @Autowired
+    private ScoreRepositoryFactory scoreRepositoryFactory;
+
+    @Autowired
     private RedissonClient redissonClient;
 
     private boolean initialized;
     private AuthenticatedPrincipal user;
     private TopLevelAsbiep topLevelAsbiep;
+    private AccessPrivilege accessPrivilege;
     private BieState state;
     private boolean forceBieUpdate;
 
@@ -76,16 +84,50 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
         this.state = topLevelAsbiep.getState();
         this.forceBieUpdate = true;
+
+        BigInteger userId = sessionService.userId(user);
+        accessPrivilege = AccessPrivilege.Prohibited;
         switch (this.state) {
+        case Initiating:
+            accessPrivilege = AccessPrivilege.Unprepared;
+            break;
+
             case WIP:
-                if (!sessionService.userId(user).equals(topLevelAsbiep.getOwnerUserId())) {
-                    throw new DataAccessForbiddenException("'" + sessionService.getAppUser(user).getLoginId() +
-                            "' doesn't have an access privilege.");
+                if (topLevelAsbiep.getOwnerUserId().equals(userId)) {
+                    accessPrivilege = AccessPrivilege.CanEdit;
+                } else {
+                    // Issue #1010
+                    if (hasReuseBie(user, topLevelAsbiep.getTopLevelAsbiepId())) {
+                        accessPrivilege = AccessPrivilege.CanView;
+                    } else {
+                        throw new DataAccessForbiddenException("'" + sessionService.getAppUser(user).getLoginId() +
+                                "' doesn't have an access privilege.");
+                    }
                 }
+                break;
+
+            case QA:
+                if (topLevelAsbiep.getOwnerUserId().equals(userId)) {
+                    accessPrivilege = AccessPrivilege.CanMove;
+                } else {
+                    accessPrivilege = AccessPrivilege.CanView;
+                }
+
+                break;
+
+            case Production:
+                accessPrivilege = AccessPrivilege.CanView;
                 break;
         }
 
         this.initialized = true;
+    }
+
+    public boolean hasReuseBie(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
+        BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
+        return !bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
+                .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                .getTopLevelAsbiepList().isEmpty();
     }
 
     private boolean isForceBieUpdate() {
@@ -127,6 +169,7 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
                 .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(topLevelAsbiepId)))
                 .fetchOneInto(BieEditAbieNode.class);
         rootNode.setHasChild(hasChild(rootNode));
+        rootNode.setAccess(accessPrivilege);
 
         return rootNode;
     }
@@ -205,7 +248,6 @@ public class DefaultBieEditTreeController implements BieEditTreeController {
 
         return Collections.emptyList();
     }
-
 
     private List<BieEditNode> getDescendants(BieEditAbieNode abieNode, boolean hideUnused) {
         Map<BigInteger, BieEditAsbie> asbieMap;

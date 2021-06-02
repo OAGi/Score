@@ -252,40 +252,77 @@ The value of this column in the latest history record should be the same as that
         return Arrays.<ForeignKey<DtRecord, ?>>asList(Keys.DT_PREVIOUS_VERSION_DT_ID_FK, Keys.DT_BASED_DT_ID_FK, Keys.DT_NAMESPACE_ID_FK, Keys.DT_CREATED_BY_FK, Keys.DT_LAST_UPDATED_BY_FK, Keys.DT_OWNER_USER_ID_FK, Keys.DT_REPLACEMENT_DT_ID_FK, Keys.DT_PREV_DT_ID_FK, Keys.DT_NEXT_DT_ID_FK);
     }
 
+    private transient Dt _dtPreviousVersionDtIdFk;
+    private transient Dt _dtBasedDtIdFk;
+    private transient Namespace _namespace;
+    private transient AppUser _dtCreatedByFk;
+    private transient AppUser _dtLastUpdatedByFk;
+    private transient AppUser _dtOwnerUserIdFk;
+    private transient Dt _dtReplacementDtIdFk;
+    private transient Dt _dtPrevDtIdFk;
+    private transient Dt _dtNextDtIdFk;
+
     public Dt dtPreviousVersionDtIdFk() {
-        return new Dt(this, Keys.DT_PREVIOUS_VERSION_DT_ID_FK);
+        if (_dtPreviousVersionDtIdFk == null)
+            _dtPreviousVersionDtIdFk = new Dt(this, Keys.DT_PREVIOUS_VERSION_DT_ID_FK);
+
+        return _dtPreviousVersionDtIdFk;
     }
 
     public Dt dtBasedDtIdFk() {
-        return new Dt(this, Keys.DT_BASED_DT_ID_FK);
+        if (_dtBasedDtIdFk == null)
+            _dtBasedDtIdFk = new Dt(this, Keys.DT_BASED_DT_ID_FK);
+
+        return _dtBasedDtIdFk;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.DT_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.DT_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public AppUser dtCreatedByFk() {
-        return new AppUser(this, Keys.DT_CREATED_BY_FK);
+        if (_dtCreatedByFk == null)
+            _dtCreatedByFk = new AppUser(this, Keys.DT_CREATED_BY_FK);
+
+        return _dtCreatedByFk;
     }
 
     public AppUser dtLastUpdatedByFk() {
-        return new AppUser(this, Keys.DT_LAST_UPDATED_BY_FK);
+        if (_dtLastUpdatedByFk == null)
+            _dtLastUpdatedByFk = new AppUser(this, Keys.DT_LAST_UPDATED_BY_FK);
+
+        return _dtLastUpdatedByFk;
     }
 
     public AppUser dtOwnerUserIdFk() {
-        return new AppUser(this, Keys.DT_OWNER_USER_ID_FK);
+        if (_dtOwnerUserIdFk == null)
+            _dtOwnerUserIdFk = new AppUser(this, Keys.DT_OWNER_USER_ID_FK);
+
+        return _dtOwnerUserIdFk;
     }
 
     public Dt dtReplacementDtIdFk() {
-        return new Dt(this, Keys.DT_REPLACEMENT_DT_ID_FK);
+        if (_dtReplacementDtIdFk == null)
+            _dtReplacementDtIdFk = new Dt(this, Keys.DT_REPLACEMENT_DT_ID_FK);
+
+        return _dtReplacementDtIdFk;
     }
 
     public Dt dtPrevDtIdFk() {
-        return new Dt(this, Keys.DT_PREV_DT_ID_FK);
+        if (_dtPrevDtIdFk == null)
+            _dtPrevDtIdFk = new Dt(this, Keys.DT_PREV_DT_ID_FK);
+
+        return _dtPrevDtIdFk;
     }
 
     public Dt dtNextDtIdFk() {
-        return new Dt(this, Keys.DT_NEXT_DT_ID_FK);
+        if (_dtNextDtIdFk == null)
+            _dtNextDtIdFk = new Dt(this, Keys.DT_NEXT_DT_ID_FK);
+
+        return _dtNextDtIdFk;
     }
 
     @Override

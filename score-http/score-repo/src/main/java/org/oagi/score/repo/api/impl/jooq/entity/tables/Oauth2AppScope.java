@@ -121,8 +121,13 @@ public class Oauth2AppScope extends TableImpl<Oauth2AppScopeRecord> {
         return Arrays.<ForeignKey<Oauth2AppScopeRecord, ?>>asList(Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
     }
 
+    private transient Oauth2App _oauth2App;
+
     public Oauth2App oauth2App() {
-        return new Oauth2App(this, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
+        if (_oauth2App == null)
+            _oauth2App = new Oauth2App(this, Keys.OAUTH2_APP_SCOPE_OAUTH2_APP_ID_FK);
+
+        return _oauth2App;
     }
 
     @Override

@@ -187,14 +187,23 @@ export class ErrorAlertInterceptor implements HttpInterceptor {
               break;
 
             case 400:
-              this.snackBar.open(error.headers.get('x-error-message'), '', {
-                duration: 3000,
-              });
+            case 403:
+              let errorMessageId = error.headers.get('x-error-message-id');
+              if (!!errorMessageId) {
+                this.snackBar.open(error.headers.get('x-error-message'), 'View detail in Notifications', {
+                  duration: 10000,
+                }).onAction().subscribe(_ => {
+                  return this.router.navigate(['/message/' + errorMessageId]);
+                });
+              } else {
+                this.snackBar.open(error.headers.get('x-error-message'), '', {
+                  duration: 3000,
+                });
+              }
 
               break;
 
             case 401:
-            case 403:
               if (req.url.indexOf(environment.logoutPath) === -1) {
                 this.snackBar.open('Authentication Failure', '', {
                   duration: 3000,

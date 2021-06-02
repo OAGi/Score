@@ -149,20 +149,37 @@ public class BdtScPriRestri extends TableImpl<BdtScPriRestriRecord> {
         return Arrays.<ForeignKey<BdtScPriRestriRecord, ?>>asList(Keys.BDT_SC_PRI_RESTRI_BDT_SC_ID_FK, Keys.BDT_SC_PRI_RESTRI_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_ID_FK, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
     }
 
+    private transient DtSc _dtSc;
+    private transient CdtScAwdPriXpsTypeMap _cdtScAwdPriXpsTypeMap;
+    private transient CodeList _codeList;
+    private transient AgencyIdList _agencyIdList;
+
     public DtSc dtSc() {
-        return new DtSc(this, Keys.BDT_SC_PRI_RESTRI_BDT_SC_ID_FK);
+        if (_dtSc == null)
+            _dtSc = new DtSc(this, Keys.BDT_SC_PRI_RESTRI_BDT_SC_ID_FK);
+
+        return _dtSc;
     }
 
     public CdtScAwdPriXpsTypeMap cdtScAwdPriXpsTypeMap() {
-        return new CdtScAwdPriXpsTypeMap(this, Keys.BDT_SC_PRI_RESTRI_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_FK);
+        if (_cdtScAwdPriXpsTypeMap == null)
+            _cdtScAwdPriXpsTypeMap = new CdtScAwdPriXpsTypeMap(this, Keys.BDT_SC_PRI_RESTRI_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_FK);
+
+        return _cdtScAwdPriXpsTypeMap;
     }
 
     public CodeList codeList() {
-        return new CodeList(this, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.BDT_SC_PRI_RESTRI_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public AgencyIdList agencyIdList() {
-        return new AgencyIdList(this, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdList == null)
+            _agencyIdList = new AgencyIdList(this, Keys.BDT_SC_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdList;
     }
 
     @Override

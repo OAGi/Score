@@ -142,20 +142,37 @@ public class BdtPriRestri extends TableImpl<BdtPriRestriRecord> {
         return Arrays.<ForeignKey<BdtPriRestriRecord, ?>>asList(Keys.BDT_PRI_RESTRI_BDT_ID_FK, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
     }
 
+    private transient Dt _dt;
+    private transient CdtAwdPriXpsTypeMap _cdtAwdPriXpsTypeMap;
+    private transient CodeList _codeList;
+    private transient AgencyIdList _agencyIdList;
+
     public Dt dt() {
-        return new Dt(this, Keys.BDT_PRI_RESTRI_BDT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.BDT_PRI_RESTRI_BDT_ID_FK);
+
+        return _dt;
     }
 
     public CdtAwdPriXpsTypeMap cdtAwdPriXpsTypeMap() {
-        return new CdtAwdPriXpsTypeMap(this, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK);
+        if (_cdtAwdPriXpsTypeMap == null)
+            _cdtAwdPriXpsTypeMap = new CdtAwdPriXpsTypeMap(this, Keys.BDT_PRI_RESTRI_CDT_AWD_PRI_XPS_TYPE_MAP_ID_FK);
+
+        return _cdtAwdPriXpsTypeMap;
     }
 
     public CodeList codeList() {
-        return new CodeList(this, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.BDT_PRI_RESTRI_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public AgencyIdList agencyIdList() {
-        return new AgencyIdList(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdList == null)
+            _agencyIdList = new AgencyIdList(this, Keys.BDT_PRI_RESTRI_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdList;
     }
 
     @Override

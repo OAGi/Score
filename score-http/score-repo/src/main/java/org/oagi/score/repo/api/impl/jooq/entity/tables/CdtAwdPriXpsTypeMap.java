@@ -133,12 +133,21 @@ public class CdtAwdPriXpsTypeMap extends TableImpl<CdtAwdPriXpsTypeMapRecord> {
         return Arrays.<ForeignKey<CdtAwdPriXpsTypeMapRecord, ?>>asList(Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
     }
 
+    private transient CdtAwdPri _cdtAwdPri;
+    private transient Xbt _xbt;
+
     public CdtAwdPri cdtAwdPri() {
-        return new CdtAwdPri(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK);
+        if (_cdtAwdPri == null)
+            _cdtAwdPri = new CdtAwdPri(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_CDT_AWD_PRI_ID_FK);
+
+        return _cdtAwdPri;
     }
 
     public Xbt xbt() {
-        return new Xbt(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
+        if (_xbt == null)
+            _xbt = new Xbt(this, Keys.CDT_AWD_PRI_XPS_TYPE_MAP_XBT_ID_FK);
+
+        return _xbt;
     }
 
     @Override

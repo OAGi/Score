@@ -3,11 +3,11 @@ package org.oagi.score.gateway.http.configuration.security;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.types.ULong;
-import org.oagi.score.repo.api.user.ScoreUserReadRepository;
-import org.oagi.score.service.common.data.AppUser;
 import org.oagi.score.repo.api.ScoreRepositoryFactory;
 import org.oagi.score.repo.api.base.ScoreDataAccessException;
+import org.oagi.score.repo.api.user.ScoreUserReadRepository;
 import org.oagi.score.repo.api.user.model.GetScoreUserRequest;
+import org.oagi.score.service.common.data.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -139,6 +139,16 @@ public class SessionService {
         sessions.values().forEach(session -> {
             sessionRepository.deleteById(session.getId());
         });
+    }
+
+    public org.oagi.score.repo.api.user.model.ScoreUser getScoreUserByUserId(BigInteger userId) {
+        ScoreUserReadRepository repo = scoreRepositoryFactory.createScoreUserReadRepository();
+        GetScoreUserRequest request = new GetScoreUserRequest().withUserId(userId);
+        return repo.getScoreUser(request).getUser();
+    }
+
+    public org.oagi.score.repo.api.user.model.ScoreUser getScoreSystemUser() {
+        return getScoreUserByUserId(BigInteger.ZERO);
     }
 
     public org.oagi.score.repo.api.user.model.ScoreUser asScoreUser(AuthenticatedPrincipal user) {

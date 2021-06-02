@@ -128,12 +128,21 @@ public class BizCtxAssignment extends TableImpl<BizCtxAssignmentRecord> {
         return Arrays.<ForeignKey<BizCtxAssignmentRecord, ?>>asList(Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient BizCtx _bizCtx;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public BizCtx bizCtx() {
-        return new BizCtx(this, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK);
+        if (_bizCtx == null)
+            _bizCtx = new BizCtx(this, Keys.BIZ_CTX_ASSIGNMENT_BIZ_CTX_ID_FK);
+
+        return _bizCtx;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BIZ_CTX_ASSIGNMENT_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

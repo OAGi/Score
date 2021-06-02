@@ -173,20 +173,37 @@ public class CtxScheme extends TableImpl<CtxSchemeRecord> {
         return Arrays.<ForeignKey<CtxSchemeRecord, ?>>asList(Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK, Keys.CTX_SCHEME_CODE_LIST_ID_FK, Keys.CTX_SCHEME_CREATED_BY_FK, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
     }
 
+    private transient CtxCategory _ctxCategory;
+    private transient CodeList _codeList;
+    private transient AppUser _ctxSchemeCreatedByFk;
+    private transient AppUser _ctxSchemeLastUpdatedByFk;
+
     public CtxCategory ctxCategory() {
-        return new CtxCategory(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK);
+        if (_ctxCategory == null)
+            _ctxCategory = new CtxCategory(this, Keys.CTX_SCHEME_CTX_CATEGORY_ID_FK);
+
+        return _ctxCategory;
     }
 
     public CodeList codeList() {
-        return new CodeList(this, Keys.CTX_SCHEME_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.CTX_SCHEME_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public AppUser ctxSchemeCreatedByFk() {
-        return new AppUser(this, Keys.CTX_SCHEME_CREATED_BY_FK);
+        if (_ctxSchemeCreatedByFk == null)
+            _ctxSchemeCreatedByFk = new AppUser(this, Keys.CTX_SCHEME_CREATED_BY_FK);
+
+        return _ctxSchemeCreatedByFk;
     }
 
     public AppUser ctxSchemeLastUpdatedByFk() {
-        return new AppUser(this, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
+        if (_ctxSchemeLastUpdatedByFk == null)
+            _ctxSchemeLastUpdatedByFk = new AppUser(this, Keys.CTX_SCHEME_LAST_UPDATED_BY_FK);
+
+        return _ctxSchemeLastUpdatedByFk;
     }
 
     @Override

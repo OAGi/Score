@@ -154,16 +154,29 @@ public class ModuleDir extends TableImpl<ModuleDirRecord> {
         return Arrays.<ForeignKey<ModuleDirRecord, ?>>asList(Keys.MODULE_DIR_PARENT_MODULE_DIR_ID_FK, Keys.MODULE_DIR_CREATED_BY_FK, Keys.MODULE_DIR_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleDir _moduleDir;
+    private transient AppUser _moduleDirCreatedByFk;
+    private transient AppUser _moduleDirLastUpdatedByFk;
+
     public ModuleDir moduleDir() {
-        return new ModuleDir(this, Keys.MODULE_DIR_PARENT_MODULE_DIR_ID_FK);
+        if (_moduleDir == null)
+            _moduleDir = new ModuleDir(this, Keys.MODULE_DIR_PARENT_MODULE_DIR_ID_FK);
+
+        return _moduleDir;
     }
 
     public AppUser moduleDirCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_DIR_CREATED_BY_FK);
+        if (_moduleDirCreatedByFk == null)
+            _moduleDirCreatedByFk = new AppUser(this, Keys.MODULE_DIR_CREATED_BY_FK);
+
+        return _moduleDirCreatedByFk;
     }
 
     public AppUser moduleDirLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_DIR_LAST_UPDATED_BY_FK);
+        if (_moduleDirLastUpdatedByFk == null)
+            _moduleDirLastUpdatedByFk = new AppUser(this, Keys.MODULE_DIR_LAST_UPDATED_BY_FK);
+
+        return _moduleDirLastUpdatedByFk;
     }
 
     @Override

@@ -185,24 +185,45 @@ public class Asbiep extends TableImpl<AsbiepRecord> {
         return Arrays.<ForeignKey<AsbiepRecord, ?>>asList(Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK, Keys.ASBIEP_CREATED_BY_FK, Keys.ASBIEP_LAST_UPDATED_BY_FK, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient AsccpManifest _asccpManifest;
+    private transient Abie _abie;
+    private transient AppUser _asbiepCreatedByFk;
+    private transient AppUser _asbiepLastUpdatedByFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public AsccpManifest asccpManifest() {
-        return new AsccpManifest(this, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK);
+        if (_asccpManifest == null)
+            _asccpManifest = new AsccpManifest(this, Keys.ASBIEP_BASED_ASCCP_MANIFEST_ID_FK);
+
+        return _asccpManifest;
     }
 
     public Abie abie() {
-        return new Abie(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK);
+        if (_abie == null)
+            _abie = new Abie(this, Keys.ASBIEP_ROLE_OF_ABIE_ID_FK);
+
+        return _abie;
     }
 
     public AppUser asbiepCreatedByFk() {
-        return new AppUser(this, Keys.ASBIEP_CREATED_BY_FK);
+        if (_asbiepCreatedByFk == null)
+            _asbiepCreatedByFk = new AppUser(this, Keys.ASBIEP_CREATED_BY_FK);
+
+        return _asbiepCreatedByFk;
     }
 
     public AppUser asbiepLastUpdatedByFk() {
-        return new AppUser(this, Keys.ASBIEP_LAST_UPDATED_BY_FK);
+        if (_asbiepLastUpdatedByFk == null)
+            _asbiepLastUpdatedByFk = new AppUser(this, Keys.ASBIEP_LAST_UPDATED_BY_FK);
+
+        return _asbiepLastUpdatedByFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.ASBIEP_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

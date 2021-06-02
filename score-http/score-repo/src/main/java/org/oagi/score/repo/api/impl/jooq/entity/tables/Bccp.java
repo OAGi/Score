@@ -237,36 +237,69 @@ State change can't be undone. But the history record can still keep the records 
         return Arrays.<ForeignKey<BccpRecord, ?>>asList(Keys.BCCP_BDT_ID_FK, Keys.BCCP_NAMESPACE_ID_FK, Keys.BCCP_REPLACEMENT_BCCP_ID_FK, Keys.BCCP_CREATED_BY_FK, Keys.BCCP_OWNER_USER_ID_FK, Keys.BCCP_LAST_UPDATED_BY_FK, Keys.BCCP_PREV_BCCP_ID_FK, Keys.BCCP_NEXT_BCCP_ID_FK);
     }
 
+    private transient Dt _dt;
+    private transient Namespace _namespace;
+    private transient Bccp _bccpReplacementBccpIdFk;
+    private transient AppUser _bccpCreatedByFk;
+    private transient AppUser _bccpOwnerUserIdFk;
+    private transient AppUser _bccpLastUpdatedByFk;
+    private transient Bccp _bccpPrevBccpIdFk;
+    private transient Bccp _bccpNextBccpIdFk;
+
     public Dt dt() {
-        return new Dt(this, Keys.BCCP_BDT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.BCCP_BDT_ID_FK);
+
+        return _dt;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.BCCP_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.BCCP_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public Bccp bccpReplacementBccpIdFk() {
-        return new Bccp(this, Keys.BCCP_REPLACEMENT_BCCP_ID_FK);
+        if (_bccpReplacementBccpIdFk == null)
+            _bccpReplacementBccpIdFk = new Bccp(this, Keys.BCCP_REPLACEMENT_BCCP_ID_FK);
+
+        return _bccpReplacementBccpIdFk;
     }
 
     public AppUser bccpCreatedByFk() {
-        return new AppUser(this, Keys.BCCP_CREATED_BY_FK);
+        if (_bccpCreatedByFk == null)
+            _bccpCreatedByFk = new AppUser(this, Keys.BCCP_CREATED_BY_FK);
+
+        return _bccpCreatedByFk;
     }
 
     public AppUser bccpOwnerUserIdFk() {
-        return new AppUser(this, Keys.BCCP_OWNER_USER_ID_FK);
+        if (_bccpOwnerUserIdFk == null)
+            _bccpOwnerUserIdFk = new AppUser(this, Keys.BCCP_OWNER_USER_ID_FK);
+
+        return _bccpOwnerUserIdFk;
     }
 
     public AppUser bccpLastUpdatedByFk() {
-        return new AppUser(this, Keys.BCCP_LAST_UPDATED_BY_FK);
+        if (_bccpLastUpdatedByFk == null)
+            _bccpLastUpdatedByFk = new AppUser(this, Keys.BCCP_LAST_UPDATED_BY_FK);
+
+        return _bccpLastUpdatedByFk;
     }
 
     public Bccp bccpPrevBccpIdFk() {
-        return new Bccp(this, Keys.BCCP_PREV_BCCP_ID_FK);
+        if (_bccpPrevBccpIdFk == null)
+            _bccpPrevBccpIdFk = new Bccp(this, Keys.BCCP_PREV_BCCP_ID_FK);
+
+        return _bccpPrevBccpIdFk;
     }
 
     public Bccp bccpNextBccpIdFk() {
-        return new Bccp(this, Keys.BCCP_NEXT_BCCP_ID_FK);
+        if (_bccpNextBccpIdFk == null)
+            _bccpNextBccpIdFk = new Bccp(this, Keys.BCCP_NEXT_BCCP_ID_FK);
+
+        return _bccpNextBccpIdFk;
     }
 
     @Override

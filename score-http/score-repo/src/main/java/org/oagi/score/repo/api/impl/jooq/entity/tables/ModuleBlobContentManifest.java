@@ -154,24 +154,45 @@ public class ModuleBlobContentManifest extends TableImpl<ModuleBlobContentManife
         return Arrays.<ForeignKey<ModuleBlobContentManifestRecord, ?>>asList(Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_BLOB_CONTENT_MANIFEST_ACC_MANIFEST_ID_FK, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_BLOB_CONTENT_MANIFEST_CREATED_BY_FK, Keys.MODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient BlobContentManifest _blobContentManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleBlobContentManifestCreatedByFk;
+    private transient AppUser _moduleBlobContentManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public BlobContentManifest blobContentManifest() {
-        return new BlobContentManifest(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_ACC_MANIFEST_ID_FK);
+        if (_blobContentManifest == null)
+            _blobContentManifest = new BlobContentManifest(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_ACC_MANIFEST_ID_FK);
+
+        return _blobContentManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleBlobContentManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_CREATED_BY_FK);
+        if (_moduleBlobContentManifestCreatedByFk == null)
+            _moduleBlobContentManifestCreatedByFk = new AppUser(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_CREATED_BY_FK);
+
+        return _moduleBlobContentManifestCreatedByFk;
     }
 
     public AppUser moduleBlobContentManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleBlobContentManifestLastUpdatedByFk == null)
+            _moduleBlobContentManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_BLOB_CONTENT_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleBlobContentManifestLastUpdatedByFk;
     }
 
     @Override

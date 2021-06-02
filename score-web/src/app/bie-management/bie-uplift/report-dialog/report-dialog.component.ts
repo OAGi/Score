@@ -34,10 +34,11 @@ export class ReportDialogComponent implements OnInit {
     this.loading = true;
     const topLevelAsbiepId = this.data.topLevelAsbiepId;
     const releaseId = this.data.releaseId;
+    const targetAsccpManifestId = this.data.targetAsccpManifestId;
     this.matchMap = new Map<string, MatchInfo>();
     this.matches = this.data.matches;
     this.matches.forEach(m => this.matchMap.set(m.bieType + '-' + m.bieId, m));
-    this.service.checkValidationMatches(topLevelAsbiepId, releaseId, this.matches)
+    this.service.checkValidationMatches(topLevelAsbiepId, releaseId, targetAsccpManifestId, this.matches)
     .pipe(finalize(() => {
       this.loading = false;
     }))
@@ -52,7 +53,10 @@ export class ReportDialogComponent implements OnInit {
 
   show(row: MatchInfo): boolean {
     if (this.hideSystemMatched) {
-      return row.match !== 'System' || !!(row.reuse) || row.valid === false;
+      if (row.message !== '') {
+        return true;
+      }
+      return row.match == 'Unmatched' || !!(row.reuse) || row.valid === false;
     }
     return true;
   }
@@ -62,7 +66,11 @@ export class ReportDialogComponent implements OnInit {
   }
 
   onClose(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
+  }
+
+  onUplift(): void {
+    this.dialogRef.close(true);
   }
 
   onDownload(): void {

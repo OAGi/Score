@@ -132,8 +132,13 @@ public class CtxSchemeValue extends TableImpl<CtxSchemeValueRecord> {
         return Arrays.<ForeignKey<CtxSchemeValueRecord, ?>>asList(Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK);
     }
 
+    private transient CtxScheme _ctxScheme;
+
     public CtxScheme ctxScheme() {
-        return new CtxScheme(this, Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK);
+        if (_ctxScheme == null)
+            _ctxScheme = new CtxScheme(this, Keys.CTX_SCHEME_VALUE_OWNER_CTX_SCHEME_ID_FK);
+
+        return _ctxScheme;
     }
 
     @Override

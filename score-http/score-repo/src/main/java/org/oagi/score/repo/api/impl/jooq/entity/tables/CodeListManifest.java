@@ -151,32 +151,61 @@ public class CodeListManifest extends TableImpl<CodeListManifestRecord> {
         return Arrays.<ForeignKey<CodeListManifestRecord, ?>>asList(Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_LOG_ID_FK, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient CodeList _codeList;
+    private transient CodeListManifest _codeListManifestBasedCodeListManifestIdFk;
+    private transient Log _log;
+    private transient CodeListManifest _codeListReplacementCodeListManifestIdFk;
+    private transient CodeListManifest _codeListManifestPrevCodeListManifestIdFk;
+    private transient CodeListManifest _codeListManifestNextCodeListManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.CODE_LIST_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public CodeList codeList() {
-        return new CodeList(this, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.CODE_LIST_MANIFEST_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public CodeListManifest codeListManifestBasedCodeListManifestIdFk() {
-        return new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK);
+        if (_codeListManifestBasedCodeListManifestIdFk == null)
+            _codeListManifestBasedCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_BASED_CODE_LIST_MANIFEST_ID_FK);
+
+        return _codeListManifestBasedCodeListManifestIdFk;
     }
 
     public Log log() {
-        return new Log(this, Keys.CODE_LIST_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.CODE_LIST_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public CodeListManifest codeListReplacementCodeListManifestIdFk() {
-        return new CodeListManifest(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK);
+        if (_codeListReplacementCodeListManifestIdFk == null)
+            _codeListReplacementCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_REPLACEMENT_CODE_LIST_MANIFEST_ID_FK);
+
+        return _codeListReplacementCodeListManifestIdFk;
     }
 
     public CodeListManifest codeListManifestPrevCodeListManifestIdFk() {
-        return new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK);
+        if (_codeListManifestPrevCodeListManifestIdFk == null)
+            _codeListManifestPrevCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_PREV_CODE_LIST_MANIFEST_ID_FK);
+
+        return _codeListManifestPrevCodeListManifestIdFk;
     }
 
     public CodeListManifest codeListManifestNextCodeListManifestIdFk() {
-        return new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK);
+        if (_codeListManifestNextCodeListManifestIdFk == null)
+            _codeListManifestNextCodeListManifestIdFk = new CodeListManifest(this, Keys.CODE_LIST_MANIFEST_NEXT_CODE_LIST_MANIFEST_ID_FK);
+
+        return _codeListManifestNextCodeListManifestIdFk;
     }
 
     @Override

@@ -123,12 +123,21 @@ public class BizCtxValue extends TableImpl<BizCtxValueRecord> {
         return Arrays.<ForeignKey<BizCtxValueRecord, ?>>asList(Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
     }
 
+    private transient BizCtx _bizCtx;
+    private transient CtxSchemeValue _ctxSchemeValue;
+
     public BizCtx bizCtx() {
-        return new BizCtx(this, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK);
+        if (_bizCtx == null)
+            _bizCtx = new BizCtx(this, Keys.BIZ_CTX_VALUE_BIZ_CTX_ID_FK);
+
+        return _bizCtx;
     }
 
     public CtxSchemeValue ctxSchemeValue() {
-        return new CtxSchemeValue(this, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
+        if (_ctxSchemeValue == null)
+            _ctxSchemeValue = new CtxSchemeValue(this, Keys.BIZ_CTX_VALUE_CTX_SCHEME_VALUE_ID_FK);
+
+        return _ctxSchemeValue;
     }
 
     @Override

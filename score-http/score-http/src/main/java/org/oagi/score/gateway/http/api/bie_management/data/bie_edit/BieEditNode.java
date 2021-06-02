@@ -1,7 +1,7 @@
 package org.oagi.score.gateway.http.api.bie_management.data.bie_edit;
 
 import lombok.Data;
-import org.oagi.score.service.common.data.BieState;
+import org.oagi.score.repo.api.bie.model.BieState;
 
 import java.math.BigInteger;
 

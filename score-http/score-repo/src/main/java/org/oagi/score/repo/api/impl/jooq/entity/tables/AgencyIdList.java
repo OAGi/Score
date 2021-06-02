@@ -210,40 +210,77 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return Arrays.<ForeignKey<AgencyIdListRecord, ?>>asList(Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK, Keys.AGENCY_ID_LIST_CREATED_BY_FK, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
     }
 
+    private transient AgencyIdListValue _agencyIdListValue;
+    private transient AgencyIdList _agencyIdListBasedAgencyIdListIdFk;
+    private transient Namespace _namespace;
+    private transient AppUser _agencyIdListCreatedByFk;
+    private transient AppUser _agencyIdListLastUpdatedByFk;
+    private transient AgencyIdList _agencyIdListReplacementAgencyIdListIdFk;
+    private transient AppUser _agencyIdListOwnerUserIdFk;
+    private transient AgencyIdList _agencyIdListPrevAgencyIdListIdFk;
+    private transient AgencyIdList _agencyIdListNextAgencyIdListIdFk;
+
     public AgencyIdListValue agencyIdListValue() {
-        return new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK);
+        if (_agencyIdListValue == null)
+            _agencyIdListValue = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValue;
     }
 
     public AgencyIdList agencyIdListBasedAgencyIdListIdFk() {
-        return new AgencyIdList(this, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdListBasedAgencyIdListIdFk == null)
+            _agencyIdListBasedAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_BASED_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdListBasedAgencyIdListIdFk;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.AGENCY_ID_LIST_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public AppUser agencyIdListCreatedByFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_CREATED_BY_FK);
+        if (_agencyIdListCreatedByFk == null)
+            _agencyIdListCreatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_CREATED_BY_FK);
+
+        return _agencyIdListCreatedByFk;
     }
 
     public AppUser agencyIdListLastUpdatedByFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK);
+        if (_agencyIdListLastUpdatedByFk == null)
+            _agencyIdListLastUpdatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_LAST_UPDATED_BY_FK);
+
+        return _agencyIdListLastUpdatedByFk;
     }
 
     public AgencyIdList agencyIdListReplacementAgencyIdListIdFk() {
-        return new AgencyIdList(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdListReplacementAgencyIdListIdFk == null)
+            _agencyIdListReplacementAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_REPLACEMENT_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdListReplacementAgencyIdListIdFk;
     }
 
     public AppUser agencyIdListOwnerUserIdFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK);
+        if (_agencyIdListOwnerUserIdFk == null)
+            _agencyIdListOwnerUserIdFk = new AppUser(this, Keys.AGENCY_ID_LIST_OWNER_USER_ID_FK);
+
+        return _agencyIdListOwnerUserIdFk;
     }
 
     public AgencyIdList agencyIdListPrevAgencyIdListIdFk() {
-        return new AgencyIdList(this, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdListPrevAgencyIdListIdFk == null)
+            _agencyIdListPrevAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_PREV_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdListPrevAgencyIdListIdFk;
     }
 
     public AgencyIdList agencyIdListNextAgencyIdListIdFk() {
-        return new AgencyIdList(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdListNextAgencyIdListIdFk == null)
+            _agencyIdListNextAgencyIdListIdFk = new AgencyIdList(this, Keys.AGENCY_ID_LIST_NEXT_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdListNextAgencyIdListIdFk;
     }
 
     @Override

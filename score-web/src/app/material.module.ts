@@ -42,6 +42,7 @@ import {MatTreeModule} from '@angular/material/tree';
 
 import {NgModule} from '@angular/core';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {MatBadgeModule} from '@angular/material/badge';
 
 @NgModule({
   exports: [
@@ -58,6 +59,7 @@ import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
     // Material
     MatAutocompleteModule,
+    MatBadgeModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatCardModule,

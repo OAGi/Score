@@ -7,6 +7,7 @@ import {MaterialModule} from '../material.module';
 import {ContextMenuModule} from 'ngx-contextmenu';
 import {BieExpressModule} from './bie-express/bie-express.module';
 import {TransferOwnershipDialogModule} from '../common/transfer-ownership-dialog/transfer-ownership-dialog.module';
+import {BieListDialogComponent} from './bie-list-dialog/bie-list-dialog.component';
 
 import {BieListComponent} from './bie-list/bie-list.component';
 import {BieCreateBizCtxComponent} from './bie-create/bie-create-biz-ctx.component';
@@ -24,6 +25,8 @@ import {TranslateModule} from '@ngx-translate/core';
 import {BieEditModule} from './bie-edit/bie-edit.module';
 import {ConfirmDialogModule} from '../common/confirm-dialog/confirm-dialog.module';
 import {ScoreCommonModule} from '../common/score-common.module';
+import {BieReportComponent} from './bie-report/bie-report.component';
+import {BieReportService} from './bie-report/domain/bie-report.service';
 import {BieUpliftComponent} from './bie-uplift/bie-uplift.component';
 import {BieUpliftService} from './bie-uplift/domain/bie-uplift.service';
 import {BieUpliftProfileBieComponent} from './bie-uplift/bie-uplift-profile-bie.component';
@@ -82,6 +85,16 @@ const routes: Routes = [
             canActivate: [AuthService]
           }
         ]
+      },
+      {
+        path: 'report',
+        children: [
+          {
+            path: '',
+            component: BieReportComponent,
+            canActivate: [AuthService]
+          }
+        ]
       }
     ]
   }
@@ -112,8 +125,10 @@ const routes: Routes = [
     BieCopyProfileBieComponent,
     BieUpliftProfileBieComponent,
     BieListComponent,
+    BieListDialogComponent,
     BieUpliftComponent,
     ReportDialogComponent,
+    BieReportComponent
   ],
   providers: [
     ReleaseService,
@@ -121,6 +136,7 @@ const routes: Routes = [
     BieCopyService,
     BieListService,
     BieUpliftService,
+    BieReportService
   ]
 })
 export class BieManagementModule {

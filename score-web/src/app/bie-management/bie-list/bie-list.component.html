@@ -292,6 +292,10 @@
 
     <context-menu #contextMenu>
       <ng-template contextMenuItem let-item
+                   (execute)="openBieListDialog($event.item, $event)">
+        <span class="context-menu-item">Find Reuses</span>
+      </ng-template>
+      <ng-template contextMenuItem let-item
                    (execute)="openTransferDialog($event.item, $event)">
         <span class="context-menu-item {{ isEditable(item) ? 'enabled' : 'disabled' }}">Transfer Ownership</span>
       </ng-template>

@@ -147,24 +147,45 @@ public class ModuleAgencyIdListManifest extends TableImpl<ModuleAgencyIdListMani
         return Arrays.<ForeignKey<ModuleAgencyIdListManifestRecord, ?>>asList(Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient AgencyIdListManifest _agencyIdListManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleAgencyIdListManifestCreatedByFk;
+    private transient AppUser _moduleAgencyIdListManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public AgencyIdListManifest agencyIdListManifest() {
-        return new AgencyIdListManifest(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+        if (_agencyIdListManifest == null)
+            _agencyIdListManifest = new AgencyIdListManifest(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_AGENCY_ID_LIST_MANIFEST_ID_FK);
+
+        return _agencyIdListManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleAgencyIdListManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK);
+        if (_moduleAgencyIdListManifestCreatedByFk == null)
+            _moduleAgencyIdListManifestCreatedByFk = new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_CREATED_BY_FK);
+
+        return _moduleAgencyIdListManifestCreatedByFk;
     }
 
     public AppUser moduleAgencyIdListManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleAgencyIdListManifestLastUpdatedByFk == null)
+            _moduleAgencyIdListManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_AGENCY_ID_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleAgencyIdListManifestLastUpdatedByFk;
     }
 
     @Override

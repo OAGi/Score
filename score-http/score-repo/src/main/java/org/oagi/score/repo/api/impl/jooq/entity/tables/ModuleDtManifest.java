@@ -147,24 +147,45 @@ public class ModuleDtManifest extends TableImpl<ModuleDtManifestRecord> {
         return Arrays.<ForeignKey<ModuleDtManifestRecord, ?>>asList(Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK, Keys.MODULE_DT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient DtManifest _dtManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleDtManifestCreatedByFk;
+    private transient AppUser _moduleDtManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public DtManifest dtManifest() {
-        return new DtManifest(this, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK);
+        if (_dtManifest == null)
+            _dtManifest = new DtManifest(this, Keys.MODULE_DT_MANIFEST_DT_MANIFEST_ID_FK);
+
+        return _dtManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_DT_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleDtManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK);
+        if (_moduleDtManifestCreatedByFk == null)
+            _moduleDtManifestCreatedByFk = new AppUser(this, Keys.MODULE_DT_MANIFEST_CREATED_BY_FK);
+
+        return _moduleDtManifestCreatedByFk;
     }
 
     public AppUser moduleDtManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleDtManifestLastUpdatedByFk == null)
+            _moduleDtManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_DT_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleDtManifestLastUpdatedByFk;
     }
 
     @Override

@@ -20,6 +20,7 @@ import {AboutService} from './about/domain/about.service';
 import {StateProgressBarModule} from '../common/state-progress-bar/state-progress-bar.module';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {ScoreCommonModule} from '../common/score-common.module';
+import {MessageManagementModule} from '../message-management/message-management.module';
 
 const routes: Routes = [
   {
@@ -46,7 +47,8 @@ const routes: Routes = [
     StateProgressBarModule,
     NgxMatSelectSearchModule,
     CommonModule,
-    ScoreCommonModule
+    ScoreCommonModule,
+    MessageManagementModule
   ],
   exports: [
     HomepageComponent,

@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {SimpleRelease} from '../../release-management/domain/release';
 import {ReleaseService} from '../../release-management/domain/release.service';
+import {BieListDialogComponent} from '../bie-list-dialog/bie-list-dialog.component';
 import {BieListService} from './domain/bie-list.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
@@ -291,5 +292,16 @@ export class BieListComponent implements OnInit {
         });
       }
     });
+  }
+
+  openBieListDialog(bie: BieList, $event) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = window.innerWidth + 'px';
+    dialogConfig.data = {
+      topLevelAsbiepId: bie.topLevelAsbiepId,
+      releaseNum: bie.releaseNum,
+      propertyTerm: bie.propertyTerm
+    };
+    const dialogRef = this.dialog.open(BieListDialogComponent, dialogConfig);
   }
 }

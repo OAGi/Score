@@ -234,36 +234,69 @@ State change can't be undone. But the history record can still keep the records 
         return Arrays.<ForeignKey<AccRecord, ?>>asList(Keys.ACC_BASED_ACC_ID_FK, Keys.ACC_NAMESPACE_ID_FK, Keys.ACC_CREATED_BY_FK, Keys.ACC_OWNER_USER_ID_FK, Keys.ACC_LAST_UPDATED_BY_FK, Keys.ACC_REPLACEMENT_ACC_ID_FK, Keys.ACC_PREV_ACC_ID_FK, Keys.ACC_NEXT_ACC_ID_FK);
     }
 
+    private transient Acc _accBasedAccIdFk;
+    private transient Namespace _namespace;
+    private transient AppUser _accCreatedByFk;
+    private transient AppUser _accOwnerUserIdFk;
+    private transient AppUser _accLastUpdatedByFk;
+    private transient Acc _accReplacementAccIdFk;
+    private transient Acc _accPrevAccIdFk;
+    private transient Acc _accNextAccIdFk;
+
     public Acc accBasedAccIdFk() {
-        return new Acc(this, Keys.ACC_BASED_ACC_ID_FK);
+        if (_accBasedAccIdFk == null)
+            _accBasedAccIdFk = new Acc(this, Keys.ACC_BASED_ACC_ID_FK);
+
+        return _accBasedAccIdFk;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.ACC_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.ACC_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public AppUser accCreatedByFk() {
-        return new AppUser(this, Keys.ACC_CREATED_BY_FK);
+        if (_accCreatedByFk == null)
+            _accCreatedByFk = new AppUser(this, Keys.ACC_CREATED_BY_FK);
+
+        return _accCreatedByFk;
     }
 
     public AppUser accOwnerUserIdFk() {
-        return new AppUser(this, Keys.ACC_OWNER_USER_ID_FK);
+        if (_accOwnerUserIdFk == null)
+            _accOwnerUserIdFk = new AppUser(this, Keys.ACC_OWNER_USER_ID_FK);
+
+        return _accOwnerUserIdFk;
     }
 
     public AppUser accLastUpdatedByFk() {
-        return new AppUser(this, Keys.ACC_LAST_UPDATED_BY_FK);
+        if (_accLastUpdatedByFk == null)
+            _accLastUpdatedByFk = new AppUser(this, Keys.ACC_LAST_UPDATED_BY_FK);
+
+        return _accLastUpdatedByFk;
     }
 
     public Acc accReplacementAccIdFk() {
-        return new Acc(this, Keys.ACC_REPLACEMENT_ACC_ID_FK);
+        if (_accReplacementAccIdFk == null)
+            _accReplacementAccIdFk = new Acc(this, Keys.ACC_REPLACEMENT_ACC_ID_FK);
+
+        return _accReplacementAccIdFk;
     }
 
     public Acc accPrevAccIdFk() {
-        return new Acc(this, Keys.ACC_PREV_ACC_ID_FK);
+        if (_accPrevAccIdFk == null)
+            _accPrevAccIdFk = new Acc(this, Keys.ACC_PREV_ACC_ID_FK);
+
+        return _accPrevAccIdFk;
     }
 
     public Acc accNextAccIdFk() {
-        return new Acc(this, Keys.ACC_NEXT_ACC_ID_FK);
+        if (_accNextAccIdFk == null)
+            _accNextAccIdFk = new Acc(this, Keys.ACC_NEXT_ACC_ID_FK);
+
+        return _accNextAccIdFk;
     }
 
     @Override

@@ -104,6 +104,10 @@ public class CodeListWriteRepository {
             codeList.setIsDeprecated((byte) 0);
         }
 
+        if (basedCodeListManifestRecord != null) {
+            codeList.setBasedCodeListId(basedCodeListManifestRecord.getCodeListId());
+        }
+
         codeList.setCodeListId(
                 dslContext.insertInto(CODE_LIST)
                         .set(codeList)

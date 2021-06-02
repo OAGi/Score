@@ -218,9 +218,9 @@ export class MatchInfo {
         break;
     }
     this.reuse = '';
-    this.sourceDisplayPath = '/' + source.parents.map(i => i.name).join('/').replace(/ /g, '');
+    this.sourceDisplayPath = '/' + source.parents.map(i => i.name).join(' /');
     if (target) {
-      this.targetDisplayPath = '/' + target.parents.map(i => i.name).join('/').replace(/ /g, '');
+      this.targetDisplayPath = '/' + target.parents.map(i => i.name).join(' /');
       if(source.fixed) {
         this.match = 'System';
       } else {
@@ -228,7 +228,7 @@ export class MatchInfo {
       }
     } else {
       this.targetDisplayPath = '';
-      this.match = '';
+      this.match = 'Unmatched';
     }
     if (source.derived) {
       this.reuse = 'Not selected';

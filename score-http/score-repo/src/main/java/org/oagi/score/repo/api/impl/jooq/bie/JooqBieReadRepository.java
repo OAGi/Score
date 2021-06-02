@@ -12,6 +12,7 @@ import org.oagi.score.repo.api.user.model.ScoreUser;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class JooqBieReadRepository
                 TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.ASBIEP_ID,
                 TOP_LEVEL_ASBIEP.RELEASE_ID,
+                ASCCP.PROPERTY_TERM,
+                ASCCP.GUID,
                 TOP_LEVEL_ASBIEP.STATE,
                 TOP_LEVEL_ASBIEP.STATUS,
                 TOP_LEVEL_ASBIEP.VERSION,
@@ -49,6 +52,8 @@ public class JooqBieReadRepository
                 TOP_LEVEL_ASBIEP.LAST_UPDATE_TIMESTAMP)
                 .from(TOP_LEVEL_ASBIEP)
                 .join(ASBIEP).on(TOP_LEVEL_ASBIEP.ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .join(ASCCP_MANIFEST).on(ASBIEP.BASED_ASCCP_MANIFEST_ID.eq(ASCCP_MANIFEST.ASCCP_MANIFEST_ID))
+                .join(ASCCP).on(ASCCP_MANIFEST.ASCCP_ID.eq(ASCCP.ASCCP_ID))
                 .join(APP_USER.as("owner")).on(TOP_LEVEL_ASBIEP.OWNER_USER_ID.eq(APP_USER.as("owner").APP_USER_ID))
                 .join(APP_USER.as("creator")).on(ASBIEP.CREATED_BY.eq(APP_USER.as("creator").APP_USER_ID))
                 .join(APP_USER.as("updater")).on(TOP_LEVEL_ASBIEP.LAST_UPDATED_BY.eq(APP_USER.as("updater").APP_USER_ID));
@@ -60,6 +65,8 @@ public class JooqBieReadRepository
             topLevelAsbiep.setTopLevelAsbiepId(record.get(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID).toBigInteger());
             topLevelAsbiep.setAsbiepId(record.get(TOP_LEVEL_ASBIEP.ASBIEP_ID).toBigInteger());
             topLevelAsbiep.setReleaseId(record.get(TOP_LEVEL_ASBIEP.RELEASE_ID).toBigInteger());
+            topLevelAsbiep.setPropertyTerm(record.get(ASCCP.PROPERTY_TERM));
+            topLevelAsbiep.setGuid(record.get(ASCCP.GUID));
             topLevelAsbiep.setState(BieState.valueOf(record.get(TOP_LEVEL_ASBIEP.STATE)));
             topLevelAsbiep.setStatus(record.get(TOP_LEVEL_ASBIEP.STATUS));
             topLevelAsbiep.setVersion(record.get(TOP_LEVEL_ASBIEP.VERSION));
@@ -390,6 +397,44 @@ public class JooqBieReadRepository
         }
 
         return new GetBiePackageResponse(biePackage);
+    }
+
+    @Override
+    public GetReuseBieListResponse getReuseBieList(
+            GetReuseBieListRequest request) throws ScoreDataAccessException {
+        ULong topLevelAsbiepId = ULong.valueOf(request.getTopLevelAsbiepId());
+        List<ULong> reuseTopLevelAsbiepIdList = getReuseTopLevelAsbiepList(topLevelAsbiepId, request.isReusedBie());
+        List<TopLevelAsbiep> reuseTopLevelAsbiepList = (!reuseTopLevelAsbiepIdList.isEmpty()) ?
+                selectTopLevelAsbiep()
+                        .where(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(reuseTopLevelAsbiepIdList))
+                        .fetch(mapperTopLevelAsbiep()) :
+                Collections.emptyList();
+        return new GetReuseBieListResponse(reuseTopLevelAsbiepList);
+    }
+
+    private List<ULong> getReuseTopLevelAsbiepList(ULong topLevelAsbiepId, boolean isReusedBie) {
+        List<Condition> conds = new ArrayList();
+        if (isReusedBie) {
+            return dslContext().selectDistinct(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                    .from(ASBIE)
+                    .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                    .join(TOP_LEVEL_ASBIEP).on(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                    .where(and(
+                            ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(topLevelAsbiepId),
+                            ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId)
+                    ))
+                    .fetchInto(ULong.class);
+        } else {
+            return dslContext().selectDistinct(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID)
+                    .from(ASBIE)
+                    .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                    .join(TOP_LEVEL_ASBIEP).on(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID))
+                    .where(and(
+                            ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.eq(topLevelAsbiepId),
+                            ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(topLevelAsbiepId)
+                    ))
+                    .fetchInto(ULong.class);
+        }
     }
 
     @Override

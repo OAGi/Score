@@ -71,19 +71,25 @@ public class BbieScWriteRepository {
             if (bbieSc.getUsed() != null){
                 bbieScRecord.setIsUsed((byte) (bbieSc.getUsed() ? 1 : 0));
             }
-
+            
             bbieScRecord.setDefinition(bbieSc.getDefinition());
-            if (bbieSc.isEmptyCardinality()) {
-                DtScRecord dtScRecord = dtScReadRepository.getDtScByManifestId(bbieSc.getBasedDtScManifestId());
-                if (dtScRecord == null) {
-                    throw new IllegalArgumentException();
-                }
-
+            DtScRecord dtScRecord = dtScReadRepository.getDtScByManifestId(bbieSc.getBasedDtScManifestId());
+            if (dtScRecord == null) {
+                throw new IllegalArgumentException();
+            }
+            if (bbieSc.getCardinalityMin() == null) {
                 bbieScRecord.setCardinalityMin(dtScRecord.getCardinalityMin());
-                bbieScRecord.setCardinalityMax(dtScRecord.getCardinalityMax());
             } else {
                 bbieScRecord.setCardinalityMin(bbieSc.getCardinalityMin());
+            }
+
+            if (bbieSc.getCardinalityMax() == null) {
+                bbieScRecord.setCardinalityMax(dtScRecord.getCardinalityMax());
+            } else {
                 bbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());
+            }
+            if (bbieScRecord.getCardinalityMax() > 0 && bbieScRecord.getCardinalityMin() > bbieScRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
             }
             bbieScRecord.setBizTerm(bbieSc.getBizTerm());
             bbieScRecord.setExample(bbieSc.getExample());
@@ -145,9 +151,16 @@ public class BbieScWriteRepository {
                 bbieScRecord.setDefinition(emptyToNull(bbieSc.getDefinition()));
             }
 
-            if (!bbieSc.isEmptyCardinality()) {
+            if (bbieSc.getCardinalityMin() != null) {
                 bbieScRecord.setCardinalityMin(bbieSc.getCardinalityMin());
+            }
+
+            if (bbieSc.getCardinalityMax() != null) {
                 bbieScRecord.setCardinalityMax(bbieSc.getCardinalityMax());
+            }
+
+            if (bbieScRecord.getCardinalityMax() > 0 && bbieScRecord.getCardinalityMin() > bbieScRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
             if (bbieSc.getBizTerm() != null) {

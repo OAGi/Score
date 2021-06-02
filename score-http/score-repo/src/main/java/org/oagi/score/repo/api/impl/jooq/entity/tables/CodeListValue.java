@@ -210,32 +210,61 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return Arrays.<ForeignKey<CodeListValueRecord, ?>>asList(Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_CREATED_BY_FK, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.CODE_LIST_VALUE_PREV_CODE_LIST_VALUE_ID_FK, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK);
     }
 
+    private transient CodeList _codeList;
+    private transient CodeListValue _codeListValueReplacementCodeListValueIdFk;
+    private transient AppUser _codeListValueCreatedByFk;
+    private transient AppUser _codeListValueOwnerUserIdFk;
+    private transient AppUser _codeListValueLastUpdatedByFk;
+    private transient CodeListValue _codeListValuePrevCodeListValueIdFk;
+    private transient CodeListValue _codeListValueNextCodeListValueIdFk;
+
     public CodeList codeList() {
-        return new CodeList(this, Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.CODE_LIST_VALUE_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public CodeListValue codeListValueReplacementCodeListValueIdFk() {
-        return new CodeListValue(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK);
+        if (_codeListValueReplacementCodeListValueIdFk == null)
+            _codeListValueReplacementCodeListValueIdFk = new CodeListValue(this, Keys.CODE_LIST_VALUE_REPLACEMENT_CODE_LIST_VALUE_ID_FK);
+
+        return _codeListValueReplacementCodeListValueIdFk;
     }
 
     public AppUser codeListValueCreatedByFk() {
-        return new AppUser(this, Keys.CODE_LIST_VALUE_CREATED_BY_FK);
+        if (_codeListValueCreatedByFk == null)
+            _codeListValueCreatedByFk = new AppUser(this, Keys.CODE_LIST_VALUE_CREATED_BY_FK);
+
+        return _codeListValueCreatedByFk;
     }
 
     public AppUser codeListValueOwnerUserIdFk() {
-        return new AppUser(this, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK);
+        if (_codeListValueOwnerUserIdFk == null)
+            _codeListValueOwnerUserIdFk = new AppUser(this, Keys.CODE_LIST_VALUE_OWNER_USER_ID_FK);
+
+        return _codeListValueOwnerUserIdFk;
     }
 
     public AppUser codeListValueLastUpdatedByFk() {
-        return new AppUser(this, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK);
+        if (_codeListValueLastUpdatedByFk == null)
+            _codeListValueLastUpdatedByFk = new AppUser(this, Keys.CODE_LIST_VALUE_LAST_UPDATED_BY_FK);
+
+        return _codeListValueLastUpdatedByFk;
     }
 
     public CodeListValue codeListValuePrevCodeListValueIdFk() {
-        return new CodeListValue(this, Keys.CODE_LIST_VALUE_PREV_CODE_LIST_VALUE_ID_FK);
+        if (_codeListValuePrevCodeListValueIdFk == null)
+            _codeListValuePrevCodeListValueIdFk = new CodeListValue(this, Keys.CODE_LIST_VALUE_PREV_CODE_LIST_VALUE_ID_FK);
+
+        return _codeListValuePrevCodeListValueIdFk;
     }
 
     public CodeListValue codeListValueNextCodeListValueIdFk() {
-        return new CodeListValue(this, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK);
+        if (_codeListValueNextCodeListValueIdFk == null)
+            _codeListValueNextCodeListValueIdFk = new CodeListValue(this, Keys.CODE_LIST_VALUE_NEXT_CODE_LIST_VALUE_ID_FK);
+
+        return _codeListValueNextCodeListValueIdFk;
     }
 
     @Override

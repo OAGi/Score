@@ -48,10 +48,6 @@ public class BbieScNode {
         private BigInteger codeListId;
         private BigInteger agencyIdListId;
 
-        public boolean isEmptyCardinality() {
-            return (cardinalityMin == null && cardinalityMax == null);
-        }
-
         public boolean isEmptyPrimitive() {
             return (bdtScPriRestriId == null && codeListId == null && agencyIdListId == null);
         }

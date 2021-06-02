@@ -184,32 +184,61 @@ The ownership can change throughout the history, but undoing shouldn't rollback 
         return Arrays.<ForeignKey<AgencyIdListValueRecord, ?>>asList(Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
     }
 
+    private transient AgencyIdList _agencyIdList;
+    private transient AgencyIdListValue _agencyIdListValueReplacementAgencyIdListValueIdFk;
+    private transient AppUser _agencyIdListValueCreatedByFk;
+    private transient AppUser _agencyIdListValueOwnerUserIdFk;
+    private transient AppUser _agencyIdListValueLastUpdatedByFk;
+    private transient AgencyIdListValue _agencyIdListValuePrevAgencyIdListValueIdFk;
+    private transient AgencyIdListValue _agencyIdListValueNextAgencyIdListValueIdFk;
+
     public AgencyIdList agencyIdList() {
-        return new AgencyIdList(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK);
+        if (_agencyIdList == null)
+            _agencyIdList = new AgencyIdList(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_LIST_ID_FK);
+
+        return _agencyIdList;
     }
 
     public AgencyIdListValue agencyIdListValueReplacementAgencyIdListValueIdFk() {
-        return new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK);
+        if (_agencyIdListValueReplacementAgencyIdListValueIdFk == null)
+            _agencyIdListValueReplacementAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_REPLACEMENT_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValueReplacementAgencyIdListValueIdFk;
     }
 
     public AppUser agencyIdListValueCreatedByFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK);
+        if (_agencyIdListValueCreatedByFk == null)
+            _agencyIdListValueCreatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_CREATED_BY_FK);
+
+        return _agencyIdListValueCreatedByFk;
     }
 
     public AppUser agencyIdListValueOwnerUserIdFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK);
+        if (_agencyIdListValueOwnerUserIdFk == null)
+            _agencyIdListValueOwnerUserIdFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_OWNER_USER_ID_FK);
+
+        return _agencyIdListValueOwnerUserIdFk;
     }
 
     public AppUser agencyIdListValueLastUpdatedByFk() {
-        return new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK);
+        if (_agencyIdListValueLastUpdatedByFk == null)
+            _agencyIdListValueLastUpdatedByFk = new AppUser(this, Keys.AGENCY_ID_LIST_VALUE_LAST_UPDATED_BY_FK);
+
+        return _agencyIdListValueLastUpdatedByFk;
     }
 
     public AgencyIdListValue agencyIdListValuePrevAgencyIdListValueIdFk() {
-        return new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK);
+        if (_agencyIdListValuePrevAgencyIdListValueIdFk == null)
+            _agencyIdListValuePrevAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_PREV_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValuePrevAgencyIdListValueIdFk;
     }
 
     public AgencyIdListValue agencyIdListValueNextAgencyIdListValueIdFk() {
-        return new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
+        if (_agencyIdListValueNextAgencyIdListValueIdFk == null)
+            _agencyIdListValueNextAgencyIdListValueIdFk = new AgencyIdListValue(this, Keys.AGENCY_ID_LIST_VALUE_NEXT_AGENCY_ID_LIST_VALUE_ID_FK);
+
+        return _agencyIdListValueNextAgencyIdListValueIdFk;
     }
 
     @Override

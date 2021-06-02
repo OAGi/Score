@@ -142,20 +142,37 @@ public class ModuleSetAssignment extends TableImpl<ModuleSetAssignmentRecord> {
         return Arrays.<ForeignKey<ModuleSetAssignmentRecord, ?>>asList(Keys.MODULE_SET_ASSIGNMENT_MODULE_SET_ID_FK, Keys.MODULE_SET_ASSIGNMENT_MODULE_ID_FK, Keys.MODULE_SET_ASSIGNMENT_CREATED_BY_FK, Keys.MODULE_SET_ASSIGNMENT_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSet _moduleSet;
+    private transient Module _module;
+    private transient AppUser _moduleSetAssignmentCreatedByFk;
+    private transient AppUser _moduleSetAssignmentLastUpdatedByFk;
+
     public ModuleSet moduleSet() {
-        return new ModuleSet(this, Keys.MODULE_SET_ASSIGNMENT_MODULE_SET_ID_FK);
+        if (_moduleSet == null)
+            _moduleSet = new ModuleSet(this, Keys.MODULE_SET_ASSIGNMENT_MODULE_SET_ID_FK);
+
+        return _moduleSet;
     }
 
     public Module module() {
-        return new Module(this, Keys.MODULE_SET_ASSIGNMENT_MODULE_ID_FK);
+        if (_module == null)
+            _module = new Module(this, Keys.MODULE_SET_ASSIGNMENT_MODULE_ID_FK);
+
+        return _module;
     }
 
     public AppUser moduleSetAssignmentCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_ASSIGNMENT_CREATED_BY_FK);
+        if (_moduleSetAssignmentCreatedByFk == null)
+            _moduleSetAssignmentCreatedByFk = new AppUser(this, Keys.MODULE_SET_ASSIGNMENT_CREATED_BY_FK);
+
+        return _moduleSetAssignmentCreatedByFk;
     }
 
     public AppUser moduleSetAssignmentLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_ASSIGNMENT_LAST_UPDATED_BY_FK);
+        if (_moduleSetAssignmentLastUpdatedByFk == null)
+            _moduleSetAssignmentLastUpdatedByFk = new AppUser(this, Keys.MODULE_SET_ASSIGNMENT_LAST_UPDATED_BY_FK);
+
+        return _moduleSetAssignmentLastUpdatedByFk;
     }
 
     @Override

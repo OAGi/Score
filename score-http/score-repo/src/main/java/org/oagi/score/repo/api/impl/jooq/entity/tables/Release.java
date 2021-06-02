@@ -162,16 +162,29 @@ public class Release extends TableImpl<ReleaseRecord> {
         return Arrays.<ForeignKey<ReleaseRecord, ?>>asList(Keys.RELEASE_NAMESPACE_ID_FK, Keys.RELEASE_CREATED_BY_FK, Keys.RELEASE_LAST_UPDATED_BY_FK);
     }
 
+    private transient Namespace _namespace;
+    private transient AppUser _releaseCreatedByFk;
+    private transient AppUser _releaseLastUpdatedByFk;
+
     public Namespace namespace() {
-        return new Namespace(this, Keys.RELEASE_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.RELEASE_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public AppUser releaseCreatedByFk() {
-        return new AppUser(this, Keys.RELEASE_CREATED_BY_FK);
+        if (_releaseCreatedByFk == null)
+            _releaseCreatedByFk = new AppUser(this, Keys.RELEASE_CREATED_BY_FK);
+
+        return _releaseCreatedByFk;
     }
 
     public AppUser releaseLastUpdatedByFk() {
-        return new AppUser(this, Keys.RELEASE_LAST_UPDATED_BY_FK);
+        if (_releaseLastUpdatedByFk == null)
+            _releaseLastUpdatedByFk = new AppUser(this, Keys.RELEASE_LAST_UPDATED_BY_FK);
+
+        return _releaseLastUpdatedByFk;
     }
 
     @Override

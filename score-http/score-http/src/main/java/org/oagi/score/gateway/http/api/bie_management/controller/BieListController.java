@@ -1,15 +1,15 @@
 package org.oagi.score.gateway.http.api.bie_management.controller;
 
-import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.data.BizCtx;
 import org.oagi.score.gateway.http.api.bie_management.data.BieList;
 import org.oagi.score.gateway.http.api.bie_management.data.BieListRequest;
 import org.oagi.score.gateway.http.api.bie_management.data.DeleteBieListRequest;
 import org.oagi.score.gateway.http.api.bie_management.service.BieService;
+import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.service.common.data.PageRequest;
 import org.oagi.score.service.common.data.PageResponse;
-import org.oagi.score.gateway.http.api.context_management.data.BizCtxAssignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -91,6 +91,27 @@ public class BieListController {
         pageRequest.setPageSize(pageSize);
         request.setPageRequest(pageRequest);
         return service.getBieList(user, request);
+    }
+
+    @RequestMapping(value = "/bie_list/{topLevelAsbiepId}/usage",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public PageResponse<BieList> getBieUsageList(@AuthenticationPrincipal AuthenticatedPrincipal user,
+                                            @PathVariable("topLevelAsbiepId") BigInteger topLevelAsbiepId,
+                                            @RequestParam(name = "sortActive") String sortActive,
+                                            @RequestParam(name = "sortDirection") String sortDirection,
+                                            @RequestParam(name = "pageIndex") int pageIndex,
+                                            @RequestParam(name = "pageSize") int pageSize) {
+
+        BieListRequest request = new BieListRequest();
+        request.setUsageTopLevelAsbiepId(topLevelAsbiepId);
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setSortActive(sortActive);
+        pageRequest.setSortDirection(sortDirection);
+        pageRequest.setPageIndex(pageIndex);
+        pageRequest.setPageSize(pageSize);
+        request.setPageRequest(pageRequest);
+        return service.getUsageOfBieList(user, request);
     }
 
     @RequestMapping(value = "/profile_bie_list/delete", method = RequestMethod.POST,

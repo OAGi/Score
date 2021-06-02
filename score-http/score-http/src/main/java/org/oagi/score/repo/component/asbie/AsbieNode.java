@@ -40,10 +40,6 @@ public class AsbieNode {
         private Boolean nillable;
         private String remark;
         private String definition;
-
-        public boolean isEmptyCardinality() {
-            return (cardinalityMin == null && cardinalityMax == null);
-        }
     }
 
     private Asbie asbie = new Asbie();

@@ -148,12 +148,21 @@ public class CtxCategory extends TableImpl<CtxCategoryRecord> {
         return Arrays.<ForeignKey<CtxCategoryRecord, ?>>asList(Keys.CTX_CATEGORY_CREATED_BY_FK, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
     }
 
+    private transient AppUser _ctxCategoryCreatedByFk;
+    private transient AppUser _ctxCategoryLastUpdatedByFk;
+
     public AppUser ctxCategoryCreatedByFk() {
-        return new AppUser(this, Keys.CTX_CATEGORY_CREATED_BY_FK);
+        if (_ctxCategoryCreatedByFk == null)
+            _ctxCategoryCreatedByFk = new AppUser(this, Keys.CTX_CATEGORY_CREATED_BY_FK);
+
+        return _ctxCategoryCreatedByFk;
     }
 
     public AppUser ctxCategoryLastUpdatedByFk() {
-        return new AppUser(this, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
+        if (_ctxCategoryLastUpdatedByFk == null)
+            _ctxCategoryLastUpdatedByFk = new AppUser(this, Keys.CTX_CATEGORY_LAST_UPDATED_BY_FK);
+
+        return _ctxCategoryLastUpdatedByFk;
     }
 
     @Override

@@ -154,20 +154,37 @@ public class TopLevelAsbiep extends TableImpl<TopLevelAsbiepRecord> {
         return Arrays.<ForeignKey<TopLevelAsbiepRecord, ?>>asList(Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK);
     }
 
+    private transient Asbiep _asbiep;
+    private transient AppUser _topLevelAsbiepOwnerUserIdFk;
+    private transient AppUser _topLevelAsbiepLastUpdatedByFk;
+    private transient Release _release;
+
     public Asbiep asbiep() {
-        return new Asbiep(this, Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK);
+        if (_asbiep == null)
+            _asbiep = new Asbiep(this, Keys.TOP_LEVEL_ASBIEP_ASBIEP_ID_FK);
+
+        return _asbiep;
     }
 
     public AppUser topLevelAsbiepOwnerUserIdFk() {
-        return new AppUser(this, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK);
+        if (_topLevelAsbiepOwnerUserIdFk == null)
+            _topLevelAsbiepOwnerUserIdFk = new AppUser(this, Keys.TOP_LEVEL_ASBIEP_OWNER_USER_ID_FK);
+
+        return _topLevelAsbiepOwnerUserIdFk;
     }
 
     public AppUser topLevelAsbiepLastUpdatedByFk() {
-        return new AppUser(this, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK);
+        if (_topLevelAsbiepLastUpdatedByFk == null)
+            _topLevelAsbiepLastUpdatedByFk = new AppUser(this, Keys.TOP_LEVEL_ASBIEP_LAST_UPDATED_BY_FK);
+
+        return _topLevelAsbiepLastUpdatedByFk;
     }
 
     public Release release() {
-        return new Release(this, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.TOP_LEVEL_ASBIEP_RELEASE_ID_FK);
+
+        return _release;
     }
 
     @Override

@@ -112,7 +112,7 @@
                                   *ngIf="(node.level > 0 && !node.fixed)"
                                   [checked]="node.target !== undefined"
                                   [disabled]="true"></mat-checkbox>
-                    <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
+                    <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
                           this.sourceSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
                           this.sourceSearcher.searchResult.indexOf(node) === this.sourceSearcher.searchIndex ? 'search-index' : 'asd']"
                           [innerHTML]="node.name | highlight : sourceSearcher.searchKeyword">
@@ -217,7 +217,7 @@
                                   [checked]="node.source !== undefined"
                                   (change)="checkMatch($event, node)"
                                   [disabled]="!canMatch(node)"></mat-checkbox>
-                    <span [class]="['pr-2', 'align-self-center', node.type.toLowerCase(),
+                    <span [class]="['pr-2', 'align-self-center', node.typeClass.toLowerCase(),
                           this.targetSearcher.searchResult.indexOf(node) > -1 ? 'inside' : 'outside',
                           this.targetSearcher.searchResult.indexOf(node) === this.targetSearcher.searchIndex ? 'search-index' : 'asd']"
                           [innerHTML]="node.name | highlight : targetSearcher.searchKeyword">
@@ -274,12 +274,8 @@
           <button mat-raised-button color="warn" (click)="back()">
             Back
           </button>
-
-          <button mat-raised-button color="default" (click)="report()">
-            Report
-          </button>
-          <button mat-raised-button color="primary" (click)="createUpliftBIE()">
-            Uplift
+          <button mat-raised-button color="primary" (click)="report()">
+            Next
           </button>
         </div>
       </div>

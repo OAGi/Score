@@ -6,6 +6,7 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/h
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MarkdownModule, MarkedOptions} from 'ngx-markdown';
 
 import {InjectableRxStompConfig, RxStompService, rxStompServiceFactory} from '@stomp/ng2-stompjs';
 import {scoreRxStompConfig} from './common/score-rx-stomp-config';
@@ -24,6 +25,7 @@ import {CcManagementModule} from './cc-management/cc-management.module';
 import {NamespaceManagementModule} from './namespace-management/namespace-management.module';
 import {ReleaseManagementModule} from './release-management/release-management.module';
 import {ModuleManagementModule} from './module-management/module-management.module';
+import {MessageManagementModule} from './message-management/message-management.module';
 
 import {RouterModule} from '@angular/router';
 import {SCORE_WEBAPP_ROUTES} from './basis/routes';
@@ -55,6 +57,19 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
     FormsModule,
     ReactiveFormsModule,
+    MarkdownModule.forRoot({
+      loader: HttpClient,
+      markedOptions: {
+        provide: MarkedOptions,
+        useValue: {
+          gfm: true,
+          breaks: false,
+          pedantic: false,
+          smartLists: true,
+          smartypants: false,
+        }
+      }
+    }),
     BasisModule,
     AccountManagementModule,
     BieManagementModule,
@@ -64,7 +79,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     LogManagementModule,
     NamespaceManagementModule,
     ReleaseManagementModule,
-    ModuleManagementModule
+    ModuleManagementModule,
+    MessageManagementModule
   ],
   declarations: [
     ScoreWebComponent

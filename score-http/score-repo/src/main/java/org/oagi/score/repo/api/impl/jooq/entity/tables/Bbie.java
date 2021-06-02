@@ -250,40 +250,77 @@ public class Bbie extends TableImpl<BbieRecord> {
         return Arrays.<ForeignKey<BbieRecord, ?>>asList(Keys.BBIE_BASED_BCC_MANIFEST_ID_FK, Keys.BBIE_FROM_ABIE_ID_FK, Keys.BBIE_TO_BBIEP_ID_FK, Keys.BBIE_BDT_PRI_RESTRI_ID_FK, Keys.BBIE_CODE_LIST_ID_FK, Keys.BBIE_AGENCY_ID_LIST_ID_FK, Keys.BBIE_CREATED_BY_FK, Keys.BBIE_LAST_UPDATED_BY_FK, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient BccManifest _bccManifest;
+    private transient Abie _abie;
+    private transient Bbiep _bbiep;
+    private transient BdtPriRestri _bdtPriRestri;
+    private transient CodeList _codeList;
+    private transient AgencyIdList _agencyIdList;
+    private transient AppUser _bbieCreatedByFk;
+    private transient AppUser _bbieLastUpdatedByFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public BccManifest bccManifest() {
-        return new BccManifest(this, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK);
+        if (_bccManifest == null)
+            _bccManifest = new BccManifest(this, Keys.BBIE_BASED_BCC_MANIFEST_ID_FK);
+
+        return _bccManifest;
     }
 
     public Abie abie() {
-        return new Abie(this, Keys.BBIE_FROM_ABIE_ID_FK);
+        if (_abie == null)
+            _abie = new Abie(this, Keys.BBIE_FROM_ABIE_ID_FK);
+
+        return _abie;
     }
 
     public Bbiep bbiep() {
-        return new Bbiep(this, Keys.BBIE_TO_BBIEP_ID_FK);
+        if (_bbiep == null)
+            _bbiep = new Bbiep(this, Keys.BBIE_TO_BBIEP_ID_FK);
+
+        return _bbiep;
     }
 
     public BdtPriRestri bdtPriRestri() {
-        return new BdtPriRestri(this, Keys.BBIE_BDT_PRI_RESTRI_ID_FK);
+        if (_bdtPriRestri == null)
+            _bdtPriRestri = new BdtPriRestri(this, Keys.BBIE_BDT_PRI_RESTRI_ID_FK);
+
+        return _bdtPriRestri;
     }
 
     public CodeList codeList() {
-        return new CodeList(this, Keys.BBIE_CODE_LIST_ID_FK);
+        if (_codeList == null)
+            _codeList = new CodeList(this, Keys.BBIE_CODE_LIST_ID_FK);
+
+        return _codeList;
     }
 
     public AgencyIdList agencyIdList() {
-        return new AgencyIdList(this, Keys.BBIE_AGENCY_ID_LIST_ID_FK);
+        if (_agencyIdList == null)
+            _agencyIdList = new AgencyIdList(this, Keys.BBIE_AGENCY_ID_LIST_ID_FK);
+
+        return _agencyIdList;
     }
 
     public AppUser bbieCreatedByFk() {
-        return new AppUser(this, Keys.BBIE_CREATED_BY_FK);
+        if (_bbieCreatedByFk == null)
+            _bbieCreatedByFk = new AppUser(this, Keys.BBIE_CREATED_BY_FK);
+
+        return _bbieCreatedByFk;
     }
 
     public AppUser bbieLastUpdatedByFk() {
-        return new AppUser(this, Keys.BBIE_LAST_UPDATED_BY_FK);
+        if (_bbieLastUpdatedByFk == null)
+            _bbieLastUpdatedByFk = new AppUser(this, Keys.BBIE_LAST_UPDATED_BY_FK);
+
+        return _bbieLastUpdatedByFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

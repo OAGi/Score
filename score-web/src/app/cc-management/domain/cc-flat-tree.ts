@@ -345,7 +345,7 @@ export class BdtScFlatNode extends CcFlatNodeImpl {
   }
 
   get name(): string {
-    return this.bdtScNode.propertyTerm + '. ' + this.bdtScNode.representationTerm;
+    return this.bdtScNode.propertyTerm + ' ' + this.bdtScNode.representationTerm;
   }
 
   set name(val: string) {
@@ -353,7 +353,7 @@ export class BdtScFlatNode extends CcFlatNodeImpl {
   }
 
   get den(): string {
-    return this.name;
+    return this.bdtScNode.propertyTerm + '. ' + this.bdtScNode.representationTerm;
   }
 
   set den(val: string) {

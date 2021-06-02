@@ -96,12 +96,12 @@ export class BieUpliftProfileBieComponent implements OnInit {
 
       this.releases = releases.filter(e => e.releaseNum !== 'Working');
       if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'upliftBIE');
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'BIE');
         if (savedReleaseId) {
           this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
           if (!this.request.release) {
             this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'upliftBIE', this.request.release.releaseId);
+            saveBranch(this.auth.getUserToken(), 'BIE', this.request.release.releaseId);
           }
         } else {
           this.request.release = this.releases[0];
@@ -129,7 +129,7 @@ export class BieUpliftProfileBieComponent implements OnInit {
 
   onSourceReleaseChange(property?: string, source?) {
     if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'upliftBIE', source.releaseId);
+      saveBranch(this.auth.getUserToken(), 'BIE', source.releaseId);
     }
 
     this.targetRelease = undefined;

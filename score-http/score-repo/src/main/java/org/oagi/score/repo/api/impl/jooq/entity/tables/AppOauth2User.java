@@ -157,12 +157,21 @@ public class AppOauth2User extends TableImpl<AppOauth2UserRecord> {
         return Arrays.<ForeignKey<AppOauth2UserRecord, ?>>asList(Keys.APP_OAUTH2_USER_APP_USER_ID_FK, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);
     }
 
+    private transient AppUser _appUser;
+    private transient Oauth2App _oauth2App;
+
     public AppUser appUser() {
-        return new AppUser(this, Keys.APP_OAUTH2_USER_APP_USER_ID_FK);
+        if (_appUser == null)
+            _appUser = new AppUser(this, Keys.APP_OAUTH2_USER_APP_USER_ID_FK);
+
+        return _appUser;
     }
 
     public Oauth2App oauth2App() {
-        return new Oauth2App(this, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);
+        if (_oauth2App == null)
+            _oauth2App = new Oauth2App(this, Keys.APP_OAUTH2_USER_OAUTH2_APP_ID_FK);
+
+        return _oauth2App;
     }
 
     @Override

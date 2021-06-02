@@ -144,28 +144,53 @@ public class BieUsageRule extends TableImpl<BieUsageRuleRecord> {
         return Arrays.<ForeignKey<BieUsageRuleRecord, ?>>asList(Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
     }
 
+    private transient UsageRule _usageRule;
+    private transient Abie _abie;
+    private transient Asbie _asbie;
+    private transient Asbiep _asbiep;
+    private transient Bbie _bbie;
+    private transient Bbiep _bbiep;
+
     public UsageRule usageRule() {
-        return new UsageRule(this, Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK);
+        if (_usageRule == null)
+            _usageRule = new UsageRule(this, Keys.BIE_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK);
+
+        return _usageRule;
     }
 
     public Abie abie() {
-        return new Abie(this, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK);
+        if (_abie == null)
+            _abie = new Abie(this, Keys.BIE_USAGE_RULE_TARGET_ABIE_ID_FK);
+
+        return _abie;
     }
 
     public Asbie asbie() {
-        return new Asbie(this, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK);
+        if (_asbie == null)
+            _asbie = new Asbie(this, Keys.BIE_USAGE_RULE_TARGET_ASBIE_ID_FK);
+
+        return _asbie;
     }
 
     public Asbiep asbiep() {
-        return new Asbiep(this, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK);
+        if (_asbiep == null)
+            _asbiep = new Asbiep(this, Keys.BIE_USAGE_RULE_TARGET_ASBIEP_ID_FK);
+
+        return _asbiep;
     }
 
     public Bbie bbie() {
-        return new Bbie(this, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK);
+        if (_bbie == null)
+            _bbie = new Bbie(this, Keys.BIE_USAGE_RULE_TARGET_BBIE_ID_FK);
+
+        return _bbie;
     }
 
     public Bbiep bbiep() {
-        return new Bbiep(this, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
+        if (_bbiep == null)
+            _bbiep = new Bbiep(this, Keys.BIE_USAGE_RULE_TARGET_BBIEP_ID_FK);
+
+        return _bbiep;
     }
 
     @Override

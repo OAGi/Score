@@ -77,18 +77,26 @@ public class AsbieWriteRepository {
             }
 
             asbieRecord.setDefinition(asbie.getDefinition());
-            if (asbie.isEmptyCardinality()) {
-                AsccRecord asccRecord = asccReadRepository.getAsccByManifestId(asbie.getBasedAsccManifestId());
-                if (asccRecord == null) {
-                    throw new IllegalArgumentException();
-                }
+            AsccRecord asccRecord = asccReadRepository.getAsccByManifestId(asbie.getBasedAsccManifestId());
+            if (asccRecord == null) {
+                throw new IllegalArgumentException();
+            }
 
+            if (asbie.getCardinalityMin() == null) {
                 asbieRecord.setCardinalityMin(asccRecord.getCardinalityMin());
-                asbieRecord.setCardinalityMax(asccRecord.getCardinalityMax());
             } else {
                 asbieRecord.setCardinalityMin(asbie.getCardinalityMin());
+            }
+
+            if (asbie.getCardinalityMax() == null) {
+                asbieRecord.setCardinalityMax(asccRecord.getCardinalityMax());
+            } else {
                 asbieRecord.setCardinalityMax(asbie.getCardinalityMax());
             }
+            if (asbieRecord.getCardinalityMax() > 0 && asbieRecord.getCardinalityMin() > asbieRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
+            }
+
             asbieRecord.setRemark(asbie.getRemark());
 
             asbieRecord.setOwnerTopLevelAsbiepId(topLevelAsbiepId);
@@ -118,9 +126,16 @@ public class AsbieWriteRepository {
                 asbieRecord.setDefinition(emptyToNull(asbie.getDefinition()));
             }
 
-            if (!asbie.isEmptyCardinality()) {
+            if (asbie.getCardinalityMin() != null) {
                 asbieRecord.setCardinalityMin(asbie.getCardinalityMin());
+            }
+
+            if (asbie.getCardinalityMax() != null) {
                 asbieRecord.setCardinalityMax(asbie.getCardinalityMax());
+            }
+
+            if (asbieRecord.getCardinalityMax() > 0 && asbieRecord.getCardinalityMin() > asbieRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
             if (asbie.getRemark() != null) {

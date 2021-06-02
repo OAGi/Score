@@ -128,12 +128,21 @@ public class CdtAwdPri extends TableImpl<CdtAwdPriRecord> {
         return Arrays.<ForeignKey<CdtAwdPriRecord, ?>>asList(Keys.CDT_AWD_PRI_CDT_ID_FK, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);
     }
 
+    private transient Dt _dt;
+    private transient CdtPri _cdtPri;
+
     public Dt dt() {
-        return new Dt(this, Keys.CDT_AWD_PRI_CDT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.CDT_AWD_PRI_CDT_ID_FK);
+
+        return _dt;
     }
 
     public CdtPri cdtPri() {
-        return new CdtPri(this, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);
+        if (_cdtPri == null)
+            _cdtPri = new CdtPri(this, Keys.CDT_AWD_PRI_CDT_PRI_ID_FK);
+
+        return _cdtPri;
     }
 
     @Override

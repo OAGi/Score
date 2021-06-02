@@ -197,24 +197,45 @@ public class Abie extends TableImpl<AbieRecord> {
         return Arrays.<ForeignKey<AbieRecord, ?>>asList(Keys.ABIE_BASED_ACC_MANIFEST_ID_FK, Keys.ABIE_BIZ_CTX_ID_FK, Keys.ABIE_CREATED_BY_FK, Keys.ABIE_LAST_UPDATED_BY_FK, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient AccManifest _accManifest;
+    private transient BizCtx _bizCtx;
+    private transient AppUser _abieCreatedByFk;
+    private transient AppUser _abieLastUpdatedByFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.ABIE_BASED_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.ABIE_BASED_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public BizCtx bizCtx() {
-        return new BizCtx(this, Keys.ABIE_BIZ_CTX_ID_FK);
+        if (_bizCtx == null)
+            _bizCtx = new BizCtx(this, Keys.ABIE_BIZ_CTX_ID_FK);
+
+        return _bizCtx;
     }
 
     public AppUser abieCreatedByFk() {
-        return new AppUser(this, Keys.ABIE_CREATED_BY_FK);
+        if (_abieCreatedByFk == null)
+            _abieCreatedByFk = new AppUser(this, Keys.ABIE_CREATED_BY_FK);
+
+        return _abieCreatedByFk;
     }
 
     public AppUser abieLastUpdatedByFk() {
-        return new AppUser(this, Keys.ABIE_LAST_UPDATED_BY_FK);
+        if (_abieLastUpdatedByFk == null)
+            _abieLastUpdatedByFk = new AppUser(this, Keys.ABIE_LAST_UPDATED_BY_FK);
+
+        return _abieLastUpdatedByFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.ABIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

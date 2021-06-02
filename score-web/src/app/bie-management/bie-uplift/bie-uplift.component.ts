@@ -652,6 +652,7 @@ export class BieUpliftComponent implements OnInit {
     const dialogRef = this.dialog.open(ReportDialogComponent, {
       data: {
         topLevelAsbiepId: this.topLevelAsbiepId,
+        targetAsccpManifestId: this.targetAsccpManifestId,
         releaseId: this.targetReleaseId,
         matches: reports,
       },
@@ -661,6 +662,12 @@ export class BieUpliftComponent implements OnInit {
       maxHeight: '100%',
       autoFocus: false
     });
+
+    dialogRef.afterClosed().subscribe(uplift => {
+      if (uplift) {
+        this.createUpliftBIE();
+      }
+    })
   }
 
   expandSourceNode(node: BieUpliftSourceFlatNode) {

@@ -1,0 +1,19 @@
+<div class="context-section">
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </div>
+
+  <div class="row action-group m-0">
+    <div class="col-3 title-wrap">
+      <mat-label class="title">{{ message.subject }}</mat-label>
+    </div>
+  </div>
+
+  <mat-card class="pt-2 pb-0">
+    <mat-card class="mb-2">
+      <mat-card-content class="mat-card-container">
+        <markdown [data]="message.body" (ready)="loading"></markdown>
+      </mat-card-content>
+    </mat-card>
+  </mat-card>
+</div>

@@ -56,6 +56,9 @@ public class ScoreResponseEntityExceptionHandler extends ResponseEntityException
 
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.set("X-Error-Message", ex.getMessage());
+        if (ex.getErrorMessageId() != null) {
+            headers.set("X-Error-Message-Id", ex.getErrorMessageId().toString());
+        }
         return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
     }
 

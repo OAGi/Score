@@ -147,24 +147,45 @@ public class ModuleAccManifest extends TableImpl<ModuleAccManifestRecord> {
         return Arrays.<ForeignKey<ModuleAccManifestRecord, ?>>asList(Keys.MODULE_ACC_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_ACC_MANIFEST_ACC_MANIFEST_ID_FK, Keys.MODULE_ACC_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_ACC_MANIFEST_CREATED_BY_FK, Keys.MODULE_ACC_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient AccManifest _accManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleAccManifestCreatedByFk;
+    private transient AppUser _moduleAccManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_ACC_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_ACC_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public AccManifest accManifest() {
-        return new AccManifest(this, Keys.MODULE_ACC_MANIFEST_ACC_MANIFEST_ID_FK);
+        if (_accManifest == null)
+            _accManifest = new AccManifest(this, Keys.MODULE_ACC_MANIFEST_ACC_MANIFEST_ID_FK);
+
+        return _accManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_ACC_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_ACC_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleAccManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_ACC_MANIFEST_CREATED_BY_FK);
+        if (_moduleAccManifestCreatedByFk == null)
+            _moduleAccManifestCreatedByFk = new AppUser(this, Keys.MODULE_ACC_MANIFEST_CREATED_BY_FK);
+
+        return _moduleAccManifestCreatedByFk;
     }
 
     public AppUser moduleAccManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_ACC_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleAccManifestLastUpdatedByFk == null)
+            _moduleAccManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_ACC_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleAccManifestLastUpdatedByFk;
     }
 
     @Override

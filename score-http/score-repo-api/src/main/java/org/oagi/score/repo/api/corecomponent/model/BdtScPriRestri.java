@@ -7,6 +7,8 @@ public class BdtScPriRestri implements Serializable {
 
     private BigInteger bdtScPriRestriId;
     private BigInteger bdtScId;
+    private BigInteger xbtId;
+    private String xbtName;
     private BigInteger cdtScAwdPriXpsTypeMapId;
     private BigInteger codeListId;
     private BigInteger agencyIdListId;
@@ -26,6 +28,22 @@ public class BdtScPriRestri implements Serializable {
 
     public void setBdtScId(BigInteger bdtScId) {
         this.bdtScId = bdtScId;
+    }
+
+    public BigInteger getXbtId() {
+        return xbtId;
+    }
+
+    public void setXbtId(BigInteger xbtId) {
+        this.xbtId = xbtId;
+    }
+
+    public String getXbtName() {
+        return xbtName;
+    }
+
+    public void setXbtName(String xbtName) {
+        this.xbtName = xbtName;
     }
 
     public BigInteger getCdtScAwdPriXpsTypeMapId() {

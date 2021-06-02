@@ -147,24 +147,45 @@ public class ModuleCodeListManifest extends TableImpl<ModuleCodeListManifestReco
         return Arrays.<ForeignKey<ModuleCodeListManifestRecord, ?>>asList(Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSetRelease _moduleSetRelease;
+    private transient CodeListManifest _codeListManifest;
+    private transient ModuleSetAssignment _moduleSetAssignment;
+    private transient AppUser _moduleCodeListManifestCreatedByFk;
+    private transient AppUser _moduleCodeListManifestLastUpdatedByFk;
+
     public ModuleSetRelease moduleSetRelease() {
-        return new ModuleSetRelease(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+        if (_moduleSetRelease == null)
+            _moduleSetRelease = new ModuleSetRelease(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_RELEASE_ID_FK);
+
+        return _moduleSetRelease;
     }
 
     public CodeListManifest codeListManifest() {
-        return new CodeListManifest(this, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK);
+        if (_codeListManifest == null)
+            _codeListManifest = new CodeListManifest(this, Keys.MODULE_CODE_LIST_MANIFEST_CODE_LIST_MANIFEST_ID_FK);
+
+        return _codeListManifest;
     }
 
     public ModuleSetAssignment moduleSetAssignment() {
-        return new ModuleSetAssignment(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+        if (_moduleSetAssignment == null)
+            _moduleSetAssignment = new ModuleSetAssignment(this, Keys.MODULE_CODE_LIST_MANIFEST_MODULE_SET_ASSIGNMENT_ID_FK);
+
+        return _moduleSetAssignment;
     }
 
     public AppUser moduleCodeListManifestCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK);
+        if (_moduleCodeListManifestCreatedByFk == null)
+            _moduleCodeListManifestCreatedByFk = new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_CREATED_BY_FK);
+
+        return _moduleCodeListManifestCreatedByFk;
     }
 
     public AppUser moduleCodeListManifestLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+        if (_moduleCodeListManifestLastUpdatedByFk == null)
+            _moduleCodeListManifestLastUpdatedByFk = new AppUser(this, Keys.MODULE_CODE_LIST_MANIFEST_LAST_UPDATED_BY_FK);
+
+        return _moduleCodeListManifestLastUpdatedByFk;
     }
 
     @Override

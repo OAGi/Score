@@ -196,20 +196,37 @@ public class Xbt extends TableImpl<XbtRecord> {
         return Arrays.<ForeignKey<XbtRecord, ?>>asList(Keys.XBT_SUBTYPE_OF_XBT_ID_FK, Keys.XBT_CREATED_BY_FK, Keys.XBT_OWNER_USER_ID_FK, Keys.XBT_LAST_UPDATED_BY_FK);
     }
 
+    private transient Xbt _xbt;
+    private transient AppUser _xbtCreatedByFk;
+    private transient AppUser _xbtOwnerUserIdFk;
+    private transient AppUser _xbtLastUpdatedByFk;
+
     public Xbt xbt() {
-        return new Xbt(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK);
+        if (_xbt == null)
+            _xbt = new Xbt(this, Keys.XBT_SUBTYPE_OF_XBT_ID_FK);
+
+        return _xbt;
     }
 
     public AppUser xbtCreatedByFk() {
-        return new AppUser(this, Keys.XBT_CREATED_BY_FK);
+        if (_xbtCreatedByFk == null)
+            _xbtCreatedByFk = new AppUser(this, Keys.XBT_CREATED_BY_FK);
+
+        return _xbtCreatedByFk;
     }
 
     public AppUser xbtOwnerUserIdFk() {
-        return new AppUser(this, Keys.XBT_OWNER_USER_ID_FK);
+        if (_xbtOwnerUserIdFk == null)
+            _xbtOwnerUserIdFk = new AppUser(this, Keys.XBT_OWNER_USER_ID_FK);
+
+        return _xbtOwnerUserIdFk;
     }
 
     public AppUser xbtLastUpdatedByFk() {
-        return new AppUser(this, Keys.XBT_LAST_UPDATED_BY_FK);
+        if (_xbtLastUpdatedByFk == null)
+            _xbtLastUpdatedByFk = new AppUser(this, Keys.XBT_LAST_UPDATED_BY_FK);
+
+        return _xbtLastUpdatedByFk;
     }
 
     @Override

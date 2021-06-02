@@ -151,32 +151,61 @@ public class AccManifest extends TableImpl<AccManifestRecord> {
         return Arrays.<ForeignKey<AccManifestRecord, ?>>asList(Keys.ACC_MANIFEST_RELEASE_ID_FK, Keys.ACC_MANIFEST_ACC_ID_FK, Keys.ACC_MANIFEST_BASED_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_LOG_ID_FK, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_PREV_ACC_MANIFEST_ID_FK, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Acc _acc;
+    private transient AccManifest _accManifestBasedAccManifestIdFk;
+    private transient Log _log;
+    private transient AccManifest _accReplacementAccManifestIdFk;
+    private transient AccManifest _accManifestPrevAccManifestIdFk;
+    private transient AccManifest _accManifestNextAccManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.ACC_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.ACC_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Acc acc() {
-        return new Acc(this, Keys.ACC_MANIFEST_ACC_ID_FK);
+        if (_acc == null)
+            _acc = new Acc(this, Keys.ACC_MANIFEST_ACC_ID_FK);
+
+        return _acc;
     }
 
     public AccManifest accManifestBasedAccManifestIdFk() {
-        return new AccManifest(this, Keys.ACC_MANIFEST_BASED_ACC_MANIFEST_ID_FK);
+        if (_accManifestBasedAccManifestIdFk == null)
+            _accManifestBasedAccManifestIdFk = new AccManifest(this, Keys.ACC_MANIFEST_BASED_ACC_MANIFEST_ID_FK);
+
+        return _accManifestBasedAccManifestIdFk;
     }
 
     public Log log() {
-        return new Log(this, Keys.ACC_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.ACC_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public AccManifest accReplacementAccManifestIdFk() {
-        return new AccManifest(this, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK);
+        if (_accReplacementAccManifestIdFk == null)
+            _accReplacementAccManifestIdFk = new AccManifest(this, Keys.ACC_REPLACEMENT_ACC_MANIFEST_ID_FK);
+
+        return _accReplacementAccManifestIdFk;
     }
 
     public AccManifest accManifestPrevAccManifestIdFk() {
-        return new AccManifest(this, Keys.ACC_MANIFEST_PREV_ACC_MANIFEST_ID_FK);
+        if (_accManifestPrevAccManifestIdFk == null)
+            _accManifestPrevAccManifestIdFk = new AccManifest(this, Keys.ACC_MANIFEST_PREV_ACC_MANIFEST_ID_FK);
+
+        return _accManifestPrevAccManifestIdFk;
     }
 
     public AccManifest accManifestNextAccManifestIdFk() {
-        return new AccManifest(this, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK);
+        if (_accManifestNextAccManifestIdFk == null)
+            _accManifestNextAccManifestIdFk = new AccManifest(this, Keys.ACC_MANIFEST_NEXT_ACC_MANIFEST_ID_FK);
+
+        return _accManifestNextAccManifestIdFk;
     }
 
     @Override

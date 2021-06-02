@@ -147,12 +147,21 @@ public class ModuleSet extends TableImpl<ModuleSetRecord> {
         return Arrays.<ForeignKey<ModuleSetRecord, ?>>asList(Keys.MODULE_SET_CREATED_BY_FK, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
     }
 
+    private transient AppUser _moduleSetCreatedByFk;
+    private transient AppUser _moduleSetLastUpdatedByFk;
+
     public AppUser moduleSetCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_CREATED_BY_FK);
+        if (_moduleSetCreatedByFk == null)
+            _moduleSetCreatedByFk = new AppUser(this, Keys.MODULE_SET_CREATED_BY_FK);
+
+        return _moduleSetCreatedByFk;
     }
 
     public AppUser moduleSetLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
+        if (_moduleSetLastUpdatedByFk == null)
+            _moduleSetLastUpdatedByFk = new AppUser(this, Keys.MODULE_SET_LAST_UPDATED_BY_FK);
+
+        return _moduleSetLastUpdatedByFk;
     }
 
     @Override

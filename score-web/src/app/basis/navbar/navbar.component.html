@@ -24,8 +24,14 @@
         <button mat-menu-item routerLink="profile_bie/express" title="{{'BIE_NAV.GENERATE' | translate}}">
           Express BIE
         </button>
+        <button mat-menu-item routerLink="profile_bie/report" title="{{'BIE_NAV.REPORT' | translate}}">
+          Reuse Report
+        </button>
         <mat-divider></mat-divider>
-        <button mat-menu-item routerLink="code_list">View/Edit Code List</button>
+        <button mat-menu-item
+                [routerLink]="['/code_list']"
+                [queryParams]="{q: q([{key: 'cookieType', value: 'BIE'}]) }"
+        >View/Edit Code List</button>
         <button mat-menu-item routerLink="code_list/uplift" [disabled]="role === 'developer'">Uplift Code List</button>
       </ng-template>
     </mat-menu>
@@ -49,13 +55,13 @@
       </ng-template>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>
-    <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">
-      <ng-template matMenuContent>
-        <button mat-menu-item routerLink="module_management/module_set">View/Edit Module Set</button>
-        <button mat-menu-item routerLink="module_management/module_set_release">View/Edit Module Set Release</button>
-      </ng-template>
-    </mat-menu>
+<!--    <button mat-button [matMenuTriggerFor]="moduleMenu" title="Module">Module</button>-->
+<!--    <mat-menu #moduleMenu="matMenu" [overlapTrigger]="false">-->
+<!--      <ng-template matMenuContent>-->
+<!--        <button mat-menu-item routerLink="module_management/module_set">View/Edit Module Set</button>-->
+<!--        <button mat-menu-item routerLink="module_management/module_set_release">View/Edit Module Set Release</button>-->
+<!--      </ng-template>-->
+<!--    </mat-menu>-->
 
     <button mat-button [matMenuTriggerFor]="adminMenu" *ngIf="role === 'developer'">Admin</button>
     <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
@@ -78,6 +84,13 @@
         </button>
       </ng-template>
     </mat-menu>
+
+    <button mat-button (click)="navigateMessageListPage()">
+      <mat-icon matBadge="{{ notiCount }}" matBadgeColor="primary"
+                [matBadgeHidden]="notiCount <= 0"
+                matTooltip="You have {{ (!!notiCount && notiCount > 0) ? notiCount : 'no' }} unread notification{{ (!!notiCount && notiCount == 1) ? '' : 's' }}"
+                matTooltipPosition="below">{{ notiMatIcon }}</mat-icon>
+    </button>
 
     <button mat-button [matMenuTriggerFor]="settingMenu">{{ username }}</button>
     <mat-menu #settingMenu="matMenu" [overlapTrigger]="false">

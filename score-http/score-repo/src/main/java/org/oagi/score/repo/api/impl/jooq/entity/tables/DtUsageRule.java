@@ -130,16 +130,29 @@ public class DtUsageRule extends TableImpl<DtUsageRuleRecord> {
         return Arrays.<ForeignKey<DtUsageRuleRecord, ?>>asList(Keys.DT_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK, Keys.DT_USAGE_RULE_TARGET_DT_ID_FK, Keys.DT_USAGE_RULE_TARGET_DT_SC_ID_FK);
     }
 
+    private transient UsageRule _usageRule;
+    private transient Dt _dt;
+    private transient DtSc _dtSc;
+
     public UsageRule usageRule() {
-        return new UsageRule(this, Keys.DT_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK);
+        if (_usageRule == null)
+            _usageRule = new UsageRule(this, Keys.DT_USAGE_RULE_ASSIGNED_USAGE_RULE_ID_FK);
+
+        return _usageRule;
     }
 
     public Dt dt() {
-        return new Dt(this, Keys.DT_USAGE_RULE_TARGET_DT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.DT_USAGE_RULE_TARGET_DT_ID_FK);
+
+        return _dt;
     }
 
     public DtSc dtSc() {
-        return new DtSc(this, Keys.DT_USAGE_RULE_TARGET_DT_SC_ID_FK);
+        if (_dtSc == null)
+            _dtSc = new DtSc(this, Keys.DT_USAGE_RULE_TARGET_DT_SC_ID_FK);
+
+        return _dtSc;
     }
 
     @Override

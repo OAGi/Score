@@ -1,4 +1,4 @@
-.mat-column-sourcePath, .mat-column-targetPath {
+.mat-column-sourceDisplayPath, .mat-column-targetDisplayPath {
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -13,3 +13,37 @@
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+
+.mat-column-reuse {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 5% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-match {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 5% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+

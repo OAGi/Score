@@ -146,28 +146,53 @@ public class DtScManifest extends TableImpl<DtScManifestRecord> {
         return Arrays.<ForeignKey<DtScManifestRecord, ?>>asList(Keys.DT_SC_MANIFEST_RELEASE_ID_FK, Keys.DT_SC_MANIFEST_DT_SC_ID_FK, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient DtSc _dtSc;
+    private transient DtManifest _dtManifest;
+    private transient DtScManifest _dtScReplacementDtScManifestIdFk;
+    private transient DtScManifest _dtScPrevDtScManifestIdFk;
+    private transient DtScManifest _dtScNextDtScManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.DT_SC_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public DtSc dtSc() {
-        return new DtSc(this, Keys.DT_SC_MANIFEST_DT_SC_ID_FK);
+        if (_dtSc == null)
+            _dtSc = new DtSc(this, Keys.DT_SC_MANIFEST_DT_SC_ID_FK);
+
+        return _dtSc;
     }
 
     public DtManifest dtManifest() {
-        return new DtManifest(this, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK);
+        if (_dtManifest == null)
+            _dtManifest = new DtManifest(this, Keys.DT_SC_MANIFEST_OWNER_DT_MANIFEST_ID_FK);
+
+        return _dtManifest;
     }
 
     public DtScManifest dtScReplacementDtScManifestIdFk() {
-        return new DtScManifest(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK);
+        if (_dtScReplacementDtScManifestIdFk == null)
+            _dtScReplacementDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_REPLACEMENT_DT_SC_MANIFEST_ID_FK);
+
+        return _dtScReplacementDtScManifestIdFk;
     }
 
     public DtScManifest dtScPrevDtScManifestIdFk() {
-        return new DtScManifest(this, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK);
+        if (_dtScPrevDtScManifestIdFk == null)
+            _dtScPrevDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_PREV_DT_SC_MANIFEST_ID_FK);
+
+        return _dtScPrevDtScManifestIdFk;
     }
 
     public DtScManifest dtScNextDtScManifestIdFk() {
-        return new DtScManifest(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
+        if (_dtScNextDtScManifestIdFk == null)
+            _dtScNextDtScManifestIdFk = new DtScManifest(this, Keys.DT_SC_NEXT_DT_SC_MANIFEST_ID_FK);
+
+        return _dtScNextDtScManifestIdFk;
     }
 
     @Override

@@ -31,7 +31,8 @@ export class BieUpliftService implements OnInit {
     });
   }
 
-  checkValidationMatches(topLevelAsbiepId: number, targetReleaseId: number, matches: MatchInfo[]): Observable<BieValidationResponse> {
-    return this.http.post<BieValidationResponse>('/api/profile_bie/' + topLevelAsbiepId + '/uplifting/' + targetReleaseId + '/valid', {mappingList: matches});
+  checkValidationMatches(topLevelAsbiepId: number, targetReleaseId: number, targetAsccpManifestId: number, matches: MatchInfo[]): Observable<BieValidationResponse> {
+    return this.http.post<BieValidationResponse>('/api/profile_bie/' + topLevelAsbiepId + '/uplifting/' + targetReleaseId + '/valid',
+      {mappingList: matches, targetAsccpManifestId: targetAsccpManifestId});
   }
 }

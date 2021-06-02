@@ -56,7 +56,7 @@ public class JooqScoreUserReadRepository
         List<Condition> conds = new ArrayList();
 
         BigInteger userId = request.getUserId();
-        if (!isNull(userId)) {
+        if (userId != null) {
             conds.add(APP_USER.APP_USER_ID.eq(ULong.valueOf(userId)));
         }
         String username = request.getUsername();

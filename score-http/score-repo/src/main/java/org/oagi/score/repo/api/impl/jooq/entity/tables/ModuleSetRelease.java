@@ -147,20 +147,37 @@ public class ModuleSetRelease extends TableImpl<ModuleSetReleaseRecord> {
         return Arrays.<ForeignKey<ModuleSetReleaseRecord, ?>>asList(Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK, Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK);
     }
 
+    private transient ModuleSet _moduleSet;
+    private transient Release _release;
+    private transient AppUser _moduleSetReleaseAssignmentCreatedByFk;
+    private transient AppUser _moduleSetReleaseAssignmentLastUpdatedByFk;
+
     public ModuleSet moduleSet() {
-        return new ModuleSet(this, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK);
+        if (_moduleSet == null)
+            _moduleSet = new ModuleSet(this, Keys.MODULE_SET_RELEASE_MODULE_SET_ID_FK);
+
+        return _moduleSet;
     }
 
     public Release release() {
-        return new Release(this, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.MODULE_SET_RELEASE_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public AppUser moduleSetReleaseAssignmentCreatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK);
+        if (_moduleSetReleaseAssignmentCreatedByFk == null)
+            _moduleSetReleaseAssignmentCreatedByFk = new AppUser(this, Keys.MODULE_SET_RELEASE_ASSIGNMENT_CREATED_BY_FK);
+
+        return _moduleSetReleaseAssignmentCreatedByFk;
     }
 
     public AppUser moduleSetReleaseAssignmentLastUpdatedByFk() {
-        return new AppUser(this, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK);
+        if (_moduleSetReleaseAssignmentLastUpdatedByFk == null)
+            _moduleSetReleaseAssignmentLastUpdatedByFk = new AppUser(this, Keys.MODULE_SET_RELEASE_ASSIGNMENT_LAST_UPDATED_BY_FK);
+
+        return _moduleSetReleaseAssignmentLastUpdatedByFk;
     }
 
     @Override

@@ -151,32 +151,61 @@ public class DtManifest extends TableImpl<DtManifestRecord> {
         return Arrays.<ForeignKey<DtManifestRecord, ?>>asList(Keys.DT_MANIFEST_RELEASE_ID_FK, Keys.DT_MANIFEST_DT_ID_FK, Keys.DT_MANIFEST_BASED_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_LOG_ID_FK, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_PREV_DT_MANIFEST_ID_FK, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK);
     }
 
+    private transient Release _release;
+    private transient Dt _dt;
+    private transient DtManifest _dtManifestBasedDtManifestIdFk;
+    private transient Log _log;
+    private transient DtManifest _dtReplacementDtManifestIdFk;
+    private transient DtManifest _dtManifestPrevDtManifestIdFk;
+    private transient DtManifest _dtManifestNextDtManifestIdFk;
+
     public Release release() {
-        return new Release(this, Keys.DT_MANIFEST_RELEASE_ID_FK);
+        if (_release == null)
+            _release = new Release(this, Keys.DT_MANIFEST_RELEASE_ID_FK);
+
+        return _release;
     }
 
     public Dt dt() {
-        return new Dt(this, Keys.DT_MANIFEST_DT_ID_FK);
+        if (_dt == null)
+            _dt = new Dt(this, Keys.DT_MANIFEST_DT_ID_FK);
+
+        return _dt;
     }
 
     public DtManifest dtManifestBasedDtManifestIdFk() {
-        return new DtManifest(this, Keys.DT_MANIFEST_BASED_DT_MANIFEST_ID_FK);
+        if (_dtManifestBasedDtManifestIdFk == null)
+            _dtManifestBasedDtManifestIdFk = new DtManifest(this, Keys.DT_MANIFEST_BASED_DT_MANIFEST_ID_FK);
+
+        return _dtManifestBasedDtManifestIdFk;
     }
 
     public Log log() {
-        return new Log(this, Keys.DT_MANIFEST_LOG_ID_FK);
+        if (_log == null)
+            _log = new Log(this, Keys.DT_MANIFEST_LOG_ID_FK);
+
+        return _log;
     }
 
     public DtManifest dtReplacementDtManifestIdFk() {
-        return new DtManifest(this, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK);
+        if (_dtReplacementDtManifestIdFk == null)
+            _dtReplacementDtManifestIdFk = new DtManifest(this, Keys.DT_REPLACEMENT_DT_MANIFEST_ID_FK);
+
+        return _dtReplacementDtManifestIdFk;
     }
 
     public DtManifest dtManifestPrevDtManifestIdFk() {
-        return new DtManifest(this, Keys.DT_MANIFEST_PREV_DT_MANIFEST_ID_FK);
+        if (_dtManifestPrevDtManifestIdFk == null)
+            _dtManifestPrevDtManifestIdFk = new DtManifest(this, Keys.DT_MANIFEST_PREV_DT_MANIFEST_ID_FK);
+
+        return _dtManifestPrevDtManifestIdFk;
     }
 
     public DtManifest dtManifestNextDtManifestIdFk() {
-        return new DtManifest(this, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK);
+        if (_dtManifestNextDtManifestIdFk == null)
+            _dtManifestNextDtManifestIdFk = new DtManifest(this, Keys.DT_MANIFEST_NEXT_DT_MANIFEST_ID_FK);
+
+        return _dtManifestNextDtManifestIdFk;
     }
 
     @Override

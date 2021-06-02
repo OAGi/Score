@@ -231,36 +231,69 @@ State change can't be undone. But the history record can still keep the records 
         return Arrays.<ForeignKey<AsccpRecord, ?>>asList(Keys.ASCCP_ROLE_OF_ACC_ID_FK, Keys.ASCCP_CREATED_BY_FK, Keys.ASCCP_OWNER_USER_ID_FK, Keys.ASCCP_LAST_UPDATED_BY_FK, Keys.ASCCP_NAMESPACE_ID_FK, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK, Keys.ASCCP_PREV_ASCCP_ID_FK, Keys.ASCCP_NEXT_ASCCP_ID_FK);
     }
 
+    private transient Acc _acc;
+    private transient AppUser _asccpCreatedByFk;
+    private transient AppUser _asccpOwnerUserIdFk;
+    private transient AppUser _asccpLastUpdatedByFk;
+    private transient Namespace _namespace;
+    private transient Asccp _asccpReplacementAsccpIdFk;
+    private transient Asccp _asccpPrevAsccpIdFk;
+    private transient Asccp _asccpNextAsccpIdFk;
+
     public Acc acc() {
-        return new Acc(this, Keys.ASCCP_ROLE_OF_ACC_ID_FK);
+        if (_acc == null)
+            _acc = new Acc(this, Keys.ASCCP_ROLE_OF_ACC_ID_FK);
+
+        return _acc;
     }
 
     public AppUser asccpCreatedByFk() {
-        return new AppUser(this, Keys.ASCCP_CREATED_BY_FK);
+        if (_asccpCreatedByFk == null)
+            _asccpCreatedByFk = new AppUser(this, Keys.ASCCP_CREATED_BY_FK);
+
+        return _asccpCreatedByFk;
     }
 
     public AppUser asccpOwnerUserIdFk() {
-        return new AppUser(this, Keys.ASCCP_OWNER_USER_ID_FK);
+        if (_asccpOwnerUserIdFk == null)
+            _asccpOwnerUserIdFk = new AppUser(this, Keys.ASCCP_OWNER_USER_ID_FK);
+
+        return _asccpOwnerUserIdFk;
     }
 
     public AppUser asccpLastUpdatedByFk() {
-        return new AppUser(this, Keys.ASCCP_LAST_UPDATED_BY_FK);
+        if (_asccpLastUpdatedByFk == null)
+            _asccpLastUpdatedByFk = new AppUser(this, Keys.ASCCP_LAST_UPDATED_BY_FK);
+
+        return _asccpLastUpdatedByFk;
     }
 
     public Namespace namespace() {
-        return new Namespace(this, Keys.ASCCP_NAMESPACE_ID_FK);
+        if (_namespace == null)
+            _namespace = new Namespace(this, Keys.ASCCP_NAMESPACE_ID_FK);
+
+        return _namespace;
     }
 
     public Asccp asccpReplacementAsccpIdFk() {
-        return new Asccp(this, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK);
+        if (_asccpReplacementAsccpIdFk == null)
+            _asccpReplacementAsccpIdFk = new Asccp(this, Keys.ASCCP_REPLACEMENT_ASCCP_ID_FK);
+
+        return _asccpReplacementAsccpIdFk;
     }
 
     public Asccp asccpPrevAsccpIdFk() {
-        return new Asccp(this, Keys.ASCCP_PREV_ASCCP_ID_FK);
+        if (_asccpPrevAsccpIdFk == null)
+            _asccpPrevAsccpIdFk = new Asccp(this, Keys.ASCCP_PREV_ASCCP_ID_FK);
+
+        return _asccpPrevAsccpIdFk;
     }
 
     public Asccp asccpNextAsccpIdFk() {
-        return new Asccp(this, Keys.ASCCP_NEXT_ASCCP_ID_FK);
+        if (_asccpNextAsccpIdFk == null)
+            _asccpNextAsccpIdFk = new Asccp(this, Keys.ASCCP_NEXT_ASCCP_ID_FK);
+
+        return _asccpNextAsccpIdFk;
     }
 
     @Override

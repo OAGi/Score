@@ -211,28 +211,53 @@ public class Asbie extends TableImpl<AsbieRecord> {
         return Arrays.<ForeignKey<AsbieRecord, ?>>asList(Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK, Keys.ASBIE_FROM_ABIE_ID_FK, Keys.ASBIE_TO_ASBIEP_ID_FK, Keys.ASBIE_CREATED_BY_FK, Keys.ASBIE_LAST_UPDATED_BY_FK, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient AsccManifest _asccManifest;
+    private transient Abie _abie;
+    private transient Asbiep _asbiep;
+    private transient AppUser _asbieCreatedByFk;
+    private transient AppUser _asbieLastUpdatedByFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public AsccManifest asccManifest() {
-        return new AsccManifest(this, Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK);
+        if (_asccManifest == null)
+            _asccManifest = new AsccManifest(this, Keys.ASBIE_BASED_ASCC_MANIFEST_ID_FK);
+
+        return _asccManifest;
     }
 
     public Abie abie() {
-        return new Abie(this, Keys.ASBIE_FROM_ABIE_ID_FK);
+        if (_abie == null)
+            _abie = new Abie(this, Keys.ASBIE_FROM_ABIE_ID_FK);
+
+        return _abie;
     }
 
     public Asbiep asbiep() {
-        return new Asbiep(this, Keys.ASBIE_TO_ASBIEP_ID_FK);
+        if (_asbiep == null)
+            _asbiep = new Asbiep(this, Keys.ASBIE_TO_ASBIEP_ID_FK);
+
+        return _asbiep;
     }
 
     public AppUser asbieCreatedByFk() {
-        return new AppUser(this, Keys.ASBIE_CREATED_BY_FK);
+        if (_asbieCreatedByFk == null)
+            _asbieCreatedByFk = new AppUser(this, Keys.ASBIE_CREATED_BY_FK);
+
+        return _asbieCreatedByFk;
     }
 
     public AppUser asbieLastUpdatedByFk() {
-        return new AppUser(this, Keys.ASBIE_LAST_UPDATED_BY_FK);
+        if (_asbieLastUpdatedByFk == null)
+            _asbieLastUpdatedByFk = new AppUser(this, Keys.ASBIE_LAST_UPDATED_BY_FK);
+
+        return _asbieLastUpdatedByFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.ASBIE_OWNER_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

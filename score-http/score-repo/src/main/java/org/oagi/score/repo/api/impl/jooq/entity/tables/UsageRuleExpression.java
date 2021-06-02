@@ -128,8 +128,13 @@ public class UsageRuleExpression extends TableImpl<UsageRuleExpressionRecord> {
         return Arrays.<ForeignKey<UsageRuleExpressionRecord, ?>>asList(Keys.USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK);
     }
 
+    private transient UsageRule _usageRule;
+
     public UsageRule usageRule() {
-        return new UsageRule(this, Keys.USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK);
+        if (_usageRule == null)
+            _usageRule = new UsageRule(this, Keys.USAGE_RULE_EXPRESSION_REPRESENTED_USAGE_RULE_ID_FK);
+
+        return _usageRule;
     }
 
     @Override

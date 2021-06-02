@@ -144,20 +144,37 @@ public class BieUserExtRevision extends TableImpl<BieUserExtRevisionRecord> {
         return Arrays.<ForeignKey<BieUserExtRevisionRecord, ?>>asList(Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
     }
 
+    private transient Abie _abie;
+    private transient Acc _bieUserExtRevisionExtAccIdFk;
+    private transient Acc _bieUserExtRevisionUserExtAccIdFk;
+    private transient TopLevelAsbiep _topLevelAsbiep;
+
     public Abie abie() {
-        return new Abie(this, Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK);
+        if (_abie == null)
+            _abie = new Abie(this, Keys.BIE_USER_EXT_REVISION_EXT_ABIE_ID_FK);
+
+        return _abie;
     }
 
     public Acc bieUserExtRevisionExtAccIdFk() {
-        return new Acc(this, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK);
+        if (_bieUserExtRevisionExtAccIdFk == null)
+            _bieUserExtRevisionExtAccIdFk = new Acc(this, Keys.BIE_USER_EXT_REVISION_EXT_ACC_ID_FK);
+
+        return _bieUserExtRevisionExtAccIdFk;
     }
 
     public Acc bieUserExtRevisionUserExtAccIdFk() {
-        return new Acc(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK);
+        if (_bieUserExtRevisionUserExtAccIdFk == null)
+            _bieUserExtRevisionUserExtAccIdFk = new Acc(this, Keys.BIE_USER_EXT_REVISION_USER_EXT_ACC_ID_FK);
+
+        return _bieUserExtRevisionUserExtAccIdFk;
     }
 
     public TopLevelAsbiep topLevelAsbiep() {
-        return new TopLevelAsbiep(this, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
+        if (_topLevelAsbiep == null)
+            _topLevelAsbiep = new TopLevelAsbiep(this, Keys.BIE_USER_EXT_REVISION_TOP_LEVEL_ASBIEP_ID_FK);
+
+        return _topLevelAsbiep;
     }
 
     @Override

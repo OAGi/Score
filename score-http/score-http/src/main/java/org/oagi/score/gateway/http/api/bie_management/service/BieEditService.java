@@ -1,13 +1,12 @@
 package org.oagi.score.gateway.http.api.bie_management.service;
 
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.types.ULong;
 import org.oagi.score.data.ACC;
-import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
-import org.oagi.score.service.common.data.AppUser;
-import org.oagi.score.service.common.data.BieState;
 import org.oagi.score.data.TopLevelAsbiep;
+import org.oagi.score.gateway.http.api.DataAccessForbiddenException;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.*;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAbieNode;
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditAsbiepNode;
@@ -15,15 +14,20 @@ import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEdit
 import org.oagi.score.gateway.http.api.bie_management.data.bie_edit.tree.BieEditRef;
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.BieEditTreeController;
 import org.oagi.score.gateway.http.api.bie_management.service.edit_tree.DefaultBieEditTreeController;
-import org.oagi.score.service.common.data.CcState;
 import org.oagi.score.gateway.http.api.cc_management.service.ExtensionService;
+import org.oagi.score.gateway.http.api.code_list_management.data.CodeListState;
 import org.oagi.score.gateway.http.configuration.security.SessionService;
 import org.oagi.score.redis.event.EventListenerContainer;
+import org.oagi.score.repo.api.ScoreRepositoryFactory;
+import org.oagi.score.repo.api.bie.BieReadRepository;
+import org.oagi.score.repo.api.bie.model.BieState;
+import org.oagi.score.repo.api.bie.model.GetReuseBieListRequest;
 import org.oagi.score.repo.api.impl.jooq.entity.Tables;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AppUserRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbieRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsbiepRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
+import org.oagi.score.repo.api.message.model.SendMessageRequest;
 import org.oagi.score.repo.component.abie.AbieNode;
 import org.oagi.score.repo.component.abie.AbieReadRepository;
 import org.oagi.score.repo.component.abie.AbieWriteRepository;
@@ -61,6 +65,9 @@ import org.oagi.score.repo.component.dt.DtReadRepository;
 import org.oagi.score.repo.component.top_level_asbiep.TopLevelAsbiepWriteRepository;
 import org.oagi.score.repo.component.top_level_asbiep.UpdateTopLevelAsbiepRequest;
 import org.oagi.score.repository.TopLevelAsbiepRepository;
+import org.oagi.score.service.common.data.AppUser;
+import org.oagi.score.service.common.data.CcState;
+import org.oagi.score.service.message.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -116,6 +123,15 @@ public class BieEditService implements InitializingBean {
 
     @Autowired
     private TopLevelAsbiepWriteRepository topLevelAsbiepWriteRepository;
+
+    @Autowired
+    private ScoreRepositoryFactory scoreRepositoryFactory;
+
+    @Autowired
+    private BieService bieService;
+
+    @Autowired
+    private MessageService messageService;
 
     private final String PURGE_BIE_EVENT_NAME = "purgeBieEvent";
 
@@ -177,8 +193,103 @@ public class BieEditService implements InitializingBean {
         return treeController.getDetail(node);
     }
 
+    public boolean hasReuseBie(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId) {
+        BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
+        return !bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
+                        .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                        .getTopLevelAsbiepList().isEmpty();
+    }
+
+    private void ensureReusingRelationships(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
+        // Issue #1010
+        BieReadRepository bieReadRepository = scoreRepositoryFactory.createBieReadRepository();
+        StringBuilder failureMessageBody = new StringBuilder();
+
+        if (state == BieState.WIP) { // 'Move to WIP' Case.
+            List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusingTopLevelAsbiepList =
+                    bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
+                            .withTopLevelAsbiepId(topLevelAsbiepId, true))
+                            .getTopLevelAsbiepList();
+
+            reusingTopLevelAsbiepList = reusingTopLevelAsbiepList.stream()
+                    .filter(e -> e.getState().getLevel() > state.getLevel()).collect(Collectors.toList());
+            if (!reusingTopLevelAsbiepList.isEmpty()) {
+                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
+                failureMessageBody = failureMessageBody.append("\n---\n[**")
+                        .append(source.get(ASCCP.PROPERTY_TERM))
+                        .append("**](")
+                        .append("/profile_bie/edit/").append(topLevelAsbiepId)
+                        .append(") (")
+                        .append(source.get(ASBIEP.GUID))
+                        .append(") cannot move to ")
+                        .append(state)
+                        .append(" because the following reusing BIEs:")
+                        .append("\n\n");
+                for (org.oagi.score.repo.api.bie.model.TopLevelAsbiep target : reusingTopLevelAsbiepList) {
+                    failureMessageBody = failureMessageBody.append("- [")
+                            .append(target.getPropertyTerm())
+                            .append("](")
+                            .append("/profile_bie/edit/").append(target.getTopLevelAsbiepId())
+                            .append(") (")
+                            .append(target.getGuid())
+                            .append(") - ")
+                            .append(target.getState()).append(" state")
+                            .append("\n");
+                }
+            }
+        } else {
+            List<org.oagi.score.repo.api.bie.model.TopLevelAsbiep> reusedTopLevelAsbiepList =
+                    bieReadRepository.getReuseBieList(new GetReuseBieListRequest(sessionService.asScoreUser(user))
+                            .withTopLevelAsbiepId(topLevelAsbiepId, false))
+                            .getTopLevelAsbiepList();
+
+            reusedTopLevelAsbiepList = reusedTopLevelAsbiepList.stream()
+                    .filter(e -> e.getState().getLevel() < state.getLevel()).collect(Collectors.toList());
+
+            if (!reusedTopLevelAsbiepList.isEmpty()) {
+                Record source = bieService.selectAsccpPropertyTermAndAsbiepGuidByTopLevelAsbiepId(ULong.valueOf(topLevelAsbiepId));
+                failureMessageBody = failureMessageBody.append("\n---\n[**")
+                        .append(source.get(ASCCP.PROPERTY_TERM))
+                        .append("**](")
+                        .append("/profile_bie/edit/").append(topLevelAsbiepId)
+                        .append(") (")
+                        .append(source.get(ASBIEP.GUID))
+                        .append(") cannot move to ")
+                        .append(state)
+                        .append(" because the following reused BIEs:")
+                        .append("\n\n");
+                for (org.oagi.score.repo.api.bie.model.TopLevelAsbiep target : reusedTopLevelAsbiepList) {
+                    failureMessageBody = failureMessageBody.append("- [")
+                            .append(target.getPropertyTerm())
+                            .append("](")
+                            .append("/profile_bie/edit/").append(target.getTopLevelAsbiepId())
+                            .append(") (")
+                            .append(target.getGuid())
+                            .append(") - ")
+                            .append(target.getState()).append(" state")
+                            .append("\n");
+                }
+            }
+        }
+
+        if (failureMessageBody.length() > 0) {
+            SendMessageRequest sendMessageRequest = new SendMessageRequest(
+                    sessionService.getScoreSystemUser())
+                    .withRecipient(sessionService.asScoreUser(user))
+                    .withSubject("Failed to update BIE state")
+                    .withBody(failureMessageBody.toString())
+                    .withBodyContentType(SendMessageRequest.MARKDOWN_CONTENT_TYPE);
+
+            BigInteger errorMessageId = messageService.asyncSendMessage(sendMessageRequest).join()
+                    .getMessageIds().values().iterator().next();
+            throw new DataAccessForbiddenException(sendMessageRequest.getSubject(), errorMessageId);
+        }
+    }
+
     @Transactional
     public void updateState(AuthenticatedPrincipal user, BigInteger topLevelAsbiepId, BieState state) {
+        ensureReusingRelationships(user, topLevelAsbiepId, state);
+
         BieEditTreeController treeController = getTreeController(user, topLevelAsbiepId);
         treeController.updateState(state);
     }

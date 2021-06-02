@@ -85,18 +85,26 @@ public class BbieWriteRepository {
             }
 
             bbieRecord.setDefinition(bbie.getDefinition());
-            if (bbie.isEmptyCardinality()) {
-                BccRecord bccRecord = bccReadRepository.getBccByManifestId(bbie.getBasedBccManifestId());
-                if (bccRecord == null) {
-                    throw new IllegalArgumentException();
-                }
+            BccRecord bccRecord = bccReadRepository.getBccByManifestId(bbie.getBasedBccManifestId());
+            if (bccRecord == null) {
+                throw new IllegalArgumentException();
+            }
 
+            if (bbie.getCardinalityMin() == null) {
                 bbieRecord.setCardinalityMin(bccRecord.getCardinalityMin());
-                bbieRecord.setCardinalityMax(bccRecord.getCardinalityMax());
             } else {
                 bbieRecord.setCardinalityMin(bbie.getCardinalityMin());
+            }
+
+            if (bbie.getCardinalityMax() == null) {
+                bbieRecord.setCardinalityMax(bccRecord.getCardinalityMax());
+            } else {
                 bbieRecord.setCardinalityMax(bbie.getCardinalityMax());
             }
+            if (bbieRecord.getCardinalityMax() > 0 && bbieRecord.getCardinalityMin() > bbieRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
+            }
+            
             bbieRecord.setExample(bbie.getExample());
             bbieRecord.setRemark(bbie.getRemark());
 
@@ -162,9 +170,16 @@ public class BbieWriteRepository {
                 bbieRecord.setDefinition(emptyToNull(bbie.getDefinition()));
             }
 
-            if (!bbie.isEmptyCardinality()) {
+            if (bbie.getCardinalityMin() != null) {
                 bbieRecord.setCardinalityMin(bbie.getCardinalityMin());
+            }
+
+            if (bbie.getCardinalityMax() != null) {
                 bbieRecord.setCardinalityMax(bbie.getCardinalityMax());
+            }
+
+            if (bbieRecord.getCardinalityMax() > 0 && bbieRecord.getCardinalityMin() > bbieRecord.getCardinalityMax()) {
+                throw new IllegalArgumentException("Cardinality is not valid.");
             }
 
             if (bbie.getExample() != null) {

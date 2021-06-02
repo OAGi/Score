@@ -64,12 +64,15 @@ export class AppendAssociationDialogComponent implements OnInit {
               private confirmDialogService: ConfirmDialogService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.action = data.action;
+    if (this.data.isGlobal) {
+      this.typeList = ['BCCP'];
+    }
   }
 
   ngOnInit() {
     this.request = new CcListRequest();
     this.request.release.releaseId = this.data.releaseId;
-    this.request.types = this.typeList;
+    this.request.types = this.data.isGlobal ? ['BCCP'] : this.typeList;
     this.request.excludes = this.data.excludes ? this.data.excludes : [];
 
     this.paginator.pageIndex = 0;

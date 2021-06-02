@@ -2,11 +2,11 @@ package org.oagi.score.repo;
 
 import org.jooq.*;
 import org.jooq.types.ULong;
-import org.oagi.score.service.common.data.BieState;
-import org.oagi.score.service.common.data.AccessPrivilege;
 import org.oagi.score.gateway.http.helper.ScoreGuid;
+import org.oagi.score.repo.api.bie.model.BieState;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.AsccpManifestRecord;
 import org.oagi.score.repo.api.impl.jooq.entity.tables.records.TopLevelAsbiepRecord;
+import org.oagi.score.service.common.data.AccessPrivilege;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 import static org.jooq.impl.DSL.and;
 import static org.jooq.impl.DSL.or;
-import static org.oagi.score.service.common.data.BieState.*;
 import static org.oagi.score.gateway.http.helper.Utility.sha256;
 import static org.oagi.score.gateway.http.helper.filter.ContainsFilterBuilder.contains;
+import static org.oagi.score.repo.api.bie.model.BieState.*;
 import static org.oagi.score.repo.api.impl.jooq.entity.Tables.*;
 
 @Repository
@@ -476,6 +476,15 @@ public class BusinessInformationEntityRepository {
             return this;
         }
 
+        public SelectBieListArguments setIncludeTopLevelAsbiepIds(List<BigInteger> includeTopLevelAsbiepIds) {
+            if (!includeTopLevelAsbiepIds.isEmpty()) {
+                conditions.add(TOP_LEVEL_ASBIEP.TOP_LEVEL_ASBIEP_ID.in(
+                        includeTopLevelAsbiepIds.stream().map(e -> ULong.valueOf(e)).collect(Collectors.toList())
+                ));
+            }
+            return this;
+        }
+
         public SelectBieListArguments setStates(List<BieState> states) {
             if (!states.isEmpty()) {
                 conditions.add(TOP_LEVEL_ASBIEP.STATE.in(states.stream().map(e -> e.name()).collect(Collectors.toList())));
@@ -731,6 +740,17 @@ public class BusinessInformationEntityRepository {
                 .where(and(ASCCP_MANIFEST.ASCCP_ID.eq(ULong.valueOf(asccp_id)),
                         ASCCP_MANIFEST.RELEASE_ID.eq(ULong.valueOf(releaseId))))
                 .fetchOptionalInto(AsccpManifestRecord.class).orElse(null);
+    }
+
+    public List<BigInteger> getReusingTopLevelAsbiepIds(BigInteger reusedTopLevelAsbiepId) {
+        return dslContext.select(ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID)
+                .from(ASBIE)
+                .join(ASBIEP).on(ASBIE.TO_ASBIEP_ID.eq(ASBIEP.ASBIEP_ID))
+                .where(and(
+                        ASBIE.OWNER_TOP_LEVEL_ASBIEP_ID.notEqual(ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID),
+                        ASBIEP.OWNER_TOP_LEVEL_ASBIEP_ID.eq(ULong.valueOf(reusedTopLevelAsbiepId))
+                ))
+                .fetchInto(BigInteger.class);
     }
 
 }

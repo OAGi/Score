@@ -143,12 +143,21 @@ public class BizCtx extends TableImpl<BizCtxRecord> {
         return Arrays.<ForeignKey<BizCtxRecord, ?>>asList(Keys.BIZ_CTX_CREATED_BY_FK, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
     }
 
+    private transient AppUser _bizCtxCreatedByFk;
+    private transient AppUser _bizCtxLastUpdatedByFk;
+
     public AppUser bizCtxCreatedByFk() {
-        return new AppUser(this, Keys.BIZ_CTX_CREATED_BY_FK);
+        if (_bizCtxCreatedByFk == null)
+            _bizCtxCreatedByFk = new AppUser(this, Keys.BIZ_CTX_CREATED_BY_FK);
+
+        return _bizCtxCreatedByFk;
     }
 
     public AppUser bizCtxLastUpdatedByFk() {
-        return new AppUser(this, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
+        if (_bizCtxLastUpdatedByFk == null)
+            _bizCtxLastUpdatedByFk = new AppUser(this, Keys.BIZ_CTX_LAST_UPDATED_BY_FK);
+
+        return _bizCtxLastUpdatedByFk;
     }
 
     @Override

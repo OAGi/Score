@@ -59,7 +59,6 @@ export class ReuseBieDialogComponent implements OnInit {
     this.request.filters.asccpManifestId = this.asbiepNode.asccpManifestId;
     this.request.release.releaseId = this.asbiepNode.releaseId;
     this.request.excludeTopLevelAsbiepIds = [this.asbiepNode.topLevelAsbiepId,];
-    this.request.states = ['Production'];
     if (this.isDeveloper) {
       this.request.ownedByDeveloper = true;
     }

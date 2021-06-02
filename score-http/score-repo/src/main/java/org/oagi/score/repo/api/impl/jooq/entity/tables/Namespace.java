@@ -158,16 +158,29 @@ public class Namespace extends TableImpl<NamespaceRecord> {
         return Arrays.<ForeignKey<NamespaceRecord, ?>>asList(Keys.NAMESPACE_OWNER_USER_ID_FK, Keys.NAMESPACE_CREATED_BY_FK, Keys.NAMESPACE_LAST_UPDATED_BY_FK);
     }
 
+    private transient AppUser _namespaceOwnerUserIdFk;
+    private transient AppUser _namespaceCreatedByFk;
+    private transient AppUser _namespaceLastUpdatedByFk;
+
     public AppUser namespaceOwnerUserIdFk() {
-        return new AppUser(this, Keys.NAMESPACE_OWNER_USER_ID_FK);
+        if (_namespaceOwnerUserIdFk == null)
+            _namespaceOwnerUserIdFk = new AppUser(this, Keys.NAMESPACE_OWNER_USER_ID_FK);
+
+        return _namespaceOwnerUserIdFk;
     }
 
     public AppUser namespaceCreatedByFk() {
-        return new AppUser(this, Keys.NAMESPACE_CREATED_BY_FK);
+        if (_namespaceCreatedByFk == null)
+            _namespaceCreatedByFk = new AppUser(this, Keys.NAMESPACE_CREATED_BY_FK);
+
+        return _namespaceCreatedByFk;
     }
 
     public AppUser namespaceLastUpdatedByFk() {
-        return new AppUser(this, Keys.NAMESPACE_LAST_UPDATED_BY_FK);
+        if (_namespaceLastUpdatedByFk == null)
+            _namespaceLastUpdatedByFk = new AppUser(this, Keys.NAMESPACE_LAST_UPDATED_BY_FK);
+
+        return _namespaceLastUpdatedByFk;
     }
 
     @Override

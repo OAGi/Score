@@ -206,6 +206,13 @@
                       <span class="context-menu-item" [attr.disabled]="true"
                             [matTooltip]="'Developer cannot create ABIE Extension'">Create ABIE Extension Globally</span>
                     </ng-template>
+                    <ng-template contextMenuItem divider="true" *ngIf="canEdit" [visible]="isUsableChildren || isCardinalityEditable"></ng-template>
+                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isUsableChildren" (execute)="enableChildren($event.item)">
+                      <span class="context-menu-item">Enable Children</span>
+                    </ng-template>
+                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isCardinalityEditable" (execute)="setMaxCardinality($event.item)">
+                      <span class="context-menu-item">Set Children Max Cardinality to 1</span>
+                    </ng-template>
                   </context-menu>
 
                   <context-menu #endUserContextMenu>
@@ -237,6 +244,13 @@
                     <ng-template contextMenuItem let-item (execute)="createGlobalAbieExtension($event.item)" [visible]="isExtension">
                       <span class="context-menu-item">Create ABIE Extension Globally</span>
                     </ng-template>
+                    <ng-template contextMenuItem divider="true" *ngIf="canEdit" [visible]="isUsableChildren || isCardinalityEditable"></ng-template>
+                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isUsableChildren" (execute)="enableChildren($event.item)">
+                      <span class="context-menu-item">Enable Children</span>
+                    </ng-template>
+                    <ng-template contextMenuItem let-item *ngIf="canEdit" [visible]="isCardinalityEditable" (execute)="setMaxCardinality($event.item)">
+                      <span class="context-menu-item">Set Children Max Cardinality to 1</span>
+                    </ng-template>
                   </context-menu>
                 </mat-card-content>
               </mat-card>
@@ -244,7 +258,7 @@
 
             <as-split-area class="right-panel" size="70" [style.height.px]="innerHeight + 17">
               <!-- ABIE -->
-              <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail()">
+              <div class="bie-edit-detail-panel scroll" *ngIf="isAbieDetail() && asAbieDetail().isLoaded ">
                 <mat-tab-group mat-align-tabs="start">
                   <mat-tab label="{{ selectedNode.name }}">
                     <div class="bie-edit-detail-container">
@@ -426,7 +440,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
-                            <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asAsbiepDetail().ascc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asAsbiepDetail().asbie && asAsbiepDetail().asbie.cardinalityMax === 0 &&
@@ -647,7 +661,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
-                            <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbiepDetail().bcc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asBbiepDetail().bbie.cardinalityMax === 0 &&
@@ -896,7 +910,7 @@
                         </div>
                         <div class="col-6">
                           <mat-form-field>
-                            <input matInput placeholder="{{ 'BIE_EDIT.MAX' | translate }}" required
+                            <input matInput placeholder="Cardinality Max (-1 for unbounded, Standard is {{ asBbieScDetail().bdtSc.cardinalityMax | unbounded}})" required
                                    [formControl]="bieCardinalityMax"
                                    [value]="bieCardinalityMax.value | unbounded">
                             <mat-hint *ngIf="bieCardinalityMax.valid && asBbieScDetail().bbieSc.cardinalityMax === 0 &&

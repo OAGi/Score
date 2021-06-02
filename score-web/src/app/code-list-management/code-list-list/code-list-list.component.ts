@@ -106,12 +106,12 @@ export class CodeListListComponent implements OnInit {
     ]).subscribe(([releases, loginIds]) => {
       this.releases.push(...releases);
       if (this.releases.length > 0) {
-        const savedReleaseId = loadBranch(this.auth.getUserToken(), 'CodeList');
+        const savedReleaseId = loadBranch(this.auth.getUserToken(), this.request.cookieType);
         if (savedReleaseId) {
           this.request.release = this.releases.filter(e => e.releaseId === savedReleaseId)[0];
           if (!this.request.release) {
             this.request.release = this.releases[0];
-            saveBranch(this.auth.getUserToken(), 'CodeList', this.request.release.releaseId);
+            saveBranch(this.auth.getUserToken(), this.request.cookieType, this.request.release.releaseId);
           }
         } else {
           this.request.release = this.releases[0];
@@ -141,7 +141,7 @@ export class CodeListListComponent implements OnInit {
 
   onChange(property?: string, source?) {
     if (property === 'branch') {
-      saveBranch(this.auth.getUserToken(), 'CodeList', source.releaseId);
+      saveBranch(this.auth.getUserToken(), this.request.cookieType, source.releaseId);
     }
 
     this.paginator.pageIndex = 0;
